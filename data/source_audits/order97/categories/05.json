@@ -1,0 +1,2157 @@
+[
+  {
+    "row_id": "rule:05:05.00:1",
+    "requirements": [
+      {
+        "requirement_id": "05.00-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Roll all dice for a given attack-pool step together.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_grouped_saves_roll_before_low_to_high_damage_allocation",
+            "role": "semantic",
+            "assertion": "assert save_context_ids == ['phase14e-grouped-saves:pool-001:attack-002', 'phase14e-grouped-saves:pool-001:attack-001', 'phase14e-grouped-saves:pool-001:attack-003']",
+            "proves": "The three saves are rolled before damage, then walked in die-result order1,2,6."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.00-obligation-02",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Hit resolution precedes wound resolution.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_no_ability_sequence_resolves_and_emits_ordered_hooks",
+            "role": "semantic",
+            "assertion": "assert emitted_steps == [AttackSequenceStep.HIT, AttackSequenceStep.CRITICAL_HIT, AttackSequenceStep.WOUND, AttackSequenceStep.CRITICAL_WOUND, AttackSequenceStep.ALLOCATE, AttackSequenceStep.SAVE, AttackSequenceStep.DAMAGE]",
+            "proves": "A real successful critical-hit/critical-wound attack emits HIT, CRITICAL_HIT, WOUND, CRITICAL_WOUND, ALLOCATE, SAVE and DAMAGE in that order."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.00-obligation-03",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Wound resolution precedes saves.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_no_ability_sequence_resolves_and_emits_ordered_hooks",
+            "role": "semantic",
+            "assertion": "assert emitted_steps == [AttackSequenceStep.HIT, AttackSequenceStep.CRITICAL_HIT, AttackSequenceStep.WOUND, AttackSequenceStep.CRITICAL_WOUND, AttackSequenceStep.ALLOCATE, AttackSequenceStep.SAVE, AttackSequenceStep.DAMAGE]",
+            "proves": "A real successful critical-hit/critical-wound attack emits HIT, CRITICAL_HIT, WOUND, CRITICAL_WOUND, ALLOCATE, SAVE and DAMAGE in that order."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.00-obligation-04",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Save rolls precede damage infliction.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_no_ability_sequence_resolves_and_emits_ordered_hooks",
+            "role": "semantic",
+            "assertion": "assert emitted_steps == [AttackSequenceStep.HIT, AttackSequenceStep.CRITICAL_HIT, AttackSequenceStep.WOUND, AttackSequenceStep.CRITICAL_WOUND, AttackSequenceStep.ALLOCATE, AttackSequenceStep.SAVE, AttackSequenceStep.DAMAGE]",
+            "proves": "A real successful critical-hit/critical-wound attack emits HIT, CRITICAL_HIT, WOUND, CRITICAL_WOUND, ALLOCATE, SAVE and DAMAGE in that order."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_grouped_saves_roll_before_low_to_high_damage_allocation",
+            "role": "semantic",
+            "assertion": "assert max(save_roll_indexes) < min(damage_record_indexes)",
+            "proves": "Every pooled save roll precedes the first damage application."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.00-obligation-05",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Inflict damage only after hit, wound, and save processing.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_no_ability_sequence_resolves_and_emits_ordered_hooks",
+            "role": "semantic",
+            "assertion": "assert emitted_steps == [AttackSequenceStep.HIT, AttackSequenceStep.CRITICAL_HIT, AttackSequenceStep.WOUND, AttackSequenceStep.CRITICAL_WOUND, AttackSequenceStep.ALLOCATE, AttackSequenceStep.SAVE, AttackSequenceStep.DAMAGE]",
+            "proves": "A real successful critical-hit/critical-wound attack emits HIT, CRITICAL_HIT, WOUND, CRITICAL_WOUND, ALLOCATE, SAVE and DAMAGE in that order."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_grouped_saves_roll_before_low_to_high_damage_allocation",
+            "role": "semantic",
+            "assertion": "assert max(save_roll_indexes) < min(damage_record_indexes)",
+            "proves": "Every pooled save roll precedes the first damage application."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.00-obligation-06",
+        "source_blocks": [
+          7
+        ],
+        "summary": "A failed attack ends its attack sequence.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_dispatch.py:resolve_attack_sequence_until_blocked"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_random_damage_is_not_rolled_for_saved_attacks",
+            "role": "semantic",
+            "assertion": "assert remaining_sequence is None",
+            "proves": "A saved attack leaves no remaining attack sequence."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_random_damage_is_not_rolled_for_saved_attacks",
+            "role": "semantic",
+            "assertion": "assert not any((record.event_type == 'random_characteristic_rolled' and cast(dict[str, object], record.payload)['characteristic'] == 'damage' for record in lifecycle.decision_controller.event_log.records))",
+            "proves": "The saved attack terminates before damage is rolled."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.00-obligation-07",
+        "source_blocks": [
+          7
+        ],
+        "summary": "An attack ends after inflicting damage.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_dispatch.py:resolve_attack_sequence_until_blocked"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert sequence.is_complete",
+            "proves": "The real shared-facade attack sequence has completed all attack pools before returning completion."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.00-obligation-08",
+        "source_blocks": [
+          7
+        ],
+        "summary": "The pooled sequence ends once every attack fails or inflicts damage.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_dispatch.py:resolve_attack_sequence_until_blocked"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert sequence.is_complete",
+            "proves": "The real shared-facade attack sequence has completed all attack pools before returning completion."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:05:05.01:1",
+    "requirements": [
+      {
+        "requirement_id": "05.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Each attack die produces one D6 hit roll.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_model.py:attack_sequence_hit_roll_spec"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_hit_and_wound_rolls_each_request_one_six_sided_die",
+            "role": "semantic",
+            "assertion": "assert spec.expression.quantity == 1",
+            "proves": "The hit and wound owners each request exactly one die."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_hit_and_wound_rolls_each_request_one_six_sided_die",
+            "role": "semantic",
+            "assertion": "assert spec.expression.sides == 6",
+            "proves": "Both die requests use six sides."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.01-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An unmodified one fails the hit roll.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_critical_hits.py::test_critical_hits_respect_raw_faces_and_mode_floors",
+            "role": "semantic",
+            "assertion": "assert hit.successful is expected",
+            "proves": "The parameterized natural-one case fails independently of hit modifier."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.01-obligation-03",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An unmodified six is a critical hit.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_critical_hits.py::test_critical_hits_respect_raw_faces_and_mode_floors",
+            "role": "semantic",
+            "assertion": "assert hit.critical is critical",
+            "proves": "The parameterized natural-six case is a critical hit."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.01-obligation-04",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Otherwise a hit succeeds when the modified result meets BS or WS.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_critical_hits.py::test_critical_hits_respect_raw_faces_and_mode_floors",
+            "role": "semantic",
+            "assertion": "assert hit.successful is expected",
+            "proves": "The parameterized ordinary hit case compares the modified result to its hit target."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.01-obligation-05",
+        "source_blocks": [
+          2
+        ],
+        "summary": "All remaining hit results fail.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_critical_hits.py::test_critical_hits_respect_raw_faces_and_mode_floors",
+            "role": "semantic",
+            "assertion": "assert hit.successful is expected",
+            "proves": "The parameterized below-target case fails."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:05:05.01.01:1",
+    "requirements": [
+      {
+        "requirement_id": "05.01.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A critical hit is a successful hit.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_no_ability_sequence_resolves_and_emits_ordered_hooks",
+            "role": "semantic",
+            "assertion": "assert emitted_steps == [AttackSequenceStep.HIT, AttackSequenceStep.CRITICAL_HIT, AttackSequenceStep.WOUND, AttackSequenceStep.CRITICAL_WOUND, AttackSequenceStep.ALLOCATE, AttackSequenceStep.SAVE, AttackSequenceStep.DAMAGE]",
+            "proves": "A real successful critical-hit/critical-wound attack emits HIT, CRITICAL_HIT, WOUND, CRITICAL_WOUND, ALLOCATE, SAVE and DAMAGE in that order."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.01.01-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A critical wound is a successful wound.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_no_ability_sequence_resolves_and_emits_ordered_hooks",
+            "role": "semantic",
+            "assertion": "assert emitted_steps == [AttackSequenceStep.HIT, AttackSequenceStep.CRITICAL_HIT, AttackSequenceStep.WOUND, AttackSequenceStep.CRITICAL_WOUND, AttackSequenceStep.ALLOCATE, AttackSequenceStep.SAVE, AttackSequenceStep.DAMAGE]",
+            "proves": "A real successful critical-hit/critical-wound attack emits HIT, CRITICAL_HIT, WOUND, CRITICAL_WOUND, ALLOCATE, SAVE and DAMAGE in that order."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.01.01-obligation-03",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Critical-result consumers such as Lethal Hits and Devastating Wounds may trigger.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_hit_wound.py:_roll_wound",
+          "src/warhammer40k_core/engine/attack_sequence_dispatch.py:resolve_attack_sequence_until_blocked"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_lethal_hits.py::test_lethal_hit_offers_both_choices_before_wounding",
+            "role": "semantic",
+            "assertion": "assert tuple((option.option_id for option in request.options)) == ('auto-wound', 'roll-to-wound')",
+            "proves": "A critical Lethal Hit offers auto-wound versus wound-roll choices."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_torrent_anti_and_devastating_wounds_are_attack_sequence_effects",
+            "role": "semantic",
+            "assertion": "assert cast(dict[str, object], wound_payload['payload'])['critical'] is True",
+            "proves": "The Anti threshold produces a critical wound."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_torrent_anti_and_devastating_wounds_are_attack_sequence_effects",
+            "role": "semantic",
+            "assertion": "assert cast(dict[str, object], deferred_payload)['mortal_wounds'] == 1",
+            "proves": "That critical Devastating Wound creates a mortal-wound packet."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:05:05.02:1",
+    "requirements": [
+      {
+        "requirement_id": "05.02-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Each hit that requires a wound roll produces one D6.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_model.py:attack_sequence_wound_roll_spec"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_hit_and_wound_rolls_each_request_one_six_sided_die",
+            "role": "semantic",
+            "assertion": "assert spec.expression.quantity == 1",
+            "proves": "The wound owner requests exactly one die."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_hit_and_wound_rolls_each_request_one_six_sided_die",
+            "role": "semantic",
+            "assertion": "assert spec.expression.sides == 6",
+            "proves": "The wound request uses a D6."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.02-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An unmodified one fails the wound roll.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_hit_wound.py:_roll_wound"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_real_wound_roll_respects_unmodified_extremes_and_modified_threshold",
+            "role": "semantic",
+            "assertion": "assert result.successful is success",
+            "proves": "Real wound resolution fails unmodified 1 despite +1, succeeds unmodified 6 despite -1, and distinguishes modified 3+1 from 4-1 against equal S/T."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_real_wound_roll_respects_unmodified_extremes_and_modified_threshold",
+            "role": "semantic",
+            "assertion": "assert result.critical is critical",
+            "proves": "Only the unmodified 6 produces a critical wound among these boundary cases."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.02-obligation-03",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An unmodified six is a critical wound.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_hit_wound.py:_roll_wound"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_real_wound_roll_respects_unmodified_extremes_and_modified_threshold",
+            "role": "semantic",
+            "assertion": "assert result.successful is success",
+            "proves": "Real wound resolution fails unmodified 1 despite +1, succeeds unmodified 6 despite -1, and distinguishes modified 3+1 from 4-1 against equal S/T."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_real_wound_roll_respects_unmodified_extremes_and_modified_threshold",
+            "role": "semantic",
+            "assertion": "assert result.critical is critical",
+            "proves": "Only the unmodified 6 produces a critical wound among these boundary cases."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.02-obligation-04",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Strength at least twice Toughness wounds on two-plus.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_wound_roll_table_uses_integer_safe_boundaries",
+            "role": "semantic",
+            "assertion": "assert wound_roll_target_number(strength=8, toughness=4) == 2",
+            "proves": "The exact S/T boundary yields the source-required wound threshold."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.02-obligation-05",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Strength greater than Toughness but less than double wounds on three-plus.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_wound_roll_table_uses_integer_safe_boundaries",
+            "role": "semantic",
+            "assertion": "assert wound_roll_target_number(strength=7, toughness=4) == 3",
+            "proves": "The exact S/T boundary yields the source-required wound threshold."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.02-obligation-06",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Equal Strength and Toughness wounds on four-plus.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_wound_roll_table_uses_integer_safe_boundaries",
+            "role": "semantic",
+            "assertion": "assert wound_roll_target_number(strength=4, toughness=4) == 4",
+            "proves": "The exact S/T boundary yields the source-required wound threshold."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.02-obligation-07",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Strength below Toughness but above half wounds on five-plus.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_wound_roll_table_uses_integer_safe_boundaries",
+            "role": "semantic",
+            "assertion": "assert wound_roll_target_number(strength=3, toughness=4) == 5",
+            "proves": "The exact S/T boundary yields the source-required wound threshold."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.02-obligation-08",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Strength at most half Toughness wounds on six-plus.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_wound_roll_table_uses_integer_safe_boundaries",
+            "role": "semantic",
+            "assertion": "assert wound_roll_target_number(strength=2, toughness=4) == 6",
+            "proves": "The exact S/T boundary yields the source-required wound threshold."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.02-obligation-09",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A modified result meeting the required wound threshold succeeds; remaining results fail.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_hit_wound.py:_roll_wound"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_real_wound_roll_respects_unmodified_extremes_and_modified_threshold",
+            "role": "semantic",
+            "assertion": "assert result.successful is success",
+            "proves": "Real wound resolution fails unmodified 1 despite +1, succeeds unmodified 6 despite -1, and distinguishes modified 3+1 from 4-1 against equal S/T."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_real_wound_roll_respects_unmodified_extremes_and_modified_threshold",
+            "role": "semantic",
+            "assertion": "assert result.critical is critical",
+            "proves": "Only the unmodified 6 produces a critical wound among these boundary cases."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          3
+        ],
+        "classification": "metadata",
+        "reason": "Rendering metadata; does not add a gameplay rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:05:05.02.01:1",
+    "requirements": [
+      {
+        "requirement_id": "05.02.01-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Against an attached unit, use the highest on-battlefield bodyguard Toughness.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_attached_unit_uses_highest_bodyguard_toughness_for_wounds",
+            "role": "semantic",
+            "assertion": "assert wound_payload['toughness'] == 5",
+            "proves": "A real attached target uses its on-battlefield bodyguardT5 rather than its leaderT7."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.02.01-obligation-02",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Otherwise use the highest on-battlefield member Toughness.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_attached_unit_uses_leader_toughness_after_bodyguard_destroyed",
+            "role": "semantic",
+            "assertion": "assert wound_payload['toughness'] == 7",
+            "proves": "Once the bodyguard is destroyed and removed, the real target uses the remaining leaderT7."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:05:05.03:1",
+    "requirements": [
+      {
+        "requirement_id": "05.03-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The opposing player owns saving and allocation choices.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_shooting_unit_selection_and_declaration_use_lifecycle_records",
+            "role": "semantic",
+            "assertion": "assert next_request.actor_id == 'player-b'",
+            "proves": "The real attack pauses for a defender-owned allocation-order decision."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.03-obligation-02",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Every CHARACTER model forms its own allocation group.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_allocation_group_payloads_preserve_roles_and_priority",
+            "role": "semantic",
+            "assertion": "assert leader_group.character_model_ids == (character_model.model_instance_id,)",
+            "proves": "A real attached Character is represented by its own model-specific allocation group."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.03-obligation-03",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Non-CHARACTER models share an allocation group only when W, Sv, and InSv match.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:allocation_groups_for_context"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_noncharacter_allocation_groups_split_each_defensive_characteristic",
+            "role": "semantic",
+            "assertion": "assert len(groups) == 2",
+            "proves": "Independently changing W, Sv or InSv on one physical non-Character model splits the actual allocation groups."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_noncharacter_allocation_groups_split_each_defensive_characteristic",
+            "role": "semantic",
+            "assertion": "assert any((group.model_ids == (model.model_instance_id,) for group in groups))",
+            "proves": "Each altered physical model forms its own group."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_grouped_allocation_splits_real_shimmershield_bearer_before_save_rolls",
+            "role": "semantic",
+            "assertion": "assert len(allocation_groups) == 2",
+            "proves": "A real bearer-only invulnerable grant also separates the bearer before saving rolls."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.03-obligation-04",
+        "source_blocks": [
+          5
+        ],
+        "summary": "The opposing player declares legal allocation-group order.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_grouped_failed_saves_transition_to_next_ordered_group",
+            "role": "semantic",
+            "assertion": "assert grouped_allocation['allocation_order_group_ids'] == [one_model_group['group_id'], later_group['group_id']]",
+            "proves": "A real defender lifecycle decision chooses the group order carried into pooled allocation."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.03-obligation-05",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Wounded non-CHARACTER groups precede unwounded non-CHARACTER groups.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:legal_allocation_group_orders"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_all_wounded_noncharacter_groups_precede_unwounded_groups",
+            "role": "semantic",
+            "assertion": "assert all((order[-1] == unwounded for order in orders))",
+            "proves": "Every legal order places all wounded non-Character groups before the unwounded group."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.03-obligation-06",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Every non-CHARACTER group precedes every CHARACTER group.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_allocation_order_only_exposes_same_tier_choices",
+            "role": "semantic",
+            "assertion": "assert forced_order == ((bodyguard_group, wounded_character_group, unwounded_character_group),)",
+            "proves": "Bodyguards precede Characters, whose wounded group precedes the unwounded Character group."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.03-obligation-07",
+        "source_blocks": [
+          8
+        ],
+        "summary": "Wounded CHARACTER groups precede unwounded CHARACTER groups.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_allocation_order_only_exposes_same_tier_choices",
+            "role": "semantic",
+            "assertion": "assert forced_order == ((bodyguard_group, wounded_character_group, unwounded_character_group),)",
+            "proves": "Bodyguards precede Characters, whose wounded group precedes the unwounded Character group."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.03-obligation-08",
+        "source_blocks": [
+          9
+        ],
+        "summary": "The opposing player rolls one save D6 for each wounding attack.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_grouped_saves_roll_before_low_to_high_damage_allocation",
+            "role": "semantic",
+            "assertion": "assert save_context_ids == ['phase14e-grouped-saves:pool-001:attack-002', 'phase14e-grouped-saves:pool-001:attack-001', 'phase14e-grouped-saves:pool-001:attack-003']",
+            "proves": "The three saves are rolled before damage, then walked in die-result order1,2,6."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:05:05.03.01:1",
+    "requirements": [
+      {
+        "requirement_id": "05.03.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Saving throw and save roll denote the same operation.",
+        "owners": [
+          "src/warhammer40k_core/engine/saves.py:resolve_saving_throw"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_mandatory_saves_and_plunging_fire_are_typed",
+            "role": "semantic",
+            "assertion": "assert saving_throw.successful is True",
+            "proves": "The save-roll operation returns the successful SavingThrow state."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_mandatory_saves_and_plunging_fire_are_typed",
+            "role": "semantic",
+            "assertion": "assert saving_throw.to_payload()['option']['save_kind'] == 'invulnerable'",
+            "proves": "That same SavingThrow payload records the chosen invulnerable save kind."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:05:05.03.02:1",
+    "requirements": [
+      {
+        "requirement_id": "05.03.02-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Hit/wound-dependent profile changes partition attacks into newly identical pools.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_out_of_phase_post_roll_pools_are_ordered_by_active_player",
+            "role": "semantic",
+            "assertion": "assert len(remaining.post_roll_attack_pools.unresolved_pools) == 2",
+            "proves": "A critical-wound-dependent Damage change splits the two real attacks into distinct post-roll pools."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_out_of_phase_post_roll_pools_are_ordered_by_active_player",
+            "role": "invalid",
+            "assertion": "assert invalid_replay.decision_controller.records == paused_records",
+            "proves": "Malformed split-pool selection preserves decision records and the pending attack state."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_out_of_phase_post_roll_pools_are_ordered_by_active_player",
+            "role": "replay",
+            "assertion": "assert first_replay.to_payload() == second_replay.to_payload()",
+            "proves": "Two restored continuations of the chosen split pool produce identical lifecycle payloads."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.03.02-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The active player chooses the new attack pool order.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_out_of_phase_post_roll_pools_are_ordered_by_active_player",
+            "role": "semantic",
+            "assertion": "assert request_payload['active_player_id'] == 'player-b'",
+            "proves": "The out-of-phase attacker owns the active attack scope and selects the split-pool order."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_out_of_phase_post_roll_pools_are_ordered_by_active_player",
+            "role": "invalid",
+            "assertion": "assert invalid_replay.decision_controller.records == paused_records",
+            "proves": "Malformed split-pool selection preserves decision records and the pending attack state."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_out_of_phase_post_roll_pools_are_ordered_by_active_player",
+            "role": "replay",
+            "assertion": "assert first_replay.to_payload() == second_replay.to_payload()",
+            "proves": "Two restored continuations of the chosen split pool produce identical lifecycle payloads."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.03.02-obligation-03",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Each selected pool completes saving and damage before another pool resolves.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_out_of_phase_post_roll_pools_are_ordered_by_active_player",
+            "role": "semantic",
+            "assertion": "assert tuple((cast(dict[str, object], payload['damage_application'])['requested_damage'] for payload in damage_payloads)) == (1, 2)",
+            "proves": "The original and changed weapon profiles keep their distinct Damage1/2 semantics through selected-pool saving and damage."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:05:05.04:1",
+    "requirements": [
+      {
+        "requirement_id": "05.04-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Process save results from lowest to highest.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_grouped_saves_roll_before_low_to_high_damage_allocation",
+            "role": "semantic",
+            "assertion": "assert save_context_ids == ['phase14e-grouped-saves:pool-001:attack-002', 'phase14e-grouped-saves:pool-001:attack-001', 'phase14e-grouped-saves:pool-001:attack-003']",
+            "proves": "The three saves are rolled before damage, then walked in die-result order1,2,6."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Stop allocation when every target model is destroyed.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation_targets.py:damage_allocation_target_state",
+          "src/warhammer40k_core/engine/attack_sequence_dispatch.py:resolve_attack_sequence_until_blocked"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_fight_on_death_only_unit_is_targetable_without_new_damage",
+            "role": "semantic",
+            "assertion": "assert _event_payloads(lifecycle, 'model_logical_death_recorded') == before_destroyed",
+            "proves": "The retained-only target receives no additional logical-death events."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_fight_on_death_only_unit_is_targetable_without_new_damage",
+            "role": "semantic",
+            "assertion": "assert _event_payloads(lifecycle, 'attack_pool_not_allocated')",
+            "proves": "The remaining attack pool is explicitly left unallocated when no living target remains."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04-obligation-03",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Discard attacks exceeding the available target models.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation_targets.py:damage_allocation_target_state",
+          "src/warhammer40k_core/engine/attack_sequence_dispatch.py:resolve_attack_sequence_until_blocked"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_fight_on_death_only_unit_is_targetable_without_new_damage",
+            "role": "semantic",
+            "assertion": "assert _event_payloads(lifecycle, 'model_logical_death_recorded') == before_destroyed",
+            "proves": "The retained-only target receives no additional logical-death events."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_fight_on_death_only_unit_is_targetable_without_new_damage",
+            "role": "semantic",
+            "assertion": "assert _event_payloads(lifecycle, 'attack_pool_not_allocated')",
+            "proves": "The remaining attack pool is explicitly left unallocated when no living target remains."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04-obligation-04",
+        "source_blocks": [
+          2
+        ],
+        "summary": "The opposing player selects a model in the current allocation group.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14k_grouped_damage_requests_defender_model_choice_inside_current_group",
+            "role": "semantic",
+            "assertion": "assert damage_payloads[-1]['model_instance_id'] == selected_model.model_instance_id",
+            "proves": "Damage is applied to the defender-selected fourth model in the current group."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14k_grouped_damage_requests_defender_model_choice_inside_current_group",
+            "role": "semantic",
+            "assertion": "assert request.actor_id == 'player-b'",
+            "proves": "The model-selection request belongs to the defending player."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04-obligation-05",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A wounded member of the current group must receive damage before an unwounded member.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14k_grouped_damage_auto_selects_only_wounded_model_in_current_group",
+            "role": "semantic",
+            "assertion": "assert damage_payloads[-1]['model_instance_id'] == wounded_model.model_instance_id",
+            "proves": "A unique wounded model receives the next allocated wound."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04-obligation-06",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A damaging attack removes wounds equal to its D characteristic.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order58_failed_save_damage_timing.py::test_failed_save_without_replacement_inflicts_weapon_damage",
+            "role": "semantic",
+            "assertion": "assert defender_wounds(lifecycle, defender) == starting - 1",
+            "proves": "After a failed save, the actual defender loses the weapon’s one Damage."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04-obligation-07",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Reaching zero wounds destroys the selected model.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal",
+            "role": "semantic",
+            "assertion": "assert model_by_id(state=state, model_instance_id=attacker_model.model_instance_id).current_wounds == 0",
+            "proves": "Lethal mortal damage leaves the physical model at zero wounds."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_grouped_failed_saves_transition_to_next_ordered_group",
+            "role": "semantic",
+            "assertion": "assert not model_by_id(state=state, model_instance_id=first_group_model.model_instance_id).is_alive",
+            "proves": "A model killed by failed-save damage is no longer alive."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04-obligation-08",
+        "source_blocks": [
+          62
+        ],
+        "summary": "An unmodified saving one inflicts damage.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_save_roll_checks_one_invulnerable_then_armour",
+            "role": "semantic",
+            "assertion": "assert one.resolution_rule is SaveResolutionRule.UNMODIFIED_ONE",
+            "proves": "The ordered save predicate produces the expected source-defined resolution rule."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04-obligation-09",
+        "source_blocks": [
+          62
+        ],
+        "summary": "A save meeting InSv prevents damage regardless of AP.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_save_roll_checks_one_invulnerable_then_armour",
+            "role": "semantic",
+            "assertion": "assert invulnerable_success.resolution_rule is SaveResolutionRule.INVULNERABLE_SAVE",
+            "proves": "The ordered save predicate produces the expected source-defined resolution rule."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04-obligation-10",
+        "source_blocks": [
+          62
+        ],
+        "summary": "A save meeting Sv after applying AP prevents damage.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_save_roll_checks_one_invulnerable_then_armour",
+            "role": "semantic",
+            "assertion": "assert armour_success.resolution_rule is SaveResolutionRule.ARMOUR_SAVE",
+            "proves": "The ordered save predicate produces the expected source-defined resolution rule."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04-obligation-11",
+        "source_blocks": [
+          62
+        ],
+        "summary": "Any remaining failed save inflicts damage.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order58_failed_save_damage_timing.py::test_failed_save_without_replacement_inflicts_weapon_damage",
+            "role": "semantic",
+            "assertion": "assert defender_wounds(lifecycle, defender) == starting - 1",
+            "proves": "After a failed save, the actual defender loses the weapon’s one Damage."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          3
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      },
+      {
+        "source_blocks": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "classification": "example",
+        "reason": "Illustration of the separately inventoried operative rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:05:05.04.01:1",
+    "requirements": [
+      {
+        "requirement_id": "05.04.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Allocation begins with the first declared group.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_grouped_failed_saves_transition_to_next_ordered_group",
+            "role": "semantic",
+            "assertion": "assert damage_model_ids[:2] == [first_group_model.model_instance_id, cast(list[str], later_group['model_ids'])[0]]",
+            "proves": "The submitted allocation order is used: destroy the first group model, then allocate to the next group."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04.01-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "After every model in the current group is destroyed, advance to the next declared group.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_grouped_failed_saves_transition_to_next_ordered_group",
+            "role": "semantic",
+            "assertion": "assert damage_model_ids[:2] == [first_group_model.model_instance_id, cast(list[str], later_group['model_ids'])[0]]",
+            "proves": "The submitted allocation order is used: destroy the first group model, then allocate to the next group."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:05:05.04.02:1",
+    "requirements": [],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "cross_reference",
+        "reason": "Explicit referral to the operative clause in another source row."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:05:05.04.03:1",
+    "requirements": [
+      {
+        "requirement_id": "05.04.03-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Reaching Resolve Damage establishes suffered-damage status even if wounds are subsequently ignored or not lost.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_damage_resolution.py:_resolve_lost_wound_stage",
+          "src/warhammer40k_core/engine/attack_sequence_hit_wound.py:_emit_damage_step_event"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_zero_damage_still_reaches_resolve_damage_without_losing_wounds",
+            "role": "semantic",
+            "assertion": "assert len(damage) == 1",
+            "proves": "The attack records its actual Resolve Damage step after Damage is replaced with0."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_zero_damage_still_reaches_resolve_damage_without_losing_wounds",
+            "role": "semantic",
+            "assertion": "assert defender_wounds(lifecycle, defender) == before",
+            "proves": "That recorded Resolve Damage step occurs even though the defender loses no wounds."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:05:05.04.04:1",
+    "requirements": [
+      {
+        "requirement_id": "05.04.04-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A unit is destroyed when all of its member models are destroyed.",
+        "owners": [
+          "src/warhammer40k_core/engine/primary_unit_destruction_tracking.py:record_primary_unit_destruction_for_logical_completion"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_primary_destruction_capture_does_not_complete_attached_unit_for_bodyguard_only",
+            "role": "semantic",
+            "assertion": "assert not state.primary_unit_destruction_states",
+            "proves": "Destroying the Bodyguard component leaves the attached rules unit undestroyed."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_primary_destruction_capture_does_not_complete_attached_unit_for_bodyguard_only",
+            "role": "semantic",
+            "assertion": "assert all((model.is_alive for model in state.army_definitions[0].unit_by_id('army-alpha:leader-unit').own_models))",
+            "proves": "The attached Leader remains alive."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn",
+            "role": "semantic",
+            "assertion": "assert destruction.destroyed_unit_instance_id == defender.unit_instance_id",
+            "proves": "The all-models-dead unit is recorded as destroyed."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04.04-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Destroyed-model rules resolve before physical removal.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks",
+            "role": "semantic",
+            "assertion": "assert event_index_by_id[reaction_window_event.event_id] < event_index_by_id[mandatory_reaction_event.event_id] < event_index_by_id[destroyed_event.event_id]",
+            "proves": "The mandatory destruction reaction resolves before the physical destroyed-model event."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04.04-obligation-03",
+        "source_blocks": [
+          2
+        ],
+        "summary": "For attack destruction, deferred destroyed-model rules and removal wait until the attacking unit finishes unless an explicit exception applies.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks",
+            "role": "semantic",
+            "assertion": "assert event_index_by_id[attacks_resolved_event.event_id] < event_index_by_id[reaction_window_event.event_id]",
+            "proves": "All attacking-unit attacks finish before the deferred destroyed-model reaction window."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks",
+            "role": "replay",
+            "assertion": "assert pre_boundary_shooting.attack_sequence == remaining",
+            "proves": "Persistence retains the exact deferred destruction queue before the attack boundary."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks",
+            "role": "invalid",
+            "assertion": "with pytest.raises(GameLifecycleError, match='Pending attack destruction queue order drift'):\n    GameLifecycle.from_payload(reordered_pre_boundary_checkpoint)",
+            "proves": "Reordering the historical destruction queue is rejected during restore."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04.04-obligation-04",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Destroyed models cannot use abilities or be selected or targeted absent an explicit exception.",
+        "owners": [
+          "src/warhammer40k_core/engine/catalog_modifier_ignore.py:modifier_ignore_permissions_for_subject",
+          "src/warhammer40k_core/engine/damage_allocation.py:allocation_groups_for_context"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_catalog_rule_runtime_consumers.py::test_modifier_ignore_subject_retains_authenticated_destroyed_bearer_permission",
+            "role": "semantic",
+            "assertion": "assert modifier_ignore_permissions_for_subject(state=state, ability_index=index, unit_instance_id=unit.unit_instance_id, model_instance_id=model_id, kind=ModifierIgnoreKind.HIT_ROLL) == ()",
+            "proves": "An ordinary destroyed bearer supplies no modifier-ignore ability."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_attached_target_uses_retained_component_geometry_but_living_allocation",
+            "role": "semantic",
+            "assertion": "assert awaiting_model.model_instance_id not in allocation_context.alive_model_ids",
+            "proves": "Even an explicitly retained dead model is excluded from living allocation candidates."
+          },
+          {
+            "nodeid": "tests/unit/test_crushing_impact.py::test_crushing_impact_rejects_a_destroyed_but_retained_selected_model",
+            "role": "semantic",
+            "assertion": "assert status.status_kind is LifecycleStatusKind.INVALID",
+            "proves": "Selecting a destroyed model for a fresh movement-end effect is rejected."
+          },
+          {
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_destroyed_selected_target_remains_an_explicit_unavailable_charge_obligation",
+            "role": "semantic",
+            "assertion": "assert constraint.unavailable_target_identity_ids == (marked.unit_instance_id,)",
+            "proves": "A destroyed required Charge target is explicitly unavailable."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04.04-obligation-05",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Destroyed-by-player credit applies to the player's model attacks.",
+        "owners": [
+          "src/warhammer40k_core/engine/primary_unit_destruction_tracking.py:record_primary_unit_destruction_for_logical_completion"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn",
+            "role": "semantic",
+            "assertion": "assert comparison_metadata['enemy_units_destroyed'] == 1",
+            "proves": "A real attack killing an enemy unit contributes exactly one enemy destruction to the attacking player’s scoring evidence."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04.04-obligation-06",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Destroyed-by-player credit applies to the player's own rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_damage_resolution.py:_resolve_deadly_demise_secondary_destroyed_models"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_reaction",
+            "role": "semantic",
+            "assertion": "assert attribution.destroying_player_id == 'player-b'",
+            "proves": "A Deadly Demise casualty is attributed to the exploding model’s player."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_reaction",
+            "role": "semantic",
+            "assertion": "assert attribution.source_rules_unit_instance_id == defender.unit_instance_id",
+            "proves": "The source rules-unit identity is the exploding model’s unit."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04.04-obligation-07",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Destruction by other means does not receive that player's kill credit.",
+        "owners": [
+          "src/warhammer40k_core/engine/primary_unit_destruction_tracking.py:record_primary_unit_destruction_for_logical_completion"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17g_chaos_daemons_shadow_legion.py::test_fade_to_darkness_ignores_unattributed_fight_enemy_destruction",
+            "role": "semantic",
+            "assertion": "assert _event_count(decisions, enhancements.ELIGIBLE_EVENT) == 0",
+            "proves": "A fight-phase enemy death without attributed attacker grants no destroyed-by-player eligibility."
+          },
+          {
+            "nodeid": "tests/unit/test_phase17g_chaos_daemons_shadow_legion.py::test_fade_to_darkness_ignores_unattributed_fight_enemy_destruction",
+            "role": "semantic",
+            "assertion": "assert enhancements.fade_to_darkness_turn_end_request(TurnEndRequestContext(state=state, decisions=decisions, completed_phase=BattlePhase.FIGHT)) is None",
+            "proves": "The unattributed death exposes no post-kill ability choice."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:05:05.04.05:1",
+    "requirements": [
+      {
+        "requirement_id": "05.04.05-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A model awaiting fight-on-death remains physically on the battlefield.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_fight_on_death_model_retains_presence_and_component_keywords",
+            "role": "semantic",
+            "assertion": "assert model_is_present_on_battlefield(state=state, model_instance_id=defender_model.model_instance_id)",
+            "proves": "The destroyed model awaiting its attack remains present."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04.05-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A retained model remains until its unit attacks or the phase ends, whichever occurs first.",
+        "owners": [
+          "src/warhammer40k_core/engine/forced_fight_queue.py:advance_forced_fight_activations",
+          "src/warhammer40k_core/engine/model_destruction_triggers.py:advance_model_destruction_triggers"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/integration/test_fight_on_death_presence.py::test_order_30_retained_model_fights_from_original_base_then_is_removed",
+            "role": "semantic",
+            "assertion": "assert retained_melee",
+            "proves": "The retained model actually makes its melee attack."
+          },
+          {
+            "nodeid": "tests/integration/test_fight_on_death_presence.py::test_order_30_retained_model_fights_from_original_base_then_is_removed",
+            "role": "semantic",
+            "assertion": "assert model_id in state.battlefield_state.removed_model_ids",
+            "proves": "Its physical base is removed after the retained attack."
+          },
+          {
+            "nodeid": "tests/integration/test_catalog_rule_ir_runtime.py::test_daemonic_patrons_fight_on_death_cleans_up_at_fight_end_and_resumes_liabilities",
+            "role": "semantic",
+            "assertion": "assert cleanup_payload['reason'] == 'phase_end'",
+            "proves": "A retained model that did not fight instead expires at phase end."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04.05-obligation-03",
+        "source_blocks": [
+          2
+        ],
+        "summary": "After its retention ends, resolve its destroyed-model triggers and remove it.",
+        "owners": [
+          "src/warhammer40k_core/engine/model_destruction_triggers.py:advance_model_destruction_triggers"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/integration/test_fight_on_death_presence.py::test_order_30_other_destruction_triggers_wait_for_retained_model_completion",
+            "role": "semantic",
+            "assertion": "assert not any((event.event_type == 'destruction_reaction_resolved' and isinstance(event.payload, dict) and (event.payload.get('model_instance_id') == model_id) and (event.payload.get('selected_reaction_kind') == 'deadly_demise') for event in session.lifecycle.decision_controller.event_log.records))",
+            "proves": "Deadly Demise waits while the model remains retained."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_retained_destruction_resolves_deferred_deadly_demise_at_cleanup",
+            "role": "semantic",
+            "assertion": "assert len(demise_indices) == 1",
+            "proves": "The retained model resolves exactly one deferred Deadly Demise at cleanup."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_retained_destruction_resolves_deferred_deadly_demise_at_cleanup",
+            "role": "semantic",
+            "assertion": "assert demise_indices[0] < removal_indices[0]",
+            "proves": "The deferred destruction trigger resolves before the model’s final removal."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04.05-obligation-04",
+        "source_blocks": [
+          3
+        ],
+        "summary": "An immediately-after-attacker fight-on-death rule waits until that model's unit fights or the phase ends.",
+        "owners": [
+          "src/warhammer40k_core/engine/forced_fight_queue.py:advance_forced_fight_activations",
+          "src/warhammer40k_core/engine/model_destruction_triggers.py:advance_model_destruction_triggers"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/integration/test_fight_on_death_presence.py::test_order_30_retained_model_fights_from_original_base_then_is_removed",
+            "role": "semantic",
+            "assertion": "assert retained_melee",
+            "proves": "The retained model actually makes its melee attack."
+          },
+          {
+            "nodeid": "tests/integration/test_fight_on_death_presence.py::test_order_30_retained_model_fights_from_original_base_then_is_removed",
+            "role": "semantic",
+            "assertion": "assert model_id in state.battlefield_state.removed_model_ids",
+            "proves": "Its physical base is removed after the retained attack."
+          },
+          {
+            "nodeid": "tests/integration/test_catalog_rule_ir_runtime.py::test_daemonic_patrons_fight_on_death_cleans_up_at_fight_end_and_resumes_liabilities",
+            "role": "semantic",
+            "assertion": "assert cleanup_payload['reason'] == 'phase_end'",
+            "proves": "A retained model that did not fight instead expires at phase end."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04.05-obligation-05",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A Stratagem targeting the retained model's unit also affects that model.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_unit_targeted_stratagem_buff_survives_into_retained_melee",
+            "role": "facade",
+            "assertion": "assert retained_pools[0].weapon_profile.armor_penetration.final == (-11 if use_buff else -10)",
+            "proves": "A real unit-targeted Draught of Terror Stratagem is selected through LocalGameSession before the bearer dies; its retained melee attack carries AP-11 versus AP-10 without the buff, after restore at the retained declaration."
+          }
+        ],
+        "qualifications": [
+          "The fixture begins at a legal engine-created Stratagem request. The assertion proves retained benefit consumption; it does not establish natural phase-start offer discovery."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:05:05.04.06:1",
+    "requirements": [
+      {
+        "requirement_id": "05.04.06-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Measurement to a destroyed model uses its authenticated pre-destruction base location.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_geometry.py:closest_fight_unit_distance_inches"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order57_destroyed_referent_measurement.py::test_destroyed_model_measurement_uses_authenticated_former_footprint",
+            "role": "semantic",
+            "assertion": "assert isclose(measured, expected, abs_tol=1e-09)",
+            "proves": "Measurement after removal equals measurement of the authenticated physical footprint before destruction."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04.06-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A baseless model or non-WALKER VEHICLE uses its pre-destruction physical model extent.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_geometry.py:closest_fight_unit_distance_inches"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order57_destroyed_referent_measurement.py::test_destroyed_model_measurement_uses_catalog_hull_not_a_center_point",
+            "role": "semantic",
+            "assertion": "assert isclose(measured, hull_distance, abs_tol=1e-09)",
+            "proves": "A destroyed baseless hull keeps its real catalog physical extent rather than a center or circular base."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "05.04.06-obligation-03",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Measurement to a destroyed unit uses the last member destroyed.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_geometry.py:closest_fight_unit_distance_inches"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order57_destroyed_referent_measurement.py::test_destroyed_unit_measurement_uses_last_destroyed_model",
+            "role": "semantic",
+            "assertion": "assert isclose(measured, last_distance, abs_tol=1e-09)",
+            "proves": "Unit measurement uses the last destroyed member at its distinct original distance."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "faq:814f382c-d6b7-4a30-a78b-1247b57ac133",
+    "requirements": [
+      {
+        "requirement_id": "faq-814f382c-d6b7-4a30-a78b-1247b57ac133-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Roll every saving die even when current-group armor cannot save, since later groups can have better saves.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14i_impossible_armour_save_remains_real_save_roll",
+            "role": "semantic",
+            "assertion": "assert save_roll_types == ['attack_sequence.save.armour']",
+            "proves": "An impossible current armor threshold still records a real armor save roll."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:ab92e97b-be2b-4125-9ded-fcfa6abe092e",
+    "requirements": [
+      {
+        "requirement_id": "faq-ab92e97b-be2b-4125-9ded-fcfa6abe092e-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Fight on Death resolves before the retained model's Deadly Demise.",
+        "owners": [
+          "src/warhammer40k_core/engine/model_destruction_triggers.py:advance_model_destruction_triggers"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/integration/test_fight_on_death_presence.py::test_order_30_other_destruction_triggers_wait_for_retained_model_completion",
+            "role": "semantic",
+            "assertion": "assert not any((event.event_type == 'destruction_reaction_resolved' and isinstance(event.payload, dict) and (event.payload.get('model_instance_id') == model_id) and (event.payload.get('selected_reaction_kind') == 'deadly_demise') for event in session.lifecycle.decision_controller.event_log.records))",
+            "proves": "Deadly Demise cannot resolve before the retained Fight on Death attacks finish."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "faq-ab92e97b-be2b-4125-9ded-fcfa6abe092e-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Deadly Demise resolves after retained models fight or phase-end expiration and are removed.",
+        "owners": [
+          "src/warhammer40k_core/engine/model_destruction_triggers.py:advance_model_destruction_triggers"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/integration/test_fight_on_death_presence.py::test_order_30_other_destruction_triggers_wait_for_retained_model_completion",
+            "role": "semantic",
+            "assertion": "assert not any((event.event_type == 'destruction_reaction_resolved' and isinstance(event.payload, dict) and (event.payload.get('model_instance_id') == model_id) and (event.payload.get('selected_reaction_kind') == 'deadly_demise') for event in session.lifecycle.decision_controller.event_log.records))",
+            "proves": "Deadly Demise waits while the model remains retained."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_retained_destruction_resolves_deferred_deadly_demise_at_cleanup",
+            "role": "semantic",
+            "assertion": "assert len(demise_indices) == 1",
+            "proves": "The retained model resolves exactly one deferred Deadly Demise at cleanup."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_retained_destruction_resolves_deferred_deadly_demise_at_cleanup",
+            "role": "semantic",
+            "assertion": "assert demise_indices[0] < removal_indices[0]",
+            "proves": "The deferred destruction trigger resolves before the model’s final removal."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:06c896b8-bf06-40bd-a892-b56cb3cde9d3",
+    "requirements": [
+      {
+        "requirement_id": "faq-06c896b8-bf06-40bd-a892-b56cb3cde9d3-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "The opponent chooses ordering among multiple wounded non-CHARACTER groups.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:build_allocation_order_request"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_all_wounded_noncharacter_groups_precede_unwounded_groups",
+            "role": "semantic",
+            "assertion": "assert {order[:2] for order in orders} == {(first, second), (second, first)}",
+            "proves": "Both orders of the wounded groups are legal."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_all_wounded_noncharacter_groups_precede_unwounded_groups",
+            "role": "semantic",
+            "assertion": "assert request.actor_id == 'player-b'",
+            "proves": "The ordering request belongs to the defending player."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_all_wounded_noncharacter_groups_precede_unwounded_groups",
+            "role": "semantic",
+            "assertion": "assert len(request.options) == 2",
+            "proves": "The request exposes both finite order choices."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "faq-06c896b8-bf06-40bd-a892-b56cb3cde9d3-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Every wounded non-CHARACTER group precedes every unwounded non-CHARACTER group.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:legal_allocation_group_orders"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_damage_evidence.py::test_all_wounded_noncharacter_groups_precede_unwounded_groups",
+            "role": "semantic",
+            "assertion": "assert all((order[-1] == unwounded for order in orders))",
+            "proves": "All wounded non-Character groups precede the unwounded group for every legal order."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:88fc6c54-a3a6-4757-947b-b2dab8b7f3bf",
+    "requirements": [
+      {
+        "requirement_id": "faq-88fc6c54-a3a6-4757-947b-b2dab8b7f3bf-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Feel No Pain is rolled in Resolve Damage.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_damage_resolution.py:_resolve_lost_wound_stage"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_forced_single_source_feel_no_pain_reduces_failed_save_damage",
+            "role": "semantic",
+            "assertion": "assert fnp_payload['ignored_wounds'] == 1",
+            "proves": "The Resolve Damage event records one ignored wound from actual Feel No Pain rolls."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_forced_single_source_feel_no_pain_reduces_failed_save_damage",
+            "role": "semantic",
+            "assertion": "assert application['requested_damage'] == 1",
+            "proves": "Only the remaining wound reaches damage application."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:fc49644c-cc46-47a0-892b-284a4c4ec018",
+    "requirements": [
+      {
+        "requirement_id": "faq-fc49644c-cc46-47a0-892b-284a4c4ec018-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Destroyed models cannot form allocation groups.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:allocation_groups_for_context"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_attached_target_uses_retained_component_geometry_but_living_allocation",
+            "role": "semantic",
+            "assertion": "assert awaiting_model.model_instance_id not in allocation_context.alive_model_ids",
+            "proves": "A destroyed retained model is excluded from the living allocation context."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_attached_target_uses_retained_component_geometry_but_living_allocation",
+            "role": "semantic",
+            "assertion": "assert allocation_context.legal_model_ids() == living_character_model_ids",
+            "proves": "Only living Character model identities remain legal recipients."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "faq-fc49644c-cc46-47a0-892b-284a4c4ec018-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Destroyed models cannot receive allocated wounds.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:allocation_groups_for_context"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_attached_target_uses_retained_component_geometry_but_living_allocation",
+            "role": "semantic",
+            "assertion": "assert awaiting_model.model_instance_id not in allocation_context.alive_model_ids",
+            "proves": "A destroyed retained model is excluded from the living allocation context."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_attached_target_uses_retained_component_geometry_but_living_allocation",
+            "role": "semantic",
+            "assertion": "assert allocation_context.legal_model_ids() == living_character_model_ids",
+            "proves": "Only living Character model identities remain legal recipients."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:04f15433-3ee1-4c6d-8546-29e4247dee5b",
+    "requirements": [
+      {
+        "requirement_id": "faq-04f15433-3ee1-4c6d-8546-29e4247dee5b-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Incoming Damage-to-zero replacement occurs after the saving roll.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_damage_resolution.py:_resolve_lost_wound_stage"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_ws14_attack_sequence_runtime_hooks.py::test_order93_failed_save_zero_replacement_is_selectable_after_save_and_consumed",
+            "role": "semantic",
+            "assertion": "assert any((event.event_type == 'attack_sequence_step' and isinstance(event.payload, dict) and (event.payload.get('step') == 'save') for event in before_events))",
+            "proves": "A Save step already exists when the Damage-to-zero choice appears."
+          },
+          {
+            "nodeid": "tests/unit/test_ws14_attack_sequence_runtime_hooks.py::test_order93_failed_save_zero_replacement_is_selectable_after_save_and_consumed",
+            "role": "semantic",
+            "assertion": "assert not any((event.event_type.startswith('failed_save_damage') for event in before_events))",
+            "proves": "The replacement has not yet applied before choosing."
+          },
+          {
+            "nodeid": "tests/unit/test_order58_failed_save_damage_timing.py::test_failed_save_changes_incoming_damage_to_zero_after_the_save",
+            "role": "semantic",
+            "assertion": "assert defender_wounds(lifecycle, defender) == starting",
+            "proves": "The accepted replacement prevents all defender wound loss."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:2d91a89e-59f3-410f-84cb-16644d7ea4a4",
+    "requirements": [
+      {
+        "requirement_id": "faq-2d91a89e-59f3-410f-84cb-16644d7ea4a4-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Retained fight-on-death models remain measurable.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_fight_on_death_model_retains_presence_and_component_keywords",
+            "role": "semantic",
+            "assertion": "assert objective_witness.objective_marker_ids == ('phase13b-remote-objective',)",
+            "proves": "Retained physical geometry still supplies objective range evidence."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "faq-2d91a89e-59f3-410f-84cb-16644d7ea4a4-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Retained fight-on-death models remain visible where geometry permits.",
+        "owners": [
+          "src/warhammer40k_core/engine/shooting_targets.py:shooting_target_candidates_for_unit"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_retained_only_enemy_locks_living_shooter_and_remains_a_visible_target",
+            "role": "semantic",
+            "assertion": "assert retained_model_ids[0] in candidates[retained_enemy.unit_instance_id].target_visible_model_ids",
+            "proves": "The retained physical model remains in the target-visible model identity set."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "faq-2d91a89e-59f3-410f-84cb-16644d7ea4a4-obligation-03",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Retained fight-on-death models retain datasheet abilities.",
+        "owners": [
+          "src/warhammer40k_core/engine/catalog_modifier_ignore.py:modifier_ignore_permissions_for_subject"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_catalog_rule_runtime_consumers.py::test_modifier_ignore_subject_retains_authenticated_destroyed_bearer_permission",
+            "role": "semantic",
+            "assertion": "assert len(modifier_ignore_permissions_for_subject(state=state, ability_index=index, unit_instance_id=unit.unit_instance_id, model_instance_id=model_id, kind=ModifierIgnoreKind.HIT_ROLL)) == 1",
+            "proves": "Authenticated retention preserves the bearer’s own datasheet or wargear modifier-ignore ability."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "faq-2d91a89e-59f3-410f-84cb-16644d7ea4a4-obligation-04",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Retained fight-on-death models remain affected by unit-targeted Stratagems.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_unit_targeted_stratagem_buff_survives_into_retained_melee",
+            "role": "facade",
+            "assertion": "assert retained_pools[0].weapon_profile.armor_penetration.final == (-11 if use_buff else -10)",
+            "proves": "A real unit-targeted Draught of Terror Stratagem is selected through LocalGameSession before the bearer dies; its retained melee attack carries AP-11 versus AP-10 without the buff, after restore at the retained declaration."
+          }
+        ],
+        "qualifications": [
+          "The fixture begins at a legal engine-created Stratagem request. The assertion proves retained benefit consumption; it does not establish natural phase-start offer discovery."
+        ]
+      },
+      {
+        "requirement_id": "faq-2d91a89e-59f3-410f-84cb-16644d7ea4a4-obligation-05",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Retained fight-on-death models remain physically engaged and constrain enemy fight movement.",
+        "owners": [
+          "src/warhammer40k_core/engine/physical_engagement.py:scenario_physically_engaged_enemy_rules_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15c_fight_order.py::test_fight_on_death_retained_base_establishes_symmetric_physical_engagement",
+            "role": "semantic",
+            "assertion": "assert scenario_physically_engaged_enemy_rules_unit_ids(scenario=scenario, ruleset_descriptor=ruleset_descriptor, unit_instance_id=living.unit_instance_id) == (retained.unit_instance_id,)",
+            "proves": "The retained base establishes physical engagement for its living enemy."
+          },
+          {
+            "nodeid": "tests/unit/test_phase15c_fight_order.py::test_fight_on_death_only_enemy_requires_engaging_consolidation_and_replays",
+            "role": "semantic",
+            "assertion": "assert proposal_request.context['legal_consolidation_modes'] == [ConsolidationModeKind.ENGAGING.value]",
+            "proves": "A retained-only enemy forces the Engaging consolidation mode."
+          },
+          {
+            "nodeid": "tests/unit/test_phase15c_fight_order.py::test_fight_on_death_only_enemy_requires_engaging_consolidation_and_replays",
+            "role": "semantic",
+            "assertion": "assert endpoint['engaged_after_unit_ids'] == [units['enemy'].unit_instance_id]",
+            "proves": "The accepted consolidation ends engaged with that retained enemy."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  }
+]

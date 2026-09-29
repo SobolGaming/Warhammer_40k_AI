@@ -1,0 +1,211 @@
+[
+  {
+    "detail": "The real status mutation leaves the active action STARTED instead of terminally interrupting it.",
+    "expected_selected_source_answer": {
+      "action_status": "interrupted",
+      "shocked": true
+    },
+    "observed_answer": {
+      "action_status": "started",
+      "shocked": true
+    },
+    "owner": "src/warhammer40k_core/engine/battle_shock_state.py:apply_direct_battle_shock_state",
+    "requirement_id": "faq-bbe268a2-b1fd-43ab-8b24-fd4363730c3f-shock-interrupt",
+    "row_id": "faq:bbe268a2-b1fd-43ab-8b24-fd4363730c3f"
+  },
+  {
+    "detail": "A moved trailing model remains outside Engagement Range despite an accepted legal engaging alternative from the identical baseline.",
+    "expected_selected_source_answer": {
+      "engaging_alternative": "waiting_for_decision",
+      "nonengaging_move": "invalid"
+    },
+    "observed_answer": {
+      "engagement_limit_inches": 2.0,
+      "engaging_alternative": "waiting_for_decision",
+      "nonengaging_model_distance_inches": 2.1337333462672716,
+      "nonengaging_move": "waiting_for_decision"
+    },
+    "owner": "src/warhammer40k_core/engine/fight_resolution.py:_pile_in_endpoint_validation",
+    "requirement_id": "12.03-attainable-engagement",
+    "row_id": "rule:12:12.03:1"
+  },
+  {
+    "detail": "The model moves away from the initially closest target at(13.9,10), approaching the other target at(10,14.3).",
+    "expected_selected_source_answer": {
+      "legal": false
+    },
+    "observed_answer": {
+      "legal": true,
+      "violation": null
+    },
+    "owner": "src/warhammer40k_core/engine/fight_resolution.py:fight_moved_models_closer_to_targets_violation",
+    "requirement_id": "12.03-closest-target",
+    "row_id": "rule:12:12.03:1"
+  },
+  {
+    "detail": "Fully enclosed window from z=1 to2in; observer inside the terrain area excludes Obscuring, isolating Solid.",
+    "expected_selected_source_answer": {
+      "visible": false
+    },
+    "observed_answer": {
+      "visible": true
+    },
+    "owner": "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext",
+    "requirement_id": "13.11-solid",
+    "row_id": "rule:13:13.11:1"
+  },
+  {
+    "detail": "The path climbs and descends three inches more than half an inch from all physical feature surfaces.",
+    "expected_selected_source_answer": {
+      "is_valid": false
+    },
+    "observed_answer": {
+      "is_valid": true,
+      "violations": []
+    },
+    "owner": "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext.validate",
+    "requirement_id": "13.06-vertical-contact",
+    "row_id": "rule:13:13.06:1"
+  },
+  {
+    "detail": "Canonical based FRAME overhang: support-base range exceeds two inches while its body is within two inches.",
+    "expected_selected_source_answer": {
+      "engaged": true
+    },
+    "observed_answer": {
+      "body_edge_distance_inches": 1.21259842519685,
+      "engaged": false,
+      "support_base_edge_distance_inches": 2.850393700787401
+    },
+    "owner": "src/warhammer40k_core/engine/battlefield_state.py:geometry_model_for_placement",
+    "requirement_id": "17.02-measurement",
+    "row_id": "rule:17:17.02:1"
+  },
+  {
+    "detail": "The Normal/Advance exception incorrectly blocks ordinary friendly-model transit for all four other movement modes.",
+    "expected_selected_source_answer": {
+      "charge": true,
+      "consolidate": true,
+      "fall_back": true,
+      "pile_in": true
+    },
+    "observed_answer": {
+      "charge": {
+        "is_valid": false,
+        "violations": [
+          "friendly_vehicle_monster_transit_forbidden"
+        ]
+      },
+      "consolidate": {
+        "is_valid": false,
+        "violations": [
+          "friendly_vehicle_monster_transit_forbidden"
+        ]
+      },
+      "fall_back": {
+        "is_valid": false,
+        "violations": [
+          "friendly_vehicle_monster_transit_forbidden"
+        ]
+      },
+      "pile_in": {
+        "is_valid": false,
+        "violations": [
+          "friendly_vehicle_monster_transit_forbidden"
+        ]
+      }
+    },
+    "owner": "src/warhammer40k_core/engine/movement_legality.py:MovementLegalityContext.to_path_validation_context",
+    "requirement_id": "faq-9b1c81f5-2ea0-40eb-9015-6a005367cd75-friendly-transit",
+    "row_id": "faq:9b1c81f5-2ea0-40eb-9015-6a005367cd75"
+  },
+  {
+    "detail": "An eight-inch body centred at (10,14) projects into y10.25..10.75; its support base does not.",
+    "expected_selected_source_answer": {
+      "within_terrain_area": true
+    },
+    "observed_answer": {
+      "within_terrain_area": false
+    },
+    "owner": "src/warhammer40k_core/geometry/terrain_area_visibility.py:model_intersects_terrain_area",
+    "requirement_id": "faq-603e9b2f-cc24-498c-ac2e-08ad3068f257-frame-membership",
+    "row_id": "faq:603e9b2f-cc24-498c-ac2e-08ad3068f257"
+  },
+  {
+    "detail": "An Infantry model occupies the enclosed window below three inches; physical wall volumes alone allow it.",
+    "expected_selected_source_answer": {
+      "legal": false
+    },
+    "observed_answer": {
+      "legal": true
+    },
+    "owner": "src/warhammer40k_core/engine/endpoint_placement.py:terrain_endpoint_placement_violation",
+    "requirement_id": "13.06.01-solid-endpoint",
+    "row_id": "rule:13:13.06.01:1"
+  },
+  {
+    "detail": "The selected-unit objective-control consumer accepts the zero-OC contributor solely from membership.",
+    "expected_selected_source_answer": {
+      "zero_unit_controls": false
+    },
+    "observed_answer": {
+      "player_controller": "player-a",
+      "zero_unit_controls": true
+    },
+    "owner": "src/warhammer40k_core/engine/stratagems_targeting.py:_objective_control_result_has_unit",
+    "requirement_id": "14.02-controlling-unit",
+    "row_id": "rule:14:14.02:1"
+  },
+  {
+    "detail": "A generic extra-distance permission also enlarges the Overrun Pile In during the Fight step.",
+    "expected_selected_source_answer": {
+      "overrun_pile_in_maximum_inches": 3.0
+    },
+    "observed_answer": {
+      "overrun_pile_in_maximum_inches": 6.0
+    },
+    "owner": "src/warhammer40k_core/engine/fight_resolution.py:fight_movement_maximum_distance_inches",
+    "requirement_id": "faq-9657bb5d-72da-4d42-9927-731c9fc0e315-distance-window",
+    "row_id": "faq:9657bb5d-72da-4d42-9927-731c9fc0e315"
+  },
+  {
+    "detail": "A Vehicle ascends through a Dense floor at z3in; the thin floor is treated as freely traversable.",
+    "expected_selected_source_answer": {
+      "is_valid": false
+    },
+    "observed_answer": {
+      "is_valid": true,
+      "violations": []
+    },
+    "owner": "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext.validate",
+    "requirement_id": "13.06-dense-floor-crossing",
+    "row_id": "rule:13:13.06:1"
+  },
+  {
+    "detail": "The selected-source Exposed category has no explicit typed representation; Unknown is not its source-backed alias.",
+    "expected_selected_source_answer": {
+      "category": "exposed",
+      "unrestricted_horizontal_vertical_transit": true
+    },
+    "observed_answer": {
+      "domain_error": "Unsupported terrain area classification token."
+    },
+    "owner": "src/warhammer40k_core/geometry/terrain_classification.py:terrain_area_classification_from_token",
+    "requirement_id": "13.06-exposed-traversal",
+    "row_id": "rule:13:13.06:1"
+  },
+  {
+    "detail": "The facade selects and damages a real recipient with no Feel No Pain; no allocation timing occurrence is emitted. The only occurrence producer is conditional on optional or multiple Feel No Pain sources, and the timing-trigger enum has no general allocation trigger.",
+    "expected_selected_source_answer": {
+      "allocation_timing_occurrence_count": 1
+    },
+    "observed_answer": {
+      "allocation_timing_occurrence_count": 0,
+      "wounds_after": 1,
+      "wounds_before": 2
+    },
+    "owner": "src/warhammer40k_core/engine/mortal_wound_model_allocation.py:resolve_mortal_wound_model_decision",
+    "requirement_id": "faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01",
+    "row_id": "faq:e58d31bc-b6eb-4db1-b319-dc27dd60154f"
+  }
+]

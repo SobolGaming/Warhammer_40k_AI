@@ -2,6 +2,13 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 97 / PEVIDENCE adds the complete selected source-block and clause inventory,
+exact assertion receipts, and runtime source reconciliation. Its negative probes
+identify further source and gameplay prerequisites before PFINAL; see the
+[scope and limits](docs/ORDER_97_SCOPE_PLAN.md) and
+[clause evidence report](docs/ORDER_97_EVIDENCE_REPORT.md).
+Verify it with `uv run python -m tools.core_rules_order97_inventory --check`.
+
 Order 96 / P24K implements optional Twin-linked wound rerolls through the shared
 source-backed decision and resume authority. Successful rolls, declines, source
 overlap, retained attacks and replay use the same path. See
@@ -14,8 +21,8 @@ See [scope and evidence](docs/ORDER_95_SCOPE_PLAN.md).
 
 Current Core status: the retained [Order 95 audit](docs/ORDER_95_AUDIT_REPORT.md)
 found two gameplay gaps and an incomplete clause-evidence inventory after Orders
-1–94. Orders 95–96 address C04-06 and C24-11. Order 97 remains open and PFINAL
-is Order 98. Core Rules and full-game performance remain uncertified; see the
+1–94. Orders 95–96 address C04-06 and C24-11. Order 97 records the clause evidence
+and schedules newly discovered repairs before PFINAL. Core Rules and full-game performance remain uncertified; see the
 [roadmap](docs/CORE_RULES_REMEDIATION_ROADMAP.md) and
 [evidence limits](docs/ORDER_95_AUDIT_NOTES.md). Historical audit observations remain unchanged.
 
@@ -23,7 +30,7 @@ Order 84 / P01G implements source-assigned dice results and active-player
 selection among tied highest/lowest physical dice. See
 [scope and evidence](docs/ORDER_84_SCOPE_PLAN.md) and
 [Contract 38 migration](contracts/migrations/37-to-38.md). Core certification
-remains separate under PFINAL (currently Order 98). Orders 85–94 were open at that audit; the
+remains separate under PFINAL (after all current roadmap prerequisites). Orders 85–94 were open at that audit; the
 implementation entries below and roadmap record their later status.
 
 Order 93 / P02I preserves individual source operations until an authorized

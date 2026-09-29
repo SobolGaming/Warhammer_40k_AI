@@ -1,0 +1,886 @@
+[
+  {
+    "finding": "source-selected-characteristic-bounds",
+    "source_ref": "02.02.01",
+    "requirement_id": "02.02.01-obligation-18",
+    "characteristic": "leadership",
+    "raw": 6,
+    "modifier": -10,
+    "expected": 5,
+    "observed": 4,
+    "owner": "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+    "scope": "Actual numeric policy mismatch; not a source parser inference."
+  },
+  {
+    "finding": "source-selected-characteristic-bounds",
+    "source_ref": "02.02.01",
+    "requirement_id": "02.02.01-obligation-18",
+    "characteristic": "leadership",
+    "raw": 6,
+    "modifier": 10,
+    "expected": 8,
+    "observed": 9,
+    "owner": "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+    "scope": "Actual numeric policy mismatch; not a source parser inference."
+  },
+  {
+    "finding": "source-selected-characteristic-bounds",
+    "source_ref": "02.02.01",
+    "requirement_id": "02.02.01-obligation-22",
+    "characteristic": "weapon_skill",
+    "raw": 6,
+    "modifier": 10,
+    "expected": 6,
+    "observed": 16,
+    "owner": "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+    "scope": "Actual numeric policy mismatch; not a source parser inference."
+  },
+  {
+    "finding": "source-selected-characteristic-bounds",
+    "source_ref": "02.02.01",
+    "requirement_id": "02.02.01-obligation-23",
+    "characteristic": "ballistic_skill",
+    "raw": 6,
+    "modifier": 10,
+    "expected": 6,
+    "observed": 16,
+    "owner": "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+    "scope": "Actual numeric policy mismatch; not a source parser inference."
+  },
+  {
+    "finding": "canonical-fixture-datasheet-name-keyword",
+    "source_ref": "02.01.01",
+    "requirement_id": "02.01.01-obligation-01",
+    "datasheet_id": "core-intercessor-like-infantry",
+    "name": "CORE Intercessor-like Infantry",
+    "canonical_name_token": "CORE_INTERCESSOR_LIKE_INFANTRY",
+    "keywords": [
+      "BATTLELINE",
+      "INFANTRY",
+      "PSYKER"
+    ],
+    "expected": true,
+    "observed": false,
+    "owner": "src/warhammer40k_core/engine/unit_factory.py:UnitInstance.keywords",
+    "scope": "Canonical CORE fixture proves no automatic datasheet-name keyword. This alone does not establish that an official provider omitted an explicit name keyword. Check provider normalization and runtime identity together before repairing."
+  },
+  {
+    "finding": "frame-full-body-measurement",
+    "source_ref": "01.04.01",
+    "requirement_id": "01.04.01-obligation-06",
+    "distance_inches": 8.5,
+    "target_support_radius": 2.362204724409449,
+    "target_body_radius": 4.0,
+    "source_radius": 0.7874015748031497,
+    "centre_distance_inches": 6,
+    "farthest_body_distance_inches": 9.21259842519685,
+    "expected": false,
+    "observed": true,
+    "owner": "src/warhammer40k_core/geometry/measurement.py:DistanceMeasurementContext.target_wholly_within_distance",
+    "scope": "Source-backed synthetic physical geometry through real battlefield conversion; shares the FRAME measurement bug class with category17.02. The based FRAME target has an 8in circular body on a 120mm support base."
+  },
+  {
+    "finding": "failed-setup-retains-selected-move",
+    "source_ref": "03.02.01",
+    "requirement_ids": [
+      "03.02.01-obligation-01",
+      "03.02.01-obligation-02"
+    ],
+    "base_diameter_inches": 100,
+    "battlefield_dimensions_inches": [
+      60.0,
+      44.0
+    ],
+    "rejection": "invalid",
+    "expected": {
+      "selected": false,
+      "remain_stationary_available": true
+    },
+    "observed": {
+      "selected": true,
+      "pending_decision_type": "submit_placement_proposal",
+      "option_ids": [
+        "submit_parameterized_payload"
+      ],
+      "placed": false
+    },
+    "owner": "src/warhammer40k_core/engine/phases/movement_transports.py:_resolve_disembark_placement_submission",
+    "scope": "Real facade. A 100in base cannot fit within the 44x60in battlefield at any orientation, making complete placement impossible. The invalid result keeps cargo unplaced but retains selection and exposes only placement retry."
+  },
+  {
+    "finding": "flying-advance-restore-authority",
+    "source_ref": "03.06",
+    "requirement_id": "faq-e5941469-5653-49b2-919e-9c9246e811d4-obligation-01",
+    "expected": "exact restore of accepted Fly Advance",
+    "observed": "Primary mission boundary Advance state lacks exact authority.",
+    "owner": "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:validate_primary_mission_boundary_unit_history_authority",
+    "scope": "The accepted, witnessed Fly Advance passes transit and final engagement checks; its exact facade checkpoint fails Advance authority reconstruction."
+  },
+  {
+    "finding": "absent-movement-advance-permission",
+    "source_ref": "02.02",
+    "requirement_id": "02.02-obligation-01",
+    "source_movement": "-",
+    "advance_roll": 3,
+    "path_distance_inches": 1,
+    "expected": false,
+    "observed": true,
+    "normal_move_valid": false,
+    "owner": "src/warhammer40k_core/engine/phases/movement_resolvers.py:resolve_advance_move",
+    "scope": "Real canonical models retain source-dash M; adding an Advance roll turns numeric zero into permission for a witnessed one-inch move."
+  },
+  {
+    "finding": "nested-condition-consumer-boundary",
+    "requirement_id": "02.03.01-obligation-01",
+    "source_ref": "02.03.01",
+    "text": "This unit's ranged attacks that target the closest eligible target can re-roll hit rolls of 1. If that target is within range of an objective your opponent controls, re-roll hit rolls instead.",
+    "diagnostics": [
+      {
+        "reason": "unsupported_language",
+        "message": "Rule clause contains unrepresented residual language.",
+        "source_span": {
+          "text": "s ranged attacks that target the closest eligible target",
+          "start": 10,
+          "end": 66
+        },
+        "blocking": true
+      },
+      {
+        "reason": "unsupported_language",
+        "message": "Rule clause contains unrepresented residual language.",
+        "source_span": {
+          "text": "target is within range of an objective your opponent controls",
+          "start": 103,
+          "end": 164
+        },
+        "blocking": true
+      }
+    ],
+    "runtime_hook_ids": [
+      "catalog-ir:hit-roll-reroll"
+    ],
+    "owner": "src/warhammer40k_core/rules/rule_parser.py:parse_rule_ir",
+    "scope": "The selected Core source's own nested-condition example does not compile to an executable stronger branch. A parser rejection is not proof of incorrect applied rerolls."
+  },
+  {
+    "finding": "implicit-unit-keyword-consumer-boundary",
+    "requirement_id": "02.05.01-obligation-11",
+    "source_ref": "02.05.01",
+    "text": "Select one friendly PSYKER within 6\" of this model.",
+    "diagnostics": [
+      {
+        "reason": "unsupported_language",
+        "message": "Rule clause contains unrepresented residual language.",
+        "source_span": {
+          "text": "PSYKER",
+          "start": 20,
+          "end": 26
+        },
+        "blocking": true
+      }
+    ],
+    "runtime_hook_ids": [],
+    "owner": "src/warhammer40k_core/rules/rule_parser.py:parse_rule_ir",
+    "scope": "The typed keyword target is not inferred when model/unit is omitted; PSYKER is retained as unsupported residual language. The otherwise-identical explicit PSYKER unit form is parsed separately as a positive control.",
+    "explicit_unit_control": {
+      "rule_id": "test:p01c:catalog-rule",
+      "source_id": "test:p01c:catalog-rule",
+      "normalized_text": "Select one friendly PSYKER unit within 6\" of this model.",
+      "parser_version": "phase17c-rule-parser-v4",
+      "schema_version": "phase17c-rule-ir-v1",
+      "clauses": [
+        {
+          "clause_id": "test:p01c:catalog-rule:clause:001",
+          "template_id": "phase17c:selected-target-constraint",
+          "source_span": {
+            "text": "Select one friendly PSYKER unit within 6\" of this model.",
+            "start": 0,
+            "end": 56
+          },
+          "trigger": null,
+          "conditions": [
+            {
+              "kind": "keyword_gate",
+              "source_span": {
+                "text": "Select one friendly PSYKER unit",
+                "start": 0,
+                "end": 31
+              },
+              "parameters": [
+                {
+                  "key": "required_keyword",
+                  "value": "PSYKER"
+                }
+              ]
+            },
+            {
+              "kind": "distance_predicate",
+              "source_span": {
+                "text": "within 6\" of this model",
+                "start": 32,
+                "end": 55
+              },
+              "parameters": [
+                {
+                  "key": "distance_inches",
+                  "value": 6.0
+                },
+                {
+                  "key": "negated",
+                  "value": false
+                },
+                {
+                  "key": "object_kind",
+                  "value": "model"
+                },
+                {
+                  "key": "object_reference",
+                  "value": "this"
+                },
+                {
+                  "key": "predicate",
+                  "value": "within"
+                },
+                {
+                  "key": "qualifier",
+                  "value": null
+                },
+                {
+                  "key": "range_kind",
+                  "value": "numeric_range"
+                }
+              ]
+            }
+          ],
+          "target": {
+            "kind": "friendly_unit",
+            "source_span": {
+              "text": "Select one friendly PSYKER unit",
+              "start": 0,
+              "end": 31
+            },
+            "parameters": [
+              {
+                "key": "allegiance",
+                "value": "friendly"
+              },
+              {
+                "key": "required_keyword",
+                "value": "PSYKER"
+              }
+            ]
+          },
+          "effects": [],
+          "duration": null,
+          "unsupported_reason": null,
+          "diagnostics": []
+        }
+      ],
+      "diagnostics": [],
+      "ir_hash": "5cb020aa7b7c9129a244cb93fd075260a415ad3c25cb21fe6ce3806033b253a5"
+    }
+  },
+  {
+    "finding": "implicit-duration-consumer-boundary",
+    "explicit_trigger": true,
+    "source_ref": "01.02.02",
+    "requirement_id": "01.02.02-obligation-05",
+    "text": "In the Shooting phase, add 1 to the attacks characteristic of ranged weapons equipped by models in this unit.",
+    "expected_attacks": 3,
+    "observed_attacks": 2,
+    "execution": {
+      "rule_id": "test:p01c:catalog-rule",
+      "source_id": "test:p01c:catalog-rule",
+      "rule_ir_hash": "9f014e9553c9f2c499e11edb1712a790419b823a053a4eb2a02d6342d1f2b87e",
+      "status": "applied",
+      "reason": null,
+      "applied_clause_ids": [
+        "test:p01c:catalog-rule:clause:001"
+      ],
+      "effect_payloads": [
+        {
+          "effect_kind": "generic_rule_execution",
+          "rule_id": "test:p01c:catalog-rule",
+          "source_id": "test:p01c:catalog-rule",
+          "rule_ir_hash": "9f014e9553c9f2c499e11edb1712a790419b823a053a4eb2a02d6342d1f2b87e",
+          "clause_id": "test:p01c:catalog-rule:clause:001",
+          "effect_index": 0,
+          "source_span": {
+            "text": "In the Shooting phase, add 1 to the attacks characteristic of ranged weapons equipped by models in this unit.",
+            "start": 0,
+            "end": 109
+          },
+          "target": {
+            "kind": "this_unit",
+            "source_span": {
+              "text": "this unit",
+              "start": 99,
+              "end": 108
+            },
+            "parameters": []
+          },
+          "target_unit_instance_ids": [
+            "army-alpha:mover"
+          ],
+          "duration": null,
+          "effect": {
+            "kind": "modify_characteristic",
+            "source_span": {
+              "text": "add 1 to the attacks characteristic of ranged weapons equipped by models in this unit",
+              "start": 23,
+              "end": 108
+            },
+            "parameters": [
+              {
+                "key": "characteristic",
+                "value": "attacks"
+              },
+              {
+                "key": "delta",
+                "value": 1
+              },
+              {
+                "key": "weapon_scope",
+                "value": "ranged"
+              }
+            ]
+          },
+          "context": {
+            "game_id": "order97-shooting-False",
+            "player_id": "player-a",
+            "battle_round": 1,
+            "phase": "shooting",
+            "active_player_id": "player-a",
+            "timing_window_id": "order97:implicit-duration",
+            "source_unit_instance_id": "army-alpha:mover",
+            "source_model_instance_id": null,
+            "target_unit_instance_ids": [],
+            "target_player_id": null,
+            "source_keywords": [],
+            "trigger_payload": null,
+            "record_persisting_effects": true
+          }
+        }
+      ],
+      "target_bindings": [],
+      "aura_evaluations": [],
+      "victory_point_transactions": [],
+      "command_point_transactions": [],
+      "created_persisting_effects": [],
+      "event_records": [
+        {
+          "event_id": "rule-event:9f014e9553c9:001:modify_characteristic:effect",
+          "event_type": "rule_execution_effect_applied",
+          "payload": {
+            "effect_kind": "generic_rule_execution",
+            "rule_id": "test:p01c:catalog-rule",
+            "source_id": "test:p01c:catalog-rule",
+            "rule_ir_hash": "9f014e9553c9f2c499e11edb1712a790419b823a053a4eb2a02d6342d1f2b87e",
+            "clause_id": "test:p01c:catalog-rule:clause:001",
+            "effect_index": 0,
+            "source_span": {
+              "text": "In the Shooting phase, add 1 to the attacks characteristic of ranged weapons equipped by models in this unit.",
+              "start": 0,
+              "end": 109
+            },
+            "target": {
+              "kind": "this_unit",
+              "source_span": {
+                "text": "this unit",
+                "start": 99,
+                "end": 108
+              },
+              "parameters": []
+            },
+            "target_unit_instance_ids": [
+              "army-alpha:mover"
+            ],
+            "duration": null,
+            "effect": {
+              "kind": "modify_characteristic",
+              "source_span": {
+                "text": "add 1 to the attacks characteristic of ranged weapons equipped by models in this unit",
+                "start": 23,
+                "end": 108
+              },
+              "parameters": [
+                {
+                  "key": "characteristic",
+                  "value": "attacks"
+                },
+                {
+                  "key": "delta",
+                  "value": 1
+                },
+                {
+                  "key": "weapon_scope",
+                  "value": "ranged"
+                }
+              ]
+            },
+            "context": {
+              "game_id": "order97-shooting-False",
+              "player_id": "player-a",
+              "battle_round": 1,
+              "phase": "shooting",
+              "active_player_id": "player-a",
+              "timing_window_id": "order97:implicit-duration",
+              "source_unit_instance_id": "army-alpha:mover",
+              "source_model_instance_id": null,
+              "target_unit_instance_ids": [],
+              "target_player_id": null,
+              "source_keywords": [],
+              "trigger_payload": null,
+              "record_persisting_effects": true
+            }
+          }
+        }
+      ],
+      "replay_payload": {
+        "executed_clause_count": 1,
+        "event_count": 1
+      }
+    },
+    "owner": "src/warhammer40k_core/engine/rule_execution.py:_persisting_effect_or_none",
+    "scope": "A compiled, supported characteristic clause executes without an explicit duration, but the generic effect is not persisted and the attack-profile consumer receives no bonus. The equivalent explicit-until-phase effect is covered by the positive foundation test."
+  },
+  {
+    "finding": "implicit-duration-consumer-boundary",
+    "explicit_trigger": false,
+    "source_ref": "01.02.02",
+    "requirement_id": "01.02.02-obligation-06",
+    "text": "Add 1 to the Attacks characteristic of ranged weapons equipped by models in this unit.",
+    "expected_attacks": 3,
+    "observed_attacks": 2,
+    "execution": {
+      "rule_id": "test:p01c:catalog-rule",
+      "source_id": "test:p01c:catalog-rule",
+      "rule_ir_hash": "33fab390f150370170d9bea1a533b7734faf1e3b5944176e4d397f570236f4ed",
+      "status": "applied",
+      "reason": null,
+      "applied_clause_ids": [
+        "test:p01c:catalog-rule:clause:001"
+      ],
+      "effect_payloads": [
+        {
+          "effect_kind": "generic_rule_execution",
+          "rule_id": "test:p01c:catalog-rule",
+          "source_id": "test:p01c:catalog-rule",
+          "rule_ir_hash": "33fab390f150370170d9bea1a533b7734faf1e3b5944176e4d397f570236f4ed",
+          "clause_id": "test:p01c:catalog-rule:clause:001",
+          "effect_index": 0,
+          "source_span": {
+            "text": "Add 1 to the Attacks characteristic of ranged weapons equipped by models in this unit.",
+            "start": 0,
+            "end": 86
+          },
+          "target": {
+            "kind": "this_unit",
+            "source_span": {
+              "text": "this unit",
+              "start": 76,
+              "end": 85
+            },
+            "parameters": []
+          },
+          "target_unit_instance_ids": [
+            "army-alpha:mover"
+          ],
+          "duration": null,
+          "effect": {
+            "kind": "modify_characteristic",
+            "source_span": {
+              "text": "Add 1 to the Attacks characteristic of ranged weapons equipped by models in this unit",
+              "start": 0,
+              "end": 85
+            },
+            "parameters": [
+              {
+                "key": "characteristic",
+                "value": "attacks"
+              },
+              {
+                "key": "delta",
+                "value": 1
+              },
+              {
+                "key": "weapon_scope",
+                "value": "ranged"
+              }
+            ]
+          },
+          "context": {
+            "game_id": "order97-shooting-False",
+            "player_id": "player-a",
+            "battle_round": 1,
+            "phase": "shooting",
+            "active_player_id": "player-a",
+            "timing_window_id": "order97:implicit-duration",
+            "source_unit_instance_id": "army-alpha:mover",
+            "source_model_instance_id": null,
+            "target_unit_instance_ids": [],
+            "target_player_id": null,
+            "source_keywords": [],
+            "trigger_payload": null,
+            "record_persisting_effects": true
+          }
+        }
+      ],
+      "target_bindings": [],
+      "aura_evaluations": [],
+      "victory_point_transactions": [],
+      "command_point_transactions": [],
+      "created_persisting_effects": [],
+      "event_records": [
+        {
+          "event_id": "rule-event:33fab390f150:001:modify_characteristic:effect",
+          "event_type": "rule_execution_effect_applied",
+          "payload": {
+            "effect_kind": "generic_rule_execution",
+            "rule_id": "test:p01c:catalog-rule",
+            "source_id": "test:p01c:catalog-rule",
+            "rule_ir_hash": "33fab390f150370170d9bea1a533b7734faf1e3b5944176e4d397f570236f4ed",
+            "clause_id": "test:p01c:catalog-rule:clause:001",
+            "effect_index": 0,
+            "source_span": {
+              "text": "Add 1 to the Attacks characteristic of ranged weapons equipped by models in this unit.",
+              "start": 0,
+              "end": 86
+            },
+            "target": {
+              "kind": "this_unit",
+              "source_span": {
+                "text": "this unit",
+                "start": 76,
+                "end": 85
+              },
+              "parameters": []
+            },
+            "target_unit_instance_ids": [
+              "army-alpha:mover"
+            ],
+            "duration": null,
+            "effect": {
+              "kind": "modify_characteristic",
+              "source_span": {
+                "text": "Add 1 to the Attacks characteristic of ranged weapons equipped by models in this unit",
+                "start": 0,
+                "end": 85
+              },
+              "parameters": [
+                {
+                  "key": "characteristic",
+                  "value": "attacks"
+                },
+                {
+                  "key": "delta",
+                  "value": 1
+                },
+                {
+                  "key": "weapon_scope",
+                  "value": "ranged"
+                }
+              ]
+            },
+            "context": {
+              "game_id": "order97-shooting-False",
+              "player_id": "player-a",
+              "battle_round": 1,
+              "phase": "shooting",
+              "active_player_id": "player-a",
+              "timing_window_id": "order97:implicit-duration",
+              "source_unit_instance_id": "army-alpha:mover",
+              "source_model_instance_id": null,
+              "target_unit_instance_ids": [],
+              "target_player_id": null,
+              "source_keywords": [],
+              "trigger_payload": null,
+              "record_persisting_effects": true
+            }
+          }
+        }
+      ],
+      "replay_payload": {
+        "executed_clause_count": 1,
+        "event_count": 1
+      }
+    },
+    "owner": "src/warhammer40k_core/engine/rule_execution.py:_persisting_effect_or_none",
+    "scope": "A compiled, supported characteristic clause executes without an explicit duration, but the generic effect is not persisted and the attack-profile consumer receives no bonus. The equivalent explicit-until-phase effect is covered by the positive foundation test."
+  },
+  {
+    "finding": "infiltrators-redeploy-zone-restriction",
+    "source_ref": "03.02.03",
+    "requirement_id": "03.02.03-obligation-03",
+    "expected": "accepted midpoint redeployment with all-model Infiltrators",
+    "observed": "invalid",
+    "diagnostics": {
+      "invalid_reason": "prebattle_proposal_invalid",
+      "request_id": "decision-request-000008",
+      "violations": [
+        {
+          "violation_code": "deployment_zone_violation",
+          "message": "Pre-battle setup requires ordinary zone containment or proven oversized edge setup.",
+          "field": null,
+          "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+          "blocker_id": null
+        },
+        {
+          "violation_code": "deployment_zone_violation",
+          "message": "Pre-battle setup requires ordinary zone containment or proven oversized edge setup.",
+          "field": null,
+          "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:002",
+          "blocker_id": null
+        },
+        {
+          "violation_code": "deployment_zone_violation",
+          "message": "Pre-battle setup requires ordinary zone containment or proven oversized edge setup.",
+          "field": null,
+          "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:003",
+          "blocker_id": null
+        },
+        {
+          "violation_code": "deployment_zone_violation",
+          "message": "Pre-battle setup requires ordinary zone containment or proven oversized edge setup.",
+          "field": null,
+          "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:004",
+          "blocker_id": null
+        },
+        {
+          "violation_code": "deployment_zone_violation",
+          "message": "Pre-battle setup requires ordinary zone containment or proven oversized edge setup.",
+          "field": null,
+          "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:005",
+          "blocker_id": null
+        },
+        {
+          "violation_code": "deployment_zone_violation",
+          "message": "Pre-battle placement must be wholly within the player's deployment zone.",
+          "field": "model_placements",
+          "model_instance_id": null,
+          "blocker_id": null
+        }
+      ],
+      "resolution": {
+        "proposal": {
+          "proposal_request_id": "decision-request-000008",
+          "proposal_kind": "redeploy_placement",
+          "game_id": "order97:redeploy",
+          "ruleset_descriptor_hash": "cbe14bddbe4b8049ce770e708239041339f1175bc3c5b785707308243a76e4ee",
+          "setup_step": "redeploy_units",
+          "player_id": "player-a",
+          "unit_instance_id": "army-alpha:intercessor-unit-1",
+          "action_kind": "redeploy",
+          "source_rule_id": "core_rules:redeploy",
+          "placement_kind": "redeploy",
+          "model_placements": [
+            {
+              "army_id": "army-alpha",
+              "player_id": "player-a",
+              "unit_instance_id": "army-alpha:intercessor-unit-1",
+              "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+              "pose": {
+                "position": {
+                  "x": 31.0,
+                  "y": 3.0,
+                  "z": 0.0
+                },
+                "facing": {
+                  "degrees": 0.0
+                }
+              }
+            },
+            {
+              "army_id": "army-alpha",
+              "player_id": "player-a",
+              "unit_instance_id": "army-alpha:intercessor-unit-1",
+              "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:002",
+              "pose": {
+                "position": {
+                  "x": 31.0,
+                  "y": 4.8,
+                  "z": 0.0
+                },
+                "facing": {
+                  "degrees": 0.0
+                }
+              }
+            },
+            {
+              "army_id": "army-alpha",
+              "player_id": "player-a",
+              "unit_instance_id": "army-alpha:intercessor-unit-1",
+              "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:003",
+              "pose": {
+                "position": {
+                  "x": 31.0,
+                  "y": 6.6,
+                  "z": 0.0
+                },
+                "facing": {
+                  "degrees": 0.0
+                }
+              }
+            },
+            {
+              "army_id": "army-alpha",
+              "player_id": "player-a",
+              "unit_instance_id": "army-alpha:intercessor-unit-1",
+              "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:004",
+              "pose": {
+                "position": {
+                  "x": 31.0,
+                  "y": 8.4,
+                  "z": 0.0
+                },
+                "facing": {
+                  "degrees": 0.0
+                }
+              }
+            },
+            {
+              "army_id": "army-alpha",
+              "player_id": "player-a",
+              "unit_instance_id": "army-alpha:intercessor-unit-1",
+              "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:005",
+              "pose": {
+                "position": {
+                  "x": 31.0,
+                  "y": 10.2,
+                  "z": 0.0
+                },
+                "facing": {
+                  "degrees": 0.0
+                }
+              }
+            }
+          ],
+          "context": {
+            "is_attached_rules_unit": false,
+            "source_rule_id": "core_rules:redeploy",
+            "action_kind": "redeploy"
+          }
+        },
+        "is_valid": false,
+        "violations": [
+          {
+            "violation_code": "deployment_zone_violation",
+            "message": "Pre-battle setup requires ordinary zone containment or proven oversized edge setup.",
+            "field": null,
+            "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+            "blocker_id": null
+          },
+          {
+            "violation_code": "deployment_zone_violation",
+            "message": "Pre-battle setup requires ordinary zone containment or proven oversized edge setup.",
+            "field": null,
+            "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:002",
+            "blocker_id": null
+          },
+          {
+            "violation_code": "deployment_zone_violation",
+            "message": "Pre-battle setup requires ordinary zone containment or proven oversized edge setup.",
+            "field": null,
+            "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:003",
+            "blocker_id": null
+          },
+          {
+            "violation_code": "deployment_zone_violation",
+            "message": "Pre-battle setup requires ordinary zone containment or proven oversized edge setup.",
+            "field": null,
+            "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:004",
+            "blocker_id": null
+          },
+          {
+            "violation_code": "deployment_zone_violation",
+            "message": "Pre-battle setup requires ordinary zone containment or proven oversized edge setup.",
+            "field": null,
+            "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:005",
+            "blocker_id": null
+          },
+          {
+            "violation_code": "deployment_zone_violation",
+            "message": "Pre-battle placement must be wholly within the player's deployment zone.",
+            "field": "model_placements",
+            "model_instance_id": null,
+            "blocker_id": null
+          }
+        ],
+        "coherency_result": {
+          "status": "coherent",
+          "ruleset_descriptor_hash": "cbe14bddbe4b8049ce770e708239041339f1175bc3c5b785707308243a76e4ee",
+          "unit_instance_id": "army-alpha:intercessor-unit-1",
+          "coherency_policy": {
+            "policy_kind": "neighbor_count",
+            "required_neighbors_small_unit": 1,
+            "required_neighbors_large_unit": null,
+            "large_unit_model_count_threshold": null,
+            "max_horizontal_inches": 2.0,
+            "max_vertical_inches": 5.0,
+            "max_all_models_distance_inches": null,
+            "max_unit_span_inches": 9.0
+          },
+          "model_instance_ids": [
+            "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+            "army-alpha:intercessor-unit-1:core-intercessor-like:002",
+            "army-alpha:intercessor-unit-1:core-intercessor-like:003",
+            "army-alpha:intercessor-unit-1:core-intercessor-like:004",
+            "army-alpha:intercessor-unit-1:core-intercessor-like:005"
+          ],
+          "offending_model_instance_ids": [],
+          "violations": []
+        },
+        "transition_batch": null,
+        "removal_batch": null,
+        "placement_batch": null
+      }
+    },
+    "owner": "src/warhammer40k_core/engine/prebattle.py:_resolve_prebattle_placement",
+    "scope": "Real facade setup, selection and placement; typed all-model Infiltrators availability is confirmed before the midfield placement is rejected as outside the deployment zone."
+  },
+  {
+    "finding": "sequential-movement-cyclic-swap",
+    "source_ref": "03.01",
+    "requirement_id": "03.01-obligation-03",
+    "expected": false,
+    "observed": true,
+    "first_start": {
+      "position": {
+        "x": 10.0,
+        "y": 20.0,
+        "z": 0.0
+      },
+      "facing": {
+        "degrees": 0.0
+      }
+    },
+    "second_start": {
+      "position": {
+        "x": 11.4,
+        "y": 20.0,
+        "z": 0.0
+      },
+      "facing": {
+        "degrees": 0.0
+      }
+    },
+    "owner": "src/warhammer40k_core/engine/phases/movement_geometry.py:_friendly_geometry_models_for_path",
+    "scope": "Two real physical models exchange exact occupied starting positions. Neither can complete its entire move first without ending on the other model, but validation compares both paths against all final positions and accepts the simultaneous swap."
+  },
+  {
+    "finding": "avoidable-setup-body-overhang",
+    "source_ref": "03.02.02",
+    "requirement_ids": [
+      "03.02.02-obligation-04",
+      "03.02.02-obligation-09"
+    ],
+    "expected": "reject body overhang where an ordinary complete-body placement exists",
+    "observed": [],
+    "base_radius_inches": 2.362204724409449,
+    "body_radius_inches": 4.0,
+    "proposed_y": 2.5,
+    "ordinary_fit_y": 10,
+    "owner": "src/warhammer40k_core/engine/deployment_geometry.py:append_geometry_violations",
+    "scope": "The authoritative deployment geometry owner accepts an eight-inch body overhanging the zone and battlefield although its entire body fits at y10. This directly proves deployment; reserve ingress needs the same full-body/impossibility audit before claiming its corresponding clause."
+  }
+]

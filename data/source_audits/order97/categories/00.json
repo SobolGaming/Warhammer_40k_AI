@@ -1,0 +1,52 @@
+[
+  {
+    "row_id": "rule:00::1",
+    "requirements": [
+      {
+        "requirement_id": "universal-disembark-assault-conversion",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A rule allowing charge after a carrier Normal move converts that disembark to Assault mode.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_disembark_permissions.py:transport_disembark_restriction_overrides"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_assault_disembark_permission_flows_through_decision_event_and_replay",
+            "role": "semantic",
+            "assertion": "assert disembarked_state.disembark_mode is DisembarkModeKind.ASSAULT_DISEMBARK",
+            "proves": "The source permission resolves Assault mode."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_assault_disembark_permission_flows_through_decision_event_and_replay",
+            "role": "semantic",
+            "assertion": "assert disembarked_state.can_declare_charge",
+            "proves": "The Assault passenger retains charge eligibility."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "universal-disembark-shock-conversion",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A rule allowing disembark after a carrier Advance converts that disembark to Shock mode.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_disembark_permissions.py:transport_disembark_restriction_overrides"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_order38_candidate_grant_and_movement_matrix",
+            "role": "semantic",
+            "assertion": "assert bool(matching) is permitted",
+            "proves": "The grant/movement matrix admits the source-authorized Shock route after Advance."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  }
+]

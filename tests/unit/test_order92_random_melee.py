@@ -202,6 +202,17 @@ def test_all_weapons_commit_before_dice_and_each_budget_is_conserved(
         request_id=request.request_id, result_id="conserved", payload=payload
     )
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.fight_phase_state is not None
+    sequence = state.fight_phase_state.attack_sequence
+    assert sequence is not None
+    assert sum(pool.attacks for pool in sequence.attack_pools) == sum(
+        cast(int, budget["base_attacks"]) for budget in budgets
+    )
+    assert {pool.weapon_instance_id for pool in sequence.attack_pools} == {
+        cast(str, budget["weapon_instance_id"]) for budget in budgets
+    }
     assert (
         ReplayRunner.from_payload(session.replay_artifact(artifact_id="multi-weapon"))
         .run()

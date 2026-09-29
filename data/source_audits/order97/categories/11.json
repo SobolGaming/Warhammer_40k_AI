@@ -1,0 +1,603 @@
+[
+  {
+    "row_id": "rule:11:11.00:1",
+    "requirements": [
+      {
+        "requirement_id": "11.00-step-sequence",
+        "source_blocks": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "summary": "Resolve start, charge body and end windows in order.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert boundaries == ['start_phase', 'end_phase']",
+            "proves": "The real facade emits start and end timing boundaries before completing each phase."
+          }
+        ],
+        "qualifications": [
+          "This assertion certifies lifecycle timing boundaries; effects attached to those boundaries use the shared timing dispatcher and their own consumer regressions."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Introductory description of the Charge phase."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:11:11.01:1",
+    "requirements": [
+      {
+        "requirement_id": "11.01-start-window",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Resolve start-of-Charge triggered rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert boundaries == ['start_phase', 'end_phase']",
+            "proves": "The real facade emits start and end timing boundaries before completing each phase."
+          }
+        ],
+        "qualifications": [
+          "This assertion certifies lifecycle timing boundaries; effects attached to those boundaries use the shared timing dispatcher and their own consumer regressions."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:11:11.03:1",
+    "requirements": [
+      {
+        "requirement_id": "11.03-end-window",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Resolve end-of-Charge triggered rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert boundaries == ['start_phase', 'end_phase']",
+            "proves": "The real facade emits start and end timing boundaries before completing each phase."
+          }
+        ],
+        "qualifications": [
+          "This assertion certifies lifecycle timing boundaries; effects attached to those boundaries use the shared timing dispatcher and their own consumer regressions."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:11:11.02:1",
+    "requirements": [
+      {
+        "requirement_id": "11.02-single-declaration",
+        "source_blocks": [
+          1,
+          2
+        ],
+        "summary": "Select each eligible friendly charging unit at most once; resolve it before the next.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_charge_facade_completes_first_unit_before_selecting_second_once",
+            "role": "facade",
+            "assertion": "assert lifecycle.decision_controller.queue.pending_requests == (request,)",
+            "proves": "Only the selected unit movement request is pending while its Charge remains unresolved."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_charge_facade_completes_first_unit_before_selecting_second_once",
+            "role": "facade",
+            "assertion": "assert session.to_persistence_payload() == before",
+            "proves": "A stale attempt to select the second unit leaves the first pending request and state unchanged."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_charge_facade_completes_first_unit_before_selecting_second_once",
+            "role": "facade",
+            "assertion": "assert {option.option_id for option in next_request.options} == {second, 'complete_charge_phase'}",
+            "proves": "After the first Charge completes, only the unselected second unit and the finish-phase choice remain."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_charge_facade_completes_first_unit_before_selecting_second_once",
+            "role": "facade",
+            "assertion": "assert selected[0] < completed < selected[1]",
+            "proves": "The first completed movement event precedes selection of the second unit; the test restores both viewers and replays the accepted decisions."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "11.02-presence",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Charge declarations require battlefield presence.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_charge_phase_filters_ineligible_units",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in request.options} == {units['intercessor-5'].unit_instance_id, COMPLETE_CHARGE_PHASE_OPTION_ID}",
+            "proves": "The eligibility fixture excludes all prohibited actors."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "11.02-range",
+        "source_blocks": [
+          4
+        ],
+        "summary": "At least one enemy must be within twelve inches to declare.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_charge_phase_filters_ineligible_units",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in request.options} == {units['intercessor-5'].unit_instance_id, COMPLETE_CHARGE_PHASE_OPTION_ID}",
+            "proves": "Out-of-range units are absent from the candidate set."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "11.02-unengaged",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Engaged units cannot declare charge.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_charge_phase_filters_ineligible_units",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in request.options} == {units['intercessor-5'].unit_instance_id, COMPLETE_CHARGE_PHASE_OPTION_ID}",
+            "proves": "Engaged actors are excluded by the eligibility matrix."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "11.02-movement-lock",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Advance or Fall Back in this turn forbids ordinary charge declaration.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_charge_phase_filters_ineligible_units",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in request.options} == {units['intercessor-5'].unit_instance_id, COMPLETE_CHARGE_PHASE_OPTION_ID}",
+            "proves": "Advanced and fallen-back actors are excluded from the candidate set."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "11.02-roll",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Roll 2D6 for maximum charge movement distance.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_charging_unit_selection_rolls_immediately_and_uses_lifecycle_records",
+            "role": "semantic",
+            "assertion": "assert 2 <= roll_result.value <= 12",
+            "proves": "The charge selection owns the recorded dice roll."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "11.02-optional-attempt",
+        "source_blocks": [
+          8
+        ],
+        "summary": "After rolling, attempt a possible charge or choose no move; either resolves the declaration.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_phase15b_charge_move_no_move_choice_records_decline_without_mutation",
+            "role": "semantic",
+            "assertion": "assert declined['phase_body_status'] == 'charge_move_declined'",
+            "proves": "The no-move proposal records a declined charge without displacement."
+          },
+          {
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_charge_roll_with_no_reachable_targets_resolves_without_model_movement",
+            "role": "semantic",
+            "assertion": "assert after_state.battlefield_state.to_payload() == before_battlefield",
+            "proves": "No reachable target yields resolution without model movement."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          9,
+          10,
+          11,
+          12
+        ],
+        "classification": "example",
+        "reason": "Diagram examples illustrate target range and complete path reachability."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:11:11.02.01:1",
+    "requirements": [
+      {
+        "requirement_id": "11.02.01-double-one",
+        "source_blocks": [
+          1
+        ],
+        "summary": "An unmodified total of two cannot complete a charge from outside Engagement Range.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_natural_double_one_has_no_charge_target",
+            "role": "semantic",
+            "assertion": "assert result.value == 2",
+            "proves": "A fixed natural double-one generates a two-inch unmodified budget."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_natural_double_one_has_no_charge_target",
+            "role": "semantic",
+            "assertion": "assert result.reachable_target_distances_inches == {}",
+            "proves": "The actual target-distance filter returns no charge target for that budget."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_natural_double_one_has_no_charge_target",
+            "role": "semantic",
+            "assertion": "assert not result.move_available",
+            "proves": "The charge result consequently exposes no possible move."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:11:11.04:1",
+    "requirements": [
+      {
+        "requirement_id": "11.04-declared",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Only a unit that declared charge this phase can make this charge move.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_charge_move_submission_rejects_stale_context_without_authoritative_mutation",
+            "role": "invalid",
+            "assertion": "assert _first_proposal_validation_violation(invalid)['violation_code'] == expected_violation",
+            "proves": "Deleting the phase/declaration distance context rejects an attempted move before mutation."
+          }
+        ],
+        "qualifications": [
+          "The declaration authorizes its exact pending movement request; the phase-state-missing and distance-state-missing cases test that prerequisite."
+        ]
+      },
+      {
+        "requirement_id": "11.04-target-limits",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Select one or more enemies within both twelve inches and the modified maximum distance.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_charge_distance_continuation.py::test_larger_movement_budget_preserves_the_separate_twelve_inch_target_gate",
+            "role": "semantic",
+            "assertion": "assert targets is None or OLD not in targets",
+            "proves": "A greater-than-twelve-inch target stays unavailable even with a larger movement budget."
+          },
+          {
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_successful_charge_roll_creates_phase15b_movement_boundary",
+            "role": "semantic",
+            "assertion": "assert status_payload['reachable_target_unit_instance_ids'] == [units['enemy'].unit_instance_id]",
+            "proves": "Only reachable selected target candidates enter the proposal."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "11.04-closer",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Each charging model must finish closer to a selected target.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_charge_distance_continuation.py::test_order47_leading_model_cannot_satisfy_another_models_endpoint",
+            "role": "facade",
+            "assertion": "assert status.payload['violation_code'] == expected_violation",
+            "proves": "The not-closer case rejects a trailing model despite other models reaching the target."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "11.04-one-inch",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Each model that can finish within one inch of a charge target must do so.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_charge_distance_continuation.py::test_order47_leading_model_cannot_satisfy_another_models_endpoint",
+            "role": "facade",
+            "assertion": "assert status.payload['violation_code'] == expected_violation",
+            "proves": "The preferred-distance case rejects a model outside one inch when a legal closer endpoint exists."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "11.04-engage-if-possible",
+        "source_blocks": [
+          8
+        ],
+        "summary": "Each model able to finish engaged with a target must do so.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_charge_distance_continuation.py::test_order47_each_model_must_engage_when_a_legal_path_exists",
+            "role": "semantic",
+            "assertion": "assert result.endpoint_violation_code == 'charge_model_not_engaged_target'",
+            "proves": "Each model must engage if its separately certified path can reach."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "11.04-shared-movement",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Charge movement follows shared witnessed movement rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_phase15b_endpoint_only_charge_witness_records_rejected_attempt_and_retries",
+            "role": "semantic",
+            "assertion": "assert cast(dict[str, object], status.payload)['violation_code'] == 'endpoint_only_path'",
+            "proves": "Endpoint-only charge submission is rejected and retry remains available."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "11.04-all-targets",
+        "source_blocks": [
+          12
+        ],
+        "summary": "The charging unit must engage every selected target.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_charge_move_submission_records_rule_invalid_endpoint_and_emits_retry",
+            "role": "invalid",
+            "assertion": "assert cast(dict[str, object], invalid.payload)['violation_code'] == expected_violation",
+            "proves": "The not-engaged case rejects failure to engage the selected target."
+          }
+        ],
+        "qualifications": [
+          "The single-target rejection proves the endpoint predicate; multi-target obligation also depends on the engine iterating the complete selected target inventory."
+        ]
+      },
+      {
+        "requirement_id": "11.04-no-other-enemy",
+        "source_blocks": [
+          13
+        ],
+        "summary": "Charge endpoints must not engage a non-target enemy.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_phase15b_charge_move_rejects_non_target_engagement_without_mutation",
+            "role": "semantic",
+            "assertion": "assert invalid['violation_code'] == 'charge_non_target_engaged'",
+            "proves": "The illegal non-target endpoint is rejected without mutation."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "11.04-fights-first",
+        "source_blocks": [
+          14
+        ],
+        "summary": "A completed charge grants each unit model Fights First through turn end.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_phase15b_charge_move_proposal_applies_witness_records_displacements_and_fights_first",
+            "role": "semantic",
+            "assertion": "assert effect_payload['effect_kind'] == 'charge_grants_fights_first'",
+            "proves": "Successful charge records the Fights First grant."
+          },
+          {
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_phase15b_charge_move_proposal_applies_witness_records_displacements_and_fights_first",
+            "role": "semantic",
+            "assertion": "assert cast(dict[str, object], persisting_effect['expiration'])['expiration_kind'] == 'end_turn'",
+            "proves": "The grant expires at turn end."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "11.04-distance",
+        "source_blocks": [
+          16
+        ],
+        "summary": "The charge roll determines the maximum movement distance.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_charge_distance_continuation.py::test_charge_budget_applies_move_effects_after_roll_bounds",
+            "role": "semantic",
+            "assertion": "assert budget.maximum_distance_inches == maximum",
+            "proves": "The distance matrix preserves rolled budget and subsequent movement modifiers."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          3,
+          5,
+          9,
+          11,
+          15
+        ],
+        "classification": "metadata",
+        "reason": "Section labels organize the operative requirements enumerated above."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:fdefb262-1eb9-43fd-a2c8-70cf3bd2a621",
+    "requirements": [
+      {
+        "requirement_id": "faq-fdefb262-1eb9-43fd-a2c8-70cf3bd2a621-out-of-phase",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An out-of-phase charge uses the ordinary roll and attempt steps.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_heroic_intervention.py::test_heroic_intervention_enters_shared_charge_declaration",
+            "role": "semantic",
+            "assertion": "assert targets.decision_type == 'select_charge_targets'",
+            "proves": "An out-of-phase charge uses the ordinary roll and attempt steps. The linked assertion exercises this source condition."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "The question supplies the condition answered by operative answer block 2."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:fb3b2776-c954-471b-b448-b70caa91929d",
+    "requirements": [
+      {
+        "requirement_id": "faq-fb3b2776-c954-471b-b448-b70caa91929d-modified-target-distance",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Charge target range includes current roll/move modifiers; later invalidation requires new targets.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/charge.py:ChargePhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_charge_distance_continuation.py::test_later_distance_reduction_replaces_targets_preserving_dice_and_replay",
+            "role": "facade",
+            "assertion": "assert request.decision_type == 'select_target_replacement'",
+            "proves": "Reducing the already-rolled budget emits replacement choice without rerolling."
+          },
+          {
+            "nodeid": "tests/unit/test_charge_distance_continuation.py::test_charge_budget_applies_move_effects_after_roll_bounds",
+            "role": "semantic",
+            "assertion": "assert budget.maximum_distance_inches == maximum",
+            "proves": "Move modifiers compose after roll bounds."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "The question supplies the condition answered by operative answer block 2."
+      }
+    ]
+  }
+]

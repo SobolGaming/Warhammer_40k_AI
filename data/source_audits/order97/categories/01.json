@@ -1,0 +1,3340 @@
+[
+  {
+    "row_id": "rule:01:01.01:1",
+    "requirements": [
+      {
+        "requirement_id": "01.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Each army belongs to its player, who controls every model in it.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:model_owner_player_id",
+          "src/warhammer40k_core/engine/damage_allocation.py:unit_owner_player_id"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_model_and_unit_ownership_resolve_to_the_controlling_player",
+            "role": "semantic",
+            "assertion": "assert model_owner_player_id(state=state, model_instance_id=model.model_instance_id) == army.player_id",
+            "proves": "Every physical model resolves to the player controlling its army."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.01-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A rule's controlling player is the owner of the affected model.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:model_owner_player_id",
+          "src/warhammer40k_core/engine/damage_allocation.py:unit_owner_player_id"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_model_and_unit_ownership_resolve_to_the_controlling_player",
+            "role": "semantic",
+            "assertion": "assert model_owner_player_id(state=state, model_instance_id=model.model_instance_id) == army.player_id",
+            "proves": "Every physical model resolves to the player controlling its army."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.01.01:1",
+    "requirements": [
+      {
+        "requirement_id": "01.01.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The pronoun you denotes the controlling player.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:model_owner_player_id"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_model_and_unit_ownership_resolve_to_the_controlling_player",
+            "role": "semantic",
+            "assertion": "assert model_owner_player_id(state=state, model_instance_id=model.model_instance_id) == army.player_id",
+            "proves": "Every physical model resolves to the player controlling its army."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.02:1",
+    "requirements": [
+      {
+        "requirement_id": "01.02-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A unit contains at least one model.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:UnitInstance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_unit_factory_instances_and_validators_fail_fast",
+            "role": "invalid",
+            "assertion": "with pytest.raises(UnitFactoryError, match='own_models'):\n    replace(unit, own_models=())",
+            "proves": "An empty unit model inventory is rejected by the typed factory."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Models in a unit move and fight as one rules group.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:UnitInstance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_units_attached_units.py::test_attached_unit_moves_as_one_rules_unit",
+            "role": "semantic",
+            "assertion": "assert group.model_ids_for_movement() == ('bodyguard-1', 'bodyguard-2', 'leader-1')",
+            "proves": "Movement membership includes bodyguard and leader models."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02-obligation-03",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A model's base is part of the model for rules purposes.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:UnitInstance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_closest_base_distance_and_baseless_frame_measurement_work",
+            "role": "semantic",
+            "assertion": "assert math.isclose(based.closest_distance_inches(), 1.0)",
+            "proves": "Physical models separated by two inches center-to-center and half-inch bases have one-inch rules separation; the pure query needs no timing context."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02-obligation-04",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Friendly models and units belong to the relevant player's army.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:UnitInstance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_phase17d_friendly_aura_evaluation_ignores_enemy_units_in_range",
+            "role": "semantic",
+            "assertion": "assert result.aura_evaluations[0]['affected_unit_instance_ids'] == [source_unit_id, friendly_unit_id]",
+            "proves": "A friendly aura includes source and same-army unit and excludes an enemy in range."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02-obligation-05",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Enemy models and units belong to the opponent's army.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:UnitInstance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_phase17d_enemy_aura_evaluation_ignores_friendly_units_in_range",
+            "role": "semantic",
+            "assertion": "assert result.aura_evaluations[0]['affected_unit_instance_ids'] == [enemy_unit_id]",
+            "proves": "An enemy aura includes only the opposite-army unit."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02-obligation-06",
+        "source_blocks": [
+          5
+        ],
+        "summary": "An unspecified allegiance permits either army.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:UnitInstance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_phase17d_any_aura_evaluation_affects_all_allegiances_in_range",
+            "role": "semantic",
+            "assertion": "assert result.aura_evaluations[0]['affected_unit_instance_ids'] == [source_unit_id, friendly_unit_id, enemy_unit_id]",
+            "proves": "An ANY aura affects source, friendly, and enemy units in range."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02-obligation-07",
+        "source_blocks": [
+          5
+        ],
+        "summary": "A unit-wide effect applies to every model in the rules unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/stealth.py:rules_unit_stealth_sources",
+          "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_catalog_stealth_aura_uses_shared_source_inclusion",
+            "role": "semantic",
+            "assertion": "assert (rules_unit_stealth_sources(state=state, target_unit_instance_id=context.target_unit_instance_id, runtime_modifier_registry=grants) is None) is exclude_source",
+            "proves": "The real catalog aura grants Stealth to every member: the all-model Stealth consumer returns a source exactly when the unit is included."
+          }
+        ],
+        "qualifications": [
+          "The generic grant family is demonstrated by Stealth; the assertion queries the all-model rule, not merely an ability descriptor."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:01:01.02.01:1",
+    "requirements": [
+      {
+        "requirement_id": "01.02.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Starting Strength is frozen at the first battle round's start.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.starting_strength_record_for_unit",
+          "src/warhammer40k_core/engine/unit_state.py:BelowHalfStrengthContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_first_battle_round_attached_starting_strength_survives_casualties",
+            "role": "semantic",
+            "assertion": "assert state.starting_strength_record_for_unit(view.unit_instance_id) == original",
+            "proves": "A first-round six-model attached Starting Strength snapshot survives four physical casualties unchanged."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.01-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "An attached rules unit counts all its component models for Starting Strength.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.starting_strength_record_for_unit",
+          "src/warhammer40k_core/engine/unit_state.py:BelowHalfStrengthContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_mustered_attached_unit_uses_original_attached_starting_strength",
+            "role": "semantic",
+            "assertion": "assert attached_record.starting_model_count == 7",
+            "proves": "Attached strength includes five bodyguards, leader and support."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.01-obligation-03",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A starting-singleton is below starting strength when its current wounds are less than its W characteristic.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.starting_strength_record_for_unit",
+          "src/warhammer40k_core/engine/unit_state.py:BelowHalfStrengthContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_single_model_strength_predicates_use_remaining_wounds",
+            "role": "semantic",
+            "assertion": "assert context.is_below_starting_strength is (remaining < 2)",
+            "proves": "Real model inventories compare remaining wounds for a singleton and remaining models for a multi-model unit against fixed starting values."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.01-obligation-04",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A starting-multimodel unit is below starting strength when fewer models remain than its starting model count.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.starting_strength_record_for_unit",
+          "src/warhammer40k_core/engine/unit_state.py:BelowHalfStrengthContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_multi_model_strength_predicates_use_the_frozen_starting_count",
+            "role": "semantic",
+            "assertion": "assert context.is_below_starting_strength is (remaining < 3)",
+            "proves": "Real model inventories compare remaining wounds for a singleton and remaining models for a multi-model unit against fixed starting values."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.01-obligation-05",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A starting-singleton is at half-strength when its current wounds equal half its W characteristic.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.starting_strength_record_for_unit",
+          "src/warhammer40k_core/engine/unit_state.py:BelowHalfStrengthContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_starting_strength_and_below_half_work_for_single_and_multi_model_units",
+            "role": "semantic",
+            "assertion": "assert even_single.is_at_half_strength",
+            "proves": "The exact strength predicate is checked for real single/multiple-model unit state."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_single_model_strength_predicates_use_remaining_wounds",
+            "role": "semantic",
+            "assertion": "assert context.is_at_half_strength is (remaining == 1)",
+            "proves": "Real model inventories compare remaining wounds for a singleton and remaining models for a multi-model unit against fixed starting values."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.01-obligation-06",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A starting-multimodel unit is at half-strength when its remaining model count equals half its starting count.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.starting_strength_record_for_unit",
+          "src/warhammer40k_core/engine/unit_state.py:BelowHalfStrengthContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_starting_strength_and_below_half_work_for_single_and_multi_model_units",
+            "role": "semantic",
+            "assertion": "assert even_multi.is_at_half_strength",
+            "proves": "The exact strength predicate is checked for real single/multiple-model unit state."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_multi_model_strength_predicates_use_the_frozen_starting_count",
+            "role": "semantic",
+            "assertion": "assert context.is_at_half_strength is False",
+            "proves": "Real model inventories compare remaining wounds for a singleton and remaining models for a multi-model unit against fixed starting values."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.01-obligation-07",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A starting-singleton is below half-strength when its current wounds are less than half its W characteristic.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.starting_strength_record_for_unit",
+          "src/warhammer40k_core/engine/unit_state.py:BelowHalfStrengthContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_starting_strength_and_below_half_work_for_single_and_multi_model_units",
+            "role": "semantic",
+            "assertion": "assert single_request.below_half_strength_context.is_below_half_strength",
+            "proves": "The exact strength predicate is checked for real single/multiple-model unit state."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_single_model_strength_predicates_use_remaining_wounds",
+            "role": "semantic",
+            "assertion": "assert context.is_below_half_strength is (remaining < 1)",
+            "proves": "Real model inventories compare remaining wounds for a singleton and remaining models for a multi-model unit against fixed starting values."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.01-obligation-08",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A starting-multimodel unit is below half-strength when its remaining model count is less than half its starting count.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.starting_strength_record_for_unit",
+          "src/warhammer40k_core/engine/unit_state.py:BelowHalfStrengthContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_multi_model_strength_predicates_use_the_frozen_starting_count",
+            "role": "semantic",
+            "assertion": "assert context.is_below_half_strength is (remaining < 1.5)",
+            "proves": "Real model inventories compare remaining wounds for a singleton and remaining models for a multi-model unit against fixed starting values."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      },
+      {
+        "source_blocks": [
+          3
+        ],
+        "classification": "example",
+        "reason": "Illustration of the separately inventoried operative rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:01:01.02.02:1",
+    "requirements": [
+      {
+        "requirement_id": "01.02.02-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Persisting effects retain their stated expiration boundary.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.record_persisting_effect",
+          "src/warhammer40k_core/engine/game_state.py:GameState.expire_persisting_effects_at_boundary"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12a_timing_reactions_effects.py::test_persisting_effects_expire_at_deterministic_lifecycle_boundaries",
+            "role": "semantic",
+            "assertion": "assert state.persisting_effects == []",
+            "proves": "The recorded Movement-phase end expiration removes the effect when that boundary is reached."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.02-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Embarking does not cancel a persisting effect.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.record_persisting_effect",
+          "src/warhammer40k_core/engine/game_state.py:GameState.expire_persisting_effects_at_boundary"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12a_timing_reactions_effects.py::test_persisting_effect_survives_embark_and_disembark",
+            "role": "semantic",
+            "assertion": "assert state.persisting_effects_for_unit(passenger_id) == (effect,)",
+            "proves": "The same effect remains available while embarked and after disembarkation."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.02-obligation-03",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Entering Strategic Reserves does not cancel a persisting effect.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.record_persisting_effect",
+          "src/warhammer40k_core/engine/game_state.py:GameState.expire_persisting_effects_at_boundary"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17g_chaos_daemons_daemonic_incursion.py::test_order64_reposition_retains_movement_history_and_unexpired_effects",
+            "role": "semantic",
+            "assertion": "assert after[field] == before[field]",
+            "proves": "Moving the unit to Strategic Reserves retains its persisting effects through serialization; expiry remains at the recorded end-turn boundary."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.02-obligation-04",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An effect still within its duration applies after the unit returns to the battlefield.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.record_persisting_effect",
+          "src/warhammer40k_core/engine/game_state.py:GameState.expire_persisting_effects_at_boundary"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12a_timing_reactions_effects.py::test_persisting_effect_survives_embark_and_disembark",
+            "role": "semantic",
+            "assertion": "assert state.persisting_effects_for_unit(passenger_id) == (effect,)",
+            "proves": "The same effect remains available while embarked and after disembarkation."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.02-obligation-05",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A triggered effect with no explicit duration expires at the end of its specified triggering period.",
+        "owners": [
+          "src/warhammer40k_core/engine/rule_execution.py:_persisting_effect_or_none"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: A compiled, supported characteristic clause executes without an explicit duration, but the generic effect is not persisted and the attack-profile consumer receives no bonus. The equivalent explicit-until-phase effect is covered by the positive foundation test. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding implicit-duration-consumer-boundary."
+        ]
+      },
+      {
+        "requirement_id": "01.02.02-obligation-06",
+        "source_blocks": [
+          4
+        ],
+        "summary": "An effect with neither explicit duration nor a longer specified period expires at the end of the phase in which it was granted.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.record_persisting_effect",
+          "src/warhammer40k_core/engine/game_state.py:GameState.expire_persisting_effects_at_boundary"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Gameplay gap: the generic effect owner drops a supported characteristic effect given in the current phase with neither a trigger nor explicit duration. The untriggered variant in observed_gaps_01_08.json executes through RuleIR but contributes no persisted modifier. It shares the duration-default repair C01-11/P01K; an explicit until-end-of-phase control does not establish this implicit lifetime."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.02.03:1",
+    "requirements": [
+      {
+        "requirement_id": "01.02.03-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "An explicit return/add rule processes the specified number of models.",
+        "owners": [
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+          "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order89_healing.py::test_mixed_attached_revival_candidates_and_accepted_placement_replay",
+            "role": "facade",
+            "assertion": "assert model.current_wounds == (model.initial_wounds if explicit else 1)",
+            "proves": "An accepted revival returns exactly the selected destroyed member, full wounds for explicit revival and one wound for ordinary healing."
+          },
+          {
+            "nodeid": "tests/unit/test_order89_healing.py::test_mixed_attached_revival_candidates_and_accepted_placement_replay",
+            "role": "facade",
+            "assertion": "assert model_by_id(state=restored.lifecycle.state, model_instance_id=ids[0] if explicit else ids[5]).current_wounds == 0",
+            "proves": "The one-model return leaves the other eligible destroyed member at zero wounds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.03-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Revival selects destroyed models belonging to that unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+          "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order89_healing.py::test_mixed_attached_revival_candidates_and_accepted_placement_replay",
+            "role": "facade",
+            "assertion": "assert model.current_wounds == (model.initial_wounds if explicit else 1)",
+            "proves": "An accepted revival returns exactly the selected destroyed member, full wounds for explicit revival and one wound for ordinary healing."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.03-obligation-03",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Returning models cannot exceed the unit's Starting Strength.",
+        "owners": [
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+          "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase14h_healing.py::test_healing_iterates_wound_revival_revived_wound_and_no_effect",
+            "role": "semantic",
+            "assertion": "assert [step.step_kind for step in resolved.resolved_steps] == [HealingStepKind.HEAL_WOUND, HealingStepKind.REVIVE_MODEL, HealingStepKind.HEAL_WOUND, HealingStepKind.NO_EFFECT]",
+            "proves": "Four wound steps heal, revive an original casualty, heal that model, then do nothing because the original inventory is full."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_explicit_return_count_cannot_exceed_attached_starting_strength",
+            "role": "facade",
+            "assertion": "assert len(current.alive_models()) == state.starting_strength_record_for_unit(current.unit_instance_id).starting_model_count == 6",
+            "proves": "An explicit return-99 effect revives the one missing member of a six-model attached rules unit, stops at Starting Strength, preserves all original physical IDs and completes exact restore, viewer and replay checks."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.03-obligation-04",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A returned model retains its original wargear.",
+        "owners": [
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+          "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order90_off_battlefield_revival.py::test_offboard_revival_preserves_source_wounds_equipment_and_replay",
+            "role": "facade",
+            "assertion": "assert returned == replace(before, wounds_remaining=before.initial_wounds if full_health else 1)",
+            "proves": "Revival changes only the permitted wounds field and preserves the full original model payload."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.03-obligation-05",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A returned model retains its original enhancements.",
+        "owners": [
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+          "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order90_off_battlefield_revival.py::test_offboard_revival_preserves_source_wounds_equipment_and_replay",
+            "role": "facade",
+            "assertion": "assert returned == replace(before, wounds_remaining=before.initial_wounds if full_health else 1)",
+            "proves": "Revival changes only the permitted wounds field and preserves the full original model payload."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.03-obligation-06",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Explicit revival restores full starting wounds unless the source states otherwise.",
+        "owners": [
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+          "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order90_off_battlefield_revival.py::test_offboard_revival_preserves_source_wounds_equipment_and_replay",
+            "role": "facade",
+            "assertion": "assert returned == replace(before, wounds_remaining=before.initial_wounds if full_health else 1)",
+            "proves": "Revival changes only the permitted wounds field and preserves the full original model payload."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.03-obligation-07",
+        "source_blocks": [
+          6
+        ],
+        "summary": "A returned battlefield model must be coherent with a model present at phase start.",
+        "owners": [
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+          "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order82_revival_engagement.py::test_separate_revivals_preserve_actual_phase_start_coherency_anchors",
+            "role": "invalid",
+            "assertion": "assert status.status_kind is LifecycleStatusKind.INVALID",
+            "proves": "A later return cannot use a newly returned model as its phase-start anchor."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.03-obligation-08",
+        "source_blocks": [
+          7
+        ],
+        "summary": "A returned model may engage an enemy unit only if its unit was already engaged with that enemy unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+          "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order82_revival_engagement.py::test_new_enemy_unit_is_rejected_atomically_then_legal_retry_replays",
+            "role": "invalid",
+            "assertion": "assert result.status_kind is LifecycleStatusKind.INVALID",
+            "proves": "Returning into a newly engaged enemy unit is rejected before mutation."
+          },
+          {
+            "nodeid": "tests/unit/test_order82_revival_engagement.py::test_revival_can_engage_another_model_in_an_already_engaged_enemy_unit",
+            "role": "facade",
+            "assertion": "assert result.status_kind is not LifecycleStatusKind.INVALID",
+            "proves": "A different enemy model in the already engaged unit is legal."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.03-obligation-09",
+        "source_blocks": [
+          8
+        ],
+        "summary": "A revived Leader or Support remains part of its attached rules unit and returns to it if possible.",
+        "owners": [
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+          "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order90_off_battlefield_revival.py::test_return_keeps_attached_ownership_and_equipment_inside_reserve_transport",
+            "role": "facade",
+            "assertion": "assert model_by_id(state=state, model_instance_id=model_id) == replace(model, wounds_remaining=model.initial_wounds)",
+            "proves": "The returned original Leader/Support model retains its identity, ownership and equipment."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.03-obligation-10",
+        "source_blocks": [
+          9
+        ],
+        "summary": "A returned embarked model remains embarked when capacity permits.",
+        "owners": [
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+          "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order90_off_battlefield_revival.py::test_capacity_counts_all_attached_cargo_without_new_destruction_trigger",
+            "role": "facade",
+            "assertion": "assert model_by_id(state=state, model_instance_id=model_id).current_wounds == (model_by_id(state=state, model_instance_id=model_id).initial_wounds if capacity == 6 else 0)",
+            "proves": "Capacity six restores the model; insufficient capacity leaves it destroyed."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.03-obligation-11",
+        "source_blocks": [
+          9
+        ],
+        "summary": "Insufficient transport capacity destroys the returned model.",
+        "owners": [
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+          "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order90_off_battlefield_revival.py::test_capacity_counts_all_attached_cargo_without_new_destruction_trigger",
+            "role": "facade",
+            "assertion": "assert model_by_id(state=state, model_instance_id=model_id).current_wounds == (model_by_id(state=state, model_instance_id=model_id).initial_wounds if capacity == 6 else 0)",
+            "proves": "Capacity six restores the model; insufficient capacity leaves it destroyed."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.03-obligation-12",
+        "source_blocks": [
+          9
+        ],
+        "summary": "Capacity destruction does not trigger destroyed-model rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+          "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order90_off_battlefield_revival.py::test_capacity_counts_all_attached_cargo_without_new_destruction_trigger",
+            "role": "facade",
+            "assertion": "assert sum((e.event_type == 'model_destroyed' for e in lifecycle.decision_controller.event_log.records)) == before",
+            "proves": "The model-destroyed event count does not increase for capacity failure."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          5
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:01:01.02.04:1",
+    "requirements": [
+      {
+        "requirement_id": "01.02.04-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Embarked units are not on the battlefield.",
+        "owners": [
+          "src/warhammer40k_core/engine/ability_presence.py:ability_spatial_relationship",
+          "src/warhammer40k_core/engine/ability_presence.py:ability_battlefield_conditions_apply",
+          "src/warhammer40k_core/engine/battle_shock.py:collect_battle_shock_test_requests"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order90_off_battlefield_revival.py::test_offboard_revival_preserves_source_wounds_equipment_and_replay",
+            "role": "facade",
+            "assertion": "assert model_id not in state.battlefield_state.placed_model_ids()",
+            "proves": "A revived reserve/embarked model has no battlefield placement."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.04-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Units in Strategic Reserves are not on the battlefield.",
+        "owners": [
+          "src/warhammer40k_core/engine/ability_presence.py:ability_spatial_relationship",
+          "src/warhammer40k_core/engine/ability_presence.py:ability_battlefield_conditions_apply",
+          "src/warhammer40k_core/engine/battle_shock.py:collect_battle_shock_test_requests"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order90_off_battlefield_revival.py::test_offboard_revival_preserves_source_wounds_equipment_and_replay",
+            "role": "facade",
+            "assertion": "assert model_id not in state.battlefield_state.placed_model_ids()",
+            "proves": "A revived reserve/embarked model has no battlefield placement."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.04-obligation-03",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Other units cannot see an off-battlefield unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/ability_presence.py:ability_spatial_relationship",
+          "src/warhammer40k_core/engine/catalog_selected_target_effects_support.py:eligible_selection_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_incoming_selection_cannot_measure_or_see_off_battlefield_targets",
+            "role": "semantic",
+            "assertion": "assert targets == ((target.unit_instance_id,) if presence == 'battlefield' or condition == 'none' else ())",
+            "proves": "Incoming target enumeration from an on-board source separately rejects embarked and Strategic Reserve targets under range and visibility conditions, accepts the on-board positive control, and accepts off-board targets without spatial conditions."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.04-obligation-04",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An off-battlefield unit is visible to itself.",
+        "owners": [
+          "src/warhammer40k_core/engine/ability_presence.py:ability_spatial_relationship",
+          "src/warhammer40k_core/engine/ability_presence.py:ability_battlefield_conditions_apply",
+          "src/warhammer40k_core/engine/battle_shock.py:collect_battle_shock_test_requests"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/integration/test_embarked_ability_authority.py::test_target_selection_uses_spatial_conditions_instead_of_source_suppression",
+            "role": "semantic",
+            "assertion": "assert source.unit_instance_id in targets",
+            "proves": "Range- and visibility-conditioned self-selection remains legal while embarked."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.04-obligation-05",
+        "source_blocks": [
+          3
+        ],
+        "summary": "An off-battlefield unit cannot see other units.",
+        "owners": [
+          "src/warhammer40k_core/engine/ability_presence.py:ability_spatial_relationship",
+          "src/warhammer40k_core/engine/ability_presence.py:ability_battlefield_conditions_apply",
+          "src/warhammer40k_core/engine/battle_shock.py:collect_battle_shock_test_requests"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/integration/test_embarked_ability_authority.py::test_target_selection_uses_spatial_conditions_instead_of_source_suppression",
+            "role": "semantic",
+            "assertion": "assert targets == (source.unit_instance_id,)",
+            "proves": "An embarked source with range or visibility gating can select only itself."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.04-obligation-06",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Distance to or from an off-battlefield unit cannot be measured.",
+        "owners": [
+          "src/warhammer40k_core/engine/ability_presence.py:ability_spatial_relationship",
+          "src/warhammer40k_core/engine/catalog_selected_target_effects_support.py:eligible_selection_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/integration/test_embarked_ability_authority.py::test_target_selection_uses_spatial_conditions_instead_of_source_suppression",
+            "role": "semantic",
+            "assertion": "assert targets == (source.unit_instance_id,)",
+            "proves": "An embarked source with range or visibility gating can select only itself."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_incoming_selection_cannot_measure_or_see_off_battlefield_targets",
+            "role": "semantic",
+            "assertion": "assert targets == ((target.unit_instance_id,) if presence == 'battlefield' or condition == 'none' else ())",
+            "proves": "Incoming target enumeration from an on-board source separately rejects embarked and Strategic Reserve targets under range and visibility conditions, accepts the on-board positive control, and accepts off-board targets without spatial conditions."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.04-obligation-07",
+        "source_blocks": [
+          4
+        ],
+        "summary": "An off-battlefield unit is within range of its own abilities.",
+        "owners": [
+          "src/warhammer40k_core/engine/ability_presence.py:ability_spatial_relationship",
+          "src/warhammer40k_core/engine/ability_presence.py:ability_battlefield_conditions_apply",
+          "src/warhammer40k_core/engine/battle_shock.py:collect_battle_shock_test_requests"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/integration/test_embarked_ability_authority.py::test_target_selection_uses_spatial_conditions_instead_of_source_suppression",
+            "role": "semantic",
+            "assertion": "assert source.unit_instance_id in targets",
+            "proves": "Range- and visibility-conditioned self-selection remains legal while embarked."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.04-obligation-08",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Visibility-dependent or measured-range-dependent selection cannot select an off-battlefield unit except its own abilities.",
+        "owners": [
+          "src/warhammer40k_core/engine/ability_presence.py:ability_spatial_relationship",
+          "src/warhammer40k_core/engine/catalog_selected_target_effects_support.py:eligible_selection_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/integration/test_embarked_ability_authority.py::test_target_selection_uses_spatial_conditions_instead_of_source_suppression",
+            "role": "semantic",
+            "assertion": "assert targets == (source.unit_instance_id,)",
+            "proves": "An embarked source with range or visibility gating can select only itself."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_incoming_selection_cannot_measure_or_see_off_battlefield_targets",
+            "role": "semantic",
+            "assertion": "assert targets == ((target.unit_instance_id,) if presence == 'battlefield' or condition == 'none' else ())",
+            "proves": "Incoming target enumeration from an on-board source separately rejects embarked and Strategic Reserve targets under range and visibility conditions, accepts the on-board positive control, and accepts off-board targets without spatial conditions."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.04-obligation-09",
+        "source_blocks": [
+          6
+        ],
+        "summary": "An off-battlefield unit may use rules whose own conditions remain met.",
+        "owners": [
+          "src/warhammer40k_core/engine/ability_presence.py:ability_spatial_relationship",
+          "src/warhammer40k_core/engine/ability_presence.py:ability_battlefield_conditions_apply",
+          "src/warhammer40k_core/engine/battle_shock.py:collect_battle_shock_test_requests"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/integration/test_embarked_ability_authority.py::test_embarked_activation_facade_restores_and_replays_exactly",
+            "role": "facade",
+            "assertion": "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+            "proves": "The actual embarked/reserve ability choice remains available and is accepted through the facade."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.04-obligation-10",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Army-wide effects and army-selection rules can still affect off-battlefield units.",
+        "owners": [
+          "src/warhammer40k_core/engine/catalog_selected_target_effects_support.py:eligible_selection_target_unit_ids",
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_incoming_army_selection_applies_effect_to_off_battlefield_target",
+            "role": "semantic",
+            "assertion": "assert target_id in targets",
+            "proves": "The on-board transport source can select its friendly attached army unit while that target is embarked or in Strategic Reserves; selection has no range or visibility condition."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_incoming_army_selection_applies_effect_to_off_battlefield_target",
+            "role": "facade",
+            "assertion": "assert restored.current_wounds == restored.initial_wounds",
+            "proves": "An engine-owned non-spatial healing effect on the off-board target resolves through the real model-choice decision and restores the destroyed physical model to full wounds; it remains embarked or in Strategic Reserves and passes exact persistence, viewer and replay checks."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.04-obligation-11",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Currently shocked off-battlefield units require Command battle-shock.",
+        "owners": [
+          "src/warhammer40k_core/engine/ability_presence.py:ability_spatial_relationship",
+          "src/warhammer40k_core/engine/ability_presence.py:ability_battlefield_conditions_apply",
+          "src/warhammer40k_core/engine/battle_shock.py:collect_battle_shock_test_requests"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/integration/test_off_battlefield_command_battle_shock.py::test_command_collection_counts_living_off_battlefield_units_once",
+            "role": "semantic",
+            "assertion": "assert tuple((request.unit_instance_id for request in requests)) == ((unit_id,) if required else ())",
+            "proves": "Parameterized off-battlefield presence and strength/shock conditions produce exactly the required unit test."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.04-obligation-12",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Off-battlefield units at or below half-strength require Command battle-shock.",
+        "owners": [
+          "src/warhammer40k_core/engine/ability_presence.py:ability_spatial_relationship",
+          "src/warhammer40k_core/engine/ability_presence.py:ability_battlefield_conditions_apply",
+          "src/warhammer40k_core/engine/battle_shock.py:collect_battle_shock_test_requests"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/integration/test_off_battlefield_command_battle_shock.py::test_command_collection_counts_living_off_battlefield_units_once",
+            "role": "semantic",
+            "assertion": "assert tuple((request.unit_instance_id for request in requests)) == ((unit_id,) if required else ())",
+            "proves": "Parameterized off-battlefield presence and strength/shock conditions produce exactly the required unit test."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.02.05:1",
+    "requirements": [
+      {
+        "requirement_id": "01.02.05-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Other model or unit excludes the original model or rules unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_other_unit_excludes_source_and_keeps_a_second_same_datasheet_instance",
+            "role": "semantic",
+            "assertion": "assert result.aura_evaluations[0]['affected_unit_instance_ids'] == [other.unit_instance_id]",
+            "proves": "The source-backed other-unit aura excludes its source while including the second friendly instance of the same datasheet."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.05-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Two instances of the same datasheet remain different units.",
+        "owners": [
+          "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_other_unit_excludes_source_and_keeps_a_second_same_datasheet_instance",
+            "role": "semantic",
+            "assertion": "assert result.aura_evaluations[0]['affected_unit_instance_ids'] == [other.unit_instance_id]",
+            "proves": "The source-backed other-unit aura excludes its source while including the second friendly instance of the same datasheet."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.02.06:1",
+    "requirements": [
+      {
+        "requirement_id": "01.02.06-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "The same models may be split only once.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_splitting.py:build_split_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_unit_splitting.py::test_split_models_cannot_be_subdivided_again_or_reassigned_without_lineage",
+            "role": "invalid",
+            "assertion": "with pytest.raises(GameLifecycleError, match='already'):\n    build_split_army(army=split, unit_instance_id=split.units[0].unit_instance_id, first_model_ids=split.units[0].own_model_ids()[:1], request_id='test:split:2', source_id='test:authorized-split', specified_strengths=None)",
+            "proves": "Attempting to subdivide already split models raises the typed rule error."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.06-obligation-02",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A pre-battle split unit has Starting Strength equal to its own resulting model count.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_splitting.py:build_split_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_split_successors_record_their_own_starting_strength",
+            "role": "semantic",
+            "assertion": "assert sorted((state.starting_strength_record_for_unit(unit.unit_instance_id).starting_model_count for unit in split.units)) == [2, 3]",
+            "proves": "The split army records separate two-model and three-model Starting Strength values."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.06-obligation-03",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A split produces exactly two units with counts as equal as possible.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_splitting.py:build_split_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_unit_splitting.py::test_ten_model_source_and_attached_leader_support_balancing",
+            "role": "facade",
+            "assertion": "assert tuple((len(record.model_ids(i)) for i in (0, 1))) == ((10 + extra_models + 1) // 2, (10 + extra_models) // 2)",
+            "proves": "Even and odd attached totals divide into balanced halves through session choices."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.06-obligation-04",
+        "source_blocks": [
+          4
+        ],
+        "summary": "The chosen model membership of each split unit is retained.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_splitting.py:build_split_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_unit_splitting.py::test_split_preserves_selected_membership_and_model_identity",
+            "role": "semantic",
+            "assertion": "assert split.units[0].own_model_ids() == selected",
+            "proves": "Chosen membership survives splitting without replacing model identities."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.06-obligation-05",
+        "source_blocks": [
+          4
+        ],
+        "summary": "An impossible specified split size falls back to the source-mandated balanced two-way split.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_splitting.py:build_split_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_unit_splitting.py::test_ten_model_source_and_attached_leader_support_balancing",
+            "role": "facade",
+            "assertion": "assert record.used_balanced_fallback is (extra_models > 0)",
+            "proves": "The source-mandated balanced fallback occurs exactly when extra attached models invalidate the specified split."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:01:01.02.07:1",
+    "requirements": [
+      {
+        "requirement_id": "01.02.07-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A unit descriptor applies when at least one member model meets it.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+          "src/warhammer40k_core/engine/stealth.py:rules_unit_stealth_sources"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_order68_selected_model_owns_warlord_and_enhancement",
+            "role": "semantic",
+            "assertion": "assert 'WARLORD' in unit.keywords",
+            "proves": "A selected WARLORD model makes its unit WARLORD without assigning that keyword to other models."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.07-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A member's descriptor does not grant it to other models.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+          "src/warhammer40k_core/engine/stealth.py:rules_unit_stealth_sources"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_order68_selected_model_owns_warlord_and_enhancement",
+            "role": "semantic",
+            "assertion": "assert 'WARLORD' not in unit.own_models[0].keywords",
+            "proves": "The unselected model retains its own keywords despite the unit keyword union."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.07-obligation-03",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An explicit unit-wide ability grant applies to every model.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+          "src/warhammer40k_core/engine/stealth.py:rules_unit_stealth_sources"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_catalog_stealth_aura_uses_shared_source_inclusion",
+            "role": "semantic",
+            "assertion": "assert (rules_unit_stealth_sources(state=state, target_unit_instance_id=context.target_unit_instance_id, runtime_modifier_registry=grants) is None) is exclude_source",
+            "proves": "The real catalog aura grants Stealth to every member: the all-model Stealth consumer returns a source exactly when the unit is included."
+          }
+        ],
+        "qualifications": [
+          "The generic grant family is demonstrated by Stealth; the assertion queries the all-model rule, not merely an ability descriptor."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          3
+        ],
+        "classification": "example",
+        "reason": "Illustration of the separately inventoried operative rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:01:01.02.08:1",
+    "requirements": [
+      {
+        "requirement_id": "01.02.08-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Indefinite a model, unit, or object means one or more when no exact count is specified.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_phase17d_any_aura_evaluation_affects_all_allegiances_in_range",
+            "role": "semantic",
+            "assertion": "assert result.aura_evaluations[0]['affected_unit_instance_ids'] == [source_unit_id, friendly_unit_id, enemy_unit_id]",
+            "proves": "The indefinite a-unit aura selects every qualifying source, friendly and enemy unit rather than limiting the match to one."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "example",
+        "reason": "Illustration of the separately inventoried operative rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:01:01.02.09:1",
+    "requirements": [
+      {
+        "requirement_id": "01.02.09-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A reminder token is never a model for any rule.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_resources.py:UnitResourceLedger",
+          "src/warhammer40k_core/engine/game_state.py:GameState.replace_unit_resource_ledgers"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_reminder_resource_tokens_never_enter_the_physical_model_inventory",
+            "role": "semantic",
+            "assertion": "assert tuple((model for army in state.army_definitions for row in army.units for model in row.own_models)) == models",
+            "proves": "Adding a reminder-token resource leaves the complete army physical model inventory unchanged."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.02.09-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A reminder token does not obstruct another model's movement; it is repositioned if needed.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_resources.py:UnitResourceLedger",
+          "src/warhammer40k_core/engine/game_state.py:GameState.replace_unit_resource_ledgers"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_reminder_resource_tokens_never_enter_the_physical_model_inventory",
+            "role": "semantic",
+            "assertion": "assert state.battlefield_state.to_payload() == battlefield",
+            "proves": "Reminder resources add no placement or blocking geometry to the authoritative battlefield."
+          }
+        ],
+        "qualifications": [
+          "The engine represents reminders as nonphysical resources. Physical tabletop repositioning has no engine state to mutate."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.02.10:1",
+    "requirements": [
+      {
+        "requirement_id": "01.02.10-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A newly added unit establishes its Starting Strength at the time it joins the army.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_state.py:StartingStrengthRecord"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_runtime_added_unit_records_starting_strength_when_added",
+            "role": "semantic",
+            "assertion": "assert record.starting_model_count == len(added_unit.own_models)",
+            "proves": "The recorded starting count equals the new unit inventory at addition."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.02.11:1",
+    "requirements": [
+      {
+        "requirement_id": "01.02.11-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "All types of model includes both armies.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:UnitInstance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_phase17d_any_aura_evaluation_affects_all_allegiances_in_range",
+            "role": "semantic",
+            "assertion": "assert result.aura_evaluations[0]['affected_unit_instance_ids'] == [source_unit_id, friendly_unit_id, enemy_unit_id]",
+            "proves": "An unrestricted unit aura matches both armies in its measured range."
+          }
+        ],
+        "qualifications": [
+          "This proves unqualified allegiance across units; the all-types model quantifier uses the same physical inclusion principle."
+        ]
+      },
+      {
+        "requirement_id": "01.02.11-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "All types of model includes every keyword class.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:UnitInstance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_unrestricted_unit_effect_includes_every_model_keyword_class",
+            "role": "semantic",
+            "assertion": "assert result.aura_evaluations[0]['affected_unit_instance_ids'] == [target.unit_instance_id]",
+            "proves": "An unrestricted source aura includes Infantry, Monster and Vehicle subjects independently of their keyword class."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.03:1",
+    "requirements": [
+      {
+        "requirement_id": "01.03-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Exactly one player is active and the other opposing, with roles changing together.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.effective_active_player_id",
+          "src/warhammer40k_core/engine/active_player_scopes.py:push_scope",
+          "src/warhammer40k_core/engine/active_player_scopes.py:pop_scope"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase14b_timing_cutover.py::test_phase14b_effective_active_player_scope_restores_after_selected_unit_context",
+            "role": "semantic",
+            "assertion": "assert state.effective_opposing_player_ids() == ('player-a',)",
+            "proves": "After the selected-unit action ends the active/opposing roles return to the current turn owner."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.03-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "The first-turn player is active outside either player's turn.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.effective_active_player_id",
+          "src/warhammer40k_core/engine/active_player_scopes.py:push_scope",
+          "src/warhammer40k_core/engine/active_player_scopes.py:pop_scope"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order36_sequencing.py::test_round_boundary_needs_no_rolloff",
+            "role": "semantic",
+            "assertion": "assert request.actor_id == 'player-a'",
+            "proves": "The first-turn player owns round-boundary order without a roll-off."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.03-obligation-03",
+        "source_blocks": [
+          3
+        ],
+        "summary": "The turn owner is active unless an explicit selected-unit scope overrides it.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.effective_active_player_id",
+          "src/warhammer40k_core/engine/active_player_scopes.py:push_scope",
+          "src/warhammer40k_core/engine/active_player_scopes.py:pop_scope"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase14b_timing_cutover.py::test_phase14b_effective_active_player_scope_restores_after_selected_unit_context",
+            "role": "semantic",
+            "assertion": "assert state.effective_active_player_id() == 'player-a'",
+            "proves": "The engine uses the selected moving/shooting owner as effective active player and restores ordinary ownership afterward."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.03-obligation-04",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A moving unit's controller is active until its move ends.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.effective_active_player_id",
+          "src/warhammer40k_core/engine/active_player_scopes.py:push_scope",
+          "src/warhammer40k_core/engine/active_player_scopes.py:pop_scope"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase14b_timing_cutover.py::test_phase14b_effective_active_player_scope_restores_after_selected_unit_context",
+            "role": "semantic",
+            "assertion": "assert state.effective_active_player_id() == 'player-a'",
+            "proves": "The engine uses the selected moving/shooting owner as effective active player and restores ordinary ownership afterward."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.03-obligation-05",
+        "source_blocks": [
+          5
+        ],
+        "summary": "A shooting unit's controller is active until its attacks resolve.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.effective_active_player_id",
+          "src/warhammer40k_core/engine/active_player_scopes.py:push_scope",
+          "src/warhammer40k_core/engine/active_player_scopes.py:pop_scope"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase14b_timing_cutover.py::test_phase14b_effective_active_player_scope_restores_after_selected_unit_context",
+            "role": "semantic",
+            "assertion": "assert state.effective_active_player_id() == 'player-b'",
+            "proves": "Completing the out-of-turn selection restores the turn owner as active."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.03-obligation-06",
+        "source_blocks": [
+          5
+        ],
+        "summary": "A fighting unit's controller is active until its attacks resolve.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.effective_active_player_id",
+          "src/warhammer40k_core/engine/active_player_scopes.py:push_scope",
+          "src/warhammer40k_core/engine/active_player_scopes.py:pop_scope"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase14b_timing_cutover.py::test_phase14b_effective_active_player_scope_restores_after_selected_unit_context",
+            "role": "semantic",
+            "assertion": "assert state.effective_active_player_id() == 'player-b'",
+            "proves": "Completing the out-of-turn selection restores the turn owner as active."
+          },
+          {
+            "nodeid": "tests/unit/test_order36_sequencing.py::test_fighting_unit_owner_becomes_active_until_activation_ends",
+            "role": "semantic",
+            "assertion": "assert state.effective_active_player_id() == 'player-b'",
+            "proves": "The out-of-turn fighting unit owner is active during its attack scope."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.03.01:1",
+    "requirements": [
+      {
+        "requirement_id": "01.03.01-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A player's army-rule effects belong to that player.",
+        "owners": [
+          "src/warhammer40k_core/engine/faction_content/bundle.py:RuntimeContentBundle"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17g_world_eaters_army_rule.py::test_lifecycle_requests_world_eaters_blessings_and_records_effect",
+            "role": "semantic",
+            "assertion": "assert request.actor_id == 'player-a'",
+            "proves": "The loaded army rule routes its Blessing choice to its owning player."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.03.01-obligation-02",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A player's detachment-rule effects belong to that player.",
+        "owners": [
+          "src/warhammer40k_core/engine/faction_content/bundle.py:RuntimeContentBundle"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/integration/test_ws14_generic_ir_lifecycle.py::test_ws14_more_dakka_detachment_rule_and_get_stuck_in_use_ir_runtime_hooks",
+            "role": "semantic",
+            "assertion": "assert WeaponKeyword.ASSAULT in baseline_profile.keywords",
+            "proves": "The loaded player detachment grants Assault to that player source unit weapon profile."
+          }
+        ],
+        "qualifications": [
+          "This demonstrates the detachment source owner path; it does not itself compare an opponent with the same datasheet."
+        ]
+      },
+      {
+        "requirement_id": "01.03.01-obligation-03",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A used Stratagem belongs to the player using it.",
+        "owners": [
+          "src/warhammer40k_core/engine/sequencing.py:create_select_next_sequencing_participant_request"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12b_stratagem_framework.py::test_opponent_stratagem_targeting_unit_does_not_block_player_same_phase_stratagem",
+            "role": "semantic",
+            "assertion": "assert state.stratagem_use_records[0].player_id == 'player-b'",
+            "proves": "The recorded use belongs to its user despite targeting the other player unit."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.03.01-obligation-04",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Enhancement effects belong to the player controlling their bearer.",
+        "owners": [
+          "src/warhammer40k_core/engine/faction_content/bundle.py:RuntimeContentBundle"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_catalog_rule_runtime_consumers.py::test_catalog_command_point_enhancement_cost_source_binds_only_assigned_bearer",
+            "role": "semantic",
+            "assertion": "assert unassigned_runtime.stratagem_cost_modifier_bindings() == ()",
+            "proves": "An enhancement creates no executable binding when the player has not assigned its bearer; the same owned army with the assignment creates the binding."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.03.01-obligation-05",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Datasheet effects belong to the player controlling their source unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/faction_content/bundle.py:RuntimeContentBundle"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_timing_evidence.py::test_loaded_command_boundary_rule_repeats_on_its_owners_turn_each_round",
+            "role": "facade",
+            "assertion": "assert all((row['player_id'] == 'player-a' for row in resolved))",
+            "proves": "The model-owned datasheet rule credits its controller even while both players receive core CP."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.03.01-obligation-06",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Usage restrictions apply only to the owner of the rule.",
+        "owners": [
+          "src/warhammer40k_core/engine/sequencing.py:create_select_next_sequencing_participant_request"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12b_stratagem_framework.py::test_opponent_stratagem_targeting_unit_does_not_block_player_same_phase_stratagem",
+            "role": "semantic",
+            "assertion": "assert allowed.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION",
+            "proves": "The opponent prior target use does not consume the player own usage permission."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.03.01-obligation-07",
+        "source_blocks": [
+          9
+        ],
+        "summary": "A mission rule used by a player is that player's rule.",
+        "owners": [
+          "src/warhammer40k_core/engine/sequencing.py:create_select_next_sequencing_participant_request"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order36_sequencing.py::test_primary_scoring_commit_preserves_one_mission_owner",
+            "role": "semantic",
+            "assertion": "assert evidence.scoring_player_id == 'player-a'",
+            "proves": "The selected primary mission commits only its owner scoring evidence."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.03.01-obligation-08",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Unowned always-active mission rules resolve before active-player rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/sequencing.py:create_select_next_sequencing_participant_request"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order36_sequencing.py::test_unowned_mission_priority_preserves_source_exceptions",
+            "role": "semantic",
+            "assertion": "assert request.actor_id == ('player-a' if mission_first else 'player-b')",
+            "proves": "The source-declared unowned mission priority determines the resolving actor."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.03.01-obligation-09",
+        "source_blocks": [
+          10
+        ],
+        "summary": "The active player chooses ordering among unowned mission rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/sequencing.py:create_select_next_sequencing_participant_request"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order36_sequencing.py::test_unowned_mission_priority_preserves_source_exceptions",
+            "role": "semantic",
+            "assertion": "assert request.actor_id == ('player-a' if mission_first else 'player-b')",
+            "proves": "At a timing without the end-boundary exception, the active player chooses among unowned mission participants."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          8
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:01:01.03.02:1",
+    "requirements": [
+      {
+        "requirement_id": "01.03.02-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Active-player mandatory rules resolve first in that player's chosen order.",
+        "owners": [
+          "src/warhammer40k_core/engine/sequencing.py:create_select_next_sequencing_participant_request"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order36_sequencing.py::test_all_four_tiers_give_each_owner_their_own_choices",
+            "role": "semantic",
+            "assertion": "assert request.actor_id == owner",
+            "proves": "Every active/opposing mandatory/optional tier is owned by its player."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.03.02-obligation-02",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Active-player selected optional rules resolve second in that player's chosen order.",
+        "owners": [
+          "src/warhammer40k_core/engine/sequencing.py:create_select_next_sequencing_participant_request"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order36_sequencing.py::test_all_four_tiers_give_each_owner_their_own_choices",
+            "role": "semantic",
+            "assertion": "assert request.actor_id == owner",
+            "proves": "Every active/opposing mandatory/optional tier is owned by its player."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.03.02-obligation-03",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Opposing-player mandatory rules resolve third in that player's chosen order.",
+        "owners": [
+          "src/warhammer40k_core/engine/sequencing.py:create_select_next_sequencing_participant_request"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order36_sequencing.py::test_all_four_tiers_give_each_owner_their_own_choices",
+            "role": "semantic",
+            "assertion": "assert request.actor_id == owner",
+            "proves": "Every active/opposing mandatory/optional tier is owned by its player."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.03.02-obligation-04",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Opposing-player selected optional rules resolve fourth in that player's chosen order.",
+        "owners": [
+          "src/warhammer40k_core/engine/sequencing.py:create_select_next_sequencing_participant_request"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order36_sequencing.py::test_all_four_tiers_give_each_owner_their_own_choices",
+            "role": "semantic",
+            "assertion": "assert request.actor_id == owner",
+            "proves": "Every active/opposing mandatory/optional tier is owned by its player."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.03.02-obligation-05",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Newly triggered rules wait until every unresolved original rule in that timing has resolved.",
+        "owners": [
+          "src/warhammer40k_core/engine/sequencing.py:create_select_next_sequencing_participant_request"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order36_sequencing.py::test_runtime_defers_new_rule_until_original_population_finishes",
+            "role": "semantic",
+            "assertion": "assert history[1].completed_participant_ids == ('new-a',)",
+            "proves": "A newly triggered rule resolves only in the next batch after the original population finishes."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      },
+      {
+        "source_blocks": [
+          7
+        ],
+        "classification": "example",
+        "reason": "Illustration of the separately inventoried operative rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:01:01.04:1",
+    "requirements": [
+      {
+        "requirement_id": "01.04-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Distances use inches.",
+        "owners": [
+          "src/warhammer40k_core/geometry/measurement.py:DistanceMeasurementContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_closest_base_distance_and_baseless_frame_measurement_work",
+            "role": "semantic",
+            "assertion": "assert math.isclose(based.closest_distance_inches(), 1.0)",
+            "proves": "Physical models separated by two inches center-to-center and half-inch bases have one-inch rules separation; the pure query needs no timing context."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.04-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Distance measurement is not restricted to a decision timing.",
+        "owners": [
+          "src/warhammer40k_core/geometry/measurement.py:DistanceMeasurementContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_closest_base_distance_and_baseless_frame_measurement_work",
+            "role": "semantic",
+            "assertion": "assert math.isclose(based.closest_distance_inches(), 1.0)",
+            "proves": "Physical models separated by two inches center-to-center and half-inch bases have one-inch rules separation; the pure query needs no timing context."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.04-obligation-03",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Default distance uses the closest part of the model's base.",
+        "owners": [
+          "src/warhammer40k_core/geometry/measurement.py:DistanceMeasurementContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_closest_base_distance_and_baseless_frame_measurement_work",
+            "role": "semantic",
+            "assertion": "assert math.isclose(based.closest_distance_inches(), 1.0)",
+            "proves": "Distance uses opposing base edges, not centers."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.04.01:1",
+    "requirements": [
+      {
+        "requirement_id": "01.04.01-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Within a distance includes equality at the boundary.",
+        "owners": [
+          "src/warhammer40k_core/geometry/measurement.py:DistancePredicateEvaluator"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_distance_predicates_evaluate_within_wholly_more_than_and_horizontal_only",
+            "role": "semantic",
+            "assertion": "assert evaluator.evaluate(WithinPredicate(0.5))",
+            "proves": "The nearest base parts exactly half an inch apart satisfy within half an inch."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.04.01-obligation-02",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A model is within when any part of its base is within.",
+        "owners": [
+          "src/warhammer40k_core/geometry/measurement.py:DistancePredicateEvaluator"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_distance_predicates_evaluate_within_wholly_more_than_and_horizontal_only",
+            "role": "semantic",
+            "assertion": "assert evaluator.evaluate(WithinPredicate(0.5))",
+            "proves": "The nearest base parts exactly half an inch apart satisfy within half an inch."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.04.01-obligation-03",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A unit is within when at least one member model is within.",
+        "owners": [
+          "src/warhammer40k_core/geometry/measurement.py:DistancePredicateEvaluator"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_unit_within_range_needs_only_one_near_model",
+            "role": "semantic",
+            "assertion": "assert _units_are_within_range_inches(state=state, first_unit_instance_id=source.unit_instance_id, second_unit_instance_id=target.unit_instance_id, distance_inches=1)",
+            "proves": "One near enemy model satisfies unit range despite the other models being out of range."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.04.01-obligation-04",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A model is wholly within when every part of its base is within.",
+        "owners": [
+          "src/warhammer40k_core/geometry/measurement.py:DistancePredicateEvaluator"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_distance_predicates_evaluate_within_wholly_more_than_and_horizontal_only",
+            "role": "semantic",
+            "assertion": "assert not evaluator.evaluate(WhollyWithinPredicate(1.4))",
+            "proves": "A partially outlying base fails whole-base distance."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.04.01-obligation-05",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A unit is wholly within when every member model is wholly within.",
+        "owners": [
+          "src/warhammer40k_core/geometry/measurement.py:DistancePredicateEvaluator"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_unit_wholly_within_region_checks_every_physical_member",
+            "role": "semantic",
+            "assertion": "assert not _placements_wholly_within_region(view=view, placements=one_outside, region_footprint=cast(_Footprint, region))",
+            "proves": "A single out-of-region member invalidates the whole-unit predicate even though every other member is wholly inside."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.04.01-obligation-06",
+        "source_blocks": [
+          4
+        ],
+        "summary": "FRAME wholly-within measurement includes every part of the model.",
+        "owners": [
+          "src/warhammer40k_core/geometry/measurement.py:DistanceMeasurementContext.target_wholly_within_distance"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: Source-backed synthetic physical geometry through real battlefield conversion; shares the FRAME measurement bug class with category17.02. The based FRAME target has an 8in circular body on a 120mm support base. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding frame-full-body-measurement."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      },
+      {
+        "source_blocks": [
+          5
+        ],
+        "classification": "example",
+        "reason": "Illustration of the separately inventoried operative rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:01:01.04.02:1",
+    "requirements": [
+      {
+        "requirement_id": "01.04.02-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Closest means the minimum model/unit distance to the rule user.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_geometry.py:closest_fight_unit_distance_inches"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order52_surge.py::test_surge_finite_choice_commits_the_closest_target",
+            "role": "semantic",
+            "assertion": "assert choices[0].payload['surge_target_unit_instance_id'] == TARGET",
+            "proves": "The source-constrained Surge choice carries the closest enemy rules unit."
+          }
+        ],
+        "qualifications": [
+          "Concrete closest-target consumer proof; other closest consumers reuse geometry but require their own action constraints."
+        ]
+      },
+      {
+        "requirement_id": "01.04.02-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "The controlling player chooses among equally closest candidates.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_geometry.py:closest_fight_unit_distance_inches"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order52_surge.py::test_tied_closest_enemies_are_explicit_finite_target_choices",
+            "role": "facade",
+            "assertion": "assert {option.option_id for option in request.options} == {'decline_triggered_movement', f'surge:{SOURCE}:target:{TARGET}', f'surge:{SOURCE}:target:army-beta:other'}",
+            "proves": "The facade exposes both tied closest enemies as finite options and excludes the farther enemy."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.04.03:1",
+    "requirements": [
+      {
+        "requirement_id": "01.04.03-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "An as-close-as-possible move reaches base contact if a legal path and all other constraints allow it.",
+        "owners": [
+          "src/warhammer40k_core/engine/emergency_disembark_placement.py:append_emergency_disembark_placement_violations"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_as_close_setup_reaches_legal_base_contact_and_rejects_farther_endpoint",
+            "role": "semantic",
+            "assertion": "assert isclose(passenger_geometry.range_to(transport_geometry), 0, abs_tol=1e-09)",
+            "proves": "The source-backed Emergency Disembark consumer has a legal base-contact endpoint, measured directly from the physical passenger and Transport bases."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_as_close_setup_reaches_legal_base_contact_and_rejects_farther_endpoint",
+            "role": "semantic",
+            "assertion": "assert accepted.is_valid",
+            "proves": "The actual source-backed as-close placement validator accepts the base-contact endpoint with all physical setup restrictions intact."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_as_close_setup_reaches_legal_base_contact_and_rejects_farther_endpoint",
+            "role": "invalid",
+            "assertion": "assert [(row.violation_code, row.model_instance_id, row.source_rule_id) for row in rejected.violations] == [(TransportOperationViolationCode.EMERGENCY_DISEMBARK_NOT_CLOSEST, first.model_instance_id, source.EMERGENCY_DISEMBARK_PLACEMENT_SOURCE_ID)]",
+            "proves": "The same consumer rejects only the passenger moved 0.17 inches farther, identifying its physical model and source rule with EMERGENCY_DISEMBARK_NOT_CLOSEST."
+          }
+        ],
+        "qualifications": [
+          "The direct consumer is Emergency Disembark (18.05), an explicit Set Up move; endpoint placement is therefore authorized without a PathWitness. This proof does not substitute for ordinary movement path validation or override the versioned Emergency Disembark geometry tolerance."
+        ]
+      },
+      {
+        "requirement_id": "01.04.03-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "If contact is unattainable, the move reaches the closest legal endpoint.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_resolution.py:fight_movement_resolution_violation",
+          "src/warhammer40k_core/engine/fight_resolution.py:resolve_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order52_surge.py::test_order75_fixed_target_optimal_surge_is_accepted_and_authenticated",
+            "role": "facade",
+            "assertion": "assert row['approach_status'] == 'optimal_bound'",
+            "proves": "The accepted witnessed surge reaches a proven closest endpoint when even engagement is unreachable."
+          }
+        ],
+        "qualifications": [
+          "The demonstrated as-close family is a surge with a certified fixed-target distance bound; unresolved searches remain explicit invalid results."
+        ]
+      },
+      {
+        "requirement_id": "01.04.03-obligation-03",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A model already maximally close cannot change position.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_resolution.py:fight_movement_resolution_violation",
+          "src/warhammer40k_core/engine/fight_resolution.py:resolve_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order85_deemed_base_contact.py::test_deemed_contact_prevents_pile_in_rotation_and_stationary_retry_replays",
+            "role": "invalid",
+            "assertion": "assert 'base_contact_model_moved' in json.dumps(status.to_payload())",
+            "proves": "A base-contact model attempted rotation is rejected through the facade."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.04.03-obligation-04",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An immobile already-maximally-close model still counts as making the instructed move.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_resolution.py:fight_movement_resolution_violation",
+          "src/warhammer40k_core/engine/fight_resolution.py:resolve_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order85_deemed_base_contact.py::test_deemed_contact_prevents_pile_in_rotation_and_stationary_retry_replays",
+            "role": "facade",
+            "assertion": "assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION",
+            "proves": "The zero-distance retry completes the pile-in and advances to its following decision."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.04.03-obligation-05",
+        "source_blocks": [
+          3
+        ],
+        "summary": "An as-close-as-possible objective move ends in objective range if legally achievable.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_resolution.py:fight_movement_resolution_violation",
+          "src/warhammer40k_core/engine/fight_resolution.py:resolve_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_consolidate_reports_engaging_and_objective_endpoint_violations",
+            "role": "invalid",
+            "assertion": "assert objective_violation.violations[0].violation_code == 'objective_consolidation_not_in_range'",
+            "proves": "A witnessed objective consolidation ending outside achievable objective range is rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.04.03-obligation-06",
+        "source_blocks": [
+          3
+        ],
+        "summary": "If objective range is unattainable, the move reaches the closest legal endpoint.",
+        "owners": [
+          "src/warhammer40k_core/engine/movement_proposals.py:MovementProposalRequest",
+          "src/warhammer40k_core/engine/consolidation_model_constraints.py:consolidation_model_violation"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Source gap: C01-12/P01L records that no real source-linked Core movement constraint and consumer implements the general as-close-as-possible objective fallback. The accepted Consolidation consumer is not a counterexample: selected 12.08 explicitly requires only a closer endpoint when objective range is unreachable, not the closest endpoint. Cogitated Need and Synaptic Goading contain objective as-close wording in load-only faction activation data; those placeholders do not establish Core execution. A real applicable source-linked consumer and witnessed closest-endpoint proof are required before certification."
+        ]
+      },
+      {
+        "requirement_id": "01.04.03-obligation-07",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A model already in objective range may move its full legal budget while ending in that range.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_resolution.py:fight_movement_resolution_violation",
+          "src/warhammer40k_core/engine/fight_resolution.py:resolve_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_p12_objective_consolidation_allows_moving_within_range_without_getting_closer",
+            "role": "semantic",
+            "assertion": "assert fight_movement_resolution_violation(proposal_request=request, proposal=proposal, resolution=resolution, scenario=scenario, ruleset_descriptor=ruleset) is None",
+            "proves": "An already-in-range model may move away while retaining range without a closer-endpoint violation."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.04.04:1",
+    "requirements": [
+      {
+        "requirement_id": "01.04.04-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Touching bases establish base contact.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_model_geometry.py::test_circular_base_edge_contact_has_zero_distance_and_overlaps",
+            "role": "semantic",
+            "assertion": "assert math.isclose(base_distance(first, first_pose, second, touching_pose), 0.0)",
+            "proves": "Exact circular edge contact has zero base distance."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.04.04-obligation-02",
+        "source_blocks": [
+          2,
+          3
+        ],
+        "summary": "Overhang-deemed contact requires sufficient move distance to reach hypothetical base contact without the overhang.",
+        "owners": [
+          "src/warhammer40k_core/engine/base_contact_authority.py:contacts_for_validated_move",
+          "src/warhammer40k_core/geometry/base_contact.py:establish_deemed_base_contact"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_deemed_contact_rejects_each_missing_movement_condition",
+            "role": "semantic",
+            "assertion": "assert contact.source_rule_id == source.DEEMED_BASE_CONTACT_SOURCE_ID",
+            "proves": "The initial accepted facade charge supplies authentic deemed-contact evidence linked to the selected Core source."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_deemed_contact_rejects_each_missing_movement_condition",
+            "role": "semantic",
+            "assertion": "assert path_result.is_valid",
+            "proves": "Each negative case still has a legal actual movement witness; rejected contact is not an invalid-path artefact."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_deemed_contact_rejects_each_missing_movement_condition",
+            "role": "invalid",
+            "assertion": "assert result.deemed_base_contacts == ()",
+            "proves": "The insufficient-counterfactual-budget case keeps the actual witnessed move valid and at body contact, but rejects deemed contact because its two-inch budget cannot reach bare-base contact."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.04.04-obligation-03",
+        "source_blocks": [
+          2,
+          4
+        ],
+        "summary": "Overhang-deemed contact requires the closest physically legal endpoint.",
+        "owners": [
+          "src/warhammer40k_core/engine/base_contact_authority.py:contacts_for_validated_move",
+          "src/warhammer40k_core/geometry/base_contact.py:establish_deemed_base_contact"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_deemed_contact_rejects_each_missing_movement_condition",
+            "role": "semantic",
+            "assertion": "assert contact.source_rule_id == source.DEEMED_BASE_CONTACT_SOURCE_ID",
+            "proves": "The initial accepted facade charge supplies authentic deemed-contact evidence linked to the selected Core source."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_deemed_contact_rejects_each_missing_movement_condition",
+            "role": "semantic",
+            "assertion": "assert path_result.is_valid",
+            "proves": "Each negative case still has a legal actual movement witness; rejected contact is not an invalid-path artefact."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_deemed_contact_rejects_each_missing_movement_condition",
+            "role": "invalid",
+            "assertion": "assert result.deemed_base_contacts == ()",
+            "proves": "The closer-legal-endpoint-exists case has sufficient budget and model parts within one inch, but the engine rejects deemed contact at an endpoint 0.2 inches short of the closest legal endpoint."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.04.04-obligation-04",
+        "source_blocks": [
+          2,
+          5
+        ],
+        "summary": "Overhang-deemed contact requires model-part separation of at most one inch.",
+        "owners": [
+          "src/warhammer40k_core/engine/base_contact_authority.py:contacts_for_validated_move",
+          "src/warhammer40k_core/geometry/base_contact.py:establish_deemed_base_contact"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_deemed_contact_rejects_each_missing_movement_condition",
+            "role": "semantic",
+            "assertion": "assert contact.source_rule_id == source.DEEMED_BASE_CONTACT_SOURCE_ID",
+            "proves": "The initial accepted facade charge supplies authentic deemed-contact evidence linked to the selected Core source."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_deemed_contact_rejects_each_missing_movement_condition",
+            "role": "semantic",
+            "assertion": "assert path_result.is_valid",
+            "proves": "Each negative case still has a legal actual movement witness; rejected contact is not an invalid-path artefact."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_deemed_contact_rejects_each_missing_movement_condition",
+            "role": "invalid",
+            "assertion": "assert result.deemed_base_contacts == ()",
+            "proves": "The model-parts-beyond-one-inch case has a valid witnessed move and ample budget, but the engine supplies no deemed contact when the physical model parts are 1.01 inches apart."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_deemed_contact_rejects_each_missing_movement_condition",
+            "role": "semantic",
+            "assertion": "assert model_parts_within(replace(mover, pose=end), enemy, 1.0) is within_one",
+            "proves": "The physical-parts predicate independently confirms which endpoints satisfy the one-inch conjunct."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10h_pathing_smoke.py::test_body_part_proximity_and_terrain_endpoints_use_full_shapes",
+            "role": "semantic",
+            "assertion": "assert model_parts_within(close, enemy, 1.0)",
+            "proves": "The full-shape predicate includes a separation of exactly one inch."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10h_pathing_smoke.py::test_body_part_proximity_and_terrain_endpoints_use_full_shapes",
+            "role": "invalid",
+            "assertion": "assert not model_parts_within(replace(close, pose=Pose.at(2.5 - 1e-05, 5)), enemy, 1.0)",
+            "proves": "The same physical model parts cease to satisfy the conjunct just beyond one inch."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.04.04-obligation-05",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Valid overhang-deemed contact expires at the turn's end.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order85_deemed_base_contact.py::test_contact_expires_at_turn_boundary",
+            "role": "semantic",
+            "assertion": "assert not current_deemed_base_contacts(state)",
+            "proves": "Accepted deemed contact is unavailable after turn cleanup, another turn, or the next round."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.04.05:1",
+    "requirements": [
+      {
+        "requirement_id": "01.04.05-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Table quarters are four equal rectangles separated by central lengthwise and widthwise strips one millimetre thick.",
+        "owners": [
+          "src/warhammer40k_core/engine/secondary_scoring_occupancy.py:build_secondary_battlefield_occupancy"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order86_table_quarters.py::test_quarter_divider_borders",
+            "role": "semantic",
+            "assertion": "assert scoring_table_quarter_id_or_none(geometry_models=(model,), center_x=30, center_y=30) == (expected if qualifies else None)",
+            "proves": "Parameterized adjacent boundary positions enforce the one-millimetre central exclusion strips."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.05:1",
+    "requirements": [
+      {
+        "requirement_id": "01.05-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "D6 has six possible faces from one through six.",
+        "owners": [
+          "src/warhammer40k_core/core/dice.py:DiceRollResult",
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_d6_accepts_each_physical_face",
+            "role": "semantic",
+            "assertion": "assert result.total == face",
+            "proves": "Each legal physical D6 face from one through six is preserved."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_d6_rejects_faces_outside_one_through_six",
+            "role": "invalid",
+            "assertion": "with pytest.raises(DiceRollSpecError):\n    DiceRollResult.from_values(roll_id='d6', spec=spec, values=(face,), source='fixed')",
+            "proves": "Zero and seven are rejected as physical D6 faces."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.05-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A threshold N+ succeeds for results greater than or equal to N.",
+        "owners": [
+          "src/warhammer40k_core/core/dice.py:DiceRollResult",
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_leadership_battle_shock_uses_two_d6_and_inclusive_threshold",
+            "role": "semantic",
+            "assertion": "assert result.passed is passed",
+            "proves": "A threshold-six leadership consumer rejects five and accepts six and seven."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.05-obligation-03",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A stated dice-result range includes both bounds.",
+        "owners": [
+          "src/warhammer40k_core/core/dice.py:DiceRollResult",
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_source_dice_ranges_include_both_endpoints",
+            "role": "semantic",
+            "assertion": "assert knights._deed_from_d6(face) is expected[(face - 1) // 2]",
+            "proves": "The real Code Chivalric consumer includes both endpoints of its1\u20132,3\u20134 and5\u20136 source ranges."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.05-obligation-04",
+        "source_blocks": [
+          4
+        ],
+        "summary": "ND6 sums the specified number of D6 results.",
+        "owners": [
+          "src/warhammer40k_core/core/dice.py:DiceRollResult",
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_multiple_dice_sum_all_faces_and_the_intrinsic_constant",
+            "role": "semantic",
+            "assertion": "assert result.total == 13",
+            "proves": "Three D6 values one, four and six plus intrinsic two total thirteen."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.05-obligation-05",
+        "source_blocks": [
+          5
+        ],
+        "summary": "D3 is a physical D6 result halved and rounded upward.",
+        "owners": [
+          "src/warhammer40k_core/core/dice.py:DiceRollResult",
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j_dice_semantics.py::test_d3_records_source_d6_and_rounded_up_result",
+            "role": "semantic",
+            "assertion": "assert result.value == 3",
+            "proves": "A physical D6 five maps to D3 three and retains its source."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.05-obligation-06",
+        "source_blocks": [
+          6
+        ],
+        "summary": "A dice-expression constant is added to the dice sum.",
+        "owners": [
+          "src/warhammer40k_core/core/dice.py:DiceRollResult",
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_multiple_dice_sum_all_faces_and_the_intrinsic_constant",
+            "role": "semantic",
+            "assertion": "assert result.total == 13",
+            "proves": "Three D6 values one, four and six plus intrinsic two total thirteen."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.05.01:1",
+    "requirements": [
+      {
+        "requirement_id": "01.05.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Automatic success skips the dice roll and advances to the next sequence step.",
+        "owners": [
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_critical_hits.py::test_torrent_does_not_invent_a_critical_roll",
+            "role": "semantic",
+            "assertion": "assert hit.skipped",
+            "proves": "Torrent automatic success does not perform the hit roll."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.05.01-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Automatic success does not trigger result-specific or critical-result rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_critical_hits.py::test_torrent_does_not_invent_a_critical_roll",
+            "role": "semantic",
+            "assertion": "assert not hit.critical",
+            "proves": "An automatic hit is successful without a fabricated critical result."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2,
+          3
+        ],
+        "classification": "example",
+        "reason": "Illustration of the separately inventoried operative rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:01:01.05.02:1",
+    "requirements": [
+      {
+        "requirement_id": "01.05.02-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A whole-roll reroll rerolls every component of a multi-die sum.",
+        "owners": [
+          "src/warhammer40k_core/core/dice.py:DiceRollState.with_reroll",
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j_dice_semantics.py::test_whole_roll_permission_rerolls_every_die_for_multi_dice_rolls_by_default",
+            "role": "semantic",
+            "assertion": "assert tuple((option.option_id for option in request.options)) == ('decline', 'reroll:0,1')",
+            "proves": "The legal choice rerolls both physical dice, with no partial option."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.05.02-obligation-02",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A physical die cannot be rerolled twice.",
+        "owners": [
+          "src/warhammer40k_core/core/dice.py:DiceRollState.with_reroll",
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j_dice_semantics.py::test_no_die_component_can_be_rerolled_twice",
+            "role": "invalid",
+            "assertion": "with pytest.raises(DiceRollSpecError):\n    state.with_reroll(decision_id='decision-result-second', request_id='decision-request-second', selected_indices=(0,), replacement_result=DiceRollResult.from_values(roll_id='roll-000003', spec=first_replacement_spec, values=[6], source='fixed'))",
+            "proves": "The physical component refuses a second reroll after its first replacement."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.05.02-obligation-03",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Rerolls precede modifiers.",
+        "owners": [
+          "src/warhammer40k_core/core/dice.py:DiceRollState.with_reroll",
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j_dice_semantics.py::test_modifiers_apply_after_rerolls_and_preserve_unmodified_value",
+            "role": "semantic",
+            "assertion": "assert modified.final_value == 6",
+            "proves": "The modifier is applied to the rerolled unmodified five."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.05.02-obligation-04",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A rerolled value remains a dice result eligible for result-triggered rules.",
+        "owners": [
+          "src/warhammer40k_core/core/dice.py:DiceRollState.with_reroll",
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_critical_hits.py::test_hit_record_uses_the_current_rerolled_face",
+            "role": "semantic",
+            "assertion": "assert current.unmodified_roll == rerolled",
+            "proves": "Critical/success evaluation consumes the replacement face, not the initial face."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:01:01.05.03:1",
+    "requirements": [],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "cross_reference",
+        "reason": "Explicit referral to the operative clause in another source row."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:01:01.05.04:1",
+    "requirements": [],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "cross_reference",
+        "reason": "Explicit referral to the operative clause in another source row."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:01:01.05.05:1",
+    "requirements": [
+      {
+        "requirement_id": "01.05.05-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Each player rolls one D6 and the highest result wins the roll-off.",
+        "owners": [
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j_dice_semantics.py::test_roll_off_ties_repeat_until_there_is_a_winner",
+            "role": "semantic",
+            "assertion": "assert result.winner_player_id == 'player-b'",
+            "proves": "The high result in the repeated round wins."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.05.05-obligation-02",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A tie for highest causes another roll-off.",
+        "owners": [
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j_dice_semantics.py::test_roll_off_ties_repeat_until_there_is_a_winner",
+            "role": "semantic",
+            "assertion": "assert tuple((round_result.is_tie for round_result in result.rounds)) == (True, False)",
+            "proves": "A tied first round is followed by a decisive roll-off round."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:01:01.05.06:1",
+    "requirements": [
+      {
+        "requirement_id": "01.05.06-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A double requires at least two dice sharing a result.",
+        "owners": [
+          "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/world_eaters/army_rule.py:_matching_allocations"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_double_consumer_requires_two_equal_dice",
+            "role": "semantic",
+            "assertion": "assert _matching_allocations(values, BlessingOfKhorne.UNBRIDLED_BLOODLUST) == expected",
+            "proves": "A source-backed double consumer permits exactly equal pairs, including each possible pair from a triple."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.05.06-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A triple requires at least three dice sharing a result.",
+        "owners": [
+          "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/world_eaters/army_rule.py:_matching_allocations"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_triple_consumer_requires_three_equal_dice",
+            "role": "semantic",
+            "assertion": "assert _matching_allocations(values, BlessingOfKhorne.MARTIAL_EXCELLENCE) == expected",
+            "proves": "A source-backed triple consumer rejects a pair and allows each equal triple from four dice."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.05.07:1",
+    "requirements": [
+      {
+        "requirement_id": "01.05.07-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The active player chooses one physical die when multiple dice tie for a referenced highest result.",
+        "owners": [
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j_dice_semantics.py::test_order84_tied_physical_die_uses_active_player_facade_and_exact_replay",
+            "role": "facade",
+            "assertion": "assert request.actor_id == 'player-a'",
+            "proves": "Both highest/lowest tied-die cases offer the physical selection to the active player."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.05.07-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "The active player chooses one physical die when multiple dice tie for a referenced lowest result.",
+        "owners": [
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j_dice_semantics.py::test_order84_tied_physical_die_uses_active_player_facade_and_exact_replay",
+            "role": "facade",
+            "assertion": "assert request.actor_id == 'player-a'",
+            "proves": "Both highest/lowest tied-die cases offer the physical selection to the active player."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.05.08:1",
+    "requirements": [
+      {
+        "requirement_id": "01.05.08-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "An assigned result activates the same result predicates as that value being rolled.",
+        "owners": [
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j_dice_semantics.py::test_order84_wound_save_and_hazard_consume_assigned_results",
+            "role": "semantic",
+            "assertion": "assert failed_hazard_roll_indices(state) == ((0,) if assigned == 1 else ())",
+            "proves": "Assigned effective values feed ordinary wound, save and hazard predicates."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.05.08-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An assigned result may exceed the physical D6 maximum.",
+        "owners": [
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j_dice_semantics.py::test_order84_assigned_result_preserves_physical_die_and_replay",
+            "role": "semantic",
+            "assertion": "assert state.current_values == (2, assigned)",
+            "proves": "Assignments including values above six become effective results while original dice remain unchanged."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.06:1",
+    "requirements": [
+      {
+        "requirement_id": "01.06-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A leadership roll uses 2D6.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_shock.py:BattleShockTestRequest.for_unit",
+          "src/warhammer40k_core/engine/battle_shock.py:BattleShockResult.from_roll_state"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_leadership_battle_shock_uses_two_d6_and_inclusive_threshold",
+            "role": "semantic",
+            "assertion": "assert request.spec.expression == DiceExpression(quantity=2, sides=6)",
+            "proves": "The battle-shock leadership operation constructs a two-D6 roll and is resolved by the shared leadership threshold owner."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.06-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A leadership roll succeeds when its sum meets at least one living unit member's Ld threshold.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_shock.py:BattleShockTestRequest.for_unit",
+          "src/warhammer40k_core/engine/battle_shock.py:BattleShockResult.from_roll_state"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order87_random_profiles.py::test_random_leadership_is_evaluated_per_living_model_at_command_test",
+            "role": "semantic",
+            "assertion": "assert request['leadership_target'] == min((cast(dict[str, int], row)['value'] for row in rolls))",
+            "proves": "The required unit leadership threshold is the minimum per-living-model value."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.06-obligation-03",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A leadership roll fails if no Ld threshold is met.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_shock.py:BattleShockTestRequest.for_unit",
+          "src/warhammer40k_core/engine/battle_shock.py:BattleShockResult.from_roll_state"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_leadership_battle_shock_uses_two_d6_and_inclusive_threshold",
+            "role": "semantic",
+            "assertion": "assert result.passed is passed",
+            "proves": "The two-D6 total five fails the required leadership-six threshold."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.06.01:1",
+    "requirements": [
+      {
+        "requirement_id": "01.06.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Leadership test and leadership roll denote the same engine operation.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_shock.py:BattleShockResult.from_roll_state"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_leadership_battle_shock_uses_two_d6_and_inclusive_threshold",
+            "role": "semantic",
+            "assertion": "assert request.spec.expression == DiceExpression(quantity=2, sides=6)",
+            "proves": "The battle-shock leadership operation constructs a two-D6 roll and is resolved by the shared leadership threshold owner."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:01:01.07:1",
+    "requirements": [
+      {
+        "requirement_id": "01.07-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Battle-shock uses the unit's leadership roll.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.record_battle_shock_result",
+          "src/warhammer40k_core/engine/battle_shock.py:BattleShockResult.from_roll_state"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_leadership_battle_shock_uses_two_d6_and_inclusive_threshold",
+            "role": "semantic",
+            "assertion": "assert request.spec.expression == DiceExpression(quantity=2, sides=6)",
+            "proves": "The battle-shock leadership operation constructs a two-D6 roll and is resolved by the shared leadership threshold owner."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.07-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A passing roll does not newly battle-shock the unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.record_battle_shock_result",
+          "src/warhammer40k_core/engine/battle_shock.py:BattleShockResult.from_roll_state"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_passed_battle_shock_does_not_mark_unit",
+            "role": "semantic",
+            "assertion": "assert state.battle_shocked_unit_ids == []",
+            "proves": "A successful roll leaves the unit unshocked."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.07-obligation-03",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A failed roll battle-shocks the whole unit and each member model.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.record_battle_shock_result",
+          "src/warhammer40k_core/engine/battle_shock.py:BattleShockResult.from_roll_state"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_failed_battle_shock_persists_and_sets_effective_oc_to_zero",
+            "role": "semantic",
+            "assertion": "assert 'army-alpha:intercessor-unit-1' in state.battle_shocked_unit_ids",
+            "proves": "Failed leadership records shock on the rules unit."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.07-obligation-04",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Every battle-shocked member's OC is replaced with an absent characteristic.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.record_battle_shock_result",
+          "src/warhammer40k_core/engine/battle_shock.py:BattleShockResult.from_roll_state"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_attributes_modifiers.py::test_phase14c_dash_characteristics_are_typed_and_replay_safe",
+            "role": "semantic",
+            "assertion": "assert battle_shock_dash.value_kind is CharacteristicValueKind.REPLACEMENT_DASH",
+            "proves": "The symbolic battle-shock OC replacement is explicitly REPLACEMENT_DASH, distinct from numeric zero."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_failed_battle_shock_persists_and_sets_effective_oc_to_zero",
+            "role": "semantic",
+            "assertion": "assert {contribution.model_instance_id: contribution.effective_objective_control for contribution in result.contributors if contribution.player_id == 'player-a'} == {'army-alpha:intercessor-unit-1:core-intercessor-like:001': 0, 'army-alpha:intercessor-unit-1:core-intercessor-like:002': 0}",
+            "proves": "The applied failed battle-shock causes every contributing model in the unit to have effective OC zero."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.07-obligation-05",
+        "source_blocks": [
+          6
+        ],
+        "summary": "The controlling player cannot target a battle-shocked unit with a Stratagem.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.record_battle_shock_result",
+          "src/warhammer40k_core/engine/battle_shock.py:BattleShockResult.from_roll_state"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_battle_shocked_friendly_unit_cannot_be_stratagem_target_by_default",
+            "role": "semantic",
+            "assertion": "assert blocked.denial_reason == 'friendly_battle_shocked_unit'",
+            "proves": "The shared targeting service rejects the controlling player's shocked target."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.07-obligation-06",
+        "source_blocks": [
+          7
+        ],
+        "summary": "A battle-shocked unit cannot start an Action.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.record_battle_shock_result",
+          "src/warhammer40k_core/engine/battle_shock.py:BattleShockResult.from_roll_state"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_phase14c_battle_shocked_units_cannot_start_or_complete_mission_actions",
+            "role": "invalid",
+            "assertion": "with pytest.raises(GameLifecycleError, match='cannot start actions'):\n    MissionActionState.start(action_id='cleanse:center:player-a', mission_action_id='cleanse-objective', player_id='player-a', unit_instance_id=unit_id, target_id='take-and-hold-vs-purge-the-foe-layout-3-center-central', condition_target_id='take-and-hold-vs-purge-the-foe-layout-3-center-central', mission_id='cleanse', battle_round=1, phase=BattlePhase.MOVEMENT.value, start_timing='movement_phase_unit_selected', completion_timing='turn_end', eligible_unit_instance_ids=(unit_id,), interruption_conditions=('unit_moved',), scoring_source_id='cleanse', victory_points=5, battle_shocked_unit_ids=(unit_id,))",
+            "proves": "The shared Action authority raises for a battle-shocked starter."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "01.07-obligation-07",
+        "source_blocks": [
+          7
+        ],
+        "summary": "An Action started by a subsequently battle-shocked unit cannot complete.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.record_battle_shock_result",
+          "src/warhammer40k_core/engine/battle_shock.py:BattleShockResult.from_roll_state"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_phase14c_battle_shocked_units_cannot_start_or_complete_mission_actions",
+            "role": "invalid",
+            "assertion": "with pytest.raises(GameLifecycleError, match='cannot complete actions'):\n    action.complete(battle_round=1, phase=BattlePhase.FIGHT.value, completion_timing='turn_end', award=award, transaction_id='victory-point:player-a:round-01:000001', battle_shocked_unit_ids=(unit_id,))",
+            "proves": "The shared Action authority raises for a battle-shocked completion."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          4
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:01:01.07.01:1",
+    "requirements": [],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:01:01.07.02:1",
+    "requirements": [
+      {
+        "requirement_id": "01.07.02-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Battle-shock test and battle-shock roll denote the same engine operation.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_shock.py:BattleShockResult.from_roll_state"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_leadership_battle_shock_uses_two_d6_and_inclusive_threshold",
+            "role": "semantic",
+            "assertion": "assert request.spec.expression == DiceExpression(quantity=2, sides=6)",
+            "proves": "The battle-shock leadership operation constructs a two-D6 roll and is resolved by the shared leadership threshold owner."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "faq:7ac6c358-0263-49ff-aee7-28b8fd4b5b8b",
+    "requirements": [
+      {
+        "requirement_id": "faq-7ac6c358-0263-49ff-aee7-28b8fd4b5b8b-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Embarked abilities remain available when their own restrictions are met.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/integration/test_embarked_ability_authority.py::test_embarked_command_point_ability_uses_its_own_battlefield_restriction",
+            "role": "semantic",
+            "assertion": "assert state.command_point_total('player-a') == before + int(not restricted or not embarked)",
+            "proves": "An unrestricted embarked CP rule applies while an on-battlefield-conditioned one does not."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "faq-7ac6c358-0263-49ff-aee7-28b8fd4b5b8b-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An embarked ability requiring visibility or distance to another unit fails.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/integration/test_embarked_ability_authority.py::test_embarked_command_point_ability_uses_its_own_battlefield_restriction",
+            "role": "semantic",
+            "assertion": "assert state.command_point_total('player-a') == before + int(not restricted or not embarked)",
+            "proves": "An unrestricted embarked CP rule applies while an on-battlefield-conditioned one does not."
+          },
+          {
+            "nodeid": "tests/integration/test_embarked_ability_authority.py::test_target_selection_uses_spatial_conditions_instead_of_source_suppression",
+            "role": "semantic",
+            "assertion": "assert targets == (source.unit_instance_id,)",
+            "proves": "Spatial requirements on another unit reject external embarked targets."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "faq-7ac6c358-0263-49ff-aee7-28b8fd4b5b8b-obligation-03",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Firing Deck uses Transport weapon ownership and does not inherit cargo-only weapon benefits.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/integration/test_embarked_ability_authority.py::test_firing_deck_preserves_attached_ability_ownership",
+            "role": "semantic",
+            "assertion": "assert runtime.weapon_profile_modifier(context) == weapon['weapon_profile']",
+            "proves": "The borrowed Transport weapon profile gains none of the cargo-only Lethal Hits effect."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  }
+]

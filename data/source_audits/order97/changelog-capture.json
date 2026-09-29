@@ -1,0 +1,662 @@
+[
+  {
+    "version": "946",
+    "date": "2026-09-02",
+    "summary": "1 item changed.",
+    "changes": [
+      {
+        "ref": "18.04.01",
+        "title": "Rapid Disembark And Limitations",
+        "kind": "added",
+        "body": "When a unit uses the rapid disembark mode after its TRANSPORT makes an ingress move, the models must follow the same rules and restrictions as that TRANSPORT did. For example, if that TRANSPORT had to be set up more than 8\" from all enemy units and not within your opponent\u2019s deployment zone, the same applies to the disembarking unit."
+      }
+    ]
+  },
+  {
+    "version": "931",
+    "date": "2026-08-26",
+    "summary": "19 items changed.",
+    "changes": [
+      {
+        "ref": "01.02.06",
+        "title": "Splitting Units",
+        "kind": "changed",
+        "excerpt": {
+          "before": "\u2026 models in that unit.",
+          "after": "\u2026 models in that unit. A unit must be split into two units, each containing as equal a number of models as possible (when splitting a unit in this way, make a note of which models form each of the two new units). If a rule states a specific starting strength of the split units, but this is not possible based on the number of models in the unit being split (e.g. due to attached Leader/Support models), split the unit as stated above."
+        }
+      },
+      {
+        "ref": "18.06",
+        "title": "Assault Disembark Move",
+        "kind": "added",
+        "body": "Your unit is set up as described in Set Up (Core Rules, 03.02). As stated in the rule allowing this move type, if all of the following apply to your unit: Embarked within a TRANSPORT model that is on the battlefield. Did not embark within that TRANSPORT this phase. That TRANSPORT has not made an advance/fall\u2011back move this phase. Set up each model in your unit wholly within the set\u2011up distance of that TRANSPORT. 3\" 18.06"
+      },
+      {
+        "ref": "18.07",
+        "title": "Shock Disembark Move",
+        "kind": "added",
+        "body": "Your unit is set up as described in Set Up (Core Rules, 03.02). As stated in the rule allowing this move type, if all of the following apply to your unit: Embarked within a TRANSPORT model that is on the battlefield. Did not embark within that TRANSPORT this phase. Set up each model in your unit wholly within the set\u2011up distance of that TRANSPORT. Each model that started this move engaged with an enemy unit must still be engaged with that enemy unit. If one or more enemy units engaged with your unit have not been selected to fight this phase, your opponent must select each of those units, one at a time; when each is selected, it becomes eligible to fight and is selected to fight 3\" 18.07"
+      },
+      {
+        "ref": "22.03.01",
+        "title": "Psychic Abilities with a Psychic Level",
+        "kind": "added",
+        "body": "When using psychic abilities with a psychic level, a PSYKER unit cannot use the same psychic ability more than once per phase."
+      },
+      {
+        "ref": "24.08",
+        "title": "Deadly Demise",
+        "kind": "changed",
+        "excerpt": {
+          "before": "\u2026 Each time a model in this unit is destroyed, after the \u2026 each unit within 6\"). Example: An Impulsor with a unit of Intercessors embarked within it is destroyed by ranged attacks. First, any unresolved attacks made by the attacking unit are resolved. Then the Intercessors make an emergency disembark move. Then the roll is made for the Deadly Demise ability, and on a 6, that ability is resolved. Finally, the Impulsor is removed from the battlefield.",
+          "after": "\u2026 Each time a model with this ability is destroyed, after the \u2026 each unit within 6\")."
+        }
+      },
+      {
+        "ref": "Errata",
+        "title": "01.02.06",
+        "kind": "added",
+        "body": "Add: \u25aa A unit must be split into two units, each containing as equal a number of models as possible (when splitting a unit in this way, make a note of which models form each of the two new units). If a rule states a specific starting strength of the split units, but this is not possible based on the number of models in the unit being split (e.g. due to attached Leader/Support models), split the unit as stated above."
+      },
+      {
+        "ref": "Errata",
+        "title": "12.08 - Consolidation Move, After Moving Section, Ongoing Consolidation",
+        "kind": "added",
+        "body": "Change to: Each model that started this move engaged with an enemy unit must still be engaged with that enemy unit. If one or more enemy units engaged with your unit have not been selected to fight this phase, your opponent must select each of those units, one at a time; when each is selected, it becomes eligible to fight and is selected to fight"
+      },
+      {
+        "ref": "FAQ",
+        "title": "Can I use the Insane Bravery stratagem on a battle-shocked unit?",
+        "kind": "added",
+        "body": "No, as a unit's controlling player cannot target that unit with stratagems (01.07)."
+      },
+      {
+        "ref": "FAQ",
+        "title": "Do a unit's abilities continue to function while they are embarked within a TRANSPORT?",
+        "kind": "added",
+        "body": "Yes, within the restrictions specified by the ability itself. Embarked units are Not On The Battlefield (01.02.04), so any ability requiring visibility or measurement to another unit will fail. Example: Azrael is attached to an Intercessor Squad unit and embarked within a TRANSPORT, and that TRANSPORT is making a shooting attack using the Firing Deck ability. While Azrael's Supreme Grand Master ability is still technically active, it will have no effect, as the requirements of the ability are not met (the ability affects 'weapons equipped by models' in Azrael's unit, and for the purposes of Firing Deck, the TRANSPORT itself is equipped with those weapons instead)."
+      },
+      {
+        "ref": "FAQ",
+        "title": "Fight On Death (05.04.05) requires models awaiting such an ability to stay on the battlefield until their unit has attacked (or until the end of the phase). How do these models function while this is the case?",
+        "kind": "added",
+        "body": "Models awaiting a Fight On Death ability are still present on the battlefield for all rules purposes. This includes (but is not limited to) the following regarding such models: They can be measured to by friendly/enemy abilities. They can be considered visible to friendly/enemy models where relevant. They can use their datasheet abilities. They can be targeted by stratagems. Enemy units can still be engaged with them (which may restrict the opposing player's consolidation/pile-In moves made as part of an overrun fight)."
+      },
+      {
+        "ref": "FAQ",
+        "title": "How do modifiers to the charge roll (or to the maximum distance of the charge move, such as Take to the Skies) affect the selection of charge targets?",
+        "kind": "added",
+        "body": "A charging unit may only select charge targets that are within the maximum distance of their charge roll, including any modifiers. If such a modifier occurs after selecting a charge target and causes that charge target to no longer be within the maximum distance, the charging unit would then select new targets (Target No Longer Eligible Or Viable, 04.03.03). Example: A unit's charge roll is 7\", and that unit has a datasheet ability which adds 1 to charge rolls: that charge's maximum distance is 8\", so you can select charge targets within 8\". Example: A FLYING unit chooses to take to the skies and rolls a charge roll of 9\"; that charge's maximum distance is 7\" (9\" minus the 2\" from taking to the skies), so you can select charge targets within 7\"."
+      },
+      {
+        "ref": "FAQ",
+        "title": "If a rule refers to an 'objective marker', does this mean an 'objective'?",
+        "kind": "added",
+        "body": "Yes (excluding rules in the Core Rules)'."
+      },
+      {
+        "ref": "FAQ",
+        "title": "If both players have units with the Scouts ability, do they alternate resolving scout moves?",
+        "kind": "added",
+        "body": "Yes, players alternate resolving any pre-battle rules units from their army may have, starting with the player who will take the first turn."
+      },
+      {
+        "ref": "FAQ",
+        "title": "My attack has a rule that means it results in a critical hit on a hit roll of 4+, and I would otherwise need a 5+ to hit. Does a 4+ hit?",
+        "kind": "added",
+        "body": "Yes, except when snap shooting: when snap shooting, each attack only hits on a roll of 6."
+      },
+      {
+        "ref": "FAQ",
+        "title": "My attack has a rule that means it results in a critical hit on a hit roll of 4+. Does this work when snap shooting?",
+        "kind": "added",
+        "body": "Unless otherwise stated, no: when snap shooting, each attack only hits on a roll of 6."
+      },
+      {
+        "ref": "FAQ",
+        "title": "My unit has access to a rule that changes the Damage characteristic of an incoming attack to 0. When such an attack is allocated to a model in that unit, is the Damage changed before or after save rolls?",
+        "kind": "added",
+        "body": "After."
+      },
+      {
+        "ref": "FAQ",
+        "title": "Units have all the keywords of all their models, and attached units have all the keywords of all of their component units. How are destroyed models taken into account for these purposes?",
+        "kind": "added",
+        "body": "These statements are only true so long as the models possessing those keywords remain part of the unit; destroyed models do not contribute their keywords to their prior unit. Example: The Aspiring Sorcerer model in a unit of Rubric Marines is destroyed; as none of the remaining models in the unit possess the PSYKER keyword, that unit is no longer a PSYKER unit."
+      },
+      {
+        "ref": "FAQ",
+        "title": "When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them?",
+        "kind": "added",
+        "body": "Line of sight is drawn from any part of the observing model to any part of the model being observed."
+      },
+      {
+        "ref": "FAQ",
+        "title": "When do the effects of a FLYING unit taking to the skies apply?",
+        "kind": "added",
+        "body": "When that unit is selected to make a normal/advance/fall-back/charge move. Note that for an advance/charge move, this means you must declare that a unit will take to the skies before rolling for that advance/charge move."
+      }
+    ]
+  },
+  {
+    "version": "925",
+    "date": "2026-08-05",
+    "summary": "No mission or Core Rules changes (faction/points data only).",
+    "changes": []
+  },
+  {
+    "version": "913",
+    "date": "2026-07-28",
+    "summary": "No mission or Core Rules changes (faction/points data only).",
+    "changes": []
+  },
+  {
+    "version": "912",
+    "date": "2026-07-23",
+    "summary": "No mission or Core Rules changes (faction/points data only).",
+    "changes": []
+  },
+  {
+    "version": "909",
+    "date": "2026-07-22",
+    "summary": "33 items changed; translation updates for 2 items.",
+    "changes": [
+      {
+        "ref": "01.02.03",
+        "title": "Revived and Adding Models to a Unit",
+        "kind": "changed",
+        "excerpt": {
+          "before": "\u2026 to it if possible.",
+          "after": "\u2026 to it if possible. When a model revives, resurrects, returns or is added to an embarked unit, if that TRANSPORT has sufficient remaining transport capacity for that model, that model is returned to that unit and is embarked. Otherwise, that model is destroyed, but it does not trigger rules that apply when a model is destroyed."
+        }
+      },
+      {
+        "ref": "01.04.05",
+        "title": "Table Quarters",
+        "kind": "added",
+        "body": "When a rule refers to a table quarter, or table quarters, divide the battlefield with imaginary lines 1mm thick drawn lengthwise and widthwise through the centre of the battlefield to create four equal rectangles. These rectangles are the table quarters."
+      },
+      {
+        "ref": "02.02.01",
+        "title": "Modifiers",
+        "kind": "changed",
+        "excerpt": {
+          "before": "\u2026 CHARACTERISTICS When modifying characteristics, the following points also \u2026",
+          "after": "\u2026 CHARACTERISTICS When modifying characteristics, unless otherwise stated, the following points also \u2026"
+        }
+      },
+      {
+        "ref": "02.02.04",
+        "title": "Healing Or Regaining Lost Wounds",
+        "kind": "changed",
+        "excerpt": {
+          "before": "\u2026 one of those destroyed models, with one wound remaining. \u2026",
+          "after": "\u2026 one of those destroyed models (excluding Character models), with one wound remaining. \u2026"
+        }
+      },
+      {
+        "ref": "03.02.02",
+        "title": "Setting Up Large Models",
+        "kind": "changed",
+        "excerpt": {
+          "before": "\u2026 set up on the battlefield, that model\u2019s unit cannot \u2026",
+          "after": "\u2026 set up on the battlefield (excluding AIRCRAFT models), that model\u2019s unit cannot \u2026"
+        }
+      },
+      {
+        "ref": "05.03.02",
+        "title": "Attacks Modified during Hit and Wound rolls",
+        "kind": "added",
+        "body": "Some attacks may be modified as a result of the values of hit/wound rolls made for those attacks. When this happens, split those attacks into attack pools based on their new identical attack profiles. The active player can decide which attack pool to resolve first for steps 5.3 and 5.4. Once those steps have been completed for that attack pool, the active player can decide the next pool to resolve and repeat until all new attack pools are resolved."
+      },
+      {
+        "ref": "05.04",
+        "title": "Inflict Damage",
+        "kind": "translations",
+        "locales": [
+          "ko"
+        ]
+      },
+      {
+        "ref": "09.07.01",
+        "title": "Desperate Escape Test",
+        "kind": "added",
+        "body": "Some rules may reference the term 'Desperate Escape test'. In all instances this means the hazard rolls made for the desperate escape mode of a fall-back move. Abilities that subtract from a unit's Desperate Escape test instead subtract from those hazard rolls. Example: A battle-shocked unit makes a fall-back move away from a unit of Bloodletters that have the Bane of Cowards ability. As a result of Bane of Cowards, because the unit making the fall-back move is battle-shocked, the hazard rolls they make as part of their desperate escape will be at -1."
+      },
+      {
+        "ref": "09.07.01",
+        "title": "Desperate Escape",
+        "kind": "added",
+        "body": "If a stratagem or ability forces a unit to make a Desperate Escape test, that unit: - Must make one hazard roll for each model in that unit. - Must make a battle-shock roll."
+      },
+      {
+        "ref": "12.08",
+        "title": "Consolidation Move",
+        "kind": "changed",
+        "excerpt": {
+          "before": "\u2026 Your unit must be within range of the selected objective. 3\" 12.08",
+          "after": "\u2026 Your unit must be unengaged and within range of the selected objective. 3\" 12.08"
+        }
+      },
+      {
+        "ref": "13.11.01",
+        "title": "Gone to Ground",
+        "kind": "changed",
+        "excerpt": {
+          "before": "Hidden models that are within Solid terrain features gain an \u2026 one or more intervening Solid terrain features. That model\u2019s \u2026",
+          "after": "Hidden models that are concealed by dense terrain features gain an \u2026 one or more intervening dense terrain features. That model\u2019s \u2026"
+        }
+      },
+      {
+        "ref": "14.02.01",
+        "title": "Controlling an Objective at the End of a Phase",
+        "kind": "added",
+        "body": "At the end of each phase and turn, the first thing players do (before any other 'at the end of the phase/end of the turn' rules or abilities) is determine which objectives are controlled by which player."
+      },
+      {
+        "ref": "18.01",
+        "title": "Transport Capacity",
+        "kind": "changed",
+        "excerpt": {
+          "before": "\u2026 for the whole unit.",
+          "after": "\u2026 for the whole unit. A friendly unit must be embarked within each friendly DEDICATED TRANSPORT model. At the end of this step, each friendly DEDICATED TRANSPORT model without an embarked unit is destroyed, but they do not trigger rules that are triggered when a model is destroyed."
+        }
+      },
+      {
+        "ref": "20.01.02",
+        "title": "Strategic Reserves at the End of the Battle",
+        "kind": "added",
+        "body": "At the end of the final turn, units in strategic reserves are destroyed, but they do not trigger rules that apply when a model is destroyed."
+      },
+      {
+        "ref": "24.28.01",
+        "title": "Precision and Devastating Wounds",
+        "kind": "added",
+        "body": "Mortal Wounds inflicted by a [PRECISION] attack with the [DEVASTATING WOUNDS] ability are first applied to the CHARACTER group that was selected for those [PRECISION] attacks (if that group is not already destroyed)."
+      },
+      {
+        "ref": "24.37.01",
+        "title": "[TORRENT] weapons cannot have [INDIRECT FIRE] or [PRECISION].",
+        "kind": "added"
+      },
+      {
+        "ref": "25.04",
+        "title": "Fill Your Army Roster",
+        "kind": "changed",
+        "excerpt": {
+          "before": "\u2026 that enhancement. EPIC HEROES cannot have enhancements. Your army cannot \u2026 points cost each time).",
+          "after": "\u2026 that enhancement. EPIC HEROES models cannot be given enhancements. Your army cannot \u2026 points cost each time). If you are playing an Incursion battle, you can select a 3DP detachment as your only detachment."
+        }
+      },
+      {
+        "ref": "FAQ",
+        "title": "After using an ability that increases the CP cost of a stratagem, if my opponent does not have the necessary CP available for the selected stratagem, what happens?",
+        "kind": "added",
+        "body": "No CP are spent and that stratagem 's effects are not resolved (but that stratagem still counts as having been used this phase)."
+      },
+      {
+        "ref": "FAQ",
+        "title": "After using an ability that increases the CP cost of a stratagem, must my opponent continue to use the selected stratagem at the increased cost if they have the necessary CP available?",
+        "kind": "added",
+        "body": "Yes."
+      },
+      {
+        "ref": "FAQ",
+        "title": "Are models that are within the boundary of a terrain area, but not on the ground floor of a terrain area (e.g. overhanging parts of FRAME VEHICLES or models on terrain features that are within that terrain area) within that terrain area?",
+        "kind": "added",
+        "body": "Yes"
+      },
+      {
+        "ref": "FAQ",
+        "title": "Are Upgrades enhancements?",
+        "kind": "added",
+        "body": "Yes, Upgrades are a type of enhancement (but not all enhancements are Upgrades)."
+      },
+      {
+        "ref": "FAQ",
+        "title": "Can a unit have both an Upgrade and an enhancement?",
+        "kind": "added",
+        "body": "No, units are prevented from having two enhancements, and Upgrades are enhancements."
+      },
+      {
+        "ref": "FAQ",
+        "title": "Can an attached unit be given an Upgrade?",
+        "kind": "added",
+        "body": "Yes."
+      },
+      {
+        "ref": "FAQ",
+        "title": "Can an Epic Hero unit form an attached unit with a unit that has an enhancement?",
+        "kind": "added",
+        "body": "Yes."
+      },
+      {
+        "ref": "FAQ",
+        "title": "Can I group or allocate a wound to a destroyed model?",
+        "kind": "added",
+        "body": "No."
+      },
+      {
+        "ref": "FAQ",
+        "title": "Do rules that affect a keyword include multi-word keywords that contain that keyword? For example, would rules that affect Commissar units affect a unit that has the Commissar Graves keyword?",
+        "kind": "added",
+        "body": "No."
+      },
+      {
+        "ref": "FAQ",
+        "title": "Does the limit to the combined points value of my units in strategic reserves only apply until the start of the first battle round?",
+        "kind": "added",
+        "body": "Yes."
+      },
+      {
+        "ref": "FAQ",
+        "title": "Does vertical movement in a unit that has taken to the skies count towards the distance a model has used for the purposes of [Heavy]?",
+        "kind": "added",
+        "body": "No."
+      },
+      {
+        "ref": "FAQ",
+        "title": "If a stratagem contains a section that carries an additional CP cost (such as the Into the Fray option of Heroic Intervention), is that additional cost considered to be a modifier?",
+        "kind": "added",
+        "body": "No, a stratagem that costs 1CP and is making use of an optional +1CP section has an original cost of 2CP."
+      },
+      {
+        "ref": "FAQ",
+        "title": "If I place units in strategic reserves during the battle, can this exceed the 50% of my points limit for the battle restriction as mentioned in Placing Units in Strategic Reserves (20.01)?",
+        "kind": "added",
+        "body": "Yes. That restriction is applicable before the battle, in the Declare Battle Formations step."
+      },
+      {
+        "ref": "FAQ",
+        "title": "In what step during the attack sequence do I roll for Feel No Pain?",
+        "kind": "added",
+        "body": "In the Resolve Damage step of the Inflict Damage step (05.04)."
+      },
+      {
+        "ref": "FAQ",
+        "title": "Is being within range of a terrain objective the same as being within range of an objective marker?",
+        "kind": "added",
+        "body": "Yes."
+      },
+      {
+        "ref": "FAQ",
+        "title": "When my unit shoots at another unit, how does it work if some models in the target unit are fully visible to some models in my unit, while others are within a terrain area /not fully visible?",
+        "kind": "added",
+        "body": "For each attacking model in your unit, determine whether the target unit has the benefit of cover, as described in Terrain and Visibility. In this scenario, the target unit will likely have the benefit of cover against some of the attacking models, but not all. This means that, in an example unit where all attacking models are using the same weapon, when you get to the Resolve Attacks step of the Attack Sequence, you will collect dice for attacks made by models against which the target unit has the benefit of cover separately from the dice for attacks made by models against which the target unit does not have the benefit of cover."
+      },
+      {
+        "ref": "FAQ",
+        "title": "While making a move type other than a normal/advance move, can my MONSTER/VEHICLE unit move through friendly units?",
+        "kind": "added",
+        "body": "Yes."
+      },
+      {
+        "ref": "Secondary",
+        "title": "Assassination",
+        "kind": "translations",
+        "locales": [
+          "ko"
+        ]
+      }
+    ]
+  },
+  {
+    "version": "895",
+    "date": "2026-07-15",
+    "summary": "12 items changed.",
+    "changes": [
+      {
+        "ref": "09.05.01",
+        "title": "More Than One Normal Move in a Phase.",
+        "kind": "added",
+        "body": "A unit cannot make more than one Normal Move in a phase."
+      },
+      {
+        "ref": "Errata",
+        "title": "Grenades Stratagem",
+        "kind": "added",
+        "body": "The Grenade Stratagem is the same as the Explosives stratagem."
+      },
+      {
+        "ref": "Errata",
+        "title": "Tank Shock Stratagem",
+        "kind": "added",
+        "body": "The Tank Shock Stratagem is the same as the Crushing Impact stratagem."
+      },
+      {
+        "ref": "CA",
+        "title": "Attacker's Battlefield Edge",
+        "kind": "added"
+      },
+      {
+        "ref": "CA",
+        "title": "Attacker's Deployment Zone",
+        "kind": "added"
+      },
+      {
+        "ref": "CA",
+        "title": "Attacker's Territory",
+        "kind": "added"
+      },
+      {
+        "ref": "CA",
+        "title": "Defender's Battlefield Edge",
+        "kind": "added"
+      },
+      {
+        "ref": "CA",
+        "title": "Defender's Deployment Zone",
+        "kind": "added"
+      },
+      {
+        "ref": "CA",
+        "title": "Defender's Territory",
+        "kind": "added"
+      },
+      {
+        "ref": "CA",
+        "title": "No Man's Land",
+        "kind": "added"
+      },
+      {
+        "ref": "CA",
+        "title": "Objective Points",
+        "kind": "added"
+      },
+      {
+        "ref": "Secondary",
+        "title": "Outflank",
+        "kind": "changed",
+        "excerpt": {
+          "before": "\u2026 units is not within 5VP your territory. (5 VP, mutually exclusive)",
+          "after": "\u2026 units is not within your territory. (5 VP, mutually exclusive)"
+        }
+      }
+    ]
+  },
+  {
+    "version": "886",
+    "date": "2026-06-26",
+    "summary": "4 items changed; translation updates for 6 items.",
+    "changes": [
+      {
+        "ref": "12.03",
+        "title": "Pile-In Move",
+        "kind": "translations",
+        "locales": [
+          "ja"
+        ]
+      },
+      {
+        "ref": "13.02",
+        "title": "Terrain Categories",
+        "kind": "translations",
+        "locales": [
+          "de",
+          "es",
+          "fr",
+          "it",
+          "ja",
+          "ko",
+          "zh"
+        ]
+      },
+      {
+        "ref": "15.01",
+        "title": "Using Stratagems",
+        "kind": "translations",
+        "locales": [
+          "ja"
+        ]
+      },
+      {
+        "ref": "15.05",
+        "title": "Crushing Impact",
+        "kind": "translations",
+        "locales": [
+          "de",
+          "es",
+          "fr",
+          "it",
+          "ja",
+          "ko",
+          "zh"
+        ]
+      },
+      {
+        "ref": "15.06",
+        "title": "Explosives",
+        "kind": "translations",
+        "locales": [
+          "de",
+          "es",
+          "fr",
+          "it",
+          "ja",
+          "ko",
+          "zh"
+        ]
+      },
+      {
+        "ref": "18.04",
+        "title": "Disembark Move",
+        "kind": "translations",
+        "locales": [
+          "de"
+        ]
+      },
+      {
+        "ref": "19.01.01",
+        "title": "Attached Units After Their Bodyguard Unit is Destroyed",
+        "kind": "changed",
+        "excerpt": {
+          "before": "Some units have rules stating that when the unit in an attached \u2026",
+          "after": "Some units have rules stating that when the bodyguard unit in an attached \u2026"
+        }
+      },
+      {
+        "ref": "Primary",
+        "title": "Immovable Object",
+        "kind": "changed",
+        "excerpt": {
+          "before": "\u2026 home objective). (5 VP) SECOND BATTLE ROUND ONWARDS \u2014 End of your Command phase (or the end of your turn in the fifth battle round). You control one or more objectives (excluding your home objective). (4 VP) You control more objectives than your opponent. (4 VP) Decks: Take and Hold \u2026",
+          "after": "\u2026 home objective). (5 VP) Decks: Take and Hold \u2026"
+        }
+      },
+      {
+        "ref": "Primary",
+        "title": "Locate and Deny",
+        "kind": "changed",
+        "excerpt": {
+          "before": "\u2026 Priority Assets. Recommended layouts: Purge the Foe/Disruption - Layout A; Purge the Foe/Disruption - Layout C; Purge the Foe/Disruption - Layout B.",
+          "after": "\u2026 Priority Assets. Recommended layouts: Disruption/Priority Assets - Layout A; Disruption/Priority Assets - Layout B; Disruption/Priority Assets - Layout C."
+        }
+      },
+      {
+        "ref": "Primary",
+        "title": "Surveil the Foe",
+        "kind": "changed",
+        "excerpt": {
+          "before": "\u2026 \u2014 End of your turn. None of your \u2026",
+          "after": "\u2026 \u2014 End of your Command phase (or the end of your turn in the fifth battle round). You control one or more objectives (excluding your home objective). (4 VP) You control more objectives than your opponent. (4 VP) SECOND BATTLE ROUND ONWARDS \u2014 End of your turn. None of your \u2026"
+        }
+      }
+    ]
+  },
+  {
+    "version": "879",
+    "date": "2026-06-23",
+    "summary": "No mission or Core Rules changes (faction/points data only).",
+    "changes": []
+  },
+  {
+    "version": "875",
+    "date": "2026-06-18",
+    "summary": "8 items changed.",
+    "changes": [
+      {
+        "ref": "CA",
+        "title": "Attacker's Battlefield Edge",
+        "kind": "removed"
+      },
+      {
+        "ref": "CA",
+        "title": "Attacker's Deployment Zone",
+        "kind": "removed"
+      },
+      {
+        "ref": "CA",
+        "title": "Attacker's Territory",
+        "kind": "removed"
+      },
+      {
+        "ref": "CA",
+        "title": "Defender's Battlefield Edge",
+        "kind": "removed"
+      },
+      {
+        "ref": "CA",
+        "title": "Defender's Deployment Zone",
+        "kind": "removed"
+      },
+      {
+        "ref": "CA",
+        "title": "Defender's Territory",
+        "kind": "removed"
+      },
+      {
+        "ref": "CA",
+        "title": "No Man's Land",
+        "kind": "removed"
+      },
+      {
+        "ref": "CA",
+        "title": "Objective Points",
+        "kind": "removed"
+      }
+    ],
+    "notes": [
+      "The official FAQ export first appears in this data version, with 30 Core Rules questions and 3 errata."
+    ]
+  },
+  {
+    "version": "867",
+    "date": "2026-06-18",
+    "summary": "First datasources export of the 11th edition Core Rules (plus the Chapter Approved mission rules, mission decks).",
+    "changes": []
+  },
+  {
+    "version": "PDF",
+    "date": "2026-06-18",
+    "summary": "Baseline: the freely available Core Rules PDF, superseded by the first app data export (version 867).",
+    "notes": [
+      "103 numbered third-level sub-rules (NN.NN.NN) were introduced \u2014 16 restructured from PDF sidebars and inline text, the rest new clarifications. In the rules browser they carry PDF/APP source badges accordingly.",
+      "Of the 162 PDF rules: 48 are unchanged, 44 gained additional content around the PDF text, and 70 were reworded or restructured.",
+      "Eight PDF sidebars were not carried over (Indirect Fire, Do Units Have To Fight?, Overrun Fights, New Foes To Face, Plunging Fire, Hold At All Costs, Where To Find Actions, Rapid Disembark). This app restores seven of them as PDF-badged callouts on their rules; Rapid Disembark reached the app export in data 946.",
+      "Cross-references now use rule numbers (e.g. \u201c(03.03)\u201d) instead of the PDF's page positions (\u201csee left/below/opposite\u201d).",
+      "All 25 sections gained introductions, and every rule is provided in eight languages."
+    ],
+    "changes": []
+  }
+]

@@ -1,0 +1,424 @@
+[
+  {
+    "row_id": "rule:14:14.01:1",
+    "requirements": [
+      {
+        "requirement_id": "14.01-terrain-objective",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A mission objective coinciding with a terrain area uses that area as its objective geometry.",
+        "owners": [
+          "src/warhammer40k_core/engine/objective_control.py:resolve_objective_control"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11b_objective_control.py::test_terrain_objectives_derive_from_coincident_marker_and_control_area",
+            "role": "semantic",
+            "assertion": "assert context.terrain_objectives == (Objective.terrain(marker.objective_marker_id, marker.name, terrain_feature.feature_id),)",
+            "proves": "Coincident mission marker and area produce a terrain objective."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "14.01-distance",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Objective distances use the closest part of the objective.",
+        "owners": [
+          "src/warhammer40k_core/engine/objective_control.py:resolve_objective_control"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11b_objective_control.py::test_p14_shared_query_measures_marker_edge_and_terrain_without_marker_radius",
+            "role": "semantic",
+            "assertion": "assert math.isclose(nearest_point.horizontal_distance_inches, 5 - marker.marker_diameter_inches / 2 - model.base_size.diameter_mm / 25.4 / 2, abs_tol=1e-12)",
+            "proves": "The shared objective query uses marker edge versus terrain geometry."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:14:14.01.01:1",
+    "requirements": [
+      {
+        "requirement_id": "14.01.01-marker",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Otherwise use a forty-millimetre circular marker centered at the mission location.",
+        "owners": [
+          "src/warhammer40k_core/engine/objective_control.py:resolve_objective_control"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11b_objective_control.py::test_objective_marker_payloads_round_trip_with_default_geometry",
+            "role": "semantic",
+            "assertion": "assert math.isclose(marker.marker_diameter_inches, 40.0 / 25.4, rel_tol=0.0, abs_tol=1e-12)",
+            "proves": "The typed marker retains its default geometry."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "14.01.01-nonblocking",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Models may traverse and finish on objective markers.",
+        "owners": [
+          "src/warhammer40k_core/engine/objective_control.py:resolve_objective_control"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11b_objective_control.py::test_nonblocking_objective_marker_can_be_occupied_at_endpoint",
+            "role": "semantic",
+            "assertion": "assert objective_marker_endpoint_violations(scenario=scenario, objective_markers=(marker,), unit_placement=overlapping) == ()",
+            "proves": "A marker can be occupied by a legal model endpoint."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "14.01.01-range",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Marker range is three inches horizontally and five vertically, measured to its nearest part.",
+        "owners": [
+          "src/warhammer40k_core/engine/objective_control.py:resolve_objective_control"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11b_objective_control.py::test_p14_shared_query_measures_marker_edge_and_terrain_without_marker_radius",
+            "role": "semantic",
+            "assertion": "assert math.isclose(nearest_point.horizontal_distance_inches, 5 - marker.marker_diameter_inches / 2 - model.base_size.diameter_mm / 25.4 / 2, abs_tol=1e-12)",
+            "proves": "Marker query uses its edge and marker-specific range."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11b_objective_control.py::test_p14_objective_query_uses_closest_vertical_part",
+            "role": "semantic",
+            "assertion": "assert result.within_control_range is expected",
+            "proves": "Vertical measurement uses the closest model part."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_objective_marker_range_and_endpoint_overlap_use_core_dimensions",
+            "role": "semantic",
+            "assertion": "assert not objective_marker_controls_model(marker_pose, too_far)",
+            "proves": "A model3.05in from the marker edge is outside range."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_objective_marker_range_and_endpoint_overlap_use_core_dimensions",
+            "role": "semantic",
+            "assertion": "assert objective_marker_controls_model(marker_pose, controlled)",
+            "proves": "A model2.95in from the marker edge is within range."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:14:14.02:1",
+    "requirements": [
+      {
+        "requirement_id": "14.02-initial",
+        "source_blocks": [
+          1
+        ],
+        "summary": "At battle start objectives are uncontrolled until positive OC models establish control; terrain range means within the area.",
+        "owners": [
+          "src/warhammer40k_core/engine/objective_control.py:resolve_objective_control"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11b_objective_control.py::test_objective_without_controlling_models_is_uncontrolled",
+            "role": "semantic",
+            "assertion": "assert result.status is ObjectiveControlStatus.UNCONTROLLED",
+            "proves": "No controlling models gives an uncontrolled objective."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11b_objective_control.py::test_terrain_objective_control_requires_terrain_area_containment_not_marker_radius",
+            "role": "semantic",
+            "assertion": "assert result.contributors == ()",
+            "proves": "Terrain control uses area membership."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "14.02-sum-boundary",
+        "source_blocks": [
+          2
+        ],
+        "summary": "At each phase and turn end, sum the OC of all in-range models per player.",
+        "owners": [
+          "src/warhammer40k_core/engine/objective_control.py:resolve_objective_control"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11b_objective_control.py::test_objective_control_sums_oc_by_player_from_current_runtime_models",
+            "role": "semantic",
+            "assertion": "assert [(score.player_id, score.score) for score in result.scores] == [('player-a', 4), ('player-b', 2)]",
+            "proves": "OC is calculated from the current authoritative model inventory."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11b_objective_control.py::test_objective_control_records_update_at_phase_and_turn_end",
+            "role": "semantic",
+            "assertion": "assert [record.timing for record in state.objective_control_records[-2:]] == [ObjectiveControlTiming.PHASE_END, ObjectiveControlTiming.TURN_END]",
+            "proves": "Control records are produced at both boundary kinds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "14.02-winner",
+        "source_blocks": [
+          3
+        ],
+        "summary": "The player with higher control total controls the objective.",
+        "owners": [
+          "src/warhammer40k_core/engine/objective_control.py:resolve_objective_control"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11b_objective_control.py::test_objective_control_sums_oc_by_player_from_current_runtime_models",
+            "role": "semantic",
+            "assertion": "assert result.controlled_by_player_id == 'player-a'",
+            "proves": "Four OC defeats two OC for player A."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "14.02-tie",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Equal totals leave an unsecured objective uncontrolled.",
+        "owners": [
+          "src/warhammer40k_core/engine/objective_control.py:resolve_objective_control"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11b_objective_control.py::test_contested_objective_has_deterministic_uncontrolled_result",
+            "role": "semantic",
+            "assertion": "assert result.controlled_by_player_id is None",
+            "proves": "Equal control produces the explicit uncontrolled status."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "14.02-controlling-unit",
+        "source_blocks": [
+          5
+        ],
+        "summary": "A unit controls a player-controlled objective only when one of its in-range models has positive OC.",
+        "owners": [
+          "src/warhammer40k_core/engine/objective_control.py:resolve_objective_control"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Gameplay gap: the selected-unit objective control consumer includes a zero-OC contributor when another same-player unit controls the objective. See probe_zero_oc_unit_control."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:14:14.02.01:1",
+    "requirements": [
+      {
+        "requirement_id": "14.02.01-control-first",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Determine control before all other end-phase or end-turn rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/objective_control.py:resolve_objective_control"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order79_control_first.py::test_control_precedes_aircraft_departure_and_exactly_replays",
+            "role": "facade",
+            "assertion": "assert control_index < departure_index",
+            "proves": "Control snapshot precedes a mandatory end-Movement departure."
+          },
+          {
+            "nodeid": "tests/unit/test_order79_control_first.py::test_turn_control_is_frozen_across_source_loaded_choice_and_restore",
+            "role": "semantic",
+            "assertion": "assert record in current_state.objective_control_records",
+            "proves": "A later source-loaded choice observes the already-frozen control snapshot."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:14:14.03:1",
+    "requirements": [
+      {
+        "requirement_id": "14.03-secured",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Secured control persists without friendly occupants until opponent OC exceeds it at a phase end.",
+        "owners": [
+          "src/warhammer40k_core/engine/objective_control.py:resolve_objective_control"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order79_control_first.py::test_direct_turn_boundary_preserves_attached_contributors_and_sticky_control",
+            "role": "semantic",
+            "assertion": "assert sticky.controlled_by_player_id == 'player-a'",
+            "proves": "Existing secured control remains player A without new control."
+          },
+          {
+            "nodeid": "tests/unit/test_phase17n_primary_scoring_boundary_lifecycle.py::test_sticky_control_expires_during_successful_atomic_secondary",
+            "role": "semantic",
+            "assertion": "assert state.sticky_objective_control_states == []",
+            "proves": "A stronger opposing control boundary removes the secured control."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "classification": "example",
+        "reason": "The terrain-control example illustrates aggregation, zero battle-shocked OC and winner selection."
+      },
+      {
+        "source_blocks": [
+          8
+        ],
+        "classification": "cross_reference",
+        "reason": "Callout points to unit abilities that can react to control or secure an objective."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:a89dddb3-7930-4704-9f7a-0a7664da4d84",
+    "requirements": [
+      {
+        "requirement_id": "faq-a89dddb3-7930-4704-9f7a-0a7664da4d84-secure-new-control",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A unit gaining control at Movement end can then apply its securing ability.",
+        "owners": [
+          "src/warhammer40k_core/engine/objective_control.py:resolve_objective_control"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17g_chaos_daemons_blood_legion.py::test_blood_tainted_records_sticky_control_at_phase_end_boundary",
+            "role": "semantic",
+            "assertion": "assert event_types.index('end_boundary_objective_control_determined') < event_types.index('sticky_objective_control_state_recorded')",
+            "proves": "Control is determined before a source-backed securing hook records sticky control."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "The question supplies the condition answered by operative answer block 2."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:c8d8181c-0fd4-40d0-a9b9-6dcfadfc287e",
+    "requirements": [
+      {
+        "requirement_id": "faq-c8d8181c-0fd4-40d0-a9b9-6dcfadfc287e-objective-range-alias",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Within-range rules can refer to terrain objectives or markers using their own objective geometry.",
+        "owners": [
+          "src/warhammer40k_core/engine/objective_control.py:resolve_objective_control"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11b_objective_control.py::test_p14_shared_query_measures_marker_edge_and_terrain_without_marker_radius",
+            "role": "semantic",
+            "assertion": "assert math.isclose(nearest_point.horizontal_distance_inches, 5 - marker.marker_diameter_inches / 2 - model.base_size.diameter_mm / 25.4 / 2, abs_tol=1e-12)",
+            "proves": "Within-range rules can refer to terrain objectives or markers using their own objective geometry. The linked assertion exercises this source condition."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "The question supplies the condition answered by operative answer block 2."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:dc9911da-e156-4b48-bf9b-18f9d96d037e",
+    "requirements": [
+      {
+        "requirement_id": "faq-dc9911da-e156-4b48-bf9b-18f9d96d037e-external-marker-alias",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Outside Core Rules, objective-marker references also mean objectives.",
+        "owners": [
+          "src/warhammer40k_core/engine/objective_control.py:resolve_objective_control"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11b_objective_control.py::test_terrain_objective_control_requires_terrain_area_containment_not_marker_radius",
+            "role": "semantic",
+            "assertion": "assert context.terrain_objectives == (Objective.terrain(marker.objective_marker_id, marker.name, terrain_feature.feature_id),)",
+            "proves": "The mission marker reference materializes as a terrain objective with the same identity."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11b_objective_control.py::test_terrain_objective_control_requires_terrain_area_containment_not_marker_radius",
+            "role": "semantic",
+            "assertion": "assert result.contributors == ()",
+            "proves": "Being near the marker does not bypass the terrain-objective geometry."
+          }
+        ],
+        "qualifications": [
+          "Vocabulary equivalence is normalized in the source-linked mission geometry boundary; this assertion proves its concrete terrain objective consumer."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "The question supplies the condition answered by operative answer block 2."
+      }
+    ]
+  }
+]

@@ -1,0 +1,952 @@
+[
+  {
+    "row_id": "rule:09:09.00:1",
+    "requirements": [
+      {
+        "requirement_id": "09.00-step-order",
+        "source_blocks": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "summary": "Resolve Movement start, unit movement, and end in order.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert boundaries == ['start_phase', 'end_phase']",
+            "proves": "The real facade emits start and end timing boundaries before completing each phase."
+          }
+        ],
+        "qualifications": [
+          "This assertion certifies lifecycle timing boundaries; effects attached to those boundaries use the shared timing dispatcher and their own consumer regressions."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Introductory description of movement and reinforcement purpose."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:09:09.01:1",
+    "requirements": [
+      {
+        "requirement_id": "09.01-start-window",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Resolve start-of-Movement triggered rules before the body.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert boundaries == ['start_phase', 'end_phase']",
+            "proves": "The real facade emits start and end timing boundaries before completing each phase."
+          }
+        ],
+        "qualifications": [
+          "This assertion certifies lifecycle timing boundaries; effects attached to those boundaries use the shared timing dispatcher and their own consumer regressions."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:09:09.02:1",
+    "requirements": [
+      {
+        "requirement_id": "09.02-one-at-a-time",
+        "source_blocks": [
+          1,
+          2
+        ],
+        "summary": "Select each friendly rules unit at most once, including battlefield, reserve, and embarked units.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10b_movement.py::test_remain_stationary_marks_unit_complete_without_changing_poses",
+            "role": "semantic",
+            "assertion": "assert tuple((option.option_id for option in next_request.options)) == ('army-alpha:intercessor-unit-2',)",
+            "proves": "Completing one unit offers only the other unselected friendly unit."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.02-choose-move",
+        "source_blocks": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "summary": "Select an eligible finite movement kind for the selected unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_action_options_outside_engagement_are_remain_normal_and_advance",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in action_request.options} == {MovementPhaseActionKind.REMAIN_STATIONARY.value, MovementPhaseActionKind.NORMAL_MOVE.value, MovementPhaseActionKind.ADVANCE.value}",
+            "proves": "Unengaged unit has ordinary finite movement choices."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_action_options_inside_engagement_are_remain_and_fall_back",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in action_request.options} == {MovementPhaseActionKind.REMAIN_STATIONARY.value, f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}', f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}'}",
+            "proves": "Engaged unit exposes stationary and Fall Back choices."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:09:09.02.01:1",
+    "requirements": [
+      {
+        "requirement_id": "09.02.01-all-units",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Complete a selection for every army unit; unchosen move types resolve stationary.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10t_movement_completion.py::test_reserve_arrivals_complete_when_only_inactive_units_remain_unselected",
+            "role": "semantic",
+            "assertion": "assert lifecycle.state.movement_phase_state.move_units_completed",
+            "proves": "Reserve phase completion accounts for inactive reserve units."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10t_movement_completion.py::test_full_movement_phase_completion_exits_to_shooting_after_all_work_is_complete",
+            "role": "semantic",
+            "assertion": "assert movement_events[1]['movement_phase_action'] == MovementPhaseActionKind.REMAIN_STATIONARY.value",
+            "proves": "The second unit is explicitly recorded as stationary before phase completion."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:09:09.02.02:1",
+    "requirements": [
+      {
+        "requirement_id": "09.02.02-exclusive-modes",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A move selects one legal mode after evaluating its prerequisites.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_action_options_inside_engagement_are_remain_and_fall_back",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in action_request.options} == {MovementPhaseActionKind.REMAIN_STATIONARY.value, f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}', f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}'}",
+            "proves": "Engaged-unit mode enumeration is restricted."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.02.02-voluntary-desperate",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An unshocked unit may select Desperate Escape instead of Ordered Retreat.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10o_fall_back.py::test_voluntary_desperate_escape_requires_one_hazard_roll_for_every_model",
+            "role": "semantic",
+            "assertion": "assert len(resolution.desperate_escape_requirements) == len(unit_placement.model_placements)",
+            "proves": "Voluntary Desperate Escape rolls hazards for the whole unit."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.02.02-mode-scope",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Mode-specific conditions apply only to that mode; shared conditions apply to all modes.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10o_fall_back.py::test_fall_back_without_desperate_escape_completes_immediately",
+            "role": "semantic",
+            "assertion": "assert fell_back_state.desperate_escape_rolls == ()",
+            "proves": "Ordered Retreat avoids the Desperate Escape continuation."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:09:09.02.03:1",
+    "requirements": [
+      {
+        "requirement_id": "09.02.03-reinforcement-alias",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Reinforcements-step timing resolves inside Move Units.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10p_reserves.py::test_movement_phase_requests_reserve_arrivals_inside_move_units",
+            "role": "semantic",
+            "assertion": "assert state.movement_phase_state.step is MovementPhaseStepKind.MOVE_UNITS",
+            "proves": "Reserve arrival request is produced in the unified movement step."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:09:09.03:1",
+    "requirements": [
+      {
+        "requirement_id": "09.03-end-window",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Resolve end-of-Movement rules at phase end.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert boundaries == ['start_phase', 'end_phase']",
+            "proves": "The real facade emits start and end timing boundaries before completing each phase."
+          }
+        ],
+        "qualifications": [
+          "This assertion certifies lifecycle timing boundaries; effects attached to those boundaries use the shared timing dispatcher and their own consumer regressions."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:09:09.04:1",
+    "requirements": [
+      {
+        "requirement_id": "09.04-eligibility",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Every unit can remain stationary.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_action_options_inside_engagement_are_remain_and_fall_back",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in action_request.options} == {MovementPhaseActionKind.REMAIN_STATIONARY.value, f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}', f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}'}",
+            "proves": "Stationary remains available while engaged."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_action_options_outside_engagement_are_remain_normal_and_advance",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in action_request.options} == {MovementPhaseActionKind.REMAIN_STATIONARY.value, MovementPhaseActionKind.NORMAL_MOVE.value, MovementPhaseActionKind.ADVANCE.value}",
+            "proves": "Stationary remains available while unengaged."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.04-no-movement",
+        "source_blocks": [
+          4,
+          6
+        ],
+        "summary": "Stationary makes no translation or rotation and triggers no move-start/end displacement.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10b_movement.py::test_remain_stationary_marks_unit_complete_without_changing_poses",
+            "role": "semantic",
+            "assertion": "assert lifecycle.state.battlefield_state.to_payload() == before_payload",
+            "proves": "Authoritative model poses are unchanged."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10d_battlefield_transitions.py::test_remain_stationary_emits_no_transition_records",
+            "role": "semantic",
+            "assertion": "assert batch.to_payload() == {'placements': [], 'removals': [], 'displacements': []}",
+            "proves": "No placement, removal or displacement transition is emitted."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          3,
+          5
+        ],
+        "classification": "metadata",
+        "reason": "Section labels organize the operative requirements enumerated above."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:09:09.05:1",
+    "requirements": [
+      {
+        "requirement_id": "09.05-eligibility",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A Normal move requires battlefield presence and an unengaged unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_action_options_inside_engagement_are_remain_and_fall_back",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in action_request.options} == {MovementPhaseActionKind.REMAIN_STATIONARY.value, f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}', f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}'}",
+            "proves": "Engaged units cannot select Normal move."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.05-witnessed-movement",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Normal movement follows the shared witnessed movement rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_normal_move_rejects_path_through_enemy_model_base",
+            "role": "semantic",
+            "assertion": "assert resolution.path_validation_results[0].violations[0].violation_code == 'enemy_model_base_crossed'",
+            "proves": "An invalid transit through an enemy model is rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.05-endpoint",
+        "source_blocks": [
+          6
+        ],
+        "summary": "A Normal move must end unengaged.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10r_aircraft.py::test_normal_and_advance_can_transit_enemy_aircraft_but_not_end_in_engagement",
+            "role": "semantic",
+            "assertion": "assert endpoint_result.path_validation_results[0].violations[0].violation_code == 'enemy_engagement_range_end_forbidden'",
+            "proves": "Transit permission does not permit an engaged endpoint."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.05-budget",
+        "source_blocks": [
+          8
+        ],
+        "summary": "Normal movement uses the unit Movement characteristic budget.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10b_movement.py::test_normal_move_consumes_movement_base_size_current_pose_and_updates_placement",
+            "role": "semantic",
+            "assertion": "assert terminal_event['movement_inches'] == 6",
+            "proves": "Canonical M6 unit completes a six-inch witnessed Normal move."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          3,
+          5,
+          7
+        ],
+        "classification": "metadata",
+        "reason": "Section labels organize the operative requirements enumerated above."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:09:09.05.01:1",
+    "requirements": [
+      {
+        "requirement_id": "09.05.01-phase-limit",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The same unit cannot make a second Normal move in the same phase occurrence.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order80_normal_move.py::test_second_reaction_same_phase_is_decline_only",
+            "role": "semantic",
+            "assertion": "assert [option.option_id for option in request.options] == ['decline_triggered_movement']",
+            "proves": "A second reactive Normal move in the same phase is unavailable."
+          },
+          {
+            "nodeid": "tests/unit/test_order80_normal_move.py::test_normal_move_reaction_does_not_consume_next_players_movement_phase",
+            "role": "semantic",
+            "assertion": "assert len(state.normal_move_states) == 2",
+            "proves": "A distinct player-turn phase has independent history."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:09:09.06:1",
+    "requirements": [
+      {
+        "requirement_id": "09.06-eligibility",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Advance requires an unengaged battlefield unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_action_options_inside_engagement_are_remain_and_fall_back",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in action_request.options} == {MovementPhaseActionKind.REMAIN_STATIONARY.value, f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}', f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}'}",
+            "proves": "An engaged unit cannot choose Advance."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.06-advance-die",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Roll one D6 before advancing.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10n_advance.py::test_lifecycle_advance_roll_is_deterministic_replay_facing_and_marks_restrictions",
+            "role": "semantic",
+            "assertion": "assert terminal_event['advance_roll'] == left_advanced.movement_dice_record.advance_roll.to_payload()",
+            "proves": "The lifecycle retains the deterministic Advance roll."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.06-witness",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Advance follows shared witnessed movement.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10n_advance.py::test_advance_move_consumes_movement_plus_d6",
+            "role": "semantic",
+            "assertion": "assert first_distance.is_within_budget",
+            "proves": "The resulting path carries a validated distance witness."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.06-unengaged-end",
+        "source_blocks": [
+          8
+        ],
+        "summary": "Advance must finish unengaged.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10r_aircraft.py::test_normal_and_advance_can_transit_enemy_aircraft_but_not_end_in_engagement",
+            "role": "semantic",
+            "assertion": "assert endpoint_result.path_validation_results[0].violations[0].violation_code == 'enemy_engagement_range_end_forbidden'",
+            "proves": "End-engagement remains forbidden despite transit exceptions."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.06-turn-locks",
+        "source_blocks": [
+          9
+        ],
+        "summary": "Advancing blocks charge and action start through turn end unless permitted by another rule.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler",
+          "src/warhammer40k_core/engine/mission_action_eligibility.py:mission_action_unit_ineligibility_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_charge_phase_filters_ineligible_units",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in request.options} == {units['intercessor-5'].unit_instance_id, COMPLETE_CHARGE_PHASE_OPTION_ID}",
+            "proves": "The engine charging-unit decision excludes both the advanced unit and the unit that Fell Back, while retaining the eligible control unit."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_mission_action_opportunity_enforces_each_core_action_restriction",
+            "role": "invalid",
+            "assertion": "assert mission_action_unit_ineligibility_reason(state=state, player_id='player-a', unit_instance_id=unit_id, runtime_modifier_registry=RuntimeModifierRegistry.empty()) == expected_reason",
+            "proves": "The Advance parameter case returns the exact Core action-start prohibition from the mission action eligibility owner."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_mission_action_opportunity_enforces_each_core_action_restriction",
+            "role": "facade",
+            "assertion": "assert waiting.decision_request is None or waiting.decision_request.decision_type != START_MISSION_ACTION_DECISION_TYPE",
+            "proves": "The Advance parameter case produces no action-start opportunity through LocalGameSession."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10n_advance.py::test_advanced_state_clears_at_end_of_active_player_turn",
+            "role": "semantic",
+            "assertion": "assert updated_state.advanced_unit_states == []",
+            "proves": "The actual Advance restriction record clears when the active player turn ends."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.06-budget",
+        "source_blocks": [
+          11
+        ],
+        "summary": "Advance maximum distance is M plus the Advance die.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10n_advance.py::test_advance_move_consumes_movement_plus_d6",
+            "role": "semantic",
+            "assertion": "assert resolution.movement_payload['movement_inches'] == 10.0",
+            "proves": "M=6 plus D6=4 yields a ten-inch move."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          3,
+          5,
+          7,
+          10
+        ],
+        "classification": "metadata",
+        "reason": "Section labels organize the operative requirements enumerated above."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:09:09.07:1",
+    "requirements": [
+      {
+        "requirement_id": "09.07-engaged",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Fall Back requires engagement.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_action_options_outside_engagement_are_remain_normal_and_advance",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in action_request.options} == {MovementPhaseActionKind.REMAIN_STATIONARY.value, MovementPhaseActionKind.NORMAL_MOVE.value, MovementPhaseActionKind.ADVANCE.value}",
+            "proves": "Unengaged units cannot select Fall Back."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.07-mode",
+        "source_blocks": [
+          4,
+          5,
+          6
+        ],
+        "summary": "Ordered Retreat requires no battle shock; otherwise Desperate Escape is compulsory and rolls one hazard per model.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10o_fall_back.py::test_battle_shocked_fall_back_requires_desperate_escape_for_every_model",
+            "role": "semantic",
+            "assertion": "assert all((DesperateEscapeRequirementReason.BATTLE_SHOCKED in requirement.reasons for requirement in resolution.desperate_escape_requirements))",
+            "proves": "Every model of the shocked unit receives a Desperate Escape requirement."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10o_fall_back.py::test_voluntary_desperate_escape_requires_one_hazard_roll_for_every_model",
+            "role": "semantic",
+            "assertion": "assert len(resolution.desperate_escape_requirements) == len(unit_placement.model_placements)",
+            "proves": "Voluntary Desperate Escape likewise rolls every model."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.07-transit",
+        "source_blocks": [
+          8
+        ],
+        "summary": "Desperate Escape permits crossing enemy models.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10o_fall_back.py::test_fall_back_enemy_model_overflight_creates_one_desperate_escape_requirement",
+            "role": "semantic",
+            "assertion": "assert requirement.reasons == (DesperateEscapeRequirementReason.ENEMY_MODEL_OVERFLIGHT,)",
+            "proves": "Enemy overflight creates the Desperate Escape requirement."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.07-witness",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Fall Back uses the shared witnessed movement path.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10o_fall_back.py::test_fall_back_full_unit_no_op_witness_emits_only_changed_displacement",
+            "role": "semantic",
+            "assertion": "assert displacement.path_witness.poses_for_model(moved_model.model_instance_id) == witness.poses_for_model(moved_model.model_instance_id)",
+            "proves": "Fall Back displacement emission uses the validated full-unit witness."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.07-end-unengaged",
+        "source_blocks": [
+          12
+        ],
+        "summary": "Fall Back must finish unengaged.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10o_fall_back.py::test_fall_back_allows_engagement_transit_but_rejects_endpoint_in_engagement",
+            "role": "semantic",
+            "assertion": "assert invalid_resolution.path_validation_results[0].violations[0].violation_code == 'enemy_engagement_range_end_forbidden'",
+            "proves": "Engagement transit is legal but an engaged endpoint is rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.07-turn-locks",
+        "source_blocks": [
+          13
+        ],
+        "summary": "Fall Back blocks shooting, charge and actions until turn end absent an explicit permission.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler",
+          "src/warhammer40k_core/engine/mission_action_eligibility.py:mission_action_unit_ineligibility_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_charge_phase_filters_ineligible_units",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in request.options} == {units['intercessor-5'].unit_instance_id, COMPLETE_CHARGE_PHASE_OPTION_ID}",
+            "proves": "The engine charging-unit decision excludes both the advanced unit and the unit that Fell Back, while retaining the eligible control unit."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_mission_action_opportunity_enforces_each_core_action_restriction",
+            "role": "invalid",
+            "assertion": "assert mission_action_unit_ineligibility_reason(state=state, player_id='player-a', unit_instance_id=unit_id, runtime_modifier_registry=RuntimeModifierRegistry.empty()) == expected_reason",
+            "proves": "The Fall Back parameter case returns the exact Core action-start prohibition from the mission action eligibility owner."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_mission_action_opportunity_enforces_each_core_action_restriction",
+            "role": "facade",
+            "assertion": "assert waiting.decision_request is None or waiting.decision_request.decision_type != START_MISSION_ACTION_DECISION_TYPE",
+            "proves": "The Fall Back parameter case produces no action-start opportunity through LocalGameSession."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10o_fall_back.py::test_failed_desperate_escape_removes_selected_model_and_records_fell_back_state",
+            "role": "semantic",
+            "assertion": "assert not fell_back_state.can_shoot",
+            "proves": "After actual Fall Back resolution, retained state prohibits shooting."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10o_fall_back.py::test_failed_desperate_escape_removes_selected_model_and_records_fell_back_state",
+            "role": "semantic",
+            "assertion": "assert not fell_back_state.can_declare_charge",
+            "proves": "After actual Fall Back resolution, retained state also prohibits declaring a charge."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10o_fall_back.py::test_game_state_records_and_clears_fell_back_unit_state",
+            "role": "semantic",
+            "assertion": "assert state.fell_back_unit_state_for_unit(player_id='player-a', battle_round=1, unit_instance_id='army-alpha:intercessor-unit-1') is None",
+            "proves": "The Fall Back restriction record clears on the later turn boundary."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.07-post-move-shock",
+        "source_blocks": [
+          14
+        ],
+        "summary": "A surviving unshocked Desperate Escape unit makes a battle-shock roll after moving.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10o_fall_back.py::test_voluntary_desperate_escape_moves_then_tests_unshocked_rules_unit",
+            "role": "semantic",
+            "assertion": "assert next((index for index, event in enumerate(lifecycle.decision_controller.event_log.records) if event.event_type == 'desperate_escape_battle_shock_resolved')) < next((index for index, event in enumerate(lifecycle.decision_controller.event_log.records) if event.event_type == 'movement_activation_completed'))",
+            "proves": "Battle shock resolves before movement activation completes."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.07-budget",
+        "source_blocks": [
+          16
+        ],
+        "summary": "Fall Back maximum distance is the Movement characteristic.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_fall_back_uses_model_movement_characteristic",
+            "role": "semantic",
+            "assertion": "assert result.is_valid is (distance <= 6)",
+            "proves": "A canonical M6 model accepts six inches and rejects6.01 inches."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          3,
+          7,
+          9,
+          11,
+          15
+        ],
+        "classification": "metadata",
+        "reason": "Section labels organize the operative requirements enumerated above."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:09:09.07.01:1",
+    "requirements": [
+      {
+        "requirement_id": "09.07.01-hazard-alias",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Desperate Escape tests denote the hazard rolls of that mode.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10o_fall_back.py::test_voluntary_desperate_escape_requires_one_hazard_roll_for_every_model",
+            "role": "semantic",
+            "assertion": "assert len(resolution.desperate_escape_requirements) == len(unit_placement.model_placements)",
+            "proves": "Mode resolution rolls one hazard for each model."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.07.01-modifier-alias",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Desperate Escape penalties modify those hazard rolls.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10o_fall_back.py::test_desperate_escape_modifiers_wait_before_every_hazard_roll_and_replay",
+            "role": "semantic",
+            "assertion": "assert roll['roll_modifiers'] == []",
+            "proves": "The modifier decision precedes hazard rolls and survives replay."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          3
+        ],
+        "classification": "example",
+        "reason": "Bloodletters example illustrates the hazard-roll modifier alias."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:09:09.07.01:2",
+    "requirements": [
+      {
+        "requirement_id": "09.07.01-forced-hazards-2",
+        "source_blocks": [
+          1,
+          2
+        ],
+        "summary": "A forced Desperate Escape test rolls one hazard for every model.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10o_fall_back.py::test_forced_desperate_escape_rolls_every_model",
+            "role": "semantic",
+            "assertion": "assert len(rolls) == len(unit_placement.model_placements)",
+            "proves": "All models receive forced hazard rolls."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "09.07.01-forced-shock-2",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Forced Desperate Escape also makes a battle-shock roll.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10o_fall_back.py::test_catalog_ability_forces_desperate_escape_on_immediate_fall_back_path",
+            "role": "semantic",
+            "assertion": "assert battle_shock_event['unit_instance_id'] == target_unit.unit_instance_id",
+            "proves": "The source-loaded forced escape path records its battle-shock continuation."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "faq:4978f15f-2b4a-4805-aacd-db9b5cad71bd",
+    "requirements": [
+      {
+        "requirement_id": "faq-4978f15f-2b4a-4805-aacd-db9b5cad71bd-auto-pass",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Automatic Desperate Escape success also auto-passes its hazard rolls.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10o_fall_back.py::test_generic_movement_transit_auto_passes_enemy_overflight_desperate_escape",
+            "role": "semantic",
+            "assertion": "assert resolution.desperate_escape_requirements == ()",
+            "proves": "Automatic Desperate Escape success also auto-passes its hazard rolls. The linked assertion exercises this source condition."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "The question supplies the condition answered by operative answer block 2."
+      }
+    ]
+  }
+]

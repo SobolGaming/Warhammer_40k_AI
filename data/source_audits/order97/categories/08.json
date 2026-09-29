@@ -1,0 +1,477 @@
+[
+  {
+    "row_id": "rule:08:08.00:1",
+    "requirements": [
+      {
+        "requirement_id": "08.00-step-3",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Resolve the start step at its prescribed Command phase position.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+            "role": "semantic",
+            "assertion": "assert battle_shock_step_resolved",
+            "proves": "The Command handler progresses through CP and battle-shock before completion."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          },
+          {
+            "nodeid": "tests/unit/test_phase17g_space_marines_army_rule.py::test_lifecycle_requests_oath_target_and_records_effects",
+            "role": "facade",
+            "assertion": "assert 'command_points_gained' not in event_types",
+            "proves": "Pending Command-start Oath blocks Core CP gain."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "08.00-step-4",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Resolve the Core CP step at its prescribed Command phase position.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+            "role": "semantic",
+            "assertion": "assert battle_shock_step_resolved",
+            "proves": "The Command handler progresses through CP and battle-shock before completion."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          },
+          {
+            "nodeid": "tests/unit/test_phase17g_space_marines_army_rule.py::test_lifecycle_requests_oath_target_and_records_effects",
+            "role": "facade",
+            "assertion": "assert max((index for index, event_type in enumerate(event_types) if event_type == 'command_points_gained')) < event_types.index('command_step_started')",
+            "proves": "Both Core CP gain events precede Command body start."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "08.00-step-5",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Resolve the battle-shock step at its prescribed Command phase position.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+            "role": "semantic",
+            "assertion": "assert battle_shock_step_resolved",
+            "proves": "The Command handler progresses through CP and battle-shock before completion."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "08.00-step-6",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Resolve the Command abilities step at its prescribed Command phase position.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+            "role": "semantic",
+            "assertion": "assert battle_shock_step_resolved",
+            "proves": "The Command handler progresses through CP and battle-shock before completion."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          }
+        ],
+        "qualifications": [
+          "Gameplay gap: phase/battle-shock completion does not establish a Command-abilities consumer. The direct unqualified Command clause probe recorded for 08.04 shows that the facade skips the effect; C08-04/P08C owns the missing body step and its position after Battle-shock and before end-phase rules."
+        ]
+      },
+      {
+        "requirement_id": "08.00-step-7",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Resolve the end step at its prescribed Command phase position.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+            "role": "semantic",
+            "assertion": "assert battle_shock_step_resolved",
+            "proves": "The Command handler progresses through CP and battle-shock before completion."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          2
+        ],
+        "classification": "context",
+        "reason": "Overview; individual ordered steps below carry the operative requirements."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:08:08.01:1",
+    "requirements": [
+      {
+        "requirement_id": "08.01-start-rules",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Resolve start-of-Command-phase rules in the start window.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          },
+          {
+            "nodeid": "tests/unit/test_phase17g_space_marines_army_rule.py::test_lifecycle_requests_oath_target_and_records_effects",
+            "role": "facade",
+            "assertion": "assert event_types.index('space_marines_oath_of_moment_target_selected') < event_types.index('command_points_gained')",
+            "proves": "The loaded Oath choice executes through the session before either player gains Core CP."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_timing_evidence.py::test_loaded_command_boundary_rule_repeats_on_its_owners_turn_each_round",
+            "role": "facade",
+            "assertion": "assert len(resolved) == 3, resolved",
+            "proves": "A source-loaded CP rule executes at its Command start/end window in three successive own turns through the facade."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:08:08.02:1",
+    "requirements": [
+      {
+        "requirement_id": "08.02-both-gain",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Both players gain one Core CP each Command phase.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+            "role": "semantic",
+            "assertion": "assert state.command_point_total('player-a') == 1",
+            "proves": "The active player gains one CP."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+            "role": "semantic",
+            "assertion": "assert state.command_point_total('player-b') == 1",
+            "proves": "The opposing player also gains one CP."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+            "role": "semantic",
+            "assertion": "assert state.command_point_total('player-a') == 2",
+            "proves": "The following player turn grants the next Core CP to both players."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:08:08.02.01:1",
+    "requirements": [
+      {
+        "requirement_id": "08.02.01-both-gain",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Both players gain one Core CP each Command phase.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+            "role": "semantic",
+            "assertion": "assert state.command_point_total('player-a') == 1",
+            "proves": "The active player gains one CP."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+            "role": "semantic",
+            "assertion": "assert state.command_point_total('player-b') == 1",
+            "proves": "The opposing player also gains one CP."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+            "role": "semantic",
+            "assertion": "assert state.command_point_total('player-a') == 2",
+            "proves": "The following player turn grants the next Core CP to both players."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:08:08.03:1",
+    "requirements": [
+      {
+        "requirement_id": "08.03-shocked",
+        "source_blocks": [
+          1,
+          2
+        ],
+        "summary": "Each currently battle-shocked active-player unit requires one Command battle-shock roll.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_currently_shocked_unit_requires_one_command_test_even_above_or_below_half",
+            "role": "semantic",
+            "assertion": "assert len(above_half_requests) == 1",
+            "proves": "A shocked above-half unit still receives exactly one test."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_battle_shock_public_event_chain_is_identical_for_both_viewers",
+            "role": "viewer",
+            "assertion": "assert player_a_events == player_b_events",
+            "proves": "The full public Command shock event chain is identical for both viewers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "08.03-half",
+        "source_blocks": [
+          1,
+          3
+        ],
+        "summary": "Each active-player unit at or below half-strength requires one Command battle-shock roll.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_exactly_half_strength_requires_command_test_for_multi_and_single_model_units",
+            "role": "semantic",
+            "assertion": "assert single_request.below_half_strength_context.is_at_half_strength",
+            "proves": "Exactly half wounds on a single model requires the test."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_battle_shock_public_event_chain_is_identical_for_both_viewers",
+            "role": "viewer",
+            "assertion": "assert player_a_events == player_b_events",
+            "proves": "The full public Command shock event chain is identical for both viewers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "08.03-clear",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A successful required roll clears shock present at the start of this battle-shock step.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_success_clears_step_start_shock_but_failure_and_forced_success_preserve",
+            "role": "semantic",
+            "assertion": "assert passed_payload['state_update'] == 'cleared_battle_shocked'",
+            "proves": "Success records the explicit cleared-shock update."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_battle_shock_public_event_chain_is_identical_for_both_viewers",
+            "role": "viewer",
+            "assertion": "assert player_a_events == player_b_events",
+            "proves": "The full public Command shock event chain is identical for both viewers."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "classification": "example",
+        "reason": "Illustrated strength and current-shock examples restate the preceding eligibility rules."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:08:08.03.01:1",
+    "requirements": [
+      {
+        "requirement_id": "08.03.01-one-per-step",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A forced battle-shock test suppresses the otherwise required test for the same unit in that step unless explicitly overridden.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11c_command_phase.py::test_below_starting_strength_forced_test_suppresses_duplicate_below_half",
+            "role": "semantic",
+            "assertion": "assert [request.reason for request in suppressed] == [BattleShockTestReason.BELOW_STARTING_STRENGTH_FORCED]",
+            "proves": "The forced candidate is the sole default test."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:08:08.04:1",
+    "requirements": [
+      {
+        "requirement_id": "08.04-ability-window",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Resolve unqualified Command-phase abilities in the Command-abilities step, excluding distinct start/end/CP/battle-shock timings.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Gameplay gap: the supported unqualified Command-phase RuleIR fixture has no registered consumer and the real facade reaches Movement without executing its effect; the otherwise-identical explicit start-of-Command control executes once. The pinned gap_observations_timing.json and tests/order97_gap_probes_timing.py isolate the missing Command-body registration without claiming named faction support. Add the shared body-step consumer and verify its position after CP/Battle-shock and before end-phase effects."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:08:08.05:1",
+    "requirements": [
+      {
+        "requirement_id": "08.05-nonmission",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Resolve non-mission end-of-Command-phase rules first.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler",
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase14b_timing_cutover.py::test_phase14b_end_phase_effects_expire_before_mission_objective_scoring",
+            "role": "semantic",
+            "assertion": "assert state.persisting_effects == []",
+            "proves": "The non-mission expiration executes before the recorded mission control boundary."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_timing_evidence.py::test_loaded_command_boundary_rule_repeats_on_its_owners_turn_each_round",
+            "role": "facade",
+            "assertion": "assert len(resolved) == 3, resolved",
+            "proves": "A source-loaded CP rule executes at its Command start/end window in three successive own turns through the facade."
+          }
+        ],
+        "qualifications": [
+          "This proves a non-empty source effect at the selected edge; relative mission precedence additionally uses ordering evidence."
+        ]
+      },
+      {
+        "requirement_id": "08.05-mission",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Resolve both players' achieved end-of-Command-phase mission rules after non-mission rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler",
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase14b_timing_cutover.py::test_phase14b_end_phase_effects_expire_before_mission_objective_scoring",
+            "role": "semantic",
+            "assertion": "assert state.objective_control_records[-1].timing.value == 'phase_end'",
+            "proves": "Mission objective control is determined at the phase-end boundary after expiration."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_timing_evidence.py::test_loaded_command_boundary_rule_repeats_on_its_owners_turn_each_round",
+            "role": "facade",
+            "assertion": "assert len(resolved) == 3, resolved",
+            "proves": "A source-loaded CP rule executes at its Command start/end window in three successive own turns through the facade."
+          }
+        ],
+        "qualifications": [
+          "This proves a non-empty source effect at the selected edge; relative mission precedence additionally uses ordering evidence."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Introduces the ordered end-of-Command-phase rule groups."
+      }
+    ]
+  }
+]

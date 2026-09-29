@@ -1,0 +1,1394 @@
+[
+  {
+    "row_id": "rule:18:18.01:1",
+    "requirements": [
+      {
+        "requirement_id": "18.01-capacity-model-count",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The datasheet transport capacity bounds the number of eligible friendly passengers across its cargo.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:TransportCapacityProfile"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_lifecycle_attached_embark_capacity_drift_mutates_nothing",
+            "role": "invalid",
+            "assertion": "assert TransportOperationViolationCode.CAPACITY_EXCEEDED.value in {row['violation_code'] for row in violation_payloads}",
+            "proves": "The shared embark decision rejects passenger count exceeding remaining capacity."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.01-eligible-passenger-types",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Datasheet passenger type restrictions determine which friendly models may embark.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:TransportCapacityProfile"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_embark_rejects_the_datasheet_passenger_keyword_restriction",
+            "role": "invalid",
+            "assertion": "assert any((row.violation_code is TransportOperationViolationCode.CAPACITY_EXCEEDED and row.message == 'Transport capacity profile does not allow this unit.' for row in result.violations))",
+            "proves": "The real embark resolver rejects the incompatible passenger keyword restriction with its exact typed diagnostic."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.01-start-embarked-whole-unit",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Declare Battle Formations may embark a whole friendly unit only when capacity remains.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_phase16d_transport_manifest_validates_capacity_and_attached_group_completeness",
+            "role": "invalid",
+            "assertion": "assert 'transport_manifest_attached_unit_incomplete' in incomplete_codes",
+            "proves": "A starting manifest omitting an attached component is rejected."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_phase16d_transport_manifest_validates_capacity_and_attached_group_completeness",
+            "role": "invalid",
+            "assertion": "assert 'transport_manifest_capacity_exceeded' in over_capacity_codes",
+            "proves": "Starting cargo exceeding transport capacity is rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.01-empty-dedicated-destruction",
+        "source_blocks": [
+          3
+        ],
+        "summary": "At the end of Declare Battle Formations an empty Dedicated Transport is destroyed.",
+        "owners": [
+          "src/warhammer40k_core/engine/empty_dedicated_transport_destruction.py:apply_empty_dedicated_transport_destruction"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order59_empty_dedicated_transport.py::test_empty_dedicated_transport_is_destroyed_at_declare_battle_formations",
+            "role": "semantic",
+            "assertion": "assert transport.own_models[0].current_wounds == 0",
+            "proves": "The empty transport reaches zero wounds at the formation boundary."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.01-empty-dedicated-no-triggers",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Destroying an empty Dedicated Transport at formation completion does not trigger model-destruction rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/empty_dedicated_transport_destruction.py:apply_empty_dedicated_transport_destruction"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order59_empty_dedicated_transport.py::test_empty_dedicated_transport_does_not_trigger_destroyed_model_rules",
+            "role": "semantic",
+            "assertion": "assert 'deadly_demise_resolved' not in event_types",
+            "proves": "Empty transport cleanup emits no Deadly Demise."
+          },
+          {
+            "nodeid": "tests/unit/test_order59_empty_dedicated_transport.py::test_empty_dedicated_transport_does_not_trigger_destroyed_model_rules",
+            "role": "semantic",
+            "assertion": "assert 'model_destroyed' not in event_types",
+            "proves": "Empty transport cleanup emits no ordinary model-destruction event."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:18:18.02:1",
+    "requirements": [
+      {
+        "requirement_id": "18.02-post-move-choice",
+        "source_blocks": [
+          1
+        ],
+        "summary": "After the first battle round starts, a completed Normal, Advance or Fall Back move can offer an embark decision.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_embark_validation.py:resolve_embark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_normal_move_ending_near_transport_emits_embark_decision",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in request.options} == {DECLINE_EMBARK_OPTION_ID, transport.unit_instance_id}",
+            "proves": "Normal movement near an eligible transport offers embark or decline."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_lifecycle_advance_then_embark_replay_preserves_advanced_state",
+            "role": "semantic",
+            "assertion": "assert state.advanced_unit_state_for_unit(player_id='player-a', battle_round=1, unit_instance_id=passenger.unit_instance_id) is not None",
+            "proves": "Embarking after an Advance retains the Advance state."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_lifecycle_fall_back_then_embark_replay_preserves_fell_back_state",
+            "role": "semantic",
+            "assertion": "assert state.fell_back_unit_state_for_unit(player_id='player-a', battle_round=1, unit_instance_id=passenger.unit_instance_id) is not None",
+            "proves": "Embarking after Fall Back retains the Fall Back state."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.02-three-inch-every-model",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Every passenger model must be within three inches of the transport.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_embark_validation.py:resolve_embark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_embark_validates_distance_for_every_attached_rules_unit_model",
+            "role": "invalid",
+            "assertion": "assert {(violation.violation_code, violation.model_instance_id) for violation in resolution.violations} == {(TransportOperationViolationCode.EMBARK_DISTANCE, leader.own_models[0].model_instance_id)}",
+            "proves": "The out-of-range attached Leader independently invalidates embarking."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.02-no-setup-this-turn",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A unit set up on the battlefield this turn cannot ordinarily embark.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_embark_validation.py:embark_after_setup_forbidden"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order61_embark.py::test_setup_blocks_every_transport_throughout_actual_turn",
+            "role": "semantic",
+            "assertion": "assert embark_option_ids(session) == ()",
+            "proves": "All embark choices are suppressed during the setup turn."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.02-datasheet-type-eligibility",
+        "source_blocks": [
+          4
+        ],
+        "summary": "The unit must satisfy the transport datasheet passenger restrictions.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:TransportCapacityProfile"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_embark_rejects_the_datasheet_passenger_keyword_restriction",
+            "role": "invalid",
+            "assertion": "assert any((row.violation_code is TransportOperationViolationCode.CAPACITY_EXCEEDED and row.message == 'Transport capacity profile does not allow this unit.' for row in result.violations))",
+            "proves": "The real embark resolver rejects the incompatible passenger keyword restriction with its exact typed diagnostic."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.02-remaining-capacity",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Remaining capacity must accommodate every passenger model.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_embark_validation.py:resolve_embark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_lifecycle_attached_embark_capacity_drift_mutates_nothing",
+            "role": "invalid",
+            "assertion": "assert TransportOperationViolationCode.CAPACITY_EXCEEDED.value in {row['violation_code'] for row in violation_payloads}",
+            "proves": "Capacity drift yields a capacity-exceeded violation before embark mutation."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.02-remove-and-record-cargo",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Accepted embarking removes the unit from the battlefield and records transport cargo ownership.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:apply_embark_to_battlefield"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_lifecycle_embark_selection_updates_battlefield_and_cargo_atomically",
+            "role": "semantic",
+            "assertion": "assert passenger.unit_instance_id not in _placed_unit_ids(state)",
+            "proves": "The accepted passenger is absent from battlefield placements."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_lifecycle_embark_selection_updates_battlefield_and_cargo_atomically",
+            "role": "semantic",
+            "assertion": "assert stored_cargo.embarked_unit_instance_ids == (passenger.unit_instance_id,)",
+            "proves": "The same accepted unit becomes transport cargo."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:18:18.02.01:1",
+    "requirements": [
+      {
+        "requirement_id": "18.02.01-modified-and-unmodified-conditions",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Embark eligibility applies source-authorized modified conditions together with all remaining ordinary conditions.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_embark_validation.py:resolve_embark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_embark_after_disembark_needs_explicit_override",
+            "role": "invalid",
+            "assertion": "assert TransportOperationViolationCode.EMBARK_AFTER_SETUP_FORBIDDEN in {violation.violation_code for violation in blocked_embark.violations}",
+            "proves": "Ordinary post-setup embarking is rejected."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_embark_after_disembark_needs_explicit_override",
+            "role": "semantic",
+            "assertion": "assert allowed_embark.is_valid",
+            "proves": "The explicit source override permits that otherwise blocked embark."
+          }
+        ],
+        "qualifications": [
+          "The linked test proves the setup-condition override; it does not certify every possible future datasheet override."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:18:18.03:1",
+    "requirements": [
+      {
+        "requirement_id": "18.03-movement-phase-choice",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The active player may select an embarked friendly unit to disembark in their Movement phase.",
+        "owners": [
+          "src/warhammer40k_core/engine/standard_disembark_resolution.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_started_embarked_unit_disembarks_through_movement_decision_lifecycle",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in action_request.options} == {MovementPhaseActionKind.REMAIN_STATIONARY.value, MovementPhaseActionKind.DISEMBARK.value}",
+            "proves": "The selected passenger receives the ordinary disembark option."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.03-destroyed-carrier-before-removal",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Each embarked unit must emergency disembark before its destroyed transport is removed.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:resolve_destroyed_transport_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demise",
+            "role": "semantic",
+            "assertion": "assert transport_model.model_instance_id in battlefield_before_disembark.placed_model_ids()",
+            "proves": "The destroyed Transport is still placed before passenger disembarkation."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demise",
+            "role": "semantic",
+            "assertion": "assert event_records.index(unit_disembarked_event) < event_records.index(deadly_demise_event)",
+            "proves": "Passenger disembarkation precedes Deadly Demise."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demise",
+            "role": "semantic",
+            "assertion": "assert event_records.index(deadly_demise_event) < event_records.index(transport_destroyed_event)",
+            "proves": "Deadly Demise precedes Transport removal."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_requests_each_embarked_unit_before_removal",
+            "role": "semantic",
+            "assertion": "assert transport_model.model_instance_id in battlefield_after_first_disembark.placed_model_ids()",
+            "proves": "The Transport remains after the first passenger group, while the next passenger group awaits disembarkation."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:18:18.04:1",
+    "requirements": [
+      {
+        "requirement_id": "18.04-battlefield-carrier",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Ordinary disembark requires an embarked unit and a transport on the battlefield.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_disembark_validation.py:append_disembark_eligibility_violations"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_order38_core_disembark_move_eligibility",
+            "role": "invalid",
+            "assertion": "assert TransportOperationViolationCode.TRANSPORT_PLACEMENT_DRIFT in {v.violation_code for v in absent.violations}",
+            "proves": "An absent carrier yields transport-placement drift."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.04-no-same-phase-embark",
+        "source_blocks": [
+          4
+        ],
+        "summary": "The passenger must not have embarked in that transport this phase.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_disembark_validation.py:append_disembark_eligibility_violations"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_order38_core_disembark_move_eligibility",
+            "role": "invalid",
+            "assertion": "assert TransportOperationViolationCode.UNIT_DID_NOT_START_PHASE_EMBARKED in {v.violation_code for v in denied.violations}",
+            "proves": "A passenger without phase-start cargo membership is rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.04-carrier-move-exclusions",
+        "source_blocks": [
+          5
+        ],
+        "summary": "A transport that Advanced or Fell Back this phase cannot offer ordinary disembark.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_disembark_validation.py:append_disembark_eligibility_violations"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_order38_candidate_grant_and_movement_matrix",
+            "role": "semantic",
+            "assertion": "assert bool(matching) is permitted",
+            "proves": "The parameterized transport movement and grant matrix enforces the available modes."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.04-rapid-tactical-distance",
+        "source_blocks": [
+          7,
+          15
+        ],
+        "summary": "Rapid and Tactical disembark place each model wholly within three inches of the transport.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_disembark_geometry.py:_model_wholly_within_any_transport_model",
+          "src/warhammer40k_core/engine/transports.py:_resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_rapid_and_tactical_disembark_enforce_three_inch_setup_band",
+            "role": "semantic",
+            "assertion": "assert result.is_valid is (distance < 3.0), result.violations",
+            "proves": "Both Rapid and Tactical typed setup resolvers accept analytically wholly-within2.99inches and reject3.01inches."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_rapid_and_tactical_disembark_enforce_three_inch_setup_band",
+            "role": "invalid",
+            "assertion": "assert (TransportOperationViolationCode.DISEMBARK_DISTANCE in {violation.violation_code for violation in result.violations}) is (distance > 3.0)",
+            "proves": "The3.01-inch setup reports the exact DISEMBARK_DISTANCE diagnostic in both modes."
+          }
+        ],
+        "qualifications": [
+          "Evidence gap: Confirmed inclusive-boundary discrepancy: both Rapid and Tactical reject analytically exact3.0-inch circular-base containment with DISEMBARK_DISTANCE, despite accepting2.99inches. The shared owner uses buffered polygon approximations. Retained probe: probe_exact_disembark_band_boundary in tests/order97_gap_probes_18_25.py. Prerequisite: restore inclusive exact containment through the owning geometry abstraction and audit all disembark modes and other wholly-within callers; the bound positive tests deliberately claim only the verified interior/exterior cases."
+        ]
+      },
+      {
+        "requirement_id": "18.04-combat-distance",
+        "source_blocks": [
+          8,
+          15
+        ],
+        "summary": "Combat disembark places each model wholly within six inches of the transport.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:resolve_combat_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_combat_disembark_rolls_hazard_for_each_model_and_round_trips",
+            "role": "semantic",
+            "assertion": "assert updated_battlefield.unit_placement_by_id(passenger.unit_instance_id) == attempted_placement",
+            "proves": "Accepted Combat disembark records the proposed passenger placement."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_disembark_six_inch_modes_reject_passenger_beyond_band",
+            "role": "invalid",
+            "assertion": "assert TransportOperationViolationCode.DISEMBARK_DISTANCE in {row.violation_code for row in result.violations}",
+            "proves": "Combat and Emergency setup outside the six-inch band is rejected with DISEMBARK_DISTANCE."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.04-rapid-mode",
+        "source_blocks": [
+          10,
+          11
+        ],
+        "summary": "A transport Normal or Ingress move this phase mandates Rapid disembark.",
+        "owners": [
+          "src/warhammer40k_core/engine/standard_disembark_resolution.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_disembark_places_unit_and_applies_after_normal_move_restrictions",
+            "role": "semantic",
+            "assertion": "assert resolution.disembarked_unit_state.disembark_mode is DisembarkModeKind.RAPID_DISEMBARK",
+            "proves": "After carrier Normal movement the resolved mode is Rapid."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.04-tactical-before-combat",
+        "source_blocks": [
+          10,
+          12
+        ],
+        "summary": "An unmoved or stationary carrier uses Tactical disembark whenever a legal Tactical setup exists.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:resolve_combat_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_started_embarked_unit_disembarks_through_movement_decision_lifecycle",
+            "role": "semantic",
+            "assertion": "assert disembarked_state.disembark_mode is DisembarkModeKind.TACTICAL_DISEMBARK",
+            "proves": "An unmoved transport resolves Tactical mode."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_movement_phase_combat_disembark_rejects_when_tactical_placement_is_legal",
+            "role": "invalid",
+            "assertion": "assert status.status_kind is LifecycleStatusKind.INVALID",
+            "proves": "Combat is invalid while Tactical placement is legal."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.04-combat-hazard",
+        "source_blocks": [
+          10,
+          13
+        ],
+        "summary": "If Tactical setup is impossible, Combat mode is used and rolls a hazard die for each passenger model.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:resolve_combat_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_combat_disembark_rolls_hazard_for_each_model_and_round_trips",
+            "role": "semantic",
+            "assertion": "assert len(result.model_rolls) == len(passenger.own_models)",
+            "proves": "Combat hazard roll count equals the passenger model count."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.04-ingress-restrictions",
+        "source_blocks": [
+          16
+        ],
+        "summary": "Rapid passengers inherit every placement restriction of their carrier ingress.",
+        "owners": [
+          "src/warhammer40k_core/engine/standard_disembark_resolution.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order63_reserve_transports.py::test_rapid_disembark_inherits_enemy_distance_on_every_model",
+            "role": "invalid",
+            "assertion": "assert 'rapid_disembark_ingress_restriction' in str(outcome.payload)",
+            "proves": "Inherited enemy-distance restrictions reject an illegal passenger."
+          },
+          {
+            "nodeid": "tests/unit/test_order63_reserve_transports.py::test_rapid_disembark_rejects_model_outside_inherited_edge_band",
+            "role": "invalid",
+            "assertion": "assert 'rapid_disembark_ingress_restriction' in str(outcome.payload)",
+            "proves": "The inherited edge band is enforced."
+          },
+          {
+            "nodeid": "tests/unit/test_order63_reserve_transports.py::test_inherited_enemy_deployment_zone_uses_owner_and_arrival_round",
+            "role": "semantic",
+            "assertion": "assert bool(failures) is invalid",
+            "proves": "Enemy deployment-zone restriction follows carrier owner and arrival round."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.04-combat-engagement-permission",
+        "source_blocks": [
+          17
+        ],
+        "summary": "Combat passengers may be set up engaged only with enemy units engaged by the transport.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:resolve_combat_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_combat_disembark_can_only_set_up_engaged_with_transport_engagement",
+            "role": "semantic",
+            "assertion": "assert combat_result.placement.is_valid",
+            "proves": "Existing carrier engagement permits Combat placement."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_combat_disembark_can_only_set_up_engaged_with_transport_engagement",
+            "role": "invalid",
+            "assertion": "assert TransportOperationViolationCode.ENEMY_ENGAGEMENT_RANGE in {violation.violation_code for violation in blocked_result.placement.violations}",
+            "proves": "A different enemy engagement is rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.04-setup-authority",
+        "source_blocks": [
+          19
+        ],
+        "summary": "Disembark uses the shared unit setup authority.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:apply_disembark_to_battlefield"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_disembark_places_unit_and_applies_after_normal_move_restrictions",
+            "role": "semantic",
+            "assertion": "assert {record.placement_kind for record in resolution.transition_batch.placements} == {BattlefieldPlacementKind.DISEMBARK}",
+            "proves": "Shared transition records identify the placements as disembark setup."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.04-rapid-charge-lock",
+        "source_blocks": [
+          21
+        ],
+        "summary": "Rapid disembark prevents declaring a charge until turn end.",
+        "owners": [
+          "src/warhammer40k_core/engine/standard_disembark_resolution.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_disembark_places_unit_and_applies_after_normal_move_restrictions",
+            "role": "semantic",
+            "assertion": "assert not resolution.disembarked_unit_state.can_declare_charge",
+            "proves": "The resolved Rapid passenger cannot declare a charge."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.04-tactical-followup",
+        "source_blocks": [
+          22
+        ],
+        "summary": "Tactical disembark immediately selects a Normal or Advance follow-up move.",
+        "owners": [
+          "src/warhammer40k_core/engine/standard_disembark_resolution.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_started_embarked_unit_disembarks_through_movement_decision_lifecycle",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in action_request.options} == {MovementPhaseActionKind.NORMAL_MOVE.value, MovementPhaseActionKind.ADVANCE.value}",
+            "proves": "The passenger must choose Normal or Advance after Tactical setup."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.04-combat-battle-shock",
+        "source_blocks": [
+          23
+        ],
+        "summary": "Combat disembark leaves the passenger Battle-shocked.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:resolve_combat_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_combat_disembark_rolls_hazard_for_each_model_and_round_trips",
+            "role": "semantic",
+            "assertion": "assert result.disembarked_unit_state.battle_shocked_until == 'end_of_turn'",
+            "proves": "The Combat result records Battle-shock until end of turn."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.04-combat-charge-lock",
+        "source_blocks": [
+          23
+        ],
+        "summary": "Combat disembark prevents declaring a charge until turn end.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:resolve_combat_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_combat_disembark_rolls_hazard_for_each_model_and_round_trips",
+            "role": "semantic",
+            "assertion": "assert result.disembarked_unit_state.can_declare_charge is False",
+            "proves": "The Combat passenger cannot declare a charge."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          6,
+          9,
+          14,
+          18,
+          20
+        ],
+        "classification": "metadata",
+        "reason": "Section labels only; operative eligibility, distance and consequences are enumerated separately."
+      },
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "context",
+        "reason": "Introduces the conjunction of the separately enumerated eligibility predicates."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:18:18.04.01:1",
+    "requirements": [
+      {
+        "requirement_id": "18.04.01-all-carrier-ingress-limits",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Rapid passengers inherit carrier ingress distance and deployment-zone restrictions.",
+        "owners": [
+          "src/warhammer40k_core/engine/standard_disembark_resolution.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order63_reserve_transports.py::test_rapid_disembark_inherits_enemy_distance_on_every_model",
+            "role": "invalid",
+            "assertion": "assert 'rapid_disembark_ingress_restriction' in str(outcome.payload)",
+            "proves": "Enemy-distance inheritance is enforced."
+          },
+          {
+            "nodeid": "tests/unit/test_order63_reserve_transports.py::test_inherited_enemy_deployment_zone_uses_owner_and_arrival_round",
+            "role": "semantic",
+            "assertion": "assert bool(failures) is invalid",
+            "proves": "Deployment-zone inheritance is tested across owner and round contexts."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:18:18.05:1",
+    "requirements": [
+      {
+        "requirement_id": "18.05-just-destroyed-carrier",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Emergency disembark applies to passengers of a just-destroyed transport.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:resolve_destroyed_transport_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order60_emergency_disembark.py::test_emergency_disembark_places_every_survivor_on_the_closest_ring",
+            "role": "semantic",
+            "assertion": "assert result.is_valid, result.violations",
+            "proves": "The destroyed-carrier fixture accepts a complete legal emergency setup."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.05-hazard-per-model",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Emergency disembark first makes a hazard roll for each passenger model.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:resolve_destroyed_transport_hazard_rolls"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_destroyed_transport_emergency_destroys_unplaceable_models_and_battleshocks_unit",
+            "role": "semantic",
+            "assertion": "assert len(result.model_rolls) == len(passenger.own_models)",
+            "proves": "Emergency hazard roll count equals passenger count."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.05-closest-unengaged",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Each emergency passenger is set up as close as possible while unengaged and within the setup band.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:resolve_destroyed_transport_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order60_emergency_disembark.py::test_emergency_disembark_rejects_a_pose_that_is_not_closest",
+            "role": "invalid",
+            "assertion": "assert any((violation.violation_code is TransportOperationViolationCode.EMERGENCY_DISEMBARK_NOT_CLOSEST and violation.source_rule_id == placement_source.EMERGENCY_DISEMBARK_PLACEMENT_SOURCE_ID for violation in result.violations))",
+            "proves": "A nonclosest emergency pose is explicitly invalid."
+          },
+          {
+            "nodeid": "tests/unit/test_order60_emergency_disembark.py::test_emergency_disembark_rejects_engaged_when_unengaged_exists",
+            "role": "invalid",
+            "assertion": "assert any((violation.violation_code is TransportOperationViolationCode.ENEMY_ENGAGEMENT_RANGE for violation in result.violations))",
+            "proves": "Engaged setup is rejected when an unengaged setup exists."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.05-engaged-fallback-closest",
+        "source_blocks": [
+          8
+        ],
+        "summary": "Only when unengaged setup is impossible may a passenger be set up engaged, still as close as possible within the setup band.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:resolve_destroyed_transport_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order60_emergency_disembark.py::test_emergency_proof_keeps_vertical_coherency_and_unengaged_preference",
+            "role": "semantic",
+            "assertion": "assert not emergency_setup_pose_exists(replace(query, enemies=(enemy,)))",
+            "proves": "The exact Emergency feasibility owner finds no supported unengaged pose."
+          },
+          {
+            "nodeid": "tests/unit/test_order60_emergency_disembark.py::test_emergency_proof_keeps_vertical_coherency_and_unengaged_preference",
+            "role": "semantic",
+            "assertion": "assert emergency_setup_pose_exists(replace(query, enemies=(enemy,), require_unengaged=False))",
+            "proves": "The same geometry is feasible after permitting engaged Emergency setup."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_engaged_emergency_fallback_uses_the_same_closest_pose_proof",
+            "role": "semantic",
+            "assertion": "assert not emergency_setup_pose_exists(query)",
+            "proves": "Exact geometry establishes no unengaged setup in the band."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_emergency_consumer_accepts_engaged_closest_setup_only_when_required",
+            "role": "semantic",
+            "assertion": "assert accepted.is_valid, accepted.violations",
+            "proves": "With every legal ground setup engaged, the actual Emergency Disembark resolver accepts the closest ring."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_emergency_consumer_accepts_engaged_closest_setup_only_when_required",
+            "role": "invalid",
+            "assertion": "assert TransportOperationViolationCode.EMERGENCY_DISEMBARK_NOT_CLOSEST in {violation.violation_code for violation in rejected.violations}",
+            "proves": "Moving the same engaged setup outward is rejected by the exact closest-placement rule."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.05-destroy-unplaceable-only",
+        "source_blocks": [
+          9
+        ],
+        "summary": "Only emergency passengers that cannot be legally set up are destroyed.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:resolve_destroyed_transport_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order60_emergency_disembark.py::test_emergency_disembark_destroys_only_a_genuinely_unplaceable_model",
+            "role": "semantic",
+            "assertion": "assert omitted == {large_id}",
+            "proves": "Only the geometrically unplaceable large model is omitted."
+          },
+          {
+            "nodeid": "tests/unit/test_order60_emergency_disembark.py::test_emergency_disembark_rejects_omitting_a_placeable_survivor",
+            "role": "invalid",
+            "assertion": "assert any((violation.violation_code is TransportOperationViolationCode.EMERGENCY_DISEMBARK_OMITTED_MODEL_PLACEABLE and violation.source_rule_id == placement_source.EMERGENCY_DISEMBARK_PLACEMENT_SOURCE_ID for violation in result.violations))",
+            "proves": "Omitting a placeable survivor is rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.05-shared-setup",
+        "source_blocks": [
+          11
+        ],
+        "summary": "Emergency placement uses the shared setup authority.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:resolve_destroyed_transport_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order60_emergency_disembark.py::test_emergency_disembark_places_every_survivor_on_the_closest_ring",
+            "role": "semantic",
+            "assertion": "assert result.is_valid, result.violations",
+            "proves": "A complete legal emergency setup is accepted."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.05-battle-shock",
+        "source_blocks": [
+          13
+        ],
+        "summary": "Emergency disembark leaves the unit Battle-shocked.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:resolve_destroyed_transport_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order60_emergency_disembark.py::test_emergency_disembark_places_every_survivor_on_the_closest_ring",
+            "role": "semantic",
+            "assertion": "assert result.disembarked_unit_state.battle_shocked_until == 'end_of_turn'",
+            "proves": "The result records turn-end Battle-shock."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.05-charge-lock",
+        "source_blocks": [
+          13
+        ],
+        "summary": "Emergency disembark prevents declaring a charge until turn end.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:resolve_destroyed_transport_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_emergency_disembark_forbids_a_charge_after_accepted_setup",
+            "role": "semantic",
+            "assertion": "assert result.is_valid",
+            "proves": "The real Emergency setup is accepted."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_emergency_disembark_forbids_a_charge_after_accepted_setup",
+            "role": "semantic",
+            "assertion": "assert result.disembarked_unit_state.can_declare_charge is False",
+            "proves": "The accepted Emergency state prohibits declaring a Charge."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.05-six-inch-band",
+        "source_blocks": [
+          15
+        ],
+        "summary": "Emergency setup is wholly within six inches of the transport.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:resolve_destroyed_transport_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_disembark_six_inch_modes_reject_passenger_beyond_band",
+            "role": "invalid",
+            "assertion": "assert TransportOperationViolationCode.DISEMBARK_DISTANCE in {row.violation_code for row in result.violations}",
+            "proves": "Combat and Emergency setup outside the six-inch band is rejected with DISEMBARK_DISTANCE."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          3,
+          5,
+          10,
+          12,
+          14
+        ],
+        "classification": "metadata",
+        "reason": "Section labels only; operative eligibility, distance and consequences are enumerated separately."
+      },
+      {
+        "source_blocks": [
+          6
+        ],
+        "classification": "context",
+        "reason": "Introduces the per-model setup requirements."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:18:18.06:1",
+    "requirements": [
+      {
+        "requirement_id": "18.06-source-permission",
+        "source_blocks": [
+          2
+        ],
+        "summary": "The special disembark mode requires a source-backed rule granting that move type.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_disembark_permissions.py:transport_disembark_restriction_overrides"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_order38_candidate_grant_and_movement_matrix",
+            "role": "semantic",
+            "assertion": "assert matching[0].restriction_overrides[0].source_rule_id == 'test:order38:restricted-grant'",
+            "proves": "A permitted special disembark candidate carries its granting source ID."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.06-placed-carrier",
+        "source_blocks": [
+          3
+        ],
+        "summary": "The unit must be embarked in a transport on the battlefield.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_disembark_validation.py:append_disembark_eligibility_violations"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_order38_core_disembark_move_eligibility",
+            "role": "invalid",
+            "assertion": "assert TransportOperationViolationCode.TRANSPORT_PLACEMENT_DRIFT in {v.violation_code for v in absent.violations}",
+            "proves": "An absent carrier invalidates the special disembark."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.06-not-embarked-this-phase",
+        "source_blocks": [
+          4
+        ],
+        "summary": "The passenger must not have embarked into this transport during this phase.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_disembark_validation.py:append_disembark_eligibility_violations"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_order38_core_disembark_move_eligibility",
+            "role": "invalid",
+            "assertion": "assert TransportOperationViolationCode.UNIT_DID_NOT_START_PHASE_EMBARKED in {v.violation_code for v in denied.violations}",
+            "proves": "Lack of phase-start cargo membership is rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.06-carrier-not-advanced-fallen-back",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Assault disembark forbids carrier Advance and Fall Back this phase.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_disembark_validation.py:append_disembark_eligibility_violations"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_order38_candidate_grant_and_movement_matrix",
+            "role": "semantic",
+            "assertion": "assert bool(matching) is permitted",
+            "proves": "The movement/grant matrix rejects prohibited Assault carrier states."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.06-three-inch-setup",
+        "source_blocks": [
+          7,
+          9
+        ],
+        "summary": "Each special-disembark model is set up wholly within three inches of the carrier.",
+        "owners": [
+          "src/warhammer40k_core/engine/standard_disembark_resolution.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_assault_disembark_resolver_requires_permission_start_state_and_three_inches",
+            "role": "invalid",
+            "assertion": "assert TransportOperationViolationCode.DISEMBARK_DISTANCE in {violation.violation_code for violation in outside_three_inches.violations}",
+            "proves": "The shared special-disembark geometry rejects a pose beyond three inches."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.06-shared-setup",
+        "source_blocks": [
+          11
+        ],
+        "summary": "The special disembark places the unit using the shared setup rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/standard_disembark_resolution.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_order38_facade_disembark_options_placement_restore_and_replay",
+            "role": "facade",
+            "assertion": "assert recorded.disembark_mode is mode",
+            "proves": "The facade records the selected special disembark mode."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_order38_facade_disembark_options_placement_restore_and_replay",
+            "role": "replay",
+            "assertion": "assert replay.reproduced_exactly, replay",
+            "proves": "The submitted special disembark reproduces exactly."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_order38_facade_disembark_options_placement_restore_and_replay",
+            "role": "viewer",
+            "assertion": "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+            "proves": "Both viewers retain identical public event streams after restore."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          6,
+          8,
+          10
+        ],
+        "classification": "metadata",
+        "reason": "Section labels only; operative eligibility, distance and consequences are enumerated separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:18:18.07:1",
+    "requirements": [
+      {
+        "requirement_id": "18.07-source-permission",
+        "source_blocks": [
+          2
+        ],
+        "summary": "The special disembark mode requires a source-backed rule granting that move type.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_disembark_permissions.py:transport_disembark_restriction_overrides"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_order38_candidate_grant_and_movement_matrix",
+            "role": "semantic",
+            "assertion": "assert matching[0].restriction_overrides[0].source_rule_id == 'test:order38:restricted-grant'",
+            "proves": "A permitted special disembark candidate carries its granting source ID."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.07-placed-carrier",
+        "source_blocks": [
+          3
+        ],
+        "summary": "The unit must be embarked in a transport on the battlefield.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_disembark_validation.py:append_disembark_eligibility_violations"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_order38_core_disembark_move_eligibility",
+            "role": "invalid",
+            "assertion": "assert TransportOperationViolationCode.TRANSPORT_PLACEMENT_DRIFT in {v.violation_code for v in absent.violations}",
+            "proves": "An absent carrier invalidates the special disembark."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.07-not-embarked-this-phase",
+        "source_blocks": [
+          4
+        ],
+        "summary": "The passenger must not have embarked into this transport during this phase.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_disembark_validation.py:append_disembark_eligibility_violations"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_order38_core_disembark_move_eligibility",
+            "role": "invalid",
+            "assertion": "assert TransportOperationViolationCode.UNIT_DID_NOT_START_PHASE_EMBARKED in {v.violation_code for v in denied.violations}",
+            "proves": "Lack of phase-start cargo membership is rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.07-three-inch-setup",
+        "source_blocks": [
+          6,
+          8
+        ],
+        "summary": "Each special-disembark model is set up wholly within three inches of the carrier.",
+        "owners": [
+          "src/warhammer40k_core/engine/standard_disembark_resolution.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_assault_disembark_resolver_requires_permission_start_state_and_three_inches",
+            "role": "invalid",
+            "assertion": "assert TransportOperationViolationCode.DISEMBARK_DISTANCE in {violation.violation_code for violation in outside_three_inches.violations}",
+            "proves": "The shared special-disembark geometry rejects a pose beyond three inches."
+          }
+        ],
+        "qualifications": [
+          "The explicit boundary assertion uses Assault mode; Shock follows the same distance authority."
+        ]
+      },
+      {
+        "requirement_id": "18.07-shared-setup",
+        "source_blocks": [
+          10
+        ],
+        "summary": "The special disembark places the unit using the shared setup rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/standard_disembark_resolution.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_order38_facade_disembark_options_placement_restore_and_replay",
+            "role": "facade",
+            "assertion": "assert recorded.disembark_mode is mode",
+            "proves": "The facade records the selected special disembark mode."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_order38_facade_disembark_options_placement_restore_and_replay",
+            "role": "replay",
+            "assertion": "assert replay.reproduced_exactly, replay",
+            "proves": "The submitted special disembark reproduces exactly."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_order38_facade_disembark_options_placement_restore_and_replay",
+            "role": "viewer",
+            "assertion": "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+            "proves": "Both viewers retain identical public event streams after restore."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "18.07-preserve-passenger-engagement",
+        "source_blocks": [
+          12
+        ],
+        "summary": "A Shock passenger retains its own starting enemy engagements; it does not inherit transport engagements.",
+        "owners": [
+          "src/warhammer40k_core/engine/standard_disembark_resolution.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_order62_transport_only_engagement_does_not_force_passenger_fight",
+            "role": "semantic",
+            "assertion": "assert proposal.start_engaged_enemy_unit_instance_ids == ()",
+            "proves": "Passenger start engagement IDs are empty despite carrier engagement."
+          }
+        ],
+        "qualifications": [
+          "Owner convention C18-07: post-placement passenger engagement determines forced replies; no inherited Transport engagements."
+        ]
+      },
+      {
+        "requirement_id": "18.07-post-placement-forced-fights",
+        "source_blocks": [
+          12
+        ],
+        "summary": "Enemies engaged with the passenger after Shock setup that have not fought must be selected one at a time by their controller.",
+        "owners": [
+          "src/warhammer40k_core/engine/standard_disembark_resolution.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_replay",
+            "role": "semantic",
+            "assertion": "assert tuple((option.option_id for option in fight_request.options)) == tuple((f'fight:normal:{unit_id}' for unit_id in engaged_enemy_ids))",
+            "proves": "The enemy controller receives exactly the legal forced Fight options."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_order62_transport_only_engagement_does_not_force_passenger_fight",
+            "role": "semantic",
+            "assertion": "assert session.lifecycle.state.fight_phase_state is None",
+            "proves": "Carrier-only engagement creates no passenger Fight queue."
+          }
+        ],
+        "qualifications": [
+          "Owner convention C18-07 remains qualified; the beginning-of-move engagement sentence does not import carrier engagements."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          5,
+          7,
+          9,
+          11
+        ],
+        "classification": "metadata",
+        "reason": "Section labels only; operative eligibility, distance and consequences are enumerated separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:c2df3e97-f21e-4fc9-943e-37072c08c10e",
+    "requirements": [
+      {
+        "requirement_id": "c2df3e97-f21e-4fc9-943e-37072c08c10e-aerialists-post-disembark",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Aerialists can embark after disembarking this turn because its embarkation does not include a Normal, Advance or Fall Back move.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:EmbarkSelection",
+          "src/warhammer40k_core/engine/transport_embark_validation.py:resolve_embark"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: Confirmed Core contract discrepancy: EmbarkSelection rejects NOT_MOVED even with the explicit post-disembark permission. Prerequisite: represent an authenticated no-movement embark occasion without inventing a Normal, Advance or Fall Back move; preserve the ordinary setup restriction and adapter replay authority. Named faction source loading remains outside this Core audit."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Question framing for the operative answer in block 2."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:fae8a959-9cbe-46e3-a721-029b23b24e24",
+    "requirements": [
+      {
+        "requirement_id": "fae8a959-9cbe-46e3-a721-029b23b24e24-explicit-embark-override",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An explicit rule allowing embark in a turn of disembark overrides the ordinary setup-turn prohibition.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_embark_validation.py:resolve_embark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_embark_after_disembark_needs_explicit_override",
+            "role": "semantic",
+            "assertion": "assert allowed_embark.is_valid",
+            "proves": "The explicit source override accepts the blocked post-setup embark."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Question framing for the operative answer in block 2."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:b49d0004-1dd8-4746-a971-0b6656719dd3",
+    "requirements": [
+      {
+        "requirement_id": "b49d0004-1dd8-4746-a971-0b6656719dd3-every-disembark-type",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Every disembark move type counts as having disembarked that turn.",
+        "owners": [
+          "src/warhammer40k_core/engine/standard_disembark_resolution.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_every_disembark_mode_records_the_shared_turn_state",
+            "role": "semantic",
+            "assertion": "assert state.disembarked_unit_state_for_unit(player_id='player-a', battle_round=state.battle_round, unit_instance_id=units['intercessor-1'].unit_instance_id) == record",
+            "proves": "Every ordinary, Assault, Shock and Emergency mode is returned by the same player-turn disembark-state lookup."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_every_disembark_mode_records_the_shared_turn_state",
+            "role": "replay",
+            "assertion": "assert DisembarkedUnitState.from_payload(record.to_payload()) == record",
+            "proves": "Every mode preserves that record through serialization."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Question framing for the operative answer in block 2."
+      }
+    ]
+  }
+]

@@ -1274,6 +1274,7 @@ def test_order68_explicit_nonfirst_bearer_retains_identity_after_split_and_resto
     before = enhancement_bearer_model(
         session.lifecycle.state.army_definitions[0], assignment=assignment
     )
+    assert before.model_instance_id == "army-alpha:bodyguard:core-intercessor-like:002"
     _complete_split(session)
     restored = session.fork()
     assert restored.lifecycle.state is not None

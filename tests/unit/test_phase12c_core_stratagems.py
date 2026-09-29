@@ -2564,6 +2564,10 @@ def test_phase15e_counteroffensive_selects_next_fight_activation() -> None:
     assert activation.interrupt_id.startswith("counteroffensive:")
     effect_payload = cast(dict[str, JsonValue], state.persisting_effects[-1].effect_payload)
     assert effect_payload["effect_kind"] == "fights_first"
+    assert state.persisting_effects[-1].target_unit_instance_ids == ("army-beta:enemy-unit",)
+    assert state.persisting_effects[-1].expiration == EffectExpiration.end_phase(
+        battle_round=state.battle_round, phase=BattlePhase.FIGHT, player_id="player-a"
+    )
     assert _last_event_payload(
         lifecycle.decision_controller,
         "counteroffensive_activation_selected",
@@ -2929,6 +2933,13 @@ def test_phase15e_epic_challenge_registers_selected_character_model_precision() 
     assert effect_payload["effect_kind"] == "epic_challenge_precision"
     assert effect_payload["model_instance_id"] == character_model_id
     assert effect_payload["weapon_keyword"] == "Precision"
+    assert persisted["target_unit_instance_ids"] == ["army-alpha:intercessor-unit-1"]
+    assert (
+        persisted["expiration"]
+        == EffectExpiration.end_phase(
+            battle_round=state.battle_round, phase=BattlePhase.FIGHT, player_id="player-a"
+        ).to_payload()
+    )
 
 
 def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() -> None:

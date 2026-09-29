@@ -1,0 +1,2305 @@
+[
+  {
+    "row_id": "rule:02:02.01:1",
+    "requirements": [],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "metadata",
+        "reason": "Rendering metadata; does not add a gameplay rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:02:02.01.01:1",
+    "requirements": [
+      {
+        "requirement_id": "02.01.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A datasheet's name contributes an additional canonical unit keyword.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:UnitInstance.keywords"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: Canonical CORE fixture proves no automatic datasheet-name keyword. This alone does not establish that an official provider omitted an explicit name keyword. Check provider normalization and runtime identity together before repairing. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding canonical-fixture-datasheet-name-keyword."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:02:02.02:1",
+    "requirements": [
+      {
+        "requirement_id": "02.02-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An absent M characteristic forbids movement.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_resolvers.py:resolve_advance_move"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: Real canonical models retain source-dash M; adding an Advance roll turns numeric zero into permission for a witnessed one-inch move. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding absent-movement-advance-permission."
+        ]
+      },
+      {
+        "requirement_id": "02.02-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An absent M characteristic still permits setup.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:ModelInstance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_absent_movement_characteristic_still_allows_physical_setup",
+            "role": "semantic",
+            "assertion": "assert tuple((row.model_instance_id for row in placement.model_placements)) == immobile.own_model_ids()",
+            "proves": "All real models with source-dash M receive explicit battlefield placements."
+          }
+        ],
+        "qualifications": [
+          "This isolates setup geometry from movement budget eligibility; normal gameplay deployment uses its separate facade evidence."
+        ]
+      },
+      {
+        "requirement_id": "02.02-obligation-03",
+        "source_blocks": [
+          4
+        ],
+        "summary": "The Sv characteristic is an armor-save threshold.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:ModelInstance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_save_roll_checks_one_invulnerable_then_armour",
+            "role": "semantic",
+            "assertion": "assert armour_success.successful is True",
+            "proves": "The actual saving-throw evaluator uses the appropriate armour or invulnerable threshold."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02-obligation-04",
+        "source_blocks": [
+          5
+        ],
+        "summary": "The optional InSv characteristic is an invulnerable-save threshold.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:ModelInstance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_save_roll_checks_one_invulnerable_then_armour",
+            "role": "semantic",
+            "assertion": "assert armour_success.successful is True",
+            "proves": "The actual saving-throw evaluator uses the appropriate armour or invulnerable threshold."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_save_roll_checks_one_invulnerable_then_armour",
+            "role": "semantic",
+            "assertion": "assert invulnerable_success.successful is True",
+            "proves": "The actual saving-throw evaluator uses the appropriate armour or invulnerable threshold."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02-obligation-05",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Reaching zero wounds destroys a model.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:ModelInstance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_model_health_definition_matches_full_wounds_and_zero_health_casualties",
+            "role": "semantic",
+            "assertion": "assert not replace(model, wounds_remaining=0).is_alive",
+            "proves": "The real model definition identifies zero health as dead and initialized health as the W characteristic."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02-obligation-06",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Ld is the threshold for leadership rolls.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:ModelInstance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_leadership_battle_shock_uses_two_d6_and_inclusive_threshold",
+            "role": "semantic",
+            "assertion": "assert result.passed is passed",
+            "proves": "The Ld value supplies the inclusive pass threshold for the leadership roll."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02-obligation-07",
+        "source_blocks": [
+          8
+        ],
+        "summary": "An absent OC characteristic prevents objective control.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:ModelInstance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order79_control_first.py::test_control_precedes_aircraft_departure_and_exactly_replays",
+            "role": "facade",
+            "assertion": "assert record.results[0].controlled_by_player_id is None",
+            "proves": "A source-dash OC model contributes zero and cannot control its objective before departure."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          3
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:02:02.02.01:1",
+    "requirements": [
+      {
+        "requirement_id": "02.02.01-obligation-01",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A positive characteristic modifier improves the characteristic according to its direction.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_threshold_and_ap_improvement_decreases_the_numeric_characteristic",
+            "role": "semantic",
+            "assertion": "assert _directional_characteristic_delta(characteristic=characteristic, verb='improve', value=2) == -2",
+            "proves": "The normalized improvement/worsening operation reverses numeric direction for threshold characteristics and AP."
+          }
+        ],
+        "qualifications": [
+          "Direction is asserted after normalization; raw signed shorthand ingestion is not exercised by this pure semantic test."
+        ]
+      },
+      {
+        "requirement_id": "02.02.01-obligation-02",
+        "source_blocks": [
+          6
+        ],
+        "summary": "A negative characteristic modifier worsens the characteristic according to its direction.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_threshold_and_ap_improvement_decreases_the_numeric_characteristic",
+            "role": "semantic",
+            "assertion": "assert _directional_characteristic_delta(characteristic=characteristic, verb='worsen', value=2) == 2",
+            "proves": "The normalized improvement/worsening operation reverses numeric direction for threshold characteristics and AP."
+          }
+        ],
+        "qualifications": [
+          "Direction is asserted after normalization; raw signed shorthand ingestion is not exercised by this pure semantic test."
+        ]
+      },
+      {
+        "requirement_id": "02.02.01-obligation-03",
+        "source_blocks": [
+          9
+        ],
+        "summary": "Applicable modifiers accumulate.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_attributes_modifiers.py::test_order26_complete_algebra_is_exact_and_independent_of_input_order",
+            "role": "semantic",
+            "assertion": "assert stack.resolve().final == 5",
+            "proves": "The all-operation test enforces replacement/multiply/add/divide/subtract and final rounding independently of input order."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-04",
+        "source_blocks": [
+          11
+        ],
+        "summary": "Value replacements occur before arithmetic modifiers.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_attributes_modifiers.py::test_order26_complete_algebra_is_exact_and_independent_of_input_order",
+            "role": "semantic",
+            "assertion": "assert stack.resolve().final == 5",
+            "proves": "The all-operation test enforces replacement/multiply/add/divide/subtract and final rounding independently of input order."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-05",
+        "source_blocks": [
+          12
+        ],
+        "summary": "Replacement of a characteristic with zero, absent, or asterisk is terminal for subsequent modifiers.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_attributes_modifiers.py::test_order26_zero_replacement_is_terminal_even_for_damage",
+            "role": "semantic",
+            "assertion": "assert resolved.applied_modifier_ids == ('replace',)",
+            "proves": "A zero replacement terminates the modifier stack."
+          },
+          {
+            "nodeid": "tests/unit/test_attributes_modifiers.py::test_order26_symbolic_replacements_are_terminal_and_serializable",
+            "role": "semantic",
+            "assertion": "assert resolve_characteristic_value(result, stack.modifiers) == result",
+            "proves": "Absent and symbolic replacements remain unchanged under later modifiers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-06",
+        "source_blocks": [
+          13
+        ],
+        "summary": "Multiplication follows replacement and precedes addition.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_attributes_modifiers.py::test_order26_complete_algebra_is_exact_and_independent_of_input_order",
+            "role": "semantic",
+            "assertion": "assert stack.resolve().final == 5",
+            "proves": "The all-operation test enforces replacement/multiply/add/divide/subtract and final rounding independently of input order."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-07",
+        "source_blocks": [
+          14
+        ],
+        "summary": "Addition follows multiplication and precedes division.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_attributes_modifiers.py::test_order26_complete_algebra_is_exact_and_independent_of_input_order",
+            "role": "semantic",
+            "assertion": "assert stack.resolve().final == 5",
+            "proves": "The all-operation test enforces replacement/multiply/add/divide/subtract and final rounding independently of input order."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-08",
+        "source_blocks": [
+          15
+        ],
+        "summary": "Division follows addition and precedes subtraction.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_attributes_modifiers.py::test_order26_complete_algebra_is_exact_and_independent_of_input_order",
+            "role": "semantic",
+            "assertion": "assert stack.resolve().final == 5",
+            "proves": "The all-operation test enforces replacement/multiply/add/divide/subtract and final rounding independently of input order."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-09",
+        "source_blocks": [
+          16
+        ],
+        "summary": "Subtraction occurs after division.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_attributes_modifiers.py::test_order26_complete_algebra_is_exact_and_independent_of_input_order",
+            "role": "semantic",
+            "assertion": "assert stack.resolve().final == 5",
+            "proves": "The all-operation test enforces replacement/multiply/add/divide/subtract and final rounding independently of input order."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-10",
+        "source_blocks": [
+          17
+        ],
+        "summary": "Fractional final results round upward only after all arithmetic.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_attributes_modifiers.py::test_order26_complete_algebra_is_exact_and_independent_of_input_order",
+            "role": "semantic",
+            "assertion": "assert stack.resolve().final == 5",
+            "proves": "The all-operation test enforces replacement/multiply/add/divide/subtract and final rounding independently of input order."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-11",
+        "source_blocks": [
+          20
+        ],
+        "summary": "Absent, asterisk, and N/A characteristics cannot receive arithmetic modifiers.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_attributes_modifiers.py::test_order26_symbolic_replacements_are_terminal_and_serializable",
+            "role": "semantic",
+            "assertion": "assert resolve_characteristic_value(result, stack.modifiers) == result",
+            "proves": "Absent, asterisk and N/A characteristic values remain symbolic under attempted arithmetic modification."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-12",
+        "source_blocks": [
+          21
+        ],
+        "summary": "A model-level WS modifier affects every equipped weapon's WS.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_aeldari_war_walkers_wraithlord_datasheets.py::test_wraithlord_psychic_guidance_modifies_live_weapon_skills_and_leadership",
+            "role": "semantic",
+            "assertion": "assert registry.modified_weapon_profile(_weapon_context(fixture, profile=fists, target=fixture.enemy_one)).skill.final == 3",
+            "proves": "The live model-level Psychic Guidance modifier reaches the respective melee or ranged weapon skill."
+          }
+        ],
+        "qualifications": [
+          "The source-backed consumer assertion samples one weapon profile of each type; generic profile evaluation supplies the same model-owned modifier per equipped weapon."
+        ]
+      },
+      {
+        "requirement_id": "02.02.01-obligation-13",
+        "source_blocks": [
+          21
+        ],
+        "summary": "A model-level BS modifier affects every equipped weapon's BS.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_aeldari_war_walkers_wraithlord_datasheets.py::test_wraithlord_psychic_guidance_modifies_live_weapon_skills_and_leadership",
+            "role": "semantic",
+            "assertion": "assert registry.modified_weapon_profile(_weapon_context(fixture, profile=bright_lance, target=fixture.enemy_one)).skill.final == 3",
+            "proves": "The live model-level Psychic Guidance modifier reaches the respective melee or ranged weapon skill."
+          }
+        ],
+        "qualifications": [
+          "The source-backed consumer assertion samples one weapon profile of each type; generic profile evaluation supplies the same model-owned modifier per equipped weapon."
+        ]
+      },
+      {
+        "requirement_id": "02.02.01-obligation-14",
+        "source_blocks": [
+          23
+        ],
+        "summary": "Modified numeric M is at least one inch.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers",
+            "role": "semantic",
+            "assertion": "assert bounded.final == expected",
+            "proves": "The parameterized characteristic case applies the numeric bound after all modifiers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-15",
+        "source_blocks": [
+          24
+        ],
+        "summary": "Modified numeric T is at least one.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers",
+            "role": "semantic",
+            "assertion": "assert bounded.final == expected",
+            "proves": "The parameterized characteristic case applies the numeric bound after all modifiers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-16",
+        "source_blocks": [
+          25
+        ],
+        "summary": "Modified Sv cannot improve beyond two-plus.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers",
+            "role": "semantic",
+            "assertion": "assert bounded.final == expected",
+            "proves": "The parameterized characteristic case applies the numeric bound after all modifiers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-17",
+        "source_blocks": [
+          26
+        ],
+        "summary": "Modified InSv cannot improve beyond two-plus.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_invulnerable_save_modifier_cannot_improve_past_two_plus",
+            "role": "semantic",
+            "assertion": "assert ModifierStack(characteristic=characteristic, raw_value=4, modifiers=(modifier,)).resolve().final == 2",
+            "proves": "An arithmetic reduction below two is clamped to the two-plus InSv floor."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-18",
+        "source_blocks": [
+          27
+        ],
+        "summary": "Modified Ld lies between five-plus and eight-plus.",
+        "owners": [
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: Actual numeric policy mismatch; not a source parser inference. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding source-selected-characteristic-bounds."
+        ]
+      },
+      {
+        "requirement_id": "02.02.01-obligation-19",
+        "source_blocks": [
+          28
+        ],
+        "summary": "Modified OC cannot be negative.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers",
+            "role": "semantic",
+            "assertion": "assert bounded.final == expected",
+            "proves": "The parameterized characteristic case applies the numeric bound after all modifiers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-20",
+        "source_blocks": [
+          29
+        ],
+        "summary": "Modified ranged-weapon Range is at least one inch.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers",
+            "role": "semantic",
+            "assertion": "assert bounded.final == expected",
+            "proves": "The parameterized characteristic case applies the numeric bound after all modifiers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-21",
+        "source_blocks": [
+          30
+        ],
+        "summary": "Modified A is at least one.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers",
+            "role": "semantic",
+            "assertion": "assert bounded.final == expected",
+            "proves": "The parameterized characteristic case applies the numeric bound after all modifiers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-22",
+        "source_blocks": [
+          31
+        ],
+        "summary": "Modified WS lies between two-plus and six-plus.",
+        "owners": [
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: Actual numeric policy mismatch; not a source parser inference. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding source-selected-characteristic-bounds."
+        ]
+      },
+      {
+        "requirement_id": "02.02.01-obligation-23",
+        "source_blocks": [
+          32
+        ],
+        "summary": "Modified BS lies between two-plus and six-plus.",
+        "owners": [
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: Actual numeric policy mismatch; not a source parser inference. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding source-selected-characteristic-bounds."
+        ]
+      },
+      {
+        "requirement_id": "02.02.01-obligation-24",
+        "source_blocks": [
+          33
+        ],
+        "summary": "Modified numeric S is at least one.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers",
+            "role": "semantic",
+            "assertion": "assert bounded.final == expected",
+            "proves": "The parameterized characteristic case applies the numeric bound after all modifiers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-25",
+        "source_blocks": [
+          34
+        ],
+        "summary": "Modified AP cannot worsen beyond zero.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers",
+            "role": "semantic",
+            "assertion": "assert bounded.final == expected",
+            "proves": "The parameterized characteristic case applies the numeric bound after all modifiers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-26",
+        "source_blocks": [
+          35
+        ],
+        "summary": "Modified numeric D is at least one unless a terminal replacement applies.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers",
+            "role": "semantic",
+            "assertion": "assert bounded.final == expected",
+            "proves": "The parameterized characteristic case applies the numeric bound after all modifiers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-27",
+        "source_blocks": [
+          37
+        ],
+        "summary": "Improving WS, BS, Sv, or Ld decreases the threshold number.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_threshold_and_ap_improvement_decreases_the_numeric_characteristic",
+            "role": "semantic",
+            "assertion": "assert _directional_characteristic_delta(characteristic=characteristic, verb='improve', value=2) == -2",
+            "proves": "The normalized improvement/worsening operation reverses numeric direction for threshold characteristics and AP."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-28",
+        "source_blocks": [
+          38
+        ],
+        "summary": "Worsening WS, BS, Sv, or Ld increases the threshold number.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_threshold_and_ap_improvement_decreases_the_numeric_characteristic",
+            "role": "semantic",
+            "assertion": "assert _directional_characteristic_delta(characteristic=characteristic, verb='worsen', value=2) == 2",
+            "proves": "The normalized improvement/worsening operation reverses numeric direction for threshold characteristics and AP."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-29",
+        "source_blocks": [
+          39
+        ],
+        "summary": "Improving AP decreases its numeric value.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_threshold_and_ap_improvement_decreases_the_numeric_characteristic",
+            "role": "semantic",
+            "assertion": "assert _directional_characteristic_delta(characteristic=characteristic, verb='improve', value=2) == -2",
+            "proves": "The normalized improvement/worsening operation reverses numeric direction for threshold characteristics and AP."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-30",
+        "source_blocks": [
+          40
+        ],
+        "summary": "Worsening AP increases its numeric value, capped at zero.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_threshold_and_ap_improvement_decreases_the_numeric_characteristic",
+            "role": "semantic",
+            "assertion": "assert _directional_characteristic_delta(characteristic=characteristic, verb='worsen', value=2) == 2",
+            "proves": "The normalized improvement/worsening operation reverses numeric direction for threshold characteristics and AP."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers",
+            "role": "semantic",
+            "assertion": "assert bounded.final == expected",
+            "proves": "The AP parameter case caps a numeric worsening at zero."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-31",
+        "source_blocks": [
+          41
+        ],
+        "summary": "Improving an ordinary numeric characteristic adds the stated amount.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_ordinary_characteristic_improvement_increases_the_numeric_characteristic",
+            "role": "semantic",
+            "assertion": "assert _directional_characteristic_delta(characteristic=characteristic, verb='improve', value=2) == 2",
+            "proves": "For ordinary numeric characteristics improvement adds and worsening subtracts the supplied amount."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-32",
+        "source_blocks": [
+          41
+        ],
+        "summary": "Worsening an ordinary numeric characteristic subtracts the stated amount.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_ordinary_characteristic_improvement_increases_the_numeric_characteristic",
+            "role": "semantic",
+            "assertion": "assert _directional_characteristic_delta(characteristic=characteristic, verb='worsen', value=2) == -2",
+            "proves": "For ordinary numeric characteristics improvement adds and worsening subtracts the supplied amount."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-33",
+        "source_blocks": [
+          44
+        ],
+        "summary": "Roll modifiers apply after rerolls.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j_dice_semantics.py::test_modifiers_apply_after_rerolls_and_preserve_unmodified_value",
+            "role": "semantic",
+            "assertion": "assert unmodified.value == 5",
+            "proves": "The preserved unmodified value is the rerolled five before the modifier."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-34",
+        "source_blocks": [
+          45
+        ],
+        "summary": "An unmodified dice result is the post-reroll result before modifiers.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j_dice_semantics.py::test_modifiers_apply_after_rerolls_and_preserve_unmodified_value",
+            "role": "semantic",
+            "assertion": "assert unmodified.value == 5",
+            "proves": "The preserved unmodified value is the rerolled five before the modifier."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-35",
+        "source_blocks": [
+          46
+        ],
+        "summary": "Modified dice may exceed the die's physical maximum.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j_dice_semantics.py::test_order27_modified_dice_limits",
+            "role": "semantic",
+            "assertion": "assert result.final_value == expected",
+            "proves": "Parameterized roll kinds enforce their terminal limits after modifiers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-36",
+        "source_blocks": [
+          47
+        ],
+        "summary": "Modified rolls cannot be below one.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j_dice_semantics.py::test_order27_modified_dice_limits",
+            "role": "semantic",
+            "assertion": "assert result.final_value == expected",
+            "proves": "Parameterized roll kinds enforce their terminal limits after modifiers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-37",
+        "source_blocks": [
+          48,
+          49
+        ],
+        "summary": "Combined hit and wound roll penalties are capped at minus one.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j_dice_semantics.py::test_order27_modified_dice_limits",
+            "role": "semantic",
+            "assertion": "assert result.final_value == expected",
+            "proves": "Parameterized roll kinds enforce their terminal limits after modifiers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-38",
+        "source_blocks": [
+          48,
+          50
+        ],
+        "summary": "Combined hit and wound roll bonuses are capped at plus one.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j_dice_semantics.py::test_order27_modified_dice_limits",
+            "role": "semantic",
+            "assertion": "assert result.final_value == expected",
+            "proves": "Parameterized roll kinds enforce their terminal limits after modifiers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-39",
+        "source_blocks": [
+          51
+        ],
+        "summary": "Modified charge-roll results are capped at twelve.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j_dice_semantics.py::test_order27_modified_dice_limits",
+            "role": "semantic",
+            "assertion": "assert result.final_value == expected",
+            "proves": "Parameterized roll kinds enforce their terminal limits after modifiers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-40",
+        "source_blocks": [
+          54
+        ],
+        "summary": "Modified detection range lies between nine and thirty inches.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_attributes_modifiers.py::test_order29_detection_range_is_terminally_bounded",
+            "role": "semantic",
+            "assertion": "assert resolved.final == expected",
+            "proves": "Parameterized extreme modifiers enforce nine-to-thirty range bounds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-41",
+        "source_blocks": [
+          54
+        ],
+        "summary": "Modified Lone Operative range lies between nine and thirty inches.",
+        "owners": [
+          "src/warhammer40k_core/engine/lone_operative.py:lone_operative_target_allowed",
+          "src/warhammer40k_core/core/modifiers.py:resolve_targeting_range"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_lone_operative_actual_target_consumer_clamps_range",
+            "role": "semantic",
+            "assertion": "assert lone_operative_target_allowed(scenario=BattlefieldScenario(armies=tuple(state.army_definitions), battlefield_state=state.battlefield_state), attacker_unit=source, attacker_model_instance_id=source.own_models[0].model_instance_id, target_rules_unit=target, profile=LoneOperativeAbilityProfile(source_id='order97:lone-range', range_inches=raw_range)) is allowed",
+            "proves": "Actual Lone Operative targeting with effective profile ranges 1 and 99 accepts only distances within the terminal 9 and 30 inch bounds; both immediately-inside and immediately-outside targets are tested."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-42",
+        "source_blocks": [
+          55
+        ],
+        "summary": "Stratagem CP cost may increase by at most one.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_attributes_modifiers.py::test_order37_stratagem_cost_uses_exact_operation_order_and_terminal_bounds",
+            "role": "semantic",
+            "assertion": "assert final == expected",
+            "proves": "Parameterized cost operations obey the original-cost-plus-one and zero bounds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.01-obligation-43",
+        "source_blocks": [
+          55
+        ],
+        "summary": "Modified Stratagem CP cost cannot be negative.",
+        "owners": [
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_attributes_modifiers.py::test_order37_stratagem_cost_uses_exact_operation_order_and_terminal_bounds",
+            "role": "semantic",
+            "assertion": "assert final == expected",
+            "proves": "Parameterized cost operations obey the original-cost-plus-one and zero bounds."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          2,
+          3,
+          8,
+          10,
+          18,
+          19,
+          22,
+          36,
+          42,
+          43,
+          52,
+          53
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      },
+      {
+        "source_blocks": [
+          5,
+          7
+        ],
+        "classification": "example",
+        "reason": "Illustration of the separately inventoried operative rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:02:02.02.02:1",
+    "requirements": [
+      {
+        "requirement_id": "02.02.02-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An unqualified ignore-modifiers rule covers rolls, unit profile characteristics, and weapon characteristics.",
+        "owners": [
+          "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_catalog_rule_runtime_consumers.py::test_modifier_ignore_subject_unrestricted_permission_covers_typed_kinds",
+            "role": "semantic",
+            "assertion": "assert permissions[0].supports(kind)",
+            "proves": "The absent modifier-kind restriction admits each parameterized typed roll, model-characteristic and weapon-characteristic kind."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.02-obligation-02",
+        "source_blocks": [
+          3
+        ],
+        "summary": "The player may select any subset of eligible modifiers to ignore, including retaining beneficial modifiers.",
+        "owners": [
+          "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order93_modifier_ignore.py::test_fixed_profile_keeps_opposing_source_operations_and_original_value",
+            "role": "semantic",
+            "assertion": "assert trace.resolve(ignored_modifier_ids=('penalty:S',)).final == 6",
+            "proves": "Ignoring only the penalty preserves the bonus rather than cancelling both."
+          },
+          {
+            "nodeid": "tests/unit/test_order93_modifier_ignore.py::test_general_hit_modifier_choice_uses_session_and_replays",
+            "role": "facade",
+            "assertion": "assert request.decision_type == 'select_modifier_ignores'",
+            "proves": "The general hit/BS choice flows through the local session and reconstructs after restore."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      },
+      {
+        "source_blocks": [
+          4,
+          5
+        ],
+        "classification": "example",
+        "reason": "Illustration of the separately inventoried operative rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:02:02.02.03:1",
+    "requirements": [
+      {
+        "requirement_id": "02.02.03-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Random M is rolled when the rules unit is selected to move.",
+        "owners": [
+          "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry",
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order87_random_profiles.py::test_random_movement_is_rolled_at_facade_selection_once_for_the_unit",
+            "role": "facade",
+            "assertion": "assert len(rolls) == 1",
+            "proves": "Selecting the moving unit through the facade produces one random-M roll."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.03-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The random M roll supplies the unit's movement value.",
+        "owners": [
+          "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry",
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order87_random_profiles.py::test_random_movement_is_rolled_at_facade_selection_once_for_the_unit",
+            "role": "facade",
+            "assertion": "assert len({v.final for v in values}) == 1",
+            "proves": "Every affected unit model receives the shared M result."
+          }
+        ],
+        "qualifications": [
+          "Order 87 mixed random-M expression grouping remains an owner-approved provisional convention, not independently verified source semantics."
+        ]
+      },
+      {
+        "requirement_id": "02.02.03-obligation-03",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Random A is rolled when attacks are generated in Resolve Attacks.",
+        "owners": [
+          "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry",
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_random_attacks_resolve_when_declaration_is_accepted",
+            "role": "semantic",
+            "assertion": "assert event_payload['value'] == pool_payload['attacks']",
+            "proves": "The accepted declaration generates its attack pool from the one recorded random A roll."
+          }
+        ],
+        "qualifications": [
+          "This evidence establishes the current declaration-to-pool boundary; any later source-selected separation of attack generation must retain this single-roll relationship."
+        ]
+      },
+      {
+        "requirement_id": "02.02.03-obligation-04",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Each physical weapon rolls random A separately before identical attacks are pooled.",
+        "owners": [
+          "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry",
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j_dice_semantics.py::test_random_attacks_and_damage_characteristics_roll_at_required_use_timing",
+            "role": "semantic",
+            "assertion": "assert first_attack.roll_state.original_result.roll_id != second_attack.roll_state.original_result.roll_id",
+            "proves": "Two random A uses receive distinct physical rolls."
+          },
+          {
+            "nodeid": "tests/unit/test_order92_random_melee.py::test_all_weapons_commit_before_dice_and_each_budget_is_conserved",
+            "role": "facade",
+            "assertion": "assert len({cast(str, cast(dict[str, JsonValue], b['roll'])['scope_id']) for b in budgets}) == len(budgets)",
+            "proves": "Every committed physical weapon receives its own random A roll scope before a declaration is submitted."
+          },
+          {
+            "nodeid": "tests/unit/test_order92_random_melee.py::test_all_weapons_commit_before_dice_and_each_budget_is_conserved",
+            "role": "facade",
+            "assertion": "assert sum((pool.attacks for pool in sequence.attack_pools)) == sum((cast(int, budget['base_attacks']) for budget in budgets))",
+            "proves": "Accepted facade declarations preserve the sum of all independent physical random A budgets in their shared attack pools; attempts to borrow attacks between physical weapons are rejected atomically."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.03-obligation-05",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Random D is rolled separately for each damaging attack after allocation to a model.",
+        "owners": [
+          "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry",
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_random_damage_rolls_after_failed_save",
+            "role": "semantic",
+            "assertion": "assert save_roll_index < damage_roll_index",
+            "proves": "Random damage is not generated before the allocated model's saving throw."
+          }
+        ],
+        "qualifications": [
+          "This proves post-save random D timing on one allocated attack; each-attack generation has separate random occurrence tests."
+        ]
+      },
+      {
+        "requirement_id": "02.02.03-obligation-06",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A random-D determination is a damage roll.",
+        "owners": [
+          "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry",
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j_dice_semantics.py::test_random_attacks_and_damage_characteristics_roll_at_required_use_timing",
+            "role": "semantic",
+            "assertion": "assert damage.value == 5",
+            "proves": "The per-attack random Damage result is carried as a damage characteristic roll."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.03-obligation-07",
+        "source_blocks": [
+          5
+        ],
+        "summary": "A dice expression's intrinsic operator and constant belong to the base D characteristic, not its modifier inventory.",
+        "owners": [
+          "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry",
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_multiple_dice_sum_all_faces_and_the_intrinsic_constant",
+            "role": "semantic",
+            "assertion": "assert result.spec.expression.modifier == 2",
+            "proves": "The plus-two constant lives on the base dice expression rather than in the external modifier stack."
+          }
+        ],
+        "qualifications": [
+          "The expression owner assertion is shared by random characteristics; this test does not exercise a random-D damage application."
+        ]
+      },
+      {
+        "requirement_id": "02.02.03-obligation-08",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Other random characteristics are determined per model or weapon on each required use.",
+        "owners": [
+          "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry",
+          "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order87_random_profiles.py::test_random_characteristics_are_evaluated_at_shooting_uses",
+            "role": "facade",
+            "assertion": "assert len(rolls) == 4",
+            "proves": "Random shooting profile uses have separately recorded physical roll occurrences."
+          }
+        ],
+        "qualifications": [
+          "This certifies the parameterized shooting uses; other random characteristics have separate consumer tests."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:02:02.02.04:1",
+    "requirements": [
+      {
+        "requirement_id": "02.02.04-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Unit healing processes no more than its specified regained wound count.",
+        "owners": [
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+          "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase14h_healing.py::test_healing_iterates_wound_revival_revived_wound_and_no_effect",
+            "role": "semantic",
+            "assertion": "assert [step.step_kind for step in resolved.resolved_steps] == [HealingStepKind.HEAL_WOUND, HealingStepKind.REVIVE_MODEL, HealingStepKind.HEAL_WOUND, HealingStepKind.NO_EFFECT]",
+            "proves": "Four wound steps heal, revive an original casualty, heal that model, then do nothing because the original inventory is full."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.04-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Unit healing selects a currently wounded model and restores one wound before reviving casualties.",
+        "owners": [
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+          "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order89_healing.py::test_any_unit_offers_wounded_model_choice_to_source_actor",
+            "role": "facade",
+            "assertion": "assert sorted(healed) == [1, 2]",
+            "proves": "The facade-selected wounded model gains one wound while the other remains wounded."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.04-obligation-03",
+        "source_blocks": [
+          3
+        ],
+        "summary": "When no living member is wounded, unit healing revives an eligible destroyed non-CHARACTER at one wound.",
+        "owners": [
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+          "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order89_healing.py::test_mixed_attached_revival_candidates_and_accepted_placement_replay",
+            "role": "facade",
+            "assertion": "assert model.current_wounds == (model.initial_wounds if explicit else 1)",
+            "proves": "An accepted revival returns exactly the selected destroyed member, full wounds for explicit revival and one wound for ordinary healing."
+          },
+          {
+            "nodeid": "tests/unit/test_order89_healing.py::test_character_exclusion_is_only_for_ordinary_unit_healing",
+            "role": "semantic",
+            "assertion": "assert resolved.resolved_steps[0].step_kind is HealingStepKind.NO_EFFECT",
+            "proves": "Ordinary healing does not revive a destroyed CHARACTER; explicit model-return rules may."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.04-obligation-04",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Healing cannot exceed a model starting wounds.",
+        "owners": [
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+          "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order89_healing.py::test_model_healing_discards_excess_without_healing_another_model_or_reviving",
+            "role": "semantic",
+            "assertion": "assert [model_by_id(state=state, model_instance_id=i).current_wounds for i in ids[:3]] == [1, 2, 0]",
+            "proves": "The selected model caps at full wounds, another remains wounded, and the destroyed model stays at zero."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.04-obligation-05",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Model-scoped healing affects only the specified model.",
+        "owners": [
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+          "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order89_healing.py::test_model_healing_discards_excess_without_healing_another_model_or_reviving",
+            "role": "semantic",
+            "assertion": "assert [model_by_id(state=state, model_instance_id=i).current_wounds for i in ids[:3]] == [1, 2, 0]",
+            "proves": "The selected model caps at full wounds, another remains wounded, and the destroyed model stays at zero."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.04-obligation-06",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Excess model healing is discarded.",
+        "owners": [
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+          "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order89_healing.py::test_model_healing_discards_excess_without_healing_another_model_or_reviving",
+            "role": "semantic",
+            "assertion": "assert [model_by_id(state=state, model_instance_id=i).current_wounds for i in ids[:3]] == [1, 2, 0]",
+            "proves": "The selected model caps at full wounds, another remains wounded, and the destroyed model stays at zero."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.02.04-obligation-07",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Model-scoped healing does not revive a destroyed unit member.",
+        "owners": [
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+          "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order89_healing.py::test_model_healing_discards_excess_without_healing_another_model_or_reviving",
+            "role": "semantic",
+            "assertion": "assert [model_by_id(state=state, model_instance_id=i).current_wounds for i in ids[:3]] == [1, 2, 0]",
+            "proves": "The selected model caps at full wounds, another remains wounded, and the destroyed model stays at zero."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:02:02.02.05:1",
+    "requirements": [
+      {
+        "requirement_id": "02.02.05-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Full wounds means remaining wounds equal the model's W characteristic.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:ModelInstance",
+          "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_model_health_definition_matches_full_wounds_and_zero_health_casualties",
+            "role": "semantic",
+            "assertion": "assert model.current_wounds == model.characteristic(Characteristic.WOUNDS).final",
+            "proves": "The real model definition identifies zero health as dead and initialized health as the W characteristic."
+          },
+          {
+            "nodeid": "tests/unit/test_phase14h_healing.py::test_healing_iterates_wound_revival_revived_wound_and_no_effect",
+            "role": "semantic",
+            "assertion": "assert revived.current_wounds == revived.initial_wounds",
+            "proves": "Healing stops at the physical model starting W limit."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:02:02.02.06:1",
+    "requirements": [],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "cross_reference",
+        "reason": "Explicit referral to the operative clause in another source row."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:02:02.03:1",
+    "requirements": [],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "metadata",
+        "reason": "Rendering metadata; does not add a gameplay rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:02:02.03.01:1",
+    "requirements": [
+      {
+        "requirement_id": "02.03.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A stronger nested-condition effect requires both its parent condition and its more-specific condition.",
+        "owners": [
+          "src/warhammer40k_core/rules/rule_parser.py:parse_rule_ir"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: The selected Core source's own nested-condition example does not compile to an executable stronger branch. A parser rejection is not proof of incorrect applied rerolls. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding nested-condition-consumer-boundary."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "classification": "example",
+        "reason": "Illustration of the separately inventoried operative rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:02:02.04:1",
+    "requirements": [
+      {
+        "requirement_id": "02.04-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Ranged weapon Range bounds target distance.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_shooting_target_candidate_cache_uses_full_weapon_profile_identity",
+            "role": "semantic",
+            "assertion": "assert {candidate['violation_code'] for candidate in illegal_candidates} == {ShootingTargetViolationCode.OUT_OF_RANGE.value}",
+            "proves": "Each weapon profile's actual Range determines its eligible targets."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.04-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Melee Range designates a melee weapon.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_wargear_weapon_profiles.py::test_range_attack_and_damage_profiles_consume_parsed_values",
+            "role": "semantic",
+            "assertion": "assert melee_profile.to_payload() == {'kind': 'melee', 'distance_inches': None}",
+            "proves": "Melee range is represented by the melee weapon range kind with no ranged distance."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.04-obligation-03",
+        "source_blocks": [
+          3
+        ],
+        "summary": "The A characteristic determines attack-dice count.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_random_attacks_resolve_when_declaration_is_accepted",
+            "role": "semantic",
+            "assertion": "assert event_payload['value'] == pool_payload['attacks']",
+            "proves": "The rolled A value is the generated attack-pool count."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.04-obligation-04",
+        "source_blocks": [
+          4
+        ],
+        "summary": "BS supplies the ranged hit threshold.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_hit_roll_bonus_cap_applies_after_ballistic_skill_modifier",
+            "role": "semantic",
+            "assertion": "assert payload['target_number'] == 5",
+            "proves": "The ranged hit evaluator receives the modified BS threshold independently of roll modifiers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.04-obligation-05",
+        "source_blocks": [
+          5
+        ],
+        "summary": "WS supplies the melee hit threshold.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_hit_roll_bonus_cap_applies_after_weapon_skill_modifier",
+            "role": "semantic",
+            "assertion": "assert hit_payload['target_number'] == 5",
+            "proves": "The melee hit evaluator receives the modified WS threshold independently of roll modifiers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.04-obligation-06",
+        "source_blocks": [
+          6
+        ],
+        "summary": "S determines the wound threshold relative to target T.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_wound_roll_table_uses_integer_safe_boundaries",
+            "role": "semantic",
+            "assertion": "assert wound_roll_target_number(strength=4, toughness=4) == 4",
+            "proves": "Equal S and T produces the four-plus wound threshold."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.04-obligation-07",
+        "source_blocks": [
+          7
+        ],
+        "summary": "AP modifies armor saving rolls.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_save_roll_checks_one_invulnerable_then_armour",
+            "role": "semantic",
+            "assertion": "assert ap_failure.final_roll == 1",
+            "proves": "AP minus three changes the physical four to an armour-save result of one and fails the save."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.04-obligation-08",
+        "source_blocks": [
+          8
+        ],
+        "summary": "D determines wounds inflicted by an attack.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_random_damage_rolls_after_failed_save",
+            "role": "semantic",
+            "assertion": "assert application['requested_damage'] == random_damage",
+            "proves": "The damage application consumes the resolved D characteristic."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:02:02.04.01:1",
+    "requirements": [
+      {
+        "requirement_id": "02.04.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A weapon lacking S uses one for an interaction with its Strength.",
+        "owners": [
+          "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order88_absent_strength.py::test_strength_interactions_through_attack_hosts_restore_and_replay",
+            "role": "facade",
+            "assertion": "assert value['strength'] == (1 if strength is None else strength)",
+            "proves": "Both Shooting and Fight facade attacks use S1 for source-absent Strength."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:02:02.05:1",
+    "requirements": [
+      {
+        "requirement_id": "02.05-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Faction and other keywords have the same rules-matching semantics outside army construction.",
+        "owners": [
+          "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_phase17d_aura_keyword_gates_match_target_faction_keywords",
+            "role": "semantic",
+            "assertion": "assert result.effect_payloads[0]['target_unit_instance_ids'] == [source_unit_id, target_unit_id]",
+            "proves": "The executable keyword-gated aura accepts units whose required keywords are in the faction inventory."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:02:02.05.01:1",
+    "requirements": [
+      {
+        "requirement_id": "02.05.01-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A rules unit possesses the union of its members' keywords.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+          "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_attached_melee_cleave_uses_rules_unit_count_and_keywords",
+            "role": "semantic",
+            "assertion": "assert 'CHARACTER' in target_rules_unit.keywords",
+            "proves": "The attached unit includes its leader CHARACTER keyword while the bodyguard itself does not."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.05.01-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A model possesses only its own keywords.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+          "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_phase17n_hidden_and_detection_range_apply_to_models_not_attached_unit_keywords",
+            "role": "semantic",
+            "assertion": "assert vehicle_leader.own_models[0].model_instance_id not in hidden_model_ids",
+            "proves": "The attached vehicle leader does not inherit the infantry members' Hidden condition."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.05.01-obligation-03",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A keyword-qualified unit rule matches if any member has the keyword.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+          "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_mixed_unit_keyword_does_not_promote_member_keywords",
+            "role": "semantic",
+            "assertion": "assert unit_has_keyword(unit, 'PSYKER')",
+            "proves": "The one PSYKER member causes a unit-keyword match."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.05.01-obligation-04",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A keyword-qualified model rule matches only that model's own keywords.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+          "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_mixed_unit_keyword_does_not_promote_member_keywords",
+            "role": "semantic",
+            "assertion": "assert tuple(('PSYKER' in model.keywords for model in unit.own_models)) == (False, False, True)",
+            "proves": "Only the physical PSYKER member carries that keyword; siblings do not."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.05.01-obligation-05",
+        "source_blocks": [
+          5
+        ],
+        "summary": "A non-keyword rule matches only if the specified model or unit lacks that keyword.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+          "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase14i_non_keyword_gated_weapon_abilities_match_missing_target_keywords",
+            "role": "semantic",
+            "assertion": "assert not lethal_hits_applies(profile, target_keywords=('VEHICLE',))",
+            "proves": "A prohibited keyword prevents the ability from applying."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.05.01-obligation-06",
+        "source_blocks": [
+          6
+        ],
+        "summary": "A mixed-keyword unit is affected by unit rules matching any member keyword.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+          "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_mixed_unit_keyword_does_not_promote_member_keywords",
+            "role": "semantic",
+            "assertion": "assert unit_has_keyword(unit, 'PSYKER')",
+            "proves": "The one PSYKER member causes a unit-keyword match."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.05.01-obligation-07",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Attacks target a rules unit, not a keyword-selected member.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+          "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_mustered_attached_unit_targets_and_allocates_as_rules_unit",
+            "role": "semantic",
+            "assertion": "assert target_candidates[0].target_unit_instance_id == attached_id",
+            "proves": "Enumerating separate bodyguard and leader identities produces one attached rules-unit target; allocation chooses models only after the unit is targeted."
+          }
+        ],
+        "qualifications": [
+          "This proves target identity, with the adjacent keyword-union assertions covering keyword eligibility. It does not promote a keyword to every model."
+        ]
+      },
+      {
+        "requirement_id": "02.05.01-obligation-08",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Model-keyword effects do not spill over to other models in a mixed unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+          "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_phase17n_hidden_and_detection_range_apply_to_models_not_attached_unit_keywords",
+            "role": "semantic",
+            "assertion": "assert vehicle_leader.own_models[0].model_instance_id not in hidden_model_ids",
+            "proves": "The model-scoped infantry condition does not grant Hidden to an attached vehicle."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.05.01-obligation-09",
+        "source_blocks": [
+          8
+        ],
+        "summary": "Comma, slash, and or keyword alternatives mean any listed keyword.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+          "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase13d_anti_keyword_supports_slash_keywords_and_non_matching_targets",
+            "role": "semantic",
+            "assertion": "assert anti_keyword_critical_threshold(profile=slash_profile, target_keywords=('MONSTER',)) == 4",
+            "proves": "Either MONSTER or VEHICLE in the slash-keyword list matches the same ability threshold."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.05.01-obligation-10",
+        "source_blocks": [
+          9
+        ],
+        "summary": "Adjacent required keywords form a conjunction.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+          "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_phase17d_aura_keyword_gates_match_target_faction_keywords",
+            "role": "semantic",
+            "assertion": "assert result.effect_payloads[0]['target_unit_instance_ids'] == [source_unit_id, target_unit_id]",
+            "proves": "The Khorne Legiones Daemonica conjunction accepts the unit with both faction keywords and excludes the one missing Khorne."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.05.01-obligation-11",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Legacy unspecified model/unit keyword subjects refer to units.",
+        "owners": [
+          "src/warhammer40k_core/rules/rule_parser.py:parse_rule_ir"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: The typed keyword target is not inferred when model/unit is omitted; PSYKER is retained as unsupported residual language. The otherwise-identical explicit PSYKER unit form is parsed separately as a positive control. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding implicit-unit-keyword-consumer-boundary."
+        ]
+      },
+      {
+        "requirement_id": "02.05.01-obligation-12",
+        "source_blocks": [
+          11
+        ],
+        "summary": "Singular and plural spellings identify the same canonical keyword.",
+        "owners": [
+          "src/warhammer40k_core/rules/rule_keyword_sequences.py:keyword_sequence_tokens",
+          "src/warhammer40k_core/engine/rule_target_resolution.py:unit_has_required_keywords"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Gameplay gap: keyword-sequence normalization preserves distinct CHARACTER and CHARACTERS tokens, and the real unit target gate rejects the plural while accepting the singular on the same CHARACTER model. The pinned keyword probe exercises the keyword itself, not pluralized model-owner labels. Resolve singular/plural aliases at the source boundary and retain canonical runtime identity."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:02:02.06:1",
+    "requirements": [
+      {
+        "requirement_id": "02.06-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Unit composition constrains the number and type of member models.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:UnitFactory.instantiate_unit"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_model_profile_counts_must_match_datasheet_composition",
+            "role": "invalid",
+            "assertion": "with pytest.raises(ArmyMusteringError, match='unit selection'):\n    muster_army(catalog=catalog, request=request)",
+            "proves": "The muster authority rejects a four-model selection outside the five-model minimum."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "02.06-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Each model receives the applicable listed default wargear.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:UnitFactory.instantiate_unit"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_default_wargear_is_equipped_separately_by_every_selected_model",
+            "role": "semantic",
+            "assertion": "assert tuple((model.wargear_ids for model in unit.own_models)) == (('core-bolt-rifle',),) * 5",
+            "proves": "Every one of the five mustered models carries its applicable default rifle independently."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:02:02.06.01:1",
+    "requirements": [
+      {
+        "requirement_id": "02.06.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The bearer is the particular model equipped with the weapon, enhancement, or wargear.",
+        "owners": [
+          "src/warhammer40k_core/engine/enhancement_bearers.py:enhancement_bearer_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_unit_splitting.py::test_order68_explicit_nonfirst_bearer_retains_identity_after_split_and_restore",
+            "role": "facade",
+            "assertion": "assert before.model_instance_id == 'army-alpha:bodyguard:core-intercessor-like:002'",
+            "proves": "The Enhancement resolves to explicitly selected physical model 002; that exact model retains its bearer identity across the facade split and restore."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:02:02.06.02:1",
+    "requirements": [
+      {
+        "requirement_id": "02.06.02-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A unit's equipment is the collection of wargear equipped by all member models.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:UnitFactory.instantiate_unit"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_default_wargear_is_equipped_separately_by_every_selected_model",
+            "role": "semantic",
+            "assertion": "assert tuple((model.wargear_ids for model in unit.own_models)) == (('core-bolt-rifle',),) * 5",
+            "proves": "The physical unit equipment inventory consists of all five independently equipped models."
+          }
+        ],
+        "qualifications": [
+          "This proves the physical aggregate inventory, not an arbitrary source equipment-condition consumer."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:02:02.07:1",
+    "requirements": [
+      {
+        "requirement_id": "02.07-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Army construction may change model equipment only through the datasheet's allowed wargear options.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:UnitInstance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_selected_wargear_must_be_legal_for_datasheet_option",
+            "role": "invalid",
+            "assertion": "with pytest.raises(ArmyMusteringError, match='unit selection'):\n    muster_army(catalog=catalog, request=request)",
+            "proves": "The muster authority rejects a heavy cannon not offered by the datasheet option."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "faq:66be2ad9-24af-4edf-890a-c0e55004bf76",
+    "requirements": [
+      {
+        "requirement_id": "faq-66be2ad9-24af-4edf-890a-c0e55004bf76-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A unit ranged-attacks A bonus modifies each ranged weapon's A characteristic, not each generated attack die.",
+        "owners": [
+          "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_unit_ranged_attacks_bonus_changes_weapon_count_once",
+            "role": "semantic",
+            "assertion": "assert modified.attack_profile.fixed_attacks == attacks + 1",
+            "proves": "The source-backed unit modifier changes a weapon A1 to2 and A3 to4: one bonus per weapon profile, not one per generated attack."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:6575ee89-b92a-456d-8e59-4ee513df8f4e",
+    "requirements": [
+      {
+        "requirement_id": "faq-6575ee89-b92a-456d-8e59-4ee513df8f4e-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Keyword matching is exact and does not match a word embedded within a different multiword keyword.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:UnitInstance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_exact_keyword_matching_does_not_promote_embedded_words",
+            "role": "semantic",
+            "assertion": "assert not unit_has_keyword(unit, 'COMMISSAR')",
+            "proves": "COMMISSAR_GRAVES matches its complete token and does not match COMMISSAR."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:60232b79-7a10-44a0-ac68-e27312c7ba60",
+    "requirements": [
+      {
+        "requirement_id": "faq-60232b79-7a10-44a0-ac68-e27312c7ba60-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A removed destroyed model no longer contributes keywords to its prior rules unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_factory.py:UnitInstance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_order71_candidate_cache_rechecks_attached_vehicle_keyword_after_casualty",
+            "role": "semantic",
+            "assertion": "assert after.violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT",
+            "proves": "Removing the attached VEHICLE model invalidates the rules-unit shooting exemption."
+          },
+          {
+            "nodeid": "tests/unit/test_model_keyword_authority.py::test_keyword_casualty_facade_restore_replay_and_both_viewers",
+            "role": "facade",
+            "assertion": "assert 'PSYKER' not in view.keywords",
+            "proves": "A casualty removes PSYKER from the rules unit after facade attack resolution, while retained-death presence preserves it until removal."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  }
+]

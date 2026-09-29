@@ -1,0 +1,703 @@
+[
+  {
+    "row_id": "rule:10:10.00:1",
+    "requirements": [
+      {
+        "requirement_id": "10.00-step-sequence",
+        "source_blocks": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "summary": "Resolve start, shooting body and end windows in order.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert boundaries == ['start_phase', 'end_phase']",
+            "proves": "The real facade emits start and end timing boundaries before completing each phase."
+          }
+        ],
+        "qualifications": [
+          "This assertion certifies lifecycle timing boundaries; effects attached to those boundaries use the shared timing dispatcher and their own consumer regressions."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Introductory description of the Shooting phase."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:10:10.01:1",
+    "requirements": [
+      {
+        "requirement_id": "10.01-start-window",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Resolve start-of-Shooting triggered rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert boundaries == ['start_phase', 'end_phase']",
+            "proves": "The real facade emits start and end timing boundaries before completing each phase."
+          }
+        ],
+        "qualifications": [
+          "This assertion certifies lifecycle timing boundaries; effects attached to those boundaries use the shared timing dispatcher and their own consumer regressions."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:10:10.03:1",
+    "requirements": [
+      {
+        "requirement_id": "10.03-end-window",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Resolve end-of-Shooting triggered rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert boundaries == ['start_phase', 'end_phase']",
+            "proves": "The real facade emits start and end timing boundaries before completing each phase."
+          }
+        ],
+        "qualifications": [
+          "This assertion certifies lifecycle timing boundaries; effects attached to those boundaries use the shared timing dispatcher and their own consumer regressions."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:10:10.02:1",
+    "requirements": [
+      {
+        "requirement_id": "10.02-sequence",
+        "source_blocks": [
+          1,
+          3
+        ],
+        "summary": "Select friendly shooting units one at a time and resolve each before selecting another.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_assault_uses_attack_host_and_serial_unit_completion",
+            "role": "facade",
+            "assertion": "assert next_request.decision_type == 'select_shooting_unit'",
+            "proves": "The next unit-selection request appears only after the shared assault attack host completes."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_assault_uses_attack_host_and_serial_unit_completion",
+            "role": "facade",
+            "assertion": "assert any((e.event_type == 'attack_sequence_completed' for e in events))",
+            "proves": "Actual attacks completed before another unit is selected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.02-eligibility",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Only battlefield units not yet selected this phase may shoot.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_absent_unit_is_not_offered_to_shoot",
+            "role": "facade",
+            "assertion": "assert SHOOTER not in {o.option_id for o in request.options}",
+            "proves": "A removed unit is absent from the real Shooting selection."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_assault_uses_attack_host_and_serial_unit_completion",
+            "role": "facade",
+            "assertion": "assert SHOOTER not in {o.option_id for o in next_request.options}",
+            "proves": "A unit that just completed shooting is excluded from the next real selection."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.02-types",
+        "source_blocks": [
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "summary": "Choose one eligible shooting type before declaring weapons and targets.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14f_select_shooting_type_is_finite_before_declaration",
+            "role": "semantic",
+            "assertion": "assert type_request.decision_type == SELECT_SHOOTING_TYPE_DECISION_TYPE",
+            "proves": "The typed shooting-mode decision precedes declaration."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:10:10.04:1",
+    "requirements": [
+      {
+        "requirement_id": "10.04-eligibility",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Normal shooting requires unengaged status and no Advance this turn.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_normal_type_requires_neither_advance_nor_engagement",
+            "role": "facade",
+            "assertion": "assert ('normal' in {o.option_id for o in request.options}) is (not advanced and (not engaged))",
+            "proves": "Normal type is offered exactly when the unit neither Advanced nor is engaged."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.04-attacks",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Resolve declared Normal attacks through the shared attack sequence.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_no_ability_sequence_resolves_and_emits_ordered_hooks",
+            "role": "semantic",
+            "assertion": "assert emitted_steps == [AttackSequenceStep.HIT, AttackSequenceStep.CRITICAL_HIT, AttackSequenceStep.WOUND, AttackSequenceStep.CRITICAL_WOUND, AttackSequenceStep.ALLOCATE, AttackSequenceStep.SAVE, AttackSequenceStep.DAMAGE]",
+            "proves": "The ordinary attack sequence produces ordered resolution hooks."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.04-action-lock",
+        "source_blocks": [
+          6
+        ],
+        "summary": "After shooting the unit cannot start an action for the rest of the phase.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_order34_completed_shooting_restricts_actions_through_exact_phase_boundary",
+            "role": "semantic",
+            "assertion": "assert has_activity_restriction(state=state, rules_unit=unit, activity='completed_shooting')",
+            "proves": "Completion adds the shared action restriction."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          3,
+          5
+        ],
+        "classification": "metadata",
+        "reason": "Section labels organize the operative requirements enumerated above."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:10:10.05:1",
+    "requirements": [
+      {
+        "requirement_id": "10.05-eligibility",
+        "source_blocks": [
+          2,
+          3,
+          4
+        ],
+        "summary": "Assault shooting requires an unengaged advanced unit with an Assault weapon.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_advanced_unit_is_eligible_to_shoot_only_when_state_permits",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in request.options} == {COMPLETE_SHOOTING_PHASE_OPTION_ID, units['intercessor-1'].unit_instance_id, units['intercessor-2'].unit_instance_id}",
+            "proves": "Advance eligibility is checked against available permissions."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.05-weapons",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Only Assault weapons can be selected for Assault shooting.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase13d_fire_overwatch_advanced_unit_exposes_only_assault_weapons",
+            "role": "semantic",
+            "assertion": "assert {weapon['weapon_profile_id'] for weapon in available_weapons} == {assault_profile.profile_id}",
+            "proves": "Advanced-unit weapon enumeration excludes non-Assault weapons."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.05-attacks",
+        "source_blocks": [
+          8
+        ],
+        "summary": "Resolve Assault attacks through the shared attack sequence.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_assault_uses_attack_host_and_serial_unit_completion",
+            "role": "facade",
+            "assertion": "assert any((e.event_type == 'attack_sequence_completed' for e in events))",
+            "proves": "A real Assault declaration reaches the shared attack completion event."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.05-action-lock",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Assault shooting blocks action start until phase end.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_order34_completed_shooting_restricts_actions_through_exact_phase_boundary",
+            "role": "semantic",
+            "assertion": "assert has_activity_restriction(state=state, rules_unit=unit, activity='completed_shooting')",
+            "proves": "Parameterized completed-shooting coverage checks phase action restriction."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          5,
+          7,
+          9
+        ],
+        "classification": "metadata",
+        "reason": "Section labels organize the operative requirements enumerated above."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:10:10.06:1",
+    "requirements": [
+      {
+        "requirement_id": "10.06-eligibility",
+        "source_blocks": [
+          2,
+          3,
+          4
+        ],
+        "summary": "Close-quarters shooting requires engagement, no Advance, and a Close-quarters weapon or Monster/Vehicle unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_locked_in_combat_big_guns_and_pistol_interactions_are_declaration_state",
+            "role": "semantic",
+            "assertion": "assert infantry_candidates[0].violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT",
+            "proves": "Typed engagement and weapon eligibility govern declarations."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.06-engaged-target",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Eligible models can target enemies engaged with their unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_locked_in_combat_big_guns_and_pistol_interactions_are_declaration_state",
+            "role": "semantic",
+            "assertion": "assert infantry_candidates[0].violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT",
+            "proves": "Engaged target eligibility is resolved in declaration state."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.06-model-penalty",
+        "source_blocks": [
+          7,
+          8
+        ],
+        "summary": "A Monster/Vehicle attacking model suffers minus one to hit except Close-quarters against its engaged target.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_order71_engagement_causes_and_weapon_exception",
+            "role": "semantic",
+            "assertion": "assert candidate.hit_roll_modifier == -len(expected_sources)",
+            "proves": "The parameterized engagement-cause matrix checks the model and target exceptions."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.06-blast",
+        "source_blocks": [
+          9
+        ],
+        "summary": "Blast cannot target an enemy engaged with the attacking unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_order71_blast_cannot_target_engaged_monster_vehicle",
+            "role": "semantic",
+            "assertion": "assert candidate.violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT",
+            "proves": "Blast rejection applies to an engaged Monster/Vehicle target."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.06-ordinary-model",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Other models are restricted to Close-quarters weapons against engaged targets.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_order71_attached_model_permissions_and_target_unit_keywords",
+            "role": "semantic",
+            "assertion": "assert candidate.violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT",
+            "proves": "Attached model permissions are evaluated per declaring model."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.06-attacks",
+        "source_blocks": [
+          12
+        ],
+        "summary": "Close-quarters attacks resolve through the common attack sequence.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_order71_both_penalties_survive_facade_modifiers_restore_and_replay",
+            "role": "semantic",
+            "assertion": "assert pools[0]['hit_roll_modifier'] == -2",
+            "proves": "Facade shooting invokes the common hit modifier path."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.06-action-lock",
+        "source_blocks": [
+          14
+        ],
+        "summary": "Close-quarters shooting blocks action start until phase end.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_order34_completed_shooting_restricts_actions_through_exact_phase_boundary",
+            "role": "semantic",
+            "assertion": "assert has_activity_restriction(state=state, rules_unit=unit, activity='completed_shooting')",
+            "proves": "Completed-shooting restriction is phase-scoped."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          5,
+          11,
+          13
+        ],
+        "classification": "metadata",
+        "reason": "Section labels organize the operative requirements enumerated above."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:10:10.07:1",
+    "requirements": [
+      {
+        "requirement_id": "10.07-unengaged-no-advance",
+        "source_blocks": [
+          2,
+          3
+        ],
+        "summary": "Indirect shooting requires an unengaged unit that did not Advance.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_indirect_mode_requires_unengaged_rules_unit",
+            "role": "semantic",
+            "assertion": "assert (ShootingType.INDIRECT.value in modes) is not engaged",
+            "proves": "An engaged rules unit cannot choose indirect shooting."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.07-indirect-weapon",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Indirect shooting requires an Indirect Fire weapon.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order91_empty_shooting.py::test_destroyed_only_indirect_bearer_does_not_authorize_indirect_selection",
+            "role": "semantic",
+            "assertion": "assert types == (ShootingType.NORMAL,)",
+            "proves": "A destroyed-only bearer does not authorize Indirect type selection."
+          },
+          {
+            "nodeid": "tests/unit/test_order91_empty_shooting.py::test_live_indirect_keyword_grant_authorizes_type_without_native_indirect",
+            "role": "semantic",
+            "assertion": "assert types == (ShootingType.NORMAL, ShootingType.INDIRECT)",
+            "proves": "A live source-backed weapon grant does authorize Indirect."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.07-invisible-target",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Indirect Fire weapons may target nonvisible units in this mode.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14f_indirect_fire_targets_unseen_units_and_unmodified_one_to_five_fail",
+            "role": "semantic",
+            "assertion": "assert candidates[0].is_legal",
+            "proves": "The declared unseen-target candidate is legal."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14f_indirect_fire_targets_unseen_units_and_unmodified_one_to_five_fail",
+            "role": "semantic",
+            "assertion": "assert candidates[0].target_visible_model_ids == ()",
+            "proves": "No target model is visible to the attacker."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.07-cover",
+        "source_blocks": [
+          7,
+          8
+        ],
+        "summary": "Indirect Fire attacks grant the target cover.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14f_indirect_fire_targets_unseen_units_and_unmodified_one_to_five_fail",
+            "role": "semantic",
+            "assertion": "assert INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in candidates[0].targeting_rule_ids",
+            "proves": "The accepted indirect candidate carries the cover rule ID."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.07-no-reroll",
+        "source_blocks": [
+          9
+        ],
+        "summary": "Indirect Fire hit rolls cannot be rerolled.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_order33_actual_reroll_windows_are_scoped_to_indirect_attacks",
+            "role": "semantic",
+            "assertion": "assert generic_rolls == allowed",
+            "proves": "Actual reroll windows distinguish indirect and ordinary attacks."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.07-hit-threshold",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Indirect unmodified 1–5 fails, reduced to 1–3 only when stationary and a friendly unit sees the target.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14f_indirect_fire_targets_unseen_units_and_unmodified_one_to_five_fail",
+            "role": "semantic",
+            "assertion": "assert cast(dict[str, object], hit_payload['payload'])['minimum_unmodified_success'] == 6",
+            "proves": "Ordinary indirect requires a natural six."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14f_indirect_stationary_friendly_visibility_uses_one_to_three_fail",
+            "role": "semantic",
+            "assertion": "assert hit['minimum_unmodified_success'] == 4",
+            "proves": "Stationary spotted indirect requires a natural four or better."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.07-attacks",
+        "source_blocks": [
+          12
+        ],
+        "summary": "Resolve Indirect attacks through the shared attack sequence.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14f_indirect_fire_targets_unseen_units_and_unmodified_one_to_five_fail",
+            "role": "semantic",
+            "assertion": "assert remaining_sequence is None",
+            "proves": "Indirect and ordinary weapons resolve in the same shooting host."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.07-action-lock",
+        "source_blocks": [
+          14
+        ],
+        "summary": "Indirect shooting blocks action start until phase end.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_order34_completed_shooting_restricts_actions_through_exact_phase_boundary",
+            "role": "semantic",
+            "assertion": "assert has_activity_restriction(state=state, rules_unit=unit, activity='completed_shooting')",
+            "proves": "The common completed-shooting action restriction covers the indirect type."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "10.07-mixed-weapons",
+        "source_blocks": [
+          15
+        ],
+        "summary": "Other weapons in an indirect-shooting unit retain normal visible-target restrictions.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_order33_stale_malformed_and_unseen_ordinary_submissions_fail_closed",
+            "role": "semantic",
+            "assertion": "assert not _event_payloads(session.lifecycle, 'shooting_declaration_accepted')",
+            "proves": "An ordinary weapon cannot borrow indirect unseen-target permission."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          5,
+          11,
+          13
+        ],
+        "classification": "metadata",
+        "reason": "Section labels organize the operative requirements enumerated above."
+      }
+    ]
+  }
+]

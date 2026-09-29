@@ -1,0 +1,502 @@
+[
+  {
+    "row_id": "rule:21:21.01:1",
+    "requirements": [],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "cross_reference",
+        "reason": "Navigation to separately inventoried operative rules."
+      },
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "metadata",
+        "reason": "Section labels only; operative eligibility, distance and consequences are enumerated separately."
+      },
+      {
+        "source_blocks": [
+          3,
+          4,
+          5
+        ],
+        "classification": "example",
+        "reason": "Illustrative instance of the separately enumerated operative rule; no additional permission or restriction."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:21:21.02:1",
+    "requirements": [
+      {
+        "requirement_id": "21.02-source-trigger",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A Surge move requires its granting rule to have triggered.",
+        "owners": [
+          "src/warhammer40k_core/engine/surge_movement.py:surge_ineligibility"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order52_surge.py::test_surge_requires_recorded_granting_trigger_before_offer",
+            "role": "invalid",
+            "assertion": "with pytest.raises(GameLifecycleError, match='recorded trigger authority'):\n    triggered_movement_unit_selection_request(state=state, player_id='player-a', descriptor=descriptor, eligible_units=(TriggeredMovementEligibleUnit(SOURCE, 'hook', descriptor.source_rule_id),))",
+            "proves": "Without an authenticated granting trigger no Surge request can be offered."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "21.02-not-battle-shocked",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Battle-shocked units cannot Surge.",
+        "owners": [
+          "src/warhammer40k_core/engine/surge_movement.py:surge_ineligibility"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10s_triggered_movement.py::test_surge_movement_cannot_occur_if_battle_shocked",
+            "role": "invalid",
+            "assertion": "assert resolution.restriction_violations[0].violation_code is TriggeredMovementViolationCode.BATTLE_SHOCKED_SURGE_FORBIDDEN",
+            "proves": "The validator identifies Battle-shock as the Surge prohibition."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "21.02-unengaged",
+        "source_blocks": [
+          5
+        ],
+        "summary": "An engaged unit cannot Surge.",
+        "owners": [
+          "src/warhammer40k_core/engine/surge_movement.py:surge_ineligibility"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10s_triggered_movement.py::test_surge_movement_cannot_occur_while_within_engagement_range",
+            "role": "invalid",
+            "assertion": "assert resolution.restriction_violations[0].violation_code is TriggeredMovementViolationCode.ENGAGEMENT_RANGE_SURGE_FORBIDDEN",
+            "proves": "Enemy engagement yields an explicit Surge restriction."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "21.02-not-moved-this-phase",
+        "source_blocks": [
+          6
+        ],
+        "summary": "A unit that already moved this phase cannot Surge.",
+        "owners": [
+          "src/warhammer40k_core/engine/surge_movement.py:surge_ineligibility"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order52_surge.py::test_prior_non_surge_move_prevents_surge_in_same_actual_player_phase",
+            "role": "semantic",
+            "assertion": "assert [option.option_id for option in request.options] == ['decline_triggered_movement']",
+            "proves": "A prior ordinary move leaves only the decline-Surge option."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "21.02-closest-target-choice",
+        "source_blocks": [
+          8
+        ],
+        "summary": "Before movement the controlling player selects a closest enemy unit as the Surge target.",
+        "owners": [
+          "src/warhammer40k_core/engine/surge_movement.py:closest_surge_targets"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order52_surge.py::test_surge_finite_choice_commits_the_closest_target",
+            "role": "semantic",
+            "assertion": "assert choices[0].payload['surge_target_unit_instance_id'] == TARGET",
+            "proves": "The finite option carries the closest target identity."
+          },
+          {
+            "nodeid": "tests/unit/test_order52_surge.py::test_surge_public_target_is_projected_consistently_to_both_players",
+            "role": "viewer",
+            "assertion": "assert context['surge_target_unit_instance_id'] == TARGET",
+            "proves": "Both viewers see the committed Surge target."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "21.02-engage-if-possible",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Every model must end engaged with the Surge target when a legal path can do so.",
+        "owners": [
+          "src/warhammer40k_core/engine/surge_movement.py:surge_endpoint_evidence"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order52_surge.py::test_surge_engages_each_model_when_a_legal_path_reaches_target",
+            "role": "invalid",
+            "assertion": "assert resolution.restriction_violations[0].violation_code.value == 'surge_engagement_not_reached'",
+            "proves": "A model failing achievable engagement receives the precise restriction."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "21.02-maximum-approach",
+        "source_blocks": [
+          11
+        ],
+        "summary": "A model unable to reach engagement must finish as close as legally possible to the Surge target.",
+        "owners": [
+          "src/warhammer40k_core/engine/surge_movement.py:surge_endpoint_evidence"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order52_surge.py::test_order74_surge_terrain_exclusion_does_not_invent_maximum_approach",
+            "role": "invalid",
+            "assertion": "assert violation == 'surge_maximum_approach_not_reached'",
+            "proves": "A legal closer route disproves the submitted maximum approach."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "21.02-shared-witnessed-movement",
+        "source_blocks": [
+          13
+        ],
+        "summary": "Surge uses the shared movement rules and witnessed-path authority.",
+        "owners": [
+          "src/warhammer40k_core/engine/surge_movement.py:surge_endpoint_evidence"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order52_surge.py::test_surge_facade_retry_restore_exact_replay_and_phase_lock",
+            "role": "facade",
+            "assertion": "assert state.phase_movement_history[0].is_surge",
+            "proves": "The accepted facade path records an actual Surge move."
+          },
+          {
+            "nodeid": "tests/unit/test_order52_surge.py::test_surge_facade_retry_restore_exact_replay_and_phase_lock",
+            "role": "replay",
+            "assertion": "assert ReplayRunner.from_payload(artifact).run().status is ReplayRunStatus.REPRODUCED",
+            "proves": "The failed retry and accepted Surge reproduce exactly."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "21.02-no-other-enemy-engagement",
+        "source_blocks": [
+          15
+        ],
+        "summary": "Surge cannot end engaged with a unit other than the selected target.",
+        "owners": [
+          "src/warhammer40k_core/engine/surge_movement.py:surge_endpoint_evidence"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order52_surge.py::test_surge_cannot_end_engaged_with_another_enemy",
+            "role": "invalid",
+            "assertion": "assert 'surge_non_target_engagement' in {row.violation_code.value for row in resolution.restriction_violations}",
+            "proves": "A nontarget engagement receives the precise restriction."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "21.02-remaining-phase-lock",
+        "source_blocks": [
+          16
+        ],
+        "summary": "After a Surge the unit cannot move again in that phase.",
+        "owners": [
+          "src/warhammer40k_core/engine/phase_movement_history.py:surge_locked"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order52_surge.py::test_surge_facade_retry_restore_exact_replay_and_phase_lock",
+            "role": "semantic",
+            "assertion": "assert surge_locked(state, SOURCE)",
+            "proves": "The completed Surge locks the original phase."
+          },
+          {
+            "nodeid": "tests/unit/test_order52_surge.py::test_surge_facade_retry_restore_exact_replay_and_phase_lock",
+            "role": "semantic",
+            "assertion": "assert not surge_locked(state, SOURCE)",
+            "proves": "The lock expires in the next phase."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "21.02-source-distance",
+        "source_blocks": [
+          18
+        ],
+        "summary": "The granting rule determines the Surge maximum movement distance.",
+        "owners": [
+          "src/warhammer40k_core/engine/surge_movement.py:surge_endpoint_evidence"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order52_surge.py::test_surge_limit_drift_rejects_live_submission_before_queue_pop",
+            "role": "invalid",
+            "assertion": "assert status.payload == {'invalid_reason': 'surge_authority_drift'}",
+            "proves": "A forged maximum distance is rejected as authority drift."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          7,
+          9,
+          12,
+          14,
+          17
+        ],
+        "classification": "metadata",
+        "reason": "Section labels only; operative eligibility, distance and consequences are enumerated separately."
+      },
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "context",
+        "reason": "Introduces the conjunctive eligibility predicates."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:21:21.03:1",
+    "requirements": [
+      {
+        "requirement_id": "21.03-flying-model-unit-definition",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A model with FLY is Flying and its containing unit is a Flying unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order51_flight.py::test_mixed_unit_flight_benefits_belong_only_to_flying_models",
+            "role": "semantic",
+            "assertion": "assert capabilities.has_fly is (index == 0)",
+            "proves": "Only the actual Flying model receives the FLY capability within the mixed unit."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "21.03-declare-before-move",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A Flying unit may declare take to the skies before Normal, Advance, Fall Back or Charge movement.",
+        "owners": [
+          "src/warhammer40k_core/engine/flight_decision_authority.py:validate_charge_flight"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order51_flight.py::test_charge_flight_is_committed_before_dice_and_survives_restore",
+            "role": "semantic",
+            "assertion": "assert choice_index < roll_index",
+            "proves": "Charge flight choice is recorded before the Charge roll."
+          },
+          {
+            "nodeid": "tests/unit/test_order51_flight.py::test_movement_flight_choice_precedes_roll_and_history_survives_shooting",
+            "role": "semantic",
+            "assertion": "assert len(choices) == 2",
+            "proves": "Movement selection offers both flight choices."
+          },
+          {
+            "nodeid": "tests/unit/test_order51_flight.py::test_fall_back_commits_flight_in_its_finite_mode_choice",
+            "role": "semantic",
+            "assertion": "assert all((isclose(row.distance_inches, 2, abs_tol=1e-09) for row in state.model_movement_history))",
+            "proves": "Fall Back flight produces recorded accepted per-model movement."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "21.03-two-inch-penalty",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Taking to the skies reduces the maximum move distance by two inches.",
+        "owners": [
+          "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_fly_take_to_the_skies_applies_budget_modifier",
+            "role": "semantic",
+            "assertion": "assert model_payload['movement_distance_modifier_inches'] == -2.0",
+            "proves": "The movement payload records the negative two-inch modifier."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_fly_take_to_the_skies_applies_budget_modifier",
+            "role": "semantic",
+            "assertion": "assert budget['max_distance_inches'] == 10.0",
+            "proves": "The resulting twelve-inch move has a ten-inch budget."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "21.03-ignore-vertical-distance",
+        "source_blocks": [
+          5
+        ],
+        "summary": "While taking to the skies, Flying models do not count vertical distance.",
+        "owners": [
+          "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order51_flight.py::test_mixed_unit_flight_benefits_belong_only_to_flying_models",
+            "role": "semantic",
+            "assertion": "assert capabilities.ignores_vertical_distance is (selected and index == 0)",
+            "proves": "Vertical-distance exemption belongs only to Flying models with flight selected."
+          },
+          {
+            "nodeid": "tests/unit/test_order51_flight.py::test_heavy_uses_each_models_accepted_vertical_distance",
+            "role": "semantic",
+            "assertion": "assert isclose(rows[model.model_instance_id].distance_inches, expected, abs_tol=1e-09)",
+            "proves": "Accepted movement history records the expected distance per model."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "21.03-all-model-transit",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Flying models taking to the skies may move through enemy and Monster/Vehicle models.",
+        "owners": [
+          "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10h_pathing_smoke.py::test_fly_take_to_the_skies_can_transit_enemy_models_and_engagement_range",
+            "role": "semantic",
+            "assertion": "assert enemy_base_context.validate().is_valid",
+            "proves": "The witnessed flight path can cross an enemy base."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "21.03-all-terrain-transit",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Flying models taking to the skies may move horizontally and vertically through every terrain category.",
+        "owners": [
+          "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_mustered_fly_unit_takes_to_the_skies_over_exact_dense_non_ruin",
+            "role": "semantic",
+            "assertion": "assert all((result.is_valid for result in resolution.terrain_path_legality_results))",
+            "proves": "The actual Flying unit’s dense-terrain path passes all terrain legality checks."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_committed_flight_grants_general_terrain_transit",
+            "role": "semantic",
+            "assertion": "assert capabilities.can_move_through_terrain",
+            "proves": "Committed flight grants unrestricted terrain transit in Normal, Advance, Fall Back and Charge modes."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_committed_flight_grants_general_terrain_transit",
+            "role": "semantic",
+            "assertion": "assert capabilities.ignores_vertical_distance",
+            "proves": "The same modes ignore vertical distance."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          8
+        ],
+        "classification": "metadata",
+        "reason": "Section labels only; operative eligibility, distance and consequences are enumerated separately."
+      },
+      {
+        "source_blocks": [
+          9,
+          10
+        ],
+        "classification": "example",
+        "reason": "Illustrative instance of the separately enumerated operative rule; no additional permission or restriction."
+      },
+      {
+        "source_blocks": [
+          4
+        ],
+        "classification": "context",
+        "reason": "Scopes the following movement benefits to Flying models."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:ce5fd555-a0f1-4bc9-85d3-00443143e94a",
+    "requirements": [
+      {
+        "requirement_id": "ce5fd555-a0f1-4bc9-85d3-00443143e94a-declare-before-roll",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Take to the skies is selected when the move is selected, before Advance or Charge dice.",
+        "owners": [
+          "src/warhammer40k_core/engine/flight_decision_authority.py:validate_charge_flight"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order51_flight.py::test_charge_flight_is_committed_before_dice_and_survives_restore",
+            "role": "semantic",
+            "assertion": "assert choice_index < roll_index",
+            "proves": "Charge flight choice precedes the Charge roll."
+          },
+          {
+            "nodeid": "tests/unit/test_order51_flight.py::test_movement_flight_choice_precedes_roll_and_history_survives_shooting",
+            "role": "semantic",
+            "assertion": "assert not any((event.event_type == 'advance_roll_resolved' for event in lifecycle.decision_controller.event_log.records))",
+            "proves": "Advance dice have not yet been rolled while the flight choices are pending."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Question framing for the operative answer in block 2."
+      }
+    ]
+  }
+]

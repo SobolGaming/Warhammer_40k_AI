@@ -1,0 +1,1215 @@
+[
+  {
+    "row_id": "rule:12:12.00:1",
+    "requirements": [
+      {
+        "requirement_id": "12.00-steps",
+        "source_blocks": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "summary": "Fight resolves start, Pile In, Fight, Consolidate, end in that order.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase14g_charge_fight_contract.py::test_phase14g_fight_policy_freezes_sequence_ordering_and_modes",
+            "role": "semantic",
+            "assertion": "assert fight_policy.steps == (FightPhaseStepKind.START, FightPhaseStepKind.PILE_IN, FightPhaseStepKind.FIGHT, FightPhaseStepKind.CONSOLIDATE, FightPhaseStepKind.END)",
+            "proves": "The source-backed descriptor declares all five steps."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_fight_facade_completes_source_steps_in_order",
+            "role": "facade",
+            "assertion": "assert snapshots == [[('start', 'complete'), ('pile_in', 'active'), ('fight', 'pending'), ('consolidate', 'pending'), ('end', 'pending')], [('start', 'complete'), ('pile_in', 'complete'), ('fight', 'complete'), ('consolidate', 'active'), ('end', 'pending')], [('start', 'complete'), ('pile_in', 'complete'), ('fight', 'complete'), ('consolidate', 'complete'), ('end', 'complete')]]",
+            "proves": "Actual Fight lifecycle event snapshots advance through start, Pile In, Fight, Consolidate and end in order; final state restores and replays."
+          }
+        ],
+        "qualifications": [
+          "This phase-order proof has no eligible fighters; individual Fight movement and attack obligations carry their own nonempty consumer evidence."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Introduction to the Fight phase."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:12:12.01:1",
+    "requirements": [
+      {
+        "requirement_id": "12.01-start-window",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Resolve start-of-Fight triggered rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert boundaries == ['start_phase', 'end_phase']",
+            "proves": "The real facade emits start and end timing boundaries before completing each phase."
+          }
+        ],
+        "qualifications": [
+          "This assertion certifies lifecycle timing boundaries; effects attached to those boundaries use the shared timing dispatcher and their own consumer regressions."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2,
+          3
+        ],
+        "classification": "example",
+        "reason": "Illustration of charged units retaining Pile In eligibility."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:12:12.02:1",
+    "requirements": [
+      {
+        "requirement_id": "12.02-sequence",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Players may pile in each eligible unit once, with the active player finishing all choices first.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_full_fight_optional_movement_once_and_player_sequence",
+            "role": "facade",
+            "assertion": "assert [actor for actor, _ in moves] == ['player-a'] * 2 + ['player-b'] * enemy_count",
+            "proves": "Actual Pile In and Consolidate no-move choices finish both active-player units before opponent units."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_full_fight_optional_movement_once_and_player_sequence",
+            "role": "facade",
+            "assertion": "assert len(moves) == len(unit_ids)",
+            "proves": "Every eligible unit receives exactly one optional movement request per step."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2,
+          3,
+          4
+        ],
+        "classification": "example",
+        "reason": "Illustrative red-then-blue Pile In example."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:12:12.03:1",
+    "requirements": [
+      {
+        "requirement_id": "12.03-eligibility",
+        "source_blocks": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "summary": "During Fight, engagement, a completed charge this turn or an Overrun selection permits Pile In.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_full_fight_optional_movement_once_and_player_sequence",
+            "role": "facade",
+            "assertion": "assert {unit for _, unit in moves} == unit_ids",
+            "proves": "Every engaged unit gets a Pile In choice."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_overrun_new_enemy_gets_both_types_and_fights_first",
+            "role": "facade",
+            "assertion": "assert result.status_kind is not LifecycleStatusKind.INVALID",
+            "proves": "The selected Overrun unit receives and completes its additional Pile In."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_overrun_new_enemy_gets_both_types_and_fights_first",
+            "role": "facade",
+            "assertion": "assert {cast(str, cast(dict[str, JsonValue], option.payload)['fight_type']) for option in request.options} == {'overrun'}",
+            "proves": "A charged unengaged unit can proceed from the initial optional Pile In to an Overrun selection."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.03-targets-engaged",
+        "source_blocks": [
+          7,
+          8
+        ],
+        "summary": "An engaged unit must select every enemy it engages as Pile In targets.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_fight_movement_rule_validation_rejects_illegal_pile_in_targets",
+            "role": "semantic",
+            "assertion": "assert incomplete_validation.violations[0].violation_code == 'pile_in_engaged_targets_must_be_complete'",
+            "proves": "Omitting an engaged target is rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.03-targets-unengaged",
+        "source_blocks": [
+          9
+        ],
+        "summary": "An unengaged unit selects one or more targets within five inches.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_extra_fight_distance_preserves_target_range",
+            "role": "semantic",
+            "assertion": "assert (enemy.unit_instance_id in targets) is (target_gap <= 5)",
+            "proves": "Five inches is legal and5.01 inches is not."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.03-base-contact",
+        "source_blocks": [
+          11
+        ],
+        "summary": "Models in base contact cannot move.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order85_deemed_base_contact.py::test_deemed_contact_prevents_pile_in_rotation_and_stationary_retry_replays",
+            "role": "semantic",
+            "assertion": "assert 'base_contact_model_moved' in json.dumps(status.to_payload())",
+            "proves": "Base-contact model rotation is rejected through the facade."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.03-closest-target",
+        "source_blocks": [
+          12
+        ],
+        "summary": "Each moved model must approach the target that was closest at move start.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Gameplay gap: the Pile In owner accepts switching closest target identities; see probe_pile_in_closest_target."
+        ]
+      },
+      {
+        "requirement_id": "12.03-attainable-engagement",
+        "source_blocks": [
+          12
+        ],
+        "summary": "Each moved model must end engaged with its closest target when a legal path can do so.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Gameplay gap: an accepted moved trailing model remains outside engagement despite an accepted engaging alternative from the identical state; see probe_pile_in_attainable_engagement."
+        ]
+      },
+      {
+        "requirement_id": "12.03-witness",
+        "source_blocks": [
+          14
+        ],
+        "summary": "Pile In follows shared witnessed movement.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_pile_in_rejects_endpoint_only_witness",
+            "role": "semantic",
+            "assertion": "assert validation.violations[0].violation_code == 'endpoint_only_path'",
+            "proves": "Endpoint-only movement cannot bypass transit validation."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.03-end-engaged",
+        "source_blocks": [
+          16
+        ],
+        "summary": "The unit must finish Pile In engaged.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_fight_movement_reports_endpoint_violations",
+            "role": "semantic",
+            "assertion": "assert not_engaged_violation.violations[0].violation_code == 'pile_in_unit_not_engaged_after'",
+            "proves": "A Pile In ending unengaged is rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.03-retain-engagement",
+        "source_blocks": [
+          17
+        ],
+        "summary": "Each model preserves each engagement it had at move start.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_continuing_engagement_preserves_each_enemy_unit",
+            "role": "semantic",
+            "assertion": "assert fight_continuing_engagement_violation(scenario=scenario, ruleset_descriptor=ruleset, before=before, after=after, state=None) == 'started_engaged_model_not_engaged_after'",
+            "proves": "Leaving one previously engaged enemy while retaining another is rejected per-model."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.03-distance",
+        "source_blocks": [
+          19
+        ],
+        "summary": "The standard Pile In maximum is three inches.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_fight_movement_no_move_and_source_linked_distance_effects",
+            "role": "semantic",
+            "assertion": "assert fight_movement_maximum_distance_inches(state=state, unit_instance_id=attacker.unit_instance_id, proposal_kind=ProposalKind.PILE_IN) == 3.0",
+            "proves": "Unmodified Pile In distance is three inches."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          6,
+          10,
+          13,
+          15,
+          18
+        ],
+        "classification": "metadata",
+        "reason": "Section labels organize the operative requirements enumerated above."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:12:12.04:1",
+    "requirements": [
+      {
+        "requirement_id": "12.04-once",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A unit already selected to fight cannot be selected again in the phase.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15c_fight_order.py::test_attached_rules_unit_components_remain_consumed_after_canonical_selection",
+            "role": "semantic",
+            "assertion": "assert contexts == ()",
+            "proves": "After selecting the attached rules unit no component remains eligible."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.04-eligibility",
+        "source_blocks": [
+          2,
+          3
+        ],
+        "summary": "Current engagement, engagement at Fight-step start or a charge this turn confers Fight eligibility.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15c_fight_order.py::test_fight_activation_options_follow_normal_and_overrun_source_eligibility",
+            "role": "semantic",
+            "assertion": "assert fight_activation_option_id(unit_instance_id=engaged_unit_id, fight_type=FightTypeKind.NORMAL) in _request_option_ids(engaged_request)",
+            "proves": "Current and historical engagement determine Normal/Overrun options."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.04-mandatory",
+        "source_blocks": [
+          4,
+          21
+        ],
+        "summary": "Every eligible unit must fight; Pile In and Consolidate remain optional.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_full_fight_optional_movement_once_and_player_sequence",
+            "role": "facade",
+            "assertion": "assert all(('pass' not in o.option_id and 'complete' not in o.option_id for o in request.options))",
+            "proves": "Engaged eligible units cannot pass or end the Fight step."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_full_fight_optional_movement_once_and_player_sequence",
+            "role": "facade",
+            "assertion": "assert set(fighters) == unit_ids",
+            "proves": "Each eligible unit fights even though every Pile In and Consolidate proposal declined movement."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.04-first-band",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Start with the active player and alternate eligible Fights First selections.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15c_fight_order.py::test_fights_first_resolves_before_remaining_combats_with_active_player_alternation",
+            "role": "semantic",
+            "assertion": "assert second_request.actor_id == 'player-b'",
+            "proves": "First and second Fights First requests alternate player ownership."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.04-empty-first",
+        "source_blocks": [
+          6,
+          7
+        ],
+        "summary": "Advance to Remaining Combats only when no Fights First unit remains; otherwise the other player selects.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15c_fight_order.py::test_fights_first_resolves_before_remaining_combats_with_active_player_alternation",
+            "role": "semantic",
+            "assertion": "assert third_payload['ordering_band'] == 'remaining_combats'",
+            "proves": "After both Fights First units, the request enters Remaining Combats."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.04-remaining",
+        "source_blocks": [
+          8,
+          9,
+          10
+        ],
+        "summary": "Continue alternation from the transitioning player, skip unavailable owners and end when no eligible unit remains.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15c_fight_order.py::test_fights_first_resolves_before_remaining_combats_with_active_player_alternation",
+            "role": "semantic",
+            "assertion": "assert third_request.actor_id == 'player-a'",
+            "proves": "The transitioning player selects first in Remaining Combats."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_full_fight_optional_movement_once_and_player_sequence",
+            "role": "facade",
+            "assertion": "assert fight_actors == ['player-a', 'player-b', 'player-a'] + ['player-b'] * (enemy_count - 1)",
+            "proves": "Real activations alternate and the one-enemy matrix skips an exhausted opponent."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_full_fight_optional_movement_once_and_player_sequence",
+            "role": "facade",
+            "assertion": "assert lifecycle.state.current_battle_phase is not BattlePhase.FIGHT",
+            "proves": "After every eligible unit fights the real lifecycle leaves Fight."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.04-return-first",
+        "source_blocks": [
+          11
+        ],
+        "summary": "Newly eligible Fights First units return sequencing to that band after a Remaining fight.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15c_fight_order.py::test_remaining_combat_returns_to_fights_first_when_new_fights_first_unit_is_eligible",
+            "role": "semantic",
+            "assertion": "assert next_payload['ordering_band'] == 'fights_first'",
+            "proves": "The dynamic ordering test revisits the Fights First band."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.04-fight-type",
+        "source_blocks": [
+          13
+        ],
+        "summary": "Each selected unit chooses an eligible fight type.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15c_fight_order.py::test_fight_activation_options_follow_normal_and_overrun_source_eligibility",
+            "role": "semantic",
+            "assertion": "assert fight_activation_option_id(unit_instance_id=engaged_unit_id, fight_type=FightTypeKind.NORMAL) in _request_option_ids(engaged_request)",
+            "proves": "Finite activation options carry the legal fight type."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          12,
+          14,
+          18
+        ],
+        "classification": "metadata",
+        "reason": "Fight-type labels and diagram titles."
+      },
+      {
+        "source_blocks": [
+          15,
+          16,
+          17,
+          19,
+          20
+        ],
+        "classification": "example",
+        "reason": "Normal and Overrun examples illustrate the preceding operative rules."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:12:12.04.01:1",
+    "requirements": [
+      {
+        "requirement_id": "12.04.01-distant-pass",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A player may pass when all eligible units are beyond five inches; consecutive passes or passing against an exhausted opponent ends Fight.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15c_fight_order.py::test_eligible_to_fight_pass_is_offered_only_when_all_eligible_units_are_more_than_five",
+            "role": "semantic",
+            "assertion": "assert ELIGIBLE_TO_FIGHT_PASS_OPTION_ID not in {option.option_id for option in close_request.options}",
+            "proves": "Pass availability follows the all-units distance predicate."
+          },
+          {
+            "nodeid": "tests/unit/test_phase15c_fight_order.py::test_fights_first_pass_completes_phase_when_no_remaining_units_exist",
+            "role": "semantic",
+            "assertion": "assert fight_phase_payload['phase_complete'] is True",
+            "proves": "A pass terminates when no remaining fight exists."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "context",
+        "reason": "Designer explanation for the distant-unit pass."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:12:12.05:1",
+    "requirements": [
+      {
+        "requirement_id": "12.05-eligibility",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Normal Fight requires engagement.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15c_fight_order.py::test_fight_activation_options_follow_normal_and_overrun_source_eligibility",
+            "role": "semantic",
+            "assertion": "assert fight_activation_option_id(unit_instance_id=engaged_unit_id, fight_type=FightTypeKind.NORMAL) in _request_option_ids(engaged_request)",
+            "proves": "Engaged actor receives Normal Fight option."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.05-melee",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Resolve Normal melee through the common attack sequence.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15c_fight_order.py::test_phase15d_lifecycle_accepts_melee_declaration_for_engaged_character",
+            "role": "semantic",
+            "assertion": "assert accepted['attack_sequence_id'] == f\"melee-sequence:phase15d-lifecycle-melee:round-01:{units['attacker'].unit_instance_id}:phase15d-lifecycle-melee-declaration\"",
+            "proves": "Lifecycle accepts a melee declaration for the engaged character."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          3
+        ],
+        "classification": "metadata",
+        "reason": "Section labels organize the operative requirements enumerated above."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:12:12.06:1",
+    "requirements": [
+      {
+        "requirement_id": "12.06-eligibility",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Overrun is available when currently unengaged or unengaged at Fight-step start before becoming engaged.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_overrun_new_enemy_gets_both_types_and_fights_first",
+            "role": "facade",
+            "assertion": "assert {cast(str, cast(dict[str, JsonValue], option.payload)['fight_type']) for option in request.options} == {'overrun'}",
+            "proves": "The currently unengaged charged unit can make an Overrun."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_overrun_new_enemy_gets_both_types_and_fights_first",
+            "role": "facade",
+            "assertion": "assert {cast(str, cast(dict[str, JsonValue], option.payload)['fight_type']) for option in request.options} == {'normal', 'overrun'}",
+            "proves": "An enemy unengaged at Fight-step start receives an Overrun option after becoming engaged."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.06-extra-pile",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Overrun permits an additional Pile In before melee attacks.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15c_fight_order.py::test_phase15d_overrun_activation_requests_overrun_pile_in_proposal",
+            "role": "semantic",
+            "assertion": "assert context['fight_movement_timing'] == 'overrun'",
+            "proves": "The Overrun-specific movement request is identified before attacks."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.06-new-enemy",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Enemies newly engaged by Overrun become eligible to fight, including their Fights First priority.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_overrun_new_enemy_gets_both_types_and_fights_first",
+            "role": "facade",
+            "assertion": "assert request.payload['ordering_band'] == 'fights_first'",
+            "proves": "The enemy newly engaged by Overrun becomes eligible in the Fights First band."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          3
+        ],
+        "classification": "metadata",
+        "reason": "Section labels organize the operative requirements enumerated above."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:12:12.07:1",
+    "requirements": [
+      {
+        "requirement_id": "12.07-sequence",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Players may consolidate each eligible unit once, completing active-player choices first.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_full_fight_optional_movement_once_and_player_sequence",
+            "role": "facade",
+            "assertion": "assert [actor for actor, _ in moves] == ['player-a'] * 2 + ['player-b'] * enemy_count",
+            "proves": "Active-player Consolidate proposals finish before opponent proposals."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_full_fight_optional_movement_once_and_player_sequence",
+            "role": "facade",
+            "assertion": "assert len(moves) == len(unit_ids)",
+            "proves": "Every eligible unit receives exactly one optional Consolidate choice."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "classification": "example",
+        "reason": "Consolidation diagrams illustrate Ongoing and Objective modes."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:12:12.08:1",
+    "requirements": [
+      {
+        "requirement_id": "12.08-eligibility",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Consolidation is available in Fight to units eligible to fight that phase.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_full_fight_optional_movement_once_and_player_sequence",
+            "role": "facade",
+            "assertion": "assert {unit for _, unit in moves} == unit_ids",
+            "proves": "Every surviving unit that fought gets its optional Consolidate request."
+          }
+        ],
+        "qualifications": [
+          "Special absent/retained-presence and historical eligibility cases use the shared eligible-to-fight history owner."
+        ]
+      },
+      {
+        "requirement_id": "12.08-ongoing-mode",
+        "source_blocks": [
+          4,
+          5
+        ],
+        "summary": "An engaged unit must choose Ongoing and all engaged enemies.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_consolidate_rule_validation_covers_modes_and_objectives",
+            "role": "semantic",
+            "assertion": "assert incomplete_validation.violations[0].violation_code == 'ongoing_consolidation_targets_must_be_complete'",
+            "proves": "Ongoing targets must include all engaged enemies."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.08-engaging-mode",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Otherwise a unit within three inches of an enemy must choose Engaging and at least one such target.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_consolidate_rule_validation_covers_modes_and_objectives",
+            "role": "semantic",
+            "assertion": "assert legal_consolidation_modes(scenario=scenario, ruleset_descriptor=ruleset, unit_instance_id=attacker.unit_instance_id, objective_markers=()) == (ConsolidationModeKind.ENGAGING,)",
+            "proves": "The nearby-enemy scenario offers only Engaging."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.08-objective-mode",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Otherwise a unit within three inches of an objective must choose Objective and one such objective.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_p12_objective_consolidation_uses_closest_parts_for_eligibility",
+            "role": "semantic",
+            "assertion": "assert legal_consolidation_modes(scenario=scenario, ruleset_descriptor=ruleset, unit_instance_id=attacker.unit_instance_id, objective_markers=(marker,)) == (ConsolidationModeKind.OBJECTIVE,)",
+            "proves": "Objective range uses the closest geometry parts."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.08-ongoing-base-contact",
+        "source_blocks": [
+          9
+        ],
+        "summary": "Ongoing Consolidation cannot move a model already in base contact.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_retained_enemy_base_contact_pins_objective_consolidation",
+            "role": "semantic",
+            "assertion": "assert violation.violations[0].violation_code == 'base_contact_model_moved'",
+            "proves": "The endpoint rejects moving a base-contact model."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.08-ongoing-closest",
+        "source_blocks": [
+          9
+        ],
+        "summary": "Each moved Ongoing model must approach its initially closest selected enemy.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_p12_consolidation_cannot_switch_which_selected_unit_was_closest",
+            "role": "semantic",
+            "assertion": "assert violation.violations[0].violation_code == 'moved_model_not_closer_to_closest_selected_unit'",
+            "proves": "The shared enemy-mode endpoint owner rejects approaching a different selected enemy."
+          }
+        ],
+        "qualifications": [
+          "The same Consolidation model predicate handles Ongoing and Engaging enemy modes."
+        ]
+      },
+      {
+        "requirement_id": "12.08-ongoing-attainable",
+        "source_blocks": [
+          9
+        ],
+        "summary": "Each moved Ongoing model must engage its closest target if possible.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_p12_each_moved_model_must_reach_its_required_endpoint_when_possible",
+            "role": "semantic",
+            "assertion": "assert violation.violations[0].violation_code == 'consolidation_model_must_reach_required_endpoint'",
+            "proves": "The shared enemy-mode predicate rejects a moved model that could reach but does not."
+          }
+        ],
+        "qualifications": [
+          "The named regression exercises Engaging; Ongoing calls the identical enemy-mode model predicate after its base-contact gate."
+        ]
+      },
+      {
+        "requirement_id": "12.08-engaging-closer",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Engaging movement approaches the closest selected enemy and reaches engagement if possible.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_p12_consolidation_cannot_switch_which_selected_unit_was_closest",
+            "role": "semantic",
+            "assertion": "assert violation.violations[0].violation_code == 'moved_model_not_closer_to_closest_selected_unit'",
+            "proves": "The model cannot substitute another selected enemy for its closest one."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.08-objective-attainable",
+        "source_blocks": [
+          11
+        ],
+        "summary": "Each moved Objective model must reach objective range when possible.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_p12_each_moved_model_must_reach_its_required_endpoint_when_possible",
+            "role": "semantic",
+            "assertion": "assert violation.violations[0].violation_code == 'consolidation_model_must_reach_required_endpoint'",
+            "proves": "The Objective case rejects a token move where range is attainable."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.08-objective-approach",
+        "source_blocks": [
+          11
+        ],
+        "summary": "A moved model unable to reach objective range must still approach it.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_unreachable_objective_still_requires_moved_model_to_approach",
+            "role": "semantic",
+            "assertion": "assert violation == (None if dx > 0 else 'objective_consolidation_model_not_closer')",
+            "proves": "The shared model predicate accepts approaching an unreachable objective and rejects moving away."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.08-witness",
+        "source_blocks": [
+          13
+        ],
+        "summary": "Consolidation follows shared witnessed movement.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15c_fight_order.py::test_phase15d_over_distance_consolidate_records_rejected_attempt_and_retries",
+            "role": "semantic",
+            "assertion": "assert status_payload['violation_code'] == 'movement_distance_exceeded'",
+            "proves": "An over-distance witness is rejected with retry."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.08-ongoing-maintains",
+        "source_blocks": [
+          15
+        ],
+        "summary": "Ongoing preserves every model engagement present at move start.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_continuing_engagement_preserves_each_enemy_unit",
+            "role": "semantic",
+            "assertion": "assert fight_continuing_engagement_violation(scenario=scenario, ruleset_descriptor=ruleset, before=before, after=after, state=None) == 'started_engaged_model_not_engaged_after'",
+            "proves": "The shared continuing-engagement owner rejects leaving one initially engaged enemy."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.08-engaging-all-targets",
+        "source_blocks": [
+          16
+        ],
+        "summary": "Engaging must finish engaged with every selected target.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_consolidate_reports_engaging_and_objective_endpoint_violations",
+            "role": "semantic",
+            "assertion": "assert engaging_violation.violations[0].violation_code == 'engaging_consolidation_target_not_engaged_after'",
+            "proves": "Missing required endpoint engagement is rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.08-engaging-forced-fights",
+        "source_blocks": [
+          16,
+          20
+        ],
+        "summary": "Only Engaging consolidation forces previously unselected engaged enemies to fight, one at a time.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15c_fight_order.py::test_p12_consolidation_forces_each_opponent_once_and_resumes_through_facade",
+            "role": "semantic",
+            "assertion": "assert sorted(selected) == sorted((units[key].unit_instance_id for key in target_keys))",
+            "proves": "Facade continuation covers each forced enemy and resumes consolidation."
+          }
+        ],
+        "qualifications": [
+          "C12-04: official App-data v946 Engaging-only owner remains authoritative; historical Ongoing-all-modes mirror claim is superseded."
+        ]
+      },
+      {
+        "requirement_id": "12.08-objective-end",
+        "source_blocks": [
+          17
+        ],
+        "summary": "Objective mode finishes unengaged and in range of its selected objective.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_consolidate_reports_engaging_and_objective_endpoint_violations",
+            "role": "semantic",
+            "assertion": "assert objective_violation.violations[0].violation_code == 'objective_consolidation_not_in_range'",
+            "proves": "Ending outside the objective range is rejected."
+          },
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_consolidate_reports_engaging_and_objective_endpoint_violations",
+            "role": "semantic",
+            "assertion": "assert engaged_after_violation.violations[0].violation_code == 'objective_consolidation_unit_engaged_after'",
+            "proves": "Ending engaged is separately rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "12.08-distance",
+        "source_blocks": [
+          19
+        ],
+        "summary": "The standard consolidation maximum is three inches.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15c_fight_order.py::test_phase15d_over_distance_consolidate_records_rejected_attempt_and_retries",
+            "role": "semantic",
+            "assertion": "assert status_payload['violation_code'] == 'movement_distance_exceeded'",
+            "proves": "The beyond-budget consolidation witness is rejected."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          3,
+          8,
+          12,
+          14,
+          18
+        ],
+        "classification": "metadata",
+        "reason": "Section labels organize the operative requirements enumerated above."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:12:12.09:1",
+    "requirements": [
+      {
+        "requirement_id": "12.09-end-window",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Resolve end-of-Fight triggered rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert boundaries == ['start_phase', 'end_phase']",
+            "proves": "The real facade emits start and end timing boundaries before completing each phase."
+          }
+        ],
+        "qualifications": [
+          "This assertion certifies lifecycle timing boundaries; effects attached to those boundaries use the shared timing dispatcher and their own consumer regressions."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "faq:acdcfb0c-5b84-4b41-b271-751c4204bf56",
+    "requirements": [
+      {
+        "requirement_id": "faq-acdcfb0c-5b84-4b41-b271-751c4204bf56-distance-replacement",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A rule allowing six-inch Pile In or Consolidation changes its maximum distance.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_fight_movement_no_move_and_source_linked_distance_effects",
+            "role": "semantic",
+            "assertion": "assert fight_movement_maximum_distance_inches(state=state, unit_instance_id=attacker.unit_instance_id, proposal_kind=ProposalKind.PILE_IN) == 6.0",
+            "proves": "A rule allowing six-inch Pile In or Consolidation changes its maximum distance. The linked assertion exercises this source condition."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "The question supplies the condition answered by operative answer block 2."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:9657bb5d-72da-4d42-9927-731c9fc0e315",
+    "requirements": [
+      {
+        "requirement_id": "faq-9657bb5d-72da-4d42-9927-731c9fc0e315-distance-window",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Extra-distance permissions apply in their specified Pile In or Consolidate step.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Gameplay gap: the real Overrun Pile In request consumes a generic extra-distance grant during the Fight step; selected FAQ restricts it to Pile In step. See probe_extra_distance_overrun_window."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "The question supplies the condition answered by operative answer block 2."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:55ea7d23-2f9e-45bf-bf6c-d98bf682549f",
+    "requirements": [
+      {
+        "requirement_id": "faq-55ea7d23-2f9e-45bf-bf6c-d98bf682549f-target-range",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Changing Pile In or Consolidation distance does not change eligible target range.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_rules_unit_movement.py:resolve_rules_unit_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_extra_fight_distance_preserves_target_range",
+            "role": "semantic",
+            "assertion": "assert (enemy.unit_instance_id in targets) is (target_gap <= 5)",
+            "proves": "A six-inch movement grant keeps the Pile In target boundary at five inches."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "The question supplies the condition answered by operative answer block 2."
+      }
+    ]
+  }
+]
