@@ -15,6 +15,11 @@ from warhammer40k_core.rules.source_evidence import (
     RuleVerificationStatus,
     SemanticExecutionStatus,
 )
+from warhammer40k_core.rules.source_supersession import (
+    SourceSupersessionError,
+    SupersededSourceRecord,
+    validate_superseded_source_records,
+)
 
 ARTIFACT_SCHEMA: Final = "core-v2-movement-phase-source-v2"
 EXPECTED_SOURCE_PACKAGE_ID: Final = "gw-11e-core-movement-phase"
@@ -26,7 +31,7 @@ EXPECTED_RULE_IDENTITIES: Final = {
         "gw-11e-core-rules:movement-phase:move-units-step",
         "09.02",
         "MOVE UNITS STEP",
-        "6ea310aedead79971d092f9ae035b0c0b79499bcc656e3899a5546ba6234c54f",
+        "7761ce9360aa56e0f00a0e74d3b6095c5b1742523fd1d424d51989e9aeaab982",
     ),
     "selecting-modes": (
         "gw-11e-core-rules:movement-phase:selecting-modes",
@@ -42,14 +47,14 @@ EXPECTED_RULE_IDENTITIES: Final = {
     ),
 }
 EXPECTED_OBSERVATION_SHA256S: Final = (
-    "cc1d33663295747bf678e49ed908e9d23e98874f076fb2cadfe37133aef7ad13",
+    "09e5ef9a4446b86b4ca530ce13efdf6904b81559e60b28af7f75bcaea9c7e0d7",
     "fe123e0660e231a31e550414e2289ee66922b20312e055c69f077ab186e21800",
     "d573029a847de5780c46b2f4047b9057ed71c6258f27f9c16690ca7e529f7d7a",
     "e5c209da27f60c11654788ed26c561e63374791fb345a032f3ce9a4620838db0",
     "10a4ebcba3fb3c33df9e32ac9917d0ba0a2c7b2048cc9767c60ee587c909bd20",
     "97d7323f54195e968c0cff8e7c8434ce5b5f8fe9dca4be3dc558359b3d1e9d23",
 )
-EXPECTED_PACKAGE_HASH: Final = "0aacec8d0c56e882c0b03329a202a00512d9ace632d2b5f0e3bb53370e001105"
+EXPECTED_PACKAGE_HASH: Final = "4c7abdec1fae2cfa18a589f0b6135cdfdc1d205feedab255604ea1b4598c45fa"
 
 
 class CoreMovementPhaseSourceArtifactError(ValueError):
@@ -156,6 +161,7 @@ class CoreMovementPhaseSourcePackageArtifact(
     source_document: CoreMovementPhaseSourceDocumentArtifact
     rules: tuple[CoreMovementPhaseSourceRuleArtifact, ...]
     evidence: tuple[CoreMovementPhaseEvidenceArtifact, ...]
+    superseded_records: tuple[SupersededSourceRecord, ...]
     package_hash: str
 
 
@@ -182,6 +188,14 @@ def core_movement_phase_source_artifact_from_json_bytes(
         )
         for rule in artifact.rules
     }
+    try:
+        validate_superseded_source_records(artifact.superseded_records)
+    except SourceSupersessionError as exc:
+        raise CoreMovementPhaseSourceArtifactError(str(exc)) from exc
+    if tuple(record.record_id for record in artifact.superseded_records) != (
+        "incomplete-excerpt:move-units-step",
+    ):
+        raise CoreMovementPhaseSourceArtifactError("Movement-phase superseded excerpt drifted.")
     if (
         artifact.artifact_schema != ARTIFACT_SCHEMA
         or artifact.source_package_id != EXPECTED_SOURCE_PACKAGE_ID
@@ -201,10 +215,14 @@ def core_movement_phase_source_artifact_from_json_bytes(
         )
         or any(
             row.transcription_sha256
-            != next(
-                identity[3]
-                for identity in EXPECTED_RULE_IDENTITIES.values()
-                if identity[0] == row.rule_source_id
+            != (
+                "6ea310aedead79971d092f9ae035b0c0b79499bcc656e3899a5546ba6234c54f"
+                if row.evidence_id == "40k-app-movement-phase-2026-08-30:move-units-step"
+                else next(
+                    identity[3]
+                    for identity in EXPECTED_RULE_IDENTITIES.values()
+                    if identity[0] == row.rule_source_id
+                )
             )
             for row in artifact.evidence
         )

@@ -67,6 +67,35 @@ _REVIEWED_SEARCH_INDEX_HEADINGS: tuple[tuple[str, int, str], ...] = (
     ("command-abilities", 4, "COMMAND ABILITIES"),
     ("end-of-command-phase", 5, "END OF COMMAND PHASE"),
 )
+_COMPLETE_SELECTED_SOURCE_TEXT: dict[str, str] = {
+    "start-of-command-phase": (
+        "Rules that are triggered at the start of the Command phase are resolved now."
+    ),
+    "gain-core-cp": "Both players gain 1 Command Point (CP).",
+    "battle-shock": (
+        "The active player must now make one battle-shock roll (01.07) for each unit in their "
+        "army that fulfils one or both of the following conditions:\n"
+        "• That unit is currently battle-shocked.\n"
+        "• That unit is at, or below, half\u2011strength.\n"
+        "If a unit was battle-shocked at the start of this step and its battle-shock roll during "
+        "this step succeeds, it is no longer battle-shocked.\n"
+        "Battle-shock Examples\n"
+        "This unit has a starting strength of 3 so is not at or below half-strength, but it is "
+        "currently battle-shocked, so a battle-shock roll must be made for it. If that roll "
+        "succeeds, the unit will no longer be battle-shocked.\n"
+        "This unit has a starting strength of 10. It has five models remaining, so it is at "
+        "half-strength and a battle-shock roll must be made for it.\n"
+        "This unit has a starting strength of 5. It has two models remaining, so it is below "
+        "half-strength and a battle-shock roll must be made for it.\n"
+        "This Vehicle has a starting strength of 1 and a W characteristic of 11. It has 3 wounds "
+        "remaining, so it is below half-strength and a battle-shock roll must be made for it."
+    ),
+}
+_LABEL_ONLY_HEADINGS: dict[str, str] = {
+    "start-of-command-phase": "START OF COMMAND PHASE",
+    "gain-core-cp": "GAIN CORE CP",
+    "battle-shock": "BATTLE-SHOCK",
+}
 _REVIEWED_RULE_EVIDENCE_LINKS: dict[str, tuple[str, str, str]] = {
     "start-of-command-phase": (
         "gw-11e-core-rules:command-phase:start-of-command-phase",
@@ -293,8 +322,37 @@ def _derived_payload(payload: dict[str, object]) -> dict[str, object]:
 
     rules = _required_list(derived["rules"], field_name="rules")
     _validate_reviewed_rule_evidence_links(rules=rules, evidence_by_id=evidence_by_id)
+    superseded_records: list[dict[str, object]] = []
     for value in rules:
         rule = _required_dict(value, field_name="rule")
+        rule_id = _required_text(rule["rule_id"], field_name="rule_id")
+        try:
+            selected_source_text = _COMPLETE_SELECTED_SOURCE_TEXT[rule_id]
+            label_only_heading = _LABEL_ONLY_HEADINGS[rule_id]
+        except KeyError as exc:
+            raise CoreCommandPhaseSourceBuildError(
+                "Command-phase rule inventory drifted from its reviewed semantic identity."
+            ) from exc
+        rule["source_text"] = selected_source_text
+        source_id = _required_text(rule["source_id"], field_name="source_id")
+        superseded_records.append(
+            {
+                "record_id": f"label-only:{rule_id}",
+                "source_id": source_id,
+                "kind": "label_only_transcription",
+                "prior_text": label_only_heading,
+                "prior_sha256": hashlib.sha256(label_only_heading.encode()).hexdigest(),
+                "successor": source_id,
+                "load_support_status": "loaded",
+                "semantic_execution_status": "not_certified",
+                "reason": (
+                    "The 2026-08-26 search-index observation recorded only this section heading. "
+                    "That heading remains in the search-index observation. The controlling "
+                    "source_text is the complete selected operative rule, including the retained "
+                    "battle-shock examples where the selected row contains them."
+                ),
+            }
+        )
         source_text = _required_text(
             rule["source_text"],
             field_name="source_text",
@@ -322,10 +380,22 @@ def _derived_payload(payload: dict[str, object]) -> dict[str, object]:
                 raise CoreCommandPhaseSourceBuildError(
                     "Rule evidence source identity does not match its rule."
                 )
-            evidence["transcription_sha256"] = transcription_sha256
             evidence["load_support_status"] = rule["load_support_status"]
             evidence["semantic_execution_status"] = rule["semantic_execution_status"]
             evidence["runtime_consumer_ids"] = rule["runtime_consumer_ids"]
+            section_label = _required_text(rule["section_heading"], field_name="section_heading")
+            if evidence["evidence_kind"] == "project_reviewed_app_transcription":
+                evidence["transcription_sha256"] = transcription_sha256
+                evidence["source_title"] = (
+                    f"Reviewed complete selected transcription of {section_label}"
+                )
+            elif evidence["evidence_kind"] == "third_party_mirror":
+                evidence["transcription_sha256"] = hashlib.sha256(
+                    label_only_heading.encode()
+                ).hexdigest()
+                evidence["source_title"] = (
+                    "40k.app Core Rules search-index Command-phase heading sequence"
+                )
             if evidence["evidence_kind"] == "third_party_mirror":
                 evidence["review_audit_id"] = search_index_observation["observation_id"]
                 evidence["review_audit_row_id"] = search_index_observation["observation_row_id"]
@@ -344,6 +414,7 @@ def _derived_payload(payload: dict[str, object]) -> dict[str, object]:
             )
         rule["source_observation_sha256"] = mirror_observation_sha256
 
+    derived["superseded_records"] = superseded_records
     derived["package_hash"] = ""
     derived["package_hash"] = _sha256_payload(derived)
     return derived

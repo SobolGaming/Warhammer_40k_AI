@@ -10,7 +10,7 @@
       "evidence_id": "core-v2-movement-source-review:move-units-step",
       "evidence_kind": "project_reviewed_app_transcription",
       "load_support_status": "loaded",
-      "observation_sha256": "cc1d33663295747bf678e49ed908e9d23e98874f076fb2cadfe37133aef7ad13",
+      "observation_sha256": "09e5ef9a4446b86b4ca530ce13efdf6904b81559e60b28af7f75bcaea9c7e0d7",
       "observed_at": null,
       "official_corroborating_source_ids": [],
       "project_authority_policy_id": null,
@@ -29,7 +29,7 @@
       "source_platform": "Repository",
       "source_title": "Reviewed transcription of 09.02 Move Units Step",
       "source_url": null,
-      "transcription_sha256": "6ea310aedead79971d092f9ae035b0c0b79499bcc656e3899a5546ba6234c54f",
+      "transcription_sha256": "7761ce9360aa56e0f00a0e74d3b6095c5b1742523fd1d424d51989e9aeaab982",
       "verification_status": "unverified"
     },
     {
@@ -186,7 +186,7 @@
       "verification_status": "authoritative_app_mirror"
     }
   ],
-  "package_hash": "0aacec8d0c56e882c0b03329a202a00512d9ace632d2b5f0e3bb53370e001105",
+  "package_hash": "4c7abdec1fae2cfa18a589f0b6135cdfdc1d205feedab255604ea1b4598c45fa",
   "rules": [
     {
       "load_support_status": "loaded",
@@ -200,8 +200,8 @@
       "section_id": "09.02",
       "semantic_execution_status": "executable_engine_runtime",
       "source_id": "gw-11e-core-rules:movement-phase:move-units-step",
-      "source_text": "MOVE UNITS STEP\nThe active player moves their units, one unit at a time, until all their units have been selected and have finished making their moves. For each unit, use the sequence below.\n1 SELECT UNIT\nSelect a friendly unit that has not been selected in this step. That unit can either be on the battlefield, in Strategic Reserves (20.02), or embarked within a Transport model (18.01). That unit has now been selected to move.\n2 SELECT MOVE TYPE\nSelect one of the eligible move types listed below for your unit to make. Resolve that move type, after which that unit has finished making its move.\n- REMAIN STATIONARY (09.04)\n- NORMAL MOVE (09.05)\n- ADVANCE (09.06)\n- FALL-BACK (09.07)\n- DISEMBARK (18.04)\n- INGRESS (20.04)",
-      "transcription_sha256": "6ea310aedead79971d092f9ae035b0c0b79499bcc656e3899a5546ba6234c54f"
+      "source_text": "The active player moves their units one at a time, using the sequence below, until all of their units have been selected to move and those moves have ended.\n1. Select Unit: Select one friendly unit that has not been selected to move this phase. You can select a unit on the battlefield, in strategic reserves, or embarked within a TRANSPORT. That unit is selected to move.\n2. Select Move Type: Select one move type that unit is eligible to make, and resolve it with that unit. This can be one listed below, or one presented elsewhere:\n\u25ab Remain stationary (09.04)\n\u25ab Normal move (09.05)\n\u25ab Advance move (09.06)\n\u25ab Fall-back move (09.07)\n\u25ab Disembark move (18.04)\n\u25ab Ingress move (20.04)",
+      "transcription_sha256": "7761ce9360aa56e0f00a0e74d3b6095c5b1742523fd1d424d51989e9aeaab982"
     },
     {
       "load_support_status": "loaded",
@@ -241,5 +241,18 @@
     "source_url": "https://www.40k.app/rules/09-movement-phase"
   },
   "source_package_id": "gw-11e-core-movement-phase",
-  "source_version": "40k-app-movement-phase-observed-2026-08-30"
+  "source_version": "40k-app-movement-phase-observed-2026-08-30",
+  "superseded_records": [
+    {
+      "kind": "incomplete_excerpt",
+      "load_support_status": "loaded",
+      "prior_sha256": "6ea310aedead79971d092f9ae035b0c0b79499bcc656e3899a5546ba6234c54f",
+      "prior_text": "MOVE UNITS STEP\nThe active player moves their units, one unit at a time, until all their units have been selected and have finished making their moves. For each unit, use the sequence below.\n1 SELECT UNIT\nSelect a friendly unit that has not been selected in this step. That unit can either be on the battlefield, in Strategic Reserves (20.02), or embarked within a Transport model (18.01). That unit has now been selected to move.\n2 SELECT MOVE TYPE\nSelect one of the eligible move types listed below for your unit to make. Resolve that move type, after which that unit has finished making its move.\n- REMAIN STATIONARY (09.04)\n- NORMAL MOVE (09.05)\n- ADVANCE (09.06)\n- FALL-BACK (09.07)\n- DISEMBARK (18.04)\n- INGRESS (20.04)",
+      "reason": "The previous excerpt said a unit had not been selected in this step and listed only the move types below. The controlling text is the complete selected Move Units step: selection is once this phase, and a move type may be one presented elsewhere. The historical 40k.app observation remains the immutable mirror evidence.",
+      "record_id": "incomplete-excerpt:move-units-step",
+      "semantic_execution_status": "not_certified",
+      "source_id": "gw-11e-core-rules:movement-phase:move-units-step",
+      "successor": "gw-11e-core-rules:movement-phase:move-units-step"
+    }
+  ]
 }

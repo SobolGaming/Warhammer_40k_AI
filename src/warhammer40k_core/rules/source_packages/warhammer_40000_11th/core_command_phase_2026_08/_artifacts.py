@@ -15,6 +15,11 @@ from warhammer40k_core.rules.source_evidence import (
     RuleVerificationStatus,
     SemanticExecutionStatus,
 )
+from warhammer40k_core.rules.source_supersession import (
+    SourceSupersessionError,
+    SupersededSourceRecord,
+    validate_superseded_source_records,
+)
 
 ARTIFACT_SCHEMA: Final = "core-v2-command-phase-source-v2"
 EXPECTED_SOURCE_PACKAGE_ID: Final = "gw-11e-core-command-phase"
@@ -49,8 +54,8 @@ EXPECTED_OFFICIAL_PDF_PATH: Final = (
 EXPECTED_OFFICIAL_PDF_SHA256: Final = (
     "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
 )
-EXPECTED_ARTIFACT_SHA256: Final = "78b2264047e263ab5537c71c7d1be681874bdda31191816b6b297eb9a39425e6"
-EXPECTED_PACKAGE_HASH: Final = "8785dda65406ce76add419f29263be499239122e1330941ab55a1dc3e6f10127"
+EXPECTED_ARTIFACT_SHA256: Final = "5278c56350f4eccefca6507f5ddb3ad6e48d02e0332bbac118bc7d5860b6051b"
+EXPECTED_PACKAGE_HASH: Final = "10688ecc851e922050e0d5b90d2220085a2dc77532075ba49dd24b9638ad88e5"
 
 EXPECTED_SEARCH_INDEX_HEADINGS: Final = (
     ("start-of-command-phase", 1, "START OF COMMAND PHASE"),
@@ -67,6 +72,30 @@ EXPECTED_SEARCH_INDEX_HEADING_SHA256_BY_HEADING_ID: Final = {
     "end-of-command-phase": "2783396269169e5333be1049e5cb0ca511b6601ecf3d650668316155988dca01",
 }
 
+EXPECTED_SELECTED_SOURCE_TEXT: Final = {
+    "start-of-command-phase": (
+        "Rules that are triggered at the start of the Command phase are resolved now."
+    ),
+    "gain-core-cp": "Both players gain 1 Command Point (CP).",
+    "battle-shock": (
+        "The active player must now make one battle-shock roll (01.07) for each unit in their "
+        "army that fulfils one or both of the following conditions:\n"
+        "• That unit is currently battle-shocked.\n"
+        "• That unit is at, or below, half\u2011strength.\n"
+        "If a unit was battle-shocked at the start of this step and its battle-shock roll during "
+        "this step succeeds, it is no longer battle-shocked.\n"
+        "Battle-shock Examples\n"
+        "This unit has a starting strength of 3 so is not at or below half-strength, but it is "
+        "currently battle-shocked, so a battle-shock roll must be made for it. If that roll "
+        "succeeds, the unit will no longer be battle-shocked.\n"
+        "This unit has a starting strength of 10. It has five models remaining, so it is at "
+        "half-strength and a battle-shock roll must be made for it.\n"
+        "This unit has a starting strength of 5. It has two models remaining, so it is below "
+        "half-strength and a battle-shock roll must be made for it.\n"
+        "This Vehicle has a starting strength of 1 and a W characteristic of 11. It has 3 wounds "
+        "remaining, so it is below half-strength and a battle-shock roll must be made for it."
+    ),
+}
 EXPECTED_RULE_IDENTITY: Final = {
     "start-of-command-phase": (
         "08.01",
@@ -112,9 +141,9 @@ EXPECTED_RULE_IDENTITY: Final = {
     ),
 }
 EXPECTED_TRANSCRIPTION_SHA256_BY_RULE_ID: Final = {
-    "start-of-command-phase": ("c7076d22487eaacd4966ce616ed23632f73c1c1e77e97264779f58571855cd33"),
-    "gain-core-cp": "15b5a4c0e0184c03730be6b15d9aad113b1b59bb262028d00173ea5475f7a42f",
-    "battle-shock": "621c1dac0261aaeb2443a843f9d4dd05d253f6ac01a6e251620739eece408e56",
+    "start-of-command-phase": "539a37c85bcb22ebe08ae017a6e926489bbc8b311680d80514d5151855ed1c31",
+    "gain-core-cp": "6a09ea8b545e04dfbb0755408986862f7cf19991bb023106cafcbbb63b8e55d0",
+    "battle-shock": "b2a5cdecb25d1f89f004062fab75868023e2f557066df4eeb2ba9d94352f2f4e",
 }
 EXPECTED_OFFICIAL_PDF_TRANSCRIPTION_SHA256_BY_RULE_ID: Final = {
     "start-of-command-phase": ("539a37c85bcb22ebe08ae017a6e926489bbc8b311680d80514d5151855ed1c31"),
@@ -282,6 +311,7 @@ class CoreCommandPhaseSourcePackageArtifact(
     search_index_observation: CoreCommandPhaseSearchIndexObservationArtifact
     rules: tuple[CoreCommandPhaseSourceRuleArtifact, ...]
     evidence_records: tuple[CoreCommandPhaseEvidenceArtifact, ...]
+    superseded_records: tuple[SupersededSourceRecord, ...]
     package_hash: str
 
     def validate(self) -> None:
@@ -299,6 +329,7 @@ class CoreCommandPhaseSourcePackageArtifact(
         _validate_source_document(self.source_document)
         _validate_rules(self.rules)
         _validate_search_index_observation(self.search_index_observation, rules=self.rules)
+        _validate_superseded_records(self.superseded_records, rules=self.rules)
         _validate_evidence(
             self.evidence_records,
             rules=self.rules,
@@ -474,6 +505,43 @@ def _validate_search_index_observation(
         )
 
 
+def _validate_superseded_records(
+    records: tuple[SupersededSourceRecord, ...],
+    *,
+    rules: tuple[CoreCommandPhaseSourceRuleArtifact, ...],
+) -> None:
+    try:
+        validate_superseded_source_records(records)
+    except SourceSupersessionError as exc:
+        raise CoreCommandPhaseSourceArtifactError(str(exc)) from exc
+    expected = {
+        (
+            f"label-only:{rule.rule_id}",
+            rule.source_id,
+            "label_only_transcription",
+            rule.section_heading,
+            hashlib.sha256(rule.section_heading.encode()).hexdigest(),
+            rule.source_id,
+        )
+        for rule in rules
+    }
+    observed = {
+        (
+            record.record_id,
+            record.source_id,
+            record.kind,
+            record.prior_text,
+            record.prior_sha256,
+            record.successor,
+        )
+        for record in records
+    }
+    if observed != expected:
+        raise CoreCommandPhaseSourceArtifactError(
+            "Command-phase superseded heading observations drifted."
+        )
+
+
 def _validate_rules(rules: tuple[CoreCommandPhaseSourceRuleArtifact, ...]) -> None:
     if type(rules) is not tuple or tuple(rule.rule_id for rule in rules) != tuple(
         EXPECTED_RULE_IDENTITY
@@ -495,19 +563,21 @@ def _validate_rules(rules: tuple[CoreCommandPhaseSourceRuleArtifact, ...]) -> No
             rule.section_id,
             rule.display_order,
             rule.section_heading,
-            rule.source_text,
             rule.source_id,
             rule.official_pdf_source_text,
         ) != (
             expected_section_id,
             expected_display_order,
             expected_heading,
-            expected_heading,
             expected_source_id,
             expected_pdf_text,
-        ):
+        ) or rule.source_text != EXPECTED_SELECTED_SOURCE_TEXT[rule.rule_id]:
             raise CoreCommandPhaseSourceArtifactError(
                 "Command-phase source rule identity or exact text drifted."
+            )
+        if rule.source_text == rule.section_heading:
+            raise CoreCommandPhaseSourceArtifactError(
+                "Command-phase source_text cannot be only its section heading."
             )
         _validate_sha256("transcription_sha256", rule.transcription_sha256)
         if (
@@ -588,7 +658,7 @@ def _validate_evidence(
             "project_reviewed_app_transcription",
             "unverified_transcription_only",
             "CORE V2 Source Review",
-            "Reviewed transcription of the Command-phase section heading",
+            f"Reviewed complete selected transcription of {rule.section_heading}",
             "Repository",
             None,
             None,
@@ -629,24 +699,27 @@ def _validate_evidence(
             raise CoreCommandPhaseSourceArtifactError(
                 "Command-phase search-index mirror provenance drifted."
             )
-        if any(
-            (
-                record.rule_source_id,
-                record.transcription_sha256,
-                record.official_corroborating_source_ids,
-                record.load_support_status,
-                record.semantic_execution_status,
-                record.runtime_consumer_ids,
+        heading_transcription_sha256 = hashlib.sha256(rule.section_heading.encode()).hexdigest()
+        if (
+            project_review.transcription_sha256 != rule.transcription_sha256
+            or mirror.transcription_sha256 != heading_transcription_sha256
+            or any(
+                (
+                    record.rule_source_id,
+                    record.official_corroborating_source_ids,
+                    record.load_support_status,
+                    record.semantic_execution_status,
+                    record.runtime_consumer_ids,
+                )
+                != (
+                    rule.source_id,
+                    (),
+                    rule.load_support_status,
+                    rule.semantic_execution_status,
+                    rule.runtime_consumer_ids,
+                )
+                for record in (project_review, mirror)
             )
-            != (
-                rule.source_id,
-                rule.transcription_sha256,
-                (),
-                rule.load_support_status,
-                rule.semantic_execution_status,
-                rule.runtime_consumer_ids,
-            )
-            for record in (project_review, mirror)
         ):
             raise CoreCommandPhaseSourceArtifactError(
                 "Command-phase source/evidence execution linkage drifted."

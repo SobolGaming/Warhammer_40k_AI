@@ -29,7 +29,7 @@ REVIEW_AUDIT_ROW_ID = "category:09"
 REVIEW_AUDIT_OBSERVATION_SHA256 = "a00bccdc9dd090acd4fa211034bd397739392c4f018276667e3309f8d66960ae"
 OBSERVED_AT = "2026-08-30T13:55:17-04:00"
 
-MOVE_UNITS_SOURCE_TEXT = """MOVE UNITS STEP
+HISTORICAL_MOVE_UNITS_EXCERPT = """MOVE UNITS STEP
 The active player moves their units, one unit at a time, until all their units have been selected and have finished making their moves. For each unit, use the sequence below.
 1 SELECT UNIT
 Select a friendly unit that has not been selected in this step. That unit can either be on the battlefield, in Strategic Reserves (20.02), or embarked within a Transport model (18.01). That unit has now been selected to move.
@@ -41,6 +41,22 @@ Select one of the eligible move types listed below for your unit to make. Resolv
 - FALL-BACK (09.07)
 - DISEMBARK (18.04)
 - INGRESS (20.04)"""
+
+MOVE_UNITS_SOURCE_TEXT = (
+    "The active player moves their units one at a time, using the sequence below, until all of "
+    "their units have been selected to move and those moves have ended.\n"
+    "1. Select Unit: Select one friendly unit that has not been selected to move this phase. "
+    "You can select a unit on the battlefield, in strategic reserves, or embarked within a "
+    "TRANSPORT. That unit is selected to move.\n"
+    "2. Select Move Type: Select one move type that unit is eligible to make, and resolve it "
+    "with that unit. This can be one listed below, or one presented elsewhere:\n"
+    "▫ Remain stationary (09.04)\n"
+    "▫ Normal move (09.05)\n"
+    "▫ Advance move (09.06)\n"
+    "▫ Fall-back move (09.07)\n"
+    "▫ Disembark move (18.04)\n"
+    "▫ Ingress move (20.04)"
+)
 
 SELECTING_MODES_SOURCE_TEXT = """SELECTING MODES
 Some rules instruct you to select a mode, such as fall-back moves (09.07). Modes are mutually exclusive, and you must assess each one in the order presented. When making a move, if your unit does not meet the conditions of any of the modes, it cannot make that move.
@@ -89,6 +105,7 @@ def _evidence_rows(
     semantic_execution_status: str,
     runtime_consumer_ids: list[str],
     observed_at: str,
+    mirror_transcription_sha256: str | None = None,
 ) -> list[dict[str, object]]:
     shared: dict[str, object] = {
         "rule_source_id": source_id,
@@ -138,6 +155,8 @@ def _evidence_rows(
         "verification_status": "authoritative_app_mirror",
         "provider_non_affiliation_recorded": True,
     }
+    if mirror_transcription_sha256 is not None:
+        mirror["transcription_sha256"] = mirror_transcription_sha256
     mirror["observation_sha256"] = _evidence_observation_sha256(mirror)
     return [review, mirror]
 
@@ -217,6 +236,11 @@ def build_payload() -> dict[str, object]:
                 semantic_execution_status=semantic_status,
                 runtime_consumer_ids=consumers,
                 observed_at=OBSERVED_AT,
+                mirror_transcription_sha256=(
+                    _sha256_text(HISTORICAL_MOVE_UNITS_EXCERPT)
+                    if rule_id == "move-units-step"
+                    else None
+                ),
             )
         )
     payload: dict[str, object] = {
@@ -232,6 +256,25 @@ def build_payload() -> dict[str, object]:
         },
         "rules": rules,
         "evidence": evidence,
+        "superseded_records": [
+            {
+                "record_id": "incomplete-excerpt:move-units-step",
+                "source_id": "gw-11e-core-rules:movement-phase:move-units-step",
+                "kind": "incomplete_excerpt",
+                "prior_text": HISTORICAL_MOVE_UNITS_EXCERPT,
+                "prior_sha256": _sha256_text(HISTORICAL_MOVE_UNITS_EXCERPT),
+                "successor": "gw-11e-core-rules:movement-phase:move-units-step",
+                "load_support_status": "loaded",
+                "semantic_execution_status": "not_certified",
+                "reason": (
+                    "The previous excerpt said a unit had not been selected in this step and "
+                    "listed only the move types below. The controlling text is the complete "
+                    "selected Move Units step: selection is once this phase, and a move type "
+                    "may be one presented elsewhere. The historical 40k.app observation remains "
+                    "the immutable mirror evidence."
+                ),
+            }
+        ],
         "package_hash": "",
     }
     payload["package_hash"] = _sha256_payload(payload)

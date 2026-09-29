@@ -146,7 +146,7 @@
       "evidence_id": "core-v2-other-concepts-source-review:visibility-classifications",
       "evidence_kind": "project_reviewed_app_transcription",
       "load_support_status": "loaded",
-      "observation_sha256": "1c957a22acf5fd65960b4b3e6878d9595b0f0ea1bfc91e95bd7640dbbc006373",
+      "observation_sha256": "a4685012897ccdc752e2793522052b9deffe7a03051b0f5d3089348772fa7d45",
       "observed_at": null,
       "official_corroborating_source_ids": [],
       "project_authority_policy_id": null,
@@ -162,7 +162,7 @@
       ],
       "semantic_execution_status": "executable_engine_runtime",
       "source_platform": "Repository",
-      "source_title": "Reviewed transcription of 06.01.01 Visibility Classifications",
+      "source_title": "Reviewed transcription of 06.01 Visibility",
       "source_url": null,
       "transcription_sha256": "7bcd8275af066324fa6d6944e4683d632fe0b552a003fdc94190159a76fc89f4",
       "verification_status": "unverified"
@@ -176,7 +176,7 @@
       "evidence_id": "core-visibility-mirror-2026-09-08:visibility-classifications",
       "evidence_kind": "third_party_mirror",
       "load_support_status": "loaded",
-      "observation_sha256": "b401b2f0e9fe7659f73d5da2673ad7cda858bf2e395630ba1583113fe4f844ec",
+      "observation_sha256": "808889d3e570fd216481c5f4651b8981f44f03cfe3120af4b6f5156daba116fe",
       "observed_at": "2026-09-08T17:17:05Z",
       "official_corroborating_source_ids": [],
       "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
@@ -192,7 +192,7 @@
       ],
       "semantic_execution_status": "executable_engine_runtime",
       "source_platform": "Web",
-      "source_title": "40k.app 06.01.01 VISIBILITY CLASSIFICATIONS",
+      "source_title": "40k.app 06.01 VISIBILITY",
       "source_url": "https://www.40k.app/rules/06-other-concepts",
       "transcription_sha256": "7bcd8275af066324fa6d6944e4683d632fe0b552a003fdc94190159a76fc89f4",
       "verification_status": "authoritative_app_mirror"
@@ -258,7 +258,7 @@
       "verification_status": "authoritative_app_mirror"
     }
   ],
-  "package_hash": "d8b159dafe25df81c5a6caa0528e5a6814e6e335df85ae2014268b5e8331991c",
+  "package_hash": "215059ed938a096ef038f67db15dcf82f9437e07a0e8c0b5140634777c15ee38",
   "rules": [
     {
       "load_support_status": "loaded",
@@ -303,8 +303,8 @@
         "warhammer40k_core.geometry.continuous_visibility:resolve_visibility_pair",
         "warhammer40k_core.core.visibility:TerrainVisibilityContext.resolve_line_of_sight"
       ],
-      "section_heading": "VISIBILITY CLASSIFICATIONS",
-      "section_id": "06.01.01",
+      "section_heading": "VISIBILITY",
+      "section_id": "06.01",
       "semantic_execution_status": "executable_engine_runtime",
       "source_id": "gw-11e-core-rules:other-concepts:visibility-classifications",
       "source_text": "VISIBILITY\nLine of sight is used to determine visibility between models. For an observing model to have line of sight, it must be possible to draw an imaginary straight line, 1 mm wide, from any part of that model to any part of the model being observed. This line is the line of sight. While doing so, other models in the observing model\u2019s unit and in the observed model\u2019s unit are ignored. Other models and units can be either visible or fully visible to the observing model, as shown in the example. Note that terrain applies additional rules to visibility (13.07).\nMODEL VISIBLE\nIf any part of another model is visible to the observing model, that model is visible.\nMODEL FULLY VISIBLE\nIf every part of another model that is facing the observing model is visible to the observing model (so the only thing blocking visibility to any part of that other model is that model itself), that model is fully visible.\nUNIT VISIBLE\nIf one or more models in a unit are visible to the observing model, that unit is visible.\nUNIT FULLY VISIBLE\nIf every model in a unit is fully visible to the observing model, that unit is fully visible. When determining this, the observing model can see through other models in that unit.",
@@ -333,5 +333,18 @@
     "source_url": "https://www.40k.app/rules/06-other-concepts"
   },
   "source_package_id": "gw-11e-core-other-concepts",
-  "source_version": "maintained-app-mirrors-observed-2026-09-08"
+  "source_version": "maintained-app-mirrors-observed-2026-09-08",
+  "superseded_records": [
+    {
+      "kind": "mislocated_locator",
+      "load_support_status": "loaded",
+      "prior_sha256": "4e33f1cecfce03fe571d7f75b2741513df074c0c8796df136e3f65e1dcd80632",
+      "prior_text": "06.01.01",
+      "reason": "The transcription contains the 06.01 visibility definitions, not the 06.01.01 default-observer clause. The previous locator is superseded and does not prove 06.01.01.",
+      "record_id": "mislocated-locator:visibility-classifications",
+      "semantic_execution_status": "not_certified",
+      "source_id": "gw-11e-core-rules:other-concepts:visibility-classifications",
+      "successor": "06.01"
+    }
+  ]
 }

@@ -162,8 +162,8 @@ def _p06c_supplement() -> tuple[
     for observation, slug, section, heading in zip(
         observations,
         ("visibility-classifications", "visibility-any-part-faq"),
-        ("06.01.01", "06.01 FAQ"),
-        ("VISIBILITY CLASSIFICATIONS", "VISIBILITY ANY-PART FAQ"),
+        ("06.01", "06.01 FAQ"),
+        ("VISIBILITY", "VISIBILITY ANY-PART FAQ"),
         strict=True,
     ):
         source_id = f"gw-11e-core-rules:other-concepts:{slug}"
@@ -300,6 +300,23 @@ def build_payload() -> dict[str, object]:
                 runtime_consumer_ids=MORTAL_WOUNDS_RUNTIME_CONSUMER_IDS,
             ),
             *supplemental_evidence,
+        ],
+        "superseded_records": [
+            {
+                "record_id": "mislocated-locator:visibility-classifications",
+                "source_id": "gw-11e-core-rules:other-concepts:visibility-classifications",
+                "kind": "mislocated_locator",
+                "prior_text": "06.01.01",
+                "prior_sha256": _sha256_text("06.01.01"),
+                "successor": "06.01",
+                "load_support_status": "loaded",
+                "semantic_execution_status": "not_certified",
+                "reason": (
+                    "The transcription contains the 06.01 visibility definitions, not the "
+                    "06.01.01 default-observer clause. The previous locator is superseded and "
+                    "does not prove 06.01.01."
+                ),
+            }
         ],
         "package_hash": "",
     }

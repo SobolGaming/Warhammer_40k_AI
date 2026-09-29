@@ -1,3 +1,4 @@
+# ruff: noqa: RUF001
 """Reproduce the reviewed Order 54 source package and observation audit offline."""
 
 from __future__ import annotations
@@ -14,9 +15,38 @@ OBSERVED_AT = "2026-09-17T00:00:00+00:00"
 AUDIT_ID = "core-large-model-setup-maintained-app-mirrors-2026-09-17"
 POLICY = "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02"
 SOURCE_ID = f"{PACKAGE_ID}:large-model-setup"
-TEXT = (
+HISTORICAL_EXCERPT = (
     "it must be set up so that it is touching your battlefield "
     "edge. ... (excluding AIRCRAFT models)"
+)
+TEXT = (
+    "If a model cannot meet all of its set up restrictions because it is too large, consult the "
+    "relevant section below:\n"
+    "During Deployment: If a model is so large that its base cannot physically be set up wholly "
+    "within your deployment zone, it must be set up so that it is touching your battlefield edge. "
+    "During a turn in which such a large model is set up on the battlefield, that model’s unit "
+    "cannot do any of the following:\n"
+    "• Make a normal/advance/fall-back/charge move.\n"
+    "• Make any attacks with ranged weapons.\n"
+    "Some large models, typically Aircraft, have wings and other parts that extend significantly "
+    "beyond their base. Such models can overhang a deployment zone if it is not possible to set "
+    "them up otherwise, but when setting them up, their base must still be wholly within that "
+    "deployment zone.\n"
+    "From Strategic Reserves: If a model is so large that its base cannot physically be set up "
+    "wholly within the distance required of the battlefield edge, it must be set up so that it is "
+    "touching a battlefield edge. During a turn in which such a large model is set up on the "
+    "battlefield (excluding AIRCRAFT models), that model’s unit cannot do any of the following:\n"
+    "normal/advance/fall-back/charge move.\n"
+    "Make any attacks with ranged weapons.\n"
+    "Some large models, typically Aircraft, have wings and other parts that extend significantly "
+    "beyond their base. Such models can overhang a battlefield edge if it is not possible to set "
+    'them up otherwise, but when setting them up, they must still be more than 8" away from all '
+    "enemy units.\n"
+    "Disembarking from a Transport: When a unit disembarks from a Transport, it must be set up "
+    'wholly within 3" of that model. If a disembarking model is so large that it is not possible '
+    'to set it up wholly within 3" (typically because it is itself larger than 3" in all '
+    'directions), set that model up with its base within 1" of that Transport’s base (or hull), '
+    "and not engaged with any enemy units."
 )
 URL = "https://www.40k.app/rules/03-moving"
 CONSUMERS = [
@@ -83,7 +113,8 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
         "transcription_sha256": transcription,
         "provider_non_affiliation_recorded": True,
         "transcription_scope": (
-            "Short excerpt; complete 03.02.02 operative text reviewed in the search index."
+            "Complete selected 03.02.02 record. The previous ellipsis excerpt remains a "
+            "superseded source record and does not certify disembark or reserve consumers."
         ),
         "reviewed_obligations": OBLIGATIONS,
     }
@@ -164,6 +195,24 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
             }
         ],
         "evidence": [review, row],
+        "superseded_records": [
+            {
+                "record_id": "incomplete-excerpt:large-model-setup",
+                "source_id": SOURCE_ID,
+                "kind": "incomplete_excerpt",
+                "prior_text": HISTORICAL_EXCERPT,
+                "prior_sha256": hashlib.sha256(HISTORICAL_EXCERPT.encode()).hexdigest(),
+                "successor": SOURCE_ID,
+                "load_support_status": "loaded",
+                "semantic_execution_status": "not_certified",
+                "reason": (
+                    "The previous ellipsis joined a deployment-edge fragment to the Strategic "
+                    "Reserves AIRCRAFT exception. The controlling text is the complete selected "
+                    "03.02.02 record, with deployment, Strategic Reserves, and disembark clauses "
+                    "kept separate."
+                ),
+            }
+        ],
         "setup_policy": DESCRIPTOR,
         "package_hash": "",
     }

@@ -2,10 +2,10 @@
   {
     "source_package_id": "gw-11e-core-abilities",
     "source_version": "game-datamissions-v931-observed-2026-09-02",
-    "package_hash": "ceda170f6ff51083eb2976ea97ee4d9096095dc3276d25ff7335d1cacabb9bfb",
+    "package_hash": "d83ffcebb9773b7318299b121e099cfe02264e2f82d2ea39cf39cf4a43c2eef8",
     "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_abilities_2026_09/artifacts/package.json",
-    "sha256": "fbfb7dae154292d33963a9c81d5c14025aa6c44873b7ee7a60c1fce754909bf7",
-    "metadata_sha256": "8eb8555c2d2c850db12ee4ce73236c56bd99e2277ebc33b856b5e9071b1f924c",
+    "sha256": "c45ac9d1ea006d32f8fc803940f51f971e934acbd6f09c51ef263c64b7f69c7b",
+    "metadata_sha256": "d66ecbdcdeb139a78dee5775cd8f334702808650535c808d21f57ed253c0c368",
     "rules": [
       {
         "source_id": "gw-11e-core-abilities:core:deadly-demise",
@@ -42,20 +42,15 @@
           "warhammer40k_core.engine.prebattle:prebattle_action_selection_request",
           "warhammer40k_core.engine.prebattle:prebattle_next_player_id_for_timing_state",
           "warhammer40k_core.engine.prebattle_alternation:align_prebattle_alternation_cursor",
-          "warhammer40k_core.engine.prebattle_alternation:validate_prebattle_alternation_restore",
+          "warhammer40k_core.engine.prebattle_integrity:validate_prebattle_alternation_restore",
           "warhammer40k_core.engine.prebattle_records:PreBattleAlternationCursor",
           "warhammer40k_core.engine.setup_flow:SetupFlow._advance_resolve_prebattle_actions"
         ],
         "selected_rows": [
           "faq:80182be3-1a44-464b-9ef6-cd9212429603"
         ],
-        "relation": "source_repair_required",
-        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution. Declared runtime consumer identity is stale; the explicit current owner is recorded separately. Package consumer metadata requires correction before PFINAL.",
-        "retired_consumer_successors": {
-          "warhammer40k_core.engine.prebattle_alternation:validate_prebattle_alternation_restore": [
-            "src/warhammer40k_core/engine/prebattle_integrity.py:validate_prebattle_alternation_restore"
-          ]
-        }
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution. The retired consumer warhammer40k_core.engine.prebattle_alternation:validate_prebattle_alternation_restore is loaded and not certified in superseded_records. The live owner is warhammer40k_core.engine.prebattle_integrity:validate_prebattle_alternation_restore. Source text and execution status are unchanged."
       },
       {
         "source_id": "gw-11e-core-abilities:core:hazardous",
@@ -240,10 +235,10 @@
   {
     "source_package_id": "gw-11e-core-attached-units",
     "source_version": "40k-app-attached-units-observed-2026-09-01",
-    "package_hash": "3f6e0c6b6c3b9a96d19967e2ef5c8ab0429fd7fc8b025304b84e3dc5cb243570",
+    "package_hash": "ec42640d7192a01eef34ceefd84d0e16071f5ad62c0956e27467f6e973673d6b",
     "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_attached_units_2026_09/artifacts/package.json",
-    "sha256": "748cf1bc4cbd2749655abab43e97c7e04acfa4e63e79b9f84b565001b9c17b66",
-    "metadata_sha256": "195e32aace02bfd50591a8be85de1d8a9a7df23cf8cfc4d6f89d199ad49ef7a3",
+    "sha256": "36f06f7c47aa13c8c96ef63c5cbe0026fb5c265b0cf6e7fc3d267dec9b222646",
+    "metadata_sha256": "7535c825c71eacef158357c43281e16fa85772a992d5dcfba64788a536cef34c",
     "rules": [
       {
         "source_id": "gw-11e-core-rules:attached-units:bodyguard-unit-destroyed",
@@ -256,18 +251,13 @@
           "warhammer40k_core.engine.attached_unit_reconciliation:validate_attached_rules_unit_identity_after_destruction",
           "warhammer40k_core.engine.rules_unit_placement:RulesUnitPlacement.from_battlefield",
           "warhammer40k_core.engine.rules_units:current_rules_unit_views_for_identity",
-          "warhammer40k_core.engine.starting_attached_units:starting_attached_unit_records_from_armies"
+          "warhammer40k_core.engine.starting_attached_units:starting_attached_unit_records_for_army"
         ],
         "selected_rows": [
           "rule:19:19.01.01:1"
         ],
-        "relation": "source_repair_required",
-        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred. Declared runtime consumer identity is stale; the explicit current owner is recorded separately. Package consumer metadata requires correction before PFINAL.",
-        "retired_consumer_successors": {
-          "warhammer40k_core.engine.starting_attached_units:starting_attached_unit_records_from_armies": [
-            "src/warhammer40k_core/engine/starting_attached_units.py:starting_attached_unit_records_for_army"
-          ]
-        }
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. The retired consumer warhammer40k_core.engine.starting_attached_units:starting_attached_unit_records_from_armies is loaded and not certified in superseded_records. The live owner is warhammer40k_core.engine.starting_attached_units:starting_attached_unit_records_for_army. Source text and execution status are unchanged."
       }
     ]
   },
@@ -418,16 +408,16 @@
   {
     "source_package_id": "gw-11e-core-command-phase",
     "source_version": "40k-app-search-index-observed-2026-08-26",
-    "package_hash": "8785dda65406ce76add419f29263be499239122e1330941ab55a1dc3e6f10127",
+    "package_hash": "10688ecc851e922050e0d5b90d2220085a2dc77532075ba49dd24b9638ad88e5",
     "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_command_phase_2026_08/artifacts/package.json",
-    "sha256": "78b2264047e263ab5537c71c7d1be681874bdda31191816b6b297eb9a39425e6",
-    "metadata_sha256": "dae5eb7c2665d1e89a1876d1baca74a5147a54c9f232570abb6f01e1eefaff95",
+    "sha256": "5278c56350f4eccefca6507f5ddb3ad6e48d02e0332bbac118bc7d5860b6051b",
+    "metadata_sha256": "4d61b7fbb82ed3fa2e460979729be32cbfbbe94fade1e669c457dc28b5757aff",
     "rules": [
       {
         "source_id": "gw-11e-core-rules:command-phase:start-of-command-phase",
         "section_id": "08.01",
-        "source_text": "START OF COMMAND PHASE",
-        "transcription_sha256": "c7076d22487eaacd4966ce616ed23632f73c1c1e77e97264779f58571855cd33",
+        "source_text": "Rules that are triggered at the start of the Command phase are resolved now.",
+        "transcription_sha256": "539a37c85bcb22ebe08ae017a6e926489bbc8b311680d80514d5151855ed1c31",
         "load_support_status": "loaded",
         "semantic_execution_status": "executable_engine_runtime",
         "runtime_consumer_ids": [
@@ -436,14 +426,14 @@
         "selected_rows": [
           "rule:08:08.01:1"
         ],
-        "relation": "source_repair_required",
-        "review": "source_text is only a phase-step label rather than its operative rule. A label cannot establish equivalence to the complete Command step. Requires complete sourced transcription and consumer revalidation before PFINAL."
+        "relation": "reviewed_layout",
+        "review": "Controlling source_text is the complete selected 08.01 sentence. The search-index heading remains the immutable 40k.app mirror observation and a loaded, not-certified label-only supersession. The official PDF excerpt corroborates the same sentence. Execution status stays executable_engine_runtime."
       },
       {
         "source_id": "gw-11e-core-rules:command-phase:gain-core-cp",
         "section_id": "08.02",
-        "source_text": "GAIN CORE CP",
-        "transcription_sha256": "15b5a4c0e0184c03730be6b15d9aad113b1b59bb262028d00173ea5475f7a42f",
+        "source_text": "Both players gain 1 Command Point (CP).",
+        "transcription_sha256": "6a09ea8b545e04dfbb0755408986862f7cf19991bb023106cafcbbb63b8e55d0",
         "load_support_status": "loaded",
         "semantic_execution_status": "executable_engine_runtime",
         "runtime_consumer_ids": [
@@ -452,14 +442,14 @@
         "selected_rows": [
           "rule:08:08.02:1"
         ],
-        "relation": "source_repair_required",
-        "review": "source_text is only a phase-step label rather than its operative rule. A label cannot establish equivalence to the complete Command step. Requires complete sourced transcription and consumer revalidation before PFINAL."
+        "relation": "reviewed_layout",
+        "review": "Controlling source_text is the complete selected 08.02 sentence. The search-index heading remains the immutable 40k.app mirror observation and a loaded, not-certified label-only supersession. The official PDF excerpt corroborates the same sentence. Execution status stays executable_engine_runtime."
       },
       {
         "source_id": "gw-11e-core-rules:command-phase:battle-shock",
         "section_id": "08.03",
-        "source_text": "BATTLE-SHOCK",
-        "transcription_sha256": "621c1dac0261aaeb2443a843f9d4dd05d253f6ac01a6e251620739eece408e56",
+        "source_text": "The active player must now make one battle-shock roll (01.07) for each unit in their army that fulfils one or both of the following conditions:\n• That unit is currently battle-shocked.\n• That unit is at, or below, half‑strength.\nIf a unit was battle-shocked at the start of this step and its battle-shock roll during this step succeeds, it is no longer battle-shocked.\nBattle-shock Examples\nThis unit has a starting strength of 3 so is not at or below half-strength, but it is currently battle-shocked, so a battle-shock roll must be made for it. If that roll succeeds, the unit will no longer be battle-shocked.\nThis unit has a starting strength of 10. It has five models remaining, so it is at half-strength and a battle-shock roll must be made for it.\nThis unit has a starting strength of 5. It has two models remaining, so it is below half-strength and a battle-shock roll must be made for it.\nThis Vehicle has a starting strength of 1 and a W characteristic of 11. It has 3 wounds remaining, so it is below half-strength and a battle-shock roll must be made for it.",
+        "transcription_sha256": "b2a5cdecb25d1f89f004062fab75868023e2f557066df4eeb2ba9d94352f2f4e",
         "load_support_status": "loaded",
         "semantic_execution_status": "partial_engine_runtime",
         "runtime_consumer_ids": [
@@ -470,8 +460,8 @@
         "selected_rows": [
           "rule:08:08.03:1"
         ],
-        "relation": "source_repair_required",
-        "review": "source_text is only a phase-step label rather than its operative rule. A label cannot establish equivalence to the complete Command step. Requires complete sourced transcription and consumer revalidation before PFINAL."
+        "relation": "reviewed_layout",
+        "review": "Controlling source_text is the complete selected 08.03 row, including example blocks. Those examples stay nonoperative in the category inventory. The official PDF excerpt remains the shorter operative corroboration. The search-index heading remains the immutable mirror observation and a loaded, not-certified label-only supersession. Execution status stays partial_engine_runtime."
       }
     ]
   },
@@ -1103,16 +1093,16 @@
   {
     "source_package_id": "gw-11e-core-large-model-setup",
     "source_version": "maintained-app-mirrors-observed-2026-09-17",
-    "package_hash": "06bd4faaa522ea3bd96e431c142be21fe9eec5a5d1a2e08b355b9b8a8f24be75",
+    "package_hash": "3149e5dd3856e61d0bc4d924a18c7af7dc14c74254e9eb46835ede5aa8a39110",
     "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_large_model_setup_2026_09/artifacts/package.json",
-    "sha256": "24e64e35889899b0b2410dfe4a68d3bc4022c2bef54d25ec9269f610ad819f58",
-    "metadata_sha256": "626ee219617f886756036f40c262810509f2bddaba7670491e3ed5aa5a9a6606",
+    "sha256": "7518bd014c6926a75cb93a9f608411a87dea2ccddf1bd6399d6f484cc358a799",
+    "metadata_sha256": "1d580930fbadab870aca77453fdc3e4200121ee2c06e4bdebfe359b6df65810d",
     "rules": [
       {
         "source_id": "gw-11e-core-large-model-setup:large-model-setup",
         "section_id": "03.02.02",
-        "source_text": "it must be set up so that it is touching your battlefield edge. ... (excluding AIRCRAFT models)",
-        "transcription_sha256": "989b99ddd217c06dae6e6f3a3c3bbc86251e23ae77eca9e36d557f910df05bce",
+        "source_text": "If a model cannot meet all of its set up restrictions because it is too large, consult the relevant section below:\nDuring Deployment: If a model is so large that its base cannot physically be set up wholly within your deployment zone, it must be set up so that it is touching your battlefield edge. During a turn in which such a large model is set up on the battlefield, that model’s unit cannot do any of the following:\n• Make a normal/advance/fall-back/charge move.\n• Make any attacks with ranged weapons.\nSome large models, typically Aircraft, have wings and other parts that extend significantly beyond their base. Such models can overhang a deployment zone if it is not possible to set them up otherwise, but when setting them up, their base must still be wholly within that deployment zone.\nFrom Strategic Reserves: If a model is so large that its base cannot physically be set up wholly within the distance required of the battlefield edge, it must be set up so that it is touching a battlefield edge. During a turn in which such a large model is set up on the battlefield (excluding AIRCRAFT models), that model’s unit cannot do any of the following:\nnormal/advance/fall-back/charge move.\nMake any attacks with ranged weapons.\nSome large models, typically Aircraft, have wings and other parts that extend significantly beyond their base. Such models can overhang a battlefield edge if it is not possible to set them up otherwise, but when setting them up, they must still be more than 8\" away from all enemy units.\nDisembarking from a Transport: When a unit disembarks from a Transport, it must be set up wholly within 3\" of that model. If a disembarking model is so large that it is not possible to set it up wholly within 3\" (typically because it is itself larger than 3\" in all directions), set that model up with its base within 1\" of that Transport’s base (or hull), and not engaged with any enemy units.",
+        "transcription_sha256": "256d130eed1d8e54d114efaf75cac44f8f7583f107a7cbbb17f42ca2c1c20922",
         "load_support_status": "loaded",
         "semantic_execution_status": "executable_engine_runtime",
         "runtime_consumer_ids": [
@@ -1122,8 +1112,8 @@
         "selected_rows": [
           "rule:03:03.02.02:1"
         ],
-        "relation": "source_repair_required",
-        "review": "Literal ellipsis combines a deployment-edge fragment with an AIRCRAFT exception from Strategic Reserves, omitting triggers, restrictions and scope. Not equivalent to complete03.02.02; requires complete transcription and runtime-consumer revalidation."
+        "relation": "reviewed_layout",
+        "review": "Controlling source_text is the complete selected 03.02.02 record after format-control stripping. The previous ellipsis is a loaded, not-certified incomplete excerpt. Deployment, Strategic Reserves and disembark clauses stay separate. This row does not newly certify disembark or reserve consumers owned by other packages. setup_policy is unchanged and execution status stays executable_engine_runtime."
       }
     ]
   },
@@ -1350,16 +1340,16 @@
   {
     "source_package_id": "gw-11e-core-movement-phase",
     "source_version": "40k-app-movement-phase-observed-2026-08-30",
-    "package_hash": "0aacec8d0c56e882c0b03329a202a00512d9ace632d2b5f0e3bb53370e001105",
+    "package_hash": "4c7abdec1fae2cfa18a589f0b6135cdfdc1d205feedab255604ea1b4598c45fa",
     "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_movement_phase_2026_08/artifacts/package.json",
-    "sha256": "f3e378e933f70c8b4b579acdd7d46a5c8ec519ee3fbfb5efda1611edc747cff2",
-    "metadata_sha256": "fd3945f75d2dd736db05db2cbb8186a7df589309aa34bc6b31a9d9f3081014a0",
+    "sha256": "40a929ca90dac89f1e607cd244e925d19b19b4e7f3ada695301f1581e78cc0b3",
+    "metadata_sha256": "88909b9afe869257c3a3e0f2b9dbf9b64ed20f1a30028cc6ed81ecba65fc88a7",
     "rules": [
       {
         "source_id": "gw-11e-core-rules:movement-phase:move-units-step",
         "section_id": "09.02",
-        "source_text": "MOVE UNITS STEP\nThe active player moves their units, one unit at a time, until all their units have been selected and have finished making their moves. For each unit, use the sequence below.\n1 SELECT UNIT\nSelect a friendly unit that has not been selected in this step. That unit can either be on the battlefield, in Strategic Reserves (20.02), or embarked within a Transport model (18.01). That unit has now been selected to move.\n2 SELECT MOVE TYPE\nSelect one of the eligible move types listed below for your unit to make. Resolve that move type, after which that unit has finished making its move.\n- REMAIN STATIONARY (09.04)\n- NORMAL MOVE (09.05)\n- ADVANCE (09.06)\n- FALL-BACK (09.07)\n- DISEMBARK (18.04)\n- INGRESS (20.04)",
-        "transcription_sha256": "6ea310aedead79971d092f9ae035b0c0b79499bcc656e3899a5546ba6234c54f",
+        "source_text": "The active player moves their units one at a time, using the sequence below, until all of their units have been selected to move and those moves have ended.\n1. Select Unit: Select one friendly unit that has not been selected to move this phase. You can select a unit on the battlefield, in strategic reserves, or embarked within a TRANSPORT. That unit is selected to move.\n2. Select Move Type: Select one move type that unit is eligible to make, and resolve it with that unit. This can be one listed below, or one presented elsewhere:\n▫ Remain stationary (09.04)\n▫ Normal move (09.05)\n▫ Advance move (09.06)\n▫ Fall-back move (09.07)\n▫ Disembark move (18.04)\n▫ Ingress move (20.04)",
+        "transcription_sha256": "7761ce9360aa56e0f00a0e74d3b6095c5b1742523fd1d424d51989e9aeaab982",
         "load_support_status": "loaded",
         "semantic_execution_status": "executable_engine_runtime",
         "runtime_consumer_ids": [
@@ -1370,8 +1360,8 @@
         "selected_rows": [
           "rule:09:09.02:1"
         ],
-        "relation": "source_repair_required",
-        "review": "Package says not selected in this step and lists move types below; selected text says not selected to move this phase and expressly permits move types presented elsewhere. Requires source reconciliation and all selection consumers reviewed; the source difference alone does not establish a gameplay defect."
+        "relation": "reviewed_layout",
+        "review": "Controlling source_text is the complete selected 09.02 row. The previous excerpt remains the immutable 40k.app mirror observation and a loaded, not-certified incomplete excerpt. The wording difference does not by itself establish a gameplay defect. Selection consumers were revalidated and movement gameplay is unchanged. Execution status stays executable_engine_runtime."
       },
       {
         "source_id": "gw-11e-core-rules:movement-phase:selecting-modes",
@@ -1578,10 +1568,10 @@
   {
     "source_package_id": "gw-11e-core-other-concepts",
     "source_version": "maintained-app-mirrors-observed-2026-09-08",
-    "package_hash": "d8b159dafe25df81c5a6caa0528e5a6814e6e335df85ae2014268b5e8331991c",
+    "package_hash": "215059ed938a096ef038f67db15dcf82f9437e07a0e8c0b5140634777c15ee38",
     "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/artifacts/package.json",
-    "sha256": "1c9c948d244a5709db7262907f3cba55edd390662873d3ac8b8ff088e207ee89",
-    "metadata_sha256": "42aa204ada2b251d4cab4a9291e263e43548f8134d5457377e4e8f59e70ede7b",
+    "sha256": "a2fc98adb77bd14001798232710b218175b8dd318581dc151180521512207f86",
+    "metadata_sha256": "7b9f98aa9b6007ca3d5721f231193ef22a08ac0d8c9f7cbeaad21a6d1ac25d19",
     "rules": [
       {
         "source_id": "gw-11e-core-rules:other-concepts:visibility",
@@ -1627,7 +1617,7 @@
       },
       {
         "source_id": "gw-11e-core-rules:other-concepts:visibility-classifications",
-        "section_id": "06.01.01",
+        "section_id": "06.01",
         "source_text": "VISIBILITY\nLine of sight is used to determine visibility between models. For an observing model to have line of sight, it must be possible to draw an imaginary straight line, 1 mm wide, from any part of that model to any part of the model being observed. This line is the line of sight. While doing so, other models in the observing model’s unit and in the observed model’s unit are ignored. Other models and units can be either visible or fully visible to the observing model, as shown in the example. Note that terrain applies additional rules to visibility (13.07).\nMODEL VISIBLE\nIf any part of another model is visible to the observing model, that model is visible.\nMODEL FULLY VISIBLE\nIf every part of another model that is facing the observing model is visible to the observing model (so the only thing blocking visibility to any part of that other model is that model itself), that model is fully visible.\nUNIT VISIBLE\nIf one or more models in a unit are visible to the observing model, that unit is visible.\nUNIT FULLY VISIBLE\nIf every model in a unit is fully visible to the observing model, that unit is fully visible. When determining this, the observing model can see through other models in that unit.",
         "transcription_sha256": "7bcd8275af066324fa6d6944e4683d632fe0b552a003fdc94190159a76fc89f4",
         "load_support_status": "loaded",
@@ -1639,8 +1629,8 @@
         "selected_rows": [
           "rule:06:06.01:1"
         ],
-        "relation": "source_repair_required",
-        "review": "Runtime section_id06.01.01 is mislocated: the transcription contains06.01 visibility definitions, not the selected06.01.01 default-observer clause. Actual wording maps to06.01. Requires locator/provenance repair; no inference that the default-observer rule is proved."
+        "relation": "reviewed_layout",
+        "review": "Locator repaired to 06.01 and heading to VISIBILITY. The transcription is unchanged and contains the 06.01 visibility definitions. The previous 06.01.01 locator is a loaded, not-certified mislocated supersession. This repair does not add or prove the 06.01.01 default-observer sentence. Execution status stays executable_engine_runtime."
       },
       {
         "source_id": "gw-11e-core-rules:other-concepts:visibility-any-part-faq",

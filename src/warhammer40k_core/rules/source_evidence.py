@@ -605,8 +605,35 @@ class RuleSourcePackage:
             expected_transcription_sha256 = hashlib.sha256(
                 source_text.raw_text.encode()
             ).hexdigest()
+            historical_legacy_mirror_ids = {
+                id(record)
+                for record in records
+                if record.evidence_kind == "third_party_mirror"
+                and record.project_authority_policy_id == CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID
+            }
+            controlling_records = [
+                record
+                for record in records
+                if id(record) not in historical_legacy_mirror_ids
+                and record.evidence_kind
+                in {
+                    "owner_supplied_app_transcription",
+                    "project_reviewed_app_transcription",
+                    "official_app_capture",
+                }
+            ]
+            if not controlling_records or any(
+                record.transcription_sha256 != expected_transcription_sha256
+                for record in controlling_records
+            ):
+                raise RuleEvidenceError(
+                    "RuleSourcePackage evidence transcription hash does not match its source row."
+                )
             if any(
-                record.transcription_sha256 != expected_transcription_sha256 for record in records
+                record.transcription_sha256 != expected_transcription_sha256
+                for record in records
+                if id(record) not in historical_legacy_mirror_ids
+                and record not in controlling_records
             ):
                 raise RuleEvidenceError(
                     "RuleSourcePackage evidence transcription hash does not match its source row."

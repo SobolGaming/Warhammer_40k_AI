@@ -95,7 +95,7 @@
         "warhammer40k_core.engine.prebattle:prebattle_action_selection_request",
         "warhammer40k_core.engine.prebattle:prebattle_next_player_id_for_timing_state",
         "warhammer40k_core.engine.prebattle_alternation:align_prebattle_alternation_cursor",
-        "warhammer40k_core.engine.prebattle_alternation:validate_prebattle_alternation_restore",
+        "warhammer40k_core.engine.prebattle_integrity:validate_prebattle_alternation_restore",
         "warhammer40k_core.engine.prebattle_records:PreBattleAlternationCursor",
         "warhammer40k_core.engine.setup_flow:SetupFlow._advance_resolve_prebattle_actions"
       ],
@@ -132,7 +132,7 @@
         "warhammer40k_core.engine.prebattle:prebattle_action_selection_request",
         "warhammer40k_core.engine.prebattle:prebattle_next_player_id_for_timing_state",
         "warhammer40k_core.engine.prebattle_alternation:align_prebattle_alternation_cursor",
-        "warhammer40k_core.engine.prebattle_alternation:validate_prebattle_alternation_restore",
+        "warhammer40k_core.engine.prebattle_integrity:validate_prebattle_alternation_restore",
         "warhammer40k_core.engine.prebattle_records:PreBattleAlternationCursor",
         "warhammer40k_core.engine.setup_flow:SetupFlow._advance_resolve_prebattle_actions"
       ],
@@ -216,7 +216,7 @@
       "verification_status": "authoritative_app_mirror"
     }
   ],
-  "package_hash": "ceda170f6ff51083eb2976ea97ee4d9096095dc3276d25ff7335d1cacabb9bfb",
+  "package_hash": "d83ffcebb9773b7318299b121e099cfe02264e2f82d2ea39cf39cf4a43c2eef8",
   "rules": [
     {
       "effect_descriptor": "roll one D6. On a 6, that model suffers a deadly demise; each unit within 6\" of that model suffers a number of mortal wounds denoted by X (if this is a random number, roll separately for each unit within 6\").",
@@ -255,7 +255,7 @@
         "warhammer40k_core.engine.prebattle:prebattle_action_selection_request",
         "warhammer40k_core.engine.prebattle:prebattle_next_player_id_for_timing_state",
         "warhammer40k_core.engine.prebattle_alternation:align_prebattle_alternation_cursor",
-        "warhammer40k_core.engine.prebattle_alternation:validate_prebattle_alternation_restore",
+        "warhammer40k_core.engine.prebattle_integrity:validate_prebattle_alternation_restore",
         "warhammer40k_core.engine.prebattle_records:PreBattleAlternationCursor",
         "warhammer40k_core.engine.setup_flow:SetupFlow._advance_resolve_prebattle_actions"
       ],
@@ -305,5 +305,18 @@
     "source_url": "https://game-datamissions.com/11th/rules/changelog"
   },
   "source_package_id": "gw-11e-core-abilities",
-  "source_version": "game-datamissions-v931-observed-2026-09-02"
+  "source_version": "game-datamissions-v931-observed-2026-09-02",
+  "superseded_records": [
+    {
+      "kind": "retired_consumer",
+      "load_support_status": "loaded",
+      "prior_sha256": "6b6da70d0bf2145708df1cfa793ace18e5bbe4ff24afe511d9a061f0e8f2231f",
+      "prior_text": "warhammer40k_core.engine.prebattle_alternation:validate_prebattle_alternation_restore",
+      "reason": "validate_prebattle_alternation_restore now lives in prebattle_integrity. The retired prebattle_alternation path is retained and is not a live consumer.",
+      "record_id": "retired-consumer:validate-prebattle-alternation-restore",
+      "semantic_execution_status": "not_certified",
+      "source_id": "gw-11e-core-abilities:faq:alternating-scout-moves",
+      "successor": "warhammer40k_core.engine.prebattle_integrity:validate_prebattle_alternation_restore"
+    }
+  ]
 }

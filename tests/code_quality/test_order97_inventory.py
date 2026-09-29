@@ -117,10 +117,9 @@ def test_order97_rejects_retired_consumer_without_successor(
         rule
         for package in payload["runtime_packages"]
         for rule in package["rules"]
-        if rule["retired_consumer_successors"]
+        if rule["runtime_consumer_ids"]
     )
-    key = next(iter(rule["retired_consumer_successors"]))
-    rule["retired_consumer_successors"][key] = []
+    rule["retired_consumer_successors"] = {rule["runtime_consumer_ids"][0]: []}
     repin(monkeypatch, payload)
     with pytest.raises(audit.InventoryError, match="Retired consumers require"):
         audit.load_inventory(payload=payload)
