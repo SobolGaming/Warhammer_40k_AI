@@ -77,6 +77,7 @@ def overhang_session(
     second_enemy: bool = False,
     source_abilities: tuple[DatasheetAbilityDescriptor, ...] = (),
     source_keywords: tuple[str, ...] = (),
+    enemy_keywords: tuple[str, ...] = (),
     persisted_permissions: bool = False,
     reserve_enemy: bool = False,
 ) -> LocalGameSession:
@@ -144,10 +145,20 @@ def overhang_session(
                 else replace(
                     sheet,
                     keywords=replace(
-                        sheet.keywords, keywords=(*sheet.keywords.keywords, "DEEP_STRIKE")
+                        sheet.keywords,
+                        keywords=tuple(
+                            sorted(
+                                {
+                                    *sheet.keywords.keywords,
+                                    *(("DEEP_STRIKE",) if reserve_enemy else ()),
+                                    *enemy_keywords,
+                                }
+                            )
+                        ),
                     ),
                 )
-                if reserve_enemy and sheet.datasheet_id == "core-vehicle-monster"
+                if sheet.datasheet_id == "core-vehicle-monster"
+                and (reserve_enemy or enemy_keywords)
                 else sheet
                 for sheet in config.army_catalog.datasheets
             ),

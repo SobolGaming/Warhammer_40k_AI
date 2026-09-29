@@ -173,13 +173,18 @@ def classification_is_solid(classification: TerrainAreaClassification) -> bool:
 def model_intersects_terrain_area(model: Model, area: TerrainVisibilityArea) -> bool:
     _validate_model_and_area(model, area)
     return any(
-        model_intersects_visibility_polygon(model, polygon) for polygon in area.footprint_polygons
+        model_intersects_visibility_polygon(subject, polygon)
+        for subject in model.rules_distance_subjects()
+        for polygon in area.footprint_polygons
     )
 
 
 def model_wholly_within_terrain_area(model: Model, area: TerrainVisibilityArea) -> bool:
     _validate_model_and_area(model, area)
-    return model_within_visibility_polygons(model, area.footprint_polygons)
+    return all(
+        model_within_visibility_polygons(subject, area.footprint_polygons)
+        for subject in model.rules_distance_subjects()
+    )
 
 
 def line_of_sight_corridor_intersects_terrain_area(

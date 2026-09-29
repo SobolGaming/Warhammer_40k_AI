@@ -58,6 +58,11 @@ class MovementGoal:
             triangulate_polygon(polygon)
 
     def contains(self, model: Model) -> bool:
+        subjects = model.rules_distance_subjects()
+        if len(subjects) != 1:
+            return any(self.contains(subject) for subject in subjects)
+        if subjects[0] is not model:
+            model = subjects[0]
         if self.models:
             if self.range_inches is not None:
                 return any(model.range_to(target) <= self.range_inches for target in self.models)
@@ -87,6 +92,16 @@ class MovementGoal:
     def distance_lower_bound(
         self, model: Model, *, ignores_vertical_distance: bool = False
     ) -> float:
+        subjects = model.rules_distance_subjects()
+        if len(subjects) != 1:
+            return min(
+                self.distance_lower_bound(
+                    subject, ignores_vertical_distance=ignores_vertical_distance
+                )
+                for subject in subjects
+            )
+        if subjects[0] is not model:
+            model = subjects[0]
         # Only the moving footprint can rotate. The target retains its measured
         # footprint/facing. Circular movers are rotation invariant, so their
         # actual separation is a translation lower bound. Other movers retain
@@ -101,9 +116,7 @@ class MovementGoal:
                             _fixed_target_horizontal_lower_bound(model, target),
                             0.0
                             if ignores_vertical_distance
-                            else model.volume.vertical_gap_to(
-                                model.pose, target.volume, target.pose
-                            ),
+                            else _rules_vertical_gap(model, target),
                         )
                         - self.range_inches,
                     )
@@ -120,8 +133,7 @@ class MovementGoal:
                     if ignores_vertical_distance
                     else max(
                         0.0,
-                        model.volume.vertical_gap_to(model.pose, target.volume, target.pose)
-                        - self.vertical_inches,
+                        _rules_vertical_gap(model, target) - self.vertical_inches,
                     ),
                 )
                 for target in self.models
@@ -166,6 +178,16 @@ class MovementGoal:
         )
 
 
+def _rules_vertical_gap(first: Model, second: Model) -> float:
+    subjects = second.rules_distance_subjects()
+    if len(subjects) == 1 and subjects[0] is second:
+        return first.volume.vertical_gap_to(first.pose, second.volume, second.pose)
+    return min(
+        first.volume.vertical_gap_to(first.pose, subject.volume, subject.pose)
+        for subject in subjects
+    )
+
+
 def _fixed_target_horizontal_lower_bound(source: Model, target: Model) -> float:
     """Use the range owner's fixed footprint; relax only moving rotations.
 
@@ -175,8 +197,13 @@ def _fixed_target_horizontal_lower_bound(source: Model, target: Model) -> float:
     distance from their center to the fixed target minus their enclosing radius
     is a lower bound for every orientation. This does not certify a legal path.
     """
+    targets = target.rules_distance_subjects()
+    if len(targets) != 1:
+        return min(_fixed_target_horizontal_lower_bound(source, item) for item in targets)
+    if targets[0] is not target:
+        target = targets[0]
     if type(source.base) is CircularBase:
-        return source.base_distance_to(target)
+        return source.rules_horizontal_distance_to(target)
     if type(target.base) is CircularBase:
         center_distance = source.pose.distance_2d_to(target.pose) - target.base.radius
     else:

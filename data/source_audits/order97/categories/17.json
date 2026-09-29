@@ -40,11 +40,43 @@
         ],
         "summary": "Frame model relationships measure from the closest part of the model, even with a base.",
         "owners": [
-          "src/warhammer40k_core/geometry/model_geometry.py:ModelGeometry"
+          "src/warhammer40k_core/engine/battlefield_state.py:geometry_model_for_placement",
+          "src/warhammer40k_core/geometry/volume.py:Model.range_to"
         ],
-        "evidence": [],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_based_frame_engagement_and_movement_use_the_body",
+            "role": "semantic",
+            "assertion": "assert unit_within_enemy_engagement_range(state=state, unit_instance_id=state.army_definitions[0].units[0].unit_instance_id) is True",
+            "proves": "A based FRAME body within two inches establishes Engagement Range while its support base remains outside two inches."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_based_frame_engagement_and_movement_use_the_body",
+            "role": "semantic",
+            "assertion": "assert goal.contains(frame) is True",
+            "proves": "Movement reachability treats the based FRAME body as within Engagement Range."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_based_frame_engagement_restores_for_both_viewers_and_replays",
+            "role": "replay",
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED",
+            "proves": "The based FRAME engagement session replays exactly."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_based_frame_engagement_restores_for_both_viewers_and_replays",
+            "role": "viewer",
+            "assertion": "assert restored.view(viewer_player_id='player-a') == session.view(viewer_player_id='player-a')",
+            "proves": "The first player restores the same based FRAME session projection."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_based_frame_engagement_restores_for_both_viewers_and_replays",
+            "role": "viewer",
+            "assertion": "assert restored.view(viewer_player_id='player-b') == session.view(viewer_player_id='player-b')",
+            "proves": "The second player restores the same based FRAME session projection."
+          }
+        ],
         "qualifications": [
-          "Gameplay gap: a based FRAME body within two inches is ignored in favour of its support base outside two inches. See probe_based_frame_measurement; the same measurement family also affects body-aware containment."
+          "Order 100 measures the closest part of a based FRAME model. tests/order97_gap_probes_09_17.py and gap_observations_09_17.json retain the historical support-base observation."
         ]
       },
       {

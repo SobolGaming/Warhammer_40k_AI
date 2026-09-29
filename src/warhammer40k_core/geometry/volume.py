@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import NotRequired, Self, TypedDict
 
 from warhammer40k_core.geometry.base import (
@@ -30,6 +30,7 @@ class ModelVolumePayload(TypedDict):
 
 class ModelPayload(TypedDict):
     body_parts: NotRequired[list[ModelBodyPartPayload]]
+    measures_every_part: NotRequired[bool]
     model_id: str
     pose: PosePayload
     base: BaseShapePayload
@@ -76,13 +77,31 @@ class Model:
     base: BaseShape
     volume: ModelVolume
     body_parts: tuple[ModelBodyPart, ...] = ()
+    measures_every_part: bool = False
 
     def __post_init__(self) -> None:
         validate_body_parts(self.body_parts)
+        if type(self.measures_every_part) is not bool:
+            raise GeometryError("Model measures_every_part must be a bool.")
         object.__setattr__(self, "model_id", _validate_model_id(self.model_id))
         validate_pose("Model pose", self.pose)
         validate_base_shape("Model base", self.base)
         _validate_model_volume("Model volume", self.volume)
+
+    def rules_distance_subjects(self) -> tuple[Model, ...]:
+        """Parts used when a rule measures to or from this model.
+
+        Ordinary models keep the support base. A model that measures every part
+        contributes that base and each recorded body prism.
+        """
+
+        if not self.measures_every_part:
+            return (self,)
+        if not self.body_parts:
+            return (replace(self, measures_every_part=False),)
+        from warhammer40k_core.geometry.physical_model import physical_prisms
+
+        return tuple(replace(part, measures_every_part=False) for part in physical_prisms(self))
 
     def stable_identity(self) -> str:
         return f"model:{self.model_id}"
@@ -95,8 +114,24 @@ class Model:
         other_model = _validate_model("other", other)
         return self.base.overlaps(self.pose, other_model.base, other_model.pose)
 
+    def rules_horizontal_distance_to(self, other: Model) -> float:
+        other_model = _validate_model("other", other)
+        if not self.measures_every_part and not other_model.measures_every_part:
+            return self.base_distance_to(other_model)
+        return min(
+            subject.base_distance_to(other_subject)
+            for subject in self.rules_distance_subjects()
+            for other_subject in other_model.rules_distance_subjects()
+        )
+
     def range_to(self, other: Model) -> float:
         other_model = _validate_model("other", other)
+        if self.measures_every_part or other_model.measures_every_part:
+            return min(
+                subject.range_to(other_subject)
+                for subject in self.rules_distance_subjects()
+                for other_subject in other_model.rules_distance_subjects()
+            )
         horizontal_gap = self.base_distance_to(other_model)
         vertical_gap = self.volume.vertical_gap_to(
             self.pose,
@@ -114,6 +149,16 @@ class Model:
         other_model = _validate_model("other", other)
         horizontal_limit = _validate_non_negative_number("horizontal_inches", horizontal_inches)
         vertical_limit = _validate_non_negative_number("vertical_inches", vertical_inches)
+        if self.measures_every_part or other_model.measures_every_part:
+            return any(
+                subject.is_within_engagement_range(
+                    other_subject,
+                    horizontal_inches=horizontal_limit,
+                    vertical_inches=vertical_limit,
+                )
+                for subject in self.rules_distance_subjects()
+                for other_subject in other_model.rules_distance_subjects()
+            )
         return (
             self.base_distance_to(other_model) <= horizontal_limit
             and self.volume.vertical_gap_to(self.pose, other_model.volume, other_model.pose)
@@ -129,6 +174,8 @@ class Model:
         }
         if self.body_parts:
             payload["body_parts"] = [part.to_payload() for part in self.body_parts]
+        if self.measures_every_part:
+            payload["measures_every_part"] = True
         return payload
 
     @classmethod
@@ -141,6 +188,7 @@ class Model:
             body_parts=tuple(ModelBodyPart.from_payload(part) for part in payload["body_parts"])
             if "body_parts" in payload
             else (),
+            measures_every_part=payload.get("measures_every_part", False),
         )
 
 

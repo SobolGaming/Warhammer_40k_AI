@@ -2069,11 +2069,25 @@
         ],
         "summary": "FRAME wholly-within measurement includes every part of the model.",
         "owners": [
-          "src/warhammer40k_core/geometry/measurement.py:DistanceMeasurementContext.target_wholly_within_distance"
+          "src/warhammer40k_core/geometry/measurement.py:DistanceMeasurementContext.target_wholly_within_distance",
+          "src/warhammer40k_core/geometry/volume.py:Model.rules_distance_subjects"
         ],
-        "evidence": [],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_based_frame_wholly_within_includes_every_part",
+            "role": "semantic",
+            "assertion": "assert context.target_wholly_within_distance(8.5) is False",
+            "proves": "An 8.5-inch wholly-within check fails because the based FRAME body extends beyond the distance that contains its support base."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_based_frame_wholly_within_includes_every_part",
+            "role": "semantic",
+            "assertion": "assert _model_wholly_within_any_transport_model(frame, transport_models=(source,), distance_inches=8.5) is False",
+            "proves": "Disembark whole-distance placement rejects a based FRAME body that extends outside the distance containing its support base."
+          }
+        ],
         "qualifications": [
-          "Evidence gap: Source-backed synthetic physical geometry through real battlefield conversion; shares the FRAME measurement bug class with category17.02. The based FRAME target has an 8in circular body on a 120mm support base. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding frame-full-body-measurement."
+          "Order 100 measures every part of a based FRAME model. tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json retain the historical support-base observation."
         ]
       }
     ],

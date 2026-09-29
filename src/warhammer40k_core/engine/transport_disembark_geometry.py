@@ -208,10 +208,12 @@ def _model_wholly_within_any_transport_model(
     transport_models: tuple[Model, ...],
     distance_inches: float,
 ) -> bool:
+    from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
+
     return any(
-        shapely_backend.footprint_for_base(transport_model.base, transport_model.pose)
-        .buffer(distance_inches)
-        .covers(shapely_backend.footprint_for_base(model.base, model.pose))
+        DistanceMeasurementContext.from_models(
+            transport_model, model
+        ).target_wholly_within_distance(distance_inches, horizontal_only=True)
         for transport_model in transport_models
     )
 

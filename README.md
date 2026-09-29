@@ -2,6 +2,11 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 100 / P17B measures every part of a based FRAME model for whole-distance,
+Engagement Range, objective control, movement, terrain-area membership, and
+disembark placement. Ordinary models still measure from the support base. See
+[scope and evidence](docs/ORDER_100_SCOPE_PLAN.md).
+
 Order 99 / P02J bounds modified Leadership to 5–8 and modified Weapon Skill and
 Ballistic Skill to 2–6 after the shared modifier algebra. Live leadership tests
 and weapon-profile hit rolls use that policy and keep source identity, order,

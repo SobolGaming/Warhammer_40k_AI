@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Self, TypedDict
+from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.geometry import shapely_backend
@@ -24,7 +24,7 @@ from warhammer40k_core.geometry.pose import (
     validate_finite_number,
     validate_pose,
 )
-from warhammer40k_core.geometry.volume import Model
+from warhammer40k_core.geometry.volume import Model, ModelPayload
 
 MILLIMETERS_PER_INCH = 25.4
 OBJECTIVE_MARKER_DIAMETER_INCHES = 40.0 / MILLIMETERS_PER_INCH
@@ -46,11 +46,13 @@ class DistanceMeasurementContextPayload(TypedDict):
     source_base: BaseShapePayload | None
     source_contact_radius_inches: float | None
     source_height_inches: float
+    source_subjects: NotRequired[list[ModelPayload]]
     target_id: str
     target_pose: PosePayload
     target_base: BaseShapePayload | None
     target_contact_radius_inches: float | None
     target_height_inches: float
+    target_subjects: NotRequired[list[ModelPayload]]
 
 
 class DistancePredicatePayload(TypedDict):
@@ -71,6 +73,8 @@ class DistanceMeasurementContext:
     target_base: BaseShape | None
     target_contact_radius_inches: float | None
     target_height_inches: float
+    source_subjects: tuple[Model, ...] = ()
+    target_subjects: tuple[Model, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
@@ -115,6 +119,16 @@ class DistanceMeasurementContext:
             "target_height_inches",
             _validate_non_negative_inches("target_height_inches", self.target_height_inches),
         )
+        object.__setattr__(
+            self,
+            "source_subjects",
+            _validate_measurement_subjects("source_subjects", self.source_subjects),
+        )
+        object.__setattr__(
+            self,
+            "target_subjects",
+            _validate_measurement_subjects("target_subjects", self.target_subjects),
+        )
 
     @classmethod
     def from_models(cls, source: Model, target: Model) -> Self:
@@ -131,6 +145,8 @@ class DistanceMeasurementContext:
             target_base=target_model.base,
             target_contact_radius_inches=None,
             target_height_inches=target_model.volume.height,
+            source_subjects=_measurement_subjects(source_model),
+            target_subjects=_measurement_subjects(target_model),
         )
 
     @classmethod
@@ -155,6 +171,7 @@ class DistanceMeasurementContext:
             target_base=target_model.base,
             target_contact_radius_inches=None,
             target_height_inches=target_model.volume.height,
+            target_subjects=_measurement_subjects(target_model),
         )
 
     @classmethod
@@ -179,39 +196,86 @@ class DistanceMeasurementContext:
             target_base=target_model.base,
             target_contact_radius_inches=None,
             target_height_inches=target_model.volume.height,
+            target_subjects=_measurement_subjects(target_model),
         )
 
     def horizontal_distance_inches(self) -> float:
-        return base_distance(
-            self._source_footprint(),
-            self.source_pose,
-            self._target_footprint(),
-            self.target_pose,
-        )
+        if not self._measures_parts():
+            return base_distance(
+                self._source_footprint(),
+                self.source_pose,
+                self._target_footprint(),
+                self.target_pose,
+            )
+        return min(pair[0] for pair in self._part_separations())
 
     def vertical_gap_inches(self) -> float:
-        return _vertical_gap(
-            self.source_pose.position.z,
-            self.source_pose.position.z + self.source_height_inches,
-            self.target_pose.position.z,
-            self.target_pose.position.z + self.target_height_inches,
-        )
+        if not self._measures_parts():
+            return _vertical_gap(
+                self.source_pose.position.z,
+                self.source_pose.position.z + self.source_height_inches,
+                self.target_pose.position.z,
+                self.target_pose.position.z + self.target_height_inches,
+            )
+        return min(pair[1] for pair in self._part_separations())
 
     def closest_distance_inches(self) -> float:
-        return math.hypot(self.horizontal_distance_inches(), self.vertical_gap_inches())
+        if not self._measures_parts():
+            return math.hypot(self.horizontal_distance_inches(), self.vertical_gap_inches())
+        return min(
+            math.hypot(horizontal, vertical) for horizontal, vertical in self._part_separations()
+        )
+
+    def within_axis_limits(self, horizontal_inches: float, vertical_inches: float) -> bool:
+        horizontal_limit = _validate_non_negative_inches("horizontal_inches", horizontal_inches)
+        vertical_limit = _validate_non_negative_inches("vertical_inches", vertical_inches)
+        if not self._measures_parts():
+            return (
+                self.horizontal_distance_inches() <= horizontal_limit
+                and self.vertical_gap_inches() <= vertical_limit
+            )
+        return any(
+            horizontal <= horizontal_limit and vertical <= vertical_limit
+            for horizontal, vertical in self._part_separations()
+        )
 
     def footprints_overlap(self) -> bool:
-        return bases_overlap(
-            self._source_footprint(),
-            self.source_pose,
-            self._target_footprint(),
-            self.target_pose,
+        if not self._measures_parts():
+            return bases_overlap(
+                self._source_footprint(),
+                self.source_pose,
+                self._target_footprint(),
+                self.target_pose,
+            )
+        return any(
+            bases_overlap(source_base, source_pose, target_base, target_pose)
+            for (
+                source_base,
+                source_pose,
+                _source_height,
+                target_base,
+                target_pose,
+                _target_height,
+            ) in self._part_footprints()
         )
 
     def contact_plane_footprints_overlap(self) -> bool:
-        return self.footprints_overlap() and contact_planes_coincide(
-            self.target_pose.position.z,
-            self.source_pose.position.z,
+        if not self._measures_parts():
+            return self.footprints_overlap() and contact_planes_coincide(
+                self.target_pose.position.z,
+                self.source_pose.position.z,
+            )
+        return any(
+            bases_overlap(source_base, source_pose, target_base, target_pose)
+            and contact_planes_coincide(target_pose.position.z, source_pose.position.z)
+            for (
+                source_base,
+                source_pose,
+                _source_height,
+                target_base,
+                target_pose,
+                _target_height,
+            ) in self._part_footprints()
         )
 
     def target_wholly_within_distance(
@@ -221,22 +285,86 @@ class DistanceMeasurementContext:
         horizontal_only: bool = False,
     ) -> bool:
         distance = _validate_positive_inches("distance_inches", distance_inches)
-        vertical_gap = 0.0 if horizontal_only else self.vertical_gap_inches()
-        if vertical_gap > distance:
-            return False
-        horizontal_allowance = math.sqrt((distance * distance) - (vertical_gap * vertical_gap))
-        source_area = shapely_backend.footprint_for_base(
-            self._source_footprint(),
-            self.source_pose,
-        ).buffer(horizontal_allowance)
-        target_area = shapely_backend.footprint_for_base(
-            self._target_footprint(),
-            self.target_pose,
+        if not self._measures_parts():
+            vertical_gap = 0.0 if horizontal_only else self.vertical_gap_inches()
+            if vertical_gap > distance:
+                return False
+            horizontal_allowance = math.sqrt((distance * distance) - (vertical_gap * vertical_gap))
+            source_area = shapely_backend.footprint_for_base(
+                self._source_footprint(),
+                self.source_pose,
+            ).buffer(horizontal_allowance)
+            target_area = shapely_backend.footprint_for_base(
+                self._target_footprint(),
+                self.target_pose,
+            )
+            return source_area.covers(target_area)
+        sources = self._source_measurements()
+        return all(
+            _buffered_sources_cover_target(
+                sources=sources,
+                target=target,
+                distance_inches=distance,
+                horizontal_only=horizontal_only,
+            )
+            for target in self._target_measurements()
         )
-        return source_area.covers(target_area)
+
+    def _measures_parts(self) -> bool:
+        return bool(self.source_subjects or self.target_subjects)
+
+    def _source_measurements(self) -> tuple[_MeasurementPart, ...]:
+        if self.source_subjects:
+            return tuple(_part_from_model(subject) for subject in self.source_subjects)
+        return (
+            _MeasurementPart(
+                self._source_footprint(),
+                self.source_pose,
+                self.source_pose.position.z,
+                self.source_pose.position.z + self.source_height_inches,
+            ),
+        )
+
+    def _target_measurements(self) -> tuple[_MeasurementPart, ...]:
+        if self.target_subjects:
+            return tuple(_part_from_model(subject) for subject in self.target_subjects)
+        return (
+            _MeasurementPart(
+                self._target_footprint(),
+                self.target_pose,
+                self.target_pose.position.z,
+                self.target_pose.position.z + self.target_height_inches,
+            ),
+        )
+
+    def _part_separations(self) -> tuple[tuple[float, float], ...]:
+        return tuple(
+            (
+                base_distance(source.base, source.pose, target.base, target.pose),
+                _vertical_gap(source.bottom, source.top, target.bottom, target.top),
+            )
+            for source in self._source_measurements()
+            for target in self._target_measurements()
+        )
+
+    def _part_footprints(
+        self,
+    ) -> tuple[tuple[BaseShape, Pose, float, BaseShape, Pose, float], ...]:
+        return tuple(
+            (
+                source.base,
+                source.pose,
+                source.top - source.bottom,
+                target.base,
+                target.pose,
+                target.top - target.bottom,
+            )
+            for source in self._source_measurements()
+            for target in self._target_measurements()
+        )
 
     def to_payload(self) -> DistanceMeasurementContextPayload:
-        return {
+        payload: DistanceMeasurementContextPayload = {
             "source_id": self.source_id,
             "source_pose": self.source_pose.to_payload(),
             "source_base": None if self.source_base is None else self.source_base.to_payload(),
@@ -248,11 +376,18 @@ class DistanceMeasurementContext:
             "target_contact_radius_inches": self.target_contact_radius_inches,
             "target_height_inches": self.target_height_inches,
         }
+        if self.source_subjects:
+            payload["source_subjects"] = [subject.to_payload() for subject in self.source_subjects]
+        if self.target_subjects:
+            payload["target_subjects"] = [subject.to_payload() for subject in self.target_subjects]
+        return payload
 
     @classmethod
     def from_payload(cls, payload: DistanceMeasurementContextPayload) -> Self:
         source_base_payload = payload["source_base"]
         target_base_payload = payload["target_base"]
+        source_subjects = payload.get("source_subjects")
+        target_subjects = payload.get("target_subjects")
         return cls(
             source_id=payload["source_id"],
             source_pose=Pose.from_payload(payload["source_pose"]),
@@ -268,6 +403,12 @@ class DistanceMeasurementContext:
             else base_shape_from_payload(target_base_payload),
             target_contact_radius_inches=payload["target_contact_radius_inches"],
             target_height_inches=payload["target_height_inches"],
+            source_subjects=()
+            if source_subjects is None
+            else tuple(Model.from_payload(subject) for subject in source_subjects),
+            target_subjects=()
+            if target_subjects is None
+            else tuple(Model.from_payload(subject) for subject in target_subjects),
         )
 
     def _source_footprint(self) -> BaseShape:
@@ -441,10 +582,7 @@ def objective_marker_controls_model(
     )
     horizontal_limit = _validate_non_negative_inches("horizontal_inches", horizontal_inches)
     vertical_limit = _validate_non_negative_inches("vertical_inches", vertical_inches)
-    return (
-        context.horizontal_distance_inches() <= horizontal_limit
-        and context.vertical_gap_inches() <= vertical_limit
-    )
+    return context.within_axis_limits(horizontal_limit, vertical_limit)
 
 
 def objective_marker_endpoint_is_clear(
@@ -505,6 +643,62 @@ def _validate_non_negative_inches(field_name: str, value: object) -> float:
     if inches < 0.0:
         raise GeometryError(f"{field_name} must not be negative.")
     return inches
+
+
+@dataclass(frozen=True, slots=True)
+class _MeasurementPart:
+    base: BaseShape
+    pose: Pose
+    bottom: float
+    top: float
+
+
+def _measurement_subjects(model: Model) -> tuple[Model, ...]:
+    if not model.measures_every_part or not model.body_parts:
+        return ()
+    return model.rules_distance_subjects()
+
+
+def _part_from_model(model: Model) -> _MeasurementPart:
+    bottom = model.pose.position.z
+    return _MeasurementPart(model.base, model.pose, bottom, bottom + model.volume.height)
+
+
+def _buffered_sources_cover_target(
+    *,
+    sources: tuple[_MeasurementPart, ...],
+    target: _MeasurementPart,
+    distance_inches: float,
+    horizontal_only: bool,
+) -> bool:
+    covered = None
+    for source in sources:
+        vertical_gap = (
+            0.0
+            if horizontal_only
+            else _vertical_gap(source.bottom, source.top, target.bottom, target.top)
+        )
+        if vertical_gap > distance_inches:
+            continue
+        allowance = math.sqrt((distance_inches * distance_inches) - (vertical_gap * vertical_gap))
+        area = shapely_backend.footprint_for_base(source.base, source.pose).buffer(allowance)
+        covered = area if covered is None else covered.union(area)
+    if covered is None:
+        return False
+    return covered.covers(shapely_backend.footprint_for_base(target.base, target.pose))
+
+
+def _validate_measurement_subjects(field_name: str, value: object) -> tuple[Model, ...]:
+    if type(value) is not tuple:
+        raise GeometryError(f"{field_name} must be a tuple.")
+    subjects: list[Model] = []
+    for subject in cast(tuple[object, ...], value):
+        if type(subject) is not Model:
+            raise GeometryError(f"{field_name} must contain Model values.")
+        if subject.measures_every_part:
+            raise GeometryError(f"{field_name} must contain individual measurement parts.")
+        subjects.append(subject)
+    return tuple(subjects)
 
 
 def _validate_model(field_name: str, value: object) -> Model:

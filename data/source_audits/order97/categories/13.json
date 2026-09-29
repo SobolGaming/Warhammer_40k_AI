@@ -863,6 +863,12 @@
             "role": "semantic",
             "assertion": "assert model_intersects_terrain_area(model, area)",
             "proves": "Identical horizontal membership is true at ground and ten-inch elevation."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_based_frame_terrain_and_objective_membership_use_the_body",
+            "role": "semantic",
+            "assertion": "assert model_intersects_terrain_area(elevated, area) is True",
+            "proves": "A based FRAME body that overhangs a terrain boundary remains inside that area when the model is elevated."
           }
         ],
         "qualifications": []
@@ -874,11 +880,30 @@
         ],
         "summary": "Frame body parts overhanging a terrain boundary place the model within that area.",
         "owners": [
-          "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          "src/warhammer40k_core/geometry/terrain_area_visibility.py:model_intersects_terrain_area"
         ],
-        "evidence": [],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_based_frame_terrain_and_objective_membership_use_the_body",
+            "role": "semantic",
+            "assertion": "assert model_intersects_terrain_area(frame, area) is True",
+            "proves": "An overhanging based FRAME body places the model inside the terrain area."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_based_frame_terrain_and_objective_membership_use_the_body",
+            "role": "semantic",
+            "assertion": "assert model_intersects_terrain_area(support_only, area) is False",
+            "proves": "The same support base, measured without the FRAME body, stays outside the terrain area."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_based_frame_terrain_and_objective_membership_use_the_body",
+            "role": "semantic",
+            "assertion": "assert objective_marker_controls_model(marker, frame) is True",
+            "proves": "Objective control uses the based FRAME body when the support base is outside the control distance."
+          }
+        ],
         "qualifications": [
-          "Gameplay gap: the body projects into the area but support-base-only membership says outside. See probe_frame_terrain_membership."
+          "Order 100 includes overhanging FRAME body parts in terrain-area membership. tests/order97_gap_probes_09_17.py and gap_observations_09_17.json retain the historical support-base observation."
         ]
       }
     ],
