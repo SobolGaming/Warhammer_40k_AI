@@ -1,0 +1,380 @@
+[
+  {
+    "row_id": "rule:22:22.01:1",
+    "requirements": [
+      {
+        "requirement_id": "22.01-aura-range-definition",
+        "source_blocks": [
+          1
+        ],
+        "summary": "An Aura is an ability whose effects depend on the stated distance from its source.",
+        "owners": [
+          "src/warhammer40k_core/engine/aura_execution.py:aura_handler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_phase17d_this_model_aura_anchors_only_to_the_selected_source_model",
+            "role": "semantic",
+            "assertion": "assert distant_anchor.aura_evaluations[0]['affected_unit_instance_ids'] == [source_unit_id]",
+            "proves": "A distant source affects only itself."
+          },
+          {
+            "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_phase17d_this_model_aura_anchors_only_to_the_selected_source_model",
+            "role": "semantic",
+            "assertion": "assert nearby_anchor.aura_evaluations[0]['affected_unit_instance_ids'] == [source_unit_id, target_unit_id]",
+            "proves": "Moving the actual source anchor into range adds the target."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "22.01-self-in-range",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A battlefield Aura source is in range of its own Aura.",
+        "owners": [
+          "src/warhammer40k_core/engine/aura_execution.py:aura_handler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_phase17d_friendly_aura_evaluation_ignores_enemy_units_in_range",
+            "role": "semantic",
+            "assertion": "assert result.aura_evaluations[0]['affected_unit_instance_ids'] == [source_unit_id, friendly_unit_id]",
+            "proves": "The source appears alongside the eligible friendly target."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "22.01-distinct-auras",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A unit may receive multiple different Auras at once.",
+        "owners": [
+          "src/warhammer40k_core/engine/aura_execution.py:aura_handler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_aura_overlap_across_attached_aliases_keeps_distinct_sources_and_effect_slots",
+            "role": "semantic",
+            "assertion": "assert len(rules_unit_persisting_effects(state, canonical)) == 3",
+            "proves": "Distinct source/effect slots remain separate on the attached rules unit."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "22.01-same-aura-once",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Overlapping instances of the same Aura apply only once to a unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/aura_execution.py:aura_handler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_overlapping_aura_effect_instances_apply_once_without_erasing_evidence",
+            "role": "semantic",
+            "assertion": "assert generic_rule_wound_roll_modifier(attack) == -1",
+            "proves": "Two retained instances yield only one negative-one wound modifier."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:22:22.02:1",
+    "requirements": [
+      {
+        "requirement_id": "22.02-faction-ability-definition",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Faction Abilities are source-designated army rules on the datasheet.",
+        "owners": [
+          "src/warhammer40k_core/engine/abilities.py:AbilityCatalogRecord"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_aeldari_kharseth_datasheet.py::test_kharseth_catalog_preserves_every_datasheet_section",
+            "role": "semantic",
+            "assertion": "assert abilities['Battle Focus'].source_kind is CatalogAbilitySourceKind.FACTION",
+            "proves": "The source datasheet’s Battle Focus ability is classified as FACTION at the catalog boundary."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "22.02-army-faction-gate",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Unless explicitly overridden, faction abilities require the selected army faction to match a unit faction keyword.",
+        "owners": [
+          "src/warhammer40k_core/engine/ability_catalog.py:build_player_ability_index"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12d_ability_registry.py::test_player_ability_index_filters_selected_sources",
+            "role": "semantic",
+            "assertion": "assert tuple((record.definition.ability_id for record in index.all_records())) == tuple(sorted((record.definition.ability_id for record in matching)))",
+            "proves": "The player activation index includes the matching faction source and excludes the other-faction record."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:22:22.03:1",
+    "requirements": [
+      {
+        "requirement_id": "22.03-psychic-damage-tag",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Wounds caused by a Psychic-tagged ability count as Psychic attack wounds.",
+        "owners": [
+          "src/warhammer40k_core/engine/mortal_wound_model_allocation.py:mortal_wound_feel_no_pain_sources",
+          "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/thousand_sons/army_rule.py:_resolve_doombolt"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_mortal_wounds_use_psychic_attack_source_with_mortal_wound_scope",
+            "role": "semantic",
+            "assertion": "assert application.feel_no_pain_resolutions[0].ignored_wounds == 1",
+            "proves": "Psychic-scoped Feel No Pain ignores the marked Psychic mortal wound."
+          }
+        ],
+        "qualifications": [
+          "Evidence gap: The actual Cabal Doombolt damage consumer retains a successful Psychic test in source context, but the shared mortal-wound owner has no Psychic classification input and excludes a Psychic-only Feel No Pain source. The retained two-branch probe contrasts an unconditional source with the otherwise identical Psychic-only source. The selected Core clause requires authenticated Psychic ability wounds to count as Psychic attacks; the pinned official Thousand Sons update refers to Doombolt but does not transcribe its own Psychic title, so that named source identity remains unverified. Establish that source evidence and propagate structured damage classification through the shared consumer before certification; the existing attack proof only covers an already-tagged weapon attack."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:22:22.03.01:1",
+    "requirements": [
+      {
+        "requirement_id": "22.03.01-once-per-phase",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A Psyker unit cannot use the same Psychic-level ability twice in one phase.",
+        "owners": [
+          "src/warhammer40k_core/engine/psychic_ability_usage.py:psychic_ability_unavailable_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_psychic_level_use_is_shared_by_attached_components",
+            "role": "invalid",
+            "assertion": "assert repeated.reason == 'psychic_ability_used_this_phase'",
+            "proves": "Repeated use across attached components is rejected for prior phase use."
+          },
+          {
+            "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_psychic_facade_preserves_historical_uses_after_phase_and_round_transitions",
+            "role": "replay",
+            "assertion": "assert replay.reproduced_exactly, replay.to_payload()",
+            "proves": "Use records survive facade replay across real phase transitions."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:22:22.04:1",
+    "requirements": [
+      {
+        "requirement_id": "22.04-wargear-source-definition",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A Wargear Ability originates from an equipped wargear item in the datasheet’s Wargear Abilities.",
+        "owners": [
+          "src/warhammer40k_core/engine/abilities.py:AbilityCatalogRecord"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_unit_abilities.py::test_catalog_ability_descriptor_validates_wargear_ir_metadata",
+            "role": "invalid",
+            "assertion": "with pytest.raises(DatasheetCatalogError, match='requires source_wargear_id'):\n    DatasheetAbilityDescriptor(ability_id='test-icon', name='Test Icon', source_id='datasheet:test:ability:test-icon', support=CatalogAbilitySupport.DESCRIPTOR_ONLY, source_kind=CatalogAbilitySourceKind.WARGEAR, effect_description='Test icon descriptor.')",
+            "proves": "A Wargear ability requires an explicit source wargear identity."
+          },
+          {
+            "nodeid": "tests/unit/rules/test_wahapedia_bridge_catalog.py::test_phase17k_selected_optional_wargear_adds_catalog_ir_ability_record",
+            "role": "semantic",
+            "assertion": "assert 'Instrument of Chaos' in player_records_by_name",
+            "proves": "Equipping the optional Instrument adds its linked ability record."
+          },
+          {
+            "nodeid": "tests/unit/rules/test_wahapedia_bridge_catalog.py::test_phase17k_selected_optional_wargear_adds_catalog_ir_ability_record",
+            "role": "semantic",
+            "assertion": "assert 'Daemonic Icon' not in player_records_by_name",
+            "proves": "The unequipped Icon does not gain an ability record."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "22.04-unit-item-ownership",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A unit-owned wargear item grants its ability to that unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/abilities.py:AbilityCatalogRecord"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/rules/test_wahapedia_bridge_catalog.py::test_phase17k_selected_optional_wargear_adds_catalog_ir_ability_record",
+            "role": "semantic",
+            "assertion": "assert effect_payload['target_unit_instance_ids'] == [unit.unit_instance_id]",
+            "proves": "The equipped unit-level item targets the owning unit."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "22.04-bearer-lifetime",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Model-owned wargear applies through its bearer and ceases when that bearer is destroyed.",
+        "owners": [
+          "src/warhammer40k_core/engine/catalog_rule_consumption.py:CatalogWeaponKeywordGrantRuntime.weapon_profile_modifier",
+          "src/warhammer40k_core/engine/ability_presence.py:active_ability_model_ids_for_unit"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_attached_grants_follow_the_living_bodyguard_or_equipped_bearer",
+            "role": "semantic",
+            "assertion": "assert WeaponKeyword.LETHAL_HITS in runtime.weapon_profile_modifier(context).keywords",
+            "proves": "The Bodyguard or specific equipped bearer grants Lethal Hits to the attached Leader while alive."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_attached_grants_follow_the_living_bodyguard_or_equipped_bearer",
+            "role": "semantic",
+            "assertion": "assert WeaponKeyword.LETHAL_HITS not in runtime.weapon_profile_modifier(context).keywords",
+            "proves": "Destroying the last Bodyguard or the one equipped bearer removes its grant."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_attached_grants_follow_the_living_bodyguard_or_equipped_bearer",
+            "role": "semantic",
+            "assertion": "assert len(unit_by_id(state=state, unit_instance_id=bodyguard.unit_instance_id).alive_own_models()) == 4",
+            "proves": "The specific-bearer case leaves four other physical Bodyguard models alive."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:22:22.05:1",
+    "requirements": [
+      {
+        "requirement_id": "22.05-ground-target-and-visible",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Plunging Fire requires a visible target unit containing a ground-level model.",
+        "owners": [
+          "src/warhammer40k_core/engine/shooting_targets.py:_plunging_fire_applies"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_roll",
+            "role": "semantic",
+            "assertion": "assert PLUNGING_FIRE_RULE_ID not in plain_candidates[0].targeting_rule_ids",
+            "proves": "The ground-level attacking control case carries no Plunging Fire source."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_plunging_fire_requires_a_ground_level_target",
+            "role": "semantic",
+            "assertion": "assert (PLUNGING_FIRE_RULE_ID in candidates[0].targeting_rule_ids) is (not elevated_target)",
+            "proves": "An otherwise legal Towering attack gains Plunging Fire for a ground-level target and loses it for an elevated target."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_mandatory_saves_and_plunging_fire_are_typed",
+            "role": "semantic",
+            "assertion": "assert not_visible.reason == 'target_not_fully_visible'",
+            "proves": "The Plunging Fire eligibility owner rejects a target lacking the required visibility."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "22.05-elevation-three",
+        "source_blocks": [
+          1,
+          2
+        ],
+        "summary": "An attacker on terrain at least three inches high improves attack BS by one against a qualifying ground target.",
+        "owners": [
+          "src/warhammer40k_core/engine/shooting_targets.py:_plunging_fire_applies"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_roll",
+            "role": "semantic",
+            "assertion": "assert PLUNGING_FIRE_RULE_ID in candidates[0].targeting_rule_ids",
+            "proves": "Elevated attacker targeting carries the Plunging Fire source."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_roll",
+            "role": "semantic",
+            "assertion": "assert payload['target_number'] == expected_target_number",
+            "proves": "The actual attack resolves at the improved target number."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "22.05-towering-twelve",
+        "source_blocks": [
+          1,
+          3
+        ],
+        "summary": "A Towering attacker within twelve inches improves attack BS by one against a qualifying ground target.",
+        "owners": [
+          "src/warhammer40k_core/engine/shooting_targets.py:_plunging_fire_applies"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_roll",
+            "role": "semantic",
+            "assertion": "assert PLUNGING_FIRE_RULE_ID in towering_candidates[0].targeting_rule_ids",
+            "proves": "The Towering case receives Plunging Fire."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          4
+        ],
+        "classification": "metadata",
+        "reason": "Section labels only; operative eligibility, distance and consequences are enumerated separately."
+      },
+      {
+        "source_blocks": [
+          5,
+          6
+        ],
+        "classification": "example",
+        "reason": "Illustrative instance of the separately enumerated operative rule; no additional permission or restriction."
+      }
+    ]
+  }
+]

@@ -1,0 +1,886 @@
+[
+  {
+    "row_id": "rule:06:06.01:1",
+    "requirements": [
+      {
+        "requirement_id": "06.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Line of sight uses a straight corridor one millimetre wide.",
+        "owners": [
+          "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext",
+          "src/warhammer40k_core/geometry/visibility_corridor.py:line_of_sight_corridor_bounds"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_visibility_pathing.py::test_p06a_visibility_uses_one_millimeter_corridor_for_terrain_and_model_hulls",
+            "role": "semantic",
+            "assertion": "assert not terrain_result.has_line_of_sight",
+            "proves": "A terrain near miss of the centerline still blocks the one-millimetre corridor."
+          },
+          {
+            "nodeid": "tests/unit/test_visibility_pathing.py::test_p06a_visibility_uses_one_millimeter_corridor_for_terrain_and_model_hulls",
+            "role": "semantic",
+            "assertion": "assert not model_result.has_line_of_sight",
+            "proves": "The same corridor width applies to physical model hull blockers."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.01-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The observer may choose any part of its physical model as the line origin.",
+        "owners": [
+          "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13a_visibility_cover.py::test_model_volume_participates_in_los_visibility_and_full_visibility",
+            "role": "semantic",
+            "assertion": "assert witness.unit_fully_visible",
+            "proves": "A low wall blocks some origins, but every facing target part is seen from an appropriate observer top-cap point."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.01-obligation-03",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The target endpoint may be any part of the observed model.",
+        "owners": [
+          "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_visibility_pathing.py::test_p06c_plane_certificate_proves_a_hidden_facing_part_over_all_origins",
+            "role": "semantic",
+            "assertion": "assert all_corridors_blocked_by_plane(observer, target, (blocker,), target_point=hidden)",
+            "proves": "An exact facing target-surface point is hidden from all origins even while another target point remains visible."
+          },
+          {
+            "nodeid": "tests/unit/test_visibility_pathing.py::test_p06c_plane_certificate_proves_a_hidden_facing_part_over_all_origins",
+            "role": "semantic",
+            "assertion": "assert not all_corridors_blocked_by_plane(observer, target, (blocker,), target_point=clear)",
+            "proves": "An independent target-surface point is visible, preserving the distinction between any and every facing part."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.01-obligation-04",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Members of the observing rules unit do not block this line.",
+        "owners": [
+          "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_phase13c_allocated_cover_excludes_attacker_and_target_units_as_blockers",
+            "role": "semantic",
+            "assertion": "assert cover.target_unit_fully_visible is True",
+            "proves": "Interposed members of both the attacking and target units are excluded from physical blockers when computing full visibility."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.01-obligation-05",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Members of the observed rules unit do not block this line.",
+        "owners": [
+          "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_phase13c_allocated_cover_excludes_attacker_and_target_units_as_blockers",
+            "role": "semantic",
+            "assertion": "assert cover.target_unit_fully_visible is True",
+            "proves": "Interposed members of both the attacking and target units are excluded from physical blockers when computing full visibility."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.01-obligation-06",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Terrain-specific visibility rules still apply.",
+        "owners": [
+          "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13a_visibility_cover.py::test_ruins_area_visibility_blocks_los_without_physical_wall_intersection",
+            "role": "semantic",
+            "assertion": "assert not witness.unit_visible",
+            "proves": "Ruins-area semantics block visibility even where no physical wall intersects."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.01-obligation-07",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A model is visible when any part is visible.",
+        "owners": [
+          "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_visibility_pathing.py::test_p06c_plane_certificate_proves_a_hidden_facing_part_over_all_origins",
+            "role": "semantic",
+            "assertion": "assert all_corridors_blocked_by_plane(observer, target, (blocker,), target_point=hidden)",
+            "proves": "An exact facing target-surface point is hidden from all origins even while another target point remains visible."
+          },
+          {
+            "nodeid": "tests/unit/test_visibility_pathing.py::test_p06c_plane_certificate_proves_a_hidden_facing_part_over_all_origins",
+            "role": "semantic",
+            "assertion": "assert not all_corridors_blocked_by_plane(observer, target, (blocker,), target_point=clear)",
+            "proves": "An independent target-surface point is visible, preserving the distinction between any and every facing part."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.01-obligation-08",
+        "source_blocks": [
+          5
+        ],
+        "summary": "A model is fully visible when every observer-facing part is unobscured except by itself.",
+        "owners": [
+          "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_visibility_pathing.py::test_p06c_plane_certificate_proves_a_hidden_facing_part_over_all_origins",
+            "role": "semantic",
+            "assertion": "assert all_corridors_blocked_by_plane(observer, target, (blocker,), target_point=hidden)",
+            "proves": "An exact facing target-surface point is hidden from all origins even while another target point remains visible."
+          },
+          {
+            "nodeid": "tests/unit/test_visibility_pathing.py::test_p06c_plane_certificate_proves_a_hidden_facing_part_over_all_origins",
+            "role": "semantic",
+            "assertion": "assert not all_corridors_blocked_by_plane(observer, target, (blocker,), target_point=clear)",
+            "proves": "An independent target-surface point is visible, preserving the distinction between any and every facing part."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.01-obligation-09",
+        "source_blocks": [
+          7
+        ],
+        "summary": "A unit is visible when at least one member is visible.",
+        "owners": [
+          "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext",
+          "src/warhammer40k_core/core/visibility_records.py:LineOfSightWitness"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_phase17n_allocated_cover_requires_every_alive_target_model_to_qualify",
+            "role": "semantic",
+            "assertion": "assert cover.target_unit_visible",
+            "proves": "A multi-model target with one clear member is visible."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.01-obligation-10",
+        "source_blocks": [
+          9
+        ],
+        "summary": "A unit is fully visible when every member is fully visible.",
+        "owners": [
+          "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext",
+          "src/warhammer40k_core/core/visibility_records.py:LineOfSightWitness"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_phase17n_allocated_cover_requires_every_alive_target_model_to_qualify",
+            "role": "semantic",
+            "assertion": "assert cover.target_unit_visible",
+            "proves": "A multi-model target with one clear member is visible."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_phase17n_allocated_cover_requires_every_alive_target_model_to_qualify",
+            "role": "semantic",
+            "assertion": "assert not cover.target_unit_fully_visible",
+            "proves": "Some target members are hidden by woods, so the unit is not fully visible despite its clear member."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.01-obligation-11",
+        "source_blocks": [
+          9
+        ],
+        "summary": "Target-unit members do not obscure one another for fully-visible determination.",
+        "owners": [
+          "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext",
+          "src/warhammer40k_core/core/visibility_records.py:LineOfSightWitness"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_phase13c_allocated_cover_excludes_attacker_and_target_units_as_blockers",
+            "role": "semantic",
+            "assertion": "assert cover.target_unit_fully_visible is True",
+            "proves": "Interposed members of both the attacking and target units are excluded from physical blockers when computing full visibility."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2,
+          4,
+          6,
+          8
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:06:06.01.01:1",
+    "requirements": [
+      {
+        "requirement_id": "06.01.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "An unspecified visible-unit reference uses the rule-using unit as observer.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_geometry.py:visible_enemy_unit_ids_for_source",
+          "src/warhammer40k_core/engine/shooting_targets.py:unit_has_line_of_sight_to_target"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_visible_target_filter_uses_rule_owner_as_observer",
+            "role": "semantic",
+            "assertion": "assert visible_enemy_unit_ids_for_source(state=state, player_id='player-a', source_unit_instance_id=SHOOTER, range_inches=48) == ()",
+            "proves": "The generic visible-enemy filter finds no target from the blocked rule-using unit, even though another friendly unit sees it."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_visible_target_filter_uses_rule_owner_as_observer",
+            "role": "semantic",
+            "assertion": "assert visible_enemy_unit_ids_for_source(state=state, player_id='player-a', source_unit_instance_id='army-alpha:spare', range_inches=48) == ('army-beta:enemy',)",
+            "proves": "Changing the source unit to the unblocked friendly unit makes the same enemy visible; observer ownership determines the result."
+          }
+        ],
+        "qualifications": [
+          "The semantic visibility consumer receives the stable source-unit identity and chooses its observing models; this assertion does not claim to test arbitrary free-text normalization."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "example",
+        "reason": "Illustration of the separately inventoried operative rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:06:06.02:1",
+    "requirements": [
+      {
+        "requirement_id": "06.02-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Resolve mortal wounds one at a time until the wound budget is exhausted or the unit is destroyed.",
+        "owners": [
+          "src/warhammer40k_core/engine/mortal_wound_model_allocation.py:continue_mortal_wound_application"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_multi_wound_mortal_destruction_round_trips_repeated_model_rows",
+            "role": "semantic",
+            "assertion": "assert len(model_applications) == defender_model.current_wounds",
+            "proves": "The mortal-wound service records separate one-wound applications up to the model wound total."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_damage_mortal_wounds_and_feel_no_pain_hosts_round_trip",
+            "role": "semantic",
+            "assertion": "assert overkill_application.remaining_mortal_wounds_lost > 0",
+            "proves": "A99-mortal-wound budget stops when the last physically available model is exhausted and records the unused overkill."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.02-obligation-02",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A wounded non-CHARACTER has first mortal-wound allocation priority.",
+        "owners": [
+          "src/warhammer40k_core/engine/mortal_wound_model_allocation.py:mortal_wound_priority_selection"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_mortal_wound_priority_tiers_cover_attached_characters",
+            "role": "semantic",
+            "assertion": "assert mortal_wound_priority_selection(state=state, target_unit_instance_id=attached_id) == ((wounded_bodyguard.model_instance_id,), MortalWoundAllocationPriority.WOUNDED_NON_CHARACTER)",
+            "proves": "The shared allocator selects the unique wounded bodyguard before other members."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.02-obligation-03",
+        "source_blocks": [
+          4
+        ],
+        "summary": "If no non-CHARACTER is wounded, select a surviving non-CHARACTER.",
+        "owners": [
+          "src/warhammer40k_core/engine/mortal_wound_model_allocation.py:mortal_wound_priority_selection"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_mortal_wound_priority_tiers_cover_attached_characters",
+            "role": "semantic",
+            "assertion": "assert tier is MortalWoundAllocationPriority.NON_CHARACTER",
+            "proves": "Unwounded bodyguards precede characters."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.02-obligation-04",
+        "source_blocks": [
+          5
+        ],
+        "summary": "With no non-CHARACTER remaining, select a wounded CHARACTER if possible.",
+        "owners": [
+          "src/warhammer40k_core/engine/mortal_wound_model_allocation.py:mortal_wound_priority_selection"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_mortal_wound_priority_tiers_cover_attached_characters",
+            "role": "semantic",
+            "assertion": "assert mortal_wound_priority_selection(state=state, target_unit_instance_id=attached_id) == ((leader.own_models[0].model_instance_id,), MortalWoundAllocationPriority.WOUNDED_CHARACTER)",
+            "proves": "Once bodyguards are gone the wounded leader is selected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.02-obligation-05",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Otherwise select a surviving CHARACTER.",
+        "owners": [
+          "src/warhammer40k_core/engine/mortal_wound_model_allocation.py:mortal_wound_priority_selection"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_mortal_wound_priority_tiers_cover_attached_characters",
+            "role": "semantic",
+            "assertion": "assert mortal_wound_priority_selection(state=state, target_unit_instance_id=attached_id) == ((support.own_models[0].model_instance_id,), MortalWoundAllocationPriority.CHARACTER)",
+            "proves": "The final unwounded character forms the remaining priority tier."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.02-obligation-06",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Each mortal wound removes one wound.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:MortalWoundApplicationProgress.after_wound_resolution"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_mortal_wound_lifecycle_progress_round_trip",
+            "role": "semantic",
+            "assertion": "assert application.applications[0].wounds_lost == 1",
+            "proves": "A mortal-wound continuation after a failed Feel No Pain removes exactly one wound."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.02-obligation-07",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Reaching zero wounds destroys the selected model.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:MortalWoundApplicationProgress.after_wound_resolution"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_multi_wound_mortal_destruction_round_trips_repeated_model_rows",
+            "role": "semantic",
+            "assertion": "assert model_applications[-1].destroyed",
+            "proves": "Only the final one-wound application exhausting the real model wound count destroys it."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.02-obligation-08",
+        "source_blocks": [
+          9
+        ],
+        "summary": "For a mixed attack pool, resolve normal damage before mortal wounds.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_group_selection.py:_apply_deferred_mortal_wounds"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_mixed_damage_finishes_normal_attacks_before_deferred_mortal_wounds",
+            "role": "facade",
+            "assertion": "assert normal_indices",
+            "proves": "The actual facade attack contains normal damage applications."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_mixed_damage_finishes_normal_attacks_before_deferred_mortal_wounds",
+            "role": "facade",
+            "assertion": "assert mortal_indices",
+            "proves": "The same attack emits deferred mortal completion events."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_mixed_damage_finishes_normal_attacks_before_deferred_mortal_wounds",
+            "role": "facade",
+            "assertion": "assert max(normal_indices) < min(mortal_indices)",
+            "proves": "All actual normal applications precede every deferred mortal completion."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_mixed_damage_finishes_normal_attacks_before_deferred_mortal_wounds",
+            "role": "facade",
+            "assertion": "assert any((application['applications'] for application in mortal_applications))",
+            "proves": "At least one deferred mortal really applies; the ordering is not satisfied by an empty or already-destroyed target."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2,
+          8
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:06:06.02.01:1",
+    "requirements": [
+      {
+        "requirement_id": "06.02.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Normal damage is the attack weapon's D-derived damage.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order58_failed_save_damage_timing.py::test_failed_save_without_replacement_inflicts_weapon_damage",
+            "role": "semantic",
+            "assertion": "assert defender_wounds(lifecycle, defender) == starting - 1",
+            "proves": "A normal damaging attack with D1 removes one wound after its failed save."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_mixed_damage_finishes_normal_attacks_before_deferred_mortal_wounds",
+            "role": "facade",
+            "assertion": "assert application['requested_damage'] == 1",
+            "proves": "The real normal-damage applications use the weapon profile D1 configured for this mixed pool."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_mixed_damage_finishes_normal_attacks_before_deferred_mortal_wounds",
+            "role": "facade",
+            "assertion": "assert application['requested_damage'] == 1",
+            "proves": "The real normal-damage applications use the weapon profile D1 configured for this mixed pool."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.02.01-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Additional mortal wounds belong to the same originating attack.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_post_roll.py:defer_grouped_devastating_wounds",
+          "src/warhammer40k_core/engine/attack_sequence_group_selection.py:_apply_deferred_mortal_wounds"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Gameplay gap: no source-backed additional-mortal producer routes normal damage plus extra mortal wounds with the same originating attack identity. The sole DeferredMortalWounds constructor is gated by Devastating Wounds, replacing normal damage; its consumer hardcodes that source and cannot certify this distinct source clause. Implement an additional-mortal consumer with shared attack identity and a real facade regression before PFINAL."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:06:06.03:1",
+    "requirements": [
+      {
+        "requirement_id": "06.03-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "One requested unit hazard roll rolls one D6.",
+        "owners": [
+          "src/warhammer40k_core/engine/hazard.py:hazard_roll_spec"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_hazard_requests_use_one_d6_or_one_explicit_simultaneous_batch",
+            "role": "semantic",
+            "assertion": "assert single.current_values == (2,)",
+            "proves": "Both unit-hazard and Hazardous-test requests use the shared hazard owner and exactly one D6 unless an explicit quantity is provided."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.03-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A hazard roll fails on one or two.",
+        "owners": [
+          "src/warhammer40k_core/engine/hazard.py:failed_hazard_roll_indices"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_hazardous_tests_resolve_after_all_attacks",
+            "role": "semantic",
+            "assertion": "assert hazardous_payload['mortal_wounds'] == expected_mortal_wounds",
+            "proves": "Injected D6 outcomes and ordinary/MONSTER/VEHICLE keyword variants check the selected failure threshold and1/3 mortal-wound consequences."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_hazardous_tests_resolve_after_all_attacks",
+            "role": "semantic",
+            "assertion": "assert hazardous_payload['successful'] is expected_successful",
+            "proves": "Hazard D6 result is checked against explicit parametrized success/failure outcomes."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.03-obligation-03",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A failed hazard roll inflicts one mortal wound on an ordinary unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/hazard.py:hazard_mortal_wounds_per_failed_roll"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_hazardous_tests_resolve_after_all_attacks",
+            "role": "semantic",
+            "assertion": "assert hazardous_payload['mortal_wounds'] == expected_mortal_wounds",
+            "proves": "Injected D6 outcomes and ordinary/MONSTER/VEHICLE keyword variants check the selected failure threshold and1/3 mortal-wound consequences."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "06.03-obligation-04",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A failed hazard roll inflicts three mortal wounds only if every model is MONSTER or VEHICLE.",
+        "owners": [
+          "src/warhammer40k_core/engine/hazard.py:hazard_mortal_wounds_per_failed_roll"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_hazardous_tests_resolve_after_all_attacks",
+            "role": "semantic",
+            "assertion": "assert hazardous_payload['mortal_wounds'] == expected_mortal_wounds",
+            "proves": "Injected D6 outcomes and ordinary/MONSTER/VEHICLE keyword variants check the selected failure threshold and1/3 mortal-wound consequences."
+          }
+        ],
+        "qualifications": [
+          "Gameplay gap: The cited tests prove homogeneous model kinds and the specific mixed INFANTRY/VEHICLE FAQ. The general all-model MONSTER/VEHICLE condition fails for mixed MOUNTED/VEHICLE: tests/order97_gap_probes_04_06.py records three wounds instead of one. P06D must repair the shared count owner."
+        ]
+      },
+      {
+        "requirement_id": "06.03-obligation-05",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Multiple requested hazard rolls are made together.",
+        "owners": [
+          "src/warhammer40k_core/engine/hazard.py:hazard_roll_spec"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_p24d_hazardous_preserves_order_through_completion_and_restore",
+            "role": "semantic",
+            "assertion": "assert expression['quantity'] == 3",
+            "proves": "Three physical Hazardous weapons produce one three-die hazard roll."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_hazard_requests_use_one_d6_or_one_explicit_simultaneous_batch",
+            "role": "semantic",
+            "assertion": "assert batch.current_values == (1, 2, 3, 6)",
+            "proves": "All four requested hazards are rolled in one shared DiceRollState before failure allocation."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:06:06.03.01:1",
+    "requirements": [
+      {
+        "requirement_id": "06.03.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Hazardous test and hazard roll denote the same operation.",
+        "owners": [
+          "src/warhammer40k_core/engine/hazard.py:hazard_roll_spec"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_hazard_requests_use_one_d6_or_one_explicit_simultaneous_batch",
+            "role": "semantic",
+            "assertion": "assert single.current_values == (2,)",
+            "proves": "Both unit-hazard and Hazardous-test requests use the shared hazard owner and exactly one D6 unless an explicit quantity is provided."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "faq:5928ab6e-7113-42c8-9085-4291faddae09",
+    "requirements": [
+      {
+        "requirement_id": "faq-5928ab6e-7113-42c8-9085-4291faddae09-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Mixed INFANTRY and MONSTER/VEHICLE units suffer one mortal wound per failed hazard roll.",
+        "owners": [
+          "src/warhammer40k_core/engine/hazard.py:hazard_mortal_wounds_per_failed_roll"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_mixed_infantry_vehicle_hazard_matches_the_specific_faq",
+            "role": "semantic",
+            "assertion": "assert hazard_mortal_wounds_per_failed_roll(unit) == 1",
+            "proves": "The specific FAQ mixed INFANTRY/VEHICLE case suffers one mortal wound. Other mixed model kinds fail the general06.03 all-model rule and are a separate finding."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "faq-5928ab6e-7113-42c8-9085-4291faddae09-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "All requested hazard dice roll simultaneously.",
+        "owners": [
+          "src/warhammer40k_core/engine/hazard.py:hazard_roll_spec"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_p24d_hazardous_preserves_order_through_completion_and_restore",
+            "role": "semantic",
+            "assertion": "assert expression['quantity'] == 3",
+            "proves": "The engine rolls all physical weapon hazard dice together."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_hazard_requests_use_one_d6_or_one_explicit_simultaneous_batch",
+            "role": "semantic",
+            "assertion": "assert batch.current_values == (1, 2, 3, 6)",
+            "proves": "All four requested hazards are rolled in one shared DiceRollState before failure allocation."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:6b074ac1-8a03-43ac-8669-3bac17d372ab",
+    "requirements": [
+      {
+        "requirement_id": "faq-6b074ac1-8a03-43ac-8669-3bac17d372ab-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Hazardous casualties use ordinary unit mortal-wound allocation and need not select Hazardous weapon bearers.",
+        "owners": [
+          "src/warhammer40k_core/engine/mortal_wound_model_allocation.py:mortal_wound_priority_selection"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_hazardous_casualty_may_be_a_non_weapon_bearer",
+            "role": "facade",
+            "assertion": "assert nonbearer.wargear_ids == ()",
+            "proves": "The recipient has no weapons at all, while its squadmates fire Hazardous weapons."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_hazardous_casualty_may_be_a_non_weapon_bearer",
+            "role": "facade",
+            "assertion": "assert nonbearer.model_instance_id in {option.option_id for option in allocation.options}",
+            "proves": "The actual failed Hazardous roll offers that weaponless model in Select Model."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_hazardous_casualty_may_be_a_non_weapon_bearer",
+            "role": "facade",
+            "assertion": "assert after.current_wounds < nonbearer.current_wounds",
+            "proves": "Submitting the weaponless recipient through LocalGameSession applies mortal damage to it."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:e58d31bc-b6eb-4db1-b319-dc27dd60154f",
+    "requirements": [
+      {
+        "requirement_id": "faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A mortal-wound allocation trigger occurs when Select Model selects its recipient.",
+        "owners": [
+          "src/warhammer40k_core/engine/mortal_wound_model_allocation.py:resolve_mortal_wound_model_decision",
+          "src/warhammer40k_core/engine/mortal_wound_model_allocation.py:_continue_mortal_wound_application_for_model",
+          "src/warhammer40k_core/engine/timing_windows.py:TimingTriggerKind"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Gameplay gap: Select Model does not dispatch a general mortal-wound-allocation timing trigger. The existing mortal_wound_model_allocated occurrence is recorded only for optional or multiple Feel No Pain sources; ordinary selected recipients emit no occurrence. Add a source-backed allocation-trigger consumer at Select Model and prove it precedes prevention or damage before PFINAL."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:81bf7082-3ef5-47b9-bfc4-f2021fff1d4f",
+    "requirements": [
+      {
+        "requirement_id": "faq-81bf7082-3ef5-47b9-bfc4-f2021fff1d4f-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A rule requiring one unit hazard roll produces a single roll, not one per model.",
+        "owners": [
+          "src/warhammer40k_core/engine/hazard.py:hazard_roll_spec"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_hazard_requests_use_one_d6_or_one_explicit_simultaneous_batch",
+            "role": "semantic",
+            "assertion": "assert single.current_values == (2,)",
+            "proves": "Both unit-hazard and Hazardous-test requests use the shared hazard owner and exactly one D6 unless an explicit quantity is provided."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:7f238e23-cd3f-40ad-aa91-c75274cc655e",
+    "requirements": [
+      {
+        "requirement_id": "faq-7f238e23-cd3f-40ad-aa91-c75274cc655e-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Line of sight uses arbitrary parts of both models, not just their bases.",
+        "owners": [
+          "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13a_visibility_cover.py::test_model_volume_participates_in_los_visibility_and_full_visibility",
+            "role": "semantic",
+            "assertion": "assert witness.unit_fully_visible",
+            "proves": "A low wall blocks some origins, but every facing target part is seen from an appropriate observer top-cap point."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  }
+]

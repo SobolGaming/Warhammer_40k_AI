@@ -1,0 +1,1666 @@
+[
+  {
+    "row_id": "rule:04:04.00:1",
+    "requirements": [
+      {
+        "requirement_id": "04.00-obligation-01",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Weapon selection precedes target selection.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_selection_context.py:WeaponSelectionContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order93_weapon_modifiers.py::test_attacks_selection_precedes_declaration_and_preserves_source_operations",
+            "role": "facade",
+            "assertion": "assert selected, 'A modifiers must be chosen before declaration or A dice.'",
+            "proves": "Source-backed weapon Attacks selection is committed before target-bearing declarations in both facade attack hosts."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.00-obligation-02",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Target selection precedes attack resolution.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal",
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert not any((e.event_type == 'attack_sequence_step' for e in events))",
+            "proves": "Neither facade attack host resolves attacks before its weapon/target declaration."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "replay",
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+            "proves": "The actual selected Shooting/Fight attack sequence reproduces exactly."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "viewer",
+            "assertion": "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+            "proves": "Owner and opponent receive the same viewer-scoped event stream after restore."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.00-obligation-03",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Resolve the attacks only after weapons and targets are declared.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal",
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert not any((e.event_type == 'attack_sequence_step' for e in events))",
+            "proves": "Neither facade attack host resolves attacks before its weapon/target declaration."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "replay",
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+            "proves": "The actual selected Shooting/Fight attack sequence reproduces exactly."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "viewer",
+            "assertion": "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+            "proves": "Owner and opponent receive the same viewer-scoped event stream after restore."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          2
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:04:04.01:1",
+    "requirements": [
+      {
+        "requirement_id": "04.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Ranged attacks use ranged weapons.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal",
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_target_range_visibility_and_lone_operative_gates_are_explicit",
+            "role": "invalid",
+            "assertion": "assert melee_candidates[0].violation_code is ShootingTargetViolationCode.MELEE_WEAPON",
+            "proves": "A real melee weapon cannot be used as a ranged target candidate."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.01-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Melee attacks use melee weapons.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_weapon_selection.py:available_melee_weapons_payloads"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert (pool.weapon_profile.range_profile.kind is RangeProfileKind.MELEE) == (phase is BattlePhase.FIGHT)",
+            "proves": "The completed Fight sequence uses the selected melee catalog profile; the Shooting sequence uses a ranged profile."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.01-obligation-03",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A shooting model may select one or more equipped ranged weapons.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:WeaponDeclaration"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_two_identical_weapon_copies_with_ability_selections_restore",
+            "role": "semantic",
+            "assertion": "assert tuple((cast(str, pool['weapon_instance_id']) for pool in pool_payloads)) == tuple((cast(str, weapon['weapon_instance_id']) for weapon in copy_weapons))",
+            "proves": "A single physical model declares both equipped ranged weapon copies, and both produce accepted attack pools."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.01-obligation-04",
+        "source_blocks": [
+          5
+        ],
+        "summary": "A fighting model must select one equipped melee weapon, subject to explicit extra-attack exceptions.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal",
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_melee_rule_validation_rejects_weapon_selection_invariants",
+            "role": "invalid",
+            "assertion": "assert validation.violations[0].violation_code == expected_code",
+            "proves": "An equipped real model cannot omit its primary melee weapon, duplicate it, or substitute unavailable wargear."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2,
+          4
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:04:04.01.01:1",
+    "requirements": [
+      {
+        "requirement_id": "04.01.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A model without ranged weapons makes no ranged attacks.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal",
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order91_empty_shooting.py::test_empty_selection_resolves_type_without_shot_history",
+            "role": "facade",
+            "assertion": "assert any((event.event_type == 'shooting_without_attacks_completed' for event in events))",
+            "proves": "Weaponless and no-legal-target units both complete the selected shoot type through the facade."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.01.01-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A model without melee weapons makes no melee attacks.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal",
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_weaponless_model_completes_a_fight_selection_without_melee_attacks",
+            "role": "facade",
+            "assertion": "assert not any((e.event_type == 'attack_sequence_step' for e in events))",
+            "proves": "A real weaponless model is selected, completes the Fight activation, and resolves no melee attacks. Fought-status bookkeeping is separately scheduled as a discovered gap."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:04:04.01.02:1",
+    "requirements": [
+      {
+        "requirement_id": "04.01.02-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "CLOSE-QUARTERS sidearm restrictions can prevent selecting all ranged weapons together.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_mixed_close_quarters_and_non_close_quarters_declarations_reject_before_pop",
+            "role": "invalid",
+            "assertion": "assert cast(list[dict[str, object]], validation['violations'])[0]['violation_code'] == 'mixed_close_quarters_non_close_quarters_declaration'",
+            "proves": "The same model cannot declare its Close-quarters pistol together with its ordinary rifle."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_mixed_close_quarters_and_non_close_quarters_declarations_reject_before_pop",
+            "role": "invalid",
+            "assertion": "assert lifecycle.decision_controller.queue.pending_requests == (declaration_request,)",
+            "proves": "Invalid mixed selection preserves the pending authoritative declaration."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:04:04.01.03:1",
+    "requirements": [
+      {
+        "requirement_id": "04.01.03-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The player selects one profile of each selected multi-profile weapon.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order92_random_melee.py::test_multiple_profiles_commit_exactly_one_without_exposing_another_profile",
+            "role": "facade",
+            "assertion": "assert len(rows) == 1",
+            "proves": "The facade commits exactly one profile of a multiple-profile physical weapon before target allocation."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.01.03-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A Hunter profile may target only units meeting its keyword restriction.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_phase14i_hunter_target_candidate_requires_one_listed_keyword",
+            "role": "invalid",
+            "assertion": "assert invalid_candidates[0].violation_code is ShootingTargetViolationCode.HUNTER_TARGET_KEYWORD_MISMATCH",
+            "proves": "The engine rejects a Hunter target lacking every listed keyword."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.01.03-obligation-03",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Different models may select different profiles of the same weapon type.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_select_target_and_attack_group_branch_precedence_records",
+            "role": "semantic",
+            "assertion": "assert len(group_request.options) == 2",
+            "proves": "The accepted declaration uses different profiles on different physical models and different target units; two distinct groups remain against the first target."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:04:04.01.04:1",
+    "requirements": [
+      {
+        "requirement_id": "04.01.04-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "An attack inherits the source weapon's characteristics and abilities.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:RangedAttackPool"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert pool.weapon_profile == wargear.weapon_profile_by_id(pool.weapon_profile_id)",
+            "proves": "The completed facade attack pool retains the entire selected catalog weapon profile, including characteristics and ability descriptors."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.01.04-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Attack-specific changes also apply to that weapon until its whole attack sequence and ability effects finish.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_out_of_phase_post_roll_pools_are_ordered_by_active_player",
+            "role": "semantic",
+            "assertion": "assert tuple((cast(dict[str, object], payload['damage_application'])['requested_damage'] for payload in damage_payloads)) == (1, 2)",
+            "proves": "The original and changed weapon profiles keep their distinct Damage1/2 semantics through selected-pool saving and damage."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.01.04-obligation-03",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Weapon roll modifiers apply to attacks made with that weapon.",
+        "owners": [
+          "src/warhammer40k_core/engine/shooting_targets.py:_target_candidate"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_heavy_accepted_vertical_movement_reaches_facade_attack",
+            "role": "facade",
+            "assertion": "assert roll['final_roll'] == cast(int, roll['unmodified_roll']) + int(flying)",
+            "proves": "The actual Heavy weapon attack roll receives its selected movement-dependent modifier."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:04:04.01.05:1",
+    "requirements": [
+      {
+        "requirement_id": "04.01.05-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Selected to shoot establishes selected-to-attack status.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert selected",
+            "proves": "Shooting unit selection or Fight activation occurs before the shared attack declaration."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "replay",
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+            "proves": "The actual selected Shooting/Fight attack sequence reproduces exactly."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "viewer",
+            "assertion": "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+            "proves": "Owner and opponent receive the same viewer-scoped event stream after restore."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.01.05-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Selected to fight establishes selected-to-attack status.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert selected",
+            "proves": "Shooting unit selection or Fight activation occurs before the shared attack declaration."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "replay",
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+            "proves": "The actual selected Shooting/Fight attack sequence reproduces exactly."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "viewer",
+            "assertion": "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+            "proves": "Owner and opponent receive the same viewer-scoped event stream after restore."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.01.05-obligation-03",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A rule choosing a unit to make attacks establishes selected-to-attack status.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_model.py:OutOfPhaseShootingState"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration",
+            "role": "facade",
+            "assertion": "assert state.out_of_phase_shooting_state.selected_unit_instance_id == 'army-alpha:intercessor-unit-1'",
+            "proves": "Using Fire Overwatch through the facade establishes the selected attacking unit before its declaration outside its normal phase."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:04:04.02:1",
+    "requirements": [
+      {
+        "requirement_id": "04.02-obligation-01",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Each ranged weapon selects exactly one enemy target when used.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal",
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert pool.target_unit_instance_id == 'army-beta:enemy'",
+            "proves": "Every physical weapon used in the accepted Shooting declaration carries one enemy target in its completed pool."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.02-obligation-02",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A ranged target must be visible to the attacking model unless expressly waived.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal",
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_target_range_visibility_and_lone_operative_gates_are_explicit",
+            "role": "invalid",
+            "assertion": "assert visibility_candidates[0].violation_code is ShootingTargetViolationCode.NOT_VISIBLE",
+            "proves": "An in-range real target behind blocking terrain still fails the independent visibility requirement."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.02-obligation-03",
+        "source_blocks": [
+          5
+        ],
+        "summary": "A ranged target must be in that weapon's range unless expressly waived.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal",
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_shooting_target_candidate_cache_uses_full_weapon_profile_identity",
+            "role": "semantic",
+            "assertion": "assert {candidate['violation_code'] for candidate in illegal_candidates} == {ShootingTargetViolationCode.OUT_OF_RANGE.value}",
+            "proves": "The short weapon profile has explicit OUT_OF_RANGE candidates despite an identically named longer profile."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.02-obligation-04",
+        "source_blocks": [
+          6
+        ],
+        "summary": "A ranged target must be unengaged unless expressly waived.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal",
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_target_side_engagement_rejects_engaged_infantry_and_applies_big_guns",
+            "role": "invalid",
+            "assertion": "assert engaged_infantry_candidates[0].violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT",
+            "proves": "An otherwise legal engaged Infantry target is rejected."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_target_side_engagement_rejects_engaged_infantry_and_applies_big_guns",
+            "role": "semantic",
+            "assertion": "assert monster_candidates[0].is_legal",
+            "proves": "The explicit MONSTER exception admits the engaged target with its shared targeting penalty."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.02-obligation-05",
+        "source_blocks": [
+          8
+        ],
+        "summary": "A melee weapon may select one or more enemy targets.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal",
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_melee_split_lowers_to_shared_attack_sequence_pools",
+            "role": "semantic",
+            "assertion": "assert [pool.attacks for pool in sequence.attack_pools] == [2, 3]",
+            "proves": "A real model explicitly splits one melee weapon into two and three attacks against two enemy units."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.02-obligation-06",
+        "source_blocks": [
+          9
+        ],
+        "summary": "Each melee target must be engaged with the bearer model unless expressly waived.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal",
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_melee_targets_are_model_engagement_scoped",
+            "role": "invalid",
+            "assertion": "assert validation.violations[0].violation_code == 'melee_target_not_engaged_with_model'",
+            "proves": "Unit-wide engagement cannot substitute for the attacking model's engagement."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.02-obligation-07",
+        "source_blocks": [
+          10
+        ],
+        "summary": "A melee weapon may not select more target units than its attack count.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal",
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_melee_split_rejects_more_targets_than_attacks",
+            "role": "invalid",
+            "assertion": "assert validation.violations[0].violation_code == 'melee_target_count_exceeds_attacks'",
+            "proves": "Six selected targets cannot consume a five-attack melee budget."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          2,
+          7
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:04:04.02.01:1",
+    "requirements": [
+      {
+        "requirement_id": "04.02.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Each weapon may select a different target.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_select_target_and_attack_group_branch_precedence_records",
+            "role": "semantic",
+            "assertion": "assert len(group_request.options) == 2",
+            "proves": "The accepted declaration uses different profiles on different physical models and different target units; two distinct groups remain against the first target."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.02.01-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A weapon with no legal target makes no attacks.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order91_empty_shooting.py::test_empty_selection_resolves_type_without_shot_history",
+            "role": "facade",
+            "assertion": "assert any((event.event_type == 'shooting_without_attacks_completed' for event in events))",
+            "proves": "Weaponless and no-legal-target units both complete the selected shoot type through the facade."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.02.01-obligation-03",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The player may decline a ranged weapon's legal target and make no attacks with that weapon.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order95_optional_shooting.py::test_decline_all_legal_targets_preserves_selection_without_shot",
+            "role": "facade",
+            "assertion": "assert unit_id not in state.shooting_phase_state.shot_unit_ids",
+            "proves": "Facade selection can decline every legal target with or without physical weapon selection, without recording a shot."
+          },
+          {
+            "nodeid": "tests/unit/test_order95_optional_shooting.py::test_decline_all_legal_targets_preserves_selection_without_shot",
+            "role": "replay",
+            "assertion": "assert ReplayRunner.from_payload(session.replay_artifact(artifact_id='order95')).run().status is ReplayRunStatus.REPRODUCED",
+            "proves": "The accepted optional-target decision sequence reproduces through ReplayRunner."
+          },
+          {
+            "nodeid": "tests/unit/test_order95_optional_shooting.py::test_decline_all_legal_targets_preserves_selection_without_shot",
+            "role": "viewer",
+            "assertion": "assert clone.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)",
+            "proves": "Both owner and opponent projections match after JSON persistence restore."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:04:04.02.02:1",
+    "requirements": [
+      {
+        "requirement_id": "04.02.02-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Against-attack rules trigger after the attacking unit completes target selection, subject to their other conditions.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal",
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_target_replacement.py::test_replacement_opens_a_fresh_defensive_window_without_resetting_usage",
+            "role": "facade",
+            "assertion": "assert replacement_window.trigger_payload == {'selected_target_unit_instance_ids': [units['new'].unit_instance_id], 'attacking_unit_instance_id': units['source'].unit_instance_id, 'attacking_player_id': 'player-a', 'attack_sequence_id': 'attack-sequence:order42:declaration'}",
+            "proves": "A defensive against-attack window opens after the new enemy target is selected and before resolution, carrying the actual attacker and selected target."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.02.02-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Attack-allocation rules trigger at model selection in Inflict Damage.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal",
+          "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_allocated_attack_damage_modifier_runs_after_model_allocation",
+            "role": "semantic",
+            "assertion": "assert observed_contexts[0].allocated_model_instance_id == defender_model.model_instance_id",
+            "proves": "The attack-allocation hook receives the actual chosen model before damage, applying its modifier at that allocation."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:04:04.02.03:1",
+    "requirements": [
+      {
+        "requirement_id": "04.02.03-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A model or unit targets a single target exactly when every attack from its selected weapons targets that same unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_selection.py:unresolved_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_selected_rules_unit_target_inventory_includes_every_weapon_pool",
+            "role": "semantic",
+            "assertion": "assert (len(targets) == 1) is (not split_targets)",
+            "proves": "The engine target inventory contains one unit only when all three selected physical weapon pools share that target; splitting the third model produces two targets."
+          }
+        ],
+        "qualifications": [
+          "This asserts the complete initial target inventory used by resolution; content-specific single-target abilities still require their own source-backed consumer proof."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:04:04.03:1",
+    "requirements": [
+      {
+        "requirement_id": "04.03-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "The active player selects one declared enemy unit for resolution.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_select_target_and_attack_group_branch_precedence_records",
+            "role": "semantic",
+            "assertion": "assert group_request.decision_type == SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE",
+            "proves": "After declaring weapons and targets, the real lifecycle asks to select a resolution target and then an unresolved weapon group for it."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.03-obligation-02",
+        "source_blocks": [
+          3
+        ],
+        "summary": "The player selects an unresolved weapon targeting that unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_select_target_and_attack_group_branch_precedence_records",
+            "role": "semantic",
+            "assertion": "assert group_request.decision_type == SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE",
+            "proves": "After declaring weapons and targets, the real lifecycle asks to select a resolution target and then an unresolved weapon group for it."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.03-obligation-03",
+        "source_blocks": [
+          3
+        ],
+        "summary": "The weapon contributes a number of attack dice equal to A.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert pool.attacks == pool.weapon_profile.attack_profile.resolve_value(18) == 18",
+            "proves": "Both facade attack hosts derive an18-attack pool from the selected physical weapon A18 profile."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.03-obligation-04",
+        "source_blocks": [
+          4
+        ],
+        "summary": "All other unresolved weapons making identical applicable attacks against that target contribute their dice to the same pool.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_identical_attack_signature_and_gathered_group_payloads",
+            "role": "semantic",
+            "assertion": "assert groups[0].total_attacks == 6",
+            "proves": "Identical weapons form one six-attack gathered group with both weapon contributions."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_identical_attack_signature_and_gathered_group_payloads",
+            "role": "semantic",
+            "assertion": "assert len(signatures) == len(different_pools)",
+            "proves": "Attack grouping separates Strength, modifiers, Torrent and Lethal Hits differences as well as physical provenance."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.03-obligation-05",
+        "source_blocks": [
+          5
+        ],
+        "summary": "The gathered pool completes the attack sequence.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert max(step_indices) < completion_index",
+            "proves": "Every emitted attack step precedes the shared completed-attacks boundary in Shooting and Fight."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "replay",
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+            "proves": "The actual selected Shooting/Fight attack sequence reproduces exactly."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "viewer",
+            "assertion": "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+            "proves": "Owner and opponent receive the same viewer-scoped event stream after restore."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert max(step_indices) < completion_index",
+            "proves": "Every emitted attack step precedes the shared completed-attacks boundary in Shooting and Fight."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.03-obligation-06",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Resolve other unresolved weapons against the same target before switching targets.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_select_target_and_attack_group_branch_precedence_records",
+            "role": "semantic",
+            "assertion": "assert group_target_order[:2] == (units['enemy-a'].unit_instance_id, units['enemy-a'].unit_instance_id)",
+            "proves": "Both unresolved groups against the first chosen target are resolved before switching to the second target."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.03-obligation-07",
+        "source_blocks": [
+          8
+        ],
+        "summary": "Only after the current target's weapons resolve may another declared target be selected.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_select_target_and_attack_group_branch_precedence_records",
+            "role": "semantic",
+            "assertion": "assert group_target_order[:2] == (units['enemy-a'].unit_instance_id, units['enemy-a'].unit_instance_id)",
+            "proves": "Both unresolved groups against the first chosen target are resolved before switching to the second target."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.03-obligation-08",
+        "source_blocks": [
+          9
+        ],
+        "summary": "The unit attack sequence ends after every selected weapon's attacks resolve.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert max(step_indices) < completion_index",
+            "proves": "Every emitted attack step precedes the shared completed-attacks boundary in Shooting and Fight."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "replay",
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+            "proves": "The actual selected Shooting/Fight attack sequence reproduces exactly."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "viewer",
+            "assertion": "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+            "proves": "Owner and opponent receive the same viewer-scoped event stream after restore."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert max(step_indices) < completion_index",
+            "proves": "Every emitted attack step precedes the shared completed-attacks boundary in Shooting and Fight."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          6
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:04:04.03.01:1",
+    "requirements": [
+      {
+        "requirement_id": "04.03.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Identical attack grouping requires equal BS/WS, S, AP, and D.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_identical_attack_grouping_separates_each_characteristic",
+            "role": "semantic",
+            "assertion": "assert len(different) == 2",
+            "proves": "Changing BS or WS, S, AP or D independently splits two otherwise identical real weapon pools in Shooting and Fight."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.03.01-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Identical attack grouping requires equal applicable abilities and rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_identical_attack_signature_and_gathered_group_payloads",
+            "role": "semantic",
+            "assertion": "assert len(signatures) == len(different_pools)",
+            "proves": "Attack grouping separates Strength, modifiers, Torrent and Lethal Hits differences as well as physical provenance."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:04:04.03.02:1",
+    "requirements": [
+      {
+        "requirement_id": "04.03.02-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The player declares the number of melee attacks assigned to each target.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_melee_split_lowers_to_shared_attack_sequence_pools",
+            "role": "semantic",
+            "assertion": "assert [pool.attacks for pool in sequence.attack_pools] == [2, 3]",
+            "proves": "A real model explicitly splits one melee weapon into two and three attacks against two enemy units."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.03.02-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Every selected melee target receives at least one attack.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_resolution.py:MeleeTargetAllocation"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_melee_dataclasses_fail_fast_on_malformed_values",
+            "role": "invalid",
+            "assertion": "with pytest.raises(GameLifecycleError, match='greater than zero'):\n    MeleeTargetAllocation(target_a.unit_instance_id, attacks=0)",
+            "proves": "The typed melee target allocation rejects zero attacks before proposal submission."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.03.02-obligation-03",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A split weapon contributes only its declared attack count to each target's pool.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_melee_split_lowers_to_shared_attack_sequence_pools",
+            "role": "semantic",
+            "assertion": "assert [pool.attacks for pool in sequence.attack_pools] == [2, 3]",
+            "proves": "The two target pools receive exactly their declared shares."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:04:04.03.03:1",
+    "requirements": [
+      {
+        "requirement_id": "04.03.03-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "If a selected target becomes ineligible, the controlling player may select replacement targets.",
+        "owners": [
+          "src/warhammer40k_core/engine/target_replacement.py:replacement_request"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_target_replacement.py::test_shooting_replaces_a_moved_target_through_the_facade_and_replays",
+            "role": "facade",
+            "assertion": "assert event.payload['replacement_target_ids'] == [units['new'].unit_instance_id]",
+            "proves": "The facade lets the controlling player choose a replacement enemy when the original target moved out of legality."
+          },
+          {
+            "nodeid": "tests/unit/test_target_replacement.py::test_shooting_replaces_a_moved_target_through_the_facade_and_replays",
+            "role": "replay",
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+            "proves": "The accepted replacement target decision exactly replays."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:04:04.03.04:1",
+    "requirements": [
+      {
+        "requirement_id": "04.03.04-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A ranged weapon has shot after all its attacks resolve.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert sequence.is_complete",
+            "proves": "Both facade attack hosts complete all attacks of their declared physical weapons before the authoritative completed sequence."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.03.04-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A model has shot after all its used ranged weapons resolve.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert max(step_indices) < completion_index",
+            "proves": "Every emitted attack step precedes the shared completed-attacks boundary in Shooting and Fight."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert model_has_attacked_this_phase(event_records=events, model_instance_id=pool.attacker_model_instance_id, battle_round=cast(int, body['battle_round']), active_player_id=cast(str, body['active_player_id']), phase=cast(str, body['phase']))",
+            "proves": "The completed physical participants are queryable through the authoritative model-attack history for the correct phase occurrence."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "replay",
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+            "proves": "The actual selected Shooting/Fight attack sequence reproduces exactly."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "viewer",
+            "assertion": "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+            "proves": "Owner and opponent receive the same viewer-scoped event stream after restore."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert max(step_indices) < completion_index",
+            "proves": "Every emitted attack step precedes the shared completed-attacks boundary in Shooting and Fight."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.03.04-obligation-03",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A unit has shot after all its models' declared ranged attacks resolve.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert max(step_indices) < completion_index",
+            "proves": "Every emitted attack step precedes the shared completed-attacks boundary in Shooting and Fight."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "replay",
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+            "proves": "The actual selected Shooting/Fight attack sequence reproduces exactly."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "viewer",
+            "assertion": "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+            "proves": "Owner and opponent receive the same viewer-scoped event stream after restore."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert max(step_indices) < completion_index",
+            "proves": "Every emitted attack step precedes the shared completed-attacks boundary in Shooting and Fight."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.03.04-obligation-04",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A selected unit making no ranged attacks has not shot.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order95_optional_shooting.py::test_decline_all_legal_targets_preserves_selection_without_shot",
+            "role": "facade",
+            "assertion": "assert unit_id not in state.shooting_phase_state.shot_unit_ids",
+            "proves": "Facade selection can decline every legal target with or without physical weapon selection, without recording a shot."
+          },
+          {
+            "nodeid": "tests/unit/test_order95_optional_shooting.py::test_decline_all_legal_targets_preserves_selection_without_shot",
+            "role": "replay",
+            "assertion": "assert ReplayRunner.from_payload(session.replay_artifact(artifact_id='order95')).run().status is ReplayRunStatus.REPRODUCED",
+            "proves": "The accepted optional-target decision sequence reproduces through ReplayRunner."
+          },
+          {
+            "nodeid": "tests/unit/test_order95_optional_shooting.py::test_decline_all_legal_targets_preserves_selection_without_shot",
+            "role": "viewer",
+            "assertion": "assert clone.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)",
+            "proves": "Both owner and opponent projections match after JSON persistence restore."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:04:04.03.05:1",
+    "requirements": [
+      {
+        "requirement_id": "04.03.05-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A melee weapon has fought after all its attacks resolve.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert sequence.is_complete",
+            "proves": "Both facade attack hosts complete all attacks of their declared physical weapons before the authoritative completed sequence."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.03.05-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A model has fought after all its selected melee weapons resolve.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert max(step_indices) < completion_index",
+            "proves": "Every emitted attack step precedes the shared completed-attacks boundary in Shooting and Fight."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert model_has_attacked_this_phase(event_records=events, model_instance_id=pool.attacker_model_instance_id, battle_round=cast(int, body['battle_round']), active_player_id=cast(str, body['active_player_id']), phase=cast(str, body['phase']))",
+            "proves": "The completed physical participants are queryable through the authoritative model-attack history for the correct phase occurrence."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "replay",
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+            "proves": "The actual selected Shooting/Fight attack sequence reproduces exactly."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "viewer",
+            "assertion": "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+            "proves": "Owner and opponent receive the same viewer-scoped event stream after restore."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert max(step_indices) < completion_index",
+            "proves": "Every emitted attack step precedes the shared completed-attacks boundary in Shooting and Fight."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.03.05-obligation-03",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A unit has fought after all its declared melee attacks resolve.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert max(step_indices) < completion_index",
+            "proves": "Every emitted attack step precedes the shared completed-attacks boundary in Shooting and Fight."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "replay",
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+            "proves": "The actual selected Shooting/Fight attack sequence reproduces exactly."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "viewer",
+            "assertion": "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+            "proves": "Owner and opponent receive the same viewer-scoped event stream after restore."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert max(step_indices) < completion_index",
+            "proves": "Every emitted attack step precedes the shared completed-attacks boundary in Shooting and Fight."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "04.03.05-obligation-04",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A selected unit making no melee attacks has not fought.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_activation_completion.py:complete_active_fight_activation"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: A real weaponless facade Fight activation emits unit_has_fought despite no melee attack steps. Reproduced by tests/order97_gap_probes_04_06.py; gameplay repair is required before PFINAL."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:04:04.03.06:1",
+    "requirements": [
+      {
+        "requirement_id": "04.03.06-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A unit has finished making attacks once all its attacks resolve.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert max(step_indices) < completion_index",
+            "proves": "Every emitted attack step precedes the shared completed-attacks boundary in Shooting and Fight."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "replay",
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+            "proves": "The actual selected Shooting/Fight attack sequence reproduces exactly."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "viewer",
+            "assertion": "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+            "proves": "Owner and opponent receive the same viewer-scoped event stream after restore."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_facade_attack_selection_precedes_resolution_and_records_completed_participation",
+            "role": "facade",
+            "assertion": "assert max(step_indices) < completion_index",
+            "proves": "Every emitted attack step precedes the shared completed-attacks boundary in Shooting and Fight."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "faq:9bfa47ed-be8d-4e11-80de-f3832d507ca1",
+    "requirements": [
+      {
+        "requirement_id": "faq-9bfa47ed-be8d-4e11-80de-f3832d507ca1-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A weaponless unit remains selectable to shoot and completes the shoot type without attacks.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal",
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order91_empty_shooting.py::test_empty_selection_resolves_type_without_shot_history",
+            "role": "facade",
+            "assertion": "assert any((event.event_type == 'shooting_without_attacks_completed' for event in events))",
+            "proves": "Weaponless and no-legal-target units both complete the selected shoot type through the facade."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "faq-9bfa47ed-be8d-4e11-80de-f3832d507ca1-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A weaponless unit remains selectable to fight and completes the fight type without attacks.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal",
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_weaponless_model_completes_a_fight_selection_without_melee_attacks",
+            "role": "facade",
+            "assertion": "assert not any((e.event_type == 'attack_sequence_step' for e in events))",
+            "proves": "A real weaponless model is selected, completes the Fight activation, and resolves no melee attacks. Fought-status bookkeeping is separately scheduled as a discovered gap."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:7f767dd0-3996-417e-bba2-b7a5828b2430",
+    "requirements": [
+      {
+        "requirement_id": "faq-7f767dd0-3996-417e-bba2-b7a5828b2430-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A model may be in weapon range while not visible; range and visibility are independent predicates.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_target_range_visibility_and_lone_operative_gates_are_explicit",
+            "role": "invalid",
+            "assertion": "assert visibility_candidates[0].violation_code is ShootingTargetViolationCode.NOT_VISIBLE",
+            "proves": "An in-range real target behind blocking terrain still fails the independent visibility requirement."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:ee9a398d-3acb-4440-b63a-68bed3e6e217",
+    "requirements": [
+      {
+        "requirement_id": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "PRECISION does not separate otherwise identical attack pools when the target has no CHARACTER.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_selection.py:identical_attack_signature"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: Otherwise identical PRECISION and ordinary attacks against a target with no CHARACTER are split into two groups. Reproduced by tests/order97_gap_probes_04_06.py; gameplay repair is required before PFINAL."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:5553f538-6182-4e72-905a-67855489bb1d",
+    "requirements": [
+      {
+        "requirement_id": "faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Different models in the same target unit may satisfy weapon range and bearer visibility.",
+        "owners": [
+          "src/warhammer40k_core/engine/shooting_targets.py:_target_candidate"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: A coherent target with visible out-of-range models and hidden in-range models is incorrectly rejected. Reproduced by tests/order97_gap_probes_04_06.py; gameplay repair is required before PFINAL."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:aab10e23-6433-42ca-86e7-ddc829f16c47",
+    "requirements": [
+      {
+        "requirement_id": "faq-aab10e23-6433-42ca-86e7-ddc829f16c47-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A generic lower critical-hit threshold does not override Snap Shooting's exact-six requirement.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_critical_hits.py::test_snap_ignores_generic_threshold_but_accepts_explicit_permission",
+            "role": "semantic",
+            "assertion": "assert not ordinary.successful",
+            "proves": "Generic lower thresholds do not permit Snap/Overwatch hits on4; an explicitly scoped exception does."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:b7d3d760-a167-44b2-9c91-32ce86684225",
+    "requirements": [
+      {
+        "requirement_id": "faq-b7d3d760-a167-44b2-9c91-32ce86684225-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A valid critical hit succeeds even below the normal modified hit threshold.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_critical_hits.py::test_critical_hits_respect_raw_faces_and_mode_floors",
+            "role": "semantic",
+            "assertion": "assert hit.successful is expected",
+            "proves": "Critical hits succeed independently of modified BS thresholds while preserving absolute mode floors across raw faces1–6 and modifiers-3,0,+3."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "faq-b7d3d760-a167-44b2-9c91-32ce86684225-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Snap Shooting still requires exact six unless an explicit source exception applies.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_critical_hits.py::test_snap_ignores_generic_threshold_but_accepts_explicit_permission",
+            "role": "semantic",
+            "assertion": "assert not ordinary.successful",
+            "proves": "Generic lower thresholds do not permit Snap/Overwatch hits on4; an explicitly scoped exception does."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  }
+]

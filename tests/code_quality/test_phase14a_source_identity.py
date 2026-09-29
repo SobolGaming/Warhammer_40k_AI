@@ -18,6 +18,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 ROOT = Path(__file__).resolve().parents[2]
 THIS_FILE = Path(__file__).resolve()
 HEX_DIGEST_PATTERN = re.compile(r"\b[0-9a-fA-F]{32,}\b")
+UUID_PATTERN = re.compile(r"\b[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}\b")
 RECONCILIATION_ARTIFACT = (
     ROOT
     / "src"
@@ -227,11 +228,37 @@ def test_superseded_mirror_policy_legacy_observation_inventory_is_immutable() ->
     assert all(evidence_id.startswith("40k-app-") for evidence_id in legacy_observation_ids)
 
 
+@pytest.mark.parametrize(
+    "identity",
+    [
+        "aab10e23-6433-42ca-86e7-ddc829f16c47",
+        "c2df3e97-f21e-4fc9-943e-37072c08c10e",
+        "AAB10E23-6433-42CA-86E7-DDC829F16C47",
+        "aab10e23643342ca86e7ddc829f16c47",
+    ],
+)
+def test_edition_audit_ignores_opaque_hex_identity_but_preserves_real_tokens(
+    identity: str,
+) -> None:
+    tokens = _retired_identity_tokens()
+    text = f"faq:{identity}-obligation-01 " + " ".join(tokens)
+    sanitized = _without_hex_identities(text)
+    assert identity not in sanitized
+    assert "faq:-obligation-01" in sanitized
+    assert all(token in sanitized for token in tokens)
+
+
+def test_edition_audit_does_not_exempt_malformed_uuid() -> None:
+    text = "faq:aab10e23-6433-42ca-86e7-ddc829f16c4z"
+    assert _without_hex_identities(text) == text
+    assert "10e" in _without_hex_identities(text)
+
+
 def test_active_code_tests_and_docs_do_not_reference_retired_edition_ids() -> None:
     violations: list[str] = []
 
     for path in _scanned_paths():
-        text = _without_hex_digests(path.read_text(encoding="utf-8"))
+        text = _without_hex_identities(path.read_text(encoding="utf-8"))
         relative_path = path.relative_to(ROOT).as_posix()
         for token in _retired_identity_tokens():
             if token in text:
@@ -250,7 +277,7 @@ def test_retired_identity_scanner_folds_concatenated_string_literals() -> None:
 
 
 def test_chaos_daemons_datasheet_runtime_does_not_construct_retired_source_ids() -> None:
-    source = _without_hex_digests(CHAOS_DAEMONS_DATASHEET_RUNTIME.read_text(encoding="utf-8"))
+    source = _without_hex_identities(CHAOS_DAEMONS_DATASHEET_RUNTIME.read_text(encoding="utf-8"))
     evaluated_strings = _python_constant_strings(source)
 
     assert not {
@@ -394,8 +421,8 @@ def _retired_identity_tokens() -> tuple[str, ...]:
     )
 
 
-def _without_hex_digests(text: str) -> str:
-    return HEX_DIGEST_PATTERN.sub("", text)
+def _without_hex_identities(text: str) -> str:
+    return HEX_DIGEST_PATTERN.sub("", UUID_PATTERN.sub("", text))
 
 
 def _python_constant_strings(source: str) -> tuple[str, ...]:

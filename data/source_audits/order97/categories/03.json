@@ -1,0 +1,1523 @@
+[
+  {
+    "row_id": "rule:03:03.01:1",
+    "requirements": [
+      {
+        "requirement_id": "03.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Each movement type imposes its own eligibility, budget, and conditions.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_model.py:MovementActionAvailabilityResult"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_action_options_inside_engagement_are_remain_and_fall_back",
+            "role": "semantic",
+            "assertion": "assert MovementPhaseActionKind.NORMAL_MOVE.value not in {option.option_id for option in action_request.options}",
+            "proves": "An engaged unit cannot select Normal Move; only stationary or the two source-defined Fall Back variants are offered."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.01-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Moving a unit may move one or more member models.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_resolvers.py:resolve_normal_move"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_normal_move_full_unit_no_op_witness_emits_only_changed_displacement",
+            "role": "semantic",
+            "assertion": "assert len(batch.displacements) == 1",
+            "proves": "A complete real-unit witness moves only one member and emits exactly that member displacement."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.01-obligation-03",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Member models move sequentially.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_geometry.py:_friendly_geometry_models_for_path"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: Two real physical models exchange exact occupied starting positions. Neither can complete its entire move first without ending on the other model, but validation compares both paths against all final positions and accepts the simultaneous swap. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding sequential-movement-cyclic-swap."
+        ]
+      },
+      {
+        "requirement_id": "03.01-obligation-04",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A model's path may combine straight segments and rotations.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_resolvers.py:_resolve_unit_move",
+          "src/warhammer40k_core/geometry/pathing.py:PathValidationContext.validate"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10k_movement_distance.py::test_rotations_cost_zero_for_every_base_shape",
+            "role": "semantic",
+            "assertion": "assert witness.straight_line_distance_inches == 4.0",
+            "proves": "A witnessed path combines two2-inch straight segments with rotations and totals both segments."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.01-obligation-05",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Ordinary movement may pass through friendly models.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_resolvers.py:_resolve_unit_move",
+          "src/warhammer40k_core/geometry/pathing.py:PathValidationContext.validate"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10h_pathing_smoke.py::test_circular_infantry_can_transit_friendly_infantry_but_not_end_overlapping",
+            "role": "semantic",
+            "assertion": "assert transit_result.is_valid",
+            "proves": "Friendly infantry transit passes continuous path validation."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.01-obligation-06",
+        "source_blocks": [
+          5
+        ],
+        "summary": "A model may transit only spaces its base fits through.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_resolvers.py:_resolve_unit_move",
+          "src/warhammer40k_core/geometry/pathing.py:PathValidationContext.validate"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10h_pathing_smoke.py::test_model_cannot_path_through_terrain_smoke_blocker",
+            "role": "semantic",
+            "assertion": "assert result.violations[0].violation_code == 'terrain_collision'",
+            "proves": "A base intersecting blocking terrain fails the witnessed path."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.01-obligation-07",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Ordinary movement cannot pass through an enemy model's base.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_resolvers.py:_resolve_unit_move",
+          "src/warhammer40k_core/geometry/pathing.py:PathValidationContext.validate"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10h_pathing_smoke.py::test_non_fly_normal_and_advance_cannot_transit_enemy_model_base",
+            "role": "semantic",
+            "assertion": "assert result.violations[0].violation_code == 'enemy_model_base_crossed'",
+            "proves": "Normal and Advance movement reject an enemy base crossing."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.01-obligation-08",
+        "source_blocks": [
+          7
+        ],
+        "summary": "A moving base cannot cross a battlefield edge.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_resolvers.py:_resolve_unit_move",
+          "src/warhammer40k_core/geometry/pathing.py:PathValidationContext.validate"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10h_pathing_smoke.py::test_model_cannot_cross_battlefield_edge",
+            "role": "semantic",
+            "assertion": "assert result.violations[0].violation_code == 'battlefield_edge_crossed'",
+            "proves": "The witnessed path fails when its base crosses the board edge."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.01-obligation-09",
+        "source_blocks": [
+          8
+        ],
+        "summary": "Every while-moving restriction holds throughout the path.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_resolvers.py:_resolve_unit_move",
+          "src/warhammer40k_core/geometry/pathing.py:PathValidationContext.validate"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_visibility_pathing.py::test_path_query_checks_engagement_range_along_witness_path",
+            "role": "invalid",
+            "assertion": "assert result.failure.reason is PathFailureReason.ENGAGEMENT_RANGE",
+            "proves": "A clear endpoint does not excuse the forbidden intermediate enemy engagement corridor."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.01-obligation-10",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Straight-segment distance measures horizontal displacement of the same base reference point.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_resolvers.py:_resolve_unit_move",
+          "src/warhammer40k_core/geometry/pathing.py:PathValidationContext.validate"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10k_movement_distance.py::test_straight_line_segment_uses_same_point_measurement_semantics",
+            "role": "semantic",
+            "assertion": "assert segment.measurement_point == 'pose_anchor'",
+            "proves": "Straight-segment measurement uses the same model pose anchor at both endpoints."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10k_movement_distance.py::test_straight_line_segment_uses_same_point_measurement_semantics",
+            "role": "semantic",
+            "assertion": "assert segment.distance_inches == 5.0",
+            "proves": "The3-by4 horizontal displacement measures5 despite a simultaneous90-degree facing change."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.01-obligation-11",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Distances accumulate across all straight segments in an activation.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_resolvers.py:_resolve_unit_move",
+          "src/warhammer40k_core/geometry/pathing.py:PathValidationContext.validate"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10k_movement_distance.py::test_rotations_cost_zero_for_every_base_shape",
+            "role": "semantic",
+            "assertion": "assert witness.straight_line_distance_inches == 4.0",
+            "proves": "A witnessed path combines two2-inch straight segments with rotations and totals both segments."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.01-obligation-12",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Cumulative distance cannot exceed that model's move budget.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_resolvers.py:_resolve_unit_move",
+          "src/warhammer40k_core/geometry/pathing.py:PathValidationContext.validate"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10k_movement_distance.py::test_straight_distance_budget_rejects_path_query_when_exceeded",
+            "role": "invalid",
+            "assertion": "assert result.failure.reason is PathFailureReason.MOVEMENT_DISTANCE_EXCEEDED",
+            "proves": "A5-inch witnessed path is rejected under an explicit4-inch movement budget."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.01-obligation-13",
+        "source_blocks": [
+          12
+        ],
+        "summary": "Rotation uses the upright model's base centre as pivot.",
+        "owners": [
+          "src/warhammer40k_core/geometry/pathing.py:PathValidationContext.validate"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10h_pathing_smoke.py::test_non_circular_base_movement_records_cost_free_rotation",
+            "role": "semantic",
+            "assertion": "assert result.movement_distance_witness.rotation_events[0].facing_delta_degrees == 90.0",
+            "proves": "The accepted path records a90degree rotation about each pose centre in the yaw-only upright geometry."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.01-obligation-14",
+        "source_blocks": [
+          12
+        ],
+        "summary": "Rotation contributes zero movement distance.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_resolvers.py:_resolve_unit_move",
+          "src/warhammer40k_core/geometry/pathing.py:PathValidationContext.validate"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10h_pathing_smoke.py::test_non_circular_base_movement_records_cost_free_rotation",
+            "role": "semantic",
+            "assertion": "assert result.movement_distance_witness.total_distance_inches == 2.0",
+            "proves": "An accepted path with a ninety-degree rotation pays only two inches of translation."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.01-obligation-15",
+        "source_blocks": [
+          15
+        ],
+        "summary": "A battlefield unit ends every move in coherency.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_resolvers.py:_resolve_unit_move",
+          "src/warhammer40k_core/geometry/pathing.py:PathValidationContext.validate"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_visibility_pathing.py::test_path_query_checks_coherency_after_group_movement",
+            "role": "invalid",
+            "assertion": "assert result.failure.reason is PathFailureReason.COHERENCY",
+            "proves": "A witnessed multi-model move with an incoherent final formation returns typed Coherency failure."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.01-obligation-16",
+        "source_blocks": [
+          16
+        ],
+        "summary": "A move cannot end on another model.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_resolvers.py:_resolve_unit_move",
+          "src/warhammer40k_core/geometry/pathing.py:PathValidationContext.validate"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10h_pathing_smoke.py::test_circular_infantry_can_transit_friendly_infantry_but_not_end_overlapping",
+            "role": "semantic",
+            "assertion": "assert overlap_result.violations[0].violation_code == 'end_on_model_overlap'",
+            "proves": "Friendly transit permission does not allow an overlapping endpoint."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.01-obligation-17",
+        "source_blocks": [
+          16
+        ],
+        "summary": "A move cannot end embedded in terrain.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_resolvers.py:resolve_normal_move"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_infantry_normal_move_cannot_end_inside_ruins_wall",
+            "role": "invalid",
+            "assertion": "assert resolution.terrain_path_legality_results[0].violations[0].violation_code == TerrainEndpointViolationCode.MODEL_CANNOT_BE_PLACED_AT_ENDPOINT.value",
+            "proves": "Infantry permission to cross a ruin wall does not permit an endpoint inside its wall."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.01-obligation-18",
+        "source_blocks": [
+          17
+        ],
+        "summary": "Every after-moving condition must hold at completion.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_resolvers.py:resolve_normal_move"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_infantry_normal_move_cannot_end_inside_ruins_wall",
+            "role": "invalid",
+            "assertion": "assert not resolution.is_valid",
+            "proves": "An invalid terrain endpoint invalidates the complete movement even after its transit path passes."
+          }
+        ],
+        "qualifications": [
+          "This binds one required endpoint condition; coherency, engagement and overlap are asserted by the adjacent obligations and movement-family evidence."
+        ]
+      },
+      {
+        "requirement_id": "03.01-obligation-19",
+        "source_blocks": [
+          18
+        ],
+        "summary": "An invalid move restores every model's original position.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_resolvers.py:_resolve_unit_move",
+          "src/warhammer40k_core/geometry/pathing.py:PathValidationContext.validate"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10l_unit_coherency.py::test_invalid_normal_move_endpoint_rolls_back_to_previous_placement",
+            "role": "semantic",
+            "assertion": "assert resolved == before",
+            "proves": "A failed coherency endpoint returns the entire original placement."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.01-obligation-20",
+        "source_blocks": [
+          18
+        ],
+        "summary": "A valid move resolves its additional after-moving rules before ending.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler.begin_phase"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_aeldari_aspect_warriors_datasheets.py::test_tactical_disembark_closes_actual_grenade_pack_boundary_before_follow_up_move",
+            "role": "semantic",
+            "assertion": "assert event_types.index(UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_RESOLVED_EVENT) < event_types.index('movement_activation_completed')",
+            "proves": "The genuine source-owned Grenade Pack continuation completes before movement_activation_completed."
+          }
+        ],
+        "qualifications": [
+          "The non-empty semantic continuation uses the real handler and controller; other movement-family facade assertions provide adapter routing."
+        ]
+      },
+      {
+        "requirement_id": "03.01-obligation-21",
+        "source_blocks": [
+          28
+        ],
+        "summary": "A baseless model rotates around its central axis.",
+        "owners": [
+          "src/warhammer40k_core/geometry/shapely_backend.py:footprint_for_base",
+          "src/warhammer40k_core/geometry/movement_envelope.py:MovementDistanceWitness.for_model_path"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_baseless_frame_rotates_upright_about_its_central_axis",
+            "role": "semantic",
+            "assertion": "assert after.pose.position == before.pose.position",
+            "proves": "Rotating the source-backed baseless body swaps its footprint orientation without translating its central axis."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_baseless_frame_rotates_upright_about_its_central_axis",
+            "role": "semantic",
+            "assertion": "assert all((isclose(a, b) for a, b in zip(shapely_backend.footprint_for_base(after.base, after.pose).bounds, (9, 8, 11, 12), strict=True)))",
+            "proves": "The 4 by 2 inch baseless hull rotates 90 degrees about its unchanged centre, producing 2 by 4 inch bounds."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          3,
+          9,
+          11,
+          13,
+          14
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      },
+      {
+        "source_blocks": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27
+        ],
+        "classification": "example",
+        "reason": "Illustration of the separately inventoried operative rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:03:03.01.01:1",
+    "requirements": [
+      {
+        "requirement_id": "03.01.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Movement budgets derived from M use each model's own M characteristic.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_resolvers.py:_resolve_unit_move"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_mixed_movement_characteristics_set_each_model_own_budget",
+            "role": "semantic",
+            "assertion": "assert tuple((result.is_valid for result in resolution.path_validation_results)) == (True, False, False, False, False)",
+            "proves": "A7in witness passes for M9 but fails for each M6 member of the same unit."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "example",
+        "reason": "Illustration of the separately inventoried operative rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:03:03.01.02:1",
+    "requirements": [
+      {
+        "requirement_id": "03.01.02-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "An explicit move-over/through-models permission permits enemy transit.",
+        "owners": [
+          "src/warhammer40k_core/engine/movement_legality.py:MovementLegalityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10h_pathing_smoke.py::test_semantic_permission_moves_through_models_but_rejects_excluded_titanic_blocker",
+            "role": "semantic",
+            "assertion": "assert transit_result.is_valid",
+            "proves": "An explicit through-models ability permits the otherwise blocked transit."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.01.02-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Enemy-transit permission does not waive other movement restrictions.",
+        "owners": [
+          "src/warhammer40k_core/engine/movement_legality.py:MovementLegalityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10h_pathing_smoke.py::test_semantic_permission_moves_through_models_but_rejects_excluded_titanic_blocker",
+            "role": "semantic",
+            "assertion": "assert endpoint_result.violations[0].violation_code == 'enemy_engagement_range_end_forbidden'",
+            "proves": "Transit permission still forbids the illegal engaged endpoint."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:03:03.01.03:1",
+    "requirements": [],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "cross_reference",
+        "reason": "Explicit referral to the operative clause in another source row."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:03:03.01.04:1",
+    "requirements": [
+      {
+        "requirement_id": "03.01.04-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Move up to X inches establishes X as that move's maximum distance.",
+        "owners": [
+          "src/warhammer40k_core/geometry/pathing.py:PathValidationContext.validate"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10k_movement_distance.py::test_straight_distance_budget_rejects_path_query_when_exceeded",
+            "role": "invalid",
+            "assertion": "assert result.failure.reason is PathFailureReason.MOVEMENT_DISTANCE_EXCEEDED",
+            "proves": "A5-inch witnessed path is rejected under an explicit4-inch movement budget."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:03:03.02:1",
+    "requirements": [
+      {
+        "requirement_id": "03.02-obligation-01",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A setup unit must be coherent.",
+        "owners": [
+          "src/warhammer40k_core/engine/deployment.py:resolve_deployment_placement",
+          "src/warhammer40k_core/engine/reserves.py:resolve_reserve_arrival",
+          "src/warhammer40k_core/engine/transports.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10l_unit_coherency.py::test_deployment_placement_outside_coherency_is_rejected",
+            "role": "invalid",
+            "assertion": "with pytest.raises(PlacementError, match='must be set up in coherency'):\n    assert_battlefield_units_in_coherency(scenario=broken_scenario, ruleset_descriptor=descriptor)",
+            "proves": "The real battlefield placement owner rejects an incoherent setup."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.02-obligation-02",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A setup unit must be unengaged unless an explicit exception applies.",
+        "owners": [
+          "src/warhammer40k_core/engine/deployment.py:resolve_deployment_placement",
+          "src/warhammer40k_core/engine/reserves.py:resolve_reserve_arrival",
+          "src/warhammer40k_core/engine/transports.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10p_reserves.py::test_strategic_reserves_reject_setup_within_enemy_engagement_range",
+            "role": "invalid",
+            "assertion": "assert ReservePlacementViolationCode.RESERVE_ENEMY_ENGAGEMENT_RANGE in codes",
+            "proves": "Setup rejects engagement even when the independently configured enemy-distance rule passes."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.02-obligation-03",
+        "source_blocks": [
+          5
+        ],
+        "summary": "All source-specific setup restrictions apply.",
+        "owners": [
+          "src/warhammer40k_core/engine/deployment.py:resolve_deployment_placement",
+          "src/warhammer40k_core/engine/reserves.py:resolve_reserve_arrival",
+          "src/warhammer40k_core/engine/transports.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10p_reserves.py::test_oversized_exception_preserves_other_placement_limits",
+            "role": "invalid",
+            "assertion": "assert ReservePlacementViolationCode.STRATEGIC_RESERVES_ENEMY_DEPLOYMENT_ZONE in codes",
+            "proves": "Oversized setup still validates the source-specific enemy deployment restriction."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.02-obligation-04",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Failure to set up every required model restores the entire unit to its prior location.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_transports.py:_resolve_disembark_placement_submission"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order55_disembark.py::test_oversized_disembark_facade_retry_restore_and_exact_replay",
+            "role": "facade",
+            "assertion": "assert state.battlefield_state.unit_placement_or_none(PASSENGER_ID) is None",
+            "proves": "Rejecting an attempted complete disembark leaves the entire cargo unit off the battlefield and offers a fresh placement request."
+          }
+        ],
+        "qualifications": [
+          "Physical rollback is proven. The associated selected-to-move reset failure is tracked by C03-06/P03F and the precise 03.02.01 obligations; this assertion does not claim eligibility reset."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          2
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:03:03.02.01:1",
+    "requirements": [
+      {
+        "requirement_id": "03.02.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A failed complete setup does not consume selected-to-move status.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_transports.py:_resolve_disembark_placement_submission"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: Real facade. A 100in base cannot fit within the 44x60in battlefield at any orientation, making complete placement impossible. The invalid result keeps cargo unplaced but retains selection and exposes only placement retry. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding failed-setup-retains-selected-move."
+        ]
+      },
+      {
+        "requirement_id": "03.02.01-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A unit whose setup failed may later retry or remain stationary.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_transports.py:_resolve_disembark_placement_submission"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: Real facade. A 100in base cannot fit within the 44x60in battlefield at any orientation, making complete placement impossible. The invalid result keeps cargo unplaced but retains selection and exposes only placement retry. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding failed-setup-retains-selected-move."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:03:03.02.02:1",
+    "requirements": [
+      {
+        "requirement_id": "03.02.02-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An oversized base that cannot fit wholly in its deployment zone must touch its own battlefield edge.",
+        "owners": [
+          "src/warhammer40k_core/engine/large_model_setup.py:oversized_deployment_violation",
+          "src/warhammer40k_core/engine/reserves.py:resolve_reserve_arrival",
+          "src/warhammer40k_core/engine/transports.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order54_setup.py::test_oversized_deployment_requires_explicit_correct_edge_authority",
+            "role": "invalid",
+            "assertion": "assert reason in {v.violation_code.value for v in result.violations}",
+            "proves": "Oversized setup requires the applicable own-edge authority."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.02.02-obligation-02",
+        "source_blocks": [
+          3
+        ],
+        "summary": "An oversized deployment locks Normal, Advance, Fall Back, and Charge movement for that setup turn.",
+        "owners": [
+          "src/warhammer40k_core/engine/deployment.py:resolve_deployment_placement",
+          "src/warhammer40k_core/engine/large_model_restrictions.py:large_model_activity_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_oversized_deployment_consumer_is_limited_to_pregame_setup",
+            "role": "semantic",
+            "assertion": "assert state.stage is GameLifecycleStage.SETUP",
+            "proves": "The canonical oversized deployment consumer runs during pregame setup."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_oversized_deployment_consumer_is_limited_to_pregame_setup",
+            "role": "semantic",
+            "assertion": "assert state.active_player_id is None",
+            "proves": "This accepted pregame setup is outside an active player turn and does not establish a first-turn lock."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_oversized_deployment_consumer_is_limited_to_pregame_setup",
+            "role": "semantic",
+            "assertion": "assert result.is_valid",
+            "proves": "The real deployment geometry owner accepts the oversized edge placement in its applicable setup stage."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_oversized_deployment_consumer_is_limited_to_pregame_setup",
+            "role": "invalid",
+            "assertion": "with pytest.raises(GameLifecycleError, match='Deployment placement requires setup stage'):\n    resolve_deployment_placement(state=state, ruleset_descriptor=state.runtime_ruleset_descriptor(), request=request, proposal=proposal)",
+            "proves": "The same deployment owner raises a typed error in BATTLE; this proves its current stage boundary, not execution of the conditional in-turn activity lock."
+          }
+        ],
+        "qualifications": [
+          "Source gap: C03-12/P03L. The cited test proves only the source/consumer boundary: the supported deployment owner accepts pregame setup and rejects BATTLE. As documented in Order 54, pregame deployment occurs outside player turns and creates no first-turn lock. The conditional deployment-turn activity restriction has no applicable authenticated in-turn deployment consumer; reconcile the source and owning path before certifying that branch. This is not a reproduced gameplay violation. The Strategic Reserves AIRCRAFT exemption does not certify or modify the deployment clause."
+        ]
+      },
+      {
+        "requirement_id": "03.02.02-obligation-03",
+        "source_blocks": [
+          4
+        ],
+        "summary": "An oversized deployment locks ranged attacks for that setup turn.",
+        "owners": [
+          "src/warhammer40k_core/engine/deployment.py:resolve_deployment_placement",
+          "src/warhammer40k_core/engine/large_model_restrictions.py:large_model_activity_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_oversized_deployment_consumer_is_limited_to_pregame_setup",
+            "role": "semantic",
+            "assertion": "assert state.stage is GameLifecycleStage.SETUP",
+            "proves": "The canonical oversized deployment consumer runs during pregame setup."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_oversized_deployment_consumer_is_limited_to_pregame_setup",
+            "role": "semantic",
+            "assertion": "assert state.active_player_id is None",
+            "proves": "This accepted pregame setup is outside an active player turn and does not establish a first-turn lock."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_oversized_deployment_consumer_is_limited_to_pregame_setup",
+            "role": "semantic",
+            "assertion": "assert result.is_valid",
+            "proves": "The real deployment geometry owner accepts the oversized edge placement in its applicable setup stage."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_oversized_deployment_consumer_is_limited_to_pregame_setup",
+            "role": "invalid",
+            "assertion": "with pytest.raises(GameLifecycleError, match='Deployment placement requires setup stage'):\n    resolve_deployment_placement(state=state, ruleset_descriptor=state.runtime_ruleset_descriptor(), request=request, proposal=proposal)",
+            "proves": "The same deployment owner raises a typed error in BATTLE; this proves its current stage boundary, not execution of the conditional in-turn activity lock."
+          }
+        ],
+        "qualifications": [
+          "Source gap: C03-12/P03L. The cited test proves only the source/consumer boundary: the supported deployment owner accepts pregame setup and rejects BATTLE. As documented in Order 54, pregame deployment occurs outside player turns and creates no first-turn lock. The conditional deployment-turn activity restriction has no applicable authenticated in-turn deployment consumer; reconcile the source and owning path before certifying that branch. This is not a reproduced gameplay violation. The Strategic Reserves AIRCRAFT exemption does not certify or modify the deployment clause."
+        ]
+      },
+      {
+        "requirement_id": "03.02.02-obligation-04",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Model overhang beyond a deployment zone is allowed only if otherwise impossible.",
+        "owners": [
+          "src/warhammer40k_core/engine/deployment_geometry.py:append_geometry_violations"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: The authoritative deployment geometry owner accepts an eight-inch body overhanging the zone and battlefield although its entire body fits at y10. This directly proves deployment; reserve ingress needs the same full-body/impossibility audit before claiming its corresponding clause. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding avoidable-setup-body-overhang."
+        ]
+      },
+      {
+        "requirement_id": "03.02.02-obligation-05",
+        "source_blocks": [
+          5
+        ],
+        "summary": "A deployment overhang exception still requires the base wholly in the zone.",
+        "owners": [
+          "src/warhammer40k_core/engine/deployment_geometry.py:append_geometry_violations"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_setup_body_overhang_does_not_exempt_base_containment",
+            "role": "invalid",
+            "assertion": "assert result['observed'] == ['battlefield_edge_crossed', 'deployment_zone_violation', 'deployment_zone_violation']",
+            "proves": "The authoritative deployment geometry rejects a real support base crossing the deployment zone and battlefield even though the same physical model has body overhang."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.02.02-obligation-06",
+        "source_blocks": [
+          6
+        ],
+        "summary": "An oversized Strategic Reserve base that cannot fit the required edge strip must touch a battlefield edge.",
+        "owners": [
+          "src/warhammer40k_core/engine/reserves.py:resolve_reserve_arrival",
+          "src/warhammer40k_core/engine/large_model_restrictions.py:large_model_activity_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order54_setup.py::test_oversized_arrival_locks_every_prohibited_activity_and_preserves_aircraft",
+            "role": "semantic",
+            "assertion": "assert result.is_valid",
+            "proves": "A 200mm reserve base that cannot fit the required edge strip is accepted touching the south battlefield edge."
+          },
+          {
+            "nodeid": "tests/unit/test_order54_setup.py::test_oversized_arrival_locks_every_prohibited_activity_and_preserves_aircraft",
+            "role": "semantic",
+            "assertion": "assert result.large_model_exception_used",
+            "proves": "The accepted edge-touching placement actually uses the oversized-base exception."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10p_reserves.py::test_phase10p_reserve_arrival_invalid_state_and_edge_paths_are_typed",
+            "role": "invalid",
+            "assertion": "assert ReservePlacementViolationCode.LARGE_MODEL_EXCEPTION_EDGE_CONTACT_MISSING in set(_violation_codes(contact_missing_result))",
+            "proves": "The authoritative reserve resolver rejects the oversized-base exception when the base is displaced away from its selected battlefield edge."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.02.02-obligation-07",
+        "source_blocks": [
+          6,
+          7
+        ],
+        "summary": "An oversized Strategic Reserve arrival locks Normal, Advance, Fall Back, and Charge for that turn, except AIRCRAFT.",
+        "owners": [
+          "src/warhammer40k_core/engine/reserves.py:resolve_reserve_arrival",
+          "src/warhammer40k_core/engine/large_model_restrictions.py:large_model_activity_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order54_setup.py::test_oversized_arrival_locks_every_prohibited_activity_and_preserves_aircraft",
+            "role": "semantic",
+            "assertion": "assert large_model_activity_reason(state, unit.unit_instance_id, activity) == expected",
+            "proves": "For every Movement, Shooting, Charge and Fight phase of the arrival turn, the actual arrival state rejects Normal, Advance, Fall Back and Charge; the AIRCRAFT case returns no large-model restriction."
+          },
+          {
+            "nodeid": "tests/unit/test_order54_setup.py::test_oversized_arrival_locks_every_prohibited_activity_and_preserves_aircraft",
+            "role": "semantic",
+            "assertion": "assert charge_unit_ineligibility_reason(state=state, charge_state=ChargePhaseState(battle_round=3, active_player_id='player-a'), ignore_already_selected=False, unit_instance_id=unit.unit_instance_id, ruleset_descriptor=state.runtime_ruleset_descriptor()) == expected",
+            "proves": "The charging consumer rejects the non-AIRCRAFT unit using the retained oversized-arrival restriction."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.02.02-obligation-08",
+        "source_blocks": [
+          6,
+          8
+        ],
+        "summary": "An oversized Strategic Reserve arrival locks ranged attacks for that turn, except AIRCRAFT.",
+        "owners": [
+          "src/warhammer40k_core/engine/reserves.py:resolve_reserve_arrival",
+          "src/warhammer40k_core/engine/large_model_restrictions.py:large_model_activity_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order54_setup.py::test_oversized_arrival_locks_every_prohibited_activity_and_preserves_aircraft",
+            "role": "semantic",
+            "assertion": "assert large_model_activity_reason(state, unit.unit_instance_id, activity) == expected",
+            "proves": "The arrival-turn activity check includes ranged_attacks in each later phase, and preserves the AIRCRAFT exception."
+          },
+          {
+            "nodeid": "tests/unit/test_order54_setup.py::test_oversized_arrival_locks_every_prohibited_activity_and_preserves_aircraft",
+            "role": "semantic",
+            "assertion": "assert shooting_state_restriction_reason(state=state, rules_unit=view, player_id='player-a') == expected",
+            "proves": "The shooting eligibility owner rejects actual oversized-arrival state and returns no large-model shooting restriction for AIRCRAFT."
+          },
+          {
+            "nodeid": "tests/unit/test_order54_setup.py::test_oversized_arrival_locks_every_prohibited_activity_and_preserves_aircraft",
+            "role": "semantic",
+            "assertion": "assert large_model_activity_reason(state, unit.unit_instance_id, 'ranged_attacks') is None",
+            "proves": "After the arrival restriction expires, the same shooting restriction is absent."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.02.02-obligation-09",
+        "source_blocks": [
+          9
+        ],
+        "summary": "Reserve model overhang beyond the battlefield is allowed only if otherwise impossible.",
+        "owners": [
+          "src/warhammer40k_core/engine/large_model_setup.py:oversized_deployment_violation",
+          "src/warhammer40k_core/engine/reserves.py:resolve_reserve_arrival",
+          "src/warhammer40k_core/engine/transports.py:resolve_disembark"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: The authoritative deployment geometry owner accepts an eight-inch body overhanging the zone and battlefield although its entire body fits at y10. This directly proves deployment; reserve ingress needs the same full-body/impossibility audit before claiming its corresponding clause. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding avoidable-setup-body-overhang."
+        ]
+      },
+      {
+        "requirement_id": "03.02.02-obligation-10",
+        "source_blocks": [
+          9
+        ],
+        "summary": "A reserve-overhang model must remain more than eight inches from every enemy unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/large_model_setup.py:oversized_deployment_violation",
+          "src/warhammer40k_core/engine/reserves.py:resolve_reserve_arrival",
+          "src/warhammer40k_core/engine/transports.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10p_reserves.py::test_oversized_strategic_reserve_exception_still_rejects_enemy_distance",
+            "role": "invalid",
+            "assertion": "assert _violation_codes(result) == (ReservePlacementViolationCode.RESERVE_ENEMY_DISTANCE,)",
+            "proves": "The edge-contact exception does not waive the enemy separation limit."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.02.02-obligation-11",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Ordinary disembark setup is wholly within three inches of the Transport.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_assault_disembark_resolver_requires_permission_start_state_and_three_inches",
+            "role": "invalid",
+            "assertion": "assert TransportOperationViolationCode.DISEMBARK_DISTANCE in {violation.violation_code for violation in outside_three_inches.violations}",
+            "proves": "The shared ordinary3in placement limit rejects the outside-three-inch unit even with assault permission."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.02.02-obligation-12",
+        "source_blocks": [
+          10
+        ],
+        "summary": "A too-large disembarking base may instead be within one inch of the Transport's base or hull.",
+        "owners": [
+          "src/warhammer40k_core/engine/large_model_setup.py:oversized_deployment_violation",
+          "src/warhammer40k_core/engine/reserves.py:resolve_reserve_arrival",
+          "src/warhammer40k_core/engine/transports.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order55_disembark.py::test_disembark_size_proof_and_one_inch_limit",
+            "role": "semantic",
+            "assertion": "assert result.is_valid is valid, result.violations",
+            "proves": "Real five-inch disembarking bases qualify at one inch but not1.01; smaller bases cannot claim the exception."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.02.02-obligation-13",
+        "source_blocks": [
+          10
+        ],
+        "summary": "The exceptional oversized disembark must still be unengaged.",
+        "owners": [
+          "src/warhammer40k_core/engine/large_model_setup.py:oversized_deployment_violation",
+          "src/warhammer40k_core/engine/reserves.py:resolve_reserve_arrival",
+          "src/warhammer40k_core/engine/transports.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order55_disembark.py::test_every_mode_uses_size_proof_and_requires_exceptional_models_unengaged",
+            "role": "invalid",
+            "assertion": "assert result.is_valid is (not enemy_nearby), result.violations",
+            "proves": "Every disembark mode preserves the oversized unengaged endpoint restriction."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:03:03.02.03:1",
+    "requirements": [
+      {
+        "requirement_id": "03.02.03-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Redeployment removes the unit before setting it up again.",
+        "owners": [
+          "src/warhammer40k_core/engine/prebattle.py:apply_redeploy_placement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase16b_prebattle.py::test_phase16b_redeploy_records_removal_and_placement_batches",
+            "role": "semantic",
+            "assertion": "assert len(cast(list[JsonValue], removal_batch['removals'])) == 5",
+            "proves": "Redeployment records removal of all five physical models, separately from fresh placement."
+          },
+          {
+            "nodeid": "tests/unit/test_phase16b_prebattle.py::test_phase16b_redeploy_records_removal_and_placement_batches",
+            "role": "semantic",
+            "assertion": "assert len(cast(list[JsonValue], placement_batch['placements'])) == 5",
+            "proves": "The same selected redeployment completes with a five-model setup batch, without movement displacements."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.02.03-obligation-02",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Redeployment uses ordinary deployment rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/prebattle.py:apply_redeploy_placement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase16b_prebattle.py::test_phase16b_redeploy_invalid_geometry_rejects_without_mutation",
+            "role": "invalid",
+            "assertion": "assert expected_violation.value in _violation_codes(invalid_status)",
+            "proves": "Redeployment rejects parameterized zone/edge/overlap/coherency violations under the normal deployment geometry rules."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.02.03-obligation-03",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A redeploying unit may use Infiltrators when all its models have that ability.",
+        "owners": [
+          "src/warhammer40k_core/engine/prebattle.py:_resolve_prebattle_placement"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: Real facade setup, selection and placement; typed all-model Infiltrators availability is confirmed before the midfield placement is rejected as outside the deployment zone. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding infiltrators-redeploy-zone-restriction."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:03:03.03:1",
+    "requirements": [
+      {
+        "requirement_id": "03.03-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A multi-model unit must be coherent after setup and every move.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_coherency.py:UnitCoherencyContext",
+          "src/warhammer40k_core/engine/game_state.py:GameState.resolve_end_turn_cleanup_boundary"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_visibility_pathing.py::test_path_query_checks_coherency_after_group_movement",
+            "role": "invalid",
+            "assertion": "assert result.failure.reason is PathFailureReason.COHERENCY",
+            "proves": "A witnessed multi-model move with an incoherent final formation returns typed Coherency failure."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10l_unit_coherency.py::test_deployment_placement_outside_coherency_is_rejected",
+            "role": "invalid",
+            "assertion": "with pytest.raises(PlacementError, match='must be set up in coherency'):\n    assert_battlefield_units_in_coherency(scenario=broken_scenario, ruleset_descriptor=descriptor)",
+            "proves": "The real battlefield placement owner rejects an incoherent setup."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.03-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Each member must have another member within two inches horizontally and five vertically.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_coherency.py:UnitCoherencyContext",
+          "src/warhammer40k_core/engine/game_state.py:GameState.resolve_end_turn_cleanup_boundary"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10l_unit_coherency.py::test_eleventh_broken_coherency_identifies_offending_model_ids",
+            "role": "semantic",
+            "assertion": "assert result.violations[0].violation_code == 'insufficient_coherency_neighbors'",
+            "proves": "A separated member without a two-inch neighbor is identified as incoherent."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.03-obligation-03",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Each member must be within nine inches horizontally and five vertically of every other member.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_coherency.py:UnitCoherencyContext",
+          "src/warhammer40k_core/engine/game_state.py:GameState.resolve_end_turn_cleanup_boundary"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10l_unit_coherency.py::test_eleventh_unit_span_limit_is_enforced_after_neighbor_coherency",
+            "role": "semantic",
+            "assertion": "assert result.violations[0].max_unit_span_inches == 9.0",
+            "proves": "Locally connected models still fail the nine-inch whole-unit span limit."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.03-obligation-04",
+        "source_blocks": [
+          5
+        ],
+        "summary": "At each turn end, the owner removes incoherent-unit models individually until coherency is restored.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_coherency.py:UnitCoherencyContext",
+          "src/warhammer40k_core/engine/game_state.py:GameState.resolve_end_turn_cleanup_boundary"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_end_turn_coherency_cleanup_removes_models_without_destroyed_triggers",
+            "role": "semantic",
+            "assertion": "assert cleanup.removed_model_instance_ids == (removed_model_id,)",
+            "proves": "End-turn lifecycle removes the isolated model to restore the remaining formation."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.03-obligation-05",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Coherency removals count as destroyed models.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_coherency.py:UnitCoherencyContext",
+          "src/warhammer40k_core/engine/game_state.py:GameState.resolve_end_turn_cleanup_boundary"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_end_turn_coherency_cleanup_removes_models_without_destroyed_triggers",
+            "role": "semantic",
+            "assertion": "assert cleanup.removals[0].removal_kind.value == 'destroyed'",
+            "proves": "Coherency removal carries explicit destroyed status."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.03-obligation-06",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Coherency removals do not trigger destroyed-model rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_coherency.py:UnitCoherencyContext",
+          "src/warhammer40k_core/engine/game_state.py:GameState.resolve_end_turn_cleanup_boundary"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_end_turn_coherency_cleanup_removes_models_without_destroyed_triggers",
+            "role": "semantic",
+            "assertion": "assert cleanup.removals[0].destroyed_model_rules_triggered is False",
+            "proves": "Coherency removal explicitly suppresses destroyed-model triggers."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          4
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:03:03.03.01:1",
+    "requirements": [
+      {
+        "requirement_id": "03.03.01-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The coherent unit must form one connected group.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_coherency.py:resolve_unit_movement_endpoint_coherency"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10l_unit_coherency.py::test_eleventh_two_disconnected_two_model_groups_are_not_coherent",
+            "role": "semantic",
+            "assertion": "assert 'unit_coherency_not_single_group' in {violation.violation_code for violation in result.violations}",
+            "proves": "Two locally coherent clusters fail the connected-unit invariant."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:03:03.04:1",
+    "requirements": [
+      {
+        "requirement_id": "03.04-obligation-01",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Engagement Range includes up to two inches horizontally and five inches vertically.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_resolution.py:melee_target_unit_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_model_geometry.py::test_model_range_and_engagement_use_2_5d_volume_distance",
+            "role": "semantic",
+            "assertion": "assert first.is_within_engagement_range(second, horizontal_inches=_engagement_horizontal_inches(), vertical_inches=_engagement_vertical_inches())",
+            "proves": "Models at the two-inch horizontal boundary are engaged under the11th-edition descriptor."
+          },
+          {
+            "nodeid": "tests/unit/test_model_geometry.py::test_model_range_and_engagement_use_2_5d_volume_distance",
+            "role": "semantic",
+            "assertion": "assert not first.is_within_engagement_range(elevated, horizontal_inches=_engagement_horizontal_inches(), vertical_inches=_engagement_vertical_inches())",
+            "proves": "A target six vertical inches above the physical extent is outside the five-inch engagement limit."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.04-obligation-02",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Opposing models within Engagement Range are mutually engaged.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_proximity.py:unit_within_enemy_engagement_range"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_engagement_is_mutual_and_one_member_engages_each_unit",
+            "role": "semantic",
+            "assertion": "assert unit_within_enemy_engagement_range(state=state, unit_instance_id=source.unit_instance_id) is near",
+            "proves": "One nearby enemy member engages its entire rules unit and the friendly unit; with every enemy far away both are unengaged."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_engagement_is_mutual_and_one_member_engages_each_unit",
+            "role": "semantic",
+            "assertion": "assert unit_within_enemy_engagement_range(state=state, unit_instance_id=target.unit_instance_id) is near",
+            "proves": "The same source-backed engagement predicate returns the same result from the opposing unit perspective."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.04-obligation-03",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Engagement of any member engages the two rules units.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_proximity.py:unit_within_enemy_engagement_range"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_engagement_is_mutual_and_one_member_engages_each_unit",
+            "role": "semantic",
+            "assertion": "assert unit_within_enemy_engagement_range(state=state, unit_instance_id=source.unit_instance_id) is near",
+            "proves": "One nearby enemy member engages its entire rules unit and the friendly unit; with every enemy far away both are unengaged."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "03.04-obligation-04",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A unit with no engaged members is unengaged.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_proximity.py:unit_within_enemy_engagement_range"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_engagement_is_mutual_and_one_member_engages_each_unit",
+            "role": "semantic",
+            "assertion": "assert unit_within_enemy_engagement_range(state=state, unit_instance_id=source.unit_instance_id) is near",
+            "proves": "One nearby enemy member engages its entire rules unit and the friendly unit; with every enemy far away both are unengaged."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "classification": "example",
+        "reason": "Illustration of the separately inventoried operative rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:03:03.04.01:1",
+    "requirements": [],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:904b8b36-09f0-4449-a9c3-45892664ef60",
+    "requirements": [
+      {
+        "requirement_id": "faq-904b8b36-09f0-4449-a9c3-45892664ef60-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Models destroyed for coherency count toward mission destruction objectives.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:GameState.resolve_end_turn_cleanup_boundary",
+          "src/warhammer40k_core/engine/secondary_unit_destruction_tracking.py:secondary_unit_destruction_from_primary",
+          "src/warhammer40k_core/engine/secondary_scoring_conditions.py:evaluate_secondary_scoring_condition"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: Confirmed consumer discrepancy: actual end-turn coherency cleanup removes a starting-W10 enemy model as destroyed while four unit mates survive, but the Bring It Down condition returns score_count0 and no destroyed model IDs. Primary departure evidence exists; Secondary destroyed-model inventory is projected only after unit/component completion. Retained probe: probe_coherency_destroyed_model_mission_count in tests/order97_gap_probes_18_25.py. Prerequisite: carry each mission-relevant coherency casualty into the shared per-model destruction/scoring route, audit other causes sharing that route, and prove real scoring, restore and replay while preserving the established control-first boundary ordering."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:e5941469-5653-49b2-919e-9c9246e811d4",
+    "requirements": [
+      {
+        "requirement_id": "faq-e5941469-5653-49b2-919e-9c9246e811d4-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Transiting an enemy Engagement Range does not itself establish engagement during a move.",
+        "owners": [
+          "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:validate_primary_mission_boundary_unit_history_authority"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_flying_transit_through_engagement_does_not_establish_engagement",
+            "role": "facade",
+            "assertion": "assert not unit_within_enemy_engagement_range(state=state, unit_instance_id='army-alpha:mover')",
+            "proves": "An accepted witnessed Fly Advance crosses an enemy Engagement Range and ends outside it; neither unit remains engaged."
+          }
+        ],
+        "qualifications": [
+          "Evidence gap: The accepted, witnessed Fly Advance passes transit and final engagement checks; its exact facade checkpoint fails Advance authority reconstruction. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding flying-advance-restore-authority."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:ba488672-92ec-443d-9087-85a999342589",
+    "requirements": [
+      {
+        "requirement_id": "faq-ba488672-92ec-443d-9087-85a999342589-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A mandatory if-able movement condition cannot force an incoherent endpoint.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_resolution.py:resolve_fight_movement"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_if_able_fight_endpoint_cannot_override_real_unit_coherency",
+            "role": "invalid",
+            "assertion": "assert not result.is_valid",
+            "proves": "A physically valid three-inch Pile-in path toward Engagement Range still fails because its actual final group is incoherent; the resolver preserves a rollback to the original placement."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:a7ba0395-6635-45cd-aeec-1cc3c0607a0b",
+    "requirements": [
+      {
+        "requirement_id": "faq-a7ba0395-6635-45cd-aeec-1cc3c0607a0b-obligation-01",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Locally-neighbouring disconnected clusters are not a coherent unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/transports.py:resolve_disembark"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10l_unit_coherency.py::test_eleventh_two_disconnected_two_model_groups_are_not_coherent",
+            "role": "semantic",
+            "assertion": "assert 'unit_coherency_not_single_group' in {violation.violation_code for violation in result.violations}",
+            "proves": "Two locally coherent clusters fail the connected-unit invariant."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+      }
+    ]
+  }
+]

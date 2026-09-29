@@ -93,7 +93,7 @@ def test_pfinal_includes_new_source_governance_rows_without_changing_aggregate()
 
 def test_comparison_uses_current_roadmap_without_rewriting_historical_observations() -> None:
     inventory = category_pr_ids(roadmap_rows(ROADMAP.read_text(encoding="utf-8")))
-    assert inventory["17"] == ("P17",)
+    assert inventory["17"] == ("P17", "P17B")
     assert "P18G" in inventory["18"]
     assert "P22B" in inventory["22"]
     assert "P24J" in inventory["24"]

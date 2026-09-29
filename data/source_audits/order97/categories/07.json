@@ -1,0 +1,548 @@
+[
+  {
+    "row_id": "rule:07:07.00:1",
+    "requirements": [
+      {
+        "requirement_id": "07.00-stage-3",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Start-of-round rules precede player turns.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "07.00-stage-4",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Player turns occur between round boundaries.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "07.00-stage-5",
+        "source_blocks": [
+          5
+        ],
+        "summary": "End-of-round rules follow both player turns.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          2
+        ],
+        "classification": "context",
+        "reason": "Introduction to the ordered battle-round sequence below."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:07:07.01:1",
+    "requirements": [
+      {
+        "requirement_id": "07.01-start",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Resolve start-of-battle-round rules before player turns.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          },
+          {
+            "nodeid": "tests/unit/test_phase17g_world_eaters_army_rule.py::test_lifecycle_requests_world_eaters_blessings_and_records_effect",
+            "role": "semantic",
+            "assertion": "assert army_rule.active_blessings_for_player(lifecycle.state, player_id='player-a') == (army_rule.BlessingOfKhorne.UNBRIDLED_BLOODLUST,)",
+            "proves": "A real loaded round-start Blessing is selected and becomes an active persisting effect."
+          },
+          {
+            "nodeid": "tests/unit/test_phase17g_world_eaters_army_rule.py::test_lifecycle_requests_world_eaters_blessings_and_records_effect",
+            "role": "semantic",
+            "assertion": "assert army_rule.active_blessings_for_player(lifecycle.state, player_id='player-a') == (army_rule.BlessingOfKhorne.UNBRIDLED_BLOODLUST,)",
+            "proves": "A loaded source-owned battle-round-start choice records the selected Blessing as active."
+          }
+        ],
+        "qualifications": [
+          "The lower-level lifecycle consumer supplies the non-empty rule effect; the facade round-order assertion supplies the shared adapter progression."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:07:07.02:1",
+    "requirements": [
+      {
+        "requirement_id": "07.02-fixed-first",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The same mission-selected player takes the first turn in each round.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "07.02-opponent-next",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The opposing player takes one turn after the first player finishes.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "07.02-seven-parts",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Each turn proceeds through start, five phases, and end in source order.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "07.02-part-3",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Resolve start-of-turn rules in the prescribed part of every turn.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "07.02-part-4",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Resolve Command phase in the prescribed part of every turn.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "07.02-part-5",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Resolve Movement phase in the prescribed part of every turn.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "07.02-part-6",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Resolve Shooting phase in the prescribed part of every turn.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "07.02-part-7",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Resolve Charge phase in the prescribed part of every turn.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "07.02-part-8",
+        "source_blocks": [
+          8
+        ],
+        "summary": "Resolve Fight phase in the prescribed part of every turn.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "07.02-part-9",
+        "source_blocks": [
+          9
+        ],
+        "summary": "Resolve end-of-turn rules in the prescribed part of every turn.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "07.02-nonmission-first",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Resolve non-mission end-of-turn rules before mission rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert payload['resolution_order'] == ['non_mission_rules', 'mission_rules']",
+            "proves": "Turn and round boundary events specify non-mission-before-mission ordering."
+          },
+          {
+            "nodeid": "tests/unit/test_order36_sequencing.py::test_mission_turn_end_offers_owner_order_between_primary_and_fixed_secondary",
+            "role": "facade",
+            "assertion": "assert kinds[0] is (VictoryPointSourceKind.PRIMARY if first_family == 'primary-scoring' else VictoryPointSourceKind.FIXED_SECONDARY)",
+            "proves": "A non-empty mission boundary executes the chosen scoring family first."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "07.02-mission-after",
+        "source_blocks": [
+          11
+        ],
+        "summary": "Resolve achieved end-of-turn mission conditions for both players after non-mission rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order36_sequencing.py::test_opposing_primary_missions_keep_distinct_commits_at_one_boundary",
+            "role": "semantic",
+            "assertion": "assert {row.scoring_player_id for row in state.primary_scoring_boundary_lifecycles} == {'player-a', 'player-b'}",
+            "proves": "Both players own separate primary scoring commits at one boundary."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:07:07.02.01:1",
+    "requirements": [
+      {
+        "requirement_id": "07.02.01-phase-lock",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An out-of-phase action does not activate other phase-locked rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/timing_windows.py:OutOfPhaseActionContext.allows_normal_phase_trigger"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_out_of_phase_shooting",
+            "role": "semantic",
+            "assertion": "assert pool_payload['hit_roll_modifier'] == 0",
+            "proves": "An out-of-phase shooting declaration receives no Heavy phase-locked bonus."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_out_of_phase_shooting",
+            "role": "semantic",
+            "assertion": "assert HEAVY_RULE_ID not in targeting_rule_ids",
+            "proves": "The accepted out-of-phase attack omits the phase-locked Heavy source."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Introduces permissions that are supplied by the individual out-of-phase rules."
+      },
+      {
+        "source_blocks": [
+          3
+        ],
+        "classification": "example",
+        "reason": "Overwatch example illustrates the phase-lock rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:07:07.02.02:1",
+    "requirements": [
+      {
+        "requirement_id": "07.02.02-every-boundary",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Unqualified start-of-round, turn, and phase triggers recur at every corresponding boundary.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_timing_evidence.py::test_loaded_unqualified_fight_trigger_repeats_on_both_players_turns",
+            "role": "facade",
+            "assertion": "assert [(row['battle_round'], row['active_player_id']) for row in resolved] == [(1, 'player-a'), (1, 'player-b'), (2, 'player-a'), (2, 'player-b')]",
+            "proves": "The source-loaded unqualified Fight-start rule creates a real selected-target Damage effect on both players turns in two rounds; exact restore, viewer and replay checks accompany the four occurrences."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "07.02.02-both-players",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An unqualified turn or phase rule applies in both players' corresponding turns or phases.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_timing_evidence.py::test_loaded_unqualified_fight_trigger_repeats_on_both_players_turns",
+            "role": "facade",
+            "assertion": "assert [(row['battle_round'], row['active_player_id']) for row in resolved] == [(1, 'player-a'), (1, 'player-b'), (2, 'player-a'), (2, 'player-b')]",
+            "proves": "The source-loaded unqualified Fight-start rule creates a real selected-target Damage effect on both players turns in two rounds; exact restore, viewer and replay checks accompany the four occurrences."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          3
+        ],
+        "classification": "example",
+        "reason": "Healing example illustrates unqualified timing."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:07:07.03:1",
+    "requirements": [
+      {
+        "requirement_id": "07.03-nonmission-first",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Resolve non-mission end-of-battle-round rules before mission rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert payload['resolution_order'] == ['non_mission_rules', 'mission_rules']",
+            "proves": "Round-end events declare the non-mission-before-mission order."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "07.03-mission-after",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Resolve achieved end-of-round mission conditions after non-mission rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order36_sequencing.py::test_unowned_mission_priority_preserves_source_exceptions",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in request.options} == ({'next:mission-0', 'next:mission-1'} if mission_first else {'next:opponent-rule'})",
+            "proves": "At end-of-round/turn boundaries, only the non-mission participant is selectable while mandatory mission participants remain; changing the source exception is rejected."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert payload['resolution_order'] == ['non_mission_rules', 'mission_rules']",
+            "proves": "Both players complete two real rounds; turn/round-end boundaries retain non-mission-before-mission resolution and the full run restores and replays."
+          }
+        ],
+        "qualifications": [
+          "The sequencing assertion covers participant priority; this clause does not certify individual mission scoring formulas."
+        ]
+      },
+      {
+        "requirement_id": "07.03-next-round",
+        "source_blocks": [
+          4
+        ],
+        "summary": "After a completed round, start the next unless the mission-defined final round ended.",
+        "owners": [
+          "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+            "role": "facade",
+            "assertion": "assert windows == expected",
+            "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_game_ends_after_configured_battle_rounds_with_draw_result",
+            "role": "semantic",
+            "assertion": "assert state.stage is GameLifecycleStage.COMPLETE",
+            "proves": "The configured mission round count ends the game."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Introduces the end-of-round ordered resolution below."
+      }
+    ]
+  }
+]

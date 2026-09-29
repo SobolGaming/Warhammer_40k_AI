@@ -1,0 +1,335 @@
+[
+  {
+    "row_id": "rule:16:16.01:1",
+    "requirements": [
+      {
+        "requirement_id": "16.01-presence",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Only battlefield units may start an action.",
+        "owners": [
+          "src/warhammer40k_core/engine/mission_action_eligibility.py:mission_action_unit_ineligibility_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_automatic_mission_action_opportunity_excludes_embarked_units",
+            "role": "semantic",
+            "assertion": "assert request is None or request.decision_type != START_MISSION_ACTION_DECISION_TYPE",
+            "proves": "Embarked units are excluded from action opportunities."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "16.01-keywords",
+        "source_blocks": [
+          11
+        ],
+        "summary": "Aircraft and Fortification units cannot start actions.",
+        "owners": [
+          "src/warhammer40k_core/engine/mission_action_eligibility.py:mission_action_unit_ineligibility_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_action_keyword_and_movement_exclusions",
+            "role": "semantic",
+            "assertion": "assert reason == f'mission_action_unit_{condition.lower()}'",
+            "proves": "Aircraft and Fortification each return their explicit action ineligibility reason."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "16.01-shock",
+        "source_blocks": [
+          12
+        ],
+        "summary": "Battle-shocked units cannot start an action absent permission.",
+        "owners": [
+          "src/warhammer40k_core/engine/mission_action_eligibility.py:mission_action_unit_ineligibility_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_automatic_mission_action_opportunity_excludes_unavailable_units",
+            "role": "semantic",
+            "assertion": "assert request is None or request.decision_type != START_MISSION_ACTION_DECISION_TYPE",
+            "proves": "The battle-shock exclusion is tested in the eligibility matrix."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "16.01-oc",
+        "source_blocks": [
+          13
+        ],
+        "summary": "Zero or absent OC prevents starting an action.",
+        "owners": [
+          "src/warhammer40k_core/engine/mission_action_eligibility.py:mission_action_unit_ineligibility_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_mission_action_eligibility_uses_runtime_modified_objective_control",
+            "role": "semantic",
+            "assertion": "assert mission_action_unit_ineligibility_reason(state=state, player_id='player-a', unit_instance_id=unit_id, runtime_modifier_registry=registry) == expected_reason",
+            "proves": "Runtime modified OC determines action eligibility."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "16.01-engagement",
+        "source_blocks": [
+          14
+        ],
+        "summary": "Engaged units cannot start an action unless Titanic.",
+        "owners": [
+          "src/warhammer40k_core/engine/mission_action_eligibility.py:mission_action_unit_ineligibility_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_titanic_unit_can_start_action_while_engaged",
+            "role": "semantic",
+            "assertion": "assert any((option.option_id.startswith(f'start:cleanse-objective:{unit_id}:') for option in request.options))",
+            "proves": "The Titanic exception allows action start while engaged."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "16.01-movement",
+        "source_blocks": [
+          15
+        ],
+        "summary": "Advance or Fall Back during the turn prevents starting an action.",
+        "owners": [
+          "src/warhammer40k_core/engine/mission_action_eligibility.py:mission_action_unit_ineligibility_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_action_keyword_and_movement_exclusions",
+            "role": "semantic",
+            "assertion": "assert reason == f'mission_action_unit_{condition.lower()}'",
+            "proves": "Real recorded Advance and Fall Back history each return their explicit action ineligibility reason."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "16.01-once",
+        "source_blocks": [
+          16
+        ],
+        "summary": "A unit that started another action this turn cannot start a second.",
+        "owners": [
+          "src/warhammer40k_core/engine/mission_action_eligibility.py:mission_action_unit_ineligibility_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_action_history_blocks_second_start_after_interruption",
+            "role": "semantic",
+            "assertion": "assert mission_action_unit_ineligibility_reason(state=state, player_id='player-a', unit_instance_id=SHOOTER, runtime_modifier_registry=RuntimeModifierRegistry.empty()) == 'mission_action_unit_already_started_action'",
+            "proves": "Even after its action is interrupted, the unit remains unable to start another during the turn."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "16.01-shooting-lock",
+        "source_blocks": [
+          18
+        ],
+        "summary": "Starting an action prevents shooting for the rest of the turn except for Titanic units.",
+        "owners": [
+          "src/warhammer40k_core/engine/mission_action_eligibility.py:mission_action_unit_ineligibility_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_started_action_excludes_that_unit_from_shooting",
+            "role": "semantic",
+            "assertion": "assert infantry_id not in {option.option_id for option in shooting_request.options}",
+            "proves": "Action start removes the unit shooting option."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_titanic_action_unit_remains_eligible_to_shoot",
+            "role": "semantic",
+            "assertion": "assert unit_id in {option.option_id for option in shooting_request.options}",
+            "proves": "Titanic action actors retain shooting eligibility."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "16.01-charge-lock",
+        "source_blocks": [
+          19
+        ],
+        "summary": "Starting an action prevents charge declaration through turn end.",
+        "owners": [
+          "src/warhammer40k_core/engine/mission_action_eligibility.py:mission_action_unit_ineligibility_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_unit_that_started_action_this_turn_cannot_declare_charge",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in request.options} == {units['intercessor-2'].unit_instance_id, COMPLETE_CHARGE_PHASE_OPTION_ID}",
+            "proves": "The charge candidate set excludes the action unit."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "16.01-interrupt-move",
+        "source_blocks": [
+          21
+        ],
+        "summary": "Moving interrupts an action except Pile In and Consolidation.",
+        "owners": [
+          "src/warhammer40k_core/engine/mission_action_eligibility.py:mission_action_unit_ineligibility_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_mission_action_cancellation_maps_displacements_and_battlefield_departure",
+            "role": "semantic",
+            "assertion": "assert interrupted_by_move.interrupted_reason == 'unit_moved'",
+            "proves": "An ordinary movement interruption records the unit-moved reason."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_mission_action_cancellation_maps_displacements_and_battlefield_departure",
+            "role": "semantic",
+            "assertion": "assert pile_in_result is None",
+            "proves": "Pile In does not interrupt."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_mission_action_cancellation_maps_displacements_and_battlefield_departure",
+            "role": "semantic",
+            "assertion": "assert consolidate_result is None",
+            "proves": "Consolidation does not interrupt."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "16.01-interrupt-departure",
+        "source_blocks": [
+          21
+        ],
+        "summary": "Leaving the battlefield interrupts the action.",
+        "owners": [
+          "src/warhammer40k_core/engine/mission_action_eligibility.py:mission_action_unit_ineligibility_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_mission_action_cancellation_maps_displacements_and_battlefield_departure",
+            "role": "semantic",
+            "assertion": "assert interrupted_by_departure.interrupted_reason == 'unit_left_battlefield'",
+            "proves": "Departure records the unit-left-battlefield interruption."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "16.01-completion",
+        "source_blocks": [
+          21
+        ],
+        "summary": "Otherwise completion triggers the action source effect.",
+        "owners": [
+          "src/warhammer40k_core/engine/mission_action_eligibility.py:mission_action_unit_ineligibility_reason"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_mission_action_can_complete_interrupt_and_score",
+            "role": "semantic",
+            "assertion": "assert [cleanse.objective_marker_id for cleanse in state.secondary_objective_cleanse_states] == [completed.target_id]",
+            "proves": "A completed action contributes its scoring effect."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          17,
+          20
+        ],
+        "classification": "metadata",
+        "reason": "Action record fields and section headings; predicates and consequences follow."
+      },
+      {
+        "source_blocks": [
+          22
+        ],
+        "classification": "cross_reference",
+        "reason": "Callout identifies mission packs and core actions as action sources."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:bbe268a2-b1fd-43ab-8b24-fd4363730c3f",
+    "requirements": [
+      {
+        "requirement_id": "faq-bbe268a2-b1fd-43ab-8b24-fd4363730c3f-shock-interrupt",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Becoming battle-shocked interrupts an action already begun.",
+        "owners": [
+          "src/warhammer40k_core/engine/mission_action_eligibility.py:mission_action_unit_ineligibility_reason"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Gameplay gap: the authoritative Battle-shock state update leaves an active action STARTED and completion checks only current shock. An immediate terminal interruption with source-backed exception handling is required."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "The question supplies the condition answered by operative answer block 2."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:4c654d00-318d-4665-9e46-26cfab179a29",
+    "requirements": [
+      {
+        "requirement_id": "faq-4c654d00-318d-4665-9e46-26cfab179a29-shock-permission",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Permission to act while battle-shocked also allows continuing after later battle shock.",
+        "owners": [
+          "src/warhammer40k_core/engine/mission_action_eligibility.py:mission_action_unit_ineligibility_reason"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Gameplay gap: action eligibility and completion unconditionally reject Battle-shock and expose no source-backed permission to continue an action whose source permits shocked start."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "The question supplies the condition answered by operative answer block 2."
+      }
+    ]
+  }
+]

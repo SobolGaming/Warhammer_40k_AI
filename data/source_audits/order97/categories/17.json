@@ -1,0 +1,199 @@
+[
+  {
+    "row_id": "rule:17:17.01:1",
+    "requirements": [
+      {
+        "requirement_id": "17.01-transit",
+        "source_blocks": [
+          1
+        ],
+        "summary": "During Normal or Advance, Monster/Vehicle models may cross friendly and enemy non-Monster/non-Vehicle models.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10h_pathing_smoke.py::test_vehicle_or_monster_normal_and_advance_can_transit_enemy_non_vehicle_models",
+            "role": "semantic",
+            "assertion": "assert path_context.may_transit_enemy_models",
+            "proves": "Monster/Vehicle models have permitted non-large-model transit."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10h_pathing_smoke.py::test_vehicle_or_monster_normal_and_advance_cannot_transit_enemy_vehicle_or_monster",
+            "role": "semantic",
+            "assertion": "assert result.violations[0].violation_code == 'enemy_vehicle_monster_transit_forbidden'",
+            "proves": "Enemy Monster/Vehicle models retain blocking authority."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:17:17.02:1",
+    "requirements": [
+      {
+        "requirement_id": "17.02-measurement",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Frame model relationships measure from the closest part of the model, even with a base.",
+        "owners": [
+          "src/warhammer40k_core/geometry/model_geometry.py:ModelGeometry"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Gameplay gap: a based FRAME body within two inches is ignored in favour of its support base outside two inches. See probe_based_frame_measurement; the same measurement family also affects body-aware containment."
+        ]
+      },
+      {
+        "requirement_id": "17.02-rotation",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A baseless Frame rotates upright about its central axis.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_baseless_frame_rotates_upright_about_its_central_axis",
+            "role": "semantic",
+            "assertion": "assert after.pose.position == before.pose.position",
+            "proves": "The runtime baseless geometry preserves its central position."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_baseless_frame_rotates_upright_about_its_central_axis",
+            "role": "semantic",
+            "assertion": "assert after.volume.height == before.volume.height == 3",
+            "proves": "The body remains upright with its original height."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_movement_evidence.py::test_baseless_frame_rotates_upright_about_its_central_axis",
+            "role": "semantic",
+            "assertion": "assert all((isclose(a, b) for a, b in zip(shapely_backend.footprint_for_base(after.base, after.pose).bounds, (9, 8, 11, 12), strict=True)))",
+            "proves": "The actual body bounds rotate ninety degrees around that center."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:17:17.03:1",
+    "requirements": [
+      {
+        "requirement_id": "17.03-target",
+        "source_blocks": [
+          1
+        ],
+        "summary": "In own Shooting phase an engaged Monster/Vehicle enemy may be targeted by non-Blast ranged attacks.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_order71_blast_cannot_target_engaged_monster_vehicle",
+            "role": "semantic",
+            "assertion": "assert candidate.violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT",
+            "proves": "Blast targeting an engaged Monster/Vehicle is rejected."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_target_side_engagement_rejects_engaged_infantry_and_applies_big_guns",
+            "role": "semantic",
+            "assertion": "assert monster_candidates[0].is_legal",
+            "proves": "Target-side engagement distinguishes Infantry from Monster/Vehicle."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "17.03-penalty",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Attacks into that engaged unit suffer minus one to hit unless a Close-quarters attacker unit engages that target.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_order71_engagement_causes_and_weapon_exception",
+            "role": "semantic",
+            "assertion": "assert candidate.hit_roll_modifier == -len(expected_sources)",
+            "proves": "Each applicable engagement source contributes its own penalty."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "classification": "example",
+        "reason": "Diagram examples illustrate the model and target engagement penalties."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:17:17.03.01:1",
+    "requirements": [
+      {
+        "requirement_id": "17.03.01-no-permission",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Being engaged with a Monster/Vehicle does not itself grant permission to shoot.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_locked_in_combat_big_guns_and_pistol_interactions_are_declaration_state",
+            "role": "semantic",
+            "assertion": "assert infantry_candidates[0].violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT",
+            "proves": "The declaring unit must independently possess a legal engaged shooting mode."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "faq:9b1c81f5-2ea0-40eb-9015-6a005367cd75",
+    "requirements": [
+      {
+        "requirement_id": "faq-9b1c81f5-2ea0-40eb-9015-6a005367cd75-friendly-transit",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Monster/Vehicle models retain ordinary friendly-model transit on other move types.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Gameplay gap: the Normal/Advance Monster/Vehicle friendly-blocker exception also blocks Fall Back, Charge, Pile In and Consolidate. See probe_friendly_transit."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "The question supplies the condition answered by operative answer block 2."
+      }
+    ]
+  }
+]

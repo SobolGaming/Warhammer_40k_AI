@@ -1,0 +1,928 @@
+[
+  {
+    "row_id": "rule:13:13.01:1",
+    "requirements": [
+      {
+        "requirement_id": "13.01-area-construction",
+        "source_blocks": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "summary": "Terrain areas use agreed or mission-defined boundaries containing one or more physical features.",
+        "owners": [
+          "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_terrain_areas.py::test_linked_physical_footprints_form_one_logical_visibility_area",
+            "role": "semantic",
+            "assertion": "assert visibility_area.member_terrain_area_ids == ('physical-left', 'physical-right')",
+            "proves": "Two declared physical footprints become one logical terrain area; the declared boundaries remain exact."
+          },
+          {
+            "nodeid": "tests/unit/test_terrain_areas.py::test_logical_group_does_not_fill_open_board_between_physical_members",
+            "role": "semantic",
+            "assertion": "assert not model_wholly_within_terrain_area(seam_spanning_model, visibility_area)",
+            "proves": "A logical grouping preserves the explicit physical areas rather than filling unagreed gaps."
+          }
+        ],
+        "qualifications": [
+          "Agreement and mission selection are external configuration inputs; the engine validates and consumes the declared exact polygons."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:13:13.02:1",
+    "requirements": [
+      {
+        "requirement_id": "13.02-feature-classification",
+        "source_blocks": [
+          1,
+          2
+        ],
+        "summary": "Each feature has its own terrain category, including mixed categories in one area.",
+        "owners": [
+          "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10f_terrain_factory.py::test_area_factory_composes_mixed_dense_ruins_and_light_obstacle_features",
+            "role": "semantic",
+            "assertion": "assert {ruins.feature_id, light.feature_id} == {'mixed-area-ruins', 'mixed-area-light-obstacle'}",
+            "proves": "The area factory composes distinct feature categories within one area."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "classification": "example",
+        "reason": "Diagrams illustrate mat boundaries and mixed physical features."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:13:13.02.01:1",
+    "requirements": [],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Optional terrain-layout and balancing advice does not impose engine mutation."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:13:13.03:1",
+    "requirements": [],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Qualitative category description; operative traversal and visibility appear in later rows."
+      },
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "example",
+        "reason": "Examples of physical terrain, not an additional rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:13:13.04:1",
+    "requirements": [],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Qualitative category description; operative traversal and visibility appear in later rows."
+      },
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "example",
+        "reason": "Examples of physical terrain, not an additional rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:13:13.05:1",
+    "requirements": [],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Qualitative category description; operative traversal and visibility appear in later rows."
+      },
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "example",
+        "reason": "Examples of physical terrain, not an additional rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:13:13.06:1",
+    "requirements": [
+      {
+        "requirement_id": "13.06-light-traversal",
+        "source_blocks": [
+          1,
+          2
+        ],
+        "summary": "All models may traverse Light terrain horizontally and vertically.",
+        "owners": [
+          "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10i_terrain_movement.py::test_light_classification_allows_mounted_through_three_inch_feature",
+            "role": "semantic",
+            "assertion": "assert result.is_valid",
+            "proves": "A Mounted model passes through a Light feature above the generic two-inch threshold."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_terrain_permitted_vertical_transit",
+            "role": "semantic",
+            "assertion": "assert result.is_valid",
+            "proves": "The Light Vehicle case passes through a four-inch feature along a vertical witness."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "13.06-exposed-traversal",
+        "source_blocks": [
+          1,
+          2
+        ],
+        "summary": "All models may traverse Exposed terrain horizontally and vertically.",
+        "owners": [
+          "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Gameplay gap: selected-source Exposed lacks an explicit typed category or verified source alias; the exact exposed token fails closed. See probe_exposed_category."
+        ]
+      },
+      {
+        "requirement_id": "13.06-dense-horizontal",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Infantry, Beasts, Swarm and Mobile may pass horizontally through Dense features.",
+        "owners": [
+          "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order53_movement_abilities.py::test_horizontal_terrain_sections_mobile_and_endpoints",
+            "role": "semantic",
+            "assertion": "assert context.validate().is_valid is accepted",
+            "proves": "The model-keyword terrain matrix exercises horizontal permissions."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "13.06-dense-vertical",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Infantry, Beasts and Swarm may pass vertically through Dense features.",
+        "owners": [
+          "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_terrain_permitted_vertical_transit",
+            "role": "semantic",
+            "assertion": "assert result.is_valid",
+            "proves": "Infantry, Beasts and Swarm each pass vertically through a four-inch Dense wall."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_terrain_permitted_vertical_transit",
+            "role": "semantic",
+            "assertion": "assert any((s.vertical_distance_inches > 0 for s in result.segments))",
+            "proves": "The witnessed accepted transit contains actual vertical movement."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "13.06-other-dense-low",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Otherwise Dense horizontal traversal is allowed only through sections at most two inches high.",
+        "owners": [
+          "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10i_terrain_movement.py::test_low_wall_can_be_moved_over_as_if_not_there",
+            "role": "semantic",
+            "assertion": "assert result.segments[0].traversal_mode.value == 'freely_traversable'",
+            "proves": "The two-inch wall is traversable without added height."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10i_terrain_movement.py::test_model_cannot_pass_through_wall_without_traversal_permission",
+            "role": "semantic",
+            "assertion": "assert not result.is_valid",
+            "proves": "An ineligible Vehicle cannot pass through the tall wall."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "13.06-other-dense-climb",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Other models must ascend and descend taller Dense sections.",
+        "owners": [
+          "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10i_terrain_movement.py::test_exact_event_dense_ruin_mobile_vertical_path_climbs_instead_of_passing_through",
+            "role": "semantic",
+            "assertion": "assert any((segment.traversal_mode.value == 'climb' for segment in matching_segments))",
+            "proves": "The permitted route climbs the actual tall Dense volume."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "13.06-dense-floor-crossing",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Models without vertical Dense transit permission cannot pass through ceilings or floors while climbing.",
+        "owners": [
+          "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Gameplay gap: a Vehicle passes vertically through a thin Dense floor at three inches; see probe_dense_floor_crossing."
+        ]
+      },
+      {
+        "requirement_id": "13.06-other-dense-upper",
+        "source_blocks": [
+          6
+        ],
+        "summary": "An unqualified model cannot end its move on an elevated terrain surface.",
+        "owners": [
+          "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10i_terrain_movement.py::test_non_eligible_model_cannot_end_on_upper_ruins_floor",
+            "role": "semantic",
+            "assertion": "assert result.violations[0].violation_code == TerrainEndpointViolationCode.UPPER_FLOOR_KEYWORD_FORBIDDEN.value",
+            "proves": "The Vehicle upper-floor endpoint is explicitly rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "13.06-vertical-contact",
+        "source_blocks": [
+          8,
+          9
+        ],
+        "summary": "Ascending or descending models remain within half an inch horizontally of the feature.",
+        "owners": [
+          "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Gameplay gap: a real vertical path more than half an inch from all terrain is accepted by TerrainPathLegalityContext; no ascending/descending contact gate is applied."
+        ]
+      },
+      {
+        "requirement_id": "13.06-vertical-distance",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Count both upward and downward travel in the total distance budget.",
+        "owners": [
+          "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_climbing_counts_both_ascent_and_descent",
+            "role": "semantic",
+            "assertion": "assert result.segments[0].vertical_distance_inches == 6",
+            "proves": "Ascending three inches and descending three inches adds six vertical inches."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_climbing_counts_both_ascent_and_descent",
+            "role": "semantic",
+            "assertion": "assert result.segments[0].counted_distance_inches == result.segments[0].horizontal_distance_inches + 6",
+            "proves": "The vertical total is added to horizontal travel."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "13.06-upper-keywords",
+        "source_blocks": [
+          12,
+          13
+        ],
+        "summary": "Ground-level endpoints are allowed; elevated surfaces require Infantry, Beasts, Swarm, Fly or Monster.",
+        "owners": [
+          "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10i_terrain_movement.py::test_eligible_keywords_can_end_on_upper_ruins_floor_without_overhang",
+            "role": "semantic",
+            "assertion": "assert result.is_valid",
+            "proves": "Permitted model keywords can use supported upper endpoints."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10i_terrain_movement.py::test_non_eligible_model_cannot_end_on_upper_ruins_floor",
+            "role": "semantic",
+            "assertion": "assert result.violations[0].violation_code == TerrainEndpointViolationCode.UPPER_FLOOR_KEYWORD_FORBIDDEN.value",
+            "proves": "Other keywords cannot use upper endpoints."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "13.06-support",
+        "source_blocks": [
+          14
+        ],
+        "summary": "An elevated endpoint must be stable and its base must not overhang.",
+        "owners": [
+          "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10i_terrain_movement.py::test_upper_ruins_floor_endpoint_fails_when_base_overhangs",
+            "role": "semantic",
+            "assertion": "assert result.violations[0].violation_code == TerrainEndpointViolationCode.BASE_OVERHANGS_SUPPORT_SURFACE.value",
+            "proves": "Overhanging upper-floor endpoint is rejected."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10i_terrain_movement.py::test_shared_endpoint_placement_rejects_rotated_floor_aabb_overhang",
+            "role": "semantic",
+            "assertion": "assert violation.violation_code == 'rotated_floor_overhang'",
+            "proves": "The shared endpoint owner rejects overhang beyond a rotated floor."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          3,
+          7,
+          11,
+          15
+        ],
+        "classification": "metadata",
+        "reason": "Traversal group labels and illustration title."
+      },
+      {
+        "source_blocks": [
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "classification": "example",
+        "reason": "Examples illustrate the category, climbing and endpoint rules."
+      },
+      {
+        "source_blocks": [
+          21
+        ],
+        "classification": "cross_reference",
+        "reason": "Plunging Fire callout points to 22.05 without modifying these movement rules."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:13:13.06.01:1",
+    "requirements": [
+      {
+        "requirement_id": "13.06.01-solid-endpoint",
+        "source_blocks": [
+          1
+        ],
+        "summary": "No model part may finish penetrating an enclosed Solid feature at or below three inches, including openings.",
+        "owners": [
+          "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Gameplay gap: the selected source forbids every model part in a low enclosed window, but the endpoint owner permits a model in that opening. See probe_solid_window_endpoint."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:13:13.07:1",
+    "requirements": [],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "cross_reference",
+        "reason": "Index of Cover, Hidden, Obscuring and Solid rules, each specified below."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:13:13.08:1",
+    "requirements": [
+      {
+        "requirement_id": "13.08-every-model",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Cover is evaluated for every model in the targeted unit against the individual attacker.",
+        "owners": [
+          "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13a_visibility_cover.py::test_one_obscured_model_does_not_grant_cover_when_another_model_has_no_cover_source",
+            "role": "semantic",
+            "assertion": "assert not context.benefit_of_cover(witness).has_benefit",
+            "proves": "One qualifying target model does not confer unit cover."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "13.08-area-cover",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Infantry, Beasts and Swarm models within a terrain area qualify for cover.",
+        "owners": [
+          "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13a_visibility_cover.py::test_terrain_area_cover_requires_each_model_to_meet_the_keyword_or_obscuration_gate",
+            "role": "semantic",
+            "assertion": "assert infantry_context.benefit_of_cover(infantry_context.resolve_line_of_sight()).has_benefit",
+            "proves": "Infantry inside the area has cover."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13a_visibility_cover.py::test_terrain_area_cover_requires_each_model_to_meet_the_keyword_or_obscuration_gate",
+            "role": "semantic",
+            "assertion": "assert not vehicle_context.benefit_of_cover(vehicle_context.resolve_line_of_sight()).has_benefit",
+            "proves": "An unqualified Vehicle model inside the same area does not gain cover."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "13.08-obstruction-cover",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Incomplete full visibility due to intervening physical terrain or Obscuring areas qualifies a model for cover.",
+        "owners": [
+          "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13a_visibility_cover.py::test_p06c_cover_attributes_independent_joint_and_incidental_terrain",
+            "role": "semantic",
+            "assertion": "assert context.benefit_of_cover(witness).has_benefit is cover",
+            "proves": "Visibility evidence attributes cover to terrain causal sources."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "13.08-skill",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Cover worsens the attack Ballistic Skill by one.",
+        "owners": [
+          "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_benefit_of_cover_worsens_ballistic_skill_before_hit_roll",
+            "role": "semantic",
+            "assertion": "assert payload['target_number'] == 4",
+            "proves": "Cover modifies the skill before resolving the hit roll."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "classification": "example",
+        "reason": "Cover diagrams instantiate the operative all-model qualification rule."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:13:13.09:1",
+    "requirements": [
+      {
+        "requirement_id": "13.09-keywords-area",
+        "source_blocks": [
+          1,
+          2
+        ],
+        "summary": "Hidden requires an Infantry/Beasts/Swarm model in an area containing Light or Dense terrain.",
+        "owners": [
+          "src/warhammer40k_core/engine/terrain_hidden.py:terrain_hidden_model_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_phase17n_automatic_hidden_uses_exact_light_and_dense_terrain_areas",
+            "role": "semantic",
+            "assertion": "assert hidden_ids == tuple(sorted((model.model_instance_id for model in target.own_models)))",
+            "proves": "Hidden derives from exact Light/Dense area membership."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "13.09-shooting-history",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Hidden requires no ranged attack in the current or preceding player turn.",
+        "owners": [
+          "src/warhammer40k_core/engine/terrain_hidden.py:terrain_hidden_model_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_ranged_attack_history_tracks_current_and_previous_player_turns",
+            "role": "semantic",
+            "assertion": "assert state.unit_made_ranged_attacks_current_or_previous_turn(unit_instance_id=unit_id)",
+            "proves": "The hidden history tracks the two relevant player turns."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "13.09-detection",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Enemy visibility of a Hidden model requires range within its detection distance, normally fifteen inches.",
+        "owners": [
+          "src/warhammer40k_core/engine/terrain_hidden.py:terrain_hidden_model_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_attributes_modifiers.py::test_phase14c_detection_range_defaults_to_fifteen_and_can_be_lowered",
+            "role": "semantic",
+            "assertion": "assert detection_range.raw == 15",
+            "proves": "The default detection characteristic is fifteen inches."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_phase17n_hidden_and_detection_range_apply_to_models_not_attached_unit_keywords",
+            "role": "semantic",
+            "assertion": "assert candidate.target_visible_model_ids == (vehicle_leader.own_models[0].model_instance_id,)",
+            "proves": "Detection eligibility is model-scoped for attached units."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:13:13.09.01:1",
+    "requirements": [
+      {
+        "requirement_id": "13.09.01-first-turn",
+        "source_blocks": [
+          1
+        ],
+        "summary": "On the first player turn, the no-prior-turn-shooting condition is true.",
+        "owners": [
+          "src/warhammer40k_core/engine/terrain_hidden.py:terrain_hidden_model_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order78_gone_to_ground.py::test_light_area_can_grant_hidden_without_dense_occupancy",
+            "role": "semantic",
+            "assertion": "assert terrain_hidden_model_ids(state=state, ruleset_descriptor=lifecycle.config.ruleset_descriptor, unit_instance_id=TARGET) == (units['enemy'].own_models[0].model_instance_id,)",
+            "proves": "The initial-turn real battlefield unit qualifies as Hidden in a Light area."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:13:13.10:1",
+    "requirements": [
+      {
+        "requirement_id": "13.10-area",
+        "source_blocks": [
+          1
+        ],
+        "summary": "An area containing Light or Dense features is Obscuring.",
+        "owners": [
+          "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13a_visibility_cover.py::test_ruins_area_visibility_blocks_los_without_physical_wall_intersection",
+            "role": "semantic",
+            "assertion": "assert not witness.unit_visible",
+            "proves": "Area visibility can block without a physical wall intersection."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "13.10-every-line",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Every sightline crossing Obscuring areas blocks mutual visibility except areas occupied by either model.",
+        "owners": [
+          "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_obscuring_area_either_endpoint_exception",
+            "role": "semantic",
+            "assertion": "assert context.resolve_line_of_sight().unit_visible is visible",
+            "proves": "A spanning area blocks all sightlines; observer-inside and target-inside cases independently restore visibility."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2,
+          3,
+          4
+        ],
+        "classification": "example",
+        "reason": "Hidden and Obscuring diagram illustrates the separately specified rules."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:13:13.11:1",
+    "requirements": [
+      {
+        "requirement_id": "13.11-solid",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Dense features block sight across enclosed gaps at or below three inches.",
+        "owners": [
+          "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Gameplay gap: real Dense terrain geometry with a fully enclosed window below three inches remains visible through that window when Obscuring does not apply. The owner checks physical wall volumes without filling source-defined enclosed gaps."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "context",
+        "reason": "Designer explanation and mission-height override guidance."
+      },
+      {
+        "source_blocks": [
+          3,
+          4,
+          5
+        ],
+        "classification": "example",
+        "reason": "Solid diagrams illustrate the three-inch visibility boundary."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:13:13.11.01:1",
+    "requirements": [
+      {
+        "requirement_id": "13.11.01-hidden",
+        "source_blocks": [
+          1,
+          2,
+          3
+        ],
+        "summary": "Gone to Ground first requires the model to be Hidden.",
+        "owners": [
+          "src/warhammer40k_core/engine/terrain_hidden.py:terrain_hidden_model_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order78_gone_to_ground.py::test_dense_feature_does_not_hide_an_unhidden_target",
+            "role": "semantic",
+            "assertion": "assert candidate_for_scene(lifecycle, units).is_legal",
+            "proves": "Dense concealment does not reduce detection for an unhidden target."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "13.11.01-dense-obstruction",
+        "source_blocks": [
+          4
+        ],
+        "summary": "The attacker lacks full visibility because of an intervening Dense feature.",
+        "owners": [
+          "src/warhammer40k_core/engine/terrain_hidden.py:terrain_hidden_model_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order78_gone_to_ground.py::test_light_feature_does_not_reduce_detection",
+            "role": "semantic",
+            "assertion": "assert candidate.is_legal",
+            "proves": "Light concealment does not grant the Dense-feature reduction."
+          },
+          {
+            "nodeid": "tests/unit/test_order78_gone_to_ground.py::test_hidden_target_concealed_by_intervening_dense_feature",
+            "role": "semantic",
+            "assertion": "assert candidate.violation_code is ShootingTargetViolationCode.OUTSIDE_DETECTION_RANGE",
+            "proves": "Dense concealment protects the Hidden target."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "13.11.01-shot-exclusion",
+        "source_blocks": [
+          5,
+          7
+        ],
+        "summary": "Any current or preceding-turn ranged attack prevents Gone to Ground, even if Hidden is retained.",
+        "owners": [
+          "src/warhammer40k_core/engine/terrain_hidden.py:terrain_hidden_model_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order78_gone_to_ground.py::test_shooting_history_blocks_gone_to_ground_even_when_hidden_is_retained",
+            "role": "semantic",
+            "assertion": "assert candidate_for_scene(lifecycle, units).is_legal is expected",
+            "proves": "The parameterized history test defeats reduction despite retained Hidden."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "13.11.01-reduction",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Gone to Ground subtracts three inches from detection range.",
+        "owners": [
+          "src/warhammer40k_core/engine/terrain_hidden.py:terrain_hidden_model_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order78_gone_to_ground.py::test_detection_reduction_uses_model_base_distance",
+            "role": "semantic",
+            "assertion": "assert candidate_for_scene(lifecycle, units).is_legal is legal",
+            "proves": "Parameterized twelve-inch boundary enforces the three-inch reduction from default fifteen."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "faq:603e9b2f-cc24-498c-ac2e-08ad3068f257",
+    "requirements": [
+      {
+        "requirement_id": "faq-603e9b2f-cc24-498c-ac2e-08ad3068f257-elevated-membership",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A model within a terrain boundary remains within that area when elevated.",
+        "owners": [
+          "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_terrain_area_membership_is_vertical_projection",
+            "role": "semantic",
+            "assertion": "assert model_intersects_terrain_area(model, area)",
+            "proves": "Identical horizontal membership is true at ground and ten-inch elevation."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "faq-603e9b2f-cc24-498c-ac2e-08ad3068f257-frame-membership",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Frame body parts overhanging a terrain boundary place the model within that area.",
+        "owners": [
+          "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Gameplay gap: the body projects into the area but support-base-only membership says outside. See probe_frame_terrain_membership."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "The question supplies the condition answered by operative answer block 2."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:e01c8a02-7a36-4d3b-b168-976b11bd47e8",
+    "requirements": [
+      {
+        "requirement_id": "faq-e01c8a02-7a36-4d3b-b168-976b11bd47e8-per-attacker-cover",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Assess cover for each attacking model and keep attacks with different cover provenance in separate groups.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_attacker_observer_provenance_prevents_unsafe_cover_gathering",
+            "role": "semantic",
+            "assertion": "assert len(groups) == 2",
+            "proves": "Assess cover for each attacking model and keep attacks with different cover provenance in separate groups. The linked assertion exercises this source condition."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "The question supplies the condition answered by operative answer block 2."
+      }
+    ]
+  }
+]

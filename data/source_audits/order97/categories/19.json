@@ -1,0 +1,468 @@
+[
+  {
+    "row_id": "rule:19:19.01:1",
+    "requirements": [
+      {
+        "requirement_id": "19.01-single-rules-unit",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Leader and Support components attached to a friendly Bodyguard form one rules unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/attached_unit_formation.py:AttachedUnitFormation"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_attachment_declarations_form_runtime_attached_unit_from_structured_catalog",
+            "role": "semantic",
+            "assertion": "assert formation.component_unit_instance_ids == (bodyguard.unit_instance_id, leader.unit_instance_id, support.unit_instance_id)",
+            "proves": "The runtime formation includes Bodyguard, Leader and Support under one attached identity."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "19.01-eligible-bodyguard-list",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Each Leader or Support may attach only to a Bodyguard permitted by its source data.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_attachment_declarations_reject_missing_eligibility_and_illegal_bodyguards",
+            "role": "invalid",
+            "assertion": "assert any((row.violation_code == 'attachment_declaration_invalid' for row in report.violations))",
+            "proves": "Missing source eligibility and an illegal Bodyguard both report attachment_declaration_invalid."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:19:19.01.01:1",
+    "requirements": [
+      {
+        "requirement_id": "19.01.01-remain-attached",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Leader and Support survivors remain one attached unit after Bodyguard destruction.",
+        "owners": [
+          "src/warhammer40k_core/engine/attached_unit_reconciliation.py:validate_attached_rules_unit_identity_after_destruction"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_phase17d_leading_model_condition_survives_destroyed_bodyguard",
+            "role": "semantic",
+            "assertion": "assert len(leader_state.army_definitions[0].attached_units) == 1",
+            "proves": "The original attached formation remains after the Bodyguard is destroyed."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Identifies the older split-on-Bodyguard-destruction wording superseded by the operative answer in block 2."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:19:19.02:1",
+    "requirements": [
+      {
+        "requirement_id": "19.02-bodyguard-maximum-toughness",
+        "source_blocks": [
+          1
+        ],
+        "summary": "While any Bodyguard remains, attacks use the highest Bodyguard Toughness.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:rules_unit_view_by_id"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_attached_unit_uses_highest_bodyguard_toughness_for_wounds",
+            "role": "semantic",
+            "assertion": "assert wound_payload['toughness'] == 5",
+            "proves": "The actual wound event uses the highest Bodyguard Toughness 5."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "19.02-survivor-maximum-toughness",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Once no Bodyguard remains, attacks use the highest surviving Leader or Support Toughness.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:rules_unit_view_by_id"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_attached_unit_uses_support_toughness_after_bodyguard_destroyed",
+            "role": "semantic",
+            "assertion": "assert wound_payload['toughness'] == 7",
+            "proves": "The actual wound event uses the surviving Support Toughness 7."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_attached_unit_uses_leader_toughness_after_bodyguard_destroyed",
+            "role": "semantic",
+            "assertion": "assert wound_payload['toughness'] == 7",
+            "proves": "The actual wound event uses the surviving Leader Toughness 7."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "19.02-whole-starting-unit-destruction",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Unit-destruction rules wait for the last model that started in the attached unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/attached_unit_reconciliation.py:validate_attached_rules_unit_identity_after_destruction"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_primary_destruction_capture_does_not_complete_attached_unit_for_bodyguard_only",
+            "role": "semantic",
+            "assertion": "assert not state.primary_unit_destruction_states",
+            "proves": "Destroying every Bodyguard with a living Leader creates no unit-destruction state."
+          },
+          {
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_primary_destruction_capture_does_not_complete_attached_unit_for_bodyguard_only",
+            "role": "viewer",
+            "assertion": "assert not any((event['event_type'] == 'primary_unit_destruction_recorded' for stream in (source_owner_events, destroyed_owner_events, administrator_events) for event in stream['events']))",
+            "proves": "Neither player nor administrator receives a premature destruction event."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:19:19.03:1",
+    "requirements": [
+      {
+        "requirement_id": "19.03-unit-keyword-union",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The attached unit has the keywords of all current component models for unit-targeting rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:rules_unit_view_by_id"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_attached_melee_cleave_uses_rules_unit_count_and_keywords",
+            "role": "semantic",
+            "assertion": "assert 'CHARACTER' in target_rules_unit.keywords",
+            "proves": "The attached target has CHARACTER despite a non-Character Bodyguard."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "19.03-model-keywords-not-inherited",
+        "source_blocks": [
+          1
+        ],
+        "summary": "An individual model does not inherit another component model’s keywords.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:rules_unit_view_by_id"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_model_keyword_authority.py::test_model_scoped_rolls_and_visibility_use_the_exact_model_owner",
+            "role": "semantic",
+            "assertion": "assert scoped_roll_model_ids_for_effect(source_rules_unit=view, current_roll_model_instance_ids=unit.own_model_ids(), effect_parameters={'required_model_keyword': 'PSYKER'}) == (specialist.model_instance_id,)",
+            "proves": "Only the actual Psyker specialist contributes to a model-keyword-gated roll."
+          },
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_attached_melee_cleave_uses_rules_unit_count_and_keywords",
+            "role": "semantic",
+            "assertion": "assert 'CHARACTER' not in target_bodyguard.keywords",
+            "proves": "The Bodyguard component does not acquire CHARACTER from its attached Leader."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "example",
+        "reason": "Illustrative instance of the separately enumerated operative rule; no additional permission or restriction."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:19:19.04:1",
+    "requirements": [
+      {
+        "requirement_id": "19.04-model-scoped-effects",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A rule scoped to one named model remains restricted to that model in an attached unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:rules_unit_view_by_id"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_ws14_attack_sequence_runtime_hooks.py::test_ws14_attached_component_targeted_this_model_effect_is_group_aware",
+            "role": "semantic",
+            "assertion": "assert _hit_modifier(catalog=catalog, state=state, attacker=leader, target=defender) == 1",
+            "proves": "The specified Leader receives the hit modifier."
+          },
+          {
+            "nodeid": "tests/unit/test_ws14_attack_sequence_runtime_hooks.py::test_ws14_attached_component_targeted_this_model_effect_is_group_aware",
+            "role": "semantic",
+            "assertion": "assert _hit_modifier(catalog=catalog, state=state, attacker=bodyguard, target=defender) == 0",
+            "proves": "The other Bodyguard model receives no modifier."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "19.04-unit-effect-spans-components",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A unit-scoped ability applies to every model of the attached unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:rules_unit_view_by_id"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_aeldari_wave_serpent_shining_spears_eldrad_dire_avengers_datasheets.py::test_bladestorm_this_unit_scope_includes_attached_leader_models",
+            "role": "semantic",
+            "assertion": "assert WeaponKeyword.SUSTAINED_HITS in modified.keywords",
+            "proves": "The Bodyguard’s unit-scoped weapon ability reaches the attached Leader attack."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "19.04-leading-after-bodyguard-loss",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Battle-start Leaders and Supports retain their own leading abilities after Bodyguard destruction.",
+        "owners": [
+          "src/warhammer40k_core/engine/rules_units.py:rules_unit_view_by_id"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_phase17d_leading_model_condition_survives_destroyed_bodyguard",
+            "role": "semantic",
+            "assertion": "assert leader_result.status is RuleExecutionStatus.APPLIED",
+            "proves": "The surviving Leader’s leading ability still applies."
+          },
+          {
+            "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_phase17d_leading_model_condition_survives_destroyed_bodyguard",
+            "role": "semantic",
+            "assertion": "assert support_result.status is RuleExecutionStatus.APPLIED",
+            "proves": "The surviving Support’s leading ability still applies."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "19.04-attack-sequence-source-retention",
+        "source_blocks": [
+          4
+        ],
+        "summary": "If an attack destroys the last conferring model, its ability persists until that attacking unit finishes all attacks.",
+        "owners": [
+          "src/warhammer40k_core/engine/ability_presence.py:active_ability_model_ids_for_unit",
+          "src/warhammer40k_core/engine/catalog_rule_consumption.py:CatalogWeaponKeywordGrantRuntime.weapon_profile_modifier"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: Confirmed runtime discrepancy in the retained probe: a real two-attack sequence kills the sole equipped grant bearer on attack_index0; five target models survive and the sequence remains waiting, but the attached Leader immediately loses Lethal Hits. Prerequisite: retain conferring-source semantics until the attacking unit completes its attack sequence, then expire them through the shared ability-presence owner."
+        ]
+      },
+      {
+        "requirement_id": "19.04-leader-support-source-lifetime",
+        "source_blocks": [
+          5
+        ],
+        "summary": "A Leader or Support unit ability ends when that component’s last model is destroyed, subject to attack-sequence retention.",
+        "owners": [
+          "src/warhammer40k_core/engine/catalog_rule_consumption.py:CatalogWeaponKeywordGrantRuntime.weapon_profile_modifier",
+          "src/warhammer40k_core/engine/ability_presence.py:active_ability_model_ids_for_unit"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_attached_weapon_grant_expires_when_its_source_component_dies",
+            "role": "semantic",
+            "assertion": "assert WeaponKeyword.LETHAL_HITS in runtime.weapon_profile_modifier(context).keywords",
+            "proves": "The living Leader grants Lethal Hits to Bodyguard ranged weapons."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_attached_weapon_grant_expires_when_its_source_component_dies",
+            "role": "semantic",
+            "assertion": "assert WeaponKeyword.LETHAL_HITS not in runtime.weapon_profile_modifier(context).keywords",
+            "proves": "Destroying that Leader removes its grant from surviving Bodyguard weapons."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "19.04-bodyguard-source-lifetime",
+        "source_blocks": [
+          5
+        ],
+        "summary": "A Bodyguard-sourced unit ability ends when its last Bodyguard model is destroyed, subject to attack-sequence retention.",
+        "owners": [
+          "src/warhammer40k_core/engine/catalog_rule_consumption.py:CatalogWeaponKeywordGrantRuntime.weapon_profile_modifier",
+          "src/warhammer40k_core/engine/ability_presence.py:active_ability_model_ids_for_unit"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_attached_grants_follow_the_living_bodyguard_or_equipped_bearer",
+            "role": "semantic",
+            "assertion": "assert WeaponKeyword.LETHAL_HITS in runtime.weapon_profile_modifier(context).keywords",
+            "proves": "The Bodyguard or specific equipped bearer grants Lethal Hits to the attached Leader while alive."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_attached_grants_follow_the_living_bodyguard_or_equipped_bearer",
+            "role": "semantic",
+            "assertion": "assert WeaponKeyword.LETHAL_HITS not in runtime.weapon_profile_modifier(context).keywords",
+            "proves": "Destroying the last Bodyguard or the one equipped bearer removes its grant."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_attached_grants_follow_the_living_bodyguard_or_equipped_bearer",
+            "role": "semantic",
+            "assertion": "assert len(unit_by_id(state=state, unit_instance_id=bodyguard.unit_instance_id).alive_own_models()) == 4",
+            "proves": "The specific-bearer case leaves four other physical Bodyguard models alive."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "19.04-specific-bearer-source-lifetime",
+        "source_blocks": [
+          5
+        ],
+        "summary": "A specific bearer’s attached-unit ability ends when that bearer is destroyed, subject to attack-sequence retention.",
+        "owners": [
+          "src/warhammer40k_core/engine/catalog_rule_consumption.py:CatalogWeaponKeywordGrantRuntime.weapon_profile_modifier",
+          "src/warhammer40k_core/engine/ability_presence.py:active_ability_model_ids_for_unit"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_attached_grants_follow_the_living_bodyguard_or_equipped_bearer",
+            "role": "semantic",
+            "assertion": "assert WeaponKeyword.LETHAL_HITS in runtime.weapon_profile_modifier(context).keywords",
+            "proves": "The Bodyguard or specific equipped bearer grants Lethal Hits to the attached Leader while alive."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_attached_grants_follow_the_living_bodyguard_or_equipped_bearer",
+            "role": "semantic",
+            "assertion": "assert WeaponKeyword.LETHAL_HITS not in runtime.weapon_profile_modifier(context).keywords",
+            "proves": "Destroying the last Bodyguard or the one equipped bearer removes its grant."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_attached_grants_follow_the_living_bodyguard_or_equipped_bearer",
+            "role": "semantic",
+            "assertion": "assert len(unit_by_id(state=state, unit_instance_id=bodyguard.unit_instance_id).alive_own_models()) == 4",
+            "proves": "The specific-bearer case leaves four other physical Bodyguard models alive."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:19:19.04.01:1",
+    "requirements": [
+      {
+        "requirement_id": "19.04.01-revived-source-reactivates",
+        "source_blocks": [
+          1
+        ],
+        "summary": "An attached-unit ability lost when its source dies applies again when that source is revived.",
+        "owners": [
+          "src/warhammer40k_core/engine/ability_presence.py:active_ability_model_ids_for_unit"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_revived_source_becomes_available_to_ability_consumers_again",
+            "role": "semantic",
+            "assertion": "assert active_ability_model_ids_for_unit(state=state, unit=source_unit) == ()",
+            "proves": "A destroyed attached Leader supplies no active ability model identity."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_revived_source_becomes_available_to_ability_consumers_again",
+            "role": "facade",
+            "assertion": "assert active_ability_model_ids_for_unit(state=state, unit=source_unit) == (model_id,)",
+            "proves": "After a shared healing submission revives it, the same physical Leader is again available to ability consumers."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "faq:c7a83b0a-e8c3-44b5-a3ca-bb3dfba98c2d",
+    "requirements": [
+      {
+        "requirement_id": "c7a83b0a-e8c3-44b5-a3ca-bb3dfba98c2d-mfm-attachment-precedence",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Where attachment lists differ, the Munitorum Field Manual list takes precedence over the datasheet list.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_army_points_mfm.py::test_catalog_with_mfm_attachment_allowances_replaces_leader_and_support_targets",
+            "role": "semantic",
+            "assertion": "assert tuple((target.bodyguard_datasheet_id for target in leader_eligibilities[0].targets)) == ('bodyguard-b',)",
+            "proves": "MFM replaces the Leader attachment target tuple, excluding the old datasheet target."
+          },
+          {
+            "nodeid": "tests/unit/test_army_points_mfm.py::test_catalog_with_mfm_attachment_allowances_replaces_leader_and_support_targets",
+            "role": "semantic",
+            "assertion": "assert tuple((target.bodyguard_datasheet_id for target in support_eligibilities[0].targets)) == ('bodyguard-b',)",
+            "proves": "MFM likewise replaces the Support target tuple."
+          },
+          {
+            "nodeid": "tests/unit/test_army_points_mfm.py::test_catalog_with_mfm_attachment_allowances_replaces_leader_and_support_targets",
+            "role": "semantic",
+            "assertion": "assert leader_eligibilities[0].targets[0].source_ids == ('test-mfm:faction:test-faction:unit:leader:leader',)",
+            "proves": "The selected eligibility carries MFM provenance."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Question framing for the operative answer in block 2."
+      }
+    ]
+  }
+]

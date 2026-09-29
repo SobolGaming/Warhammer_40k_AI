@@ -1,0 +1,25 @@
+{
+  "requirement_id": "08.04-ability-window",
+  "observations": [
+    {
+      "source_text": "In your Command phase, roll one D6: on a 1+, you gain 1CP.",
+      "source_id": "test:p01c:catalog-rule",
+      "compiled_supported": true,
+      "runtime_consumers": [],
+      "effect_events": 0,
+      "next_phase": "movement"
+    },
+    {
+      "source_text": "At the start of your Command phase, roll one D6: on a 1+, you gain 1CP.",
+      "source_id": "test:p01c:catalog-rule",
+      "compiled_supported": true,
+      "runtime_consumers": [
+        "catalog-ir:command-point-gain"
+      ],
+      "effect_events": 1,
+      "next_phase": "movement"
+    }
+  ],
+  "expected": "The unqualified supported clause executes in the Command-abilities step.",
+  "qualification": "A canonical source-linked RuleIR fixture isolates the timing difference. The unqualified clause compiles but has no runtime consumer and the facade advances to Movement without executing it; the explicit start control executes. This is a consumer-registration/Command-body gap, not a named faction support claim."
+}

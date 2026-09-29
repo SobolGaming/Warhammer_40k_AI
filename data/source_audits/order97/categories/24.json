@@ -1,0 +1,2805 @@
+[
+  {
+    "row_id": "rule:24:24.01:1",
+    "requirements": [
+      {
+        "requirement_id": "24.01-typed-ability-families",
+        "source_blocks": [
+          1,
+          2
+        ],
+        "summary": "Core abilities belong to datasheets and weapon abilities to weapon profiles; bracketed weapon-ability notation is normalized at the source boundary.",
+        "owners": [
+          "src/warhammer40k_core/core/weapon_profiles.py:WeaponProfile"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_wargear_weapon_profiles.py::test_weapon_keywords_are_canonical_tokens_shared_with_rule_normalization",
+            "role": "semantic",
+            "assertion": "assert canonical_keyword_forms() == (*canonical_weapon_keyword_tokens(), *canonical_rule_keyword_tokens())",
+            "proves": "Rule and weapon families have distinct canonical token sets at normalization."
+          },
+          {
+            "nodeid": "tests/unit/test_wargear_weapon_profiles.py::test_weapon_keywords_are_canonical_tokens_shared_with_rule_normalization",
+            "role": "semantic",
+            "assertion": "assert 'Feel No Pain' in canonical_rule_keyword_tokens()",
+            "proves": "Feel No Pain belongs to the rule-ability set."
+          },
+          {
+            "nodeid": "tests/unit/test_wargear_weapon_profiles.py::test_weapon_keywords_are_canonical_tokens_shared_with_rule_normalization",
+            "role": "semantic",
+            "assertion": "assert 'Feel No Pain' not in canonical_weapon_keyword_tokens()",
+            "proves": "Feel No Pain is not a weapon family."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_attached_weapon_grant_expires_when_its_source_component_dies",
+            "role": "semantic",
+            "assertion": "assert WeaponKeyword.LETHAL_HITS in runtime.weapon_profile_modifier(context).keywords",
+            "proves": "Bracketed [LETHAL HITS] source prose is normalized to a typed weapon keyword and consumed by the owner."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.01-target-keyword-condition",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A keyword-qualified weapon ability applies only against targets carrying at least one qualifying keyword.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:weapon_ability_applies"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase14i_keyword_gated_weapon_abilities_match_target_keywords",
+            "role": "semantic",
+            "assertion": "assert lethal_hits_applies(profile, target_keywords=('VEHICLE',))",
+            "proves": "Vehicle-qualified Lethal Hits applies against VEHICLE."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase14i_keyword_gated_weapon_abilities_match_target_keywords",
+            "role": "semantic",
+            "assertion": "assert not lethal_hits_applies(profile, target_keywords=('INFANTRY',))",
+            "proves": "The same descriptor does not apply against INFANTRY."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase14i_keyword_gated_weapon_abilities_match_target_keywords",
+            "role": "semantic",
+            "assertion": "assert sustained_hits_generated_hits(profile, critical_hit=True, target_keywords=('BEASTS',)) == 2",
+            "proves": "Slash-separated alternatives admit the BEASTS target."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          4
+        ],
+        "classification": "example",
+        "reason": "Illustrative instance of the separately enumerated operative rule; no additional permission or restriction."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:24:24.01.01:1",
+    "requirements": [
+      {
+        "requirement_id": "24.01.01-family-independent-number",
+        "source_blocks": [
+          1
+        ],
+        "summary": "An ability-family requirement ignores the numeric value following the family name.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_abilities.py:unit_has_deadly_demise"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_deadly_demise_numeric_instances_share_family",
+            "role": "semantic",
+            "assertion": "assert unit_has_deadly_demise(unit)",
+            "proves": "Fixed 1, D3 and D6 descriptor instances all match the Deadly Demise family."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_deadly_demise_numeric_instances_share_family",
+            "role": "semantic",
+            "assertion": "assert profile.mortal_wounds_token == token",
+            "proves": "Each numeric instance retains its own damage parameter."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "example",
+        "reason": "Illustrative instance of the separately enumerated operative rule; no additional permission or restriction."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:24:24.02:1",
+    "requirements": [
+      {
+        "requirement_id": "24.02-single-selected-core-instance",
+        "source_blocks": [
+          1,
+          2
+        ],
+        "summary": "Duplicated core abilities do not stack; the controlling player selects one active source even when numbers differ.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_abilities.py:unit_has_firing_deck"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_unit_abilities.py::test_order56_numeric_core_instances_require_and_retain_one_active_source",
+            "role": "semantic",
+            "assertion": "assert firing_deck_value_for_unit(selected) == 2",
+            "proves": "Two numeric sources resolve to the selected Firing Deck value."
+          },
+          {
+            "nodeid": "tests/unit/test_unit_abilities.py::test_order56_core_instance_decision_uses_facade_and_restores",
+            "role": "facade",
+            "assertion": "assert len(request.options) == 2",
+            "proves": "The core duplicate decision offers the two source instances."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.02-single-selected-weapon-instance",
+        "source_blocks": [
+          1,
+          3,
+          4
+        ],
+        "summary": "Each Select Weapons step selects one instance of duplicated weapon ability families, including different numbers or keywords.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:weapon_ability_applies"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_order56_duplicate_selection_precedes_target_conditions_and_never_stacks",
+            "role": "semantic",
+            "assertion": "assert len(selected.abilities) == 2",
+            "proves": "Selecting one source per family reduces the four-source profile to two active abilities."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase14i_keyword_gated_weapon_abilities_match_target_keywords",
+            "role": "semantic",
+            "assertion": "assert not lethal_hits_applies(profile, target_keywords=('INFANTRY',))",
+            "proves": "The chosen target-keyword gate remains effective after selection."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.02-scouts-common-or-minimum",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Scouts may use a number shared by every model; otherwise the lowest unshared model value constrains the unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/prebattle_instance_selection.py:scout_distance_options_for_model_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase16b_prebattle.py::test_order56_scout_values_are_finite_and_source_examples_are_preserved",
+            "role": "semantic",
+            "assertion": "assert scout_distance_options_for_model_ids(model_instance_ids=model_ids, ability_instances=(ScoutAbilityInstance(model_instance_id='model-1', distance_inches=6.0), ScoutAbilityInstance(model_instance_id='model-1', distance_inches=8.0), ScoutAbilityInstance(model_instance_id='model-2', distance_inches=6.0), ScoutAbilityInstance(model_instance_id='model-2', distance_inches=8.0))) == (6.0, 8.0)",
+            "proves": "Models sharing Scouts 6 and 8 may select either."
+          },
+          {
+            "nodeid": "tests/unit/test_phase16b_prebattle.py::test_order56_scout_values_are_finite_and_source_examples_are_preserved",
+            "role": "semantic",
+            "assertion": "assert scout_distance_options_for_model_ids(model_instance_ids=model_ids, ability_instances=(ScoutAbilityInstance(model_instance_id='model-1', distance_inches=6.0), ScoutAbilityInstance(model_instance_id='model-2', distance_inches=8.0))) == (6.0,)",
+            "proves": "A mixed 6/8 unit is limited to six inches."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.03:1",
+    "requirements": [
+      {
+        "requirement_id": "24.03-keyword-threshold-critical",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Anti-X Y+ causes an unmodified wound of at least Y to be critical against a target with keyword X.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:anti_keyword_critical_threshold"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_torrent_anti_and_devastating_wounds_are_attack_sequence_effects",
+            "role": "semantic",
+            "assertion": "assert cast(dict[str, object], wound_payload['payload'])['critical_threshold'] == 4",
+            "proves": "The attack uses the Anti critical threshold of four."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_torrent_anti_and_devastating_wounds_are_attack_sequence_effects",
+            "role": "semantic",
+            "assertion": "assert cast(dict[str, object], wound_payload['payload'])['critical'] is True",
+            "proves": "The matching unmodified wound is recorded as critical."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "example",
+        "reason": "Illustrative instance of the separately enumerated operative rule; no additional permission or restriction."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:24:24.04:1",
+    "requirements": [
+      {
+        "requirement_id": "24.04-assault-shooting-permission",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A unit containing an Assault weapon may use Assault shooting.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:has_weapon_keyword"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_order34_completed_shooting_restricts_actions_through_exact_phase_boundary",
+            "role": "facade",
+            "assertion": "assert SHOOTER in state.shooting_phase_state.shot_unit_ids",
+            "proves": "The advanced Assault case completes shooting through the shared facade and records the unit as having shot."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_order34_completed_shooting_restricts_actions_through_exact_phase_boundary",
+            "role": "replay",
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+            "proves": "The same accepted Assault sequence reproduces from replay."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.05:1",
+    "requirements": [
+      {
+        "requirement_id": "24.05-blast-one-per-five",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Blast adds one attack die per complete five target models counted at Select Targets.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:blast_attack_bonus"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase13d_weapon_ability_helpers_use_structured_descriptors",
+            "role": "semantic",
+            "assertion": "assert blast_attack_bonus(target_model_count=11) == 2",
+            "proves": "Eleven target models add two Blast dice."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_declaration_applies_rapid_blast_melta_and_heavy_modifiers",
+            "role": "semantic",
+            "assertion": "assert f'{BLAST_RULE_ID}:1' in targeting_rule_ids",
+            "proves": "The declared attack pool records the Blast contribution."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.05-blast-x-per-five",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Blast X adds X attack dice per complete five target models at Select Targets.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:blast_attack_bonus"
+        ],
+        "evidence": [],
+        "qualifications": [
+          "Evidence gap: Confirmed runtime discrepancy: the shared Blast helper accepts only target_model_count and returns floor(count/5); AbilityKind has no parameterized Blast descriptor. Prerequisite: normalize Blast X and consume X times the frozen Select Targets five-model groups in attack pools."
+        ]
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          3
+        ],
+        "classification": "example",
+        "reason": "Illustrative instance of the separately enumerated operative rule; no additional permission or restriction."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:24:24.06:1",
+    "requirements": [
+      {
+        "requirement_id": "24.06-cleave-single-target",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Cleave X adds X dice per complete five target models only if the weapon allocated every attack to one target.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:cleave_attack_bonus"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase13d_weapon_ability_helpers_use_structured_descriptors",
+            "role": "semantic",
+            "assertion": "assert cleave_attack_bonus(profile, single_target=True, target_model_count=11) == 4",
+            "proves": "Cleave 2 adds four attacks against eleven models when unsplit."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase13d_weapon_ability_helpers_use_structured_descriptors",
+            "role": "semantic",
+            "assertion": "assert cleave_attack_bonus(profile, single_target=False, target_model_count=11) == 0",
+            "proves": "Split targeting receives no Cleave bonus."
+          },
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase14e_melee_cleave_adds_single_target_attacks_from_target_model_count",
+            "role": "semantic",
+            "assertion": "assert sequence.attack_pools[0].attacks == 9",
+            "proves": "Actual melee gathering incorporates the Cleave bonus."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "example",
+        "reason": "Illustrative instance of the separately enumerated operative rule; no additional permission or restriction."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:24:24.07:1",
+    "requirements": [
+      {
+        "requirement_id": "24.07-close-quarters-shooting-permission",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A unit with a Close-quarters weapon may use Close-quarters shooting.",
+        "owners": [
+          "src/warhammer40k_core/engine/shooting_targets.py:shooting_target_candidates_for_unit",
+          "src/warhammer40k_core/engine/phases/shooting_declaration_validation.py:_validate_declaration_submission"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_locked_in_combat_big_guns_and_pistol_interactions_are_declaration_state",
+            "role": "semantic",
+            "assertion": "assert close_quarters_candidates[0].is_legal",
+            "proves": "An engaged infantry model with Close-quarters has a legal target."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_locked_in_combat_big_guns_and_pistol_interactions_are_declaration_state",
+            "role": "semantic",
+            "assertion": "assert close_quarters_candidates[0].shooting_types == (ShootingType.CLOSE_QUARTERS,)",
+            "proves": "Its legal shooting type is Close-quarters."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.07-per-model-weapon-exclusivity",
+        "source_blocks": [
+          2,
+          3,
+          4
+        ],
+        "summary": "Outside Close-quarters shooting, each non-Monster/non-Vehicle model chooses Close-quarters weapons or other ranged weapons, never both.",
+        "owners": [
+          "src/warhammer40k_core/engine/shooting_targets.py:shooting_target_candidates_for_unit",
+          "src/warhammer40k_core/engine/phases/shooting_declaration_validation.py:_validate_declaration_submission"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_mixed_close_quarters_and_non_close_quarters_declarations_reject_before_pop",
+            "role": "invalid",
+            "assertion": "assert cast(list[dict[str, object]], validation['violations'])[0]['violation_code'] == 'mixed_close_quarters_non_close_quarters_declaration'",
+            "proves": "Mixed Close-quarters and ordinary weapon declarations are rejected."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_mixed_close_quarters_and_non_close_quarters_declarations_reject_before_pop",
+            "role": "invalid",
+            "assertion": "assert len(lifecycle.decision_controller.records) == before_records",
+            "proves": "Rejection leaves the decision record count unchanged."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_large_models_can_mix_close_quarters_and_ordinary_weapon_declarations",
+            "role": "semantic",
+            "assertion": "assert validation is None",
+            "proves": "The shared validator accepts mixed ordinary and Close-quarters declarations for both Monster and Vehicle models."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.08:1",
+    "requirements": [
+      {
+        "requirement_id": "24.08-after-emergency-disembark",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Deadly Demise resolves only after any embarked units complete Emergency disembark.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_damage_resolution.py:_resolve_deadly_demise_before_removal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demise",
+            "role": "semantic",
+            "assertion": "assert event_records.index(unit_disembarked_event) < event_records.index(deadly_demise_event)",
+            "proves": "Emergency passenger disembarkation precedes Deadly Demise."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_requests_each_embarked_unit_before_removal",
+            "role": "semantic",
+            "assertion": "assert transport_model.model_instance_id in battlefield_after_first_disembark.placed_model_ids()",
+            "proves": "The Transport remains after the first passenger group, while a further group awaits disembarkation."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.08-six-to-trigger",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A destroyed model with Deadly Demise rolls a D6 and triggers on six.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_damage_resolution.py:_resolve_deadly_demise_before_removal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal",
+            "role": "semantic",
+            "assertion": "assert deadly_demise_source.payload == {'trigger_roll_threshold': 6, 'range_inches': 6.0, 'mortal_wounds': {'kind': 'd3'}}",
+            "proves": "The source-backed demise profile records six to trigger and six-inch range."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_is_mandatory_and_not_a_decline_choice",
+            "role": "semantic",
+            "assertion": "assert deadly_demise_payload['triggered'] is False",
+            "proves": "The nontriggering die produces no explosion."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.08-mortal-wounds-per-unit",
+        "source_blocks": [
+          1
+        ],
+        "summary": "On a trigger, each unit within six inches suffers X mortal wounds, rolling random X separately per unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_damage_resolution.py:_resolve_deadly_demise_before_removal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal",
+            "role": "semantic",
+            "assertion": "assert applied['mortal_wounds'] == 2",
+            "proves": "The affected target receives the rolled two mortal wounds."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_deadly_demise_rolls_random_damage_separately_for_each_target",
+            "role": "semantic",
+            "assertion": "assert [amount for amount, _ in results] == [1, 6]",
+            "proves": "The shared random-damage consumer rolls1 and6 for two different targets from the sameD6 source."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_deadly_demise_rolls_random_damage_separately_for_each_target",
+            "role": "semantic",
+            "assertion": "assert results[0][1] != results[1][1]",
+            "proves": "Each target carries a distinct roll payload."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_deadly_demise_target_query_uses_the_six_inch_base_boundary",
+            "role": "semantic",
+            "assertion": "assert (target.unit_instance_id in targets) is (distance == 6)",
+            "proves": "The shared physical target query includes the six-inch base boundary and excludes6.01inches."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.09:1",
+    "requirements": [
+      {
+        "requirement_id": "24.09-all-models-deep-strike",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Deep Strike ingress requires the ability on every model in the unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_abilities.py:unit_has_deep_strike"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_attached_deep_strike_and_infiltrators_require_every_component",
+            "role": "semantic",
+            "assertion": "assert (option is not None) is all_components",
+            "proves": "A Deep Strike declaration is available only when every attached component grants the ability."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.09-deep-strike-distance",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Deep Strike may set up anywhere, including the enemy zone, while remaining more than eight horizontal inches from enemies.",
+        "owners": [
+          "src/warhammer40k_core/engine/reserve_arrival_resolution.py:resolve_reserve_arrival"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_deep_strike_enemy_zone_still_requires_more_than_eight_inches",
+            "role": "semantic",
+            "assertion": "assert result.is_valid is (distance > 8)",
+            "proves": "Actual Deep Strike placement inside the enemy deployment zone is accepted at8.01inches and rejected at exactly8."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_deep_strike_enemy_zone_still_requires_more_than_eight_inches",
+            "role": "semantic",
+            "assertion": "assert (ReservePlacementViolationCode.RESERVE_ENEMY_DISTANCE in {v.violation_code for v in result.violations}) is (distance == 8)",
+            "proves": "The exact8-inch rejection is specifically the enemy-distance rule."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.10:1",
+    "requirements": [
+      {
+        "requirement_id": "24.10-critical-replaces-normal-sequence",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A Devastating critical wound ends that attack’s ordinary allocation/save sequence and generates Damage-characteristic mortal wounds.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:devastating_wounds_resolution"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_torrent_anti_and_devastating_wounds_are_attack_sequence_effects",
+            "role": "semantic",
+            "assertion": "assert not any((event['step'] == AttackSequenceStep.SAVE.value for event in events))",
+            "proves": "The critical Devastating attack emits no saving-throw step."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_grouped_devastating_wounds_cap_each_critical_wound",
+            "role": "semantic",
+            "assertion": "assert all((payload['mortal_wounds'] == 3 for payload in applied_payloads))",
+            "proves": "Each critical Damage-3 attack generates three mortal wounds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.10-after-normal-damage",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Devastating mortal wounds resolve after the attacking unit’s normal damage.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:devastating_wounds_resolution"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_mixed_damage_finishes_normal_attacks_before_deferred_mortal_wounds",
+            "role": "facade",
+            "assertion": "assert max(normal_indices) < min(mortal_indices)",
+            "proves": "In a real mixed normal/Devastating Wounds attack sequence, every normal damage event precedes the first deferred mortal application."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_attack_evidence.py::test_mixed_damage_finishes_normal_attacks_before_deferred_mortal_wounds",
+            "role": "facade",
+            "assertion": "assert any((application['applications'] for application in mortal_applications))",
+            "proves": "The deferred packet performs an actual mortal damage application."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.10-one-model-no-spill",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Each Devastating critical wound can damage only one model and loses excess mortal wounds.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:devastating_wounds_resolution"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_grouped_devastating_wounds_cap_each_critical_wound",
+            "role": "semantic",
+            "assertion": "assert all((payload['remaining_mortal_wounds_lost'] == 1 for payload in applied_payloads))",
+            "proves": "The excess mortal wound from each critical attack is lost."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_grouped_devastating_wounds_cap_each_critical_wound",
+            "role": "semantic",
+            "assertion": "assert all((len({application['model_instance_id'] for application in applications}) == 1 for applications in application_lists))",
+            "proves": "Each critical attack damages exactly one model."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          3
+        ],
+        "classification": "example",
+        "reason": "Illustrative instance of the separately enumerated operative rule; no additional permission or restriction."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:24:24.11:1",
+    "requirements": [
+      {
+        "requirement_id": "24.11-mandatory-extra-weapons",
+        "source_blocks": [
+          1,
+          2
+        ],
+        "summary": "A fighting model must select all of its Extra Attacks weapons.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_weapon_selection.py:validate_melee_declaration_rules"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_extra_attacks_weapon_can_be_added_to_primary_melee_weapon",
+            "role": "semantic",
+            "assertion": "assert [pool.wargear_id for pool in sequence.attack_pools] == ['core-leader-blade', 'core-extra-blade']",
+            "proves": "The accepted melee attack pools include the Extra Attacks weapon."
+          }
+        ],
+        "qualifications": [
+          "Evidence gap: Confirmed runtime discrepancy: canonical model carrying primary and Extra Attacks weapons may omit the Extra Attacks weapon; validate_melee_declaration_rules returns valid. Prerequisite: enforce all eligible physical Extra Attacks declarations, retaining the legal Extra-only branch, with facade rejection and replay coverage."
+        ]
+      },
+      {
+        "requirement_id": "24.11-one-other-melee-if-possible",
+        "source_blocks": [
+          1,
+          3
+        ],
+        "summary": "Alongside Extra Attacks weapons a model selects one other melee weapon when available.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_weapon_selection.py:validate_melee_declaration_rules"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_melee_rule_validation_rejects_weapon_selection_invariants",
+            "role": "invalid",
+            "assertion": "assert validation.violations[0].violation_code == expected_code",
+            "proves": "When a primary weapon exists, declaring only Extra Attacks reports melee_primary_weapon_required."
+          },
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_melee_rejects_multiple_primary_weapons_per_model",
+            "role": "invalid",
+            "assertion": "assert validation.violations[0].violation_code == 'melee_model_declared_multiple_weapons'",
+            "proves": "Selecting two primary melee weapons is rejected."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.11.01:1",
+    "requirements": [
+      {
+        "requirement_id": "24.11.01-extra-without-primary",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Extra Attacks weapons can attack even when no ordinary melee weapon is selected.",
+        "owners": [
+          "src/warhammer40k_core/engine/fight_weapon_selection.py:validate_melee_declaration_rules"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_extra_attacks_only_model_can_select_its_weapon",
+            "role": "semantic",
+            "assertion": "assert validation.is_valid",
+            "proves": "A model equipped only with an Extra Attacks weapon can make a legal declaration."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_extra_attacks_only_model_can_select_its_weapon",
+            "role": "semantic",
+            "assertion": "assert sequence.attack_pools[0].wargear_id == 'core-extra-blade'",
+            "proves": "The accepted declaration generates its Extra Attacks pool."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.12:1",
+    "requirements": [
+      {
+        "requirement_id": "24.12-per-wound-save",
+        "source_blocks": [
+          1
+        ],
+        "summary": "For each wound a model with Feel No Pain X+ would lose, a D6 of X+ prevents that wound.",
+        "owners": [
+          "src/warhammer40k_core/engine/damage_allocation.py:feel_no_pain_roll_spec",
+          "src/warhammer40k_core/engine/damage_allocation.py:resolve_feel_no_pain_rolls"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_forced_single_source_feel_no_pain_reduces_failed_save_damage",
+            "role": "semantic",
+            "assertion": "assert fnp_payload['ignored_wounds'] == 1",
+            "proves": "A two-wound attack rolls 5 and 2 against FNP 5+, ignoring exactly one wound."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_forced_single_source_feel_no_pain_reduces_failed_save_damage",
+            "role": "semantic",
+            "assertion": "assert updated_model.current_wounds == defender_model.current_wounds - 1",
+            "proves": "The model loses the one remaining wound."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.13:1",
+    "requirements": [
+      {
+        "requirement_id": "24.13-every-model-fights-first",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A unit counts as Fights First only while every model has that ability.",
+        "owners": [
+          "src/warhammer40k_core/engine/fights_first.py:FightsFirstRegistry"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15c_fight_order.py::test_order70_native_fights_first_requires_every_attached_model",
+            "role": "semantic",
+            "assertion": "assert FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id) is (len(native_components) == 2)",
+            "proves": "The parameterized native attached-unit coverage determines Fights First eligibility."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "cross_reference",
+        "reason": "Navigation to separately inventoried operative rules."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:24:24.14:1",
+    "requirements": [
+      {
+        "requirement_id": "24.14-own-shooting-selection-window",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Firing Deck is offered when its transport is selected to shoot in its own Shooting phase and has cargo.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_firing_deck.py:resolve_firing_deck_selection",
+          "src/warhammer40k_core/engine/phases/shooting_firing_deck.py:_validate_firing_deck_selection"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_firing_deck_requires_shooting_phase_and_never_changes_equipped_weapons",
+            "role": "facade",
+            "assertion": "assert status.status_kind is not LifecycleStatusKind.INVALID",
+            "proves": "The own Shooting-phase Firing Deck selection is accepted."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_firing_deck_requires_shooting_phase_and_never_changes_equipped_weapons",
+            "role": "invalid",
+            "assertion": "with pytest.raises(GameLifecycleError, match=\"owner's Shooting phase\"):\n    record_firing_deck_restriction(state=state, transport_unit_instance_id=TRANSPORT, embarked_unit_instance_ids=('army-alpha:passenger-1',), result_id='order97:wrong-window')",
+            "proves": "A Firing Deck contribution outside the Shooting phase is rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.14-model-limit-and-prior-selection",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Firing Deck selects at most X embarked models, excluding units already selected to shoot this phase.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_firing_deck.py:resolve_firing_deck_selection",
+          "src/warhammer40k_core/engine/phases/shooting_firing_deck.py:_validate_firing_deck_selection"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_firing_deck_reports_capacity_membership_shot_model_and_melee_failures",
+            "role": "invalid",
+            "assertion": "assert {TransportOperationViolationCode.FIRING_DECK_CAPACITY_EXCEEDED, TransportOperationViolationCode.FIRING_DECK_UNIT_NOT_EMBARKED, TransportOperationViolationCode.FIRING_DECK_UNIT_ALREADY_SHOT, TransportOperationViolationCode.FIRING_DECK_MODEL_DRIFT, TransportOperationViolationCode.FIRING_DECK_MELEE_WEAPON} <= {violation.violation_code for violation in result.violations}",
+            "proves": "The validator reports capacity excess, noncargo and already-shot source failures."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.14-one-ranged-non-one-shot",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Each chosen cargo model contributes one ranged weapon, excluding One Shot weapons.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_firing_deck.py:resolve_firing_deck_selection",
+          "src/warhammer40k_core/engine/phases/shooting_firing_deck.py:_validate_firing_deck_selection"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligible",
+            "role": "invalid",
+            "assertion": "assert TransportOperationViolationCode.FIRING_DECK_DUPLICATE_MODEL_SELECTION in {violation.violation_code for violation in duplicate_model_result.violations}",
+            "proves": "Two selections from one cargo model are rejected."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10q_transports.py::test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligible",
+            "role": "invalid",
+            "assertion": "assert TransportOperationViolationCode.FIRING_DECK_ONE_SHOT_WEAPON in {violation.violation_code for violation in one_shot_result.violations}",
+            "proves": "One Shot borrowing is rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.14-borrow-until-completed",
+        "source_blocks": [
+          4
+        ],
+        "summary": "The transport temporarily has the selected weapons until its attacks finish.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_firing_deck.py:resolve_firing_deck_selection",
+          "src/warhammer40k_core/engine/phases/shooting_firing_deck.py:_validate_firing_deck_selection"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_firing_deck_requires_shooting_phase_and_never_changes_equipped_weapons",
+            "role": "facade",
+            "assertion": "assert any((event.event_type == 'attack_sequence_completed' for event in session.lifecycle.decision_controller.event_log.records))",
+            "proves": "The borrowed-weapon attack sequence completes."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_firing_deck_requires_shooting_phase_and_never_changes_equipped_weapons",
+            "role": "facade",
+            "assertion": "assert unit_by_id(state=state, unit_instance_id=TRANSPORT).own_models[0].wargear_ids == before",
+            "proves": "The Transport has no permanent equipped-weapon mutation after that completed contribution."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.14-all-cargo-shooting-lock",
+        "source_blocks": [
+          5
+        ],
+        "summary": "After Firing Deck selection, every embarked unit is ineligible to shoot until turn end.",
+        "owners": [
+          "src/warhammer40k_core/engine/transport_firing_deck.py:resolve_firing_deck_selection",
+          "src/warhammer40k_core/engine/phases/shooting_firing_deck.py:_validate_firing_deck_selection"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_firing_deck_declaration_consumes_embarked_weapon_and_marks_unit_ineligible",
+            "role": "semantic",
+            "assertion": "assert shooting_state_restriction_reason(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=units[key].unit_instance_id), player_id='player-a') == 'firing_deck'",
+            "proves": "Each cargo unit has the Firing Deck shooting restriction."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.15:1",
+    "requirements": [
+      {
+        "requirement_id": "24.15-after-attacks",
+        "source_blocks": [
+          1
+        ],
+        "summary": "After selected Shooting or Fight attacks finish, Hazardous rolls occur.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_hazardous.py:_resolve_hazardous_tests"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_hazardous_tests_resolve_after_all_attacks",
+            "role": "semantic",
+            "assertion": "assert event_types.index('attack_sequence_completed') < event_types.index('hazardous_test_resolved')",
+            "proves": "Attack-sequence completion precedes the Hazardous event."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.15-selected-physical-weapon-count",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Hazardous roll count equals the selected physical Hazardous weapons, irrespective of targets.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_hazardous.py:_resolve_hazardous_tests"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order95_optional_shooting.py::test_hazardous_counts_selected_weapons_including_declined_targets",
+            "role": "facade",
+            "assertion": "assert len(hazards[0].payload['hazardous_weapon_instance_ids']) == len(rows)",
+            "proves": "The number of Hazardous tests equals selected physical weapons, including targetless selections."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_p24d_hazardous_preserves_order_through_completion_and_restore",
+            "role": "semantic",
+            "assertion": "assert expression['quantity'] == 3",
+            "proves": "Three selected physical weapons generate three Hazardous dice."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_p24d_hazardous_preserves_order_through_completion_and_restore",
+            "role": "semantic",
+            "assertion": "assert payload['hazardous_weapon_instance_ids'] == list(weapon_instance_ids)",
+            "proves": "Each die remains attached to its physical weapon identity."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.16:1",
+    "requirements": [
+      {
+        "requirement_id": "24.16-own-phase-hit-bonus",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Heavy adds one to hit only in the attacker’s own Shooting phase.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_targeting.py:_heavy_hit_roll_modifier_applies",
+          "src/warhammer40k_core/engine/model_movement_history.py:models_within_turn_distance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_declaration_applies_rapid_blast_melta_and_heavy_modifiers",
+            "role": "semantic",
+            "assertion": "assert pool_payload['hit_roll_modifier'] == 1",
+            "proves": "Qualifying Heavy pool has a plus-one hit modifier."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_out_of_phase_shooting",
+            "role": "semantic",
+            "assertion": "assert HEAVY_RULE_ID not in targeting_rule_ids",
+            "proves": "Out-of-phase attacks carry no Heavy source."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.16-unengaged-required",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Heavy requires the attacking unit to be unengaged.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_targeting.py:_heavy_hit_roll_modifier_applies",
+          "src/warhammer40k_core/engine/model_movement_history.py:models_within_turn_distance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_engaged_unit",
+            "role": "semantic",
+            "assertion": "assert HEAVY_RULE_ID not in targeting_rule_ids",
+            "proves": "The engaged attack receives no Heavy source."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.16-not-set-up-this-turn",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Heavy requires the attacking unit not to have been set up this turn.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_targeting.py:_heavy_hit_roll_modifier_applies",
+          "src/warhammer40k_core/engine/model_movement_history.py:models_within_turn_distance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_unit_set_up_this_turn",
+            "role": "semantic",
+            "assertion": "assert HEAVY_RULE_ID not in targeting_rule_ids",
+            "proves": "A newly set-up attacker receives no Heavy source."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_disembarked_unit_set_up_this_turn",
+            "role": "semantic",
+            "assertion": "assert HEAVY_RULE_ID not in targeting_rule_ids",
+            "proves": "Disembark setup also denies Heavy."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.16-every-model-at-most-three",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Heavy requires no model in the unit to have moved more than three inches this turn, using accepted movement measurement.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_targeting.py:_heavy_hit_roll_modifier_applies",
+          "src/warhammer40k_core/engine/model_movement_history.py:models_within_turn_distance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order51_flight.py::test_heavy_uses_each_models_accepted_vertical_distance",
+            "role": "semantic",
+            "assertion": "assert models_within_turn_distance(state=state, model_ids=ids, maximum_inches=3) is (selected and (not mixed))",
+            "proves": "The shared distance query checks every model including vertical movement and mixed flight."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_heavy_accepted_vertical_movement_reaches_facade_attack",
+            "role": "facade",
+            "assertion": "assert all((isclose(row.distance_inches, 2 if flying else sqrt(13), abs_tol=1e-09) for row in state.model_movement_history))",
+            "proves": "Accepted movement records two inches for flight and sqrt(13) for walking on the same vertical path."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_heavy_accepted_vertical_movement_reaches_facade_attack",
+            "role": "facade",
+            "assertion": "assert roll['capped_modifier'] == int(flying)",
+            "proves": "The actual Heavy hit gains +1 exactly for the flight path that stayed within three counted inches."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_heavy_accepted_vertical_movement_reaches_facade_attack",
+            "role": "invalid",
+            "assertion": "assert session.to_persistence_payload() == before",
+            "proves": "A malformed movement submission leaves authoritative session state unchanged."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.17:1",
+    "requirements": [
+      {
+        "requirement_id": "24.17-hover-no-flight-penalty",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Hover removes the two-inch maximum-distance reduction when taking to the skies.",
+        "owners": [
+          "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order51_flight.py::test_heroic_flight_is_selected_before_roll_and_penalty_follows_cap",
+            "role": "semantic",
+            "assertion": "assert roll.movement_budget.maximum_distance_inches == (6 if hover else 4)",
+            "proves": "The same six-inch Heroic roll yields six inches with Hover and four without."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.18:1",
+    "requirements": [
+      {
+        "requirement_id": "24.18-deny-all-cover",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Ignores Cover prevents all sources of benefit of cover, including Stealth.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:has_weapon_keyword"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_order39_stealth_uses_one_cover_skill_modifier",
+            "role": "semantic",
+            "assertion": "assert len(snapshots) == (0 if ignored else 1)",
+            "proves": "Ignores Cover removes the Stealth cover modifier from the actual modifier list."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.19:1",
+    "requirements": [
+      {
+        "requirement_id": "24.19-indirect-shooting-permission",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A unit containing an Indirect Fire weapon may use Indirect shooting.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:has_weapon_keyword"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14f_indirect_fire_targets_unseen_units_and_unmodified_one_to_five_fail",
+            "role": "semantic",
+            "assertion": "assert candidates[0].is_legal",
+            "proves": "Indirect Fire legally selects the target."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14f_indirect_fire_targets_unseen_units_and_unmodified_one_to_five_fail",
+            "role": "semantic",
+            "assertion": "assert candidates[0].target_visible_model_ids == ()",
+            "proves": "The target is unseen by every attacking model."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.20:1",
+    "requirements": [
+      {
+        "requirement_id": "24.20-all-models-infiltrators",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Infiltrator deployment requires the ability on every model.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_abilities.py:unit_has_infiltrators"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_attached_deep_strike_and_infiltrators_require_every_component",
+            "role": "semantic",
+            "assertion": "assert rules_unit_has_infiltrators(state=state, view=view) is all_components",
+            "proves": "Mixed attached Infiltrators fails; every component having it succeeds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.20-enemy-zone-distance",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Infiltrators may deploy outside their own zone but must be more than eight horizontal inches from the opponent’s zone.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_abilities.py:unit_has_infiltrators"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase16a_deployment.py::test_phase16a_infiltrators_may_deploy_outside_zone_more_than_eight_from_enemy_zone",
+            "role": "semantic",
+            "assertion": "assert valid_resolution.is_valid",
+            "proves": "A midfield placement is accepted."
+          },
+          {
+            "nodeid": "tests/unit/test_phase16a_deployment.py::test_phase16a_infiltrators_may_deploy_outside_zone_more_than_eight_from_enemy_zone",
+            "role": "invalid",
+            "assertion": "assert DeploymentPlacementViolationCode.INFILTRATORS_ENEMY_ZONE_DISTANCE in {violation.violation_code for violation in invalid_resolution.violations}",
+            "proves": "A placement too near the enemy zone is rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.20-enemy-unit-distance",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Infiltrator placement must also be more than eight horizontal inches from every enemy unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_abilities.py:unit_has_infiltrators"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_infiltrators_enemy_model_distance_is_independent_of_zone",
+            "role": "semantic",
+            "assertion": "assert (DeploymentPlacementViolationCode.INFILTRATORS_ENEMY_UNIT_DISTANCE in {v.violation_code for v in violations}) is (distance == 8)",
+            "proves": "The shared deployment geometry consumer reports Infiltrators enemy-model proximity at exactly8inches and removes that violation at8.01, independently of zone checks."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.21:1",
+    "requirements": [
+      {
+        "requirement_id": "24.21-charge-turn-wound-bonus",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Lance adds one to wound if the attacking model’s unit charged this turn.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:has_weapon_keyword"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase14e_melee_lance_uses_charge_move_wound_modifier",
+            "role": "semantic",
+            "assertion": "assert wound_payload['modifier'] == 1",
+            "proves": "A Charge grants the actual Lance wound roll +1."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_lance_without_charge_has_no_wound_bonus",
+            "role": "semantic",
+            "assertion": "assert LANCE_RULE_ID not in sequence.attack_pools[0].targeting_rule_ids",
+            "proves": "Without Charge history the attack pool carries no Lance source."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.22:1",
+    "requirements": [
+      {
+        "requirement_id": "24.22-muster-attachment",
+        "source_blocks": [
+          1
+        ],
+        "summary": "During Muster Armies a Leader or Support may select one eligible friendly Bodyguard to form an attached unit for the battle.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_attachment_declarations_form_runtime_attached_unit_from_structured_catalog",
+            "role": "semantic",
+            "assertion": "assert formation.component_unit_instance_ids == (bodyguard.unit_instance_id, leader.unit_instance_id, support.unit_instance_id)",
+            "proves": "The structured muster declaration produces the complete attached formation."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.22-one-role-each",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Unless overridden, a Bodyguard has at most one Leader and one Support.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_attachment_declarations_reject_duplicate_sources_and_duplicate_roles",
+            "role": "invalid",
+            "assertion": "with pytest.raises(ArmyMusteringError, match='one Leader or one Support'):\n    muster_army(catalog=catalog, request=duplicate_role_request)",
+            "proves": "Two Leaders on the same Bodyguard violate the shared one-Leader/one-Support rule."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          3
+        ],
+        "classification": "cross_reference",
+        "reason": "Navigation to separately inventoried operative rules."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:24:24.34:1",
+    "requirements": [
+      {
+        "requirement_id": "24.34-muster-attachment",
+        "source_blocks": [
+          1
+        ],
+        "summary": "During Muster Armies a Leader or Support may select one eligible friendly Bodyguard to form an attached unit for the battle.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_attachment_declarations_form_runtime_attached_unit_from_structured_catalog",
+            "role": "semantic",
+            "assertion": "assert formation.component_unit_instance_ids == (bodyguard.unit_instance_id, leader.unit_instance_id, support.unit_instance_id)",
+            "proves": "The structured muster declaration produces the complete attached formation."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.34-one-role-each",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Unless overridden, a Bodyguard has at most one Leader and one Support.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_attachment_declarations_reject_duplicate_sources_and_duplicate_roles",
+            "role": "invalid",
+            "assertion": "with pytest.raises(ArmyMusteringError, match='one Leader or one Support'):\n    muster_army(catalog=catalog, request=duplicate_role_request)",
+            "proves": "Two Leaders on the same Bodyguard violate the shared one-Leader/one-Support rule."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          3
+        ],
+        "classification": "cross_reference",
+        "reason": "Navigation to separately inventoried operative rules."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:24:24.23:1",
+    "requirements": [
+      {
+        "requirement_id": "24.23-optional-critical-auto-wound",
+        "source_blocks": [
+          1
+        ],
+        "summary": "For each Lethal Hits critical hit the controlling player may select automatic wounding.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:lethal_hits_applies"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay",
+            "role": "semantic",
+            "assertion": "assert rolled['skipped'] is (choice == 'auto-wound')",
+            "proves": "The wound roll is skipped exactly when the controlling player chose automatic wounding."
+          },
+          {
+            "nodeid": "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay",
+            "role": "replay",
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+            "proves": "Both accepted and declined Lethal choices reproduce exactly."
+          },
+          {
+            "nodeid": "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay",
+            "role": "viewer",
+            "assertion": "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+            "proves": "Both viewers retain identical events after restore."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.23-auto-wound-no-critical",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Choosing automatic wounding makes no wound roll and cannot generate a critical-wound effect.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:lethal_hits_applies"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay",
+            "role": "semantic",
+            "assertion": "assert not rolled['critical']",
+            "proves": "An automatic wound is not critical."
+          },
+          {
+            "nodeid": "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay",
+            "role": "semantic",
+            "assertion": "assert rolled['roll_state'] is None",
+            "proves": "An automatic wound has no roll state."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.24:1",
+    "requirements": [
+      {
+        "requirement_id": "24.24-default-twelve-direct-visibility",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A nonattached Lone Operative is invisible to enemies farther than twelve inches.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_abilities.py:lone_operative_profile_for_unit"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_phase13d_lone_operative_descriptor_blocks_targets_outside_twelve",
+            "role": "semantic",
+            "assertion": "assert blocked_candidates[0].violation_code is ShootingTargetViolationCode.LONE_OPERATIVE",
+            "proves": "Outside twelve inches the target receives the Lone Operative violation."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_phase13d_lone_operative_descriptor_blocks_targets_outside_twelve",
+            "role": "semantic",
+            "assertion": "assert close_candidates[0].is_legal",
+            "proves": "Inside the range it is legal."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.24-default-twelve-indirect",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Indirect Fire cannot target a nonattached Lone Operative beyond twelve inches.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_abilities.py:lone_operative_profile_for_unit"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17_emperors_children_lucius.py::test_lucius_lone_operative_uses_twelve_inch_boundary_for_direct_and_indirect_fire",
+            "role": "semantic",
+            "assertion": "assert candidate.violation_code is ShootingTargetViolationCode.LONE_OPERATIVE",
+            "proves": "The parameterized direct/indirect cases reject attacks beyond twelve inches."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.24-parameterized-range",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Lone Operative X uses X instead of twelve for visibility and Indirect targeting.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_abilities.py:lone_operative_profile_for_unit"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17_emperors_children_lucius.py::test_attached_rules_unit_all_lone_operative_uses_largest_component_range",
+            "role": "semantic",
+            "assertion": "assert profile.range_inches == 15.0",
+            "proves": "The parameterized profile carries its fifteen-inch range."
+          },
+          {
+            "nodeid": "tests/unit/test_phase17_emperors_children_lucius.py::test_attached_rules_unit_all_lone_operative_uses_largest_component_range",
+            "role": "semantic",
+            "assertion": "assert outside_larger_range.violation_code is ShootingTargetViolationCode.LONE_OPERATIVE",
+            "proves": "Targets beyond the selected larger range are rejected."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.24.01:1",
+    "requirements": [
+      {
+        "requirement_id": "24.24.01-all-models-lone-operative",
+        "source_blocks": [
+          1
+        ],
+        "summary": "An attached unit receives Lone Operative only when all its current models have it.",
+        "owners": [
+          "src/warhammer40k_core/engine/lone_operative.py:lone_operative_profile_for_rules_unit"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_lone_operative_activates_after_last_nonqualifying_component_dies",
+            "role": "semantic",
+            "assertion": "assert lone_operative_profile_for_rules_unit(view) is None",
+            "proves": "A Lone Operative leader has no unit protection while its unqualified Bodyguard survives."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.24.01-highest-live-range",
+        "source_blocks": [
+          2
+        ],
+        "summary": "If models have different Lone Operative ranges, the highest range on battlefield models applies to the unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/lone_operative.py:lone_operative_profile_for_rules_unit"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17_emperors_children_lucius.py::test_attached_rules_unit_all_lone_operative_uses_largest_component_range",
+            "role": "semantic",
+            "assertion": "assert profile.range_inches == 15.0",
+            "proves": "The 12/15-inch attached formation uses fifteen inches."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.24.01-reactivate-after-casualties",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Lone Operative becomes active again when only qualifying models remain in a below-starting-strength attached unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/lone_operative.py:lone_operative_profile_for_rules_unit"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_lone_operative_activates_after_last_nonqualifying_component_dies",
+            "role": "semantic",
+            "assertion": "assert profile is not None",
+            "proves": "After the last unqualified Bodyguard is destroyed, the attached unit gains Lone Operative."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_lone_operative_activates_after_last_nonqualifying_component_dies",
+            "role": "semantic",
+            "assertion": "assert profile.range_inches == 12",
+            "proves": "The reactivated protection uses the surviving source range."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          4,
+          5
+        ],
+        "classification": "example",
+        "reason": "Illustrative instance of the separately enumerated operative rule; no additional permission or restriction."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:24:24.25:1",
+    "requirements": [
+      {
+        "requirement_id": "24.25-half-range-damage",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Melta X adds X to Damage when the target was within half range at Select Targets, retained through that attacking unit’s attacks.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:melta_damage_bonus"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_melta_keeps_declared_half_range_when_target_geometry_later_changes",
+            "role": "semantic",
+            "assertion": "assert _melta_damage_modifier(pool, target_keywords=units['enemy'].keywords) == 2",
+            "proves": "The accepted declaration’s actual frozen pool hasMelta+2 at half range."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_melta_keeps_declared_half_range_when_target_geometry_later_changes",
+            "role": "semantic",
+            "assertion": "assert _melta_damage_modifier(pool, target_keywords=target.keywords) == 2",
+            "proves": "The damage consumer retains+2 after the target’s physical models move beyond weapon range."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "example",
+        "reason": "Illustrative instance of the separately enumerated operative rule; no additional permission or restriction."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:24:24.26:1",
+    "requirements": [
+      {
+        "requirement_id": "24.26-once-per-physical-weapon",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Each physical One Shot weapon may be selected to attack only once per battle.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:OneShotWeaponUseRecord"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_one_shot_weapon_use_is_battle_scoped_and_blocks_redeclaration",
+            "role": "semantic",
+            "assertion": "assert not restored_state.one_shot_weapon_available(model_instance_id=used_model.model_instance_id, weapon_instance_id=one_shot_instances[0].weapon_instance_id, wargear_id=used_wargear_id, weapon_profile_id=one_shot_profile.profile_id)",
+            "proves": "The selected physical weapon remains unavailable after restore."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_one_shot_weapon_use_is_battle_scoped_and_blocks_redeclaration",
+            "role": "invalid",
+            "assertion": "assert violation['violation_code'] == 'weapon_declaration_unavailable'",
+            "proves": "Redeclaring the spent instance is rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.26-revival-keeps-spent",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Reviving a model does not reset One Shot weapons that it previously selected.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:OneShotWeaponUseRecord"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_revived_model_keeps_spent_physical_one_shot_weapon",
+            "role": "facade",
+            "assertion": "assert model_by_id(state=state, model_instance_id=model_id).is_alive",
+            "proves": "The shared healing decision revives the destroyed physical bearer."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_revived_model_keeps_spent_physical_one_shot_weapon",
+            "role": "facade",
+            "assertion": "assert not state.one_shot_weapon_available(**identity)",
+            "proves": "The revived bearer’s previously spent weapon remains unavailable."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_revived_model_keeps_spent_physical_one_shot_weapon",
+            "role": "replay",
+            "assertion": "assert not restored.lifecycle.state.one_shot_weapon_available(**identity)",
+            "proves": "The spent state remains unavailable after restoring the session."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.26-new-unit-fresh-weapons",
+        "source_blocks": [
+          3
+        ],
+        "summary": "One Shot weapons in a newly added unit each receive their own one-use allowance.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:OneShotWeaponUseRecord"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_new_unit_identity_has_fresh_one_shot_weapons",
+            "role": "semantic",
+            "assertion": "assert added_weapon.weapon_instance_id != weapon.weapon_instance_id",
+            "proves": "A newly instantiated unit owns fresh physical weapon identity."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_new_unit_identity_has_fresh_one_shot_weapons",
+            "role": "semantic",
+            "assertion": "assert state.one_shot_weapon_available(model_instance_id=added.own_models[0].model_instance_id, weapon_instance_id=added_weapon.weapon_instance_id, wargear_id=added_weapon.wargear_id, weapon_profile_id=profile.profile_id)",
+            "proves": "The new unit’s weapon is available."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_new_unit_identity_has_fresh_one_shot_weapons",
+            "role": "semantic",
+            "assertion": "assert not state.one_shot_weapon_available(**original_identity)",
+            "proves": "Creating it leaves the original physical weapon spent."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.26.01:1",
+    "requirements": [
+      {
+        "requirement_id": "24.26.01-multiple-identical-copies",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Two identical One Shot weapon copies on one model each have a separate once-per-battle allowance.",
+        "owners": [
+          "src/warhammer40k_core/engine/game_state.py:OneShotWeaponUseRecord"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_one_shot_weapon_use_is_battle_scoped_and_blocks_redeclaration",
+            "role": "semantic",
+            "assertion": "assert restored_state.one_shot_weapon_available(model_instance_id=used_model.model_instance_id, weapon_instance_id=one_shot_instances[1].weapon_instance_id, wargear_id=used_wargear_id, weapon_profile_id=one_shot_profile.profile_id)",
+            "proves": "The second physical copy remains available after the first is spent."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.27:1",
+    "requirements": [
+      {
+        "requirement_id": "24.27-pistol-close-quarters-alias",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Pistol and Close-quarters are the same ability for all rules purposes.",
+        "owners": [
+          "src/warhammer40k_core/engine/shooting_targets.py:shooting_target_candidates_for_unit"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_locked_in_combat_big_guns_and_pistol_interactions_are_declaration_state",
+            "role": "semantic",
+            "assertion": "assert pistol_candidates[0].shooting_types == (ShootingType.CLOSE_QUARTERS,)",
+            "proves": "Pistol selects the Close-quarters shooting type."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_locked_in_combat_big_guns_and_pistol_interactions_are_declaration_state",
+            "role": "semantic",
+            "assertion": "assert close_quarters_candidates[0].shooting_types == (ShootingType.CLOSE_QUARTERS,)",
+            "proves": "The explicit Close-quarters keyword selects the same type."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_mixed_close_quarters_and_non_close_quarters_declarations_reject_before_pop",
+            "role": "invalid",
+            "assertion": "assert cast(list[dict[str, object]], validation['violations'])[0]['violation_code'] == 'mixed_close_quarters_non_close_quarters_declaration'",
+            "proves": "Mixed ordinary and Close-quarters declarations are rejected before queue pop."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "context",
+        "reason": "Explains the terminology change; the operative equivalence is enumerated separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:24:24.28:1",
+    "requirements": [
+      {
+        "requirement_id": "24.28-visible-character-choice",
+        "source_blocks": [
+          1
+        ],
+        "summary": "At Allocation Order, Precision permits the active player to select an allocation group containing a Character visible to an attacking model.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_state.py:AttackSequence"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_precision_allocation_can_select_visible_attached_character",
+            "role": "semantic",
+            "assertion": "assert len(character_options) == 1",
+            "proves": "Precision offers the one visible Character group."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_precision_allocation_can_select_visible_attached_character",
+            "role": "semantic",
+            "assertion": "assert save_step['allocated_model_id'] == character_model.model_instance_id",
+            "proves": "The actual save allocates to the selected visible Character."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_precision_decline_or_no_visible_character_uses_bodyguard_allocation",
+            "role": "semantic",
+            "assertion": "assert hidden_save_step['allocated_model_id'] == hidden_bodyguard.model_instance_id",
+            "proves": "Invisible Characters remain protected behind Bodyguard allocation."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.28-character-priority-lifetime",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The selected Precision group remains current until these attacks finish or that Character group is destroyed.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_state.py:AttackSequence"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_grouped_precision_promotes_character_then_returns_to_bodyguard",
+            "role": "semantic",
+            "assertion": "assert damage_model_ids[:2] == [character_model.model_instance_id, bodyguard_model.model_instance_id]",
+            "proves": "Actual damage first hits the selected Character and then the Bodyguard after Character death."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.28.01:1",
+    "requirements": [
+      {
+        "requirement_id": "24.28.01-precision-devastating-priority",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Devastating mortal wounds from Precision first apply to the selected surviving Character group.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_state.py:AttackSequence"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_precision_devastating_mortal_wounds_prioritize_selected_character",
+            "role": "semantic",
+            "assertion": "assert cast(list[dict[str, object]], mortal_wound_application['applications'])[0]['model_instance_id'] == character_model.model_instance_id",
+            "proves": "The first mortal-wound application names the selected Character model."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_precision_devastating_mortal_wounds_prioritize_selected_character",
+            "role": "semantic",
+            "assertion": "assert model_by_id(state=state, model_instance_id=bodyguard_model.model_instance_id).current_wounds == bodyguard_model.initial_wounds",
+            "proves": "The Bodyguard remains unwounded."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.29:1",
+    "requirements": [
+      {
+        "requirement_id": "24.29-optional-skill-modifier-subsets",
+        "source_blocks": [
+          1
+        ],
+        "summary": "For a Psychic attack the player may ignore any chosen subset of BS or WS modifiers.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_psychic_modifiers.py:_psychic_attack_modifier_ignore_request",
+          "src/warhammer40k_core/engine/attack_sequence_psychic_modifiers.py:validate_psychic_attack_modifier_ignore_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/integration/test_psychic_modifier_identity.py::test_facade_individual_subset_preserves_sources_restore_and_replay",
+            "role": "facade",
+            "assertion": "assert set(selected.ignored_modifier_ids) == wanted",
+            "proves": "The exact chosen modifier subset survives to the real hit result in both Shooting BS and Fight WS."
+          },
+          {
+            "nodeid": "tests/integration/test_psychic_modifier_identity.py::test_facade_individual_subset_preserves_sources_restore_and_replay",
+            "role": "facade",
+            "assertion": "assert payload['target_number'] == max(2, initial.skill_base - 1)",
+            "proves": "The actual hit target reflects the selected skill modifier subset."
+          },
+          {
+            "nodeid": "tests/integration/test_psychic_modifier_identity.py::test_every_source_subset_is_reachable_without_enumerating_a_power_set",
+            "role": "semantic",
+            "assertion": "assert len(complete) == 2 ** len(pending.modifiers)",
+            "proves": "Every subset of individual sources is reachable."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.29-optional-hit-modifier-subsets",
+        "source_blocks": [
+          1
+        ],
+        "summary": "For a Psychic attack the player may ignore any chosen subset of hit-roll modifiers.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_psychic_modifiers.py:_psychic_attack_modifier_ignore_request",
+          "src/warhammer40k_core/engine/attack_sequence_psychic_modifiers.py:validate_psychic_attack_modifier_ignore_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/integration/test_psychic_modifier_identity.py::test_facade_individual_subset_preserves_sources_restore_and_replay",
+            "role": "facade",
+            "assertion": "assert payload['modifier'] == -2",
+            "proves": "Choosing independent source modifiers changes the actual uncapped hit modifier to -2."
+          },
+          {
+            "nodeid": "tests/integration/test_psychic_modifier_identity.py::test_facade_individual_subset_preserves_sources_restore_and_replay",
+            "role": "facade",
+            "assertion": "assert payload['capped_modifier'] == -1",
+            "proves": "The cap applies after subset choice."
+          },
+          {
+            "nodeid": "tests/integration/test_psychic_modifier_identity.py::test_every_source_subset_is_reachable_without_enumerating_a_power_set",
+            "role": "semantic",
+            "assertion": "assert len(complete) == 2 ** len(pending.modifiers)",
+            "proves": "Every subset of individual sources is reachable."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.29-psychic-attack-tag",
+        "source_blocks": [
+          1
+        ],
+        "summary": "An attack using a Psychic weapon is recorded as a Psychic attack for downstream rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/attack_sequence_psychic_modifiers.py:_psychic_attack_modifier_ignore_request",
+          "src/warhammer40k_core/engine/attack_sequence_psychic_modifiers.py:validate_psychic_attack_modifier_ignore_decision"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_psychic_attack_can_ignore_detrimental_skill_and_hit_roll_modifiers",
+            "role": "semantic",
+            "assertion": "assert payload['is_psychic_attack'] is True",
+            "proves": "The resolved hit event carries is_psychic_attack=True."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.30:1",
+    "requirements": [
+      {
+        "requirement_id": "24.30-half-range-extra-dice",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Rapid Fire X adds X attack dice when the target was within half range at Select Targets.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:rapid_fire_attack_bonus"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase13d_weapon_ability_helpers_use_structured_descriptors",
+            "role": "semantic",
+            "assertion": "assert rapid_fire_attack_bonus(profile, target_within_half_range=True) == 2",
+            "proves": "Within half range the profile adds two dice."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase13d_weapon_ability_helpers_use_structured_descriptors",
+            "role": "semantic",
+            "assertion": "assert rapid_fire_attack_bonus(profile, target_within_half_range=False) == 0",
+            "proves": "Outside half range it adds none."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_declaration_applies_rapid_blast_melta_and_heavy_modifiers",
+            "role": "semantic",
+            "assertion": "assert f'{RAPID_FIRE_RULE_ID}:1' in targeting_rule_ids",
+            "proves": "Declaration records the selected-target Rapid Fire contribution."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "example",
+        "reason": "Illustrative instance of the separately enumerated operative rule; no additional permission or restriction."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:24:24.31:1",
+    "requirements": [
+      {
+        "requirement_id": "24.31-all-model-prebattle-permission",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Scouts is a prebattle option only if every model has the ability; one permitted action is selected.",
+        "owners": [
+          "src/warhammer40k_core/engine/prebattle.py:scout_move_candidates_for_player"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase16b_prebattle.py::test_phase16b_dedicated_transport_with_non_scout_cargo_is_ineligible",
+            "role": "semantic",
+            "assertion": "assert dedicated_transport_scout_move_candidates_for_player(state=state, army_catalog=catalog, player_id='player-b') == ()",
+            "proves": "Non-Scout cargo blocks the all-model-derived transport Scout permission."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_attached_scouts_require_every_component",
+            "role": "semantic",
+            "assertion": "assert bool(instances) is all_components",
+            "proves": "A mixed attached Scouts unit has no Scouts instances; every-component qualification succeeds."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_scout_candidates_require_own_zone_and_have_only_one_action",
+            "role": "semantic",
+            "assertion": "assert unit.unit_instance_id not in {v.unit_instance_id for v in scout_move_candidates_for_player(state=state, army_catalog=config.army_catalog, player_id='player-a')}",
+            "proves": "After the recorded Scout action, the same unit is no longer a Scout candidate."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.31-reserve-own-zone-setup",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A Scout unit in Strategic Reserves may set up wholly within its deployment zone.",
+        "owners": [
+          "src/warhammer40k_core/engine/prebattle.py:apply_scout_reserve_setup"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_reserve_setup_uses_structured_proposal_and_validation",
+            "role": "invalid",
+            "assertion": "assert PreBattleViolationCode.DEPLOYMENT_ZONE_VIOLATION in {violation.violation_code for violation in invalid_resolution.violations}",
+            "proves": "Scout reserve setup outside the deployment zone is rejected."
+          },
+          {
+            "nodeid": "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_reserve_setup_apply_records_arrival_action_and_event",
+            "role": "semantic",
+            "assertion": "assert reserve_state.status is ReserveStatus.ARRIVED",
+            "proves": "Accepted Scout setup marks the unit arrived."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.31-own-zone-scout-move",
+        "source_blocks": [
+          3
+        ],
+        "summary": "A Scout unit wholly within its deployment zone may make a Scout move.",
+        "owners": [
+          "src/warhammer40k_core/engine/prebattle.py:scout_move_candidates_for_player"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase16b_prebattle.py::test_phase16b_valid_scout_move_records_displacements_without_movement_phase_state",
+            "role": "semantic",
+            "assertion": "assert {cast(str, record['displacement_kind']) for record in displacements} == {ModelDisplacementKind.SCOUT_MOVE.value}",
+            "proves": "Accepted prebattle movement records Scout displacements."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.31-dedicated-transport-cargo",
+        "source_blocks": [
+          4
+        ],
+        "summary": "A Dedicated Transport wholly in its deployment zone may Scout when every embarked model has Scouts.",
+        "owners": [
+          "src/warhammer40k_core/engine/prebattle.py:dedicated_transport_scout_move_candidates_for_player"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase16b_prebattle.py::test_phase16b_dedicated_transport_with_non_scout_cargo_is_ineligible",
+            "role": "semantic",
+            "assertion": "assert dedicated_transport_scout_move_candidates_for_player(state=state, army_catalog=catalog, player_id='player-b') == ()",
+            "proves": "Mixed non-Scout cargo offers no transport Scout move."
+          },
+          {
+            "nodeid": "tests/unit/test_phase16b_prebattle.py::test_phase16b_dedicated_transport_scout_move_uses_cargo_scouts_and_records_action",
+            "role": "semantic",
+            "assertion": "assert records[0].unit_instance_id == 'army-beta:transport-unit-1'",
+            "proves": "The accepted Scout action belongs to the cargo-bearing transport."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.32:1",
+    "requirements": [
+      {
+        "requirement_id": "24.32-prebattle-zone-eligibility",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A Scout move occurs in Resolve Pre-battle Abilities and begins wholly in the player deployment zone.",
+        "owners": [
+          "src/warhammer40k_core/engine/prebattle.py:scout_move_candidates_for_player"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_scout_candidates_require_own_zone_and_have_only_one_action",
+            "role": "semantic",
+            "assertion": "assert unit.unit_instance_id in {v.unit_instance_id for v in scout_move_candidates_for_player(state=state, army_catalog=config.army_catalog, player_id='player-a')}",
+            "proves": "A source-qualified unit wholly in its own zone is a Scout candidate."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_scout_candidates_require_own_zone_and_have_only_one_action",
+            "role": "semantic",
+            "assertion": "assert unit.unit_instance_id not in {v.unit_instance_id for v in scout_move_candidates_for_player(state=state, army_catalog=config.army_catalog, player_id='player-a')}",
+            "proves": "Moving the same fixture outside its own zone removes candidacy."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_scout_candidates_require_own_zone_and_have_only_one_action",
+            "role": "invalid",
+            "assertion": "with pytest.raises(GameLifecycleError, match='setup stage'):\n    _validate_prebattle_state(state, SetupStep.RESOLVE_PREBATTLE_ACTIONS)",
+            "proves": "The shared Scout proposal gate rejects battle-stage requests."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_scout_candidates_require_own_zone_and_have_only_one_action",
+            "role": "invalid",
+            "assertion": "with pytest.raises(GameLifecycleError, match='setup step drift'):\n    _validate_prebattle_state(state, SetupStep.RESOLVE_PREBATTLE_ACTIONS)",
+            "proves": "The shared Scout proposal gate rejects the wrong setup step."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.32-witnessed-shared-move",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Scout uses the shared witnessed movement rules.",
+        "owners": [
+          "src/warhammer40k_core/engine/prebattle.py:apply_scout_move"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase16b_prebattle.py::test_phase16b_valid_scout_move_records_displacements_without_movement_phase_state",
+            "role": "semantic",
+            "assertion": "assert len(displacements) == 5",
+            "proves": "Accepted Scout movement produces five physical displacement records."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.32-enemy-eight-inch-boundary",
+        "source_blocks": [
+          6
+        ],
+        "summary": "The Scout move must end more than eight horizontal inches from all enemies.",
+        "owners": [
+          "src/warhammer40k_core/engine/prebattle.py:apply_scout_move"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_move_requires_more_than_eight_from_enemy",
+            "role": "invalid",
+            "assertion": "assert PreBattleViolationCode.SCOUT_ENEMY_DISTANCE.value in _violation_codes(invalid_status)",
+            "proves": "A too-close Scout endpoint returns the specific enemy-distance violation."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.32-ability-distance-cap",
+        "source_blocks": [
+          8
+        ],
+        "summary": "A Scout move’s maximum distance is its selected Scouts X value.",
+        "owners": [
+          "src/warhammer40k_core/engine/prebattle.py:apply_scout_move"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase16b_prebattle.py::test_phase16b_dedicated_transport_scout_move_uses_cargo_scouts_and_records_action",
+            "role": "semantic",
+            "assertion": "assert proposal_request.scout_distance_inches == selected_distance",
+            "proves": "The request carries the selected cargo-derived Scout distance."
+          },
+          {
+            "nodeid": "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_move_rejects_over_distance_path_without_mutation",
+            "role": "invalid",
+            "assertion": "assert PreBattleViolationCode.PATH_VALIDATION_FAILED.value in _violation_codes(invalid_status)",
+            "proves": "A path beyond the Scout allowance fails shared path validation."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          3,
+          5,
+          7
+        ],
+        "classification": "metadata",
+        "reason": "Section labels only; operative eligibility, distance and consequences are enumerated separately."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:24:24.33:1",
+    "requirements": [
+      {
+        "requirement_id": "24.33-all-models-stealth",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Stealth supplies cover against ranged attacks only when every model has it.",
+        "owners": [
+          "src/warhammer40k_core/engine/stealth.py:rules_unit_stealth_sources"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_order39_stealth_requires_each_model_or_a_complete_grant",
+            "role": "semantic",
+            "assertion": "assert (sources is not None) is (grant or stealth_count == 5)",
+            "proves": "Incomplete native coverage denies Stealth unless a complete grant exists."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_order39_stealth_uses_one_cover_skill_modifier",
+            "role": "semantic",
+            "assertion": "assert snapshots[0].kind == 'skill'",
+            "proves": "The resulting cover effect modifies skill rather than hit rolls."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.35:1",
+    "requirements": [
+      {
+        "requirement_id": "24.35-normal-advance-fall-back-scope",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Super-Heavy Walker transit permissions apply only during Normal, Advance and Fall Back movement.",
+        "owners": [
+          "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order53_movement_abilities.py::test_other_moves_do_not_inherit_walker_permissions",
+            "role": "semantic",
+            "assertion": "assert capability.horizontal_terrain_transit_height_inches is None",
+            "proves": "Other move types do not receive the low-terrain transit allowance."
+          },
+          {
+            "nodeid": "tests/unit/test_order53_movement_abilities.py::test_other_moves_do_not_inherit_walker_permissions",
+            "role": "semantic",
+            "assertion": "assert not capability.can_move_through_enemy_models",
+            "proves": "Other move types do not receive enemy-model transit."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.35-transit-models-except-titanic",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Walker models may traverse other models including Monster/Vehicle, excluding Titanic.",
+        "owners": [
+          "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order53_movement_abilities.py::test_witnessed_normal_move_crosses_friendly_vehicle_but_not_titanic",
+            "role": "semantic",
+            "assertion": "assert result.is_valid is not titanic",
+            "proves": "The witnessed Normal path accepts Vehicle transit and rejects Titanic."
+          },
+          {
+            "nodeid": "tests/unit/test_order53_movement_abilities.py::test_fall_back_enemy_vehicle_transit_preserves_titanic_exclusion",
+            "role": "semantic",
+            "assertion": "assert result.is_valid is not titanic",
+            "proves": "Fall Back preserves the same Titanic exclusion."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.35-horizontal-four-inch-terrain",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Walker models may move horizontally through terrain sections no higher than four inches.",
+        "owners": [
+          "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order53_movement_abilities.py::test_horizontal_terrain_sections_mobile_and_endpoints",
+            "role": "semantic",
+            "assertion": "assert context.validate().is_valid is accepted",
+            "proves": "The parameterized terrain-height and MOBILE matrix validates accepted traversal."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.35-optional-all-model-mobile",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Before movement the player may give every model MOBILE until that move ends.",
+        "owners": [
+          "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order53_movement_abilities.py::test_all_model_keyword_choice_precedes_move_and_advance_roll",
+            "role": "semantic",
+            "assertion": "assert {cast(bool, option.payload['move_keyword_choice']['selected']) for option in choices if isinstance(option.payload, dict) and isinstance(option.payload['move_keyword_choice'], dict)} == {False, True}",
+            "proves": "The finite decision offers selected and declined MOBILE choices before rolling."
+          },
+          {
+            "nodeid": "tests/unit/test_order53_movement_abilities.py::test_attached_rules_unit_has_one_all_model_choice",
+            "role": "semantic",
+            "assertion": "assert choice['model_instance_ids'] == sorted((m.model_instance_id for m in view.alive_models()))",
+            "proves": "The option includes every alive attached-unit model."
+          },
+          {
+            "nodeid": "tests/unit/test_order53_movement_abilities.py::test_move_keyword_completion_is_once_per_move_and_replays",
+            "role": "semantic",
+            "assertion": "assert all(('MOBILE' not in model.keywords for model in units['mover'].own_models))",
+            "proves": "MOBILE does not persist on model keywords after the move."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.35-end-move-shock-on-one",
+        "source_blocks": [
+          3
+        ],
+        "summary": "If MOBILE was selected, one D6 is rolled after movement and a one Battle-shocks the unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order53_movement_abilities.py::test_move_keyword_completion_is_once_per_move_and_replays",
+            "role": "semantic",
+            "assertion": "assert len(rolls) == int(selected)",
+            "proves": "Exactly one completion roll occurs when selected and none when declined."
+          },
+          {
+            "nodeid": "tests/unit/test_order53_movement_abilities.py::test_move_keyword_completion_is_once_per_move_and_replays",
+            "role": "semantic",
+            "assertion": "assert (units['mover'].unit_instance_id in state.battle_shocked_unit_ids) == (roll.current_total == 1)",
+            "proves": "Battle-shock matches the rolled one result."
+          },
+          {
+            "nodeid": "tests/unit/test_order53_movement_abilities.py::test_move_keyword_completion_is_once_per_move_and_replays",
+            "role": "replay",
+            "assertion": "assert ReplayRunner.from_payload(session.replay_artifact(artifact_id='move-keywords')).run().status is ReplayRunStatus.REPRODUCED",
+            "proves": "The complete decision/move/roll path reproduces exactly."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          4
+        ],
+        "classification": "context",
+        "reason": "Explains the Dense-terrain consequence of the separately specified MOBILE keyword grant."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:24:24.36:1",
+    "requirements": [
+      {
+        "requirement_id": "24.36-critical-extra-hits",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Sustained Hits X adds X further hits on each critical hit.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:sustained_hits_generated_hits"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase13d_weapon_ability_helpers_use_structured_descriptors",
+            "role": "semantic",
+            "assertion": "assert sustained_hits_generated_hits(profile, critical_hit=True) == 3",
+            "proves": "Sustained Hits 2 yields three total hits on a critical."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase13d_weapon_ability_helpers_use_structured_descriptors",
+            "role": "semantic",
+            "assertion": "assert sustained_hits_generated_hits(profile, critical_hit=False) == 1",
+            "proves": "An ordinary hit remains one."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_lethal_and_sustained_hits_resolve_generated_hits",
+            "role": "semantic",
+            "assertion": "assert cast(dict[str, object], wound_events[1]['payload'])['skipped'] is False",
+            "proves": "The generated hit receives its own ordinary wound roll."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          2
+        ],
+        "classification": "example",
+        "reason": "Illustrative instance of the separately enumerated operative rule; no additional permission or restriction."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:24:24.37:1",
+    "requirements": [
+      {
+        "requirement_id": "24.37-automatic-hit",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Torrent attacks hit automatically.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:has_weapon_keyword"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_torrent_anti_and_devastating_wounds_are_attack_sequence_effects",
+            "role": "semantic",
+            "assertion": "assert cast(dict[str, object], hit_payload['payload'])['skipped'] is True",
+            "proves": "The Torrent attack skips its hit roll."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.37.01:1",
+    "requirements": [
+      {
+        "requirement_id": "24.37.01-no-indirect-or-precision",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A Torrent weapon cannot have Indirect Fire or Precision.",
+        "owners": [
+          "src/warhammer40k_core/core/weapon_profiles.py:WeaponProfile"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_wargear_weapon_profiles.py::test_torrent_rejects_indirect_fire_and_precision",
+            "role": "invalid",
+            "assertion": "with pytest.raises(WeaponProfileError, match='Torrent WeaponProfile cannot also have Indirect Fire or Precision'):\n    WeaponProfile(profile_id=f'invalid-torrent-{incompatible_keyword.name.lower()}', name='Invalid Torrent profile', range_profile=RangeProfile.distance(12), attack_profile=AttackProfile.fixed(1), skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3), strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4), armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0), damage_profile=DamageProfile.fixed(1), keywords=(WeaponKeyword.TORRENT, incompatible_keyword))",
+            "proves": "The parameterized constructor rejects Torrent paired with either Indirect Fire or Precision."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.38:1",
+    "requirements": [
+      {
+        "requirement_id": "24.38-optional-wound-reroll",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Every Twin-linked wound roll may be rerolled or declined by its controlling player, including successful rolls.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:weapon_ability_applies"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order96_twin_linked.py::test_optional_twin_linked_all_wounds_restore_viewers_and_exact_replay",
+            "role": "semantic",
+            "assertion": "assert [option.option_id for option in request.options] == ['decline', 'reroll:0']",
+            "proves": "Each wound request offers decline and reroll."
+          },
+          {
+            "nodeid": "tests/unit/test_order96_twin_linked.py::test_optional_twin_linked_all_wounds_restore_viewers_and_exact_replay",
+            "role": "semantic",
+            "assertion": "assert values & {4, 5, 6}",
+            "proves": "The exercised choices include successful wounds."
+          },
+          {
+            "nodeid": "tests/unit/test_order96_twin_linked.py::test_optional_twin_linked_all_wounds_restore_viewers_and_exact_replay",
+            "role": "semantic",
+            "assertion": "assert len(cast(list[JsonValue], roll['rerolls'])) == (choice != 'decline')",
+            "proves": "Actual reroll count follows the submitted choice."
+          },
+          {
+            "nodeid": "tests/unit/test_order96_twin_linked.py::test_optional_twin_linked_all_wounds_restore_viewers_and_exact_replay",
+            "role": "replay",
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+            "proves": "The optional decisions reproduce exactly."
+          },
+          {
+            "nodeid": "tests/unit/test_order96_twin_linked.py::test_optional_twin_linked_all_wounds_restore_viewers_and_exact_replay",
+            "role": "viewer",
+            "assertion": "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+            "proves": "Both viewers retain identical event projections after restore."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:24:24.39:1",
+    "requirements": [
+      {
+        "requirement_id": "24.39-wounds-threshold",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A model is Damaged while its wounds are at or below the stated X threshold.",
+        "owners": [
+          "src/warhammer40k_core/engine/damaged_effects.py:CatalogDamagedEffectRuntime"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_damaged_effects.py::test_damaged_effects_modify_hit_roll_and_objective_control_inside_wound_range",
+            "role": "semantic",
+            "assertion": "assert registry.hit_roll_modifier(HitRollModifierContext(state=fresh_state, attacking_unit_instance_id=fresh_unit.unit_instance_id, attacker_model_instance_id=fresh_unit.own_models[0].model_instance_id, target_unit_instance_id=fresh_unit.unit_instance_id, weapon_profile=_weapon_profile(catalog, model.wargear_ids[0]), source_phase=BattlePhase.SHOOTING)) == 0",
+            "proves": "The fresh model above the damaged range receives no hit penalty."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "24.39-minus-one-hit",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Attacks made by a Damaged model have minus one to hit.",
+        "owners": [
+          "src/warhammer40k_core/engine/damaged_effects.py:CatalogDamagedEffectRuntime"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_damaged_effects.py::test_damaged_effects_modify_hit_roll_and_objective_control_inside_wound_range",
+            "role": "semantic",
+            "assertion": "assert registry.hit_roll_modifier(HitRollModifierContext(state=state, attacking_unit_instance_id=unit.unit_instance_id, attacker_model_instance_id=model.model_instance_id, target_unit_instance_id=unit.unit_instance_id, weapon_profile=_weapon_profile(catalog, model.wargear_ids[0]), source_phase=BattlePhase.SHOOTING)) == -1",
+            "proves": "The low-wound model receives the minus-one hit modifier."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "faq:bb42e060-31e1-46bc-ba52-85cd5ea8c6cf",
+    "requirements": [
+      {
+        "requirement_id": "bb42e060-31e1-46bc-ba52-85cd5ea8c6cf-anti-non-keyword",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Anti-non-X applies against units that lack X; Anti-non-Monster/Vehicle requires neither prohibited keyword.",
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:anti_keyword_critical_threshold"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase13d_anti_keyword_supports_slash_keywords_and_non_matching_targets",
+            "role": "semantic",
+            "assertion": "assert anti_keyword_critical_threshold(profile=non_keyword_profile, target_keywords=('PSYKER',)) is None",
+            "proves": "Anti-non-Psyker does not trigger on PSYKER."
+          },
+          {
+            "nodeid": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase13d_anti_keyword_supports_slash_keywords_and_non_matching_targets",
+            "role": "semantic",
+            "assertion": "assert anti_keyword_critical_threshold(profile=non_keyword_profile, target_keywords=('INFANTRY',)) == 2",
+            "proves": "Anti-non-Psyker triggers at two against an INFANTRY target lacking PSYKER."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Question framing for the operative answer in block 2."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:3103e536-8fb8-4fa3-800c-c0d159115bba",
+    "requirements": [
+      {
+        "requirement_id": "3103e536-8fb8-4fa3-800c-c0d159115bba-parameterized-inches",
+        "source_blocks": [
+          2
+        ],
+        "summary": "X in Lone Operative X denotes the stated range in inches.",
+        "owners": [
+          "src/warhammer40k_core/engine/unit_abilities.py:lone_operative_profile_for_unit"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17_emperors_children_lucius.py::test_attached_rules_unit_all_lone_operative_uses_largest_component_range",
+            "role": "semantic",
+            "assertion": "assert profile.range_inches == 15.0",
+            "proves": "The Lone Operative 15 profile carries a fifteen-inch range."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Question framing for the operative answer in block 2."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:e846db5e-3138-4ac6-b7ee-ca2ff7fe303e",
+    "requirements": [
+      {
+        "requirement_id": "e846db5e-3138-4ac6-b7ee-ca2ff7fe303e-flying-heavy-vertical",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Vertical distance ignored by taking to the skies also does not count for Heavy’s movement limit.",
+        "owners": [
+          "src/warhammer40k_core/engine/model_movement_history.py:models_within_turn_distance"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order51_flight.py::test_heavy_uses_each_models_accepted_vertical_distance",
+            "role": "semantic",
+            "assertion": "assert models_within_turn_distance(state=state, model_ids=ids, maximum_inches=3) is (selected and (not mixed))",
+            "proves": "The Heavy movement predicate follows accepted flight distance for each model."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_heavy_accepted_vertical_movement_reaches_facade_attack",
+            "role": "facade",
+            "assertion": "assert all((isclose(row.distance_inches, 2 if flying else sqrt(13), abs_tol=1e-09) for row in state.model_movement_history))",
+            "proves": "Accepted movement records two inches for flight and sqrt(13) for walking on the same vertical path."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_heavy_accepted_vertical_movement_reaches_facade_attack",
+            "role": "facade",
+            "assertion": "assert roll['capped_modifier'] == int(flying)",
+            "proves": "The actual Heavy hit gains +1 exactly for the flight path that stayed within three counted inches."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_heavy_accepted_vertical_movement_reaches_facade_attack",
+            "role": "invalid",
+            "assertion": "assert session.to_persistence_payload() == before",
+            "proves": "A malformed movement submission leaves authoritative session state unchanged."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Question framing for the operative answer in block 2."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:80182be3-1a44-464b-9ef6-cd9212429603",
+    "requirements": [
+      {
+        "requirement_id": "80182be3-1a44-464b-9ef6-cd9212429603-alternate-prebattle",
+        "source_blocks": [
+          2
+        ],
+        "summary": "When both players have prebattle rules, resolve units alternately starting with the first-turn player.",
+        "owners": [
+          "src/warhammer40k_core/engine/prebattle.py:prebattle_next_player_id_for_timing_state"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase16b_prebattle.py::test_phase16b_simultaneous_scouts_start_with_first_turn_player_and_alternate_by_unit",
+            "role": "semantic",
+            "assertion": "assert first_request.actor_id == 'player-a'",
+            "proves": "The first-turn player resolves first."
+          },
+          {
+            "nodeid": "tests/unit/test_phase16b_prebattle.py::test_phase16b_simultaneous_scouts_start_with_first_turn_player_and_alternate_by_unit",
+            "role": "semantic",
+            "assertion": "assert second_request.actor_id == 'player-b'",
+            "proves": "The next unit is selected by the opponent."
+          },
+          {
+            "nodeid": "tests/unit/test_phase16b_prebattle.py::test_phase16b_simultaneous_scouts_start_with_first_turn_player_and_alternate_by_unit",
+            "role": "semantic",
+            "assertion": "assert third_request.actor_id == 'player-a'",
+            "proves": "The following unit returns to the first player."
+          },
+          {
+            "nodeid": "tests/unit/test_phase16b_prebattle.py::test_phase16b_simultaneous_scouts_start_with_first_turn_player_and_alternate_by_unit",
+            "role": "replay",
+            "assertion": "assert replay_result.reproduced_exactly, replay_result.to_payload()",
+            "proves": "The alternating prebattle decisions reproduce exactly."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Question framing for the operative answer in block 2."
+      }
+    ]
+  }
+]

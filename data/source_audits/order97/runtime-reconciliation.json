@@ -1,0 +1,2461 @@
+[
+  {
+    "source_package_id": "gw-11e-core-abilities",
+    "source_version": "game-datamissions-v931-observed-2026-09-02",
+    "package_hash": "ceda170f6ff51083eb2976ea97ee4d9096095dc3276d25ff7335d1cacabb9bfb",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_abilities_2026_09/artifacts/package.json",
+    "sha256": "fbfb7dae154292d33963a9c81d5c14025aa6c44873b7ee7a60c1fce754909bf7",
+    "metadata_sha256": "8eb8555c2d2c850db12ee4ce73236c56bd99e2277ebc33b856b5e9071b1f924c",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-abilities:core:deadly-demise",
+        "section_id": "24.08",
+        "source_text": "This ability always takes the form Deadly Demise X. Each time a model with this ability is destroyed, after the units embarked within it (if any) have made their emergency disembark moves, roll one D6. On a 6, that model suffers a deadly demise; each unit within 6\" of that model suffers a number of mortal wounds denoted by X (if this is a random number, roll separately for each unit within 6\").",
+        "transcription_sha256": "a5ca19362fe04090968372fe83f3398cfa1236d52d69a2a87ad6ca555f429ff4",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.ability_catalog:eleventh_edition_core_ability_catalog_records",
+          "warhammer40k_core.engine.abilities:default_ability_handler_registry",
+          "warhammer40k_core.engine.attack_sequence_damage_resolution:_resolve_deadly_demise_before_removal",
+          "warhammer40k_core.engine.catalog_rule_consumption:record_core_deadly_demise_sources_for_unit",
+          "warhammer40k_core.engine.deadly_demise:resolve_deadly_demise_trigger",
+          "warhammer40k_core.engine.rule_model_destruction:destroy_model_with_rule_reactions"
+        ],
+        "selected_rows": [
+          "rule:24:24.08:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-abilities:faq:alternating-scout-moves",
+        "section_id": "FAQ",
+        "source_text": "If both players have units with the Scouts ability, do they alternate resolving scout moves?\nYes, players alternate resolving any pre-battle rules units from their army may have, starting with the player who will take the first turn.",
+        "transcription_sha256": "e2e4740b73d2ea159eecb42da7246c399dc157bef038a623f9ecd94d07ba1296",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.game_state:GameState.record_prebattle_action",
+          "warhammer40k_core.engine.game_state:GameState.set_prebattle_alternation_cursor",
+          "warhammer40k_core.engine.prebattle:_timing_state_for_step",
+          "warhammer40k_core.engine.prebattle:prebattle_action_selection_request",
+          "warhammer40k_core.engine.prebattle:prebattle_next_player_id_for_timing_state",
+          "warhammer40k_core.engine.prebattle_alternation:align_prebattle_alternation_cursor",
+          "warhammer40k_core.engine.prebattle_alternation:validate_prebattle_alternation_restore",
+          "warhammer40k_core.engine.prebattle_records:PreBattleAlternationCursor",
+          "warhammer40k_core.engine.setup_flow:SetupFlow._advance_resolve_prebattle_actions"
+        ],
+        "selected_rows": [
+          "faq:80182be3-1a44-464b-9ef6-cd9212429603"
+        ],
+        "relation": "source_repair_required",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution. Declared runtime consumer identity is stale; the explicit current owner is recorded separately. Package consumer metadata requires correction before PFINAL.",
+        "retired_consumer_successors": {
+          "warhammer40k_core.engine.prebattle_alternation:validate_prebattle_alternation_restore": [
+            "src/warhammer40k_core/engine/prebattle_integrity.py:validate_prebattle_alternation_restore"
+          ]
+        }
+      },
+      {
+        "source_id": "gw-11e-core-abilities:core:hazardous",
+        "section_id": "24.15",
+        "source_text": "Each time a unit is selected to shoot or selected to fight, after that unit has resolved all of its attacks, make a number of hazard rolls (06.03) for that unit equal to the number of [HAZARDOUS] weapons you selected in the Select Weapons step.",
+        "transcription_sha256": "2ecefae469a748d8f5b337dcbbb4a1c3211bfa4c3555626fbbd05ee6fbde3832",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.ability_catalog:eleventh_edition_core_ability_catalog_records",
+          "warhammer40k_core.engine.abilities:default_ability_handler_registry",
+          "warhammer40k_core.engine.attack_sequence_dispatch:resolve_attack_sequence_until_blocked",
+          "warhammer40k_core.engine.attack_sequence_group_selection:_continue_hazardous_after_mortal_wound_feel_no_pain",
+          "warhammer40k_core.engine.attack_sequence_hazardous:_resolve_hazardous_tests",
+          "warhammer40k_core.engine.attack_sequence_hazardous:validate_hazardous_mortal_wound_source_context",
+          "warhammer40k_core.engine.attack_sequence_hazardous:validate_pending_hazardous_mortal_wound_requests",
+          "warhammer40k_core.engine.weapon_declaration:RangedAttackPool"
+        ],
+        "selected_rows": [
+          "rule:24:24.15:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-actions",
+    "source_version": "maintained-app-mirrors-observed-2026-09-09",
+    "package_hash": "13a1e8c9c3b110a5b2b2fb7c61d37f92af65ba8209b593123e24611024440279",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_actions_2026_09/artifacts/package.json",
+    "sha256": "b9027d83c608961b9cde5baae546bbb97336235b8b9a6297b182cf0e93fad8aa",
+    "metadata_sha256": "86f907be4e889e2ea2b4b98b9b3068b0454ce70bb2f7d2d6a93cdc8684df3d3e",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-actions:performing-actions",
+        "section_id": "16.01",
+        "source_text": "PERFORMING ACTIONS\nSome rules allow units to perform actions. Each action states:\n- STARTS: When it is started.\n- UNITS: Which friendly units can perform it.\n- USE LIMIT: How many times friendly units can start it.\n- COMPLETES: When it completes.\n- EFFECT: What the effects of completing it are.\n- Any additional restrictions that may apply.\nSTARTING AN ACTION\nA unit is eligible to start an action unless one or more of the following apply to that unit:\n- It is not on the battlefield.\n- It is an AIRCRAFT/FORTIFICATION unit.\n- It is battle-shocked.\n- It has an OC characteristic of 0 or ‘-’.\n- It is engaged (unless it is a TITANIC unit).\n- It made an advance or fall-back move this turn.\n- It started another action this turn.\nIf a unit starts an action, until the end of the turn:\n- It is not eligible to shoot (excluding TITANIC units).\n- It is not eligible to declare a charge.\nCOMPLETING AN ACTION\nIf a unit performing an action makes a move (excluding pile-in and consolidation moves) or leaves the battlefield, that unit does not complete that action. Otherwise, when an action is completed, its ‘Effect’ section is triggered.",
+        "transcription_sha256": "35ce80a49504a36233fd650004a26e48390cb63d4da397b371642a9094c93b91",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "partial_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.activity_restrictions:record_action_restriction",
+          "warhammer40k_core.engine.mission_action_eligibility:mission_action_unit_ineligibility_reason"
+        ],
+        "selected_rows": [
+          "rule:16:16.01:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Section title, bullets and format controls differ. Reviewed all Action fields, eligibility exclusions, turn restrictions and movement/absence interruption. The selected Where To Find Actions callout is additional context outside this runtime excerpt."
+      },
+      {
+        "source_id": "gw-11e-core-actions:normal-shooting",
+        "section_id": "10.04",
+        "source_text": "NORMAL SHOOTING\nWhen eligible: Your unit is unengaged and did not make an advance move this turn.\nEffect: Your unit shoots as described in Making Attacks (04).\nAfter shooting: Until the end of the phase, your unit is not eligible to start an action.",
+        "transcription_sha256": "935daf3f177abed66fca8f2e611b85c68b67ccca890b097c6bf1e452ca9b82ed",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "partial_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.activity_restrictions:record_completed_shooting_restriction",
+          "warhammer40k_core.engine.mission_action_eligibility:mission_action_unit_ineligibility_reason"
+        ],
+        "selected_rows": [
+          "rule:10:10.04:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      },
+      {
+        "source_id": "gw-11e-core-actions:assault-shooting",
+        "section_id": "10.05",
+        "source_text": "ASSAULT SHOOTING\nWhen eligible: All of the following apply to your unit:\n- Unengaged and made an advance move this turn.\n- Has one or more [ASSAULT] weapons.\nEffect: Your unit shoots as described in Making Attacks (04).\nWhile shooting: You can only select [ASSAULT] weapons to make attacks with.\nAfter shooting: Until the end of the phase, your unit is not eligible to start an action.",
+        "transcription_sha256": "e4e66c31cd61c47040fb4413d6ea27303b98dd23801093aafad16cb6cca1240f",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "partial_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.activity_restrictions:record_completed_shooting_restriction",
+          "warhammer40k_core.engine.mission_action_eligibility:mission_action_unit_ineligibility_reason"
+        ],
+        "selected_rows": [
+          "rule:10:10.05:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      },
+      {
+        "source_id": "gw-11e-core-actions:close-quarters-shooting",
+        "section_id": "10.06",
+        "source_text": "CLOSE-QUARTERS SHOOTING\nWhen eligible: All of the following apply to your unit:\n- Engaged and did not make an advance move this turn.\n- Has one or more [CLOSE‑QUARTERS] weapons or is a MONSTER/VEHICLE unit.\nEffect: Your unit shoots as described in Making Attacks (04).\nWhile shooting: Models in your unit can target enemy units your unit is engaged with.\n- MONSTER/VEHICLE Models: Each time a MONSTER/VEHICLE model in your unit makes an attack:\n  - Unless that attack is made with a [CLOSE‑QUARTERS] weapon and targets a unit your unit is engaged with, subtract 1 from the hit roll.\n  - If that attack is made with a [BLAST] weapon, it still cannot target a unit your unit is engaged with.\n- Non-MONSTER/Non-VEHICLE Models: You can only select [CLOSE‑QUARTERS] weapons to make attacks with and you can only select enemy units that are engaged with your unit as targets.\nAfter shooting: Until the end of the phase, your unit is not eligible to start an action.",
+        "transcription_sha256": "c44508145d53b35217bab6049826848d84569409feb52ab41e3644aa94f6dc78",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "partial_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.activity_restrictions:record_completed_shooting_restriction",
+          "warhammer40k_core.engine.mission_action_eligibility:mission_action_unit_ineligibility_reason"
+        ],
+        "selected_rows": [
+          "rule:10:10.06:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-aircraft",
+    "source_version": "maintained-app-mirrors-observed-2026-09-20",
+    "package_hash": "edc38e45438c8053ff61ce92caddf8bcb3e88c35f14be8316d23571aa3276164",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_aircraft_2026_09/artifacts/package.json",
+    "sha256": "bd02714ea87d67d74ecc5c47ed7db6e35f3d99ec169b49fd1e631fca4a906fbe",
+    "metadata_sha256": "c5de5bc5a972d3f61fb4af260e78698b190b6cb7a1f2a38dc691de4ee6f9d2a0",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-aircraft:deployment",
+        "section_id": "23.01",
+        "source_text": "In the Declare Battle Formations step, all AIRCRAFT units must be placed in strategic reserves (20.01).",
+        "transcription_sha256": "0121fe485981e9ddb6ddd73733ee09d133ba4b1f5e67e7909847ef5134b680e6",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.reserve_declarations:apply_mandatory_aircraft_reserve_declarations"
+        ],
+        "selected_rows": [
+          "rule:23:23.01:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-aircraft:movement",
+        "section_id": "23.02",
+        "source_text": "AIRCRAFT units are only eligible to make an ingress move (20.04); they are not eligible to make any other type of move. At the end of your opponent’s turn, all AIRCRAFT units in your army that are on the battlefield must be placed in strategic reserves. Each time a unit makes any type of move, its models can be moved through AIRCRAFT models. Each time a unit makes a pile-in, consolidation or surge move, unless that unit can FLY, while making that move, ignore AIRCRAFT units for the purposes of selecting enemy units and determining the closest enemy unit. Being engaged solely with one or more AIRCRAFT units does not prevent a unit from being eligible to make a normal or advance move.",
+        "transcription_sha256": "eb8485ee6333408f13c1bf413495a1d8015354241c7227ead66e60eefae61675",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.aircraft_rules:aircraft_movement_target_allowed",
+          "warhammer40k_core.engine.aircraft_turn_end:aircraft_turn_end_binding",
+          "warhammer40k_core.engine.movement_locks:movement_lock_reason"
+        ],
+        "selected_rows": [
+          "rule:23:23.02:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-aircraft:shooting",
+        "section_id": "23.03",
+        "source_text": "The Plunging Fire rule (22.05) has no effect on attacks made by, or targeting, AIRCRAFT units.",
+        "transcription_sha256": "dc06fda0e274db68edabf4a46469900c61ce025958c646139716b32a3d043dfe",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.shooting_targets:_plunging_fire_applies"
+        ],
+        "selected_rows": [
+          "rule:23:23.03:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-aircraft:charging-and-fighting",
+        "section_id": "23.04",
+        "source_text": "AIRCRAFT units are not eligible to declare a charge, and can only make melee attacks that target FLYING units. Only FLYING units can select AIRCRAFT units as a charge target, and only FLYING models can make melee attacks that target AIRCRAFT units.",
+        "transcription_sha256": "93567627909c8b3bdd8e086a2ecfd0d5b8f7fa648b948be874a100d0d6992271",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.charge_targets:charge_target_restriction",
+          "warhammer40k_core.engine.aircraft_rules:aircraft_melee_target_allowed"
+        ],
+        "selected_rows": [
+          "rule:23:23.04:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-attached-units",
+    "source_version": "40k-app-attached-units-observed-2026-09-01",
+    "package_hash": "3f6e0c6b6c3b9a96d19967e2ef5c8ab0429fd7fc8b025304b84e3dc5cb243570",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_attached_units_2026_09/artifacts/package.json",
+    "sha256": "748cf1bc4cbd2749655abab43e97c7e04acfa4e63e79b9f84b565001b9c17b66",
+    "metadata_sha256": "195e32aace02bfd50591a8be85de1d8a9a7df23cf8cfc4d6f89d199ad49ef7a3",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-rules:attached-units:bodyguard-unit-destroyed",
+        "section_id": "19.01.01",
+        "source_text": "ATTACHED UNITS AFTER THEIR BODYGUARD UNIT IS DESTROYED\nSome units have rules stating that when the bodyguard unit in an attached unit is destroyed, leader/support units that were attached to them become separate units with their original starting strengths. When the bodyguard unit in an attached unit affected by such a rule is destroyed, all of those leader/support units remain a single unit for all rules purposes.",
+        "transcription_sha256": "cb8ea6a1b9633420c8a2c59989edf8bfd97987ce1847faca6820f08b99931bbe",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.attached_unit_reconciliation:validate_attached_rules_unit_identity_after_destruction",
+          "warhammer40k_core.engine.rules_unit_placement:RulesUnitPlacement.from_battlefield",
+          "warhammer40k_core.engine.rules_units:current_rules_unit_views_for_identity",
+          "warhammer40k_core.engine.starting_attached_units:starting_attached_unit_records_from_armies"
+        ],
+        "selected_rows": [
+          "rule:19:19.01.01:1"
+        ],
+        "relation": "source_repair_required",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred. Declared runtime consumer identity is stale; the explicit current owner is recorded separately. Package consumer metadata requires correction before PFINAL.",
+        "retired_consumer_successors": {
+          "warhammer40k_core.engine.starting_attached_units:starting_attached_unit_records_from_armies": [
+            "src/warhammer40k_core/engine/starting_attached_units.py:starting_attached_unit_records_for_army"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-attack-sequence",
+    "source_version": "40k-app-attack-sequence-observed-2026-09-01",
+    "package_hash": "ec4bf56033c8c90db0a2870051a5ea472a42f7767ed48299bc0352a2b1092a5f",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_attack_sequence_2026_09/artifacts/package.json",
+    "sha256": "161c67830d5976033e04f9ab64830e0ddc4ddca93e95e270945839b60d53bdd9",
+    "metadata_sha256": "f1238000a5d014fcef9229238ad09d2e8907106722381c0f8ee1a7bd912475d5",
+    "rules": [
+      {
+        "source_id": "core_rules_05_04_04_destroyed",
+        "section_id": "05.04.04",
+        "source_text": "DESTROYED\nThroughout a battle, models will suffer damage, lose wounds and be destroyed. When every model in a unit has been destroyed, that unit is destroyed.\n\nWhen a model is destroyed, first resolve any rules that are triggered when it is destroyed, then it is removed from the battlefield. If any such rules apply, and if the model was destroyed as the result of an attack, unless otherwise stated, those rules are only resolved and that model is only removed after the attacking unit’s attacks have been resolved. Unless otherwise stated, destroyed models and units cannot use abilities or be selected or targeted by rules.\n\nSome rules only trigger if an enemy model or unit was destroyed by you, or by a model or unit from your army. This means that the enemy model or unit was destroyed by an attack made by a model from your army, or by a player rule you have. Enemy models or units that are destroyed by any other means are not destroyed by you, or by a model or unit from your army.",
+        "transcription_sha256": "0f3cb2ce7fb896aa9d2404eafdf6bde0d701e89ff895dc680a7ca6d56780e9f2",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.attack_sequence_destruction_boundary:attack_destruction_requires_end_of_attacks_boundary",
+          "warhammer40k_core.engine.attack_sequence_destruction_boundary:defer_destroyed_attack_damage_if_required",
+          "warhammer40k_core.engine.attack_sequence_destruction_boundary:resolve_pending_attack_destruction_until_blocked",
+          "warhammer40k_core.engine.attack_sequence_dispatch:resolve_attack_sequence_until_blocked",
+          "warhammer40k_core.engine.model_destruction_cause_attack_restore:validate_pending_attack_destruction_boundary"
+        ],
+        "selected_rows": [
+          "rule:05:05.04.04:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-aura-psychic",
+    "source_version": "maintained-app-mirrors-observed-2026-09-06",
+    "package_hash": "611075a8a78013ec02bd767c1b3785e51b56497437f32c24793d389ca26d7721",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_aura_psychic_2026_09/artifacts/package.json",
+    "sha256": "0be7cc3324b0b2c3f3cdfc2a49b1c725ac656dac36b89534bcd633a13322e81f",
+    "metadata_sha256": "b4bb713d3c02843f39fb37ddf7f9692c9223f13bf82bffba6ddc1c9acb299e25",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-aura-psychic:aura-abilities",
+        "section_id": "22.01",
+        "source_text": "Abilities that affect models or units within a stated range are aura abilities, and are tagged with the word ‘Aura’.\nWhile a model with an aura ability is on the battlefield, it is always within range of its own aura ability.\nA unit can be affected by more than one aura ability at a time, but if a unit is within range of the same aura ability more than once, that aura ability only applies to that unit once.",
+        "transcription_sha256": "930015bed3490c7c24cf3e3952d925a17dd6144874dc9a56c2ab68d3fd452b60",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.rule_aura_resolution:aura_affected_unit_ids",
+          "warhammer40k_core.engine.aura_applications:non_stacking_aura_applications"
+        ],
+        "selected_rows": [
+          "rule:22:22.01:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-aura-psychic:psychic-abilities-with-a-psychic-level",
+        "section_id": "22.03.01",
+        "source_text": "When using psychic abilities with a psychic level, a PSYKER unit cannot use the same psychic ability more than once per phase.",
+        "transcription_sha256": "e94feeb3d390500884ff9ceba0c0717087303e578d182efa444a7ad1f41906c4",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.psychic_ability_usage:psychic_ability_unavailable_reason",
+          "warhammer40k_core.engine.psychic_ability_restore:validate_psychic_usage_history"
+        ],
+        "selected_rows": [
+          "rule:22:22.03.01:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-base-contact",
+    "source_version": "maintained-app-mirrors-observed-2026-09-24",
+    "package_hash": "44edca1a5f0f0768cedc90e6d40a0e9c621de50b9be10f362565314b2f01cf09",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_base_contact_2026_09/artifacts/package.json",
+    "sha256": "401149ec591786231d33ec19525add700473c8db5c63ee880a524f6478753580",
+    "metadata_sha256": "eec324d57b0bb5d45dcec3a43ee97f6fe489c62dad4dd9041b7c9b789143c5f3",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-base-contact:deemed-base-contact",
+        "section_id": "01.04.04",
+        "source_text": "When two models’ bases are touching, they are in base contact – also known as base-to-base contact – and are as close as possible (01.04.03).\nWhen moving a model from your army into base contact with an enemy model during a move, if that enemy model overhangs its base such that it is not physically possible to be in base contact with that model, until the end of the turn, those models are considered to be in base contact with each other while all of the following are true:\nThe distance your model could move was sufficient to move it into base contact with the enemy model if there was no overhang.\nThe models are as close as possible together.\nAny part of one model is within 1\" of any part of the other model.",
+        "transcription_sha256": "322efc48b56d09690b4bb611b0e60dbc5f54a0ea863fa0304414a5775387bc7f",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.base_contact_authority:contacts_for_validated_move"
+        ],
+        "selected_rows": [
+          "rule:01:01.04.04:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-charge",
+    "source_version": "maintained-app-mirrors-observed-2026-09-14",
+    "package_hash": "ec30c78c0b16a660dc100980796382544539cd2f11d1b75f58d38aa6c0d6559e",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_charge_2026_09/artifacts/package.json",
+    "sha256": "315ae2049fffdfc5ee913002190d7a1c0345f785fbbc0b4e19575322fdaa77a9",
+    "metadata_sha256": "6576ac7972993cd1aac388ff31b0c8f51c91daccf3dab59d5f54b10cc4aea4b6",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-charge:modified-charge-targets-faq",
+        "section_id": "11 FAQ v931",
+        "source_text": "How do modifiers to the charge roll (or to the maximum distance of the charge move, such as Take to the Skies) affect the selection of charge targets?\nA charging unit may only select charge targets that are within the maximum distance of their charge roll, including any modifiers. If such a modifier occurs after selecting a charge target and causes that charge target to no longer be within the maximum distance, the charging unit would then select new targets (Target No Longer Eligible Or Viable, 04.03.03).\nExample: A unit's charge roll is 7\", and that unit has a datasheet ability which adds 1 to charge rolls: that charge's maximum distance is 8\", so you can select charge targets within 8\".\nExample: A FLYING unit chooses to take to the skies and rolls a charge roll of 9\"; that charge's maximum distance is 7\" (9\" minus the 2\" from taking to the skies), so you can select charge targets within 7\".",
+        "transcription_sha256": "c6b5f4d46423ed4c74fbb43b00721b190b7576e4a220a747c84d447bac52d0fc",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.charge_movement_budget:current_charge_movement_budget",
+          "warhammer40k_core.engine.charge_target_continuation:continue_charge_move"
+        ],
+        "selected_rows": [
+          "faq:fb3b2776-c954-471b-b448-b70caa91929d"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-charge:model-endpoints",
+        "section_id": "11.04",
+        "source_text": "Each model must end its move closer to one or more charge targets.",
+        "transcription_sha256": "f89a63e4c03d60eb727523f3d3894a3bb550507939eaddf3cf145f6257d86191",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.charge_move_resolution:resolve_charge_move",
+          "warhammer40k_core.engine.charge_model_endpoints:charge_model_endpoint_witness"
+        ],
+        "selected_rows": [
+          "rule:11:11.04:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-command-phase",
+    "source_version": "40k-app-search-index-observed-2026-08-26",
+    "package_hash": "8785dda65406ce76add419f29263be499239122e1330941ab55a1dc3e6f10127",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_command_phase_2026_08/artifacts/package.json",
+    "sha256": "78b2264047e263ab5537c71c7d1be681874bdda31191816b6b297eb9a39425e6",
+    "metadata_sha256": "dae5eb7c2665d1e89a1876d1baca74a5147a54c9f232570abb6f01e1eefaff95",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-rules:command-phase:start-of-command-phase",
+        "section_id": "08.01",
+        "source_text": "START OF COMMAND PHASE",
+        "transcription_sha256": "c7076d22487eaacd4966ce616ed23632f73c1c1e77e97264779f58571855cd33",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.command_phase_start_authority:resolve_command_phase_start_boundary"
+        ],
+        "selected_rows": [
+          "rule:08:08.01:1"
+        ],
+        "relation": "source_repair_required",
+        "review": "source_text is only a phase-step label rather than its operative rule. A label cannot establish equivalence to the complete Command step. Requires complete sourced transcription and consumer revalidation before PFINAL."
+      },
+      {
+        "source_id": "gw-11e-core-rules:command-phase:gain-core-cp",
+        "section_id": "08.02",
+        "source_text": "GAIN CORE CP",
+        "transcription_sha256": "15b5a4c0e0184c03730be6b15d9aad113b1b59bb262028d00173ea5475f7a42f",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.phases.command:_resolve_gain_core_command_points_step"
+        ],
+        "selected_rows": [
+          "rule:08:08.02:1"
+        ],
+        "relation": "source_repair_required",
+        "review": "source_text is only a phase-step label rather than its operative rule. A label cannot establish equivalence to the complete Command step. Requires complete sourced transcription and consumer revalidation before PFINAL."
+      },
+      {
+        "source_id": "gw-11e-core-rules:command-phase:battle-shock",
+        "section_id": "08.03",
+        "source_text": "BATTLE-SHOCK",
+        "transcription_sha256": "621c1dac0261aaeb2443a843f9d4dd05d253f6ac01a6e251620739eece408e56",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "partial_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.phases.command:_resolve_battle_shock_step",
+          "warhammer40k_core.engine.battle_shock:collect_battle_shock_test_requests",
+          "warhammer40k_core.engine.battle_shock_resolution:record_battle_shock_result_and_outcome_events"
+        ],
+        "selected_rows": [
+          "rule:08:08.03:1"
+        ],
+        "relation": "source_repair_required",
+        "review": "source_text is only a phase-step label rather than its operative rule. A label cannot establish equivalence to the complete Command step. Requires complete sourced transcription and consumer revalidation before PFINAL."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-critical-hits",
+    "source_version": "maintained-app-mirrors-observed-2026-09-13",
+    "package_hash": "823333e2eaf3fe1f4521c1213561448091cff83f6feea171066b6d859d2a6cd2",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_critical_hits_2026_09/artifacts/package.json",
+    "sha256": "d4e25297d34f21a9f3b504b78eb010f9c667914a87d6332a4c9a72bb4ca3badb",
+    "metadata_sha256": "4e6fc36f3b9633c4f41b114a4830fa824d604ee579fb49954ed8f8bac7dbf0f9",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-critical-hits:critical-hit-success-faq",
+        "section_id": "04 FAQ v931",
+        "source_text": "My attack has a rule that means it results in a critical hit on a hit roll of 4+, and I would otherwise need a 5+ to hit. Does a 4+ hit?\nYes, except when snap shooting: when snap shooting, each attack only hits on a roll of 6.",
+        "transcription_sha256": "35a614564523f4d385f1b42290caf85293f62d5bdb55f10b5d5eea34b4c4120b",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.hit_thresholds:resolve_hit_thresholds",
+          "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+        ],
+        "selected_rows": [
+          "faq:b7d3d760-a167-44b2-9c91-32ce86684225"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-critical-hits:snap-critical-hit-faq",
+        "section_id": "04 FAQ v931",
+        "source_text": "My attack has a rule that means it results in a critical hit on a hit roll of 4+. Does this work when snap shooting?\nUnless otherwise stated, no: when snap shooting, each attack only hits on a roll of 6.",
+        "transcription_sha256": "b5df271c18783405b0a70abc938ce0efcb4b7c5b9a02e63bfebd2b16416cd1ea",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.hit_thresholds:resolve_hit_thresholds",
+          "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+        ],
+        "selected_rows": [
+          "faq:aab10e23-6433-42ca-86e7-ddc829f16c47"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-dice-results",
+    "source_version": "maintained-app-mirrors-observed-2026-09-24",
+    "package_hash": "dbd557aed9a56fd1df617dede166f36c8bafd060e572804a1072f3a8887d632e",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_dice_results_2026_09/artifacts/package.json",
+    "sha256": "b35120d15c542113ba3ab11eede412e95966ae2a7202f41eb19f4503f2ebd3c6",
+    "metadata_sha256": "28159def8d5e0a577ce5c9203853ffd97b9587ada642ee1775f891f080a9e3ba",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-dice-results:highest-lowest",
+        "section_id": "01.05.07",
+        "source_text": "If a rule refers to the highest dice result and a dice roll involves multiple dice, if more than one of those dice have the same value, and that value is the highest, the active player must select one of those dice to be the highest dice result. If a rule refers to the lowest dice result and a dice roll involves multiple dice, if more than one of those dice have the same value, and that value is the lowest, the active player must select one of those dice to be the lowest dice result.",
+        "transcription_sha256": "14241e9bcaf4daa1e7026903f99e2518dda542cc47c689129a50b4e51e696113",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.dice_extremum:request_dice_extremum"
+        ],
+        "selected_rows": [
+          "rule:01:01.05.07:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-dice-results:treated-as-set-to",
+        "section_id": "01.05.08",
+        "source_text": "When a dice result is ‘treated as’ or 'set' to another value, any rules that would take effect if that value had been rolled take effect. This may result in a value that is greater than a value that could be rolled on a D6 dice.",
+        "transcription_sha256": "5c562063cb3ab6245120e12cd9f6b7c6a2ab98fa84299929d6ae94b6ba99da37",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.core.dice:DiceRollState.with_result_override"
+        ],
+        "selected_rows": [
+          "rule:01:01.05.08:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-dice-results:default-critical-hit",
+        "section_id": "05.01",
+        "source_text": "Unmodified 6\nCRITICAL HIT",
+        "transcription_sha256": "d95c2d9aa08b4becce3179f82ed704c97776168f25e6a6c8340403be31826c1a",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.interpreted_dice:CriticalRollThreshold"
+        ],
+        "selected_rows": [
+          "rule:05:05.01:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-dice-results:default-critical-wound",
+        "section_id": "05.02",
+        "source_text": "Unmodified 6\nCRITICAL WOUND",
+        "transcription_sha256": "4a40a91cccbe0ab80a0e1436d221125d30fe12e6a79246c7d2dd419ddbef1988",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.interpreted_dice:CriticalRollThreshold"
+        ],
+        "selected_rows": [
+          "rule:05:05.02:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-duplicated-abilities",
+    "source_version": "maintained-app-mirrors-observed-2026-09-06",
+    "package_hash": "9fe57b008009fd3f98814729634e6d60b126e7685610214df451d9541e7fc06a",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_duplicated_abilities_2026_09/artifacts/package.json",
+    "sha256": "798df658ccb1400c93d8eb4b2371ef5dd3814a159c6b7d207ccfc131b282ab76",
+    "metadata_sha256": "ad2210df78b03ab64fb70881690bde96c038e568752c4ec51f0a4d1f4d5fac11",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-duplicated-abilities:duplicated-abilities",
+        "section_id": "24.02",
+        "source_text": "Multiple instances of the same core ability or weapon ability are not cumulative, regardless of any numbers or keywords included in them. In such cases, the controlling player must select which instance will apply at any one time. In the case of duplicated weapon abilities, this selection must be made each time that unit makes attacks, in the Select Weapons step.\nMultiple instances of core abilities that include a number are duplicated even if that number varies. However, in the case of Scouts, you must select the lowest number not shared by every model in that unit (e.g. if every model in a unit has both Scouts 6\" and Scouts 8\", you could select Scouts 8\" as it is shared by every model, but if a unit contains one model with Scouts 6\" and five with Scouts 8\", you must select Scouts 6\").\nMultiple instances of weapon abilities that include a number (e.g. [SUSTAINED HITS 1]) are duplicated even if that number varies (e.g. the controlling player would have to select between [SUSTAINED HITS 1] and [SUSTAINED HITS 2]).\nMultiple instances of weapon abilities that include a keyword are duplicated even if that keyword varies (e.g. the controlling player would have to select between [ANTI‑VEHICLE 4+] and [ANTI‑INFANTRY 2+]).",
+        "transcription_sha256": "34244f9733c5d16731e52e23636b68afd931761b0077431bba2010275f980ab4",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.core.ability_sources:datasheet_ability_sources",
+          "warhammer40k_core.core.weapon_ability_sources:weapon_ability_sources",
+          "warhammer40k_core.core.weapon_ability_sources:grant_weapon_ability",
+          "warhammer40k_core.engine.core_ability_selection:core_ability_selection_dispatch_handler",
+          "warhammer40k_core.engine.weapon_selection_context:WeaponSelectionContext",
+          "warhammer40k_core.engine.core_ability_damage_selection:apply_attack_deadly_demise_instance_choice",
+          "warhammer40k_core.engine.core_ability_damage_selection:apply_rule_deadly_demise_instance_choice",
+          "warhammer40k_core.engine.prebattle_instance_selection:scout_distance_options_for_model_ids"
+        ],
+        "selected_rows": [
+          "rule:24:24.02:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-embark-setup-turn",
+    "source_version": "maintained-app-mirrors-observed-2026-09-19",
+    "package_hash": "4492d34a63c39a9f43a3d575e43543be0855823a7ed9ccf014490b1845d22f1e",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_embark_setup_turn_2026_09/artifacts/package.json",
+    "sha256": "d318c7965bbd70b5ea1bf97995e6b3142b4c6e9f9cc6e06ea26f974537aa450e",
+    "metadata_sha256": "9a65bf777255954b86331562e83efec9bab50965c5f30e3c80b0aa110b422681",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-embark-setup-turn:embark-setup-turn",
+        "section_id": "18.02",
+        "source_text": "Once the first battle round has started, a friendly unit can embark within a friendly TRANSPORT model after making a normal, advance or fall-back move, if all of the following conditions apply: Each model in that unit is within 3\" of that TRANSPORT. That unit was not set up on the battlefield this turn. That unit is eligible to embark within that TRANSPORT, as described on that TRANSPORT’s datasheet. That TRANSPORT has sufficient remaining transport capacity for each model in that unit. When a unit embarks, the active player removes that unit from the battlefield and places it to one side – it is now embarked within that TRANSPORT and is not on the battlefield.",
+        "transcription_sha256": "975d00c6c3cb2853f2cc9b649d0bbc49232ba288c36d470d2525598f5fb9b341",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.transport_embark_validation:resolve_embark",
+          "warhammer40k_core.engine.phase_movement_history:completion_phase_record"
+        ],
+        "selected_rows": [
+          "rule:18:18.02:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-embarked-abilities",
+    "source_version": "maintained-app-mirrors-observed-2026-09-07",
+    "package_hash": "81e006418aa305b53635b0f7a51a1b99922d380795506ad023e08efd894d8dbf",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_embarked_abilities_2026_09/artifacts/package.json",
+    "sha256": "3102868123dc8f612999dffcc069fad97a1d0ed1bbf6f3e663e39cc97c4d05ff",
+    "metadata_sha256": "8d94741e2e14e81898017fdc78b4933487ffef0c9c0b4f32316e76c250bbbd7d",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-embarked-abilities:embarked-abilities",
+        "section_id": "FAQ",
+        "source_text": "Do a unit's abilities continue to function while they are embarked within a TRANSPORT?\nYes, within the restrictions specified by the ability itself. Embarked units are Not On The Battlefield (01.02.04), so any ability requiring visibility or measurement to another unit will fail.\nExample: Azrael is attached to an Intercessor Squad unit and embarked within a TRANSPORT, and that TRANSPORT is making a shooting attack using the Firing Deck ability. While Azrael's Supreme Grand Master ability is still technically active, it will have no effect, as the requirements of the ability are not met (the ability affects 'weapons equipped by models' in Azrael's unit, and for the purposes of Firing Deck, the TRANSPORT itself is equipped with those weapons instead).",
+        "transcription_sha256": "4c186dc9730e3431986655c2d8a81be7dc788c44382e0f508ccd30ee0c9376e6",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.ability_presence:active_ability_model_ids_for_unit"
+        ],
+        "selected_rows": [
+          "faq:7ac6c358-0263-49ff-aee7-28b8fd4b5b8b"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-embarked-abilities:off-battlefield-ability-conditions",
+        "section_id": "01.02.04",
+        "source_text": "A unit that is embarked within a TRANSPORT or that is in strategic reserves is not on the battlefield. The following applies to such units:\nThat unit is not visible to any other units (units are visible to themselves).\nAny other unit is not visible to that unit.\nPlayers cannot measure distances to or from that unit (units are within range of their own abilities).\nThis means units not on the battlefield cannot be selected or targeted by any attack or rule that requires a unit to be visible or within a certain distance (other than their own abilities).\nSuch units can still use their other rules, and are still units in the controlling player's army and so can be affected by rules that require a player to select a unit from an army, as well as rules that affect all units in an army.",
+        "transcription_sha256": "d54813925aec1839fd755c822f9b9662b5e2f25c9e5d33e1dcc7eb51e10205bd",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.ability_presence:ability_spatial_relationship"
+        ],
+        "selected_rows": [
+          "rule:01:01.02.04:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-emergency-disembark-placement",
+    "source_version": "maintained-app-mirrors-observed-2026-09-18",
+    "package_hash": "2ce41103cfbeb94a955a48b4a78a97b5caca7261fd727e73e8ff76d5a18e15f8",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_emergency_disembark_placement_2026_09/artifacts/package.json",
+    "sha256": "81fbfdb90b7d747b99d7be582ba7a4c006dadd38fea1ccf2a0dad93f85a80bb4",
+    "metadata_sha256": "d5209b0a652a5bf47c47357470a09dba0e889946b84568d27e08287182dc338d",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-emergency-disembark-placement:emergency-disembark-placement",
+        "section_id": "18.05",
+        "source_text": "While moving: Set up each model in your unit: - Wholly within the set-up distance of that TRANSPORT, and as close as possible to that TRANSPORT. - Or: If the above is not possible while remaining unengaged, set up that model wholly within the set-up distance of that TRANSPORT, as close as possible to that TRANSPORT, and engaged. Each model that still cannot be set up is destroyed.",
+        "transcription_sha256": "cc63b547abc5339f6c3f98530f53cd3a838800f9b5a89003715ebf19e7c39923",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.emergency_disembark_placement:append_emergency_disembark_placement_violations",
+          "warhammer40k_core.engine.emergency_disembark_placement:append_emergency_disembark_rules_unit_omission_violations",
+          "warhammer40k_core.engine.transport_disembark_geometry:append_disembark_endpoint_violations"
+        ],
+        "selected_rows": [
+          "rule:18:18.05:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-empty-dedicated-transport",
+    "source_version": "maintained-app-mirrors-observed-2026-09-18",
+    "package_hash": "204472d8b9481787017bcc40f24bc463723b6512cacd7db86edbe354d2140dd7",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_empty_dedicated_transport_2026_09/artifacts/package.json",
+    "sha256": "6ae167dd10b45bda9ed5335d98630fe8b90a6048ac54fd7ed26bd53744da50b3",
+    "metadata_sha256": "1b70d1afb51c65ea66b77cb14ffa6b06da67df7e304be1fcb1bbb8442cb44b0c",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-empty-dedicated-transport:empty-dedicated-transport",
+        "section_id": "18.01",
+        "source_text": "A friendly unit must be embarked within each friendly DEDICATED TRANSPORT model. At the end of this step, each friendly DEDICATED TRANSPORT model without an embarked unit is destroyed, but they do not trigger rules that are triggered when a model is destroyed.",
+        "transcription_sha256": "44160b6df089669f0044b4dbfa2ec776eb09f51559340b6f875946c8b7e4cb3f",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.empty_dedicated_transport_destruction:apply_empty_dedicated_transport_destruction",
+          "warhammer40k_core.engine.setup_flow:SetupFlow.advance",
+          "warhammer40k_core.engine.setup_completion:_append_empty_transport_manifest_violations"
+        ],
+        "selected_rows": [
+          "rule:18:18.01:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-engaged-shooting",
+    "source_version": "maintained-app-mirrors-observed-2026-09-21",
+    "package_hash": "cf3c22e31431065964541452e521e4aea29125f1622cda5606a35159f051cee3",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_engaged_shooting_2026_09/artifacts/package.json",
+    "sha256": "0dfed05d9cf2d7b842f66b9e7375a636e6b45ed73a09f8831521dc43e38692ab",
+    "metadata_sha256": "d0b40ee9ae5625c718dc1cfc6388682e1eadd9286cda50e4ab4b7f55165631dd",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-engaged-shooting:engaged-monster-vehicle-target",
+        "section_id": "17.03",
+        "source_text": "In your Shooting phase, enemy MONSTER/VEHICLE units that are engaged can be selected as targets of ranged attacks (excluding attacks made with [BLAST] weapons).\nEach time a model makes a ranged attack that targets such a unit, subtract 1 from the hit roll (excluding attacks made with [CLOSE‑QUARTERS] weapons by models in a unit engaged with the target).",
+        "transcription_sha256": "12806475dcbcab62cd737334b032c0f214dff4fd11720161cdbaeb4405eee26e",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.shooting_engagement:engaged_shooting_penalty_sources"
+        ],
+        "selected_rows": [
+          "rule:17:17.03:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-failed-save-damage-timing",
+    "source_version": "maintained-app-mirrors-observed-2026-09-18",
+    "package_hash": "e73538517f367e716eb4733faf62dcfe50c8567dffb91daab7faa785d694fa7b",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_failed_save_damage_timing_2026_09/artifacts/package.json",
+    "sha256": "e3928ede0f5a5cad6fa01cbd0237b7f55d28a7ec68449df4b54887bb5c6ceed1",
+    "metadata_sha256": "1107bffd12a6bb592253b891503556e661b9818f814cd4c07795c7f3479d77df",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-failed-save-damage-timing:damage-to-0-after-saves-faq",
+        "section_id": "05 FAQ v931",
+        "source_text": "My unit has access to a rule that changes the Damage characteristic of an incoming attack to 0. When such an attack is allocated to a model in that unit, is the Damage changed before or after save rolls?\nAfter.",
+        "transcription_sha256": "e5579ebc0e86951594e8a083c82d63f839fb435354cca9b905df89f38d57bcb0",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.failed_save_damage_timing:unused_failed_save_damage_replacement",
+          "warhammer40k_core.engine.attack_sequence_grouped_allocation:_resolve_grouped_damage_from",
+          "warhammer40k_core.engine.runtime_modifiers:RuntimeModifierRegistry.failed_save_damage_replacement",
+          "warhammer40k_core.engine.catalog_datasheet_rule_runtime:CatalogDatasheetRuleRuntime.failed_save_damage_replacement_bindings"
+        ],
+        "selected_rows": [
+          "faq:04f15433-3ee1-4c6d-8546-29e4247dee5b"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-fight",
+    "source_version": "maintained-app-mirrors-owner-resolved-v946-2026-09-21",
+    "package_hash": "58d2af327089d2b5cdfe850fa72d9dd49f7e212f11e033d4f6e80a87a4e885e3",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_fight_2026_09/artifacts/package.json",
+    "sha256": "df45dfddbb5e851346fa355063b9cd92298c0c68f2491c6b312dc594c8ee15a9",
+    "metadata_sha256": "2a2cb6943b4077be38006a351132a4dadd1cb163ab40d185aeffb5cc9aa2d265",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-fight:consolidation-move",
+        "section_id": "12.08",
+        "source_text": "When eligible: It is the Fight phase and your unit was eligible to fight this phase.\nMaximum distance: 3\"\nEffect: Your unit moves as described in Moving (03).\nBefore moving: Select consolidation mode:\nOngoing Consolidation: If your unit is engaged, you must select this mode and select every enemy unit it is engaged with.\nEngaging Consolidation: Otherwise, if your unit is within 3\" of one or more enemy units, you must select this mode and select one or more of those enemy units.\nObjective Consolidation: Otherwise, if your unit is within 3\" of one or more objectives, you must select this mode and select one of those objectives.\nWhile moving:\nOngoing Consolidation: Models in base‑contact with one or more enemy models cannot be moved. Each model that is moved must end its move closer to the closest selected enemy unit, and engaged with it if possible.\nEngaging Consolidation: Each model that is moved must end its move closer to the closest selected enemy unit, and engaged with it if possible.\nObjective Consolidation: Each model that is moved must end its move within range of the selected objective if possible, or closer to it if not.\nAfter moving:\nOngoing Consolidation: Each model that started this move engaged with an enemy unit must still be engaged with that enemy unit.\nEngaging Consolidation: Your unit must be engaged with all of the selected enemy units. If one or more enemy units engaged with your unit have not been selected to fight this phase, your opponent must select each of those units, one at a time; when each is selected, it becomes eligible to fight and is selected to fight (12.04).\nObjective Consolidation: Your unit must be unengaged and within range of the selected objective.",
+        "transcription_sha256": "cfcace8bd96251a0b11c8eb24ccb20ea64a69f72d33a9a7cc8a6993c17f7ae89",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.consolidation_validation:validate_consolidation",
+          "warhammer40k_core.engine.consolidation_model_constraints:consolidation_model_violation",
+          "warhammer40k_core.engine.consolidation_fight_queue:start_consolidation_fight_queue"
+        ],
+        "selected_rows": [
+          "rule:12:12.08:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed reordered eligibility/distance/effect headings and bullets. All three modes retain the same conditions. New Foes callout explains Engaging only. Order72 official App v946 owner resolution controls After Moving; historical v931 Ongoing erratum is separately superseded."
+      },
+      {
+        "source_id": "gw-11e-core-fight:ongoing-consolidation-erratum",
+        "section_id": "Errata",
+        "source_text": "Each model that started this move engaged with an enemy unit must still be engaged with that enemy unit. If one or more enemy units engaged with your unit have not been selected to fight this phase, your opponent must select each of those units, one at a time; when each is selected, it becomes eligible to fight and is selected to fight",
+        "transcription_sha256": "97f1acc3a1e4eda12ffcb286908efb993ce95800ba33ad0a3d526964cb8aeafd",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "not_certified",
+        "runtime_consumer_ids": [],
+        "selected_rows": [
+          "rule:12:12.08:1"
+        ],
+        "relation": "superseded",
+        "review": "Historical v931 Ongoing erratum retained loaded/not_certified with no consumers. Superseded by owner-confirmed official App v946 Engaging-only forced-fight rule in Order72. Lexical similarity to Shock Disembark is not equivalence."
+      },
+      {
+        "source_id": "gw-11e-core-fight:consolidate-step",
+        "section_id": "12.07",
+        "source_text": "Both players make consolidation moves (12.08) with all of their eligible units they choose to move. The ‘Eligible If’ section describes which units are eligible to make such moves. The player whose turn it is resolves all of their moves first, followed by their opponent. Each unit cannot make more than one consolidation move during this step.",
+        "transcription_sha256": "4e538c9393f4a2d434ef61e4657be18687b4f45c5b20729015f97721c5a0ca0b",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.phases.fight:FightPhaseHandler"
+        ],
+        "selected_rows": [
+          "rule:12:12.07:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-fight-on-death",
+    "source_version": "maintained-app-mirrors-observed-2026-09-07",
+    "package_hash": "e48e85098c6c425f60da32a9735283f124a906cbf1ab846c3e9a21c6d5c3779c",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_fight_on_death_2026_09/artifacts/package.json",
+    "sha256": "2465e094b0c30db3321924367db7a995660e1524c7fde5876482397bd69acd9d",
+    "metadata_sha256": "fd671e0acaf37b5b9fa385cee62373f155fb6aaa9a1013da8630674dac18dcc5",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-fight-on-death:retained-presence",
+        "section_id": "FAQ",
+        "source_text": "Fight On Death (05.04.05) requires models awaiting such an ability to stay on the battlefield until their unit has attacked (or until the end of the phase). How do these models function while this is the case?\nModels awaiting a Fight On Death ability are still present on the battlefield for all rules purposes. This includes (but is not limited to) the following regarding such models:\nThey can be measured to by friendly/enemy abilities.\nThey can be considered visible to friendly/enemy models where relevant.\nThey can use their datasheet abilities.\nThey can be targeted by stratagems.\nEnemy units can still be engaged with them (which may restrict the opposing player's consolidation/pile-In moves made as part of an overrun fight).",
+        "transcription_sha256": "53e0e0abd50bb145278431b245f05e2a71b2ba09e4f56953ca23767da92d47b3",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.ability_presence:active_ability_model_ids_for_unit"
+        ],
+        "selected_rows": [
+          "faq:2d91a89e-59f3-410f-84cb-16644d7ea4a4"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-fight-on-death:fight-on-death",
+        "section_id": "05.04.05",
+        "source_text": "Some rules enable models to attack after they have been destroyed. When a model under such an effect is destroyed, do not remove it from play.\nThose models will stay on the battlefield until their unit is selected to attack and has attacked, or until the end of the phase (whichever comes first). Any rules triggered by those models being destroyed are resolved, and then those destroyed models are removed.\nIf a rule instructs a destroyed model to fight immediately after the attacking unit, instead that model is not removed from the battlefield until that model's unit has fought, or until the end of the phase (whichever comes first). This allows the models in the unit to fight all at once, and stratagems that target that unit will also affect that destroyed model.",
+        "transcription_sha256": "b4398b729037efaade1d9649d8dfff421d118959a46ebcb222f801b79d8ec37a",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.retained_destruction_selection:apply_retention_selection"
+        ],
+        "selected_rows": [
+          "rule:05:05.04.05:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-fights-first",
+    "source_version": "maintained-app-mirrors-observed-2026-09-21",
+    "package_hash": "2f2f8c7f0b8affe1fde2e478ce7f65c967d87706949c343fc3754d6c2801fdfd",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_fights_first_2026_09/artifacts/package.json",
+    "sha256": "501db53231ec964f4c60af8dca80b726bca7902ba3618023e7a04919d712593d",
+    "metadata_sha256": "7ebc3eee932a7f153f88b531a7d62a83c2a1c050024af9d16840d25e4c29833f",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-fights-first:fights-first",
+        "section_id": "24.13",
+        "source_text": "While every model in a unit has this ability, that unit is a Fights First unit.",
+        "transcription_sha256": "35e5bd3db977c70e49dc2ae64913ce55fbd487a8df0333e85636d5e8ff4fb227",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.fights_first:FightsFirstRegistry.from_state"
+        ],
+        "selected_rows": [
+          "rule:24:24.13:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-fights-first:unit-grants",
+        "section_id": "01.02",
+        "source_text": "When an effect or ability applies to a unit, it applies to every model in that unit.",
+        "transcription_sha256": "1d29a08b455a18c186b76bdb992d8a0afa24c95c68df2d3d2af7e0cce9a7fbac",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.fights_first:fights_first_model_inventory"
+        ],
+        "selected_rows": [
+          "rule:01:01.02:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-firing-deck",
+    "source_version": "maintained-app-mirrors-observed-2026-09-20",
+    "package_hash": "97749179ef59a1c8109a22c5ba499a0b9794058baa913da3542609e95176678f",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_firing_deck_2026_09/artifacts/package.json",
+    "sha256": "8ecab220d6c9c8491f438b5c702df77ad21ea63d8cedb6fd49ecafac85f93de4",
+    "metadata_sha256": "6bd0c241a64abf0a0f2d9a6153ec346809d053168dc4e5ae0fea71cfe5fc8d18",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-firing-deck:firing_deck",
+        "section_id": "24.14",
+        "source_text": "This ability always takes the form Firing Deck X. In your Shooting phase, each time this TRANSPORT is selected to shoot, if one or more units are embarked within it, resolve the following sequence: 1. Select up to X models embarked within this TRANSPORT (excluding models whose units have already been selected to shoot this phase). 2. For each selected model, select one of its ranged weapons (excluding [ONE SHOT] weapons). 3. Until this TRANSPORT has resolved all of its attacks, it has all of those selected weapons in addition to its other weapons. 4. Until the end of the turn, units embarked within this TRANSPORT are not eligible to shoot.",
+        "transcription_sha256": "b234400ffa38153cd65622cb8a64189f8a786b5ecbdf25cd09772ffcd0c178c1",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.firing_deck_restrictions:record_firing_deck_restriction",
+          "warhammer40k_core.engine.shooting_eligibility_state:shooting_state_restriction_reason"
+        ],
+        "selected_rows": [
+          "rule:24:24.14:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-flying",
+    "source_version": "maintained-app-mirrors-observed-2026-09-15",
+    "package_hash": "27b26c14f4f80bea2ee9e7ce13d91254e9e7d2959f534ad86f05d95d0d599160",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_flying_2026_09/artifacts/package.json",
+    "sha256": "e3e59cb5903b1d582464be68f60deebce0b28cef5e8d67a2ea16ba564599dbb5",
+    "metadata_sha256": "ad1987a7aa048dd1a1969c2cac5e1889fcb2a232082e9b1ea51b8b0775c57069",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-flying:take-to-the-skies",
+        "section_id": "21.03 FAQ v931",
+        "source_text": "you must declare that a unit will take to the skies before rolling for that advance/charge move.",
+        "transcription_sha256": "92b3008c4e2a4340d8889da3008bbc923569d0451896a17ffad11bc2408ea19b",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.take_to_the_skies:flight_choices",
+          "warhammer40k_core.engine.movement_legality:MovementCapabilitySet",
+          "warhammer40k_core.engine.charge_movement_budget:current_charge_movement_budget"
+        ],
+        "selected_rows": [
+          "faq:ce5fd555-a0f1-4bc9-85d3-00443143e94a"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-gone-to-ground",
+    "source_version": "maintained-app-mirrors-observed-2026-09-23",
+    "package_hash": "5356414cc3e9bc3fc84e516df272f08d51967503064e1d629992fab566ad6fcf",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_gone_to_ground_2026_09/artifacts/package.json",
+    "sha256": "a13477e1e963431b97ffc50cae34a777a9b82401e10d8a37c3aaed793565a5cd",
+    "metadata_sha256": "1ad40f05724b3c44303fe34ebe3298e96063a406ffa6b842dba48df72b4f494f",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-gone-to-ground:gone-to-ground",
+        "section_id": "13.11.01",
+        "source_text": "Hidden models that are concealed by dense terrain features gain an extra benefit while they have gone to ground. A model has gone to ground while all of the following apply: That model is hidden. That model is not fully visible to the attacking model due to one or more intervening dense terrain features. That model’s unit did not make one or more ranged attacks during this turn or during the previous turn. While a model has gone to ground, subtract 3\" from that model’s detection range. Designer’s Note: Units that made ranged attacks in the current or previous turn cannot go to ground, regardless of any abilities that allow them to shoot and remain hidden.",
+        "transcription_sha256": "97063c88c0146126f288170f1cd6fc4f6ecc291c8f4b33bb6075f209716a2c8c",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.hidden_detection:hidden_detection_eligible_target_model_ids"
+        ],
+        "selected_rows": [
+          "rule:13:13.11.01:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-indirect-shooting",
+    "source_version": "maintained-app-mirrors-observed-2026-09-09",
+    "package_hash": "2c8e76b5551496b5f0834634606e839677bebd23adaab61782c60037578fc3a1",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_indirect_shooting_2026_09/artifacts/package.json",
+    "sha256": "ce825fb4882d3cfe009afa2f49572adb6e464e48ef9082dfe058e26b52bcaf3e",
+    "metadata_sha256": "7c29c0ec740222b95fb8820ae3572038747751d41d2a8dfb5b2d4bc2fdec67d8",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-indirect-shooting:indirect-shooting",
+        "section_id": "10.07",
+        "source_text": "INDIRECT SHOOTING\nWhen eligible: All of the following apply to your unit:\n- Unengaged and did not make an advance move this turn.\n- Has one or more [INDIRECT FIRE] weapons.\nEffect: Your unit shoots as described in Making Attacks (04).\nWhile shooting:\n- [INDIRECT FIRE] weapons in your unit can target units that are not visible to the attacking model.\n- Each time an [INDIRECT FIRE] weapon makes an attack:\n  - The target has the benefit of cover against that attack (13.08).\n  - You cannot re‑roll hit rolls.\n  - An unmodified hit roll of 1‑5 fails, unless your unit remained stationary this turn and the target is visible to one or more friendly units, in which case an unmodified hit roll of 1‑3 fails instead.\nAfter shooting: Until the end of the phase, your unit is not eligible to start an action.",
+        "transcription_sha256": "7aeef69b1ade8d455875b076fdec79b10a229999aa485ba72742eaf64dc07316",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "partial_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.phases.shooting_declaration_validation:_apply_phase13d_weapon_modifiers",
+          "warhammer40k_core.engine.phases.shooting_requests:_shooting_types_for_selected_type_for_rules_unit",
+          "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit",
+          "warhammer40k_core.engine.activity_restrictions:record_completed_shooting_restriction"
+        ],
+        "selected_rows": [
+          "rule:10:10.07:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      },
+      {
+        "source_id": "gw-11e-core-indirect-shooting:remain-stationary",
+        "section_id": "09.04",
+        "source_text": "REMAIN STATIONARY\nWhen eligible: Any unit.\nEffect: No models are moved (either in straight lines or rotated). Units that remain stationary do not trigger any rules that are triggered when a unit starts or ends a move.",
+        "transcription_sha256": "bc0dfa0868a80975d7abf96a32a6265d48f4a1cca01157d615af0682f2c81ed7",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "partial_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.phases.shooting_targeting:_rules_unit_remained_stationary"
+        ],
+        "selected_rows": [
+          "rule:09:09.04:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-large-model-disembark",
+    "source_version": "maintained-app-mirrors-observed-2026-09-17",
+    "package_hash": "730aa5c8550dcfc124deb12b9372ec1fed9f5a17a0cb76080e8fb37a5d7b2da2",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_large_model_disembark_2026_09/artifacts/package.json",
+    "sha256": "3278bc09544b35b4f08e4ec710666ff443b67312c023870c60785688ca5a5ad0",
+    "metadata_sha256": "5e8f165ef79c2da97a9530cf6224418f8bdf2945e535245041129a451ec83879",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-large-model-disembark:large-model-disembark",
+        "section_id": "03.02.02",
+        "source_text": "base within 1\" of that Transport’s base (or hull), and not engaged with any enemy units.",
+        "transcription_sha256": "84601593cedab8b07f626e0876707038b4ba0b40085cd486fd61e639adf5dd02",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.transport_disembark_geometry:append_disembark_endpoint_violations"
+        ],
+        "selected_rows": [
+          "rule:03:03.02.02:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-large-model-setup",
+    "source_version": "maintained-app-mirrors-observed-2026-09-17",
+    "package_hash": "06bd4faaa522ea3bd96e431c142be21fe9eec5a5d1a2e08b355b9b8a8f24be75",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_large_model_setup_2026_09/artifacts/package.json",
+    "sha256": "24e64e35889899b0b2410dfe4a68d3bc4022c2bef54d25ec9269f610ad819f58",
+    "metadata_sha256": "626ee219617f886756036f40c262810509f2bddaba7670491e3ed5aa5a9a6606",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-large-model-setup:large-model-setup",
+        "section_id": "03.02.02",
+        "source_text": "it must be set up so that it is touching your battlefield edge. ... (excluding AIRCRAFT models)",
+        "transcription_sha256": "989b99ddd217c06dae6e6f3a3c3bbc86251e23ae77eca9e36d557f910df05bce",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.large_model_setup:oversized_deployment_violation",
+          "warhammer40k_core.engine.large_model_restrictions:large_model_activity_reason"
+        ],
+        "selected_rows": [
+          "rule:03:03.02.02:1"
+        ],
+        "relation": "source_repair_required",
+        "review": "Literal ellipsis combines a deployment-edge fragment with an AIRCRAFT exception from Strategic Reserves, omitting triggers, restrictions and scope. Not equivalent to complete03.02.02; requires complete transcription and runtime-consumer revalidation."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-lethal-hits",
+    "source_version": "maintained-app-mirrors-observed-2026-09-13",
+    "package_hash": "7b21dc60a9c008ccb79fd40182a287b7f66b87560cd9077bc1778039ba75e597",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_lethal_hits_2026_09/artifacts/package.json",
+    "sha256": "1f22463ec18288cd912d76e892108597ae978623e4126cea7be93ace27398d84",
+    "metadata_sha256": "ed8e1061540e4e02ec150c491078be943c78a8359f5474a71068e296139a5ed4",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-lethal-hits:lethal-hits",
+        "section_id": "24.23",
+        "source_text": "Each time an attack made with a [LETHAL HITS] weapon results in a critical hit, you can choose for that attack to automatically wound the target.\nDesigner’s Note: Choosing to automatically wound the target means that no wound roll is made for that attack. You may decide against this, as it means that attack cannot result in a critical wound and so cannot trigger other abilities such as [DEVASTATING WOUNDS].",
+        "transcription_sha256": "5862c427e3682a38d219004e3b03ad7c5a2f8c09bb4175ce3f90e6f917f3bd5e",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.lethal_hits:lethal_hit_wound_choice"
+        ],
+        "selected_rows": [
+          "rule:24:24.23:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-measuring-to-destroyed",
+    "source_version": "maintained-app-mirrors-observed-2026-09-18",
+    "package_hash": "cf892e8d90820a034d3a5cb723cb2c800d9b47f7d93eb15e84b663bcb9fddfbb",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_measuring_to_destroyed_2026_09/artifacts/package.json",
+    "sha256": "ca8c2ea2b8dbae29b046cfc8c1d11062e773b8b83e64c4a855c6cd0ad9a498c7",
+    "metadata_sha256": "647b7af469f18ffa6dfc311115c65519ee284e9c3c77176b0d4132e9aeba49cc",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-measuring-to-destroyed:measuring-to-destroyed",
+        "section_id": "05.04.06",
+        "source_text": "When a player has to measure the distance to a destroyed model, that player can measure to any point occupied by that model's base (or any part of that model if it does not have a base or is a Vehicle, excluding Walker models that have a base) before it was destroyed.\nWhen a player has to measure the distance to a destroyed unit, they measure to the last model destroyed in that unit.",
+        "transcription_sha256": "ff3dc9be8b2dfb1d6ff28da5323b9a1c4e958c9c0df3de623d481ce02db82eb2",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.destroyed_referent_measurement:former_footprint_for_destroyed_model",
+          "warhammer40k_core.engine.destroyed_referent_measurement:former_footprint_for_destroyed_unit",
+          "warhammer40k_core.engine.destroyed_referent_measurement:distance_to_destroyed_model",
+          "warhammer40k_core.engine.destroyed_referent_measurement:distance_to_destroyed_unit",
+          "warhammer40k_core.engine.deadly_demise:deadly_demise_target_unit_ids"
+        ],
+        "selected_rows": [
+          "rule:05:05.04.06:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-model-keywords",
+    "source_version": "maintained-app-mirrors-observed-2026-09-08",
+    "package_hash": "787473dc91edfcbe0c27379cff3ad876517d475da9c5f75869df42b4e418be18",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_model_keywords_2026_09/artifacts/package.json",
+    "sha256": "7a345d1c1127f2e3a1c682202bca89feaee7b58673588df4ef958b0602d8492d",
+    "metadata_sha256": "cbec4378ca2419ef5f3ae35c9573057b335173e504f489e96bcd6eb2359f66e3",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-model-keywords:destroyed-model-keywords",
+        "section_id": "FAQ",
+        "source_text": "Units have all the keywords of all their models, and attached units have all the keywords of all of their component units. How are destroyed models taken into account for these purposes?\nThese statements are only true so long as the models possessing those keywords remain part of the unit; destroyed models do not contribute their keywords to their prior unit. Example: The Aspiring Sorcerer model in a unit of Rubric Marines is destroyed; as none of the remaining models in the unit possess the PSYKER keyword, that unit is no longer a PSYKER unit.",
+        "transcription_sha256": "d2f96dfeb423592623f05012e82c181a7737b12c791f7fbd237202a1968025be",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.rules_units:RulesUnitView.keywords"
+        ],
+        "selected_rows": [
+          "faq:60232b79-7a10-44a0-ac68-e27312c7ba60"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-modifiers",
+    "source_version": "maintained-app-mirrors-observed-2026-09-07",
+    "package_hash": "e22cdb1131493a2afe0849554c2b892ea6da37a86ef363259ca9dc47782ef1da",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_modifiers_2026_09/artifacts/package.json",
+    "sha256": "1ac10341f079842acb14666e0f8c74b72a7528b597b240ae9c80679dc86c8a5f",
+    "metadata_sha256": "791ec1e4df82c6258e522090a1bc9ebbecfdbca6efe423ce304b326471013e56",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-modifiers:ordered-modifiers",
+        "section_id": "02.02.01",
+        "source_text": "APPLYING MODIFIERS\n\nThis section presents the various ways rules may be modified. All modifiers are cumulative.\n\nWhen a value is modified (e.g. characteristic, dice roll, distance), do so in the following order.\n\n1. If a rule instructs you to change or replace one value with a specified value, you must first change the relevant value to the new value.\n\nNote that rules that modify a characteristic in this step to a new value of ‘0’, ‘-’ or ‘*’ cannot be modified by other rules (in such cases, skip steps 2-5).\n\n2. Apply multiplication modifiers.\n\n3. Apply addition modifiers.\n\n4. Apply division modifiers.\n\n5. Apply subtraction modifiers.\n\n6. Round any fractions up after applying all modifiers.",
+        "transcription_sha256": "3fe2b25367c04c5648e0b572c9a802a3afd7fe69b03e4e4b11058920d0ce5044",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.core.modifiers:ModifierStack"
+        ],
+        "selected_rows": [
+          "rule:02:02.02.01:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-modifiers:modified-dice-limits",
+        "section_id": "02.02.01",
+        "source_text": "WHEN MODIFYING DICE ROLLS\n\nWhen modifying dice rolls, the following points also apply:\n\n  * Modifiers are applied after any re-rolls of that dice roll.\n    * Rules that refer to the value of an ‘unmodified’ dice roll are referring to the dice result after any re-rolls, but before modifiers.\n  * A dice result can be modified above its maximum possible value (for example, a D6 roll can be modified above 6).\n  * A result that would be less than 1 is changed to a result of 1.\n  * Hit rolls and wound rolls can never be modified by more than -1 or +1. After all the cumulative modifiers to such a roll have been calculated, if the total modifier would be:\n    * -2 or worse, it is changed to -1.\n    * +2 or better, it is changed to +1.\n  * Charge rolls cannot be greater than 12. After all the cumulative modifiers to a charge roll have been calculated, if the result would be 13 or more, it is changed to 12.",
+        "transcription_sha256": "21d051f1c9f037ac11d4957a94dd93cba1bab969ffd1f9bf9ffc7c847ddc5d29",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.core.modifiers:resolve_roll_modifiers"
+        ],
+        "selected_rows": [
+          "rule:02:02.02.01:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-modifiers:detection-lone-operative-limits",
+        "section_id": "02.02.01",
+        "source_text": "OTHER MODIFIED RULES\n\nThe following rules apply to various rules and effects found throughout the game.\n\n  * Detection range and Lone Operative cannot be better than 9\" or worse than 30\".",
+        "transcription_sha256": "0bb1eb9564822364cae638f8db886fe5186524fd999f16c382f1d4b73a9afccc",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.core.modifiers:resolve_targeting_range"
+        ],
+        "selected_rows": [
+          "rule:02:02.02.01:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-modifiers:psychic-individual-modifiers",
+        "section_id": "24.29",
+        "source_text": "Each time an attack is made with a [PSYCHIC] weapon, you can ignore any or all modifiers to that attack’s BS or WS characteristic and any or all modifiers to the hit roll. Attacks made with [PSYCHIC] weapons are known as psychic attacks (this can be important for the triggering of other rules).",
+        "transcription_sha256": "4a6d83c584957daf12e931a840822fee1a46c25814eb14fc6f563bf39f82c4d0",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.attack_sequence_psychic_modifiers"
+        ],
+        "selected_rows": [
+          "rule:24:24.29:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-modifiers:ignore-individual-modifiers",
+        "section_id": "02.02.02",
+        "source_text": "Some rules enable a player, weapon, model or unit to ignore modifiers. When using such rules, the following points apply:\n\nUnless otherwise stated, that rule allows you to ignore modifiers to the unit's rolls and the unit's profile and weapon characteristics.\n\nWhen a rule states you can ignore modifiers to a stated roll or characteristic, you can choose to ignore all of those modifiers, or only some of them. For example, you can still choose to apply positive/beneficial modifiers while ignoring negative/detrimental modifiers.\n\nExample: Your unit can ignore characteristic modifiers and is under the effect of +2\" M and -2\" M. You can choose to ignore the -2\" M, meaning that unit's M characteristic will only be modified by the +2\" M.\n\nExample: Your unit's ranged attacks can ignore roll modifiers and are under the effect of +1 to hit rolls and -1 to hit rolls. You can choose to ignore the -1 to hit rolls, meaning those attacks will only be affected by the +1 to hit rolls.",
+        "transcription_sha256": "7c1439a4548907e7648e50c665cab0bfb7e0cf9eb3e92d82ccb453fda838a2a0",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.modifier_evaluation"
+        ],
+        "selected_rows": [
+          "rule:02:02.02.02:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-modifiers:stratagem-cost-limits",
+        "section_id": "02.02.01",
+        "source_text": "OTHER MODIFIED RULES\n\nA stratagem cannot have its CP increased by more than 1 or reduced to below 0 after all modifiers have been applied.",
+        "transcription_sha256": "3a2de7d2e6ccb69167c07c653367318efe5ff5d7a2413e8b88c794969349f444",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.stratagem_cost_modifiers:StratagemCostModifierRegistry"
+        ],
+        "selected_rows": [
+          "rule:02:02.02.01:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Selected final modifier sentence agrees after format controls. OTHER MODIFIED RULES is a retained heading; introduction and Detection/Lone Operative sentence are outside this single-limit excerpt."
+      },
+      {
+        "source_id": "gw-11e-core-modifiers:weapons-with-no-strength",
+        "section_id": "02.04.01",
+        "source_text": "If a weapon has no S characteristic (because it is '-', or for any other reason) and a rule interacts with that weapon's S, that weapon has S 1 for that interaction.",
+        "transcription_sha256": "1317770dea2170439335e5e2d19690874f42f7ff6902ee81e9e0596fc86ee03a",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.core.weapon_profiles:WeaponProfile.strength_for_interaction"
+        ],
+        "selected_rows": [
+          "rule:02:02.04.01:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-modifiers:healing",
+        "section_id": "02.02.04",
+        "source_text": "When a unit heals or regains a number of wounds, it regains up to that number of lost wounds. For each wound healed or regained, consult the following: • If that unit has one or more models that does not have its full wounds remaining, select one of those models; that model regains one lost wound. • If all models in that unit have their starting number of wounds, but one or more models from that unit are currently destroyed, revive one of those destroyed models (excluding Character models), with one wound remaining. This cannot cause a model to have more wounds remaining than it started the battle with. If a rule states that a model heals or regains a number of wounds, only that model can regain wounds up to its starting number of wounds. Any excess regained wounds are lost and do not cause a destroyed model from that unit to revive.",
+        "transcription_sha256": "c63778ee0ab76fd30c447ad7bf4d11c27581f9c3e65f4f7a167b1d651f8c9eb0",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.healing:resolve_healing_until_blocked"
+        ],
+        "selected_rows": [
+          "rule:02:02.02.04:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-movement-phase",
+    "source_version": "40k-app-movement-phase-observed-2026-08-30",
+    "package_hash": "0aacec8d0c56e882c0b03329a202a00512d9ace632d2b5f0e3bb53370e001105",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_movement_phase_2026_08/artifacts/package.json",
+    "sha256": "f3e378e933f70c8b4b579acdd7d46a5c8ec519ee3fbfb5efda1611edc747cff2",
+    "metadata_sha256": "fd3945f75d2dd736db05db2cbb8186a7df589309aa34bc6b31a9d9f3081014a0",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-rules:movement-phase:move-units-step",
+        "section_id": "09.02",
+        "source_text": "MOVE UNITS STEP\nThe active player moves their units, one unit at a time, until all their units have been selected and have finished making their moves. For each unit, use the sequence below.\n1 SELECT UNIT\nSelect a friendly unit that has not been selected in this step. That unit can either be on the battlefield, in Strategic Reserves (20.02), or embarked within a Transport model (18.01). That unit has now been selected to move.\n2 SELECT MOVE TYPE\nSelect one of the eligible move types listed below for your unit to make. Resolve that move type, after which that unit has finished making its move.\n- REMAIN STATIONARY (09.04)\n- NORMAL MOVE (09.05)\n- ADVANCE (09.06)\n- FALL-BACK (09.07)\n- DISEMBARK (18.04)\n- INGRESS (20.04)",
+        "transcription_sha256": "6ea310aedead79971d092f9ae035b0c0b79499bcc656e3899a5546ba6234c54f",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.phases.movement_handler:MovementPhaseHandler.begin_phase",
+          "warhammer40k_core.engine.phases.movement_handler:MovementPhaseHandler.apply_decision",
+          "warhammer40k_core.engine.phases.movement_action_decisions:_movement_action_options_for_selected_unit"
+        ],
+        "selected_rows": [
+          "rule:09:09.02:1"
+        ],
+        "relation": "source_repair_required",
+        "review": "Package says not selected in this step and lists move types below; selected text says not selected to move this phase and expressly permits move types presented elsewhere. Requires source reconciliation and all selection consumers reviewed; the source difference alone does not establish a gameplay defect."
+      },
+      {
+        "source_id": "gw-11e-core-rules:movement-phase:selecting-modes",
+        "section_id": "09.02.02",
+        "source_text": "SELECTING MODES\nSome rules instruct you to select a mode, such as fall-back moves (09.07). Modes are mutually exclusive, and you must assess each one in the order presented. When making a move, if your unit does not meet the conditions of any of the modes, it cannot make that move.\nSometimes a mode will be mandatory if applicable (e.g. consolidation modes, 12.08), but in the case of fall-back moves, ordered retreat is not mandatory, so you could select desperate escape instead.\nMany move types state conditions you must meet while/after moving. Those that are labelled with a mode name only apply if you selected that mode; those not labelled with a mode name always apply.",
+        "transcription_sha256": "094c4bf218bd4c900864ee622364987378851fc06f23610ca95bd6574ee3c2d6",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "partial_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.phases.movement_validation:_fall_back_modes_for_parameterized_option",
+          "warhammer40k_core.engine.phases.movement_validation:_fall_back_mode_violation_code"
+        ],
+        "selected_rows": [
+          "rule:09:09.02.02:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      },
+      {
+        "source_id": "gw-11e-core-rules:movement-phase:fall-back-move",
+        "section_id": "09.07",
+        "source_text": "FALL-BACK MOVE\nWhen eligible: Your unit is engaged.\nMaximum distance: Your unit's M characteristic.\nEffect: Your unit moves as described in Moving (03).\nBefore moving: Select fall-back mode:\n* Ordered Retreat: If your unit is not battle-shocked, you can select this mode.\n* Desperate Escape: Otherwise, you must select this mode. Make a hazard roll for each model in your unit (06.03).\nWhile moving:\n* Desperate Escape: Each model that is moved can be moved through enemy models.\nAfter moving:\n* Your unit must be unengaged.\n* Until the end of the turn, unless otherwise stated, your unit is not eligible to shoot, declare a charge or start an action.\n* Desperate Escape: If your unit is not battle-shocked, you must make a battle-shock roll for your unit (01.07).",
+        "transcription_sha256": "2f9a2b3a35e8ca0f2d76a43b788c93b9feccaa66f2bba19a8b0ce348d401db0b",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.phases.movement_geometry:_desperate_escape_requirements_for_fall_back",
+          "warhammer40k_core.engine.phases.movement_resolution_flow:_apply_movement_proposal_decision",
+          "warhammer40k_core.engine.phases.movement_fall_back_embark:_apply_fall_back_result"
+        ],
+        "selected_rows": [
+          "rule:09:09.07:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-mustering-limits",
+    "source_version": "maintained-app-mirrors-observed-2026-09-20",
+    "package_hash": "2ae281f45991506ec23a5f8ef50405e5d49fa5e52b1f9d9ee9454a926c03571c",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_mustering_limits_2026_09/artifacts/package.json",
+    "sha256": "cd6eb80ebdc43a1561d4823f4dec0b7a9834a70e27da4a4bf6e462840cbc1abc",
+    "metadata_sha256": "5569d6de9a7b11a6ca135b22f8d9316f4510eb9b97fb0384fd83bee37a0bac52",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-mustering-limits:battle_size",
+        "section_id": "25.03",
+        "source_text": "BATTLE SIZE | Points Total | Detachment Points (DP) | Enhancement Limit | Unit Limit*\nINCURSION | 1000 | 2 | 2 | 2\nSTRIKE FORCE | 2000 | 3 | 4 | 3\nThe unit limit for BATTLELINE and DEDICATED TRANSPORT units is double the relevant amount shown above, and every EPIC HERO has a unit limit of 1, regardless of the battle size.",
+        "transcription_sha256": "4814d68cd7b6f065e97e3d2837fddff188d7db51c63679c403628bd0ee2f78fb",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.list_validation:BattleSizeMusteringPolicy.incursion",
+          "warhammer40k_core.engine.roster_unit_limits:datasheet_unit_limit"
+        ],
+        "selected_rows": [
+          "rule:25:25.03:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Runtime serializes25.03 table before the unit-limit footnote using pipes. Incursion1000/2/2/2 and Strike Force2000/3/4/3, doubled BATTLELINE/DEDICATED TRANSPORT and EPIC HERO1 agree cell by cell. Narrative battle-size selection lies outside this narrow table excerpt."
+      },
+      {
+        "source_id": "gw-11e-core-mustering-limits:single_three_dp_detachment",
+        "section_id": "25.04",
+        "source_text": "If you are playing an Incursion battle, you can select a 3DP detachment as your only detachment.",
+        "transcription_sha256": "ccdcec776c186d934bbeefe61307a9608dfa47e95b0b4e95f0f18cd3add37835",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.list_validation:validate_detachment_selection"
+        ],
+        "selected_rows": [
+          "rule:25:25.04:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-mustering-limits:upgrade_accounting",
+        "section_id": "25.04",
+        "source_text": "You can include up to three of the same Upgrade in your army (the second and third instances of the same Upgrade do not count towards the total number of enhancements in your army, but you must still spend the stated points cost each time).",
+        "transcription_sha256": "498817660ab2a921958720521432effaa22aab043f571bf3224706622bbf8dc7",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.roster_bearer_validation:append_enhancement_violations",
+          "warhammer40k_core.engine.army_mustering:_append_unit_point_violations"
+        ],
+        "selected_rows": [
+          "rule:25:25.04:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-objectives",
+    "source_version": "maintained-app-mirrors-observed-2026-09-05",
+    "package_hash": "864a6a549fb3260004bee04146c0d2de885955adbbac534d380b61c4a235dfec",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_objectives_2026_09/artifacts/package.json",
+    "sha256": "184a3fe08b6da5ce85dc2bfd99c72d1d0bbd3b7b2a136d4f0c374d31de374be1",
+    "metadata_sha256": "bcd7431dc3dc3de59887a671ddfeb6c5a86e1fd54a3bf35be9408a7141c0b8cd",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-objectives:terrain-objectives",
+        "section_id": "14.01",
+        "source_text": "If a mission uses objectives, it will state where they are located on the battlefield. Typically, your mission will have a deployment map showing several points where objectives should be placed. The location of each point should coincide with a terrain area (13.01); that terrain area is the objective, and is called a terrain objective.\nWhen measuring distances to and from an objective, measure to and from the closest part of it.",
+        "transcription_sha256": "99e2404a6648e40162a7703012d4283218ce5601c79b2afa5a49e7a259037d66",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.objective_geometry:measure_rules_unit_to_objective",
+          "warhammer40k_core.engine.objective_control:resolve_objective_control"
+        ],
+        "selected_rows": [
+          "rule:14:14.01:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-objectives:objectives-not-within-a-terrain-area",
+        "section_id": "14.01.01",
+        "source_text": "If the location point of an objective does not coincide with a terrain area, you must denote the location of that objective with a flat, circular marker, 40 mm in diameter, centred on that point – this is called an objective marker. Models can move through objective markers and they can end a move on top of objective markers.\nA model is within range of an objective marker while it is within 3\" horizontally and 5\" vertically of that objective marker. When measuring distances to and from an objective marker, measure to and from the closest part of it.",
+        "transcription_sha256": "f2d880bb3b9df994d34faca73ea716f003f995eb751b291e404603ad9f0cdc0d",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.objective_geometry:measure_rules_unit_to_objective",
+          "warhammer40k_core.engine.objective_control:resolve_objective_control"
+        ],
+        "selected_rows": [
+          "rule:14:14.01.01:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-objectives:terrain-objective-control-range",
+        "section_id": "14.02",
+        "source_text": "At the start of the battle, no objective on the battlefield is controlled by either player. To gain control of an objective, a player will need one or more models with an OC characteristic of 1 or more within range of it. A model is within range of a terrain objective while it is within that terrain area.",
+        "transcription_sha256": "df777fe4fb14a8d482eccb72b78644872819b65b4fccaed4507a30ea157bf257",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.objective_geometry:measure_rules_unit_to_objective",
+          "warhammer40k_core.engine.objective_control:resolve_objective_control"
+        ],
+        "selected_rows": [
+          "rule:14:14.02:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-objectives:objective-marker-terminology-faq",
+        "section_id": "FAQ",
+        "source_text": "If a rule refers to an 'objective marker', does this mean an 'objective'?\nYes (excluding rules in the Core Rules)'.",
+        "transcription_sha256": "7c16a67d7d2835bdfac943b3bebad62e415cac68b9028c5da64ce04a677b831e",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.rules.objective_terminology:normalize_objective_rule_text"
+        ],
+        "selected_rows": [
+          "faq:dc9911da-e156-4b48-bf9b-18f9d96d037e"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-off-battlefield-battle-shock",
+    "source_version": "maintained-app-mirrors-observed-2026-09-06",
+    "package_hash": "3511cf76063155feeb1c5dbec11d0369dcca3647ffe150134ea3027fbda2441c",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_off_battlefield_battle_shock_2026_09/artifacts/package.json",
+    "sha256": "b0fd96e46a961f6674e14bfca48fc71e62648a7eab3725c314fb57f37454a85f",
+    "metadata_sha256": "a9fdc76247ee729b31d9e5fc50dbb4574a48ca100962036e7bbe43d8e96d8103",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-off-battlefield-battle-shock:off-battlefield-battle-shock",
+        "section_id": "01.02.04",
+        "source_text": "A unit that is embarked within a TRANSPORT or that is in strategic reserves is not on the battlefield. The following applies to such units:\nThe controlling player must make battle-shock rolls for units that are not on the battlefield in their Command phase if they are battle-shocked, or if they are at or below half-strength.",
+        "transcription_sha256": "cadc6f7705726995ad1a0c8329e0fe5763798c9f004e6e1d9086a6e8fbfa3a9b",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.command_battle_shock_candidates:command_battle_shock_candidate_inventory",
+          "warhammer40k_core.engine.battle_shock_model_authority:battle_shock_model_ids",
+          "warhammer40k_core.engine.battle_shock_historical_authority:HistoricalBattleShockAuthorityContext.battle_shock_model_ids"
+        ],
+        "selected_rows": [
+          "rule:01:01.02.04:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Two noncontiguous exact paragraphs from01.02.04: absence definition and mandatory Command Battle-shock. Intervening visibility/range clauses remain separate requirements. This explicitly narrow excerpt is not equivalence to the full section."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-other-concepts",
+    "source_version": "maintained-app-mirrors-observed-2026-09-08",
+    "package_hash": "d8b159dafe25df81c5a6caa0528e5a6814e6e335df85ae2014268b5e8331991c",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/artifacts/package.json",
+    "sha256": "1c9c948d244a5709db7262907f3cba55edd390662873d3ac8b8ff088e207ee89",
+    "metadata_sha256": "42aa204ada2b251d4cab4a9291e263e43548f8134d5457377e4e8f59e70ede7b",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-rules:other-concepts:visibility",
+        "section_id": "06.01",
+        "source_text": "VISIBILITY\nLine of sight is used to determine visibility between models. For an observing model to have line of sight, it must be possible to draw an imaginary straight line, 1 mm wide, from any part of that model to any part of the model being observed. This line is the line of sight. While doing so, other models in the observing model’s unit and in the observed model’s unit are ignored. Other models and units can be either visible or fully visible to the observing model, as shown in the example. Note that terrain applies additional rules to visibility (13.07).",
+        "transcription_sha256": "eefe89c9c39b6d8560ba274d414567faebfad2aa17f2b84b5745eb714ffd9883",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.core.visibility:TerrainVisibilityContext.resolve_line_of_sight",
+          "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_model",
+          "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_polygon",
+          "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_polygon_union",
+          "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_terrain_volume",
+          "warhammer40k_core.engine.shooting_targets:shooting_target_candidates_for_unit",
+          "warhammer40k_core.engine.shooting_targets:unit_has_line_of_sight_to_target"
+        ],
+        "selected_rows": [
+          "rule:06:06.01:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      },
+      {
+        "source_id": "gw-11e-core-rules:other-concepts:mortal-wounds",
+        "section_id": "06.02",
+        "source_text": "MORTAL WOUNDS\nSome attacks or rules inflict mortal wounds on units. Each time a unit suffers one or more mortal wounds, its controlling player must resolve the following sequence for each of those mortal wounds, until either all of them have been inflicted or that unit is destroyed:\n1. Select Model: Select one model in that unit by following the first instruction below that applies:\n- If a non‑CHARACTER model in that unit has lost one or more wounds, you must select that model.\n- Otherwise, if that unit contains one or more non‑CHARACTER models, you must select one of those models.\n- Otherwise, if one or more CHARACTER models in that unit have lost one or more wounds, you must select one of those models.\n- Otherwise, you must select one CHARACTER model in that unit.\n2. Resolve Damage: The selected model loses 1 wound. If this reduces that model’s remaining wounds to 0, it is destroyed.",
+        "transcription_sha256": "9b8eedb42371fc609796c18ede005681d025fba136d3a8b9578f74c5a550d831",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.mortal_wound_model_allocation:mortal_wound_priority_selection",
+          "warhammer40k_core.engine.mortal_wound_model_allocation:build_mortal_wound_model_request",
+          "warhammer40k_core.engine.mortal_wound_model_allocation:continue_mortal_wound_application",
+          "warhammer40k_core.engine.mortal_wound_model_allocation:resolve_mortal_wound_model_decision",
+          "warhammer40k_core.engine.lifecycle:GameLifecycle.submit_decision"
+        ],
+        "selected_rows": [
+          "rule:06:06.02:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Same ordered four allocation predicates and1-wound loss in06.02 blocks1–7, with title/bullets. Final normal-damage-before-mortals paragraph is outside this narrow package row and remains a separate requirement."
+      },
+      {
+        "source_id": "gw-11e-core-rules:other-concepts:visibility-classifications",
+        "section_id": "06.01.01",
+        "source_text": "VISIBILITY\nLine of sight is used to determine visibility between models. For an observing model to have line of sight, it must be possible to draw an imaginary straight line, 1 mm wide, from any part of that model to any part of the model being observed. This line is the line of sight. While doing so, other models in the observing model’s unit and in the observed model’s unit are ignored. Other models and units can be either visible or fully visible to the observing model, as shown in the example. Note that terrain applies additional rules to visibility (13.07).\nMODEL VISIBLE\nIf any part of another model is visible to the observing model, that model is visible.\nMODEL FULLY VISIBLE\nIf every part of another model that is facing the observing model is visible to the observing model (so the only thing blocking visibility to any part of that other model is that model itself), that model is fully visible.\nUNIT VISIBLE\nIf one or more models in a unit are visible to the observing model, that unit is visible.\nUNIT FULLY VISIBLE\nIf every model in a unit is fully visible to the observing model, that unit is fully visible. When determining this, the observing model can see through other models in that unit.",
+        "transcription_sha256": "7bcd8275af066324fa6d6944e4683d632fe0b552a003fdc94190159a76fc89f4",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.geometry.continuous_visibility:resolve_visibility_pair",
+          "warhammer40k_core.core.visibility:TerrainVisibilityContext.resolve_line_of_sight"
+        ],
+        "selected_rows": [
+          "rule:06:06.01:1"
+        ],
+        "relation": "source_repair_required",
+        "review": "Runtime section_id06.01.01 is mislocated: the transcription contains06.01 visibility definitions, not the selected06.01.01 default-observer clause. Actual wording maps to06.01. Requires locator/provenance repair; no inference that the default-observer rule is proved."
+      },
+      {
+        "source_id": "gw-11e-core-rules:other-concepts:visibility-any-part-faq",
+        "section_id": "06.01 FAQ",
+        "source_text": "When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them?\nLine of sight is drawn from any part of the observing model to any part of the model being observed.",
+        "transcription_sha256": "7ad46ec389adfa76cc3d0e3d763f6237835ae60a4264fbca52d48a97b79911ed",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.geometry.continuous_visibility:resolve_visibility_pair",
+          "warhammer40k_core.core.visibility:TerrainVisibilityContext.resolve_line_of_sight"
+        ],
+        "selected_rows": [
+          "faq:7f238e23-cd3f-40ad-aa91-c75274cc655e"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-random-characteristics",
+    "source_version": "maintained-app-mirrors-observed-2026-09-25",
+    "package_hash": "046e974e4921430f48905b8e7907a925010076f00cf5ba0e928fdf4f233138e1",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_random_profiles_2026_09/artifacts/package.json",
+    "sha256": "3d51d219d4ea811be2bf5318f5029b0df0286206e16521e813437c6f3660701a",
+    "metadata_sha256": "9f62f57690eb4c4044a71c513d465d9229561305c972059e2aca35381a039db1",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-random-characteristics:random-characteristics",
+        "section_id": "02.02.03",
+        "source_text": "Random Movement: When a unit with a random M characteristic is selected to move, determine the entire unit’s move distance by rolling the indicated number of dice. Random Attacks: If a weapon has a random A characteristic, that characteristic is determined when generating attacks for that weapon at the Resolve Attacks step (04.03). If several weapons with random A characteristics are making identical attacks, generate the attacks for each of those weapons individually, and group them all together. Random Damage: If a weapon has a random D characteristic, then each time an attack made with it inflicts damage, the controlling player determines that weapon's characteristic when the opposing player has selected a model in the target unit to allocate that attack to. When determining a random D characteristic, the dice roll made is called a damage roll. Where a D characteristic includes an operator (e.g. a ‘+’, as in D6+1), the value after the operator is part of that D characteristic – it is not a modifier. Other Random Characteristics: For all other characteristics, roll to determine the value on an individual, per-model or per-weapon basis each time that characteristic is required.",
+        "transcription_sha256": "3346acc0247c46a3dbf5801ddc191fcb88b0cfff7083e0043512dcee9d66f07b",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.random_profile_evaluation:evaluate_unit_profile_characteristics",
+          "warhammer40k_core.engine.random_profile_evaluation:evaluate_model_profile_inventory",
+          "warhammer40k_core.engine.random_weapon_profiles:evaluate_attack_weapon_profile",
+          "warhammer40k_core.engine.random_weapon_range:evaluate_weapon_ranges"
+        ],
+        "selected_rows": [
+          "rule:02:02.02.03:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-reserve-lifetimes",
+    "source_version": "maintained-app-mirrors-observed-2026-09-19",
+    "package_hash": "2cc7fdd7b07cccbd7d09f987aeadbcec4038e8504ef60ef01a64c9ccab0d32d2",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_reserve_lifetimes_2026_09/artifacts/package.json",
+    "sha256": "d22f5ca58b27172445f595ebe4a4763e372162950cb825d48cb7816073c488c1",
+    "metadata_sha256": "6c260291c37f2530cc9cf4b789ac474e263485c5d9faf4020d9d62ac652134c9",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-reserve-lifetimes:final-turn-cleanup",
+        "section_id": "20.01.02",
+        "source_text": "At the end of the final turn, units in strategic reserves are destroyed, but they do not trigger rules that apply when a model is destroyed.",
+        "transcription_sha256": "3fa819929c984fee69c69888fd56f6bc4632d5a4f136a9abdb194aef145f1bd8",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.reserve_destruction:final_turn_cleanup_policy"
+        ],
+        "selected_rows": [
+          "rule:20:20.01.02:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-reserve-lifetimes:reposition",
+        "section_id": "20.02",
+        "source_text": "Some rules allow units to be removed from the battlefield and placed in strategic reserves during the battle. Units that use such rules are known as repositioned units. In addition to any other rules that apply to such units (such as where they can or cannot arrive), all of the following rules apply to them: If used in the Movement phase, such rules can be used on units that have already moved that phase. A repositioned unit that is set up in the same turn in which it made an advance, fall-back or disembark move has still made an advance, fall-back or disembark move that turn. When they are removed from the battlefield, any rules that are affecting such units for a specified duration or under specified circumstances continue to affect them while that duration and/or those circumstances apply. Example: A unit that was within range of an aura ability when removed from the battlefield would no longer be affected by that aura ability if it is no longer within range of it when it makes an ingress move, but a unit that was battle-shocked when removed from the battlefield would still be battle-shocked if it makes an ingress move in the same turn.",
+        "transcription_sha256": "4b614b66247ba49ad43a92c330af196745bbcefcac4fe61243393b8713825a4b",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.game_state:GameState.reposition_unit_to_strategic_reserves"
+        ],
+        "selected_rows": [
+          "rule:20:20.02:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-reserve-lifetimes:arrival",
+        "section_id": "20.03",
+        "source_text": "To arrive on the battlefield, each strategic reserves unit must make an ingress move (20.04). Unless otherwise stated, they can only do so from the second battle round onwards. At the end of the third battle round, unless otherwise stated, all strategic reserves units that have not made one or more ingress moves are destroyed, with the following exceptions: Units embarked within TRANSPORTS that have made an ingress move during the battle. Repositioned units (20.02).",
+        "transcription_sha256": "5953968f0912ce0b8ef90a2f6150005da22adca2da18841772095456a432f2dc",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.reserve_destruction:resolve_unarrived_reserve_destruction"
+        ],
+        "selected_rows": [
+          "rule:20:20.03:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-reserve-lifetimes:ingress",
+        "section_id": "20.04",
+        "source_text": "When eligible: Your unit is in strategic reserves (excluding units that are embarked within TRANSPORTS that are themselves in strategic reserves) Set-up distance: 6\" Effect: Your unit is set up as described in Set Up (03.02) While moving: Set up your unit wholly within the set-up distance of one or more battlefield edges and more than 8\" horizontally from all enemy units. Before the Third Battle Round: While doing so, no models can be set up within your opponent’s deployment zone. After moving: Unless otherwise stated, until the start of the next Charge phase, your unit is not eligible to make any other type of move.",
+        "transcription_sha256": "3ebcf9f594a98f20242c6e3272a5bb3ef63345bd1aff0657560b887321464eba",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.ingress_lifetimes:ingress_movement_locked"
+        ],
+        "selected_rows": [
+          "rule:20:20.04:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-reserve-transport",
+    "source_version": "maintained-app-mirrors-observed-2026-09-19",
+    "package_hash": "a0c17754e8f2ea18042f6f7c44c22973ca9813058182127be058e4876cb1d6dc",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_reserve_transport_2026_09/artifacts/package.json",
+    "sha256": "425ec8d96ee5bab05cf3852cb6762c38c2ecc197c94c19c93a1cf507dfe31c4c",
+    "metadata_sha256": "5592725135ec695d5e4c922ab191f3d9b964075ca2e0d2a1b5808c128c519230",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-reserve-transport:reserve-transport",
+        "section_id": "18.04.01",
+        "source_text": "When a unit uses the rapid disembark mode after its TRANSPORT makes an ingress move, the models must follow the same rules and restrictions as that TRANSPORT did. For example, if that TRANSPORT had to be set up more than 8\" from all enemy units and not within your opponent’s deployment zone, the same applies to the disembarking unit.",
+        "transcription_sha256": "e19428a70d186098f9e5fd7a36b969c1744f4c2ac6574c6cc5471c91d0dfa597",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.ingress_placement_restrictions:validate_inherited_placement"
+        ],
+        "selected_rows": [
+          "rule:18:18.04.01:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-reserve-transport:placing-reserves",
+        "section_id": "20.01",
+        "source_text": "Before the battle, in the Declare Battle Formations step, you can select one or more friendly units (excluding FORTIFICATIONS) to place in strategic reserves. Instead of setting up these units on the battlefield during deployment, place them to one side; they are strategic reserves units, and will arrive later in the battle. Unless otherwise stated, the combined points value of all of your strategic reserves units (including those embarked within TRANSPORTS that are themselves placed in strategic reserves) cannot exceed 50% of your points limit for your battle size.",
+        "transcription_sha256": "becc8ca294dadd36ef4fb1d586320d57162141e5efde9e373aa3625534fd4202",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "partial_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.reserves:StrategicReserveDeclaration"
+        ],
+        "selected_rows": [
+          "rule:20:20.01:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-reserve-transport:ingress",
+        "section_id": "20.04",
+        "source_text": "When eligible: Your unit is in strategic reserves (excluding units that are embarked within TRANSPORTS that are themselves in strategic reserves) Set-up distance: 6\" Effect: Your unit is set up as described in Set Up (03.02) While moving: Set up your unit wholly within the set-up distance of one or more battlefield edges and more than 8\" horizontally from all enemy units. Before the Third Battle Round: While doing so, no models can be set up within your opponent’s deployment zone. After moving: Unless otherwise stated, until the start of the next Charge phase, your unit is not eligible to make any other type of move.",
+        "transcription_sha256": "3ebcf9f594a98f20242c6e3272a5bb3ef63345bd1aff0657560b887321464eba",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "partial_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.reserve_arrival_resolution:resolve_reserve_arrival"
+        ],
+        "selected_rows": [
+          "rule:20:20.04:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-revival",
+    "source_version": "maintained-app-mirrors-observed-2026-09-24",
+    "package_hash": "276d3c5f22f0637362eb58d855eb21d2f01da66d11d12d9f47afa2ac3d83958d",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_revival_2026_09/artifacts/package.json",
+    "sha256": "804d98b9045540be76096da63bfaa42e4b2ed92267d035f861146d603a366272",
+    "metadata_sha256": "0ee5453364cea905c8e9448b32b4f745e51be51cae6dda931f4af94d06fc31d2",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-revival:revival",
+        "section_id": "01.02.03",
+        "source_text": "When a rule revives, resurrects, returns or adds models to a unit, the specified number of models are added to the unit. If a rule revives, resurrects or returns models to a unit, it does so through destroyed models from that unit. This cannot expand a unit beyond its starting strength. Unless otherwise stated, such models are added with all wargear and enhancements they started the battle with, and with their full W remaining. Models returned to a unit on the battlefield must be set up as follows: They must be set up in coherency with models in that unit that started that phase on the battlefield. They can be set up engaged with one or more enemy units, but only if those enemy units were already engaged with the unit that model is being returned to. If a leader or support model in an attached unit is destroyed and subsequently revived, they are still part of that attached unit and they must be returned to it if possible. When a model revives, resurrects, returns or is added to an embarked unit, if that TRANSPORT has sufficient remaining transport capacity for that model, that model is returned to that unit and is embarked. Otherwise, that model is destroyed, but it does not trigger rules that apply when a model is destroyed.",
+        "transcription_sha256": "cce4b8e3cd0c8a6efb2e36e5a2c72c569be3675493482bdf8a33570a95889b02",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.revival_engagement:revival_engagement_evidence"
+        ],
+        "selected_rows": [
+          "rule:01:01.02.03:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-roster-construction",
+    "source_version": "maintained-app-mirrors-observed-2026-09-20",
+    "package_hash": "09e374e2f11ae003eb9628ddf01573e7e503f84a0f86569e23c0b87b08e17a3a",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_roster_construction_2026_09/artifacts/package.json",
+    "sha256": "1f3b02b45720ccc6408804eebb9cb8deb9174e7481566c6b5beb05731e620da8",
+    "metadata_sha256": "ed6512ee7e1d16fe957f66cfe314d536fa34f5a24cb2f544cc90398cf071c692",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-roster-construction:duplicate-detachment",
+        "section_id": "25.04",
+        "source_text": "You cannot select the same detachment more than once.",
+        "transcription_sha256": "e3995d40353edd14fb4fed162c66cacb5a6905d970ca3940c7494cf1c668eb9f",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.list_validation:validate_detachment_selection"
+        ],
+        "selected_rows": [
+          "rule:25:25.04:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-roster-construction:constraints",
+        "section_id": "25.04",
+        "source_text": "Note that some detachment rules list units and other detachments that your army either must include or cannot include; you must follow all such rules when building your army for the detachments you have selected.",
+        "transcription_sha256": "df5dfdef9f4a7e4b8898ce8e3c08f4fb7357c398fccbf78f1c5291eed57ee676",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.roster_construction_validation:append_construction_violations"
+        ],
+        "selected_rows": [
+          "rule:25:25.04:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-roster-construction:unit-admission",
+        "section_id": "25.04",
+        "source_text": "You can only select units with your faction keyword and units available to your army faction.",
+        "transcription_sha256": "1719f6f9c3204ab870bdbd0d78c418f7a23d890ba808e3213840f21766fc3b7f",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.list_validation:validate_unit_selection_for_army"
+        ],
+        "selected_rows": [
+          "rule:25:25.04:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-roster-construction:support-attachment",
+        "section_id": "25.04",
+        "source_text": "For each leader and support unit in your roster, you can attach them to a bodyguard unit that they can join, following the rules for Forming Attached Units (19.01). Each support unit in your roster must be attached to a bodyguard unit.",
+        "transcription_sha256": "835bf2e3eb7105f36a809a97de0b0990e1b0aeb907d20aa25191fa0e50970b1b",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.roster_attachment_validation:resolve_attached_unit_formations"
+        ],
+        "selected_rows": [
+          "rule:25:25.04:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-roster-models",
+    "source_version": "maintained-app-mirrors-observed-2026-09-20",
+    "package_hash": "8e1038b86a10c39830a61d4ae9ff46d13c5c7daf80c4afb281b8f92fda05ac36",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_roster_models_2026_09/artifacts/package.json",
+    "sha256": "b9826e4ffb726f3aa92f836fdef65e607a4b6902d4dd313734116fa3841a95f0",
+    "metadata_sha256": "ea2e503060d1c7d3b8215b8a8af393fa50fe3b454c66751055b8f906d8c8248f",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-roster-models:warlord",
+        "section_id": "25.04",
+        "source_text": "Select one CHARACTER unit to be your Warlord’s unit. This must be a unit that has the faction keyword you chose as your army faction. Then select one CHARACTER model in that unit to be your Warlord – the supreme leader of your army – and make a note of this on your army roster. That model gains the WARLORD keyword. Some units have a rule on their datasheet stating that they must be your WARLORD. If you want to include one or more of these units in your army, you must select one of them to be your WARLORD. Rules that state that a model cannot be your WARLORD take precedence over ones that require it to be your WARLORD.",
+        "transcription_sha256": "f1162a5e6944dd7e97e33a6b0d164beed837e58fafb22cd0ef6bfc6c1dc3ba2c",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.roster_bearer_validation:append_warlord_violations"
+        ],
+        "selected_rows": [
+          "rule:25:25.04:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-roster-models:enhancement",
+        "section_id": "25.04",
+        "source_text": "SELECT ENHANCEMENTS\n\nSelect all of the enhancements you want to include from the detachments you selected and give each one to a different unit in your army. When you do, increase those units’ points values accordingly. The points values for enhancements can be found in the Warhammer 40,000 app.\n\nUnless otherwise stated:\n\n  * Only CHARACTER units can be given enhancements. If such a unit contains more than one model, select one CHARACTER model in that unit to have that enhancement.\n  * EPIC HEROES models cannot be given enhancements.\n  * Your army cannot include more than one of the same enhancement.\n\nUpgrades: Some enhancements are tagged with ‘Upgrade'. Unlike other enhancements:\n\n  * These can be given to non-Character units.\n  * You can include up to three of the same Upgrade in your army (the second and third instances of the same Upgrade do not count towards the total number of enhancements in your army, but you must still spend the stated points cost each time).\n\n** If you are playing an Incursion battle, you can select a 3DP detachment as your only detachment.",
+        "transcription_sha256": "a2f1588a24fa30f9c1eb036fae12fc7ef454bd7b220195d9f756705460b70110",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.roster_bearer_validation:append_enhancement_violations"
+        ],
+        "selected_rows": [
+          "rule:25:25.04:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-sequencing",
+    "source_version": "maintained-app-mirrors-observed-2026-09-10",
+    "package_hash": "e6b90c7c30caeb371e59307c1bd19f0508b7f948326971b90a3c2d4403eed769",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_sequencing_2026_09/artifacts/package.json",
+    "sha256": "6b0e245b29afc22bad605ca4c5c9b5693bd12d0b8b9e77629f26c4c9afd2803f",
+    "metadata_sha256": "579813e0e02571e677af32e99b7d6a1bfbb3aa216ddcdee42340c7755910b317",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-sequencing:active-player",
+        "section_id": "01.03",
+        "source_text": "ACTIVE PLAYER AND OPPOSING PLAYER\nAt any given time, one player is the ‘active player’ and their opponent is the ‘opposing player’. Which player is which changes throughout the battle, but both players are always one or the other; whenever a player becomes the active player, their opponent becomes the opposing player, and vice versa.\nWhile it is neither player’s turn (e.g. at the start or end of the battle round), the player who takes the first turn in each battle round is the active player.\nWhile it is a player’s turn, that player is the active player, with the following exceptions:\n- Each time a unit is selected to move, that unit’s controlling player is the active player until that move ends.\n- Each time a unit is selected to shoot or selected to fight, that unit’s controlling player is the active player until those attacks are resolved.",
+        "transcription_sha256": "21857210123f06ce92f90dc165eca0aaf781d4000d03c00aafb00e37797b69e4",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.active_player:effective_active_player_id",
+          "warhammer40k_core.engine.active_player_scopes:ActivePlayerScope"
+        ],
+        "selected_rows": [
+          "rule:01:01.03:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      },
+      {
+        "source_id": "gw-11e-core-sequencing:players-rules",
+        "section_id": "01.03.01",
+        "source_text": "Player's Rules\nDuring the game, players will sometimes need to know which rules are theirs, as opposed to their opponent’s. The following are considered a player’s rules:\n- Any army rules they have.\n- Any detachments in their army.\n- Any stratagems they use.\n- Any enhancements that units or models in their army have.\n- Any abilities or rules found on their units’ datasheets.\nRules that have restrictions (e.g. 'Once per battle/turn/phase') only apply to the player whose rule it is. Some missions may introduce additional rules that take effect in the battle. Where this is the case:\n- If the rule is used by a player, it is treated as one of that player’s rules.\n- If it is not used by a player, and always takes effect, such a rule is resolved before any of the active player’s rules, in an order of their choosing.",
+        "transcription_sha256": "31bfe6b542396a549425031a23296bfc8163ada09ada0f8cc02523280f039732",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.sequencing:sequencing_tier",
+          "warhammer40k_core.engine.mission_timing_candidates:mission_timing_candidates"
+        ],
+        "selected_rows": [
+          "rule:01:01.03.01:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      },
+      {
+        "source_id": "gw-11e-core-sequencing:rules-sequencing",
+        "section_id": "01.03.02",
+        "source_text": "Rules Sequencing\nAt any point in the game, the players will have rules that they can or must use, which may occur at the same time another player can or must use a rule. Unless otherwise stated, these are activated in the following order:\n1. All of the active player’s rules that must be used, in an order of their choosing.\n2. All of the active player’s rules that they can optionally use and wish to use, in an order of their choosing.\n3. All of the opposing player’s rules that must be used, in an order of their choosing.\n4. All of the opposing player’s rules that they can optionally use and wish to use, in an order of their choosing.\nIf another rule could be used after a rule has resolved during this sequence but before other rules in that same timing have resolved, those new rules do not trigger until all the remaining rules to be resolved in that same timing have been resolved.\nExample: The active player's unit has an ability enabling it to make a normal move after it has shot. An enemy unit targeted by that unit has an ability enabling it to shoot back at a unit that shot at it. The active player's rule is resolved first, followed by the opposing player's rule.",
+        "transcription_sha256": "ef175fbb3535a41a3d8e3488e87d74adb3596108c40713ac249c8bdbecb1e19a",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.sequencing:sequencing_tier",
+          "warhammer40k_core.engine.timing_rule_candidates:resolve_timing_rule_candidates",
+          "warhammer40k_core.engine.rule_trigger_state:observe_rule_trigger"
+        ],
+        "selected_rows": [
+          "rule:01:01.03.02:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      },
+      {
+        "source_id": "gw-11e-core-sequencing:end-turn-mission-order",
+        "section_id": "07.02",
+        "source_text": "7. End of Turn Step: Rules that are triggered at the end of a turn are resolved now, in the following order:\n1. First resolve rules triggered at this point other than mission rules.\n2. Both players then consult their mission; if one or both players have achieved any aspects of their mission that are triggered at this point, resolve them now.",
+        "transcription_sha256": "f701b0350a1fd74e5e23237de96fd7e9aae1b13c48b6a5a615353041b3ed89aa",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.battle_round_flow:BattleRoundFlow",
+          "warhammer40k_core.engine.mission_turn_end_sequencing:request_mission_turn_end_rules"
+        ],
+        "selected_rows": [
+          "rule:07:07.02:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-sequencing:end-round-mission-order",
+        "section_id": "07.03",
+        "source_text": "END OF BATTLE ROUND\nRules that are triggered at the end of the battle round are resolved now, in the following order:\n1. First resolve rules triggered at this point other than mission rules.\n2. Both players then consult their mission; if one or both players have achieved any aspects of their mission that are triggered at this point, resolve them now.\nThe battle round then ends and, unless the battle ends, the next battle round starts. The mission you are playing will tell you how many battle rounds to resolve before the battle ends.",
+        "transcription_sha256": "ca4615bfb347e36582b37e451b8a6fac92dd7ecb0244bcb9eb8731b9e2c9cbb7",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.battle_round_flow:BattleRoundFlow",
+          "warhammer40k_core.engine.sequencing:sequencing_tier"
+        ],
+        "selected_rows": [
+          "rule:07:07.03:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-smokescreen",
+    "source_version": "maintained-app-mirrors-observed-2026-09-12",
+    "package_hash": "82c82d6344cf717e2df6d9348b0232d325b3e975c73cdb3fc5028bc538220e97",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_smokescreen_2026_09/artifacts/package.json",
+    "sha256": "4df13e91081cd9cd7ac65b84da13d628b185a645f8b127b326da2dd300fc0bce",
+    "metadata_sha256": "21e738278afef53bfdc3c1e55a7976a8ec454ddab1e6096704cac33cdd534a01",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-stratagems:core:smokescreen",
+        "section_id": "15.10",
+        "source_text": "WHEN: Start of your opponent’s Shooting phase. TARGET: One friendly SMOKE unit. EFFECT: Until the end of the phase, each time an attack targets either your SMOKE unit, or a unit that is not fully visible to the attacking model because of one or more models in your SMOKE unit, the target has the benefit of cover against that attack (13.08).",
+        "transcription_sha256": "982800bbc28dae25715347aacbec4dd865440383fa26a5d8f7cf0fce880baf6a",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.obscuring_model_cover:obscuring_model_cover_sources",
+          "warhammer40k_core.engine.attack_sequence_hit_wound:_benefit_of_cover_ballistic_skill_penalty"
+        ],
+        "selected_rows": [
+          "rule:15:15.10:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-stealth",
+    "source_version": "maintained-app-mirrors-observed-2026-09-12",
+    "package_hash": "b1a1b218d4b61a490817d3e5c60a91a3ad207e9a53ab789aedeb180d4da45a9a",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stealth_2026_09/artifacts/package.json",
+    "sha256": "50d05f2f15af7a173b74cbd2e4c601a9ee00f4260bccdb4248aed584c9f9eadb",
+    "metadata_sha256": "d388d677e9a91dc319f402d2aff45e7b667bfa98524d067ab570229bae25219d",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-stealth:stealth",
+        "section_id": "24.33",
+        "source_text": "If every model in a unit has this ability, each time a ranged attack targets that unit, that unit has the benefit of cover against that attack (13.08).",
+        "transcription_sha256": "f10c66ca0215b0893d5385bd13b4064640f23182cdaef342715a87e68c8d4f85",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.stealth:rules_unit_stealth_sources",
+          "warhammer40k_core.engine.attack_sequence_hit_wound:_benefit_of_cover_ballistic_skill_penalty"
+        ],
+        "selected_rows": [
+          "rule:24:24.33:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-stratagems",
+    "source_version": "reviewed-stratagems-observed-2026-09-02",
+    "package_hash": "986d317b5e6ea805bc40008e1f590a6bcfeeaeaa4f2b9b4d8aa5cafd06b4bbf2",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems_2026_08/artifacts/package.json",
+    "sha256": "41aab84b3ab128e71b17b288125407ba285308b690097680d7819b098cf3227c",
+    "metadata_sha256": "8f30dbb95f86f5a9180212a66b5cf5131c716c22d027df83bedc21eace164213",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-stratagems:core:crushing-impact",
+        "section_id": "15.05",
+        "source_text": "15.05 Crushing Impact\nCrushing Impact\nCharge Phase\nTARGET\nThat MONSTER/VEHICLE unit\nWHEN\nYour Charge phase, just after a friendly MONSTER/VEHICLE unit ends a charge move.\nEFFECT\nResolve the following sequence:\n1. Select one enemy unit engaged with your unit.\n2. Select one model in your unit engaged with that enemy unit.\n3. Roll a number of D6 equal to the T characteristic of that model: for each 1, your unit suffers 1 mortal wound; for each 5+, that enemy unit suffers 1 mortal wound (to a maximum of 6 mortal wounds per unit)\n1 CP",
+        "transcription_sha256": "63fe27d984e7863a906d1ff7edeaef678fa69cdc1c6a7040869409749353e060",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.stratagems_targeting:_target_binding_error",
+          "warhammer40k_core.engine.stratagems_geometry:_crushing_impact_context_error",
+          "warhammer40k_core.engine.stratagems_effect_handlers:_apply_crushing_impact_handler"
+        ],
+        "selected_rows": [
+          "rule:15:15.05:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      },
+      {
+        "source_id": "gw-11e-core-stratagems:core:explosives",
+        "section_id": "15.06",
+        "source_text": "15.06 Explosives\nExplosives\nShooting Phase\nTARGET\nOne friendly unengaged EXPLOSIVES/GRENADES unit that is eligible to shoot and did not make an advance move this turn.\nWHEN\nYour Shooting phase.\nEFFECT\nResolve the following sequence: 1. Select one EXPLOSIVES/GRENADES model in your unit. 2. Select one unengaged enemy unit within 8\" of and visible to that model. 3. Roll six D6: for each 4+, that enemy unit suffers 1 mortal wound (06.02).\n1 CP",
+        "transcription_sha256": "c3b1f80f88da3e8772eed3d8fa49694c0f2c2539498a74aadd1b39cc859f897f",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.stratagems_geometry:_explosives_context_error",
+          "warhammer40k_core.engine.stratagems_effect_handlers:_apply_explosives_handler"
+        ],
+        "selected_rows": [
+          "rule:15:15.06:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      },
+      {
+        "source_id": "gw-11e-core-stratagems:core:rapid-ingress",
+        "section_id": "15.07",
+        "source_text": "15.07 Rapid Ingress\nRapid Ingress\nMovement Phase\nTARGET\nOne friendly unit that is in strategic reserves (excluding AIRCRAFT).\nWHEN\nEnd of your opponent’s Movement phase.\nEFFECT\nYour unit makes an Ingress Move (20.04).\nRESTRICTION\nYou cannot use this stratagem during the first battle round.\n1 CP",
+        "transcription_sha256": "2e9028ed2bf0c1fa19d7774ceb7bb81d415097e38b47c78ab67d7cff303955f6",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "partial_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.stratagems_targeting:_rapid_ingress_unit_ids",
+          "warhammer40k_core.engine.stratagems_core_handlers:_apply_rapid_ingress_handler",
+          "warhammer40k_core.engine.stratagems_ingress:_apply_rapid_ingress_placement"
+        ],
+        "selected_rows": [
+          "rule:15:15.07:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      },
+      {
+        "source_id": "gw-11e-core-stratagems:core:fire-overwatch",
+        "section_id": "15.08",
+        "source_text": "15.08 Fire Overwatch\nFire Overwatch\nMovement Phase\nTARGET\nOne friendly unengaged unit (excluding TITANIC units).\nWHEN\nEnd of your opponent’s Movement phase.\nEFFECT\nYour unit shoots using Snap Shooting (15.09).\n1 CP",
+        "transcription_sha256": "7cbb6c048a5c5420b2209a7c585b6063dafebfbca4f1d6e52af607282c77c8f0",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.stratagems_eligibility:_handler_unavailable_reason",
+          "warhammer40k_core.engine.stratagems_targeting:_fire_overwatch_target_binding_error",
+          "warhammer40k_core.engine.stratagems_fire_overwatch:_apply_fire_overwatch_handler"
+        ],
+        "selected_rows": [
+          "rule:15:15.08:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Title, phase and cost presentation differ in order. Selected see below resolves to adjacent15.09 Snap Shooting, cited numerically in package. Same unengaged non-TITANIC target, opponent Movement end,1CP and Snap Shooting effect."
+      },
+      {
+        "source_id": "gw-11e-core-stratagems:rule:snap-shooting",
+        "section_id": "15.09",
+        "source_text": "15.09 Snap Shooting\nWHEN ELIGIBLE\nAs stated in the rule allowing this shooting type.\nEFFECT\nYour unit shoots as described in Making Attacks (04).\nWHILE SHOOTING\nYou can only target one visible enemy unit within 24\" of your unit (and only if it is an eligible target).\nEach attack only hits on an unmodified hit roll of 6 (irrespective of the attacking weapon’s BS characteristic or any modifiers).\nYou cannot re‑roll hit rolls.\nAFTER SHOOTING\nUntil the end of the phase, your unit is not eligible to start an action.",
+        "transcription_sha256": "d9a660775aab4e7e07277850b27f2930682a232115bc720c81cb1618b50c5545",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.phases.shooting_targeting:_snap_shooting_type_allowed_for_unit_target",
+          "warhammer40k_core.engine.phases.shooting_declaration_validation:_attack_pools_or_validation",
+          "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit",
+          "warhammer40k_core.engine.activity_restrictions:record_completed_shooting_restriction"
+        ],
+        "selected_rows": [
+          "rule:15:15.09:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      },
+      {
+        "source_id": "gw-11e-core-stratagems:core:insane-bravery",
+        "section_id": "FAQ",
+        "source_text": "Can I use the Insane Bravery stratagem on a battle-shocked unit?\nNo, as a unit's controlling player cannot target that unit with stratagems (01.07).",
+        "transcription_sha256": "caf8973ed7c25c2c99db11bc0e489e3d9803300012b40b4f29eb878df54b1a25",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.stratagem_catalog:eleventh_edition_core_stratagem_catalog_records",
+          "warhammer40k_core.engine.stratagems_targeting:_target_binding_error",
+          "warhammer40k_core.engine.stratagems_apply:invalid_stratagem_target_proposal_status",
+          "warhammer40k_core.engine.stratagems_apply:_apply_stratagem_use",
+          "warhammer40k_core.engine.command_insane_bravery_authority:validate_loaded_command_auto_pass_authority"
+        ],
+        "selected_rows": [
+          "faq:421a6f30-63e2-4e1f-b352-99b643637c53"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-super-heavy-walker",
+    "source_version": "maintained-app-mirrors-observed-2026-09-16",
+    "package_hash": "7ee0fd5012f95ef5ad7fb9dce6bbb37960c446bcfae43c42d8d6209a7778bb3e",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_super_heavy_walker_2026_09/artifacts/package.json",
+    "sha256": "63b3448bb1fb5fbcb52f3b23f5b8ce2709a4ab2a295cbfed80b046af20d3a1f0",
+    "metadata_sha256": "ed848d9128a348b9fd07aae5ba72005fc16d33e3cbf8414ecf441b664670035b",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-super-heavy-walker:super-heavy-walker",
+        "section_id": "24.35",
+        "source_text": "Before moving that unit, you can select for all models in that unit to have the MOBILE keyword until that move ends.",
+        "transcription_sha256": "9d2329fa28bc526c73ad5d9dc85249079a6d64f3a9ba5484a4acc4482db09487",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.move_ability_choices:movement_keyword_options",
+          "warhammer40k_core.engine.movement_legality:MovementCapabilitySet",
+          "warhammer40k_core.engine.move_keyword_completion:move_keyword_completion_bindings"
+        ],
+        "selected_rows": [
+          "rule:24:24.35:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-surge",
+    "source_version": "maintained-app-mirrors-observed-2026-09-16",
+    "package_hash": "a8a5589493a8abefe3a07c36c13b58fb55705543c34ef8ccf8c8a0ff9df8ed5a",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_surge_2026_09/artifacts/package.json",
+    "sha256": "a7d9a2438603e5f6d2881d88bb4108c2ecaeb49621651b317e897d5c7a3c27c8",
+    "metadata_sha256": "81b52e900e896f231ba46348484efc1a30139769fd888ea48a55bd20d60f9ed4",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-surge:surge-move",
+        "section_id": "21.02",
+        "source_text": "Each model must end its move engaged with the surge target if possible.",
+        "transcription_sha256": "331dd613b946a475fd851ee8b6b7977d442aaf69dfae19ebd55e91320cd57716",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.surge_movement:surge_ineligibility",
+          "warhammer40k_core.engine.surge_movement:surge_endpoint_evidence",
+          "warhammer40k_core.engine.surge_choices:surge_target_options",
+          "warhammer40k_core.engine.phase_movement_history:surge_locked"
+        ],
+        "selected_rows": [
+          "rule:21:21.02:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-table-quarters",
+    "source_version": "maintained-app-mirrors-observed-2026-09-25",
+    "package_hash": "93ce3156fd45cf54c04e4cd16e8d1f003227c776a082c4d97c51c06bb11c8d87",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_table_quarters_2026_09/artifacts/package.json",
+    "sha256": "516688942363928ec47786854ca40b352d422fd660f03a4142be2a07cad6fd94",
+    "metadata_sha256": "57401055742b3162f3adc8942f52f32847dc8bbc3d7cedad24900a8c48856a01",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-table-quarters:table-quarters",
+        "section_id": "01.04.05",
+        "source_text": "When a rule refers to a table quarter, or table quarters, divide the battlefield with imaginary lines 1mm thick drawn lengthwise and widthwise through the centre of the battlefield to create four equal rectangles. These rectangles are the table quarters.",
+        "transcription_sha256": "743e2558a9259d96f7c169381dc53e54616bbeccf655ad871d4072572e27916c",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.table_quarters:scoring_table_quarter_id_or_none"
+        ],
+        "selected_rows": [
+          "rule:01:01.04.05:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-target-replacement",
+    "source_version": "maintained-app-mirrors-observed-2026-09-12",
+    "package_hash": "9a32847668ff15c3b8be04c777e3c92e72b8e4895b34041f9015f9e598442881",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_target_replacement_2026_09/artifacts/package.json",
+    "sha256": "0ff886fafa5d120ca406986f33e9932b762e1cf9b4ef0beccce66df000fd32ed",
+    "metadata_sha256": "839865b7712a3c27910df0feb176a1193aae6fb37360cf1b54914ac6d51c0b32",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-target-replacement:target-no-longer-eligible-or-viable",
+        "section_id": "04.03.03",
+        "source_text": "Target No Longer Eligible Or Viable\nIf a unit that was an eligible target for a rule or attack when it was selected stops being an eligible target (for example, because a rule enables it to make an out-of-phase move that takes it out of range), the controlling player can select new targets.",
+        "transcription_sha256": "79602f3c84d99ea65d29f823d93e5959d8af3ea3b87cc026e7f3d3ce01ae3b91",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.target_replacement:replacement_selection",
+          "warhammer40k_core.engine.shooting_target_replacement:next_shooting_target_replacement"
+        ],
+        "selected_rows": [
+          "rule:04:04.03.03:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-transports",
+    "source_version": "reviewed-transports-observed-2026-09-03",
+    "package_hash": "a44f8932a0a6e1e557a00e71876691858627c6c3008f519de0b00f5918375b71",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_transports_2026_09/artifacts/package.json",
+    "sha256": "1b0f790f63da545c4cd0d509bba52aa3deacaa18dda9f1402491b00beded2e76",
+    "metadata_sha256": "8789f6dbbb116541bd1bfbf2a9bcd030512d670baa83555e168e6b9accddcea6",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-rules:transports:emergency-disembark-move",
+        "section_id": "18.05",
+        "source_text": "EMERGENCY DISEMBARK MOVE\nWhen eligible: Your unit is embarked within a TRANSPORT model that was just destroyed.\nMaximum distance: SET-UP DISTANCE: 6\"\nEffect: Your unit is set up as described in Set Up (03.02)\nBefore moving: Make a hazard roll for each model in your unit (06.03)\nWhile moving: Set up each model in your unit:\n- Wholly within the set-up distance of that TRANSPORT, and as close as possible to that TRANSPORT.\n- Or: If the above is not possible while remaining unengaged, set up that model wholly within the set-up distance of that TRANSPORT, as close as possible to that TRANSPORT, and engaged.\nEach model that still cannot be set up is destroyed.\nAfter moving: Your unit is battle-shocked and, until the end of the turn, it is not eligible to declare a charge.",
+        "transcription_sha256": "3d2ae5c7c61267b25d42f7139353d31528f5b4f7c66acbc63c64b596f3f8eb56",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.attack_sequence_destroyed_transport:_continue_pending_destroyed_transport_disembark",
+          "warhammer40k_core.engine.attack_sequence_destroyed_transport:_request_destroyed_transport_disembark_placement",
+          "warhammer40k_core.engine.emergency_disembark:apply_transport_hazard_mortal_wounds_service",
+          "warhammer40k_core.engine.emergency_disembark:resolve_destroyed_transport_hazard_rolls_service"
+        ],
+        "selected_rows": [
+          "rule:18:18.05:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Reviewed title, typography, bullets and heading presentation against selected operative sentences. Eligibility/effect heading order is presentation order, not resolution order. Conditions and effects agree; no whole-corpus version equivalence is inferred."
+      },
+      {
+        "source_id": "gw-11e-core-rules:transports:assault-disembark-move",
+        "section_id": "18.06",
+        "source_text": "ASSAULT DISEMBARK MOVE\nYour unit is set up as described in Set Up (Core Rules, 03.02). As stated in the rule allowing this move type, if all of the following apply to your unit: Embarked within a TRANSPORT model that is on the battlefield. Did not embark within that TRANSPORT this phase. That TRANSPORT has not made an advance/fall‑back move this phase. Set up each model in your unit wholly within the set‑up distance of that TRANSPORT. 3\" 18.06",
+        "transcription_sha256": "93b5d311d7bce309e94f93c6b501a6980a820505786f59e0cb2bbfc6e53e4bee",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.assault_disembark:assault_disembark_restriction_overrides",
+          "warhammer40k_core.engine.phases.charge:_charge_unit_ineligibility_reason",
+          "warhammer40k_core.engine.phases.movement_transports:_disembark_candidates_for_movement_unit",
+          "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",
+          "warhammer40k_core.engine.transports:resolve_disembark"
+        ],
+        "selected_rows": [
+          "rule:18:18.06:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Title and18.06 surround reordered effect/eligibility/placement/distance. Reviewed battlefield Transport, no embark this phase, no Transport Advance/Fall Back, wholly-within3 and Set Up03.02 conditions."
+      },
+      {
+        "source_id": "gw-11e-core-rules:transports:shock-disembark-move",
+        "section_id": "18.07",
+        "source_text": "SHOCK DISEMBARK MOVE\nYour unit is set up as described in Set Up (Core Rules, 03.02). As stated in the rule allowing this move type, if all of the following apply to your unit: Embarked within a TRANSPORT model that is on the battlefield. Did not embark within that TRANSPORT this phase. Set up each model in your unit wholly within the set-up distance of that TRANSPORT. Each model that started this move engaged with an enemy unit must still be engaged with that enemy unit. If one or more enemy units engaged with your unit have not been selected to fight this phase, your opponent must select each of those units, one at a time; when each is selected, it becomes eligible to fight and is selected to fight. 3\" 18.07",
+        "transcription_sha256": "d8dae354aabcc30c582b66e70939dd67c010055637f86923292c0c76ffe7252c",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.transport_disembark_geometry:append_disembark_endpoint_violations",
+          "warhammer40k_core.engine.phases.movement_placement_proposals:_start_shock_disembark_forced_fight_activations",
+          "warhammer40k_core.engine.shock_disembark_history:validate_shock_disembark_engagement_history",
+          "warhammer40k_core.engine.shock_disembark:shock_disembark_restriction_overrides",
+          "warhammer40k_core.engine.phases.movement_transports:_disembark_candidates_for_movement_unit",
+          "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",
+          "warhammer40k_core.engine.transports:resolve_disembark",
+          "warhammer40k_core.engine.phases.fight:FightPhaseHandler.advance_forced_fight_activations_if_needed"
+        ],
+        "selected_rows": [
+          "rule:18:18.07:1"
+        ],
+        "relation": "reviewed_layout",
+        "review": "Title and18.07 surround reordered effect/eligibility/placement/distance. Complete selected After Moving block12 agrees on passenger engagement and forcing unselected engaged enemies to fight. C18-07 means actual passenger post-placement engagements, never inherited Transport engagements."
+      }
+    ]
+  },
+  {
+    "source_package_id": "gw-11e-core-unit-splitting",
+    "source_version": "maintained-app-mirrors-observed-2026-09-06",
+    "package_hash": "741dba74d805647ae5317f91dc914d7e60779abe748af9496533fee81a8a413d",
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_unit_splitting_2026_09/artifacts/package.json",
+    "sha256": "c8e2d5ff82146cf127ef890e32e9c946251c549c03efdc2398a7326627915ecc",
+    "metadata_sha256": "bea9b40b2b7887d0550dd356f76269e0fb17a46457f5813a06a77992b52cb8bb",
+    "rules": [
+      {
+        "source_id": "gw-11e-core-unit-splitting:unit-splitting",
+        "section_id": "01.02.06",
+        "source_text": "Some rules allow you to split units into smaller units (e.g. the Transport ability of Drukhari Venoms). When using such rules:\nThe same models can only be subdivided in this way once (e.g. those smaller units cannot themselves be split further).\nIf a rule is used to split a unit into multiple units before the battle, the starting strength of each individual unit is changed to be equal to the number of models in that unit.",
+        "transcription_sha256": "cfbc728ec6c5d07a9d6497db3f37754bb7b0c227d4194ee13a2e2f7cdf40793f",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.unit_splitting:build_split_army"
+        ],
+        "selected_rows": [
+          "rule:01:01.02.06:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      },
+      {
+        "source_id": "gw-11e-core-unit-splitting:balanced-unit-splitting",
+        "section_id": "01.02.06",
+        "source_text": "A unit must be split into two units, each containing as equal a number of models as possible (when splitting a unit in this way, make a note of which models form each of the two new units). If a rule states a specific starting strength of the split units, but this is not possible based on the number of models in the unit being split (e.g. due to attached Leader/Support models), split the unit as stated above.",
+        "transcription_sha256": "0c9515272839227cdd4070b2e7fca961f2892388992adf9db80c6345f667edca",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.unit_splitting:build_split_army"
+        ],
+        "selected_rows": [
+          "rule:01:01.02.06:1"
+        ],
+        "relation": "selected_excerpt",
+        "review": "Retained wording is a selected passage after typography and format controls. This establishes correspondence for the excerpt only, not package completeness or gameplay execution."
+      }
+    ]
+  }
+]

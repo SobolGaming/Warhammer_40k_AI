@@ -1,0 +1,352 @@
+{
+  "mixed_hazard": {
+    "expected_mortal_wounds": 1,
+    "model_keywords": [
+      [
+        "BATTLELINE",
+        "MOUNTED"
+      ],
+      [
+        "BATTLELINE",
+        "MOUNTED"
+      ],
+      [
+        "BATTLELINE",
+        "PSYKER",
+        "VEHICLE"
+      ]
+    ],
+    "observed_mortal_wounds": 3,
+    "owner": "src/warhammer40k_core/engine/hazard.py:hazard_mortal_wounds_per_failed_roll",
+    "requirement_ids": [
+      "06.03-obligation-04"
+    ]
+  },
+  "precision_grouping": {
+    "expected_identical_groups": 1,
+    "observed_identical_groups": 2,
+    "owner": "src/warhammer40k_core/engine/attack_sequence_selection.py:identical_attack_signature",
+    "requirement_ids": [
+      "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01"
+    ],
+    "target_model_keywords": [
+      [
+        "BATTLELINE",
+        "INFANTRY"
+      ],
+      [
+        "BATTLELINE",
+        "INFANTRY"
+      ],
+      [
+        "BATTLELINE",
+        "INFANTRY"
+      ],
+      [
+        "BATTLELINE",
+        "INFANTRY"
+      ],
+      [
+        "BATTLELINE",
+        "INFANTRY"
+      ]
+    ]
+  },
+  "separate_range_visibility": {
+    "expected_legal": true,
+    "observed": {
+      "attacker_unit_instance_id": "army-alpha:intercessor-1",
+      "hit_roll_modifier": 0,
+      "is_legal": false,
+      "line_of_sight_witness": {
+        "context_fingerprint": "563d9c12984d830d084fc2963fb663b218df86669f598610787f115a16920945",
+        "fully_visible_model_ids": [],
+        "los_cache_key": "los:7117037c72f022bf",
+        "model_records": [
+          {
+            "blocker_records": [
+              {
+                "blocker_id": "phase13b-blocking-ruin",
+                "blocker_kind": "terrain_feature",
+                "blocks_full_visibility": true,
+                "blocks_model_visibility": true,
+                "exception_applied": null,
+                "line_of_sight_policy": "area_obscuring",
+                "terrain_area_classification": null,
+                "terrain_area_id": null,
+                "terrain_feature_id": "phase13b-blocking-ruin",
+                "terrain_feature_kind": "ruins"
+              },
+              {
+                "blocker_id": "phase13b-blocking-ruin:wall",
+                "blocker_kind": "terrain_volume",
+                "blocks_full_visibility": true,
+                "blocks_model_visibility": true,
+                "exception_applied": null,
+                "line_of_sight_policy": "true_line_of_sight",
+                "terrain_area_classification": null,
+                "terrain_area_id": null,
+                "terrain_feature_id": "phase13b-blocking-ruin",
+                "terrain_feature_kind": "ruins"
+              }
+            ],
+            "evidence": {
+              "algorithm_id": "continuous-analytic-prism-visibility:1",
+              "checked_witness_count": 0,
+              "clear_corridor": null,
+              "full_visibility_proof": "not_visible",
+              "hidden_target_part": null,
+              "input_fingerprint": "eedb37c262b3a4ee8e1af0c68de04b31eb9c6389858c22fe3da11a6de82cddc4",
+              "model_fully_visible": false,
+              "model_visible": false,
+              "visibility_proof": "blocked_cross_section"
+            },
+            "model_fully_visible": false,
+            "model_visible": false,
+            "target_model_id": "army-beta:enemy:core-intercessor-like:001"
+          },
+          {
+            "blocker_records": [
+              {
+                "blocker_id": "phase13b-blocking-ruin",
+                "blocker_kind": "terrain_feature",
+                "blocks_full_visibility": true,
+                "blocks_model_visibility": true,
+                "exception_applied": null,
+                "line_of_sight_policy": "area_obscuring",
+                "terrain_area_classification": null,
+                "terrain_area_id": null,
+                "terrain_feature_id": "phase13b-blocking-ruin",
+                "terrain_feature_kind": "ruins"
+              },
+              {
+                "blocker_id": "phase13b-blocking-ruin:wall",
+                "blocker_kind": "terrain_volume",
+                "blocks_full_visibility": true,
+                "blocks_model_visibility": true,
+                "exception_applied": null,
+                "line_of_sight_policy": "true_line_of_sight",
+                "terrain_area_classification": null,
+                "terrain_area_id": null,
+                "terrain_feature_id": "phase13b-blocking-ruin",
+                "terrain_feature_kind": "ruins"
+              }
+            ],
+            "evidence": {
+              "algorithm_id": "continuous-analytic-prism-visibility:1",
+              "checked_witness_count": 0,
+              "clear_corridor": null,
+              "full_visibility_proof": "not_visible",
+              "hidden_target_part": null,
+              "input_fingerprint": "575ddbffd129601eda62584598b45804bc9649ddfb7f79bb7c36b2213cfaab1d",
+              "model_fully_visible": false,
+              "model_visible": false,
+              "visibility_proof": "blocked_cross_section"
+            },
+            "model_fully_visible": false,
+            "model_visible": false,
+            "target_model_id": "army-beta:enemy:core-intercessor-like:002"
+          },
+          {
+            "blocker_records": [
+              {
+                "blocker_id": "phase13b-blocking-ruin",
+                "blocker_kind": "terrain_feature",
+                "blocks_full_visibility": true,
+                "blocks_model_visibility": true,
+                "exception_applied": null,
+                "line_of_sight_policy": "area_obscuring",
+                "terrain_area_classification": null,
+                "terrain_area_id": null,
+                "terrain_feature_id": "phase13b-blocking-ruin",
+                "terrain_feature_kind": "ruins"
+              },
+              {
+                "blocker_id": "phase13b-blocking-ruin:wall",
+                "blocker_kind": "terrain_volume",
+                "blocks_full_visibility": true,
+                "blocks_model_visibility": true,
+                "exception_applied": null,
+                "line_of_sight_policy": "true_line_of_sight",
+                "terrain_area_classification": null,
+                "terrain_area_id": null,
+                "terrain_feature_id": "phase13b-blocking-ruin",
+                "terrain_feature_kind": "ruins"
+              }
+            ],
+            "evidence": {
+              "algorithm_id": "continuous-analytic-prism-visibility:1",
+              "checked_witness_count": 0,
+              "clear_corridor": null,
+              "full_visibility_proof": "not_visible",
+              "hidden_target_part": null,
+              "input_fingerprint": "03b2263b7509c9fbc2d890e0550a3799b74a01791e9763598e5b11c6a17f92f0",
+              "model_fully_visible": false,
+              "model_visible": false,
+              "visibility_proof": "blocked_cross_section"
+            },
+            "model_fully_visible": false,
+            "model_visible": false,
+            "target_model_id": "army-beta:enemy:core-intercessor-like:003"
+          },
+          {
+            "blocker_records": [
+              {
+                "blocker_id": "phase13b-blocking-ruin",
+                "blocker_kind": "terrain_feature",
+                "blocks_full_visibility": true,
+                "blocks_model_visibility": true,
+                "exception_applied": null,
+                "line_of_sight_policy": "area_obscuring",
+                "terrain_area_classification": null,
+                "terrain_area_id": null,
+                "terrain_feature_id": "phase13b-blocking-ruin",
+                "terrain_feature_kind": "ruins"
+              },
+              {
+                "blocker_id": "phase13b-blocking-ruin:wall",
+                "blocker_kind": "terrain_volume",
+                "blocks_full_visibility": true,
+                "blocks_model_visibility": true,
+                "exception_applied": null,
+                "line_of_sight_policy": "true_line_of_sight",
+                "terrain_area_classification": null,
+                "terrain_area_id": null,
+                "terrain_feature_id": "phase13b-blocking-ruin",
+                "terrain_feature_kind": "ruins"
+              }
+            ],
+            "evidence": {
+              "algorithm_id": "continuous-analytic-prism-visibility:1",
+              "checked_witness_count": 77,
+              "clear_corridor": [
+                [
+                  "10/1",
+                  "160462900109066885/4503599627370496",
+                  "7943356823078669/4503599627370496"
+                ],
+                [
+                  "35/1",
+                  "180729098432234117/4503599627370496",
+                  "7943356823078669/4503599627370496"
+                ]
+              ],
+              "full_visibility_proof": "hidden_target_part",
+              "hidden_target_part": [
+                "35/1",
+                "175055272130035067/4503599627370496",
+                "0/1"
+              ],
+              "input_fingerprint": "58ec471d572a8a0c714b841896907f171d702b4dc150fbb35b978495b5a56082",
+              "model_fully_visible": false,
+              "model_visible": true,
+              "visibility_proof": "clear_corridor"
+            },
+            "model_fully_visible": false,
+            "model_visible": true,
+            "target_model_id": "army-beta:enemy:core-intercessor-like:004"
+          },
+          {
+            "blocker_records": [
+              {
+                "blocker_id": "phase13b-blocking-ruin",
+                "blocker_kind": "terrain_feature",
+                "blocks_full_visibility": true,
+                "blocks_model_visibility": true,
+                "exception_applied": null,
+                "line_of_sight_policy": "area_obscuring",
+                "terrain_area_classification": null,
+                "terrain_area_id": null,
+                "terrain_feature_id": "phase13b-blocking-ruin",
+                "terrain_feature_kind": "ruins"
+              },
+              {
+                "blocker_id": "phase13b-blocking-ruin:wall",
+                "blocker_kind": "terrain_volume",
+                "blocks_full_visibility": true,
+                "blocks_model_visibility": true,
+                "exception_applied": null,
+                "line_of_sight_policy": "true_line_of_sight",
+                "terrain_area_classification": null,
+                "terrain_area_id": null,
+                "terrain_feature_id": "phase13b-blocking-ruin",
+                "terrain_feature_kind": "ruins"
+              }
+            ],
+            "evidence": {
+              "algorithm_id": "continuous-analytic-prism-visibility:1",
+              "checked_witness_count": 33,
+              "clear_corridor": [
+                [
+                  "10/1",
+                  "35/1",
+                  "7943356823078669/4503599627370496"
+                ],
+                [
+                  "36/1",
+                  "187484497873289861/4503599627370496",
+                  "7943356823078669/4503599627370496"
+                ]
+              ],
+              "full_visibility_proof": "hidden_target_part",
+              "hidden_target_part": [
+                "102965912670229114533561/2848954887751415627776",
+                "1840935858219663633323531/45583278204022650044416",
+                "0/1"
+              ],
+              "input_fingerprint": "8f6c102574253c877c6ada9ccc7b411ed5eb92b00595dab7ed2c000062a0d75d",
+              "model_fully_visible": false,
+              "model_visible": true,
+              "visibility_proof": "clear_corridor"
+            },
+            "model_fully_visible": false,
+            "model_visible": true,
+            "target_model_id": "army-beta:enemy:core-intercessor-like:005"
+          }
+        ],
+        "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+        "ruleset_descriptor_hash": "cbe14bddbe4b8049ce770e708239041339f1175bc3c5b785707308243a76e4ee",
+        "target_model_ids": [
+          "army-beta:enemy:core-intercessor-like:001",
+          "army-beta:enemy:core-intercessor-like:002",
+          "army-beta:enemy:core-intercessor-like:003",
+          "army-beta:enemy:core-intercessor-like:004",
+          "army-beta:enemy:core-intercessor-like:005"
+        ],
+        "unit_fully_visible": false,
+        "unit_visible": true,
+        "visible_model_ids": [
+          "army-beta:enemy:core-intercessor-like:004",
+          "army-beta:enemy:core-intercessor-like:005"
+        ]
+      },
+      "message": "No target model is both visible to and within range of the attacker.",
+      "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+      "shooting_types": [],
+      "target_in_range_model_ids": [
+        "army-beta:enemy:core-intercessor-like:001",
+        "army-beta:enemy:core-intercessor-like:002",
+        "army-beta:enemy:core-intercessor-like:003"
+      ],
+      "target_unit_instance_id": "army-beta:enemy",
+      "target_visible_model_ids": [],
+      "targeting_rule_ids": [],
+      "violation_code": "not_visible",
+      "visibility_cache_key": "los:7117037c72f022bf",
+      "weapon_profile_id": "core-bolt-rifle:standard"
+    },
+    "owner": "src/warhammer40k_core/engine/shooting_targets.py:_target_candidate",
+    "requirement_ids": [
+      "faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01"
+    ]
+  },
+  "weaponless_fought_status": {
+    "attack_step_count": 0,
+    "expected_has_fought_events": 0,
+    "observed_has_fought_events": 1,
+    "owner": "src/warhammer40k_core/engine/fight_activation_completion.py:complete_active_fight_activation",
+    "requirement_ids": [
+      "04.03.05-obligation-04"
+    ]
+  }
+}

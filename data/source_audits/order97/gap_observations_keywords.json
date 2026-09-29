@@ -1,0 +1,31 @@
+{
+  "requirement_id": "02.05.01-obligation-12",
+  "source_inputs": [
+    "CHARACTER",
+    "CHARACTERS"
+  ],
+  "normalized_tokens": [
+    [
+      "CHARACTER"
+    ],
+    [
+      "CHARACTERS"
+    ]
+  ],
+  "unit_instance_id": "army-alpha:leader",
+  "unit_keywords": [
+    "ATTACHED_UNIT",
+    "CHARACTER",
+    "INFANTRY",
+    "LEADER"
+  ],
+  "target_gate_matches": [
+    true,
+    false
+  ],
+  "expected_target_gate_matches": [
+    true,
+    true
+  ],
+  "qualification": "The source keyword-sequence normalizer preserves different tokens for the singular and plural, and the actual typed unit target gate fails the plural. This is keyword identity, distinct from model-owner label pluralization."
+}

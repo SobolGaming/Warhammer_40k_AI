@@ -1,0 +1,259 @@
+[
+  {
+    "row_id": "rule:23:23.01:1",
+    "requirements": [
+      {
+        "requirement_id": "23.01-mandatory-reserves",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Every Aircraft unit is placed in Strategic Reserves during Declare Battle Formations.",
+        "owners": [
+          "src/warhammer40k_core/engine/aircraft.py:AircraftMovementPolicy"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase16c_reserve_declarations.py::test_phase16c_aircraft_are_mandatory_source_backed_reserves",
+            "role": "semantic",
+            "assertion": "assert reserve_state.reserve_origin is ReserveOrigin.AIRCRAFT_MANDATORY_RESERVE",
+            "proves": "The Aircraft reserve origin is mandatory deployment."
+          },
+          {
+            "nodeid": "tests/unit/test_phase16c_reserve_declarations.py::test_order66_mandatory_aircraft_reserves_use_attached_identity",
+            "role": "semantic",
+            "assertion": "assert len(state.reserve_states) == 1",
+            "proves": "An attached Aircraft rules unit has exactly one mandatory reserve record."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:23:23.02:1",
+    "requirements": [
+      {
+        "requirement_id": "23.02-ingress-only",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Aircraft can make only Ingress moves.",
+        "owners": [
+          "src/warhammer40k_core/engine/aircraft.py:AircraftMovementPolicy"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10r_aircraft.py::test_order66_aircraft_has_no_ordinary_movement_actions",
+            "role": "semantic",
+            "assertion": "assert context.evaluate().available_actions == ()",
+            "proves": "Aircraft have no ordinary movement actions."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10r_aircraft.py::test_order66_returned_aircraft_uses_facade_ingress_and_retains_keyword",
+            "role": "facade",
+            "assertion": "assert state.phase_movement_history[-1].is_ingress",
+            "proves": "Facade return records an Ingress move."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "23.02-opponent-turn-return",
+        "source_blocks": [
+          2
+        ],
+        "summary": "At opponent turn end, every friendly Aircraft on the battlefield returns to Strategic Reserves.",
+        "owners": [
+          "src/warhammer40k_core/engine/aircraft.py:AircraftMovementPolicy"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10r_aircraft.py::test_order66_end_turn_returns_every_aircraft_once",
+            "role": "semantic",
+            "assertion": "assert {row.unit_instance_id for row in state.reserve_states if row.is_unarrived} == {'army-alpha:aircraft', 'army-alpha:aircraft-2'}",
+            "proves": "Both friendly Aircraft return as unarrived reserves."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10r_aircraft.py::test_order66_own_turn_end_keeps_aircraft_on_battlefield",
+            "role": "semantic",
+            "assertion": "assert state.battlefield_state.is_unit_placed('army-alpha:aircraft')",
+            "proves": "Own turn end leaves the Aircraft on the battlefield."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "23.02-other-model-transit",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Other units may move through Aircraft models during any move.",
+        "owners": [
+          "src/warhammer40k_core/engine/aircraft.py:aircraft_model_ids_for_scenario"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10r_aircraft.py::test_order66_every_move_transits_aircraft_and_preserves_endpoint_collision",
+            "role": "semantic",
+            "assertion": "assert result.is_valid is legal",
+            "proves": "Each parameterized move accepts legal Aircraft transit and rejects endpoint overlap."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "23.02-closest-target-exclusion",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Non-Flying units ignore Aircraft when choosing Pile-in, Consolidation and Surge enemy targets.",
+        "owners": [
+          "src/warhammer40k_core/engine/aircraft_rules.py:aircraft_movement_target_ids"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10r_aircraft.py::test_order66_charge_and_fight_targets_use_fly_not_skies_choice",
+            "role": "semantic",
+            "assertion": "assert (enemy.unit_instance_id in targets) is flying",
+            "proves": "Aircraft target inclusion tracks the unit’s Flying status."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10r_aircraft.py::test_order66_charge_and_fight_targets_use_fly_not_skies_choice",
+            "role": "semantic",
+            "assertion": "assert (enemy.unit_instance_id in targets) is flying",
+            "proves": "The second movement target family uses the same Flying filter."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "23.02-aircraft-only-engagement",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Engagement solely with Aircraft does not forbid Normal or Advance movement.",
+        "owners": [
+          "src/warhammer40k_core/engine/aircraft.py:AircraftMovementPolicy"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10r_aircraft.py::test_non_aircraft_engaged_only_by_enemy_aircraft_can_normal_move_and_advance",
+            "role": "semantic",
+            "assertion": "assert {option.option_id for option in action_request.options} == {MovementPhaseActionKind.REMAIN_STATIONARY.value, MovementPhaseActionKind.NORMAL_MOVE.value, MovementPhaseActionKind.ADVANCE.value}",
+            "proves": "The finite movement options retain Normal and Advance."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:23:23.03:1",
+    "requirements": [
+      {
+        "requirement_id": "23.03-no-plunging-fire",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Plunging Fire never applies to attacks made by or targeting Aircraft.",
+        "owners": [
+          "src/warhammer40k_core/engine/shooting_targets.py:_plunging_fire_applies"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_roll",
+            "role": "semantic",
+            "assertion": "assert PLUNGING_FIRE_RULE_ID not in aircraft_candidates[0].targeting_rule_ids",
+            "proves": "Both attacker-Aircraft and target-Aircraft cases suppress Plunging Fire for elevated and Towering attackers."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:23:23.04:1",
+    "requirements": [
+      {
+        "requirement_id": "23.04-aircraft-no-charge",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Aircraft cannot declare charges.",
+        "owners": [
+          "src/warhammer40k_core/engine/aircraft.py:AircraftMovementPolicy"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10r_aircraft.py::test_order66_hover_does_not_remove_aircraft_identity",
+            "role": "semantic",
+            "assertion": "assert not policy.can_declare_charge",
+            "proves": "Even Hover Aircraft have no charge declaration permission."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "23.04-aircraft-melee-only-flying",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Aircraft melee attacks may target only Flying units.",
+        "owners": [
+          "src/warhammer40k_core/engine/aircraft_rules.py:aircraft_melee_target_allowed"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10r_aircraft.py::test_order66_charge_and_fight_targets_use_fly_not_skies_choice",
+            "role": "semantic",
+            "assertion": "assert (mover.unit_instance_id in aircraft_targets) is flying",
+            "proves": "Targets of the Aircraft’s melee attacks depend on target Flying status."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "23.04-only-flying-charge-aircraft",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Only Flying units may declare an Aircraft as charge target.",
+        "owners": [
+          "src/warhammer40k_core/engine/aircraft_rules.py:aircraft_melee_target_allowed"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10r_aircraft.py::test_order66_charge_and_fight_targets_use_fly_not_skies_choice",
+            "role": "semantic",
+            "assertion": "assert aircraft.is_legal is flying",
+            "proves": "Aircraft charge-target legality tracks the charging unit’s Flying status."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "23.04-only-flying-model-melee",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Only individually Flying models may make melee attacks against Aircraft.",
+        "owners": [
+          "src/warhammer40k_core/engine/aircraft_rules.py:aircraft_melee_target_allowed"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10r_aircraft.py::test_order66_mixed_fly_unit_melee_requires_individual_flying_model",
+            "role": "semantic",
+            "assertion": "assert bool(targets) is (model.model_instance_id == first.model_instance_id)",
+            "proves": "Only the Flying model in a mixed unit receives Aircraft melee targets."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  }
+]

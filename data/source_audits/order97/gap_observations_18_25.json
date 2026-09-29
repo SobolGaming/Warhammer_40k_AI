@@ -1,0 +1,401 @@
+{
+  "observations": [
+    {
+      "expected": {
+        "is_valid": false,
+        "reason": "The model must also declare its eligible Extra Attacks weapon."
+      },
+      "input": {
+        "available_wargear": [
+          "core-leader-blade",
+          "core-extra-blade"
+        ],
+        "equipped_wargear": [
+          "core-leader-blade",
+          "core-extra-blade"
+        ],
+        "selected_wargear": [
+          "core-leader-blade"
+        ]
+      },
+      "observed": {
+        "is_valid": true,
+        "proposal_kind": "melee_declaration",
+        "proposal_request_id": "phase15d-melee-request",
+        "status": "valid",
+        "violations": []
+      },
+      "owner": "src/warhammer40k_core/engine/fight_weapon_selection.py:validate_melee_declaration_rules",
+      "requirement_ids": [
+        "24.11-mandatory-extra-weapons"
+      ],
+      "source_row_ids": [
+        "rule:24:24.11:1"
+      ]
+    },
+    {
+      "expected": {
+        "parameterized_blast_descriptor": true,
+        "total_attacks": 7
+      },
+      "input": {
+        "base_attacks": 3,
+        "blast_x": 2,
+        "target_model_count": 12
+      },
+      "observed": {
+        "parameterized_blast_descriptor": false,
+        "total_attacks": 5
+      },
+      "owner": "src/warhammer40k_core/engine/weapon_abilities.py:blast_attack_bonus",
+      "requirement_ids": [
+        "24.05-blast-x-per-five"
+      ],
+      "source_row_ids": [
+        "rule:24:24.05:1"
+      ]
+    },
+    {
+      "expected": {
+        "representable_without_invented_movement": true
+      },
+      "input": {
+        "explicit_post_disembark_permission": true,
+        "movement_phase_action": "not_moved"
+      },
+      "observed": {
+        "rejection": "EmbarkSelection requires a Normal, Advance, or Fall Back action.",
+        "representable_without_invented_movement": false
+      },
+      "owner": "src/warhammer40k_core/engine/transports.py:EmbarkSelection",
+      "qualification": "This probes the Core permission contract. Loading the named faction ability is outside this Core audit.",
+      "requirement_ids": [
+        "c2df3e97-f21e-4fc9-943e-37072c08c10e-aerialists-post-disembark"
+      ],
+      "source_row_ids": [
+        "faq:c2df3e97-f21e-4fc9-943e-37072c08c10e"
+      ]
+    },
+    {
+      "expected": {
+        "grant_after_first_bearer_casualty_before_final_attack": true,
+        "grant_before_attack": true
+      },
+      "observed": {
+        "damage_window_observations": [
+          {
+            "attack_count": 2,
+            "attack_index": 0,
+            "grant_active": false,
+            "surviving_target_models": 5
+          }
+        ],
+        "grant_before_attack": true,
+        "remaining_sequence": true,
+        "status": "waiting_for_decision"
+      },
+      "owner": "src/warhammer40k_core/engine/ability_presence.py:active_ability_model_ids_for_unit",
+      "requirement_ids": [
+        "19.04-attack-sequence-source-retention"
+      ],
+      "source_row_ids": [
+        "rule:19:19.04:1"
+      ]
+    },
+    {
+      "expected": {
+        "psychic_source_damage_can_preserve_psychic_only_fnp_eligibility": true
+      },
+      "observed": [
+        {
+          "pending_request": null,
+          "psychic_only_source": false,
+          "resolved_applications": [
+            {
+              "doombolt_d3_result": {
+                "source_d6_result": {
+                  "roll_id": "roll-000001",
+                  "source": "rng",
+                  "spec": {
+                    "actor_id": "player-a",
+                    "expression": {
+                      "modifier": 0,
+                      "quantity": 1,
+                      "sides": 6
+                    },
+                    "reason": "D3 source D6 for Cabal of Sorcerers Doombolt for army-beta:enemy",
+                    "reroll_forbidden_rule_ids": [],
+                    "roll_type": "thousand_sons.cabal_of_sorcerers.doombolt.d3_source"
+                  },
+                  "total": 1,
+                  "values": [
+                    1
+                  ]
+                },
+                "value": 1
+              },
+              "doombolt_mortal_wounds": 1,
+              "mortal_wound_application": {
+                "applications": [],
+                "feel_no_pain_resolutions": [
+                  {
+                    "ignored_wounds": 1,
+                    "remaining_wounds": 0,
+                    "requested_wounds": 1,
+                    "rolls": [
+                      {
+                        "roll_state": {
+                          "current_total": 2,
+                          "current_values": [
+                            2
+                          ],
+                          "original_result": {
+                            "roll_id": "roll-000002",
+                            "source": "rng",
+                            "spec": {
+                              "actor_id": "player-b",
+                              "expression": {
+                                "modifier": 0,
+                                "quantity": 1,
+                                "sides": 6
+                              },
+                              "reason": "Feel No Pain order97:ability-damage-fnp for army-beta:enemy:core-intercessor-like:001 wound 1",
+                              "reroll_forbidden_rule_ids": [],
+                              "roll_type": "attack_sequence.feel_no_pain"
+                            },
+                            "total": 2,
+                            "values": [
+                              2
+                            ]
+                          },
+                          "rerolls": [],
+                          "result_override": null
+                        },
+                        "source": {
+                          "source_id": "order97:ability-damage-fnp",
+                          "threshold": 2
+                        },
+                        "successful": true
+                      }
+                    ],
+                    "source": {
+                      "source_id": "order97:ability-damage-fnp",
+                      "threshold": 2
+                    }
+                  }
+                ],
+                "ignored_mortal_wounds": 1,
+                "mortal_wounds": 1,
+                "remaining_mortal_wounds_lost": 0,
+                "spill_over": true,
+                "target_unit_instance_id": "army-beta:enemy"
+              },
+              "mortal_wound_kind": "doombolt",
+              "player_id": "player-a",
+              "psychic_test_result": 7,
+              "result_id": "order97:doombolt",
+              "target_owner_player_id": "player-b",
+              "target_rules_unit_instance_id": "army-beta:enemy"
+            }
+          ],
+          "roll_types": [
+            "thousand_sons.cabal_of_sorcerers.doombolt.d3_source",
+            "attack_sequence.feel_no_pain"
+          ]
+        },
+        {
+          "pending_request": null,
+          "psychic_only_source": true,
+          "resolved_applications": [
+            {
+              "doombolt_d3_result": {
+                "source_d6_result": {
+                  "roll_id": "roll-000001",
+                  "source": "rng",
+                  "spec": {
+                    "actor_id": "player-a",
+                    "expression": {
+                      "modifier": 0,
+                      "quantity": 1,
+                      "sides": 6
+                    },
+                    "reason": "D3 source D6 for Cabal of Sorcerers Doombolt for army-beta:enemy",
+                    "reroll_forbidden_rule_ids": [],
+                    "roll_type": "thousand_sons.cabal_of_sorcerers.doombolt.d3_source"
+                  },
+                  "total": 1,
+                  "values": [
+                    1
+                  ]
+                },
+                "value": 1
+              },
+              "doombolt_mortal_wounds": 1,
+              "mortal_wound_application": {
+                "applications": [
+                  {
+                    "damage_kind": "mortal",
+                    "destroyed": true,
+                    "excess_damage_lost": 0,
+                    "final_wounds_remaining": 0,
+                    "model_instance_id": "army-beta:enemy:core-intercessor-like:001",
+                    "requested_damage": 1,
+                    "starting_wounds_remaining": 1,
+                    "target_unit_instance_id": "army-beta:enemy",
+                    "wounds_lost": 1
+                  }
+                ],
+                "feel_no_pain_resolutions": [
+                  {
+                    "ignored_wounds": 0,
+                    "remaining_wounds": 1,
+                    "requested_wounds": 1,
+                    "rolls": [],
+                    "source": null
+                  }
+                ],
+                "ignored_mortal_wounds": 0,
+                "mortal_wounds": 1,
+                "remaining_mortal_wounds_lost": 0,
+                "spill_over": true,
+                "target_unit_instance_id": "army-beta:enemy"
+              },
+              "mortal_wound_kind": "doombolt",
+              "player_id": "player-a",
+              "psychic_test_result": 7,
+              "result_id": "order97:doombolt",
+              "target_owner_player_id": "player-b",
+              "target_rules_unit_instance_id": "army-beta:enemy"
+            }
+          ],
+          "roll_types": [
+            "thousand_sons.cabal_of_sorcerers.doombolt.d3_source"
+          ]
+        }
+      ],
+      "owners": [
+        "src/warhammer40k_core/engine/mortal_wound_model_allocation.py:mortal_wound_feel_no_pain_sources",
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/thousand_sons/army_rule.py:_resolve_doombolt"
+      ],
+      "qualification": "This calls the actual named Cabal damage consumer, not an invented tagged mortal packet. Its source context carries the successful Psychic test, but the mortal-wound FNP owner accepts no Psychic classification and filters the Psychic-only source. The selected Core clause requires this classification for authenticated Psychic abilities. The pinned official July Thousand Sons update refers to Doombolt but does not transcribe its own Psychic title; verify that source identity before certifying the named consumer as compliant. The generic source-classification limitation is observed independently of that remaining source qualification.",
+      "requirement_ids": [
+        "22.03-psychic-damage-tag"
+      ],
+      "source_row_ids": [
+        "rule:22:22.03:1"
+      ]
+    },
+    {
+      "expected": {
+        "destroyed_model_ids": [
+          "army-beta:enemy:core-intercessor-like:005"
+        ],
+        "score_count": 1
+      },
+      "input": {
+        "enemy_isolated_model": "army-beta:enemy:core-intercessor-like:005",
+        "isolated_model_starting_wounds": 10,
+        "remaining_component_model_count": 4,
+        "scoring_player": "player-a",
+        "secondary_scoring_condition": "each_enemy_model_w10_or_more_destroyed_this_turn"
+      },
+      "observed": {
+        "cleanup_removed_model_ids": [
+          "army-beta:enemy:core-intercessor-like:005"
+        ],
+        "destroyed_model_rules_triggered": false,
+        "primary_departure_count": 1,
+        "removal_kind": "destroyed",
+        "score_condition_result": {
+          "controlled_objective_ids": [],
+          "destroyed_model_instance_ids": [],
+          "destroyed_unit_instance_ids": [],
+          "enemy_unit_instance_ids": [],
+          "home_objective_ids": [],
+          "objective_marker_ids": [],
+          "score_count": 0,
+          "terrain_feature_ids": []
+        },
+        "secondary_destruction_count": 0
+      },
+      "owners": [
+        "src/warhammer40k_core/engine/game_state.py:GameState.resolve_end_turn_cleanup_boundary",
+        "src/warhammer40k_core/engine/secondary_unit_destruction_tracking.py:secondary_unit_destruction_from_primary",
+        "src/warhammer40k_core/engine/secondary_scoring_conditions.py:evaluate_secondary_scoring_condition"
+      ],
+      "qualification": "This exercises the actual cleanup and Bring It Down condition consumer with a real domain unit. It does not claim a completed scoring-ledger transaction or facade replay. The Secondary model inventory is projected only after unit/component completion, so a qualifying coherency casualty in a surviving component is absent. Repair the shared per-model destruction evidence route and audit other destruction causes using the same inventory.",
+      "requirement_ids": [
+        "faq-904b8b36-09f0-4449-a9c3-45892664ef60-obligation-01"
+      ],
+      "source_row_ids": [
+        "faq:904b8b36-09f0-4449-a9c3-45892664ef60"
+      ]
+    },
+    {
+      "expected": {
+        "exact_three_inch_wholly_within_boundary_inclusive": true
+      },
+      "observed": [
+        {
+          "analytic_wholly_within_distance_inches": 2.99,
+          "expected_valid": true,
+          "mode": "rapid_disembark",
+          "observed_valid": true,
+          "violation_codes": []
+        },
+        {
+          "analytic_wholly_within_distance_inches": 3.0,
+          "expected_valid": true,
+          "mode": "rapid_disembark",
+          "observed_valid": false,
+          "violation_codes": [
+            "disembark_distance"
+          ]
+        },
+        {
+          "analytic_wholly_within_distance_inches": 3.01,
+          "expected_valid": false,
+          "mode": "rapid_disembark",
+          "observed_valid": false,
+          "violation_codes": [
+            "disembark_distance"
+          ]
+        },
+        {
+          "analytic_wholly_within_distance_inches": 2.99,
+          "expected_valid": true,
+          "mode": "tactical_disembark",
+          "observed_valid": true,
+          "violation_codes": []
+        },
+        {
+          "analytic_wholly_within_distance_inches": 3.0,
+          "expected_valid": true,
+          "mode": "tactical_disembark",
+          "observed_valid": false,
+          "violation_codes": [
+            "disembark_distance"
+          ]
+        },
+        {
+          "analytic_wholly_within_distance_inches": 3.01,
+          "expected_valid": false,
+          "mode": "tactical_disembark",
+          "observed_valid": false,
+          "violation_codes": [
+            "disembark_distance"
+          ]
+        }
+      ],
+      "owner": "src/warhammer40k_core/engine/transport_disembark_geometry.py:_model_wholly_within_any_transport_model",
+      "qualification": "The canonical circular passenger and Transport bases are placed using the analytic center-radius formula, with other units clear of the band. Both ordinary modes reject exact three-inch containment while accepting 2.99 inches. The shared owner instead checks buffered Shapely polygon approximations. Correct inclusive containment through the shared geometry owner and audit the other modes and wholly-within callers.",
+      "requirement_ids": [
+        "18.04-rapid-tactical-distance"
+      ],
+      "source_row_ids": [
+        "rule:18:18.04:1"
+      ]
+    }
+  ],
+  "schema_version": 1
+}

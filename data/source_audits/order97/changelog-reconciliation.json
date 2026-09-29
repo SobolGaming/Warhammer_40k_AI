@@ -1,0 +1,2070 @@
+[
+  {
+    "entry_id": "946:change:1",
+    "version": "946",
+    "kind": "added",
+    "entry_sha256": "8cddd71d0ab7e924581cc37e7a8ba73c8a4e8690cd77ccc32d14d6d8e80c5651",
+    "summary": "Rapid Disembark And Limitations",
+    "source_rows": [
+      "rule:18:18.04.01:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "18.04.01",
+      "title": "Rapid Disembark And Limitations",
+      "kind": "added",
+      "body": "When a unit uses the rapid disembark mode after its TRANSPORT makes an ingress move, the models must follow the same rules and restrictions as that TRANSPORT did. For example, if that TRANSPORT had to be set up more than 8\" from all enemy units and not within your opponent’s deployment zone, the same applies to the disembarking unit."
+    },
+    "requirement_ids": [
+      "18.04.01-all-carrier-ingress-limits"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "931:change:1",
+    "version": "931",
+    "kind": "changed",
+    "entry_sha256": "0bb70a3e0548c8f77c9f20c56482ac5ca8cb13537d3402aed4f38831a8f8d0ac",
+    "summary": "Splitting Units",
+    "source_rows": [
+      "rule:01:01.02.06:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "01.02.06",
+      "title": "Splitting Units",
+      "kind": "changed",
+      "excerpt": {
+        "before": "… models in that unit.",
+        "after": "… models in that unit. A unit must be split into two units, each containing as equal a number of models as possible (when splitting a unit in this way, make a note of which models form each of the two new units). If a rule states a specific starting strength of the split units, but this is not possible based on the number of models in the unit being split (e.g. due to attached Leader/Support models), split the unit as stated above."
+      }
+    },
+    "requirement_ids": [
+      "01.02.06-obligation-01",
+      "01.02.06-obligation-02",
+      "01.02.06-obligation-03",
+      "01.02.06-obligation-04",
+      "01.02.06-obligation-05"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "931:change:2",
+    "version": "931",
+    "kind": "added",
+    "entry_sha256": "75f2a7d4b477c6123e5504294801fb1ec07399c1081f19a7b0127b9a98eda1b1",
+    "summary": "Assault Disembark Move",
+    "source_rows": [
+      "rule:18:18.06:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "18.06",
+      "title": "Assault Disembark Move",
+      "kind": "added",
+      "body": "Your unit is set up as described in Set Up (Core Rules, 03.02). As stated in the rule allowing this move type, if all of the following apply to your unit: Embarked within a TRANSPORT model that is on the battlefield. Did not embark within that TRANSPORT this phase. That TRANSPORT has not made an advance/fall‑back move this phase. Set up each model in your unit wholly within the set‑up distance of that TRANSPORT. 3\" 18.06"
+    },
+    "requirement_ids": [
+      "18.06-source-permission",
+      "18.06-placed-carrier",
+      "18.06-not-embarked-this-phase",
+      "18.06-carrier-not-advanced-fallen-back",
+      "18.06-three-inch-setup",
+      "18.06-shared-setup"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "931:change:3",
+    "version": "931",
+    "kind": "added",
+    "entry_sha256": "3bade330c3bfa77125776f8576c21f9f105510ae6dc3237dabcab79e281cc9eb",
+    "summary": "Shock Disembark Move",
+    "source_rows": [
+      "rule:18:18.07:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "18.07",
+      "title": "Shock Disembark Move",
+      "kind": "added",
+      "body": "Your unit is set up as described in Set Up (Core Rules, 03.02). As stated in the rule allowing this move type, if all of the following apply to your unit: Embarked within a TRANSPORT model that is on the battlefield. Did not embark within that TRANSPORT this phase. Set up each model in your unit wholly within the set‑up distance of that TRANSPORT. Each model that started this move engaged with an enemy unit must still be engaged with that enemy unit. If one or more enemy units engaged with your unit have not been selected to fight this phase, your opponent must select each of those units, one at a time; when each is selected, it becomes eligible to fight and is selected to fight 3\" 18.07"
+    },
+    "requirement_ids": [
+      "18.07-source-permission",
+      "18.07-placed-carrier",
+      "18.07-not-embarked-this-phase",
+      "18.07-three-inch-setup",
+      "18.07-shared-setup",
+      "18.07-preserve-passenger-engagement",
+      "18.07-post-placement-forced-fights"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "931:change:4",
+    "version": "931",
+    "kind": "added",
+    "entry_sha256": "dbf1a709bb94b3949cdbee67a5d7a37578d5e340460770c141f80a9e3d2a5294",
+    "summary": "Psychic Abilities with a Psychic Level",
+    "source_rows": [
+      "rule:22:22.03.01:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "22.03.01",
+      "title": "Psychic Abilities with a Psychic Level",
+      "kind": "added",
+      "body": "When using psychic abilities with a psychic level, a PSYKER unit cannot use the same psychic ability more than once per phase."
+    },
+    "requirement_ids": [
+      "22.03.01-once-per-phase"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "931:change:5",
+    "version": "931",
+    "kind": "changed",
+    "entry_sha256": "e333db5a0ddb5a98b43ae991a66686d2ad383df087665a879dc4415496a162ea",
+    "summary": "Deadly Demise",
+    "source_rows": [
+      "rule:24:24.08:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "24.08",
+      "title": "Deadly Demise",
+      "kind": "changed",
+      "excerpt": {
+        "before": "… Each time a model in this unit is destroyed, after the … each unit within 6\"). Example: An Impulsor with a unit of Intercessors embarked within it is destroyed by ranged attacks. First, any unresolved attacks made by the attacking unit are resolved. Then the Intercessors make an emergency disembark move. Then the roll is made for the Deadly Demise ability, and on a 6, that ability is resolved. Finally, the Impulsor is removed from the battlefield.",
+        "after": "… Each time a model with this ability is destroyed, after the … each unit within 6\")."
+      }
+    },
+    "requirement_ids": [
+      "24.08-after-emergency-disembark",
+      "24.08-six-to-trigger",
+      "24.08-mortal-wounds-per-unit"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "931:change:6",
+    "version": "931",
+    "kind": "added",
+    "entry_sha256": "9d8ad7fa9e026e3b59fd4845f93db0eac9497b56747d503eb2335ad1d0c7bf1d",
+    "summary": "01.02.06",
+    "source_rows": [
+      "rule:01:01.02.06:1"
+    ],
+    "disposition": "duplicate_splitting_erratum_same_obligation",
+    "entry": {
+      "ref": "Errata",
+      "title": "01.02.06",
+      "kind": "added",
+      "body": "Add: ▪ A unit must be split into two units, each containing as equal a number of models as possible (when splitting a unit in this way, make a note of which models form each of the two new units). If a rule states a specific starting strength of the split units, but this is not possible based on the number of models in the unit being split (e.g. due to attached Leader/Support models), split the unit as stated above."
+    },
+    "requirement_ids": [
+      "01.02.06-obligation-01",
+      "01.02.06-obligation-02",
+      "01.02.06-obligation-03",
+      "01.02.06-obligation-04",
+      "01.02.06-obligation-05"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "931:change:7",
+    "version": "931",
+    "kind": "added",
+    "entry_sha256": "c8bb226e002b16e22f45f4c5c5734a4539176b765fba477ea0b69f13e64c8ef2",
+    "summary": "12.08 - Consolidation Move, After Moving Section, Ongoing Consolidation",
+    "source_rows": [
+      "rule:12:12.08:1"
+    ],
+    "disposition": "superseded_by_owner_app_v946",
+    "entry": {
+      "ref": "Errata",
+      "title": "12.08 - Consolidation Move, After Moving Section, Ongoing Consolidation",
+      "kind": "added",
+      "body": "Change to: Each model that started this move engaged with an enemy unit must still be engaged with that enemy unit. If one or more enemy units engaged with your unit have not been selected to fight this phase, your opponent must select each of those units, one at a time; when each is selected, it becomes eligible to fight and is selected to fight"
+    },
+    "requirement_ids": [
+      "12.08-eligibility",
+      "12.08-ongoing-mode",
+      "12.08-engaging-mode",
+      "12.08-objective-mode",
+      "12.08-ongoing-base-contact",
+      "12.08-ongoing-closest",
+      "12.08-ongoing-attainable",
+      "12.08-engaging-closer",
+      "12.08-objective-attainable",
+      "12.08-objective-approach",
+      "12.08-witness",
+      "12.08-ongoing-maintains",
+      "12.08-engaging-all-targets",
+      "12.08-engaging-forced-fights",
+      "12.08-objective-end",
+      "12.08-distance"
+    ],
+    "qualification": "Historical v931 Ongoing erratum is superseded by the explicit Order72 official-App v946 Engaging-only owner resolution. Both observations remain retained; no co-versioned equivalence is claimed."
+  },
+  {
+    "entry_id": "931:change:8",
+    "version": "931",
+    "kind": "added",
+    "entry_sha256": "236784433818038c7f86ff55e0b3ba6a9b9b738884e17260f11e16f1e4db8688",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:421a6f30-63e2-4e1f-b352-99b643637c53"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "Can I use the Insane Bravery stratagem on a battle-shocked unit?",
+      "kind": "added",
+      "body": "No, as a unit's controlling player cannot target that unit with stratagems (01.07)."
+    },
+    "requirement_ids": [
+      "faq-421a6f30-63e2-4e1f-b352-99b643637c53-insane-shocked"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "931:change:9",
+    "version": "931",
+    "kind": "added",
+    "entry_sha256": "43cbcb331498a3807249599da7f83c980c0472b89f76e72a9ce041fa1f067561",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:7ac6c358-0263-49ff-aee7-28b8fd4b5b8b"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "Do a unit's abilities continue to function while they are embarked within a TRANSPORT?",
+      "kind": "added",
+      "body": "Yes, within the restrictions specified by the ability itself. Embarked units are Not On The Battlefield (01.02.04), so any ability requiring visibility or measurement to another unit will fail. Example: Azrael is attached to an Intercessor Squad unit and embarked within a TRANSPORT, and that TRANSPORT is making a shooting attack using the Firing Deck ability. While Azrael's Supreme Grand Master ability is still technically active, it will have no effect, as the requirements of the ability are not met (the ability affects 'weapons equipped by models' in Azrael's unit, and for the purposes of Firing Deck, the TRANSPORT itself is equipped with those weapons instead)."
+    },
+    "requirement_ids": [
+      "faq-7ac6c358-0263-49ff-aee7-28b8fd4b5b8b-obligation-01",
+      "faq-7ac6c358-0263-49ff-aee7-28b8fd4b5b8b-obligation-02",
+      "faq-7ac6c358-0263-49ff-aee7-28b8fd4b5b8b-obligation-03"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "931:change:10",
+    "version": "931",
+    "kind": "added",
+    "entry_sha256": "6a5933a4a6095894bfc2c9a5fab4202e1c8f9295369cf83d5da5b1e38b37c89f",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:2d91a89e-59f3-410f-84cb-16644d7ea4a4"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "Fight On Death (05.04.05) requires models awaiting such an ability to stay on the battlefield until their unit has attacked (or until the end of the phase). How do these models function while this is the case?",
+      "kind": "added",
+      "body": "Models awaiting a Fight On Death ability are still present on the battlefield for all rules purposes. This includes (but is not limited to) the following regarding such models: They can be measured to by friendly/enemy abilities. They can be considered visible to friendly/enemy models where relevant. They can use their datasheet abilities. They can be targeted by stratagems. Enemy units can still be engaged with them (which may restrict the opposing player's consolidation/pile-In moves made as part of an overrun fight)."
+    },
+    "requirement_ids": [
+      "faq-2d91a89e-59f3-410f-84cb-16644d7ea4a4-obligation-01",
+      "faq-2d91a89e-59f3-410f-84cb-16644d7ea4a4-obligation-02",
+      "faq-2d91a89e-59f3-410f-84cb-16644d7ea4a4-obligation-03",
+      "faq-2d91a89e-59f3-410f-84cb-16644d7ea4a4-obligation-04",
+      "faq-2d91a89e-59f3-410f-84cb-16644d7ea4a4-obligation-05"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "931:change:11",
+    "version": "931",
+    "kind": "added",
+    "entry_sha256": "d9fa8b9c7eb7b0895da27f1e4398d0aecc33fade0856b0c6ef49a86782bd88f1",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:fb3b2776-c954-471b-b448-b70caa91929d"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "How do modifiers to the charge roll (or to the maximum distance of the charge move, such as Take to the Skies) affect the selection of charge targets?",
+      "kind": "added",
+      "body": "A charging unit may only select charge targets that are within the maximum distance of their charge roll, including any modifiers. If such a modifier occurs after selecting a charge target and causes that charge target to no longer be within the maximum distance, the charging unit would then select new targets (Target No Longer Eligible Or Viable, 04.03.03). Example: A unit's charge roll is 7\", and that unit has a datasheet ability which adds 1 to charge rolls: that charge's maximum distance is 8\", so you can select charge targets within 8\". Example: A FLYING unit chooses to take to the skies and rolls a charge roll of 9\"; that charge's maximum distance is 7\" (9\" minus the 2\" from taking to the skies), so you can select charge targets within 7\"."
+    },
+    "requirement_ids": [
+      "faq-fb3b2776-c954-471b-b448-b70caa91929d-modified-target-distance"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "931:change:12",
+    "version": "931",
+    "kind": "added",
+    "entry_sha256": "f6464dceb3bc1661144ffc248fe0c816ba5848edaea7d3eb95a1d5159e57d2a1",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:dc9911da-e156-4b48-bf9b-18f9d96d037e"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "If a rule refers to an 'objective marker', does this mean an 'objective'?",
+      "kind": "added",
+      "body": "Yes (excluding rules in the Core Rules)'."
+    },
+    "requirement_ids": [
+      "faq-dc9911da-e156-4b48-bf9b-18f9d96d037e-external-marker-alias"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "931:change:13",
+    "version": "931",
+    "kind": "added",
+    "entry_sha256": "2815599a61cc1fa7099deef25779739feb94c9389e59dd3e0406a33a732cf027",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:80182be3-1a44-464b-9ef6-cd9212429603"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "If both players have units with the Scouts ability, do they alternate resolving scout moves?",
+      "kind": "added",
+      "body": "Yes, players alternate resolving any pre-battle rules units from their army may have, starting with the player who will take the first turn."
+    },
+    "requirement_ids": [
+      "80182be3-1a44-464b-9ef6-cd9212429603-alternate-prebattle"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "931:change:14",
+    "version": "931",
+    "kind": "added",
+    "entry_sha256": "fa15109add8cdaa8fb6786fa64df9967148d56630ba6df11f943f27f4f078590",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:b7d3d760-a167-44b2-9c91-32ce86684225"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "My attack has a rule that means it results in a critical hit on a hit roll of 4+, and I would otherwise need a 5+ to hit. Does a 4+ hit?",
+      "kind": "added",
+      "body": "Yes, except when snap shooting: when snap shooting, each attack only hits on a roll of 6."
+    },
+    "requirement_ids": [
+      "faq-b7d3d760-a167-44b2-9c91-32ce86684225-obligation-01",
+      "faq-b7d3d760-a167-44b2-9c91-32ce86684225-obligation-02"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "931:change:15",
+    "version": "931",
+    "kind": "added",
+    "entry_sha256": "0d3e52959d1b49409aa77251ba26d36e8f32586e1a43b2c26031cd58be3541b5",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:aab10e23-6433-42ca-86e7-ddc829f16c47"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "My attack has a rule that means it results in a critical hit on a hit roll of 4+. Does this work when snap shooting?",
+      "kind": "added",
+      "body": "Unless otherwise stated, no: when snap shooting, each attack only hits on a roll of 6."
+    },
+    "requirement_ids": [
+      "faq-aab10e23-6433-42ca-86e7-ddc829f16c47-obligation-01"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "931:change:16",
+    "version": "931",
+    "kind": "added",
+    "entry_sha256": "61dcd6e5d5c7aeac607d616887bc0eecdbb31059ac5bfc3a6804015f4ff549e8",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:04f15433-3ee1-4c6d-8546-29e4247dee5b"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "My unit has access to a rule that changes the Damage characteristic of an incoming attack to 0. When such an attack is allocated to a model in that unit, is the Damage changed before or after save rolls?",
+      "kind": "added",
+      "body": "After."
+    },
+    "requirement_ids": [
+      "faq-04f15433-3ee1-4c6d-8546-29e4247dee5b-obligation-01"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "931:change:17",
+    "version": "931",
+    "kind": "added",
+    "entry_sha256": "1108abb1896de106a53bcdd21962da4ca7faa932888ce655b4ce65dcfa810cc6",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:60232b79-7a10-44a0-ac68-e27312c7ba60"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "Units have all the keywords of all their models, and attached units have all the keywords of all of their component units. How are destroyed models taken into account for these purposes?",
+      "kind": "added",
+      "body": "These statements are only true so long as the models possessing those keywords remain part of the unit; destroyed models do not contribute their keywords to their prior unit. Example: The Aspiring Sorcerer model in a unit of Rubric Marines is destroyed; as none of the remaining models in the unit possess the PSYKER keyword, that unit is no longer a PSYKER unit."
+    },
+    "requirement_ids": [
+      "faq-60232b79-7a10-44a0-ac68-e27312c7ba60-obligation-01"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "931:change:18",
+    "version": "931",
+    "kind": "added",
+    "entry_sha256": "97a12c226829e10e9d20843e415c3d0679a3adcaeeebeea72af9ac3aef2ffef8",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:7f238e23-cd3f-40ad-aa91-c75274cc655e"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them?",
+      "kind": "added",
+      "body": "Line of sight is drawn from any part of the observing model to any part of the model being observed."
+    },
+    "requirement_ids": [
+      "faq-7f238e23-cd3f-40ad-aa91-c75274cc655e-obligation-01"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "931:change:19",
+    "version": "931",
+    "kind": "added",
+    "entry_sha256": "8a494b7a8832c664234b46ca81042298523f6aeef72d7ac0777fa5427582a9fb",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:ce5fd555-a0f1-4bc9-85d3-00443143e94a"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "When do the effects of a FLYING unit taking to the skies apply?",
+      "kind": "added",
+      "body": "When that unit is selected to make a normal/advance/fall-back/charge move. Note that for an advance/charge move, this means you must declare that a unit will take to the skies before rolling for that advance/charge move."
+    },
+    "requirement_ids": [
+      "ce5fd555-a0f1-4bc9-85d3-00443143e94a-declare-before-roll"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:1",
+    "version": "909",
+    "kind": "changed",
+    "entry_sha256": "9dec4c544522abf9b3e082231c76c7a958af4e9af46e82470fd3172148077766",
+    "summary": "Revived and Adding Models to a Unit",
+    "source_rows": [
+      "rule:01:01.02.03:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "01.02.03",
+      "title": "Revived and Adding Models to a Unit",
+      "kind": "changed",
+      "excerpt": {
+        "before": "… to it if possible.",
+        "after": "… to it if possible. When a model revives, resurrects, returns or is added to an embarked unit, if that TRANSPORT has sufficient remaining transport capacity for that model, that model is returned to that unit and is embarked. Otherwise, that model is destroyed, but it does not trigger rules that apply when a model is destroyed."
+      }
+    },
+    "requirement_ids": [
+      "01.02.03-obligation-01",
+      "01.02.03-obligation-02",
+      "01.02.03-obligation-03",
+      "01.02.03-obligation-04",
+      "01.02.03-obligation-05",
+      "01.02.03-obligation-06",
+      "01.02.03-obligation-07",
+      "01.02.03-obligation-08",
+      "01.02.03-obligation-09",
+      "01.02.03-obligation-10",
+      "01.02.03-obligation-11",
+      "01.02.03-obligation-12"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:2",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "c3411b8be472ef199e63073cedaa43c0094c2ce8399994a523133a689711be75",
+    "summary": "Table Quarters",
+    "source_rows": [
+      "rule:01:01.04.05:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "01.04.05",
+      "title": "Table Quarters",
+      "kind": "added",
+      "body": "When a rule refers to a table quarter, or table quarters, divide the battlefield with imaginary lines 1mm thick drawn lengthwise and widthwise through the centre of the battlefield to create four equal rectangles. These rectangles are the table quarters."
+    },
+    "requirement_ids": [
+      "01.04.05-obligation-01"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:3",
+    "version": "909",
+    "kind": "changed",
+    "entry_sha256": "6ba00d0bf83eba6396579ffada0708fa609cc3cba56fe89bddbbed6f4d9c99d8",
+    "summary": "Modifiers",
+    "source_rows": [
+      "rule:02:02.02.01:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "02.02.01",
+      "title": "Modifiers",
+      "kind": "changed",
+      "excerpt": {
+        "before": "… CHARACTERISTICS When modifying characteristics, the following points also …",
+        "after": "… CHARACTERISTICS When modifying characteristics, unless otherwise stated, the following points also …"
+      }
+    },
+    "requirement_ids": [
+      "02.02.01-obligation-01",
+      "02.02.01-obligation-02",
+      "02.02.01-obligation-03",
+      "02.02.01-obligation-04",
+      "02.02.01-obligation-05",
+      "02.02.01-obligation-06",
+      "02.02.01-obligation-07",
+      "02.02.01-obligation-08",
+      "02.02.01-obligation-09",
+      "02.02.01-obligation-10",
+      "02.02.01-obligation-11",
+      "02.02.01-obligation-12",
+      "02.02.01-obligation-13",
+      "02.02.01-obligation-14",
+      "02.02.01-obligation-15",
+      "02.02.01-obligation-16",
+      "02.02.01-obligation-17",
+      "02.02.01-obligation-18",
+      "02.02.01-obligation-19",
+      "02.02.01-obligation-20",
+      "02.02.01-obligation-21",
+      "02.02.01-obligation-22",
+      "02.02.01-obligation-23",
+      "02.02.01-obligation-24",
+      "02.02.01-obligation-25",
+      "02.02.01-obligation-26",
+      "02.02.01-obligation-27",
+      "02.02.01-obligation-28",
+      "02.02.01-obligation-29",
+      "02.02.01-obligation-30",
+      "02.02.01-obligation-31",
+      "02.02.01-obligation-32",
+      "02.02.01-obligation-33",
+      "02.02.01-obligation-34",
+      "02.02.01-obligation-35",
+      "02.02.01-obligation-36",
+      "02.02.01-obligation-37",
+      "02.02.01-obligation-38",
+      "02.02.01-obligation-39",
+      "02.02.01-obligation-40",
+      "02.02.01-obligation-41",
+      "02.02.01-obligation-42",
+      "02.02.01-obligation-43"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:4",
+    "version": "909",
+    "kind": "changed",
+    "entry_sha256": "25ccdb554132dee241146ff34d692da571b8e630d76885aec7d590e2f8821cb9",
+    "summary": "Healing Or Regaining Lost Wounds",
+    "source_rows": [
+      "rule:02:02.02.04:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "02.02.04",
+      "title": "Healing Or Regaining Lost Wounds",
+      "kind": "changed",
+      "excerpt": {
+        "before": "… one of those destroyed models, with one wound remaining. …",
+        "after": "… one of those destroyed models (excluding Character models), with one wound remaining. …"
+      }
+    },
+    "requirement_ids": [
+      "02.02.04-obligation-01",
+      "02.02.04-obligation-02",
+      "02.02.04-obligation-03",
+      "02.02.04-obligation-04",
+      "02.02.04-obligation-05",
+      "02.02.04-obligation-06",
+      "02.02.04-obligation-07"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:5",
+    "version": "909",
+    "kind": "changed",
+    "entry_sha256": "fd78a2169a96ece142774636a3b5cbb5a3c33c43bae331b59869b44704496a1d",
+    "summary": "Setting Up Large Models",
+    "source_rows": [
+      "rule:03:03.02.02:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "03.02.02",
+      "title": "Setting Up Large Models",
+      "kind": "changed",
+      "excerpt": {
+        "before": "… set up on the battlefield, that model’s unit cannot …",
+        "after": "… set up on the battlefield (excluding AIRCRAFT models), that model’s unit cannot …"
+      }
+    },
+    "requirement_ids": [
+      "03.02.02-obligation-01",
+      "03.02.02-obligation-02",
+      "03.02.02-obligation-03",
+      "03.02.02-obligation-04",
+      "03.02.02-obligation-05",
+      "03.02.02-obligation-06",
+      "03.02.02-obligation-07",
+      "03.02.02-obligation-08",
+      "03.02.02-obligation-09",
+      "03.02.02-obligation-10",
+      "03.02.02-obligation-11",
+      "03.02.02-obligation-12",
+      "03.02.02-obligation-13"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:6",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "d161151cb983d6a3fb94fffce02045eba7678f8ca9f0dddb0755e0e04deafdca",
+    "summary": "Attacks Modified during Hit and Wound rolls",
+    "source_rows": [
+      "rule:05:05.03.02:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "05.03.02",
+      "title": "Attacks Modified during Hit and Wound rolls",
+      "kind": "added",
+      "body": "Some attacks may be modified as a result of the values of hit/wound rolls made for those attacks. When this happens, split those attacks into attack pools based on their new identical attack profiles. The active player can decide which attack pool to resolve first for steps 5.3 and 5.4. Once those steps have been completed for that attack pool, the active player can decide the next pool to resolve and repeat until all new attack pools are resolved."
+    },
+    "requirement_ids": [
+      "05.03.02-obligation-01",
+      "05.03.02-obligation-02",
+      "05.03.02-obligation-03"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:7",
+    "version": "909",
+    "kind": "translations",
+    "entry_sha256": "9bf03c26a71de66cab9e935a0ff28f182f57f0fa0fbef2fd4d559c05d6571fac",
+    "summary": "Inflict Damage",
+    "source_rows": [
+      "rule:05:05.04:1"
+    ],
+    "disposition": "translation_metadata_no_new_english_obligation",
+    "entry": {
+      "ref": "05.04",
+      "title": "Inflict Damage",
+      "kind": "translations",
+      "locales": [
+        "ko"
+      ]
+    },
+    "requirement_ids": [
+      "05.04-obligation-01",
+      "05.04-obligation-02",
+      "05.04-obligation-03",
+      "05.04-obligation-04",
+      "05.04-obligation-05",
+      "05.04-obligation-06",
+      "05.04-obligation-07",
+      "05.04-obligation-08",
+      "05.04-obligation-09",
+      "05.04-obligation-10",
+      "05.04-obligation-11"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:8",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "cf3703098116e2b52beedb9765b5bcdf1c063fb2baea8f8b20d354874ff39b1e",
+    "summary": "Desperate Escape Test",
+    "source_rows": [
+      "rule:09:09.07.01:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "09.07.01",
+      "title": "Desperate Escape Test",
+      "kind": "added",
+      "body": "Some rules may reference the term 'Desperate Escape test'. In all instances this means the hazard rolls made for the desperate escape mode of a fall-back move. Abilities that subtract from a unit's Desperate Escape test instead subtract from those hazard rolls. Example: A battle-shocked unit makes a fall-back move away from a unit of Bloodletters that have the Bane of Cowards ability. As a result of Bane of Cowards, because the unit making the fall-back move is battle-shocked, the hazard rolls they make as part of their desperate escape will be at -1."
+    },
+    "requirement_ids": [
+      "09.07.01-hazard-alias",
+      "09.07.01-modifier-alias"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:9",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "c4bcf2bdaf19e62aa2b4c9af39edc31ed67eb58d8ec7a6e475c4e1dbf6b0dbc7",
+    "summary": "Desperate Escape",
+    "source_rows": [
+      "rule:09:09.07.01:2"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "09.07.01",
+      "title": "Desperate Escape",
+      "kind": "added",
+      "body": "If a stratagem or ability forces a unit to make a Desperate Escape test, that unit: - Must make one hazard roll for each model in that unit. - Must make a battle-shock roll."
+    },
+    "requirement_ids": [
+      "09.07.01-forced-hazards-2",
+      "09.07.01-forced-shock-2"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:10",
+    "version": "909",
+    "kind": "changed",
+    "entry_sha256": "6b1bf38d2e5e9ecd4112e472d06ae5e00e57815ac4ecdcce1cba2cf37e2e7029",
+    "summary": "Consolidation Move",
+    "source_rows": [
+      "rule:12:12.08:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "12.08",
+      "title": "Consolidation Move",
+      "kind": "changed",
+      "excerpt": {
+        "before": "… Your unit must be within range of the selected objective. 3\" 12.08",
+        "after": "… Your unit must be unengaged and within range of the selected objective. 3\" 12.08"
+      }
+    },
+    "requirement_ids": [
+      "12.08-eligibility",
+      "12.08-ongoing-mode",
+      "12.08-engaging-mode",
+      "12.08-objective-mode",
+      "12.08-ongoing-base-contact",
+      "12.08-ongoing-closest",
+      "12.08-ongoing-attainable",
+      "12.08-engaging-closer",
+      "12.08-objective-attainable",
+      "12.08-objective-approach",
+      "12.08-witness",
+      "12.08-ongoing-maintains",
+      "12.08-engaging-all-targets",
+      "12.08-engaging-forced-fights",
+      "12.08-objective-end",
+      "12.08-distance"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:11",
+    "version": "909",
+    "kind": "changed",
+    "entry_sha256": "5e44387546b9010297d72e657341fc2aa0ae0cb018cf227e21626924fe666b25",
+    "summary": "Gone to Ground",
+    "source_rows": [
+      "rule:13:13.11.01:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "13.11.01",
+      "title": "Gone to Ground",
+      "kind": "changed",
+      "excerpt": {
+        "before": "Hidden models that are within Solid terrain features gain an … one or more intervening Solid terrain features. That model’s …",
+        "after": "Hidden models that are concealed by dense terrain features gain an … one or more intervening dense terrain features. That model’s …"
+      }
+    },
+    "requirement_ids": [
+      "13.11.01-hidden",
+      "13.11.01-dense-obstruction",
+      "13.11.01-shot-exclusion",
+      "13.11.01-reduction"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:12",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "b338aab1318a40ca985ab6023776bdea59349864d05e5229f8465185ed0dc3d5",
+    "summary": "Controlling an Objective at the End of a Phase",
+    "source_rows": [
+      "rule:14:14.02.01:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "14.02.01",
+      "title": "Controlling an Objective at the End of a Phase",
+      "kind": "added",
+      "body": "At the end of each phase and turn, the first thing players do (before any other 'at the end of the phase/end of the turn' rules or abilities) is determine which objectives are controlled by which player."
+    },
+    "requirement_ids": [
+      "14.02.01-control-first"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:13",
+    "version": "909",
+    "kind": "changed",
+    "entry_sha256": "62c64b24c934200eb2a29a44030dff30005c1364e02c70388d151e9431620d2d",
+    "summary": "Transport Capacity",
+    "source_rows": [
+      "rule:18:18.01:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "18.01",
+      "title": "Transport Capacity",
+      "kind": "changed",
+      "excerpt": {
+        "before": "… for the whole unit.",
+        "after": "… for the whole unit. A friendly unit must be embarked within each friendly DEDICATED TRANSPORT model. At the end of this step, each friendly DEDICATED TRANSPORT model without an embarked unit is destroyed, but they do not trigger rules that are triggered when a model is destroyed."
+      }
+    },
+    "requirement_ids": [
+      "18.01-capacity-model-count",
+      "18.01-eligible-passenger-types",
+      "18.01-start-embarked-whole-unit",
+      "18.01-empty-dedicated-destruction",
+      "18.01-empty-dedicated-no-triggers"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:14",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "a44a0d145707599a0e91e13d93376e390c4b5b0df069049d336200a0e58f665c",
+    "summary": "Strategic Reserves at the End of the Battle",
+    "source_rows": [
+      "rule:20:20.01.02:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "20.01.02",
+      "title": "Strategic Reserves at the End of the Battle",
+      "kind": "added",
+      "body": "At the end of the final turn, units in strategic reserves are destroyed, but they do not trigger rules that apply when a model is destroyed."
+    },
+    "requirement_ids": [
+      "20.01.02-final-turn-destruction",
+      "20.01.02-final-no-model-triggers"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:15",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "49021ab24cdebc63ebf0a3de0e5d676e9f401f9d69396e437cd71a8c195b1bba",
+    "summary": "Precision and Devastating Wounds",
+    "source_rows": [
+      "rule:24:24.28.01:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "24.28.01",
+      "title": "Precision and Devastating Wounds",
+      "kind": "added",
+      "body": "Mortal Wounds inflicted by a [PRECISION] attack with the [DEVASTATING WOUNDS] ability are first applied to the CHARACTER group that was selected for those [PRECISION] attacks (if that group is not already destroyed)."
+    },
+    "requirement_ids": [
+      "24.28.01-precision-devastating-priority"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:16",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "28cd61f424eff79f7398ad3eb791c45b975fc16eaa99b362b9e4c9d54d6595e3",
+    "summary": "[TORRENT] weapons cannot have [INDIRECT FIRE] or [PRECISION].",
+    "source_rows": [
+      "rule:24:24.37.01:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "24.37.01",
+      "title": "[TORRENT] weapons cannot have [INDIRECT FIRE] or [PRECISION].",
+      "kind": "added"
+    },
+    "requirement_ids": [
+      "24.37.01-no-indirect-or-precision"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:17",
+    "version": "909",
+    "kind": "changed",
+    "entry_sha256": "3e8ddda7474c3c14fde71939cbe61ac0c58735374f14dce64bbf2466a091e964",
+    "summary": "Fill Your Army Roster",
+    "source_rows": [
+      "rule:25:25.04:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "25.04",
+      "title": "Fill Your Army Roster",
+      "kind": "changed",
+      "excerpt": {
+        "before": "… that enhancement. EPIC HEROES cannot have enhancements. Your army cannot … points cost each time).",
+        "after": "… that enhancement. EPIC HEROES models cannot be given enhancements. Your army cannot … points cost each time). If you are playing an Incursion battle, you can select a 3DP detachment as your only detachment."
+      }
+    },
+    "requirement_ids": [
+      "25.04-record-all-selections",
+      "25.04-obey-size-budgets",
+      "25.04-one-enhancement-per-unit",
+      "25.04-obey-content-restrictions",
+      "25.04-available-faction-detachments",
+      "25.04-unique-detachments",
+      "25.04-detachment-unlocks",
+      "25.04-eligible-faction-units",
+      "25.04-record-unit-loadouts",
+      "25.04-character-faction-warlord",
+      "25.04-warlord-model-keyword",
+      "25.04-mandatory-warlord-choice",
+      "25.04-warlord-prohibition-prevails",
+      "25.04-support-must-attach",
+      "25.04-selected-detachment-enhancements",
+      "25.04-enhancement-points",
+      "25.04-character-model-bearer",
+      "25.04-epic-model-no-enhancement",
+      "25.04-standard-enhancement-unique",
+      "25.04-upgrade-noncharacter",
+      "25.04-upgrade-max-three",
+      "25.04-upgrade-count-once",
+      "25.04-upgrade-pay-each",
+      "25.04-incursion-single-three-dp"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:18",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "70da326b59fa4742a7e4bbead5f19ee3371963d2eaed83c001ea8e0c167f84f0",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:beaeca32-9701-45f7-9461-879d8ae3d78f"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "After using an ability that increases the CP cost of a stratagem, if my opponent does not have the necessary CP available for the selected stratagem, what happens?",
+      "kind": "added",
+      "body": "No CP are spent and that stratagem 's effects are not resolved (but that stratagem still counts as having been used this phase)."
+    },
+    "requirement_ids": [
+      "faq-beaeca32-9701-45f7-9461-879d8ae3d78f-unaffordable-increase"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:19",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "6447f2b65513071cc934fd8916a1f937481c67be19c234445b10153abea86250",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:7a982686-03ff-4565-8d5a-2549e5650268"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "After using an ability that increases the CP cost of a stratagem, must my opponent continue to use the selected stratagem at the increased cost if they have the necessary CP available?",
+      "kind": "added",
+      "body": "Yes."
+    },
+    "requirement_ids": [
+      "faq-7a982686-03ff-4565-8d5a-2549e5650268-affordable-increase"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:20",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "04e0129a13c7d3554273c44b6b68b2f6334638020ead0a7303c38188a1b250a8",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:603e9b2f-cc24-498c-ac2e-08ad3068f257"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "Are models that are within the boundary of a terrain area, but not on the ground floor of a terrain area (e.g. overhanging parts of FRAME VEHICLES or models on terrain features that are within that terrain area) within that terrain area?",
+      "kind": "added",
+      "body": "Yes"
+    },
+    "requirement_ids": [
+      "faq-603e9b2f-cc24-498c-ac2e-08ad3068f257-elevated-membership",
+      "faq-603e9b2f-cc24-498c-ac2e-08ad3068f257-frame-membership"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:21",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "34603a0569d50497b260b2cf8d39c888dcb48cfba6891ba23e5d57b0145f5028",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:3de45ba4-435e-4f58-a50c-fbda3f71bdc5"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "Are Upgrades enhancements?",
+      "kind": "added",
+      "body": "Yes, Upgrades are a type of enhancement (but not all enhancements are Upgrades)."
+    },
+    "requirement_ids": [
+      "3de45ba4-435e-4f58-a50c-fbda3f71bdc5-upgrade-subtype"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:22",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "47b20cc62330c1aa25dbb2877ee4b9df9feca7fd730b9da49bb27977c5f4d013",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:38785a5c-16ba-41c5-b936-723a385f57aa"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "Can a unit have both an Upgrade and an enhancement?",
+      "kind": "added",
+      "body": "No, units are prevented from having two enhancements, and Upgrades are enhancements."
+    },
+    "requirement_ids": [
+      "38785a5c-16ba-41c5-b936-723a385f57aa-upgrade-plus-enhancement-prohibited"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:23",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "bb41b1a435ef2a413033138a70cae5c98e6e98e9ed03a1723e8bf3004893c80e",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:019feac1-cd25-4644-b855-2ce3fa048fee"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "Can an attached unit be given an Upgrade?",
+      "kind": "added",
+      "body": "Yes."
+    },
+    "requirement_ids": [
+      "019feac1-cd25-4644-b855-2ce3fa048fee-attached-upgrade"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:24",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "34ba1b0a1b4e33658b943e45a52eba590633e8a111c489182c28bb96f38cda33",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:9aea2cef-c9db-4a30-bbfb-6b07c1f148a2"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "Can an Epic Hero unit form an attached unit with a unit that has an enhancement?",
+      "kind": "added",
+      "body": "Yes."
+    },
+    "requirement_ids": [
+      "9aea2cef-c9db-4a30-bbfb-6b07c1f148a2-epic-attachment-permitted"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:25",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "239489339ccef16a52310b40a2d9cf838e19b49a1d031194629e0208d86bb13d",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:fc49644c-cc46-47a0-892b-284a4c4ec018"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "Can I group or allocate a wound to a destroyed model?",
+      "kind": "added",
+      "body": "No."
+    },
+    "requirement_ids": [
+      "faq-fc49644c-cc46-47a0-892b-284a4c4ec018-obligation-01",
+      "faq-fc49644c-cc46-47a0-892b-284a4c4ec018-obligation-02"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:26",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "b3e24c23f1c1d61879b282a05e1c5cd966bdc0cb4e8319bc3cf801c18bd45e2d",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:6575ee89-b92a-456d-8e59-4ee513df8f4e"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "Do rules that affect a keyword include multi-word keywords that contain that keyword? For example, would rules that affect Commissar units affect a unit that has the Commissar Graves keyword?",
+      "kind": "added",
+      "body": "No."
+    },
+    "requirement_ids": [
+      "faq-6575ee89-b92a-456d-8e59-4ee513df8f4e-obligation-01"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:27",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "184c31e4cac80cd0d1a6c8d32c67c7ba6c79f2f6a5e852b07d55d779f927a7f6",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:adf7c2cd-b765-4e84-abb7-f0ed45d52841"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "Does the limit to the combined points value of my units in strategic reserves only apply until the start of the first battle round?",
+      "kind": "added",
+      "body": "Yes."
+    },
+    "requirement_ids": [
+      "adf7c2cd-b765-4e84-abb7-f0ed45d52841-pregame-only-cap"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:28",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "218c334ff86b5495ea1235f33b207891ce75239f66163e9af2697bc5a7feba4e",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:e846db5e-3138-4ac6-b7ee-ca2ff7fe303e"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "Does vertical movement in a unit that has taken to the skies count towards the distance a model has used for the purposes of [Heavy]?",
+      "kind": "added",
+      "body": "No."
+    },
+    "requirement_ids": [
+      "e846db5e-3138-4ac6-b7ee-ca2ff7fe303e-flying-heavy-vertical"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:29",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "5d40e13b89781c0640bda594c576f6f9f7b2688184f152193177aead6fa410a7",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:e43402db-7c49-4cd6-acf7-fa6cac83acb0"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "If a stratagem contains a section that carries an additional CP cost (such as the Into the Fray option of Heroic Intervention), is that additional cost considered to be a modifier?",
+      "kind": "added",
+      "body": "No, a stratagem that costs 1CP and is making use of an optional +1CP section has an original cost of 2CP."
+    },
+    "requirement_ids": [
+      "faq-e43402db-7c49-4cd6-acf7-fa6cac83acb0-section-original-cost"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:30",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "ea796998fde9d4605dfcc81f40fc71714733f1e0cb8ed7e4c16e5f7401c490d7",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:9e243f82-42e9-4f0d-9e4b-3f5b74cd68bc"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "If I place units in strategic reserves during the battle, can this exceed the 50% of my points limit for the battle restriction as mentioned in Placing Units in Strategic Reserves (20.01)?",
+      "kind": "added",
+      "body": "Yes. That restriction is applicable before the battle, in the Declare Battle Formations step."
+    },
+    "requirement_ids": [
+      "9e243f82-42e9-4f0d-9e4b-3f5b74cd68bc-pregame-only-cap"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:31",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "31e0ae8096f8f8bd011640e4b9d6dcaf779307b182d0855628df92cd4d43a85f",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:88fc6c54-a3a6-4757-947b-b2dab8b7f3bf"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "In what step during the attack sequence do I roll for Feel No Pain?",
+      "kind": "added",
+      "body": "In the Resolve Damage step of the Inflict Damage step (05.04)."
+    },
+    "requirement_ids": [
+      "faq-88fc6c54-a3a6-4757-947b-b2dab8b7f3bf-obligation-01"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:32",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "a1441a4ca344a2c3ae192c3f2e645850d26cf5c6b964abb5a7e2188af96e1402",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:c8d8181c-0fd4-40d0-a9b9-6dcfadfc287e"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "Is being within range of a terrain objective the same as being within range of an objective marker?",
+      "kind": "added",
+      "body": "Yes."
+    },
+    "requirement_ids": [
+      "faq-c8d8181c-0fd4-40d0-a9b9-6dcfadfc287e-objective-range-alias"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:33",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "11257420c015f2cc25e9769924c3e6a3316e696fe93b7e9259e67e313b8ff075",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:e01c8a02-7a36-4d3b-b168-976b11bd47e8"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "When my unit shoots at another unit, how does it work if some models in the target unit are fully visible to some models in my unit, while others are within a terrain area /not fully visible?",
+      "kind": "added",
+      "body": "For each attacking model in your unit, determine whether the target unit has the benefit of cover, as described in Terrain and Visibility. In this scenario, the target unit will likely have the benefit of cover against some of the attacking models, but not all. This means that, in an example unit where all attacking models are using the same weapon, when you get to the Resolve Attacks step of the Attack Sequence, you will collect dice for attacks made by models against which the target unit has the benefit of cover separately from the dice for attacks made by models against which the target unit does not have the benefit of cover."
+    },
+    "requirement_ids": [
+      "faq-e01c8a02-7a36-4d3b-b168-976b11bd47e8-per-attacker-cover"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:34",
+    "version": "909",
+    "kind": "added",
+    "entry_sha256": "9e47ed324a78a8df6b01379d89f04aebca55b229702d3aba0f17e5f6293d7bc1",
+    "summary": "Core FAQ retained by exact question/answer observation.",
+    "source_rows": [
+      "faq:9b1c81f5-2ea0-40eb-9015-6a005367cd75"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "FAQ",
+      "title": "While making a move type other than a normal/advance move, can my MONSTER/VEHICLE unit move through friendly units?",
+      "kind": "added",
+      "body": "Yes."
+    },
+    "requirement_ids": [
+      "faq-9b1c81f5-2ea0-40eb-9015-6a005367cd75-friendly-transit"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "909:change:35",
+    "version": "909",
+    "kind": "translations",
+    "entry_sha256": "923787260069a92a6d9d4f311ecd603fa9d62689972c3838e4ba84249daa9c74",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "Secondary",
+      "title": "Assassination",
+      "kind": "translations",
+      "locales": [
+        "ko"
+      ]
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "895:change:1",
+    "version": "895",
+    "kind": "added",
+    "entry_sha256": "f207bbeb1baf16ed06e883649acafd99879617b51d6a6a1bfad66a9f96d80e52",
+    "summary": "More Than One Normal Move in a Phase.",
+    "source_rows": [
+      "rule:09:09.05.01:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "09.05.01",
+      "title": "More Than One Normal Move in a Phase.",
+      "kind": "added",
+      "body": "A unit cannot make more than one Normal Move in a phase."
+    },
+    "requirement_ids": [
+      "09.05.01-phase-limit"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "895:change:2",
+    "version": "895",
+    "kind": "added",
+    "entry_sha256": "5c44b6a4072caba19978687d7f2e9161816338d869800db6583d9b3097d63df6",
+    "summary": "Grenades Stratagem",
+    "source_rows": [
+      "rule:15:15.06:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "Errata",
+      "title": "Grenades Stratagem",
+      "kind": "added",
+      "body": "The Grenade Stratagem is the same as the Explosives stratagem."
+    },
+    "requirement_ids": [
+      "15.06-cost",
+      "15.06-window",
+      "15.06-keyword",
+      "15.06-unengaged",
+      "15.06-shooting-eligible",
+      "15.06-no-advance",
+      "15.06-model",
+      "15.06-target",
+      "15.06-dice-damage"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "895:change:3",
+    "version": "895",
+    "kind": "added",
+    "entry_sha256": "28cb2a28e237b3e30df129fbd55ed43f03c76a4333141d682b655b3a4ee874d5",
+    "summary": "Tank Shock Stratagem",
+    "source_rows": [
+      "rule:15:15.05:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "Errata",
+      "title": "Tank Shock Stratagem",
+      "kind": "added",
+      "body": "The Tank Shock Stratagem is the same as the Crushing Impact stratagem."
+    },
+    "requirement_ids": [
+      "15.05-cost",
+      "15.05-window",
+      "15.05-target",
+      "15.05-select-enemy",
+      "15.05-select-model",
+      "15.05-dice",
+      "15.05-self",
+      "15.05-enemy"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "895:change:4",
+    "version": "895",
+    "kind": "added",
+    "entry_sha256": "490494a55b1038808fb79ea3d40d1ea82ef2f98ae16dbbfc27706211be2896ab",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "CA",
+      "title": "Attacker's Battlefield Edge",
+      "kind": "added"
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "895:change:5",
+    "version": "895",
+    "kind": "added",
+    "entry_sha256": "7f95a66b6f72e80d0534242f26bc1ea46143c406a3d5cd213ce230764a366c3b",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "CA",
+      "title": "Attacker's Deployment Zone",
+      "kind": "added"
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "895:change:6",
+    "version": "895",
+    "kind": "added",
+    "entry_sha256": "546a175b4ae1acb8d2f13f1fe6c748b39d89d39ec07fc807465637ec42b9e219",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "CA",
+      "title": "Attacker's Territory",
+      "kind": "added"
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "895:change:7",
+    "version": "895",
+    "kind": "added",
+    "entry_sha256": "f7a0e5299e26cbd03d79f3ed0b1ee2a777ba11798493dbdbabe65cebedc31033",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "CA",
+      "title": "Defender's Battlefield Edge",
+      "kind": "added"
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "895:change:8",
+    "version": "895",
+    "kind": "added",
+    "entry_sha256": "785d1f92746bf925c7a3ce1ba6adf6ba7a0a6540a2324799c4a17495fc0ac5fb",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "CA",
+      "title": "Defender's Deployment Zone",
+      "kind": "added"
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "895:change:9",
+    "version": "895",
+    "kind": "added",
+    "entry_sha256": "08566332fa27fb186e8687954e2c7c8d5b2d23f3136b2cff98cc3229a7170836",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "CA",
+      "title": "Defender's Territory",
+      "kind": "added"
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "895:change:10",
+    "version": "895",
+    "kind": "added",
+    "entry_sha256": "ff132004b99df1e15eac7f5c43f2afbece45dab2ce8fff147e3dd5ffd242c535",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "CA",
+      "title": "No Man's Land",
+      "kind": "added"
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "895:change:11",
+    "version": "895",
+    "kind": "added",
+    "entry_sha256": "94939cc78c116287ef356bebf7e189f2b70bb740f5b4beb737331025d84c7f6d",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "CA",
+      "title": "Objective Points",
+      "kind": "added"
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "895:change:12",
+    "version": "895",
+    "kind": "changed",
+    "entry_sha256": "78dede1eacd5a456e5790b5b64a911a0fa152e467e5673f08b20848be2757b79",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "Secondary",
+      "title": "Outflank",
+      "kind": "changed",
+      "excerpt": {
+        "before": "… units is not within 5VP your territory. (5 VP, mutually exclusive)",
+        "after": "… units is not within your territory. (5 VP, mutually exclusive)"
+      }
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "886:change:1",
+    "version": "886",
+    "kind": "translations",
+    "entry_sha256": "3ec7aeb6ea4ecd9fbabc3eba76ef179b6a51303d3e875e8c1b0a139f688bc7a4",
+    "summary": "Pile-In Move",
+    "source_rows": [
+      "rule:12:12.03:1"
+    ],
+    "disposition": "translation_metadata_no_new_english_obligation",
+    "entry": {
+      "ref": "12.03",
+      "title": "Pile-In Move",
+      "kind": "translations",
+      "locales": [
+        "ja"
+      ]
+    },
+    "requirement_ids": [
+      "12.03-eligibility",
+      "12.03-targets-engaged",
+      "12.03-targets-unengaged",
+      "12.03-base-contact",
+      "12.03-closest-target",
+      "12.03-attainable-engagement",
+      "12.03-witness",
+      "12.03-end-engaged",
+      "12.03-retain-engagement",
+      "12.03-distance"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "886:change:2",
+    "version": "886",
+    "kind": "translations",
+    "entry_sha256": "f4e33c0b7e1aa4419659befcd59270168ea322f10dae4207c9ef698e3139cdd9",
+    "summary": "Terrain Categories",
+    "source_rows": [
+      "rule:13:13.02:1"
+    ],
+    "disposition": "translation_metadata_no_new_english_obligation",
+    "entry": {
+      "ref": "13.02",
+      "title": "Terrain Categories",
+      "kind": "translations",
+      "locales": [
+        "de",
+        "es",
+        "fr",
+        "it",
+        "ja",
+        "ko",
+        "zh"
+      ]
+    },
+    "requirement_ids": [
+      "13.02-feature-classification"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "886:change:3",
+    "version": "886",
+    "kind": "translations",
+    "entry_sha256": "10bdab9fe4d0c39d676ab54eb2893581c75adf4d1561ab3ba4cb1084a29cd8d7",
+    "summary": "Using Stratagems",
+    "source_rows": [
+      "rule:15:15.01:1"
+    ],
+    "disposition": "translation_metadata_no_new_english_obligation",
+    "entry": {
+      "ref": "15.01",
+      "title": "Using Stratagems",
+      "kind": "translations",
+      "locales": [
+        "ja"
+      ]
+    },
+    "requirement_ids": [
+      "15.01-one-per-phase",
+      "15.01-target-limit",
+      "15.01-targets",
+      "15.01-pay",
+      "15.01-effect"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "886:change:4",
+    "version": "886",
+    "kind": "translations",
+    "entry_sha256": "174e15527ce6cc8eb2d4fb10c53d63a9e1067d951b6fa2ea38be0d401cf6dd78",
+    "summary": "Crushing Impact",
+    "source_rows": [
+      "rule:15:15.05:1"
+    ],
+    "disposition": "translation_metadata_no_new_english_obligation",
+    "entry": {
+      "ref": "15.05",
+      "title": "Crushing Impact",
+      "kind": "translations",
+      "locales": [
+        "de",
+        "es",
+        "fr",
+        "it",
+        "ja",
+        "ko",
+        "zh"
+      ]
+    },
+    "requirement_ids": [
+      "15.05-cost",
+      "15.05-window",
+      "15.05-target",
+      "15.05-select-enemy",
+      "15.05-select-model",
+      "15.05-dice",
+      "15.05-self",
+      "15.05-enemy"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "886:change:5",
+    "version": "886",
+    "kind": "translations",
+    "entry_sha256": "72c8b2365b765df3408c1503df05b04da8bfb2693c979744c773e517e6aaa3eb",
+    "summary": "Explosives",
+    "source_rows": [
+      "rule:15:15.06:1"
+    ],
+    "disposition": "translation_metadata_no_new_english_obligation",
+    "entry": {
+      "ref": "15.06",
+      "title": "Explosives",
+      "kind": "translations",
+      "locales": [
+        "de",
+        "es",
+        "fr",
+        "it",
+        "ja",
+        "ko",
+        "zh"
+      ]
+    },
+    "requirement_ids": [
+      "15.06-cost",
+      "15.06-window",
+      "15.06-keyword",
+      "15.06-unengaged",
+      "15.06-shooting-eligible",
+      "15.06-no-advance",
+      "15.06-model",
+      "15.06-target",
+      "15.06-dice-damage"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "886:change:6",
+    "version": "886",
+    "kind": "translations",
+    "entry_sha256": "d28e650d482ad2ecfb264c6a2f8f954e89cbb62ad6e6486277187fe399f70579",
+    "summary": "Disembark Move",
+    "source_rows": [
+      "rule:18:18.04:1"
+    ],
+    "disposition": "translation_metadata_no_new_english_obligation",
+    "entry": {
+      "ref": "18.04",
+      "title": "Disembark Move",
+      "kind": "translations",
+      "locales": [
+        "de"
+      ]
+    },
+    "requirement_ids": [
+      "18.04-battlefield-carrier",
+      "18.04-no-same-phase-embark",
+      "18.04-carrier-move-exclusions",
+      "18.04-rapid-tactical-distance",
+      "18.04-combat-distance",
+      "18.04-rapid-mode",
+      "18.04-tactical-before-combat",
+      "18.04-combat-hazard",
+      "18.04-ingress-restrictions",
+      "18.04-combat-engagement-permission",
+      "18.04-setup-authority",
+      "18.04-rapid-charge-lock",
+      "18.04-tactical-followup",
+      "18.04-combat-battle-shock",
+      "18.04-combat-charge-lock"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "886:change:7",
+    "version": "886",
+    "kind": "changed",
+    "entry_sha256": "05af6d2b46648f08c8c6b1308c39f7918f708ee851fbb0c9fbceb0ed646005a1",
+    "summary": "Attached Units After Their Bodyguard Unit is Destroyed",
+    "source_rows": [
+      "rule:19:19.01.01:1"
+    ],
+    "disposition": "operative_in_current_body_not_clause_certified",
+    "entry": {
+      "ref": "19.01.01",
+      "title": "Attached Units After Their Bodyguard Unit is Destroyed",
+      "kind": "changed",
+      "excerpt": {
+        "before": "Some units have rules stating that when the unit in an attached …",
+        "after": "Some units have rules stating that when the bodyguard unit in an attached …"
+      }
+    },
+    "requirement_ids": [
+      "19.01.01-remain-attached"
+    ],
+    "qualification": "Selected clauses are linked individually; assertion binding and any source/gameplay gaps remain distinct from changelog inclusion."
+  },
+  {
+    "entry_id": "886:change:8",
+    "version": "886",
+    "kind": "changed",
+    "entry_sha256": "b346914283cc1e28fd0db7cd044b3453ebdd7cd40eecb3adc5dd4e8bd88c874a",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "Primary",
+      "title": "Immovable Object",
+      "kind": "changed",
+      "excerpt": {
+        "before": "… home objective). (5 VP) SECOND BATTLE ROUND ONWARDS — End of your Command phase (or the end of your turn in the fifth battle round). You control one or more objectives (excluding your home objective). (4 VP) You control more objectives than your opponent. (4 VP) Decks: Take and Hold …",
+        "after": "… home objective). (5 VP) Decks: Take and Hold …"
+      }
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "886:change:9",
+    "version": "886",
+    "kind": "changed",
+    "entry_sha256": "9a7fcdef97a15f6a96465bb216c6ee4ea755e3007c0cd1b3e2cf9e0f72cdb13f",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "Primary",
+      "title": "Locate and Deny",
+      "kind": "changed",
+      "excerpt": {
+        "before": "… Priority Assets. Recommended layouts: Purge the Foe/Disruption - Layout A; Purge the Foe/Disruption - Layout C; Purge the Foe/Disruption - Layout B.",
+        "after": "… Priority Assets. Recommended layouts: Disruption/Priority Assets - Layout A; Disruption/Priority Assets - Layout B; Disruption/Priority Assets - Layout C."
+      }
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "886:change:10",
+    "version": "886",
+    "kind": "changed",
+    "entry_sha256": "02c23fa6347cb27d746a8a219a271bea40feb03021d4cd1b4091b53adca14878",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "Primary",
+      "title": "Surveil the Foe",
+      "kind": "changed",
+      "excerpt": {
+        "before": "… — End of your turn. None of your …",
+        "after": "… — End of your Command phase (or the end of your turn in the fifth battle round). You control one or more objectives (excluding your home objective). (4 VP) You control more objectives than your opponent. (4 VP) SECOND BATTLE ROUND ONWARDS — End of your turn. None of your …"
+      }
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "875:change:1",
+    "version": "875",
+    "kind": "removed",
+    "entry_sha256": "31c01051d8b0ee293b714121cd97c5694e609b5ca69fd46335c46f39a4ce1bc4",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "CA",
+      "title": "Attacker's Battlefield Edge",
+      "kind": "removed"
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "875:change:2",
+    "version": "875",
+    "kind": "removed",
+    "entry_sha256": "72a0a9e9be872c63ddba078e43623210d6ae8ad5a6b5c14630bf480c8a17992a",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "CA",
+      "title": "Attacker's Deployment Zone",
+      "kind": "removed"
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "875:change:3",
+    "version": "875",
+    "kind": "removed",
+    "entry_sha256": "77474cde0cbd457769975f00ed2d3b36a5f723f54cd067bc88f07d771004180e",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "CA",
+      "title": "Attacker's Territory",
+      "kind": "removed"
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "875:change:4",
+    "version": "875",
+    "kind": "removed",
+    "entry_sha256": "b8599215b2b0a4fe937706988fd8efc33f97c3afbecbe85196e3e85193e88789",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "CA",
+      "title": "Defender's Battlefield Edge",
+      "kind": "removed"
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "875:change:5",
+    "version": "875",
+    "kind": "removed",
+    "entry_sha256": "2db79e40a9d52c6c5074c00e6449a58a8c5959da33cf306bdee3003bdc0f1d1f",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "CA",
+      "title": "Defender's Deployment Zone",
+      "kind": "removed"
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "875:change:6",
+    "version": "875",
+    "kind": "removed",
+    "entry_sha256": "4bb3f8bb25501be41d15afb856603499a08285344fd7d255e1da14ff93c5b941",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "CA",
+      "title": "Defender's Territory",
+      "kind": "removed"
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "875:change:7",
+    "version": "875",
+    "kind": "removed",
+    "entry_sha256": "9b85ab50466e7cf5facd903a4c77b1beb03e2bc1577fdafc6ff863b6a1d207c2",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "CA",
+      "title": "No Man's Land",
+      "kind": "removed"
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "875:change:8",
+    "version": "875",
+    "kind": "removed",
+    "entry_sha256": "8dfaa488ecfc2883aad43531e3f06f8b6395db831f049e3d16608e18d18e12f6",
+    "summary": "Mission-document change; no Core runtime support claimed.",
+    "source_rows": [],
+    "disposition": "mission_document_change_outside_core_01_25",
+    "entry": {
+      "ref": "CA",
+      "title": "Objective Points",
+      "kind": "removed"
+    },
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "875:note:1",
+    "version": "875",
+    "kind": "note",
+    "entry_sha256": "7f76f77990193d5af6acae2e52e085fe5d3e7f31a60647e05410d010ec979d81",
+    "summary": "Provider corpus/format history, not an independent engine rule.",
+    "source_rows": [],
+    "disposition": "provider_metadata_not_runtime_rule",
+    "entry": "The official FAQ export first appears in this data version, with 30 Core Rules questions and 3 errata.",
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "PDF:note:1",
+    "version": "PDF",
+    "kind": "note",
+    "entry_sha256": "935340f0117245fe2ebd0b6695a03a8e64052d6778bc7b32d67e0449274cbc2b",
+    "summary": "Provider corpus/format history, not an independent engine rule.",
+    "source_rows": [],
+    "disposition": "provider_metadata_not_runtime_rule",
+    "entry": "103 numbered third-level sub-rules (NN.NN.NN) were introduced — 16 restructured from PDF sidebars and inline text, the rest new clarifications. In the rules browser they carry PDF/APP source badges accordingly.",
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "PDF:note:2",
+    "version": "PDF",
+    "kind": "note",
+    "entry_sha256": "68f6bda15cfef86997a713c933875b81ad7e26f465f2d3d41454036cadb4383b",
+    "summary": "Provider corpus/format history, not an independent engine rule.",
+    "source_rows": [],
+    "disposition": "provider_metadata_not_runtime_rule",
+    "entry": "Of the 162 PDF rules: 48 are unchanged, 44 gained additional content around the PDF text, and 70 were reworded or restructured.",
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "PDF:note:3",
+    "version": "PDF",
+    "kind": "note",
+    "entry_sha256": "13eaf871f99180b77bd2b8c08a38cd3e7b244479334f22f27557a17badecf9b7",
+    "summary": "Provider corpus/format history, not an independent engine rule.",
+    "source_rows": [],
+    "disposition": "provider_metadata_not_runtime_rule",
+    "entry": "Eight PDF sidebars were not carried over (Indirect Fire, Do Units Have To Fight?, Overrun Fights, New Foes To Face, Plunging Fire, Hold At All Costs, Where To Find Actions, Rapid Disembark). This app restores seven of them as PDF-badged callouts on their rules; Rapid Disembark reached the app export in data 946.",
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "PDF:note:4",
+    "version": "PDF",
+    "kind": "note",
+    "entry_sha256": "f0d161e487c82a48d7b65973e1b801026a2770f329e5f0a8f70d81bdf5f92182",
+    "summary": "Provider corpus/format history, not an independent engine rule.",
+    "source_rows": [],
+    "disposition": "provider_metadata_not_runtime_rule",
+    "entry": "Cross-references now use rule numbers (e.g. “(03.03)”) instead of the PDF's page positions (“see left/below/opposite”).",
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  },
+  {
+    "entry_id": "PDF:note:5",
+    "version": "PDF",
+    "kind": "note",
+    "entry_sha256": "aceb70c6f1d0b6af6ef62fcfb87723fde593b0308475c3c4b7a860c83b3e2522",
+    "summary": "Provider corpus/format history, not an independent engine rule.",
+    "source_rows": [],
+    "disposition": "provider_metadata_not_runtime_rule",
+    "entry": "All 25 sections gained introductions, and every rule is provided in eight languages.",
+    "requirement_ids": [],
+    "qualification": "Provider metadata, translation-only or mission-document change outside this Core semantic claim; retained in full."
+  }
+]

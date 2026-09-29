@@ -1,0 +1,1929 @@
+[
+  {
+    "row_id": "rule:15:15.01:1",
+    "requirements": [
+      {
+        "requirement_id": "15.01-one-per-phase",
+        "source_blocks": [
+          8
+        ],
+        "summary": "Each player may use a given Stratagem once per phase occurrence.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12b_stratagem_framework.py::test_same_phase_duplicate_and_battle_shocked_targeting_suppress_options",
+            "role": "semantic",
+            "assertion": "assert duplicate.status_kind is LifecycleStatusKind.UNSUPPORTED",
+            "proves": "Duplicate use suppresses the finite option."
+          },
+          {
+            "nodeid": "tests/unit/test_phase12b_stratagem_framework.py::test_same_stratagem_restriction_uses_active_player_phase_instance",
+            "role": "semantic",
+            "assertion": "assert same_player_different_turn_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION",
+            "proves": "Different turn-owner phase occurrences are independent."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.01-target-limit",
+        "source_blocks": [
+          9
+        ],
+        "summary": "A player cannot target the same unit with different Stratagems in one phase absent an exception.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12b_stratagem_framework.py::test_different_stratagem_same_unit_same_phase_suppresses_options",
+            "role": "semantic",
+            "assertion": "assert stratagem_use_options(state=state, catalog_records=second_catalog, context=context) == ()",
+            "proves": "The second Stratagem has no legal option for the previously targeted unit."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.01-targets",
+        "source_blocks": [
+          11
+        ],
+        "summary": "Select the described targets before spending CP.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12b_stratagem_framework.py::test_parameterized_stratagem_target_proposals_validate_before_queue_pop",
+            "role": "semantic",
+            "assertion": "assert valid_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION",
+            "proves": "Target validation rejects invalid submissions without consuming authority."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.01-pay",
+        "source_blocks": [
+          12
+        ],
+        "summary": "Spend the printed cost plus any elected section cost, and reject unaffordable use.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12b_stratagem_framework.py::test_finite_stratagem_use_round_trips_through_lifecycle_and_spends_cp",
+            "role": "semantic",
+            "assertion": "assert use_record.command_point_cost == 1",
+            "proves": "A paid use records the printed cost and transaction."
+          },
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase15e_heroic_intervention_into_the_fray_spends_additional_cp",
+            "role": "semantic",
+            "assertion": "assert state.stratagem_use_records[0].command_point_cost == 2",
+            "proves": "The optional section cost is included in the actual expenditure."
+          },
+          {
+            "nodeid": "tests/unit/test_phase12b_stratagem_framework.py::test_stratagem_spend_prevalidation_rejects_cp_drift_without_underflow",
+            "role": "invalid",
+            "assertion": "assert unavailable.status_kind is LifecycleStatusKind.UNSUPPORTED",
+            "proves": "Insufficient balance fails closed before underflow."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.01-effect",
+        "source_blocks": [
+          13
+        ],
+        "summary": "After valid target selection and expenditure, resolve the selected Stratagem effect.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_command_reroll_source_handler_resolves_via_restored_lifecycle",
+            "role": "semantic",
+            "assertion": "assert _has_event(restored.decision_controller, 'dice_reroll_resolved')",
+            "proves": "The paid source Stratagem reaches its real reroll effect after restore."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          10,
+          14,
+          15
+        ],
+        "classification": "metadata",
+        "reason": "Stratagem record schema and headings; executable restrictions are separately enumerated."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:15:15.01.01:1",
+    "requirements": [
+      {
+        "requirement_id": "15.01.01-floor",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Modified CP cost cannot be below zero.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17g_aeldari_corsair_coterie.py::test_stratagem_cost_hook_registries_track_sources_and_round_trip_result",
+            "role": "semantic",
+            "assertion": "assert floored_cost == 0",
+            "proves": "A cost-reducing modifier is floored at zero."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.01.01-duration",
+        "source_blocks": [
+          3
+        ],
+        "summary": "An undated CP-cost modifier applies only to the current use.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_catalog_rule_runtime_consumers.py::test_catalog_command_point_cost_choices_modify_only_the_current_stratagem_use",
+            "role": "semantic",
+            "assertion": "assert applied_cost == 2",
+            "proves": "Selected use applies its cost modifiers."
+          },
+          {
+            "nodeid": "tests/unit/test_catalog_rule_runtime_consumers.py::test_catalog_command_point_cost_choices_modify_only_the_current_stratagem_use",
+            "role": "semantic",
+            "assertion": "assert unrelated_cost == 1",
+            "proves": "A different use retains its unmodified cost."
+          },
+          {
+            "nodeid": "tests/unit/test_catalog_rule_runtime_consumers.py::test_catalog_command_point_cost_choices_modify_only_the_current_stratagem_use",
+            "role": "semantic",
+            "assertion": "assert no_choice_cost == 1",
+            "proves": "Unchosen use retains its unmodified cost."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Introduction to cost modification."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:15:15.01.02:1",
+    "requirements": [
+      {
+        "requirement_id": "15.01.02-affected",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The Stratagem target is the affected unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12b_stratagem_framework.py::test_attached_unit_components_share_one_stratagem_affected_key",
+            "role": "semantic",
+            "assertion": "assert state.stratagem_use_records[0].affected_unit_instance_ids == (attached_id,)",
+            "proves": "Attached target components share the affected rules-unit identity."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:15:15.01.03:1",
+    "requirements": [
+      {
+        "requirement_id": "15.01.03-user",
+        "source_blocks": [
+          1,
+          2
+        ],
+        "summary": "Your and opponent Stratagems are identified by their using player.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12b_stratagem_framework.py::test_opponent_stratagem_targeting_unit_does_not_block_player_same_phase_stratagem",
+            "role": "semantic",
+            "assertion": "assert state.stratagem_use_records[0].player_id == 'player-b'",
+            "proves": "Opponent use is tracked separately for the same target."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.01.03-effect-target",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Your unit in an effect denotes that Stratagem selected target, not another army unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase15e_epic_challenge_registers_selected_character_model_precision",
+            "role": "semantic",
+            "assertion": "assert persisted['target_unit_instance_ids'] == ['army-alpha:intercessor-unit-1']",
+            "proves": "The actual effect binds precisely the selected friendly unit."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:15:15.02:1",
+    "requirements": [
+      {
+        "requirement_id": "15.02-cost",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Command Re-roll costs one CP.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase14i_command_reroll_non_charge_multi_dice_roll_selects_one_die",
+            "role": "semantic",
+            "assertion": "assert state.stratagem_use_records[-1].command_point_cost == 1",
+            "proves": "The real reroll use records one CP spent."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.02-eligible-rolls",
+        "source_blocks": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "summary": "Immediately after a friendly listed Advance, Charge, Damage, Hazard, Hit, Save, Wound or attacks-count roll, Command Re-roll may reroll it.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase14i_command_reroll_accepts_real_attack_and_save_roll_specs",
+            "role": "semantic",
+            "assertion": "assert len(state.stratagem_use_records) == 1",
+            "proves": "Real attack/save roll specs are accepted."
+          },
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_command_reroll_allows_eleventh_edition_number_of_attacks_roll_for_actor",
+            "role": "semantic",
+            "assertion": "assert len(state.stratagem_use_records) == 1",
+            "proves": "A weapon attacks-count roll is eligible."
+          },
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_command_reroll_source_eligibility_rejects_unlisted_roll_type_before_queue_pop",
+            "role": "semantic",
+            "assertion": "assert stratagem_use_options(state=state, catalog_records=(command_reroll,), context=context) == ()",
+            "proves": "An unlisted roll type is rejected before use."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.02-target",
+        "source_blocks": [
+          11
+        ],
+        "summary": "The target is the unit or model whose roll is being rerolled.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_command_reroll_requires_affected_unit_context_and_records_it",
+            "role": "semantic",
+            "assertion": "assert request_stratagem_use(state=state, decisions=lifecycle.decision_controller, catalog_records=(command_reroll,), context=missing_unit_context).status_kind is LifecycleStatusKind.UNSUPPORTED",
+            "proves": "Affected-unit context is required and retained."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.02-one-die",
+        "source_blocks": [
+          12
+        ],
+        "summary": "For a multi-die non-Charge roll select one die; reroll a Charge roll in full.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase14i_command_reroll_non_charge_multi_dice_roll_selects_one_die",
+            "role": "semantic",
+            "assertion": "assert rerolls[0]['selected_indices'] == [0]",
+            "proves": "The non-Charge reroll resolves only the selected die."
+          },
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase14i_command_reroll_charge_roll_keeps_whole_roll_selection",
+            "role": "semantic",
+            "assertion": "assert rerolls[0]['selected_indices'] == [0, 1]",
+            "proves": "The Charge reroll resolves both dice."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:15:15.03:1",
+    "requirements": [
+      {
+        "requirement_id": "15.03-cost",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Epic Challenge costs one CP.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase15e_epic_challenge_registers_selected_character_model_precision",
+            "role": "semantic",
+            "assertion": "assert state.stratagem_use_records[0].command_point_cost == 1",
+            "proves": "The actual use records one CP."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.03-window",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Use Epic Challenge just after a friendly unit is selected to fight.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase15e_epic_challenge_registers_selected_character_model_precision",
+            "role": "semantic",
+            "assertion": "assert effect_payload['effect_kind'] == 'epic_challenge_precision'",
+            "proves": "The just-selected-to-fight source window produces Precision."
+          },
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase15e_core_stratagem_descriptors_are_supported_and_window_scoped",
+            "role": "invalid",
+            "assertion": "assert stratagem_use_options(state=state, catalog_records=phase15e_records, context=context) == ()",
+            "proves": "A Movement-phase window produces no options for this Fight Stratagem."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.03-target",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Its target must be the selected friendly Character unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase15e_core_stratagem_target_policies_reject_invalid_official_contexts",
+            "role": "invalid",
+            "assertion": "assert epic_selected.payload == {'invalid_reason': 'epic_challenge_unit_not_selected_to_fight'}",
+            "proves": "A unit other than the selected fighter is rejected."
+          },
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase15e_core_stratagem_target_policies_reject_invalid_official_contexts",
+            "role": "invalid",
+            "assertion": "assert epic_character.payload == {'invalid_reason': 'epic_challenge_unit_not_character'}",
+            "proves": "A non-Character unit is rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.03-model",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Choose one Character model in the target unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase15e_epic_challenge_registers_selected_character_model_precision",
+            "role": "semantic",
+            "assertion": "assert effect_payload['model_instance_id'] == character_model_id",
+            "proves": "The effect records the selected Character model."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.03-precision",
+        "source_blocks": [
+          5
+        ],
+        "summary": "That model melee weapons gain Precision.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_epic_challenge_and_charge_follow_attached_lineage",
+            "role": "semantic",
+            "assertion": "assert WeaponKeyword.PRECISION in leader_pool.weapon_profile.keywords",
+            "proves": "The actual attached Character melee pool gains Precision."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.03-expiry",
+        "source_blocks": [
+          5
+        ],
+        "summary": "The Precision grant expires at the end of this phase.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase15e_epic_challenge_registers_selected_character_model_precision",
+            "role": "semantic",
+            "assertion": "assert persisted['expiration'] == EffectExpiration.end_phase(battle_round=state.battle_round, phase=BattlePhase.FIGHT, player_id='player-a').to_payload()",
+            "proves": "The exact current Fight-phase boundary is persisted."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:15:15.04:1",
+    "requirements": [
+      {
+        "requirement_id": "15.04-cost",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Insane Bravery costs one CP.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_insane_bravery_target_proposal_spends_cp_and_auto_passes_battle_shock",
+            "role": "semantic",
+            "assertion": "assert state.command_point_total('player-a') == 0",
+            "proves": "The one-CP fixture balance is spent by the actual use."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.04-window",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Use Insane Bravery immediately before the friendly Command Battle-shock roll.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_command_phase_progression_offers_insane_bravery_from_index_before_battle_shock",
+            "role": "semantic",
+            "assertion": "assert proposal_request.stratagem_id == 'insane-bravery'",
+            "proves": "The real Command progression exposes the choice before resolving the pending shock roll."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.04-target",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Target the unit about to take that Battle-shock test.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_insane_bravery_target_proposal_spends_cp_and_auto_passes_battle_shock",
+            "role": "semantic",
+            "assertion": "assert request_payload['unit_instance_id'] == target_unit_id",
+            "proves": "The auto-pass consumes the test for exactly the selected target."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.04-pass",
+        "source_blocks": [
+          4
+        ],
+        "summary": "The selected Battle-shock roll succeeds automatically.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_insane_bravery_target_proposal_spends_cp_and_auto_passes_battle_shock",
+            "role": "semantic",
+            "assertion": "assert auto_passed['auto_passed'] is True",
+            "proves": "The target proposal spends CP and auto-passes the test."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.04-battle-limit",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Insane Bravery is limited to one use per battle.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_insane_bravery_target_proposal_spends_cp_and_auto_passes_battle_shock",
+            "role": "semantic",
+            "assertion": "assert stratagem_target_proposal_from_index(state=state, index=eleventh_edition_stratagem_index(), context=next_round_context, handler_id=CORE_INSANE_BRAVERY_HANDLER_ID, require_legal_affordable_target=True) is None",
+            "proves": "After first use, an otherwise legal next-round proposal is absent."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:15:15.05:1",
+    "requirements": [
+      {
+        "requirement_id": "15.05-cost",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Crushing Impact costs one CP.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_crushing_impact.py::test_crushing_impact_restores_both_damage_sides_and_resumes_charge",
+            "role": "facade",
+            "assertion": "assert state.command_point_total('player-a') == before_cp - (0 if decline else 1)",
+            "proves": "A used effect spends exactly one CP, unlike decline."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.05-window",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Use Crushing Impact immediately after a friendly Charge move in the own Charge phase.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_crushing_impact.py::test_charge_completion_offers_crushing_impact",
+            "role": "facade",
+            "assertion": "assert request.decision_type == 'use_stratagem'",
+            "proves": "A real completed Charge emits the use window."
+          },
+          {
+            "nodeid": "tests/unit/test_crushing_impact.py::test_crushing_impact_revalidates_without_spending_or_consuming",
+            "role": "invalid",
+            "assertion": "assert status.status_kind is LifecycleStatusKind.INVALID",
+            "proves": "The phase-drift case rejects using the pending option outside Charge."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.05-target",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Target the friendly Monster or Vehicle unit that just charged.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_crushing_impact.py::test_charge_completion_offers_crushing_impact",
+            "role": "semantic",
+            "assertion": "assert any(('army-alpha:leader' in o.option_id for o in options))",
+            "proves": "The attached source variants offer the charged Monster/Vehicle rules unit."
+          },
+          {
+            "nodeid": "tests/unit/test_crushing_impact.py::test_crushing_impact_revalidates_without_spending_or_consuming",
+            "role": "invalid",
+            "assertion": "assert status.status_kind is LifecycleStatusKind.INVALID",
+            "proves": "The source-keyword drift case rejects a no-longer-qualified source."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.05-select-enemy",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Select one enemy engaged with the charging unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_crushing_impact.py::test_crushing_impact_restores_both_damage_sides_and_resumes_charge",
+            "role": "semantic",
+            "assertion": "assert event['target_unit_instance_id'] == selection['enemy_target_unit_instance_id']",
+            "proves": "The selected engaged enemy receives its own damage resolution."
+          },
+          {
+            "nodeid": "tests/unit/test_crushing_impact.py::test_crushing_impact_revalidates_without_spending_or_consuming",
+            "role": "invalid",
+            "assertion": "assert status.status_kind is LifecycleStatusKind.INVALID",
+            "proves": "Moving the selected enemy out of engagement invalidates the choice."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.05-select-model",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Select a model in the charging unit engaged with that enemy.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_crushing_impact.py::test_crushing_impact_restores_both_damage_sides_and_resumes_charge",
+            "role": "semantic",
+            "assertion": "assert event['source_model_instance_id'] == selection['model_instance_id']",
+            "proves": "Resolution records the exact chosen source model."
+          },
+          {
+            "nodeid": "tests/unit/test_crushing_impact.py::test_crushing_impact_revalidates_without_spending_or_consuming",
+            "role": "invalid",
+            "assertion": "assert status.status_kind is LifecycleStatusKind.INVALID",
+            "proves": "A missing chosen source model invalidates the choice."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.05-dice",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Roll as many D6 as the selected model Toughness.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_crushing_impact.py::test_crushing_impact_rolls_the_selected_attached_models_toughness",
+            "role": "semantic",
+            "assertion": "assert len(roll.current_values) == 11",
+            "proves": "The selected model Toughness determines the roll count."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.05-self",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Each natural one inflicts a mortal wound on the friendly unit, capped at six.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_crushing_impact.py::test_crushing_impact_independent_caps_and_dice_validation",
+            "role": "semantic",
+            "assertion": "assert crushing_impact_mortal_wounds((1,) * 9 + (5,) * 8) == (6, 6)",
+            "proves": "Nine ones produce only six friendly mortal wounds."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.05-enemy",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Each five-plus inflicts a mortal wound on the enemy unit, independently capped at six.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_crushing_impact.py::test_crushing_impact_independent_caps_and_dice_validation",
+            "role": "semantic",
+            "assertion": "assert crushing_impact_mortal_wounds((1,) * 9 + (5,) * 8) == (6, 6)",
+            "proves": "Eight five-plus dice produce only six enemy mortal wounds."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          4
+        ],
+        "classification": "metadata",
+        "reason": "Effect sequence introduction."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:15:15.06:1",
+    "requirements": [
+      {
+        "requirement_id": "15.06-cost",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Explosives costs one CP.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_explosives.py::test_explosives_facade_restores_replays_and_resumes_shooting",
+            "role": "facade",
+            "assertion": "assert state.command_point_total('player-a') == (2 if decline else 1)",
+            "proves": "Use consumes one of two starting CP; decline consumes none."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.06-window",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Explosives is used during the owning player Shooting phase.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_explosives.py::test_explosives_source_uses_during_phase_finite_selection",
+            "role": "semantic",
+            "assertion": "assert row.definition.timing.trigger_kind.value == 'during_phase'",
+            "proves": "The source descriptor binds During Phase."
+          },
+          {
+            "nodeid": "tests/unit/test_explosives.py::test_explosives_revalidates_before_queue_pop_or_spend",
+            "role": "invalid",
+            "assertion": "assert status.status_kind is LifecycleStatusKind.INVALID",
+            "proves": "The phase-drift case rejects the pending option after leaving Shooting."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.06-keyword",
+        "source_blocks": [
+          3
+        ],
+        "summary": "The target unit must contain an Explosives or Grenades source model.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_explosives.py::test_explosives_offers_each_matching_source_model",
+            "role": "semantic",
+            "assertion": "assert {ExplosivesSelection.from_payload(s).source_model_instance_id for s in selections} == {m.model_instance_id for m in units['source'].own_models}",
+            "proves": "Both canonical keyword cases enumerate the matching source models."
+          },
+          {
+            "nodeid": "tests/unit/test_explosives.py::test_explosives_revalidates_before_queue_pop_or_spend",
+            "role": "invalid",
+            "assertion": "assert status.status_kind is LifecycleStatusKind.INVALID",
+            "proves": "Source-keyword drift invalidates the pending selection."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.06-unengaged",
+        "source_blocks": [
+          3
+        ],
+        "summary": "The target unit must be unengaged.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_explosives.py::test_explosives_revalidates_before_queue_pop_or_spend",
+            "role": "invalid",
+            "assertion": "assert status.status_kind is LifecycleStatusKind.INVALID",
+            "proves": "The engaged case moves the enemy into source engagement and rejects the pending choice."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.06-shooting-eligible",
+        "source_blocks": [
+          3
+        ],
+        "summary": "The target unit must be eligible to shoot.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_explosives.py::test_explosives_advance_is_absolute_but_fall_back_uses_shoot_permission",
+            "role": "semantic",
+            "assertion": "assert any((o.option_id.startswith('use-stratagem:explosives:') for o in request.options)) == can_shoot",
+            "proves": "The post-Fall-Back source is offered exactly when the source-backed shooting permission is present."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.06-no-advance",
+        "source_blocks": [
+          3
+        ],
+        "summary": "The target unit must not have Advanced this turn.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_explosives.py::test_explosives_advance_is_absolute_but_fall_back_uses_shoot_permission",
+            "role": "semantic",
+            "assertion": "assert not any((o.option_id.startswith('use-stratagem:explosives:') for o in request.options))",
+            "proves": "Advance forbids Explosives even where an ordinary shooting permission is present."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.06-model",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Choose a model carrying Explosives or Grenades.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_explosives.py::test_explosives_offers_each_matching_source_model",
+            "role": "semantic",
+            "assertion": "assert {ExplosivesSelection.from_payload(s).source_model_instance_id for s in selections} == {m.model_instance_id for m in units['source'].own_models}",
+            "proves": "The finite selection enumerates matching models."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.06-target",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Choose an unengaged enemy visible to and within eight inches of that model.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_explosives.py::test_explosives_range_and_keywords_belong_to_the_selected_model",
+            "role": "semantic",
+            "assertion": "assert units['source'].own_models[1].model_instance_id in options[0].option_id",
+            "proves": "Range and keyword gates use the selected model."
+          },
+          {
+            "nodeid": "tests/unit/test_explosives.py::test_explosives_uses_selected_model_visibility",
+            "role": "semantic",
+            "assertion": "assert len(options) == count",
+            "proves": "Visibility is checked from the selected model."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.06-dice-damage",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Roll six D6 and inflict one mortal wound per four-plus result.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_explosives_rolls_six_and_counts_each_four_plus",
+            "role": "facade",
+            "assertion": "assert len(values) == 6",
+            "proves": "The actual Stratagem roll contains six dice."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_explosives_rolls_six_and_counts_each_four_plus",
+            "role": "facade",
+            "assertion": "assert event['mortal_wounds'] == sum((cast(int, value) >= 4 for value in values))",
+            "proves": "Its applied mortal count equals the number of four-plus dice."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          4
+        ],
+        "classification": "metadata",
+        "reason": "Effect sequence introduction."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:15:15.07:1",
+    "requirements": [
+      {
+        "requirement_id": "15.07-cost",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Rapid Ingress costs one CP.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_rapid_ingress_target_and_placement_proposals_resolve_through_lifecycle",
+            "role": "semantic",
+            "assertion": "assert state.command_point_total('player-b') == 0",
+            "proves": "One starting CP is consumed by actual Ingress."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.07-window",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Use Rapid Ingress at the opponent Movement phase end.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_movement_phase_progression_offers_rapid_ingress_reaction_from_index",
+            "role": "semantic",
+            "assertion": "assert proposal_request.player_id == 'player-b'",
+            "proves": "The ending player-a Movement phase offers the reaction to player B."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.07-target",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Only a friendly Strategic Reserve unit excluding Aircraft can be selected.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_order35_rapid_ingress_source_eligibility_matrix",
+            "role": "semantic",
+            "assertion": "assert (reason is None) == bool(expected)",
+            "proves": "The source eligibility matrix distinguishes legal reserve and Aircraft cases."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.07-ingress",
+        "source_blocks": [
+          4
+        ],
+        "summary": "The target uses the normal Ingress move path.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_rapid_ingress_target_and_placement_proposals_resolve_through_lifecycle",
+            "role": "semantic",
+            "assertion": "assert arrived_state.status is ReserveStatus.ARRIVED",
+            "proves": "Stratagem target and placement use the lifecycle path."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.07-round",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Rapid Ingress cannot be used in round one.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_order35_first_round_direct_facade_submission_is_atomic",
+            "role": "semantic",
+            "assertion": "assert status.payload == {'invalid_reason': 'rapid_ingress_first_battle_round' if claimed_round == 1 else 'stale_battle_round'}",
+            "proves": "Direct round-one facade submission is rejected atomically."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:15:15.08:1",
+    "requirements": [
+      {
+        "requirement_id": "15.08-cost",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Fire Overwatch costs one CP.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration",
+            "role": "semantic",
+            "assertion": "assert state.command_point_total('player-a') == 0",
+            "proves": "The actual use spends the single available CP."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.08-window",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Use Fire Overwatch at the opponent Movement phase end.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration",
+            "role": "semantic",
+            "assertion": "assert state.out_of_phase_shooting_state.parent_phase is BattlePhase.MOVEMENT",
+            "proves": "The actual out-of-phase shooting records its Movement parent."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.08-target",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Select a friendly unengaged non-Titanic unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase13d_fire_overwatch_rejects_titanic_selected_unit_before_cp_spend",
+            "role": "semantic",
+            "assertion": "assert status.payload == {'invalid_reason': 'fire_overwatch_unit_titanic'}",
+            "proves": "Titanic target rejection precedes CP spending."
+          },
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase13d_fire_overwatch_rejects_engaged_selected_unit_before_cp_spend",
+            "role": "semantic",
+            "assertion": "assert status.payload == {'invalid_reason': 'fire_overwatch_unit_engaged'}",
+            "proves": "Engaged target rejection precedes CP spending."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.08-snap",
+        "source_blocks": [
+          4
+        ],
+        "summary": "The target shoots using Snap shooting.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration",
+            "role": "semantic",
+            "assertion": "assert {tuple(cast(list[str], candidate['shooting_types'])) for candidate in target_candidates} == {(ShootingType.SNAP.value,)}",
+            "proves": "The actual Overwatch target declaration exposes only Snap."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:15:15.09:1",
+    "requirements": [
+      {
+        "requirement_id": "15.09-eligibility",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Snap eligibility is granted by the invoking source rule.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration",
+            "role": "semantic",
+            "assertion": "assert {tuple(cast(list[str], candidate['shooting_types'])) for candidate in target_candidates} == {(ShootingType.SNAP.value,)}",
+            "proves": "Overwatch supplies a source-backed out-of-phase shooting request."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.09-target",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Snap targets exactly one eligible visible enemy within twenty-four inches of the unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_fire_overwatch.py::test_invisible_enemy_is_excluded_even_with_indirect_weapon",
+            "role": "facade",
+            "assertion": "assert {c['target_unit_instance_id'] for c in candidates if c['is_legal']} == ({ENEMIES[1]} if blocked else set(ENEMIES))",
+            "proves": "A fully obscured enemy is removed from the Snap candidate set even with an Indirect weapon."
+          },
+          {
+            "nodeid": "tests/unit/test_fire_overwatch.py::test_shooting_proposal_faults_preserve_pending_request_and_state",
+            "role": "invalid",
+            "assertion": "assert status.status_kind is LifecycleStatusKind.INVALID, status",
+            "proves": "The split-targets case rejects allocating Snap weapons to two enemies before mutation."
+          },
+          {
+            "nodeid": "tests/unit/test_fire_overwatch.py::test_snap_24_inch_boundary_is_shared_by_offer_and_submission",
+            "role": "facade",
+            "assertion": "assert (ENEMIES[0] in legal) == (distance <= 24)",
+            "proves": "The actual target offers enforce the twenty-four-inch threshold."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.09-hits",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Snap attacks hit only on an unmodified six, regardless of skill and modifiers.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14f_snap_shooting_rule_hits_only_on_unmodified_sixes",
+            "role": "semantic",
+            "assertion": "assert hit['minimum_unmodified_success'] == 6",
+            "proves": "Snap hit threshold is a natural six."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.09-rerolls",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Snap hit rolls cannot be rerolled.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_fire_overwatch.py::test_phase_end_snap_preserves_raw_six_no_hit_reroll_and_action_lock",
+            "role": "facade",
+            "assertion": "assert spec['reroll_forbidden_rule_ids'] == ['core:snap-shooting']",
+            "proves": "Every Snap hit roll carries the core prohibition of rerolls through the actual attack host."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.09-attack-host",
+        "source_blocks": [
+          8
+        ],
+        "summary": "Snap uses the common attack resolution sequence.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration",
+            "role": "semantic",
+            "assertion": "assert _has_event(lifecycle.decision_controller, 'out_of_phase_shooting_completed')",
+            "proves": "The real Snap use completes the shared shooting host."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.09-action-lock",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Snap shooting blocks action start through phase end.",
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_order34_completed_shooting_restricts_actions_through_exact_phase_boundary",
+            "role": "semantic",
+            "assertion": "assert has_activity_restriction(state=state, rules_unit=unit, activity='completed_shooting')",
+            "proves": "Common completion restriction spans all tested shooting types."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1,
+          3,
+          7,
+          9
+        ],
+        "classification": "metadata",
+        "reason": "Section labels organize the operative requirements enumerated above."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:15:15.10:1",
+    "requirements": [
+      {
+        "requirement_id": "15.10-cost",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Smokescreen costs one CP.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_smokescreen.py::test_order40_facade_phase_start_restores_replays_and_expires",
+            "role": "facade",
+            "assertion": "assert state.command_point_total('player-b') == (2 if decline else 1)",
+            "proves": "Using Smokescreen spends one CP; declining spends none."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.10-window",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Use Smokescreen at the opponent Shooting phase start.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_smokescreen.py::test_order40_facade_phase_start_restores_replays_and_expires",
+            "role": "facade",
+            "assertion": "assert request.actor_id == 'player-b'",
+            "proves": "The start of the player-a phase emits the source choice to player B."
+          },
+          {
+            "nodeid": "tests/unit/test_smokescreen.py::test_order40_facade_phase_start_restores_replays_and_expires",
+            "role": "facade",
+            "assertion": "assert state.shooting_phase_state is None",
+            "proves": "The choice precedes Shooting-body initialization."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.10-target",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Target a friendly Smoke unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_smokescreen.py::test_order40_pending_target_or_cost_drift_is_rejected_without_mutation",
+            "role": "invalid",
+            "assertion": "assert status.status_kind is LifecycleStatusKind.INVALID",
+            "proves": "Removing Smoke from the pending selected unit rejects its use."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.10-direct-cover",
+        "source_blocks": [
+          4
+        ],
+        "summary": "The selected Smoke unit gains cover against each targeting attack until phase end.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_smokescreen.py::test_order40_cover_is_attack_specific_and_never_a_hit_modifier",
+            "role": "semantic",
+            "assertion": "assert sum((item.modifier.operand for item in snapshots if item.kind == 'skill')) == expected",
+            "proves": "Smokescreen supplies attack-specific cover."
+          },
+          {
+            "nodeid": "tests/unit/test_smokescreen.py::test_order40_facade_phase_start_restores_replays_and_expires",
+            "role": "facade",
+            "assertion": "assert not state.persisting_effects",
+            "proves": "Real end-of-Shooting progression removes the cover effect."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.10-interposed-cover",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Other targets gain cover when selected Smoke models causally prevent full visibility, until phase end.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_smokescreen.py::test_order40_attached_source_uses_leader_blocker_and_retained_presence",
+            "role": "semantic",
+            "assertion": "assert obscuring_model_cover_sources(state=state, pool=pool) is not None",
+            "proves": "An interposed attached leader supplies cover before and during physical retention."
+          },
+          {
+            "nodeid": "tests/unit/test_smokescreen.py::test_order40_facade_phase_start_restores_replays_and_expires",
+            "role": "facade",
+            "assertion": "assert not state.persisting_effects",
+            "proves": "The same source effect expires at actual phase end."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:15:15.11:1",
+    "requirements": [
+      {
+        "requirement_id": "15.11-base-cost",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Base cost: 1 CP",
+        "owners": [
+          "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems.py:core_stratagem_rows"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_heroic_intervention.py::test_heroic_shared_reroll_targets_decline_restore_and_exact_replay",
+            "role": "semantic",
+            "assertion": "assert state.command_point_total('player-a') == 0",
+            "proves": "Base cost: 1 CP is exercised by the selected Heroic regression."
+          }
+        ],
+        "qualifications": [
+          "Uses complete Order 94 selected transcription; original GDM omissions remain preserved as source discrepancies."
+        ]
+      },
+      {
+        "requirement_id": "15.11-target",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Friendly unengaged unit within 12 inches",
+        "owners": [
+          "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems.py:core_stratagem_rows"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_heroic_intervention.py::test_heroic_intervention_enters_shared_charge_declaration",
+            "role": "semantic",
+            "assertion": "assert unit_id in {option.option_id for option in declaration.options}",
+            "proves": "Friendly unengaged unit within 12 inches is exercised by the selected Heroic regression."
+          }
+        ],
+        "qualifications": [
+          "Uses complete Order 94 selected transcription; original GDM omissions remain preserved as source discrepancies."
+        ]
+      },
+      {
+        "requirement_id": "15.11-vehicle",
+        "source_blocks": [
+          3
+        ],
+        "summary": "VEHICLE must also be CHARACTER/WALKER",
+        "owners": [
+          "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems.py:core_stratagem_rows"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_heroic_intervention.py::test_heroic_uses_vehicle_exceptions_and_ordinary_aircraft_restriction",
+            "role": "semantic",
+            "assertion": "assert status.status_kind is LifecycleStatusKind.INVALID",
+            "proves": "VEHICLE must also be CHARACTER/WALKER is exercised by the selected Heroic regression."
+          }
+        ],
+        "qualifications": [
+          "Uses complete Order 94 selected transcription; original GDM omissions remain preserved as source discrepancies."
+        ]
+      },
+      {
+        "requirement_id": "15.11-timing",
+        "source_blocks": [
+          4
+        ],
+        "summary": "End of opponent Charge phase",
+        "owners": [
+          "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems.py:core_stratagem_rows"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_end_charge_heroic_ordinary_opportunity_is_independent_of_snarling_state",
+            "role": "semantic",
+            "assertion": "assert request.actor_id == 'player-a'",
+            "proves": "End of opponent Charge phase is exercised by the selected Heroic regression."
+          }
+        ],
+        "qualifications": [
+          "Uses complete Order 94 selected transcription; original GDM omissions remain preserved as source discrepancies."
+        ]
+      },
+      {
+        "requirement_id": "15.11-charge",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Resolve the ordinary charge under 11.02",
+        "owners": [
+          "src/warhammer40k_core/engine/heroic_intervention_rolls.py:heroic_charge_source"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_heroic_intervention.py::test_heroic_intervention_enters_shared_charge_declaration",
+            "role": "semantic",
+            "assertion": "assert targets.decision_type == 'select_charge_targets'",
+            "proves": "Resolve the ordinary charge under 11.02 is exercised by the selected Heroic regression."
+          }
+        ],
+        "qualifications": [
+          "Uses complete Order 94 selected transcription; original GDM omissions remain preserved as source discrepancies."
+        ]
+      },
+      {
+        "requirement_id": "15.11-choice",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Select one mode before rolling",
+        "owners": [
+          "src/warhammer40k_core/engine/heroic_intervention_rolls.py:heroic_charge_source"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_heroic_intervention.py::test_missing_heroic_mode_is_rejected_before_spend_or_roll",
+            "role": "semantic",
+            "assertion": "assert state.to_payload() == before",
+            "proves": "Select one mode before rolling is exercised by the selected Heroic regression."
+          }
+        ],
+        "qualifications": [
+          "Uses complete Order 94 selected transcription; original GDM omissions remain preserved as source discrepancies."
+        ]
+      },
+      {
+        "requirement_id": "15.11-leap",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Leap to Defend: only completed chargers within maximum distance",
+        "owners": [
+          "src/warhammer40k_core/engine/heroic_intervention_rolls.py:heroic_charge_source"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_heroic_intervention.py::test_leap_targets_completed_charge_moves_not_fights_first_effects",
+            "role": "semantic",
+            "assertion": "assert not any((event.event_type in {'charge_roll_resolved', 'charge_move_completed'} for event in session.lifecycle.decision_controller.event_log.records))",
+            "proves": "Leap to Defend: only completed chargers within maximum distance is exercised by the selected Heroic regression."
+          }
+        ],
+        "qualifications": [
+          "Uses complete Order 94 selected transcription; original GDM omissions remain preserved as source discrepancies."
+        ]
+      },
+      {
+        "requirement_id": "15.11-fray-cost",
+        "source_blocks": [
+          8
+        ],
+        "summary": "Into the Fray option and additional 1 CP",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_selection.py:_heroic_intervention_mode_additional_cost"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase15e_heroic_intervention_into_the_fray_spends_additional_cp",
+            "role": "semantic",
+            "assertion": "assert state.stratagem_use_records[0].command_point_cost == 2",
+            "proves": "Into the Fray records the one-plus-one cost."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.11-fray-roll",
+        "source_blocks": [
+          9
+        ],
+        "summary": "Into the Fray: cap Charge result at 6 after modifiers",
+        "owners": [
+          "src/warhammer40k_core/engine/heroic_intervention_rolls.py:heroic_charge_source"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_heroic_intervention.py::test_heroic_roll_modifiers_are_applied_before_source_cap",
+            "role": "semantic",
+            "assertion": "assert roll.value == (expected if expected is not None else min(raw, 6))",
+            "proves": "Into the Fray: cap Charge result at 6 after modifiers is exercised by the selected Heroic regression."
+          }
+        ],
+        "qualifications": [
+          "Uses complete Order 94 selected transcription; original GDM omissions remain preserved as source discrepancies."
+        ]
+      },
+      {
+        "requirement_id": "15.11-fray-target",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Into the Fray: enemies within 6 inches and maximum distance",
+        "owners": [
+          "src/warhammer40k_core/engine/heroic_intervention_rolls.py:heroic_charge_source"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_heroic_intervention.py::test_fray_target_range_remains_six_with_extra_movement",
+            "role": "semantic",
+            "assertion": "assert candidate.is_legal is legal",
+            "proves": "Into the Fray: enemies within 6 inches and maximum distance is exercised by the selected Heroic regression."
+          }
+        ],
+        "qualifications": [
+          "Uses complete Order 94 selected transcription; original GDM omissions remain preserved as source discrepancies."
+        ]
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:15:15.12:1",
+    "requirements": [
+      {
+        "requirement_id": "15.12-cost",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Counteroffensive costs two CP.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase15e_counteroffensive_selects_next_fight_activation",
+            "role": "semantic",
+            "assertion": "assert state.command_point_total('player-b') == 0",
+            "proves": "The actual use spends the two starting CP."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.12-window",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Use Counteroffensive in the opponent Fight step just after an enemy fights.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase15e_counteroffensive_selects_next_fight_activation",
+            "role": "semantic",
+            "assertion": "assert activation.interrupt_id.startswith('counteroffensive:')",
+            "proves": "The source after-enemy-fought window emits the interrupt selection."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.12-target",
+        "source_blocks": [
+          3
+        ],
+        "summary": "The friendly target must be eligible to fight.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase15e_counteroffensive_selects_next_fight_activation",
+            "role": "semantic",
+            "assertion": "assert activation.unit_instance_id == 'army-beta:enemy-unit'",
+            "proves": "The eligible selected unit becomes the next actual activation."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.12-fights-first",
+        "source_blocks": [
+          4
+        ],
+        "summary": "The target gains Fights First.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase15e_counteroffensive_selects_next_fight_activation",
+            "role": "semantic",
+            "assertion": "assert effect_payload['effect_kind'] == 'fights_first'",
+            "proves": "The real source use records its Fights First grant."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.12-expiry",
+        "source_blocks": [
+          4
+        ],
+        "summary": "The grant expires at the end of the current Fight phase.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase15e_counteroffensive_selects_next_fight_activation",
+            "role": "semantic",
+            "assertion": "assert state.persisting_effects[-1].expiration == EffectExpiration.end_phase(battle_round=state.battle_round, phase=BattlePhase.FIGHT, player_id='player-a')",
+            "proves": "The actual effect has the exact phase-end expiration."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "15.12-next-selection",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Its owner must select this unit next.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase15e_counteroffensive_selects_next_fight_activation",
+            "role": "semantic",
+            "assertion": "assert activation.unit_instance_id == 'army-beta:enemy-unit'",
+            "proves": "The engine makes the selected unit the next activation immediately."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "faq:7a982686-03ff-4565-8d5a-2549e5650268",
+    "requirements": [
+      {
+        "requirement_id": "faq-7a982686-03ff-4565-8d5a-2549e5650268-affordable-increase",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An affordable increased Stratagem cost must be paid after commitment.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17g_aeldari_corsair_coterie.py::test_archraider_lord_of_deceit_lifecycle_pauses_and_resumes_stratagem_cost",
+            "role": "semantic",
+            "assertion": "assert use_record.command_point_cost == 2",
+            "proves": "An affordable increased Stratagem cost must be paid after commitment. The linked assertion exercises this source condition."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "The question supplies the condition answered by operative answer block 2."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:beaeca32-9701-45f7-9461-879d8ae3d78f",
+    "requirements": [
+      {
+        "requirement_id": "faq-beaeca32-9701-45f7-9461-879d8ae3d78f-unaffordable-increase",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An unaffordable increased cost spends no CP and resolves no effect, but counts as used in the phase.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase17g_aeldari_corsair_coterie.py::test_archraider_cost_increase_can_make_stratagem_used_without_resolving_effects",
+            "role": "semantic",
+            "assertion": "assert use_record.effects_resolved is False",
+            "proves": "An unaffordable increased cost spends no CP and resolves no effect, but counts as used in the phase. The linked assertion exercises this source condition."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "The question supplies the condition answered by operative answer block 2."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:e43402db-7c49-4cd6-acf7-fa6cac83acb0",
+    "requirements": [
+      {
+        "requirement_id": "faq-e43402db-7c49-4cd6-acf7-fa6cac83acb0-section-original-cost",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An optional extra section cost belongs to original cost before modifiers.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_order37_cost_ceiling_uses_the_selected_stratagem_section",
+            "role": "semantic",
+            "assertion": "assert result.command_point_cost == expected",
+            "proves": "An optional extra section cost belongs to original cost before modifiers. The linked assertion exercises this source condition."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "The question supplies the condition answered by operative answer block 2."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:421a6f30-63e2-4e1f-b352-99b643637c53",
+    "requirements": [
+      {
+        "requirement_id": "faq-421a6f30-63e2-4e1f-b352-99b643637c53-insane-shocked",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Insane Bravery cannot target an already battle-shocked friendly unit.",
+        "owners": [
+          "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_insane_bravery_is_not_offered_for_already_battle_shocked_unit",
+            "role": "semantic",
+            "assertion": "assert proposal is None",
+            "proves": "Insane Bravery cannot target an already battle-shocked friendly unit. The linked assertion exercises this source condition."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "The question supplies the condition answered by operative answer block 2."
+      }
+    ]
+  }
+]

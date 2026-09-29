@@ -1,0 +1,982 @@
+[
+  {
+    "row_id": "rule:25:25.01:1",
+    "requirements": [
+      {
+        "requirement_id": "25.01-record-roster",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Army details are recorded in a complete army roster.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:ArmyMusterRequest"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_army_mustering_consumes_catalog_and_produces_runtime_instances",
+            "role": "replay",
+            "assertion": "assert ArmyDefinition.from_payload(payload).to_payload() == army.to_payload()",
+            "proves": "The complete runtime army roster round-trips without losing unit data."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.01-show-opponent-before-battle",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Players show their completed roster to the opponent before battle.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:ArmyDefinition"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase18a_cli_projection.py::test_non_owner_predeployment_projection_exposes_roster_but_conceals_formation_state",
+            "role": "viewer",
+            "assertion": "assert opponent_unit['unit_display_name'] == 'CORE Intercessor-like Infantry'",
+            "proves": "The opponent’s roster unit name is public before deployment."
+          },
+          {
+            "nodeid": "tests/unit/test_phase18a_cli_projection.py::test_non_owner_predeployment_projection_exposes_roster_but_conceals_formation_state",
+            "role": "viewer",
+            "assertion": "assert opponent_unit['selected_wargear_ids'] == ['core-bolt-rifle']",
+            "proves": "Its selected wargear is public before deployment."
+          },
+          {
+            "nodeid": "tests/unit/test_phase18a_cli_projection.py::test_non_owner_predeployment_projection_exposes_roster_but_conceals_formation_state",
+            "role": "viewer",
+            "assertion": "assert set(opponent_model_ids) <= set(player_a_view['model_display_by_id'])",
+            "proves": "Every roster model is available in the opponent projection."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:25:25.02:1",
+    "requirements": [
+      {
+        "requirement_id": "25.02-select-one-faction",
+        "source_blocks": [
+          1
+        ],
+        "summary": "The army roster names one faction keyword as its army faction.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:ArmyMusterRequest"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_strike_force_detachment_points_force_dispositions_and_unit_grants",
+            "role": "semantic",
+            "assertion": "assert faction.faction_id == 'core-marine-force'",
+            "proves": "The army retains its single selected faction identity."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_list_validation_fails_fast_on_invalid_selection_shapes",
+            "role": "invalid",
+            "assertion": "with pytest.raises(ListValidationError, match='not legal for faction'):\n    validate_unit_selection_for_faction(catalog=catalog, selection=unit_selection, faction=FactionDefinition(faction_id='other-faction', name='Other Faction', faction_keywords=('Other Keyword',)))",
+            "proves": "A unit without the selected faction keyword is rejected."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": []
+  },
+  {
+    "row_id": "rule:25:25.03:1",
+    "requirements": [
+      {
+        "requirement_id": "25.03-select-battle-size",
+        "source_blocks": [
+          1,
+          2
+        ],
+        "summary": "The selected battle size determines points, Detachment Points, Enhancement and datasheet-copy limits.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_supported_battle_size_policies_are_source_backed",
+            "role": "semantic",
+            "assertion": "assert muster_army(catalog=catalog, request=request).battle_size.value == 'strike_force'",
+            "proves": "The selected battle size survives mustering in the army state."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_supported_battle_size_policies_are_source_backed",
+            "role": "invalid",
+            "assertion": "with pytest.raises(ListValidationError, match='Unsupported BattleSize'):\n    battle_size_from_token('combat_patrol')",
+            "proves": "Unsupported battle sizes fail rather than silently selecting a policy."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.03-incursion-limits",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Incursion permits 1000 points, two Detachment Points, two Enhancements and two ordinary copies per datasheet.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_supported_battle_size_policies_are_source_backed",
+            "role": "semantic",
+            "assertion": "assert incursion.points_limit == 1000",
+            "proves": "Incursion has a 1000-point cap."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_supported_battle_size_policies_are_source_backed",
+            "role": "semantic",
+            "assertion": "assert incursion.detachment_point_limit == 2",
+            "proves": "Incursion has two Detachment Points."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_supported_battle_size_policies_are_source_backed",
+            "role": "semantic",
+            "assertion": "assert incursion.enhancement_limit == 2",
+            "proves": "Incursion permits two Enhancements."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_supported_battle_size_policies_are_source_backed",
+            "role": "semantic",
+            "assertion": "assert incursion.unit_limit == 2",
+            "proves": "Incursion ordinarily permits two copies of a datasheet."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.03-strike-force-limits",
+        "source_blocks": [
+          5
+        ],
+        "summary": "Strike Force permits 2000 points, three Detachment Points, four Enhancements and three ordinary copies per datasheet.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_supported_battle_size_policies_are_source_backed",
+            "role": "semantic",
+            "assertion": "assert policy.points_limit == 2000",
+            "proves": "Strike Force has a 2000-point cap."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_supported_battle_size_policies_are_source_backed",
+            "role": "semantic",
+            "assertion": "assert policy.detachment_point_limit == 3",
+            "proves": "Strike Force has three Detachment Points."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_supported_battle_size_policies_are_source_backed",
+            "role": "semantic",
+            "assertion": "assert policy.enhancement_limit == 4",
+            "proves": "Strike Force permits four Enhancements."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_supported_battle_size_policies_are_source_backed",
+            "role": "semantic",
+            "assertion": "assert policy.unit_limit == 3",
+            "proves": "Strike Force ordinarily permits three copies of a datasheet."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.03-battleline-transport-double",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Battleline and Dedicated Transport datasheet-copy limits are twice the ordinary cap, without stacking both exceptions.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_order67_duplicate_limits_are_independent_and_do_not_stack",
+            "role": "semantic",
+            "assertion": "assert {v.violation_code for v in report.violations} == {'unit_limit_exceeded'}",
+            "proves": "The parameterized category combinations reject only over-limit copies."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.03-epic-hero-one",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Each Epic Hero has a one-unit limit regardless of battle size.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_phase16d_enhancement_restrictions_cover_epic_and_attached_squads",
+            "role": "semantic",
+            "assertion": "assert {'epic_hero_not_unique', 'epic_hero_enhancement_forbidden'} <= epic_codes",
+            "proves": "Repeated Epic Hero inclusion yields epic_hero_not_unique."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          3
+        ],
+        "classification": "context",
+        "reason": "Introduces the numerical battle-size table."
+      }
+    ]
+  },
+  {
+    "row_id": "rule:25:25.04:1",
+    "requirements": [
+      {
+        "requirement_id": "25.04-record-all-selections",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Roster construction records detachments, units, Warlord, Enhancements and attached-unit selections.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_phase16d_strict_roster_records_warlord_enhancement_and_transport_manifest",
+            "role": "semantic",
+            "assertion": "assert army.warlord_selection == request.warlord_selection",
+            "proves": "The runtime roster retains the Warlord selection."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_phase16d_strict_roster_records_warlord_enhancement_and_transport_manifest",
+            "role": "semantic",
+            "assertion": "assert army.enhancement_assignments == request.enhancement_assignments",
+            "proves": "The runtime roster retains Enhancement assignments."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_attachment_declarations_form_runtime_attached_unit_from_structured_catalog",
+            "role": "semantic",
+            "assertion": "assert formation.component_unit_instance_ids == (bodyguard.unit_instance_id, leader.unit_instance_id, support.unit_instance_id)",
+            "proves": "Attachment selections materialize their components."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-obey-size-budgets",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Roster totals must obey all limits for the selected battle size.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_phase16d_enhancement_points_count_toward_strike_force_limit",
+            "role": "semantic",
+            "assertion": "assert 'points_limit_exceeded' in codes",
+            "proves": "The points budget includes Enhancement costs."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_order67_duplicate_limits_are_independent_and_do_not_stack",
+            "role": "semantic",
+            "assertion": "assert {v.violation_code for v in report.violations} == {'unit_limit_exceeded'}",
+            "proves": "Unit-copy overruns are reported."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-one-enhancement-per-unit",
+        "source_blocks": [
+          4
+        ],
+        "summary": "No unit, including an attached rules unit, can have more than one Enhancement.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_phase16d_enhancement_restrictions_cover_epic_and_attached_squads",
+            "role": "semantic",
+            "assertion": "assert 'attached_squad_enhancement_limit_exceeded' in attached_codes",
+            "proves": "Stacking Enhancements on an attached group is rejected."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_phase16d_upgrade_and_leader_enhancement_cannot_stack_on_attached_squad",
+            "role": "semantic",
+            "assertion": "assert 'attached_squad_enhancement_limit_exceeded' in codes",
+            "proves": "An Upgrade and Leader Enhancement cannot coexist in one attached unit."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-obey-content-restrictions",
+        "source_blocks": [
+          5,
+          8
+        ],
+        "summary": "Every selected unit and detachment’s source-backed roster restrictions must hold.",
+        "owners": [
+          "src/warhammer40k_core/engine/roster_construction_validation.py:append_construction_violations"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_order69_unit_constraints_are_enforced_by_report_and_mustering",
+            "role": "semantic",
+            "assertion": "assert matches[0].violation_code == constraint.kind.value",
+            "proves": "The exact constraint kind becomes the violation code."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_order69_all_selected_detachments_apply_even_when_constraints_contradict",
+            "role": "semantic",
+            "assertion": "assert any((row.violation_code == 'prohibited_unit' and row.unit_selection_id == 'a' for row in report.violations))",
+            "proves": "A selected detachment’s prohibited unit restriction remains active alongside another constraint."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-available-faction-detachments",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Selected detachments must be available to the army faction.",
+        "owners": [
+          "src/warhammer40k_core/engine/list_validation.py:validate_detachment_selection"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_phase16_faction_detachment_matrix_fails_closed_on_invalid_rows",
+            "role": "invalid",
+            "assertion": "with pytest.raises(ListValidationError, match='does not belong to faction'):\n    validate_detachment_selection(catalog=catalog, selection=cross_faction_selection)",
+            "proves": "Selecting a detachment of another faction fails the owning validator."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-unique-detachments",
+        "source_blocks": [
+          7
+        ],
+        "summary": "A detachment cannot be selected more than once, including aliases of the same source identity.",
+        "owners": [
+          "src/warhammer40k_core/engine/list_validation.py:validate_detachment_selection"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_order69_aliases_cannot_select_the_same_source_detachment_twice",
+            "role": "invalid",
+            "assertion": "with pytest.raises(ListValidationError, match='same detachment'):\n    validate_detachment_selection(catalog=catalog, selection=selection)",
+            "proves": "Aliases of one source detachment cannot be selected together."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-detachment-unlocks",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Selecting a detachment grants its recorded rules, dispositions, Enhancements and Stratagem inventory.",
+        "owners": [
+          "src/warhammer40k_core/engine/list_validation.py:validate_detachment_selection"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_detachment_enhancement_and_stratagem_selections_are_validated_as_data",
+            "role": "semantic",
+            "assertion": "assert army.detachment_selection == valid_request.detachment_selection",
+            "proves": "The allowed selected Enhancement and Stratagem inventories are retained."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_detachment_enhancement_and_stratagem_selections_are_validated_as_data",
+            "role": "invalid",
+            "assertion": "with pytest.raises(ArmyMusteringError, match='detachment selection'):\n    muster_army(catalog=catalog_with_content, request=invalid_request)",
+            "proves": "A foreign Enhancement selection is rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-eligible-faction-units",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Roster units must carry the army faction keyword or be explicitly available to that army faction.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_list_validation_fails_fast_on_invalid_selection_shapes",
+            "role": "invalid",
+            "assertion": "with pytest.raises(ListValidationError, match='not legal for faction'):\n    validate_unit_selection_for_faction(catalog=catalog, selection=unit_selection, faction=FactionDefinition(faction_id='other-faction', name='Other Faction', faction_keywords=('Other Keyword',)))",
+            "proves": "A unit lacking the army faction keyword is rejected."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_aeldari_disparate_paths_allows_source_linked_harlequin_in_asuryani_army",
+            "role": "semantic",
+            "assertion": "assert army.roster_legality_report.is_legal",
+            "proves": "An explicitly authorized Harlequin inclusion in the Asuryani army is legal."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_aeldari_disparate_paths_allows_source_linked_harlequin_in_asuryani_army",
+            "role": "semantic",
+            "assertion": "assert {unit.datasheet_id for unit in army.units} == {'phase17g-aeldari-autarch', 'phase17g-aeldari-solitaire'}",
+            "proves": "The mustered army contains the explicitly authorized allied datasheet."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-record-unit-loadouts",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Unit roster entries record model count, allowed wargear/upgrades and points.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_army_mustering_consumes_catalog_and_produces_runtime_instances",
+            "role": "semantic",
+            "assertion": "assert len(unit.own_models) == 5",
+            "proves": "The runtime entry contains the selected five models."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_army_mustering_consumes_catalog_and_produces_runtime_instances",
+            "role": "semantic",
+            "assertion": "assert unit.wargear_selections[0].wargear_ids == ('core-bolt-rifle',)",
+            "proves": "The runtime entry retains its selected rifle loadout."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_selected_wargear_must_be_legal_for_datasheet_option",
+            "role": "invalid",
+            "assertion": "with pytest.raises(ArmyMusteringError, match='unit selection'):\n    muster_army(catalog=catalog, request=request)",
+            "proves": "An unavailable weapon choice for the selected option fails mustering."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_roster_unit_points_survive_mustering_and_round_trip",
+            "role": "semantic",
+            "assertion": "assert army.unit_points == points",
+            "proves": "Per-unit points records survive army mustering."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_roster_unit_points_survive_mustering_and_round_trip",
+            "role": "replay",
+            "assertion": "assert ArmyDefinition.from_payload(army.to_payload()).unit_points == points",
+            "proves": "Per-unit points round-trip with the mustered army."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-character-faction-warlord",
+        "source_blocks": [
+          11
+        ],
+        "summary": "Select a Character unit of the army faction and one Character model in it as Warlord.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_order68_mixed_unit_checks_selected_model_keywords",
+            "role": "semantic",
+            "assertion": "assert {'warlord_character_required', 'enhancement_character_required'} <= codes",
+            "proves": "A non-Character selected model yields the specific Warlord Character violation."
+          },
+          {
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_roster_rejects_a_warlord_without_the_army_faction_keyword",
+            "role": "invalid",
+            "assertion": "assert {'unit_selection_invalid', 'warlord_unknown_unit'} <= {row.violation_code for row in report.violations}",
+            "proves": "The selected foreign-faction Character fails unit selection and cannot supply a Warlord."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-warlord-model-keyword",
+        "source_blocks": [
+          11
+        ],
+        "summary": "Only the selected model receives WARLORD and the roster records its identity.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_order68_selected_model_owns_warlord_and_enhancement",
+            "role": "semantic",
+            "assertion": "assert 'WARLORD' not in unit.own_models[0].keywords",
+            "proves": "The unselected model does not gain WARLORD."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_order68_selected_model_owns_warlord_and_enhancement",
+            "role": "semantic",
+            "assertion": "assert 'WARLORD' in unit.own_models[1].keywords",
+            "proves": "The chosen model gains WARLORD."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_order68_selected_model_owns_warlord_and_enhancement",
+            "role": "replay",
+            "assertion": "assert ArmyMusterRequest.from_payload(request.to_payload()) == request",
+            "proves": "The exact model selection round-trips."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-mandatory-warlord-choice",
+        "source_blocks": [
+          11
+        ],
+        "summary": "If mandatory Warlord units are included, select one eligible mandatory candidate.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_mustering_requires_warlord_to_be_an_eligible_supreme_commander",
+            "role": "semantic",
+            "assertion": "assert 'supreme_commander_warlord_required' in {violation.violation_code for violation in report.violations}",
+            "proves": "Selecting an ordinary Character over a mandatory candidate is rejected."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_mustering_allows_multiple_supreme_commanders_when_one_is_warlord",
+            "role": "semantic",
+            "assertion": "assert 'WARLORD' in keywords_by_unit_id['army-alpha:leader-two']",
+            "proves": "One of multiple mandatory candidates can be selected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-warlord-prohibition-prevails",
+        "source_blocks": [
+          11
+        ],
+        "summary": "A prohibition on being Warlord overrides a requirement to be Warlord.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_mustering_warlord_forbidden_rule_takes_precedence_over_supreme_commander",
+            "role": "semantic",
+            "assertion": "assert {'supreme_commander_warlord_required', 'warlord_forbidden'} <= forbidden_codes",
+            "proves": "The forbidden mandatory candidate remains ineligible."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_mustering_cannot_be_warlord_overrides_all_mandatory_candidates",
+            "role": "semantic",
+            "assertion": "assert 'supreme_commander_warlord_required' not in violation_codes",
+            "proves": "All-prohibited mandatory candidates do not block the ordinary eligible Character."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-support-must-attach",
+        "source_blocks": [
+          13
+        ],
+        "summary": "Every Support unit must attach to a permitted Bodyguard; a Leader may remain unattached.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_support_units_must_be_declared_attached_but_leaders_can_muster_solo",
+            "role": "semantic",
+            "assertion": "assert not report.is_legal",
+            "proves": "Unattached Support makes the roster illegal."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_support_units_must_be_declared_attached_but_leaders_can_muster_solo",
+            "role": "semantic",
+            "assertion": "assert leader_army.attached_units == ()",
+            "proves": "The ordinary Leader may muster solo."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-selected-detachment-enhancements",
+        "source_blocks": [
+          15
+        ],
+        "summary": "Enhancements must come from selected detachments and be assigned to distinct eligible units.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_phase16d_roster_reports_source_reference_diagnostics",
+            "role": "semantic",
+            "assertion": "assert {'unit_points_unknown_unit', 'points_limit_exceeded', 'warlord_character_required', 'enhancement_not_selected', 'enhancement_not_allowed_by_detachment', 'enhancement_unknown', 'transport_manifest_unknown_cargo', 'transport_manifest_transport_required', 'transport_manifest_dedicated_transport_required', 'transport_manifest_capacity_datasheet_drift', 'transport_manifest_cargo_ineligible'} <= codes",
+            "proves": "Foreign or unselected Enhancement source assignments produce explicit diagnostics."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-enhancement-points",
+        "source_blocks": [
+          15
+        ],
+        "summary": "Every Enhancement adds its points cost to the assigned unit’s army contribution.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_phase16d_enhancement_points_count_toward_strike_force_limit",
+            "role": "semantic",
+            "assertion": "assert 'points_limit_exceeded' in codes",
+            "proves": "Enhancement points are included when checking the army cap."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-character-model-bearer",
+        "source_blocks": [
+          17
+        ],
+        "summary": "Ordinary Enhancements require a Character unit and an explicitly selected Character model when the unit has several models.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_order68_mixed_unit_checks_selected_model_keywords",
+            "role": "semantic",
+            "assertion": "assert {'warlord_character_required', 'enhancement_character_required'} <= codes",
+            "proves": "Selecting a non-Character bearer produces enhancement_character_required."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_order68_reconstructs_shared_bearer_once_per_validation",
+            "role": "semantic",
+            "assertion": "assert 'enhancement_invalid_model_selection' in {row.violation_code for row in validate_roster_legality(catalog=catalog, request=changed).violations}",
+            "proves": "An invalid bearer identity is rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-epic-model-no-enhancement",
+        "source_blocks": [
+          18
+        ],
+        "summary": "An Epic Hero model cannot receive an Enhancement.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_order68_mixed_unit_checks_selected_model_keywords",
+            "role": "semantic",
+            "assertion": "assert ('epic_hero_enhancement_forbidden' in codes) == other_epic",
+            "proves": "Enhancement eligibility follows the selected model’s Epic Hero keyword."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-standard-enhancement-unique",
+        "source_blocks": [
+          19
+        ],
+        "summary": "The army cannot repeat an ordinary Enhancement.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_phase16d_standard_enhancements_remain_single_assignment",
+            "role": "semantic",
+            "assertion": "assert 'enhancement_repeated_assignment_forbidden' in codes",
+            "proves": "Repeated ordinary assignments are rejected."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-upgrade-noncharacter",
+        "source_blocks": [
+          21
+        ],
+        "summary": "Upgrade Enhancements can be assigned to non-Character units.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_phase16d_attached_unit_can_receive_one_upgrade_enhancement",
+            "role": "semantic",
+            "assertion": "assert report.is_legal",
+            "proves": "A legal attached unit receives its Upgrade."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-upgrade-max-three",
+        "source_blocks": [
+          22
+        ],
+        "summary": "The army may include up to three copies of one Upgrade.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_phase16d_upgrade_assignment_limits_and_targets_are_validated",
+            "role": "semantic",
+            "assertion": "assert 'upgrade_assignment_limit_exceeded' in too_many_codes",
+            "proves": "A fourth Upgrade assignment receives the cap violation."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-upgrade-count-once",
+        "source_blocks": [
+          22
+        ],
+        "summary": "The second and third copies of the same Upgrade do not increase the army Enhancement count.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_order67_upgrade_copies_count_once_but_each_pays_points",
+            "role": "semantic",
+            "assertion": "assert {v.violation_code for v in report.violations} == expected",
+            "proves": "The parameterized Upgrade/ordinary counts produce the expected Enhancement-limit result."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-upgrade-pay-each",
+        "source_blocks": [
+          22
+        ],
+        "summary": "Every Upgrade copy still costs its full points value.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_order67_upgrade_copies_count_once_but_each_pays_points",
+            "role": "semantic",
+            "assertion": "assert {v.violation_code for v in validate_roster_legality(catalog=catalog, request=over_points).violations} == expected | {'points_limit_exceeded'}",
+            "proves": "Paying per-copy cost can cross the points limit even when Enhancement count remains legal."
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "requirement_id": "25.04-incursion-single-three-dp",
+        "source_blocks": [
+          23
+        ],
+        "summary": "Incursion may select one three-DP detachment as its only detachment.",
+        "owners": [
+          "src/warhammer40k_core/engine/list_validation.py:validate_detachment_selection"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_order67_three_dp_is_only_a_single_detachment_exception",
+            "role": "semantic",
+            "assertion": "assert len(validate_detachment_selection(catalog=catalog, selection=selection, battle_size=BattleSize.INCURSION)[1]) == len(costs)",
+            "proves": "The sole-three-DP Incursion selection is legal."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_order67_three_dp_is_only_a_single_detachment_exception",
+            "role": "invalid",
+            "assertion": "with pytest.raises(ListValidationError, match='Detachment Points'):\n    validate_detachment_selection(catalog=catalog, selection=selection, battle_size=BattleSize.INCURSION)",
+            "proves": "The parameterized three-DP-plus-other selection fails the DP limit."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          6,
+          9,
+          12,
+          14
+        ],
+        "classification": "metadata",
+        "reason": "Section labels only; operative eligibility, distance and consequences are enumerated separately."
+      },
+      {
+        "source_blocks": [
+          2,
+          16,
+          20
+        ],
+        "classification": "context",
+        "reason": "Introduces the roster restrictions and the Upgrade exception list."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:019feac1-cd25-4644-b855-2ce3fa048fee",
+    "requirements": [
+      {
+        "requirement_id": "019feac1-cd25-4644-b855-2ce3fa048fee-attached-upgrade",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An attached unit may receive an Upgrade.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_phase16d_attached_unit_can_receive_one_upgrade_enhancement",
+            "role": "semantic",
+            "assertion": "assert report.is_legal",
+            "proves": "The attached Upgrade roster is legal."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Question framing for the operative answer in block 2."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:38785a5c-16ba-41c5-b936-723a385f57aa",
+    "requirements": [
+      {
+        "requirement_id": "38785a5c-16ba-41c5-b936-723a385f57aa-upgrade-plus-enhancement-prohibited",
+        "source_blocks": [
+          2
+        ],
+        "summary": "One unit cannot have an Upgrade and another Enhancement simultaneously.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_phase16d_upgrade_and_leader_enhancement_cannot_stack_on_attached_squad",
+            "role": "semantic",
+            "assertion": "assert 'attached_squad_enhancement_limit_exceeded' in codes",
+            "proves": "The combined assignment exceeds the attached unit Enhancement limit."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Question framing for the operative answer in block 2."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:3de45ba4-435e-4f58-a50c-fbda3f71bdc5",
+    "requirements": [
+      {
+        "requirement_id": "3de45ba4-435e-4f58-a50c-fbda3f71bdc5-upgrade-subtype",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Upgrades are a subtype of Enhancement.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:EnhancementAssignment"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_phase16d_upgrade_assignments_share_one_selection_and_pay_per_unit",
+            "role": "semantic",
+            "assertion": "assert army.detachment_selection.enhancement_ids == ('core-upgrade',)",
+            "proves": "The Upgrade is retained in the selected Enhancement inventory."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Question framing for the operative answer in block 2."
+      }
+    ]
+  },
+  {
+    "row_id": "faq:9aea2cef-c9db-4a30-bbfb-6b07c1f148a2",
+    "requirements": [
+      {
+        "requirement_id": "9aea2cef-c9db-4a30-bbfb-6b07c1f148a2-epic-attachment-permitted",
+        "source_blocks": [
+          2
+        ],
+        "summary": "An Epic Hero may attach to a unit carrying an Enhancement without receiving that Enhancement itself.",
+        "owners": [
+          "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+        ],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_phase16d_epic_hero_can_attach_to_unit_with_upgrade_enhancement",
+            "role": "semantic",
+            "assertion": "assert report.is_legal",
+            "proves": "The roster is legal."
+          },
+          {
+            "nodeid": "tests/unit/test_phase9c_mustering.py::test_phase16d_epic_hero_can_attach_to_unit_with_upgrade_enhancement",
+            "role": "semantic",
+            "assertion": "assert army.attached_units[0].leader_unit_instance_ids == (leader.unit_instance_id,)",
+            "proves": "The Epic Hero is an attached Leader in the Enhanced unit."
+          }
+        ],
+        "qualifications": []
+      }
+    ],
+    "nonoperative_blocks": [
+      {
+        "source_blocks": [
+          1
+        ],
+        "classification": "context",
+        "reason": "Question framing for the operative answer in block 2."
+      }
+    ]
+  }
+]
