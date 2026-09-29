@@ -9,7 +9,7 @@ Assertion-bound includes qualified and negative evidence; it does not mean the c
 | Category | Operative requirements | Assertion-bound | Explicit repair/proof gaps |
 |---|---:|---:|---:|
 | 01 | 143 | 139 | 4 |
-| 02 | 100 | 92 | 8 |
+| 02 | 100 | 95 | 5 |
 | 03 | 62 | 55 | 10 |
 | 04 | 63 | 60 | 3 |
 | 05 | 82 | 82 | 0 |
@@ -52,7 +52,6 @@ Assertion-bound includes qualified and negative evidence; it does not mean the c
 
 ## Required follow-ups before PFINAL
 
-- **C02-10 / P02J:** Reconcile the selected Ld5–8 and WS/BS2–6 limits with the shared characteristic bound policy. The retained probe observes Ld4/9 and WS/BS16. Apply the selected limits through live profile/roll consumers and retain source identity, modifier order and replay.
 - **C17-02 / P17B:** Measure every part of a based FRAME model for whole-distance, Engagement Range and terrain-area membership. Current consumers use only the support base despite a larger body. Repair the shared geometric owner and its range, objective, movement, terrain and placement consumers.
 - **C03-06 / P03F:** An impossible complete setup leaves the unit selected and trapped in placement retries. Restore selected-to-move eligibility as required, preserve its prior location, and expose legal reselection/Remain Stationary/retry through shared facade authority, historical restore and replay.
 - **C04-07 / P04F:** A weaponless Fight activation emits unit_has_fought despite resolving no melee attacks. Separate selection completion from actual fought status across ordinary and retained hosts without allowing an extra activation; authenticate the distinction in effects, restore, viewers and replay.
@@ -1505,13 +1504,11 @@ Owners: `src/warhammer40k_core/core/modifiers.py:ModifierStack`, `src/warhammer4
 
 Source `rule:02:02.02.01:1`, blocks [27]: Modified Ld lies between five-plus and eight-plus.
 
-Owners: `src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy`.
+Owners: `src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy`, `src/warhammer40k_core/core/modifiers.py:ModifierStack`.
 
-**Evidence gap; prerequisite repair required.**
+`tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers` (semantic: Leadership modifiers resolve to the selected five-plus through eight-plus bound.); `tests/unit/test_phase10j1_numeric_rules.py::test_leadership_and_skill_bounds_follow_complete_modifier_order` (semantic: Replacement, multiplication and addition finish before the Leadership ceiling.); `tests/integration/test_core_modifier_boundaries.py::test_order99_leadership_and_weapon_skill_bounds_reach_live_rolls` (facade: Command-phase Battle-shock uses the bounded Leadership target after a source-linked modifier.); `tests/integration/test_core_modifier_boundaries.py::test_order99_leadership_and_weapon_skill_bounds_reach_live_rolls` (replay: The bounded Leadership session replays exactly.)
 
-Required before PFINAL: **C02-10 / P02J**.
-
-Qualification: Evidence gap: Actual numeric policy mismatch; not a source parser inference. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding source-selected-characteristic-bounds.
+Qualification: Order 99 applies the selected five-plus through eight-plus limit through the shared characteristic bound policy. tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json retain the historical observation of Leadership 4 and 9.
 
 ### 02.02.01-obligation-19
 
@@ -1541,25 +1538,21 @@ Owners: `src/warhammer40k_core/core/modifiers.py:ModifierStack`, `src/warhammer4
 
 Source `rule:02:02.02.01:1`, blocks [31]: Modified WS lies between two-plus and six-plus.
 
-Owners: `src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy`.
+Owners: `src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy`, `src/warhammer40k_core/core/modifiers.py:ModifierStack`.
 
-**Evidence gap; prerequisite repair required.**
+`tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers` (semantic: Weapon Skill modifiers resolve to the selected two-plus through six-plus bound.); `tests/integration/test_core_modifier_boundaries.py::test_order99_leadership_and_weapon_skill_bounds_reach_live_rolls` (facade: A live melee hit uses the bounded Weapon Skill after a source-linked profile modifier.)
 
-Required before PFINAL: **C02-10 / P02J**.
-
-Qualification: Evidence gap: Actual numeric policy mismatch; not a source parser inference. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding source-selected-characteristic-bounds.
+Qualification: Order 99 applies the selected two-plus through six-plus limit through the shared characteristic bound policy. tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json retain the historical observation of Weapon Skill 16.
 
 ### 02.02.01-obligation-23
 
 Source `rule:02:02.02.01:1`, blocks [32]: Modified BS lies between two-plus and six-plus.
 
-Owners: `src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy`.
+Owners: `src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy`, `src/warhammer40k_core/core/modifiers.py:ModifierStack`.
 
-**Evidence gap; prerequisite repair required.**
+`tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers` (semantic: Ballistic Skill modifiers resolve to the selected two-plus through six-plus bound.); `tests/integration/test_core_modifier_boundaries.py::test_order99_leadership_and_weapon_skill_bounds_reach_live_rolls` (facade: Benefit of Cover cannot worsen a six-plus Ballistic Skill.)
 
-Required before PFINAL: **C02-10 / P02J**.
-
-Qualification: Evidence gap: Actual numeric policy mismatch; not a source parser inference. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding source-selected-characteristic-bounds.
+Qualification: Order 99 applies the selected two-plus through six-plus limit through the shared characteristic bound policy. tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json retain the historical observation of Ballistic Skill 16.
 
 ### 02.02.01-obligation-24
 

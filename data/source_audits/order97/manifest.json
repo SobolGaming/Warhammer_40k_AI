@@ -54,7 +54,7 @@
     },
     {
       "path": "data/source_audits/order97/categories/02.json",
-      "sha256": "22f07d8389fc84129d957f800ca4ac25ba14c577d0ab381f999bdf8f71336f56"
+      "sha256": "fe5d38f1e501e35e03bf1da51ee7a7e6ede785a9d2c0847488b87e068d04bfbf"
     },
     {
       "path": "data/source_audits/order97/categories/03.json",
@@ -206,7 +206,7 @@
     },
     {
       "path": "src/warhammer40k_core/_engine_build_manifest.json",
-      "sha256": "9c54280384dc9274016dfded5c2f27ab8cba0bd6b2db34e240d5e7fb02469f1c"
+      "sha256": "4c88fd0336909dc43fb1b981c5e1bdceb3054063f76b3d91acfc60181e7c6220"
     },
     {
       "path": "tests/absent_strength_helpers.py",
@@ -333,12 +333,20 @@
       "sha256": "27c10d476c9c1b2781e3ce81b92d6d5e1791176448b8b6b2663f1523fdc0a53b"
     },
     {
+      "path": "tests/historical_leadership_helpers.py",
+      "sha256": "f46cc9fa4425c6acea3b36fcfd512ab454b115880d0be0cd64d71bcaaed2739a"
+    },
+    {
       "path": "tests/indirect_shooting_helpers.py",
       "sha256": "14f45bb1315eaa7a17156e70a1ee77b717af3a7ed4b7f6fd772849bc850feaa9"
     },
     {
       "path": "tests/integration/test_catalog_rule_ir_runtime.py",
       "sha256": "3ff4018b00d9c7f68f14787c448dc63f07a5b66b8b24845ebaa3864d8aa0553c"
+    },
+    {
+      "path": "tests/integration/test_core_modifier_boundaries.py",
+      "sha256": "34ae71faeb956f0e61c670c3f3e8bb8f2848a72140adb02138a7707560b64354"
     },
     {
       "path": "tests/integration/test_embarked_ability_authority.py",
@@ -609,6 +617,10 @@
       "sha256": "1f3f9d145c3ddcc93359a412e4a393e046aff8ca4da15dc529851b2e882855f8"
     },
     {
+      "path": "tests/stratagem_cost_helpers.py",
+      "sha256": "9189c4be2b352294b9256216b560bd4bf76ae7f376047ecc5f5d2db98a71466c"
+    },
+    {
       "path": "tests/support/ability_presence_fixtures.py",
       "sha256": "d7d01d57258bab1c80c4c8c9d8030534c6a9cf2b440ccb25c9756b9690adf902"
     },
@@ -686,7 +698,7 @@
     },
     {
       "path": "tests/unit/test_catalog_rule_runtime_consumers.py",
-      "sha256": "051b825daec4efea9f97f3ad41532bd5dcdc8758fe2f9939234fa028550265be"
+      "sha256": "5810ba8d2a05729b0a57317acd1c3d52e83babfbd3d8f9398a1ce6a96c091435"
     },
     {
       "path": "tests/unit/test_charge_distance_continuation.py",
@@ -898,7 +910,7 @@
     },
     {
       "path": "tests/unit/test_phase10j1_numeric_rules.py",
-      "sha256": "e7e5945a946c727200123d19c473a1ce20b20b7210ea4a3528f0605a41a38a21"
+      "sha256": "e321c196f7a9f3e66975ac1693fcac7c2d5841d0141314ab861430ab534fcf88"
     },
     {
       "path": "tests/unit/test_phase10j_dice_semantics.py",
@@ -1046,7 +1058,7 @@
     },
     {
       "path": "tests/unit/test_phase17g_chaos_daemons_shadow_legion.py",
-      "sha256": "bf4df0839573f6f2721b612ad21d698aff755b551b75ab59ad1b52f624538f8f"
+      "sha256": "9e1c033fa246822e637d0c87f7daadbc4fee1d9eb53f424eb23a3a58a51be1a4"
     },
     {
       "path": "tests/unit/test_phase17g_space_marines_army_rule.py",
@@ -1123,18 +1135,6 @@
     "Complete-game performance remains deferred under Order 32 and is not certified by this evidence-only change."
   ],
   "followups": [
-    {
-      "finding_id": "C02-10",
-      "pr_id": "P02J",
-      "kind": "gameplay",
-      "description": "Reconcile the selected Ld5–8 and WS/BS2–6 limits with the shared characteristic bound policy. The retained probe observes Ld4/9 and WS/BS16. Apply the selected limits through live profile/roll consumers and retain source identity, modifier order and replay.",
-      "requirement_ids": [
-        "02.02.01-obligation-18",
-        "02.02.01-obligation-22",
-        "02.02.01-obligation-23"
-      ],
-      "runtime_source_ids": []
-    },
     {
       "finding_id": "C17-02",
       "pr_id": "P17B",

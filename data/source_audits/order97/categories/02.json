@@ -564,11 +564,37 @@
         ],
         "summary": "Modified Ld lies between five-plus and eight-plus.",
         "owners": [
-          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy"
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack"
         ],
-        "evidence": [],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers",
+            "role": "semantic",
+            "assertion": "assert bounded.final == expected",
+            "proves": "Leadership modifiers resolve to the selected five-plus through eight-plus bound."
+          },
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_leadership_and_skill_bounds_follow_complete_modifier_order",
+            "role": "semantic",
+            "assertion": "assert bounded.final == 8",
+            "proves": "Replacement, multiplication and addition finish before the Leadership ceiling."
+          },
+          {
+            "nodeid": "tests/integration/test_core_modifier_boundaries.py::test_order99_leadership_and_weapon_skill_bounds_reach_live_rolls",
+            "role": "facade",
+            "assertion": "assert request_payload['leadership_target'] == expected",
+            "proves": "Command-phase Battle-shock uses the bounded Leadership target after a source-linked modifier."
+          },
+          {
+            "nodeid": "tests/integration/test_core_modifier_boundaries.py::test_order99_leadership_and_weapon_skill_bounds_reach_live_rolls",
+            "role": "replay",
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+            "proves": "The bounded Leadership session replays exactly."
+          }
+        ],
         "qualifications": [
-          "Evidence gap: Actual numeric policy mismatch; not a source parser inference. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding source-selected-characteristic-bounds."
+          "Order 99 applies the selected five-plus through eight-plus limit through the shared characteristic bound policy. tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json retain the historical observation of Leadership 4 and 9."
         ]
       },
       {
@@ -641,11 +667,25 @@
         ],
         "summary": "Modified WS lies between two-plus and six-plus.",
         "owners": [
-          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy"
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack"
         ],
-        "evidence": [],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers",
+            "role": "semantic",
+            "assertion": "assert bounded.final == expected",
+            "proves": "Weapon Skill modifiers resolve to the selected two-plus through six-plus bound."
+          },
+          {
+            "nodeid": "tests/integration/test_core_modifier_boundaries.py::test_order99_leadership_and_weapon_skill_bounds_reach_live_rolls",
+            "role": "facade",
+            "assertion": "assert hit.target_number == expected",
+            "proves": "A live melee hit uses the bounded Weapon Skill after a source-linked profile modifier."
+          }
+        ],
         "qualifications": [
-          "Evidence gap: Actual numeric policy mismatch; not a source parser inference. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding source-selected-characteristic-bounds."
+          "Order 99 applies the selected two-plus through six-plus limit through the shared characteristic bound policy. tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json retain the historical observation of Weapon Skill 16."
         ]
       },
       {
@@ -655,11 +695,25 @@
         ],
         "summary": "Modified BS lies between two-plus and six-plus.",
         "owners": [
-          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy"
+          "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+          "src/warhammer40k_core/core/modifiers.py:ModifierStack"
         ],
-        "evidence": [],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers",
+            "role": "semantic",
+            "assertion": "assert bounded.final == expected",
+            "proves": "Ballistic Skill modifiers resolve to the selected two-plus through six-plus bound."
+          },
+          {
+            "nodeid": "tests/integration/test_core_modifier_boundaries.py::test_order99_leadership_and_weapon_skill_bounds_reach_live_rolls",
+            "role": "facade",
+            "assertion": "assert covered_hit.target_number == 6",
+            "proves": "Benefit of Cover cannot worsen a six-plus Ballistic Skill."
+          }
+        ],
         "qualifications": [
-          "Evidence gap: Actual numeric policy mismatch; not a source parser inference. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding source-selected-characteristic-bounds."
+          "Order 99 applies the selected two-plus through six-plus limit through the shared characteristic bound policy. tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json retain the historical observation of Ballistic Skill 16."
         ]
       },
       {

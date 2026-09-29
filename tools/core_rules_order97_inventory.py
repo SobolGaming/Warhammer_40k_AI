@@ -21,7 +21,7 @@ from tools.core_rules_order97_models import Inventory
 ROOT = Path(__file__).resolve().parents[1]
 DIRECTORY = ROOT / "data/source_audits/order97"
 REPORT = ROOT / "docs/ORDER_97_EVIDENCE_REPORT.md"
-REVIEW_SHA256 = "366d2bc25dd266ad9bdc10fe1d5d4181b5f3459ff9beca5ed6087249abc8b3a1"
+REVIEW_SHA256 = "21d6a78ba1674207c59bb2c23d3a9ec612c20dc5a152855ec8e40287dbb84db5"
 
 
 class InventoryError(ValueError):

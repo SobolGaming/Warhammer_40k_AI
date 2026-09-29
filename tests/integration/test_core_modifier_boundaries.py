@@ -1113,7 +1113,9 @@ def test_order99_leadership_and_weapon_skill_bounds_reach_live_rolls() -> None:
             characteristic=Characteristic.LEADERSHIP,
         )
         assert len(operations) == 1
-        assert operations[0].source_id.startswith("fixture:historical-leadership")
+        source_id = operations[0].source_id
+        assert source_id is not None
+        assert source_id.startswith("fixture:historical-leadership")
         assert operations[0].operand == (10 if game_suffix == "worsen" else -10)
         bounded = ModifierStack(
             characteristic=Characteristic.LEADERSHIP,

@@ -37,7 +37,7 @@ skill operations, including Benefit of Cover. Replay and persistence use the
 existing decision and event records; no payload shape or contract version
 changes.
 
-## Evidence
+## Evidence and retained gates
 
 `tests/unit/test_phase10j1_numeric_rules.py` covers the floors, ceilings,
 in-range results, and replacement-multiplication-addition order with source
@@ -48,3 +48,14 @@ both viewers. The same test resolves ranged and melee weapon profiles through
 the live hit consumer, including a Ballistic Skill 6+ attack worsened by
 Benefit of Cover. No Core Rules or complete-game performance certificate is
 claimed. PFINAL remains open.
+
+The Order 97 inventory now binds these clauses to the assertions above. Its
+probe file and `observed_gaps_01_08.json` stay the historical Leadership 4/9
+and WS/BS 16 observation. The reviewed inventory fingerprint was recomputed
+after those evidence, pin, and runtime-manifest changes.
+
+Runtime identity changed, so the existing runtime-bound head reports were
+remeasured on this host with the same workloads, baselines, and budgets.
+Historical baseline samples were not relabeled. Commands, durations, and
+hashes are in
+[the refresh record](performance/order99/inherited-refresh.json).

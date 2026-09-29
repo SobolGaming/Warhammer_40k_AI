@@ -1,5 +1,10 @@
 # Order 64 authenticated reconstruction guard
 
+Order 99 refreshed the active head report for runtime `85ed7b47` with unchanged
+baselines, workloads and budgets. Current qualification is recorded in
+[Order 99 refresh](../order99/inherited-refresh.json); prior results below
+remain historical.
+
 Order 87 refreshed the active head report for runtime `904893c1`; prior tables and
 revision notes below describe historical runs. Current samples and refresh details
 are recorded in [Order 87 evidence](../order87/README.md). Baselines and budgets
