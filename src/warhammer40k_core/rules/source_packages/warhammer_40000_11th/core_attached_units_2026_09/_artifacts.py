@@ -15,6 +15,11 @@ from warhammer40k_core.rules.source_evidence import (
     RuleVerificationStatus,
     SemanticExecutionStatus,
 )
+from warhammer40k_core.rules.source_supersession import (
+    SourceSupersessionError,
+    SupersededSourceRecord,
+    validate_superseded_source_records,
+)
 
 ARTIFACT_SCHEMA: Final = "core-v2-attached-units-source-v1"
 EXPECTED_SOURCE_PACKAGE_ID: Final = "gw-11e-core-attached-units"
@@ -32,7 +37,7 @@ EXPECTED_OBSERVATION_SHA256S: Final = (
     "29c65f1de8ddfd855323b8d0ef6f99b5ce6d28e322034ca2e68097398e408aec",
     "ee513960052396784786dee07ff736c25c0c120f06e56d6940b020fdf71f2d5d",
 )
-EXPECTED_PACKAGE_HASH: Final = "3f6e0c6b6c3b9a96d19967e2ef5c8ab0429fd7fc8b025304b84e3dc5cb243570"
+EXPECTED_PACKAGE_HASH: Final = "ec42640d7192a01eef34ceefd84d0e16071f5ad62c0956e27467f6e973673d6b"
 
 
 class CoreAttachedUnitsSourceArtifactError(ValueError):
@@ -139,6 +144,7 @@ class CoreAttachedUnitsSourcePackageArtifact(
     source_document: CoreAttachedUnitsSourceDocumentArtifact
     rules: tuple[CoreAttachedUnitsSourceRuleArtifact, ...]
     evidence: tuple[CoreAttachedUnitsEvidenceArtifact, ...]
+    superseded_records: tuple[SupersededSourceRecord, ...]
     package_hash: str
 
 
@@ -156,6 +162,14 @@ def core_attached_units_source_artifact_from_json_bytes(
         raise CoreAttachedUnitsSourceArtifactError(
             "Attached Units source artifact schema is invalid."
         ) from exc
+    try:
+        validate_superseded_source_records(artifact.superseded_records)
+    except SourceSupersessionError as exc:
+        raise CoreAttachedUnitsSourceArtifactError(str(exc)) from exc
+    if tuple(record.record_id for record in artifact.superseded_records) != (
+        "retired-consumer:starting-attached-unit-records-from-armies",
+    ):
+        raise CoreAttachedUnitsSourceArtifactError("Attached Units superseded consumer drifted.")
     if len(artifact.rules) != 1:
         raise CoreAttachedUnitsSourceArtifactError(
             "Attached Units source artifact drifted from its reviewed identity."

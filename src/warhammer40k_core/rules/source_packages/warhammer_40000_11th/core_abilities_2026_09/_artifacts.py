@@ -15,6 +15,11 @@ from warhammer40k_core.rules.source_evidence import (
     RuleVerificationStatus,
     SemanticExecutionStatus,
 )
+from warhammer40k_core.rules.source_supersession import (
+    SourceSupersessionError,
+    SupersededSourceRecord,
+    validate_superseded_source_records,
+)
 
 ARTIFACT_SCHEMA: Final = "core-v2-core-abilities-source-v1"
 EXPECTED_SOURCE_PACKAGE_ID: Final = "gw-11e-core-abilities"
@@ -85,7 +90,7 @@ EXPECTED_OBSERVATION_SHA256S: Final = (
     "a80ec4f83e554f7004a396a7363977db41f9ca0e3a8675df1c0163bab3967ffd",
     "8292a0b2aaa7640ee6b82b2dca9e822aa2ce26d59759dfb72a276a9e63b77e1b",
 )
-EXPECTED_PACKAGE_HASH: Final = "ceda170f6ff51083eb2976ea97ee4d9096095dc3276d25ff7335d1cacabb9bfb"
+EXPECTED_PACKAGE_HASH: Final = "d83ffcebb9773b7318299b121e099cfe02264e2f82d2ea39cf39cf4a43c2eef8"
 
 
 class CoreAbilitiesSourceArtifactError(ValueError):
@@ -199,6 +204,7 @@ class CoreAbilitiesSourcePackageArtifact(
     source_document: CoreAbilitiesSourceDocumentArtifact
     rules: tuple[CoreAbilitiesSourceRuleArtifact, ...]
     evidence: tuple[CoreAbilitiesEvidenceArtifact, ...]
+    superseded_records: tuple[SupersededSourceRecord, ...]
     package_hash: str
 
 
@@ -216,6 +222,14 @@ def core_abilities_source_artifact_from_json_bytes(
         raise CoreAbilitiesSourceArtifactError(
             "Core Abilities source artifact schema is invalid."
         ) from exc
+    try:
+        validate_superseded_source_records(artifact.superseded_records)
+    except SourceSupersessionError as exc:
+        raise CoreAbilitiesSourceArtifactError(str(exc)) from exc
+    if tuple(record.record_id for record in artifact.superseded_records) != (
+        "retired-consumer:validate-prebattle-alternation-restore",
+    ):
+        raise CoreAbilitiesSourceArtifactError("Core Abilities superseded consumer drifted.")
     if len(artifact.rules) != 3:
         raise CoreAbilitiesSourceArtifactError(
             "Core Abilities source artifact drifted from its reviewed identity."

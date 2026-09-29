@@ -182,7 +182,7 @@
     },
     {
       "path": "data/source_audits/order97/runtime-reconciliation.json",
-      "sha256": "cf1f4fb35455c49e014f28ee35fb2c2fc09f1ddab1045bc4bdda1a7e90967d20"
+      "sha256": "68d93f855e3698da1a83bdafeff99458e5bd65b48d64483f6d1312a37606c05a"
     },
     {
       "path": "data/source_audits/order97/selected-sources.json",
@@ -206,7 +206,7 @@
     },
     {
       "path": "src/warhammer40k_core/_engine_build_manifest.json",
-      "sha256": "21a95aac3990571899031b4956f45effb6180e5a1a8baa10d587c64ad4076813"
+      "sha256": "9c54280384dc9274016dfded5c2f27ab8cba0bd6b2db34e240d5e7fb02469f1c"
     },
     {
       "path": "tests/absent_strength_helpers.py",
@@ -1123,23 +1123,6 @@
     "Complete-game performance remains deferred under Order 32 and is not certified by this evidence-only change."
   ],
   "followups": [
-    {
-      "finding_id": "CAUDIT-03",
-      "pr_id": "PSOURCERECON",
-      "kind": "source",
-      "description": "Replace label-only Command transcriptions and incomplete large-model/Move Units excerpts with complete selected source records; repair the visibility locator and retired Scouts/attached-unit consumer identities. Preserve provenance, explicit supersessions and separate load/execution status; regenerate runtime identity and revalidate consumers.",
-      "requirement_ids": [],
-      "runtime_source_ids": [
-        "gw-11e-core-abilities:faq:alternating-scout-moves",
-        "gw-11e-core-rules:attached-units:bodyguard-unit-destroyed",
-        "gw-11e-core-rules:command-phase:start-of-command-phase",
-        "gw-11e-core-rules:command-phase:gain-core-cp",
-        "gw-11e-core-rules:command-phase:battle-shock",
-        "gw-11e-core-large-model-setup:large-model-setup",
-        "gw-11e-core-rules:movement-phase:move-units-step",
-        "gw-11e-core-rules:other-concepts:visibility-classifications"
-      ]
-    },
     {
       "finding_id": "C02-10",
       "pr_id": "P02J",

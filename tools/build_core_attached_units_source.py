@@ -36,7 +36,7 @@ RUNTIME_CONSUMER_IDS = [
     "warhammer40k_core.engine.attached_unit_reconciliation:validate_attached_rules_unit_identity_after_destruction",
     "warhammer40k_core.engine.rules_unit_placement:RulesUnitPlacement.from_battlefield",
     "warhammer40k_core.engine.rules_units:current_rules_unit_views_for_identity",
-    "warhammer40k_core.engine.starting_attached_units:starting_attached_unit_records_from_armies",
+    "warhammer40k_core.engine.starting_attached_units:starting_attached_unit_records_for_army",
 ]
 
 
@@ -138,6 +138,32 @@ def build_payload() -> dict[str, object]:
             }
         ],
         "evidence": _evidence_rows(transcription_sha256=transcription_sha256),
+        "superseded_records": [
+            {
+                "record_id": "retired-consumer:starting-attached-unit-records-from-armies",
+                "source_id": "gw-11e-core-rules:attached-units:bodyguard-unit-destroyed",
+                "kind": "retired_consumer",
+                "prior_text": (
+                    "warhammer40k_core.engine.starting_attached_units:"
+                    "starting_attached_unit_records_from_armies"
+                ),
+                "prior_sha256": _sha256_text(
+                    "warhammer40k_core.engine.starting_attached_units:"
+                    "starting_attached_unit_records_from_armies"
+                ),
+                "successor": (
+                    "warhammer40k_core.engine.starting_attached_units:"
+                    "starting_attached_unit_records_for_army"
+                ),
+                "load_support_status": "loaded",
+                "semantic_execution_status": "not_certified",
+                "reason": (
+                    "starting_attached_unit_records_from_armies was replaced by "
+                    "starting_attached_unit_records_for_army. The retired name is retained and "
+                    "is not a live consumer."
+                ),
+            }
+        ],
         "package_hash": "",
     }
     payload["package_hash"] = _sha256_payload(payload)

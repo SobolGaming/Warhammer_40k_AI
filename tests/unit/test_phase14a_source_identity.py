@@ -189,18 +189,18 @@ def test_p09a_move_units_source_artifact_is_pinned_typed_and_executable() -> Non
     assert rule.transcription_sha256 == core_movement_phase_2026_08.TRANSCRIPTION_SHA256
     assert {
         "battlefield",
-        "Strategic Reserves",
-        "embarked within a Transport",
-        "DISEMBARK (18.04)",
-        "INGRESS (20.04)",
+        "strategic reserves",
+        "embarked within a TRANSPORT",
+        "Disembark move (18.04)",
+        "Ingress move (20.04)",
     } <= {
         token
         for token in (
             "battlefield",
-            "Strategic Reserves",
-            "embarked within a Transport",
-            "DISEMBARK (18.04)",
-            "INGRESS (20.04)",
+            "strategic reserves",
+            "embarked within a TRANSPORT",
+            "Disembark move (18.04)",
+            "Ingress move (20.04)",
         )
         if token in rule.source_text
     }
@@ -2451,7 +2451,7 @@ def test_p08ab_command_phase_source_is_ordered_hash_pinned_and_truthful() -> Non
 
     assert hashlib.sha256(raw).hexdigest() == (core_command_phase_2026_08.EXPECTED_ARTIFACT_SHA256)
     assert core_command_phase_2026_08.PACKAGE_HASH == (
-        "8785dda65406ce76add419f29263be499239122e1330941ab55a1dc3e6f10127"
+        "10688ecc851e922050e0d5b90d2220085a2dc77532075ba49dd24b9638ad88e5"
     )
     assert [(rule.section_id, rule.display_order, rule.section_heading) for rule in rules] == [
         ("08.01", 1, "START OF COMMAND PHASE"),
@@ -2598,16 +2598,20 @@ def test_p08ab_command_phase_source_is_ordered_hash_pinned_and_truthful() -> Non
         )
         assert mirror.observation_sha256 == rule.source_observation_sha256
         assert all(
-            record.transcription_sha256 == rule.transcription_sha256
-            and record.load_support_status == "loaded"
+            record.load_support_status == "loaded"
             and record.semantic_execution_status == expected_semantic_status[rule.rule_id]
             and record.runtime_consumer_ids == rule.runtime_consumer_ids
             and RuleEvidenceRecord.from_payload(record.to_payload()) == record
             for record in evidence
         )
+        assert project_review.transcription_sha256 == rule.transcription_sha256
+        assert (
+            mirror.transcription_sha256 == hashlib.sha256(rule.section_heading.encode()).hexdigest()
+        )
+        assert rule.source_text != rule.section_heading
         assert (
             source_package.source_catalog.source_text_by_id(rule.source_id).raw_text
-            == rule.section_heading
+            == rule.source_text
         )
         assert (
             source_package.source_catalog.source_text_by_id(

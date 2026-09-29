@@ -38,7 +38,7 @@ from ._artifacts import (
 )
 
 _ARTIFACT_PATH: Final = "artifacts/package.json"
-EXPECTED_ARTIFACT_SHA256: Final = "fbfb7dae154292d33963a9c81d5c14025aa6c44873b7ee7a60c1fce754909bf7"
+EXPECTED_ARTIFACT_SHA256: Final = "c45ac9d1ea006d32f8fc803940f51f971e934acbd6f09c51ef263c64b7f69c7b"
 
 
 def _load_artifact() -> CoreAbilitiesSourcePackageArtifact:

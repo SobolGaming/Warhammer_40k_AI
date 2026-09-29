@@ -25,7 +25,7 @@ CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID = (
 )
 CORE_RULES_SOURCE_AUTHORITY_SCOPE: SourceAuthorityScope = "warhammer_40000_11th_core_rules"
 EXPECTED_SOURCE_AUTHORITY_REGISTRY_SHA256 = (
-    "eb052465af86e378063dcff2807e83f3e34282b91d203b943a468aecdc540f5c"
+    "db51f5f293ed6e014e87d3e4af0c3722dd786322252662e77b116337dc471e16"
 )
 
 _REGISTRY_PATH = Path(__file__).with_name("source_authority_registry.json")
@@ -57,6 +57,16 @@ class LegacyObservationAuthorization:
 
 
 @dataclass(frozen=True, slots=True)
+class LegacyControllingTranscriptionAuthorization:
+    namespace: str
+    package_name: str
+    version: str
+    rule_source_id: str
+    historical_observation_sha256: str
+    controlling_transcription_sha256: str
+
+
+@dataclass(frozen=True, slots=True)
 class SourcePackageAuthorization:
     namespace: str
     package_name: str
@@ -73,6 +83,7 @@ class SourceAuthorityScopeRegistry:
     policy_ids: tuple[str, ...]
     audit_rows: tuple[AuditRowAuthorization, ...]
     legacy_observations: tuple[LegacyObservationAuthorization, ...]
+    legacy_controlling_transcriptions: tuple[LegacyControllingTranscriptionAuthorization, ...]
     source_packages: tuple[SourcePackageAuthorization, ...]
 
 
@@ -189,6 +200,32 @@ class SourceAuthorityRegistry:
                 "inventory."
             )
 
+    def authorize_legacy_controlling_transcription(
+        self,
+        *,
+        scope_id: SourceAuthorityScope,
+        namespace: str,
+        package_name: str,
+        version: str,
+        rule_source_id: str,
+        historical_observation_sha256: str,
+        controlling_transcription_sha256: str,
+    ) -> None:
+        scope = self.scope(scope_id)
+        if not any(
+            row.namespace == namespace
+            and row.package_name == package_name
+            and row.version == version
+            and row.rule_source_id == rule_source_id
+            and row.historical_observation_sha256 == historical_observation_sha256
+            and row.controlling_transcription_sha256 == controlling_transcription_sha256
+            for row in scope.legacy_controlling_transcriptions
+        ):
+            raise SourceAuthorityRegistryError(
+                "A legacy mirror may differ from its controlling transcription only when that "
+                "package, source, historical observation, and replacement text are registered."
+            )
+
     def authorize_source_package(
         self,
         *,
@@ -281,6 +318,7 @@ def _scope(payload: dict[str, object]) -> SourceAuthorityScopeRegistry:
             "policy_ids",
             "audit_rows",
             "legacy_observations",
+            "legacy_controlling_transcriptions",
             "source_packages",
         },
         context="scope",
@@ -303,6 +341,15 @@ def _scope(payload: dict[str, object]) -> SourceAuthorityScopeRegistry:
                 "legacy_observations",
                 context="legacy observations",
                 allow_empty=scope_id == FACTION_SOURCE_AUTHORITY_SCOPE,
+            )
+        ),
+        legacy_controlling_transcriptions=tuple(
+            _legacy_controlling_transcription(item)
+            for item in _object_rows(
+                row,
+                "legacy_controlling_transcriptions",
+                context="legacy controlling transcriptions",
+                allow_empty=True,
             )
         ),
         source_packages=tuple(
@@ -365,6 +412,31 @@ def _legacy_observation(payload: dict[str, object]) -> LegacyObservationAuthoriz
     )
 
 
+def _legacy_controlling_transcription(
+    payload: dict[str, object],
+) -> LegacyControllingTranscriptionAuthorization:
+    row = _exact_dict(
+        payload,
+        {
+            "namespace",
+            "package_name",
+            "version",
+            "rule_source_id",
+            "historical_observation_sha256",
+            "controlling_transcription_sha256",
+        },
+        context="legacy controlling transcription",
+    )
+    return LegacyControllingTranscriptionAuthorization(
+        namespace=_text(row, "namespace"),
+        package_name=_text(row, "package_name"),
+        version=_text(row, "version"),
+        rule_source_id=_text(row, "rule_source_id"),
+        historical_observation_sha256=_sha256(row, "historical_observation_sha256"),
+        controlling_transcription_sha256=_sha256(row, "controlling_transcription_sha256"),
+    )
+
+
 def _source_package(payload: dict[str, object]) -> SourcePackageAuthorization:
     row = _exact_dict(
         payload,
@@ -404,6 +476,18 @@ def _validate_registry_contents(registry: SourceAuthorityRegistry) -> None:
         if faction_scope and scope.legacy_observations:
             raise SourceAuthorityRegistryError(
                 "Faction scope cannot authorize legacy observations."
+            )
+        if faction_scope and scope.legacy_controlling_transcriptions:
+            raise SourceAuthorityRegistryError(
+                "Faction scope cannot authorize legacy controlling transcriptions."
+            )
+        replacement_keys = tuple(
+            (row.namespace, row.package_name, row.version, row.rule_source_id)
+            for row in scope.legacy_controlling_transcriptions
+        )
+        if len(replacement_keys) != len(set(replacement_keys)):
+            raise SourceAuthorityRegistryError(
+                "Legacy controlling transcriptions must be unique per source row."
             )
         if faction_scope and any(
             package.catalog_sha256 is None for package in scope.source_packages
@@ -457,6 +541,31 @@ def _validate_registry_contents(registry: SourceAuthorityRegistry) -> None:
             raise SourceAuthorityRegistryError(
                 "Legacy observations must name an authorized Core Rules source ID."
             )
+        packages_by_identity = {
+            (row.namespace, row.package_name, row.version): row for row in scope.source_packages
+        }
+        legacy_observations_by_source = {
+            source_id: {
+                row.observation_sha256
+                for row in scope.legacy_observations
+                if row.rule_source_id == source_id
+            }
+            for source_id in {row.rule_source_id for row in scope.legacy_observations}
+        }
+        for replacement in scope.legacy_controlling_transcriptions:
+            package = packages_by_identity.get(
+                (replacement.namespace, replacement.package_name, replacement.version)
+            )
+            if (
+                package is None
+                or replacement.rule_source_id not in package.allowed_rule_source_ids
+                or replacement.historical_observation_sha256
+                not in legacy_observations_by_source.get(replacement.rule_source_id, set())
+            ):
+                raise SourceAuthorityRegistryError(
+                    "Legacy controlling transcriptions must bind an authorized package, source, "
+                    "and immutable historical observation."
+                )
 
 
 def _exact_dict(

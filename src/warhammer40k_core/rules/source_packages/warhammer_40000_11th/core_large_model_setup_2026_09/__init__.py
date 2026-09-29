@@ -22,8 +22,13 @@ from warhammer40k_core.rules.source_evidence import (
     SourceEvidenceCatalog,
 )
 from warhammer40k_core.rules.source_packages.artifact_loader import package_artifact_bytes
+from warhammer40k_core.rules.source_supersession import (
+    SourceSupersessionError,
+    SupersededSourceRecord,
+    validate_superseded_source_records,
+)
 
-EXPECTED_ARTIFACT_SHA256: Final = "24e64e35889899b0b2410dfe4a68d3bc4022c2bef54d25ec9269f610ad819f58"
+EXPECTED_ARTIFACT_SHA256: Final = "7518bd014c6926a75cb93a9f608411a87dea2ccddf1bd6399d6f484cc358a799"
 SOURCE_PACKAGE_ID: Final = "gw-11e-core-large-model-setup"
 SOURCE_VERSION: Final = "maintained-app-mirrors-observed-2026-09-17"
 LARGE_MODEL_SETUP_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:large-model-setup"
@@ -58,6 +63,7 @@ class LargeModelSetupSourceArtifact(msgspec.Struct, frozen=True, forbid_unknown_
     source_version: str
     rules: tuple[LargeModelSetupSourceRule, ...]
     evidence: tuple[RuleEvidencePayload, ...]
+    superseded_records: tuple[SupersededSourceRecord, ...]
     package_hash: str
     setup_policy: LargeModelSetupPolicy
 
@@ -76,6 +82,14 @@ def validate_source_artifact_bytes(raw: bytes) -> LargeModelSetupSourceArtifact:
         or tuple(rule.source_id for rule in artifact.rules) != (LARGE_MODEL_SETUP_SOURCE_ID,)
     ):
         raise LargeModelSetupSourceError("LargeModelSetup source identity drifted.")
+    try:
+        validate_superseded_source_records(artifact.superseded_records)
+    except SourceSupersessionError as exc:
+        raise LargeModelSetupSourceError(str(exc)) from exc
+    if tuple(record.record_id for record in artifact.superseded_records) != (
+        "incomplete-excerpt:large-model-setup",
+    ):
+        raise LargeModelSetupSourceError("LargeModelSetup superseded excerpt drifted.")
     for rule in artifact.rules:
         if hashlib.sha256(rule.source_text.encode()).hexdigest() != rule.transcription_sha256:
             raise LargeModelSetupSourceError("LargeModelSetup transcription hash drifted.")

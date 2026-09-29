@@ -132,18 +132,17 @@ def _build_source_catalog() -> SourceCatalog:
         objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id=f"{SOURCE_PACKAGE_ID}:manifest:p08ab-source-provenance",
         raw_text=(
-            "P08A and P08B pair reviewed Command-phase section headings with the retained "
-            f"project-authoritative 40k.app search-index observation at {SOURCE_URL}, observed "
-            f"{OBSERVED_AT}. That RuleEvidence pins the exact five-heading sequence only and "
-            "contains no operative body text; the "
-            f"older category-08 audit at {CATEGORY_URL}, observed {CATEGORY_OBSERVED_AT}, remains "
-            "category-locator metadata and retains no page body. Complete operative text for "
-            "sections 08.01 through 08.03 is separately transcribed from official Core Rules PDF "
-            "source "
+            "P08A and P08B retain the project-authoritative 40k.app search-index observation at "
+            f"{SOURCE_URL}, observed {OBSERVED_AT}. That observation pins the exact five-heading "
+            "sequence only and contains no operative body text. The controlling source_text for "
+            "sections 08.01 through 08.03 is the complete selected rule, including the retained "
+            "battle-shock examples. The official Core Rules PDF "
             f"{_ARTIFACT.source_document.official_pdf_source_id}, SHA-256 "
-            f"{EXPECTED_OFFICIAL_PDF_SHA256}. Battle-shock runtime support remains partial only "
-            "because P01 retains the off-battlefield embarked and Strategic Reserve extension; "
-            "P08B's on-battlefield scope is executable."
+            f"{EXPECTED_OFFICIAL_PDF_SHA256}, remains corroboration for the operative PDF excerpt. "
+            f"The older category-08 audit at {CATEGORY_URL}, observed {CATEGORY_OBSERVED_AT}, "
+            "remains category-locator metadata and retains no page body. Battle-shock runtime "
+            "support remains partial only because P01 retains the off-battlefield embarked and "
+            "Strategic Reserve extension; P08B's on-battlefield scope is executable."
         ),
     )
     source_texts = [provenance]

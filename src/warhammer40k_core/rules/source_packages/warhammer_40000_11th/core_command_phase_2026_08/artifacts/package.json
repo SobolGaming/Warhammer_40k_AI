@@ -10,7 +10,7 @@
       "evidence_id": "core-v2-p08a-source-review:start-of-command-phase",
       "evidence_kind": "project_reviewed_app_transcription",
       "load_support_status": "loaded",
-      "observation_sha256": "a7b62f3bd25472b0895f678499799d685a3a71f88a274543145b0ea1caa3f33c",
+      "observation_sha256": "86bddaffc1a8f24f75a9b383c09a18f56bb63de132c36de8cf0d2ea63f317dd7",
       "observed_at": null,
       "official_corroborating_source_ids": [],
       "project_authority_policy_id": null,
@@ -25,9 +25,9 @@
       ],
       "semantic_execution_status": "executable_engine_runtime",
       "source_platform": "Repository",
-      "source_title": "Reviewed transcription of the Command-phase section heading",
+      "source_title": "Reviewed complete selected transcription of START OF COMMAND PHASE",
       "source_url": null,
-      "transcription_sha256": "c7076d22487eaacd4966ce616ed23632f73c1c1e77e97264779f58571855cd33",
+      "transcription_sha256": "539a37c85bcb22ebe08ae017a6e926489bbc8b311680d80514d5151855ed1c31",
       "verification_status": "unverified"
     },
     {
@@ -68,7 +68,7 @@
       "evidence_id": "core-v2-p08a-source-review:gain-core-cp",
       "evidence_kind": "project_reviewed_app_transcription",
       "load_support_status": "loaded",
-      "observation_sha256": "1e78d9bf1747212e3f3d2ddc03ca8fc44755f6a38ccac3f455c7a1f973f3534d",
+      "observation_sha256": "167ca9e514937af1bab908f96e437d4773f8829399b8203ac951dfb9958f93ed",
       "observed_at": null,
       "official_corroborating_source_ids": [],
       "project_authority_policy_id": null,
@@ -83,9 +83,9 @@
       ],
       "semantic_execution_status": "executable_engine_runtime",
       "source_platform": "Repository",
-      "source_title": "Reviewed transcription of the Command-phase section heading",
+      "source_title": "Reviewed complete selected transcription of GAIN CORE CP",
       "source_url": null,
-      "transcription_sha256": "15b5a4c0e0184c03730be6b15d9aad113b1b59bb262028d00173ea5475f7a42f",
+      "transcription_sha256": "6a09ea8b545e04dfbb0755408986862f7cf19991bb023106cafcbbb63b8e55d0",
       "verification_status": "unverified"
     },
     {
@@ -126,7 +126,7 @@
       "evidence_id": "core-v2-p08b-source-review:battle-shock",
       "evidence_kind": "project_reviewed_app_transcription",
       "load_support_status": "loaded",
-      "observation_sha256": "8f1a6267b957431f620bbb7e8cee0a1f82a7dda25672babfab3e1cdd8e63699e",
+      "observation_sha256": "b32d414dd6e9385e78d02454477ce45ef41573d6d0bfeca5b68fd28b441e8846",
       "observed_at": null,
       "official_corroborating_source_ids": [],
       "project_authority_policy_id": null,
@@ -143,9 +143,9 @@
       ],
       "semantic_execution_status": "partial_engine_runtime",
       "source_platform": "Repository",
-      "source_title": "Reviewed transcription of the Command-phase section heading",
+      "source_title": "Reviewed complete selected transcription of BATTLE-SHOCK",
       "source_url": null,
-      "transcription_sha256": "621c1dac0261aaeb2443a843f9d4dd05d253f6ac01a6e251620739eece408e56",
+      "transcription_sha256": "b2a5cdecb25d1f89f004062fab75868023e2f557066df4eeb2ba9d94352f2f4e",
       "verification_status": "unverified"
     },
     {
@@ -180,7 +180,7 @@
       "verification_status": "authoritative_app_mirror"
     }
   ],
-  "package_hash": "8785dda65406ce76add419f29263be499239122e1330941ab55a1dc3e6f10127",
+  "package_hash": "10688ecc851e922050e0d5b90d2220085a2dc77532075ba49dd24b9638ad88e5",
   "rules": [
     {
       "display_order": 1,
@@ -200,8 +200,8 @@
       "semantic_execution_status": "executable_engine_runtime",
       "source_id": "gw-11e-core-rules:command-phase:start-of-command-phase",
       "source_observation_sha256": "9b5ce8b7402b6719772dec0ebca6e477d6f2c9a0ddb3b83f8504d2337d5c6d76",
-      "source_text": "START OF COMMAND PHASE",
-      "transcription_sha256": "c7076d22487eaacd4966ce616ed23632f73c1c1e77e97264779f58571855cd33"
+      "source_text": "Rules that are triggered at the start of the Command phase are resolved now.",
+      "transcription_sha256": "539a37c85bcb22ebe08ae017a6e926489bbc8b311680d80514d5151855ed1c31"
     },
     {
       "display_order": 2,
@@ -221,8 +221,8 @@
       "semantic_execution_status": "executable_engine_runtime",
       "source_id": "gw-11e-core-rules:command-phase:gain-core-cp",
       "source_observation_sha256": "9809dd16794d824ee12f6b7d6a8e0075e61cabde43c93a9bdfe9b797b5df283a",
-      "source_text": "GAIN CORE CP",
-      "transcription_sha256": "15b5a4c0e0184c03730be6b15d9aad113b1b59bb262028d00173ea5475f7a42f"
+      "source_text": "Both players gain 1 Command Point (CP).",
+      "transcription_sha256": "6a09ea8b545e04dfbb0755408986862f7cf19991bb023106cafcbbb63b8e55d0"
     },
     {
       "display_order": 3,
@@ -244,8 +244,8 @@
       "semantic_execution_status": "partial_engine_runtime",
       "source_id": "gw-11e-core-rules:command-phase:battle-shock",
       "source_observation_sha256": "e60b785371c3815fe3a9a2b77ca4dc012c6e5541c95dbcc22f68b5452c576a78",
-      "source_text": "BATTLE-SHOCK",
-      "transcription_sha256": "621c1dac0261aaeb2443a843f9d4dd05d253f6ac01a6e251620739eece408e56"
+      "source_text": "The active player must now make one battle-shock roll (01.07) for each unit in their army that fulfils one or both of the following conditions:\n\u2022 That unit is currently battle-shocked.\n\u2022 That unit is at, or below, half\u2011strength.\nIf a unit was battle-shocked at the start of this step and its battle-shock roll during this step succeeds, it is no longer battle-shocked.\nBattle-shock Examples\nThis unit has a starting strength of 3 so is not at or below half-strength, but it is currently battle-shocked, so a battle-shock roll must be made for it. If that roll succeeds, the unit will no longer be battle-shocked.\nThis unit has a starting strength of 10. It has five models remaining, so it is at half-strength and a battle-shock roll must be made for it.\nThis unit has a starting strength of 5. It has two models remaining, so it is below half-strength and a battle-shock roll must be made for it.\nThis Vehicle has a starting strength of 1 and a W characteristic of 11. It has 3 wounds remaining, so it is below half-strength and a battle-shock roll must be made for it.",
+      "transcription_sha256": "b2a5cdecb25d1f89f004062fab75868023e2f557066df4eeb2ba9d94352f2f4e"
     }
   ],
   "search_index_observation": {
@@ -310,5 +310,40 @@
     "source_title": "Warhammer 40,000 Core Rules - Command Phase"
   },
   "source_package_id": "gw-11e-core-command-phase",
-  "source_version": "40k-app-search-index-observed-2026-08-26"
+  "source_version": "40k-app-search-index-observed-2026-08-26",
+  "superseded_records": [
+    {
+      "kind": "label_only_transcription",
+      "load_support_status": "loaded",
+      "prior_sha256": "c7076d22487eaacd4966ce616ed23632f73c1c1e77e97264779f58571855cd33",
+      "prior_text": "START OF COMMAND PHASE",
+      "reason": "The 2026-08-26 search-index observation recorded only this section heading. That heading remains in the search-index observation. The controlling source_text is the complete selected operative rule, including the retained battle-shock examples where the selected row contains them.",
+      "record_id": "label-only:start-of-command-phase",
+      "semantic_execution_status": "not_certified",
+      "source_id": "gw-11e-core-rules:command-phase:start-of-command-phase",
+      "successor": "gw-11e-core-rules:command-phase:start-of-command-phase"
+    },
+    {
+      "kind": "label_only_transcription",
+      "load_support_status": "loaded",
+      "prior_sha256": "15b5a4c0e0184c03730be6b15d9aad113b1b59bb262028d00173ea5475f7a42f",
+      "prior_text": "GAIN CORE CP",
+      "reason": "The 2026-08-26 search-index observation recorded only this section heading. That heading remains in the search-index observation. The controlling source_text is the complete selected operative rule, including the retained battle-shock examples where the selected row contains them.",
+      "record_id": "label-only:gain-core-cp",
+      "semantic_execution_status": "not_certified",
+      "source_id": "gw-11e-core-rules:command-phase:gain-core-cp",
+      "successor": "gw-11e-core-rules:command-phase:gain-core-cp"
+    },
+    {
+      "kind": "label_only_transcription",
+      "load_support_status": "loaded",
+      "prior_sha256": "621c1dac0261aaeb2443a843f9d4dd05d253f6ac01a6e251620739eece408e56",
+      "prior_text": "BATTLE-SHOCK",
+      "reason": "The 2026-08-26 search-index observation recorded only this section heading. That heading remains in the search-index observation. The controlling source_text is the complete selected operative rule, including the retained battle-shock examples where the selected row contains them.",
+      "record_id": "label-only:battle-shock",
+      "semantic_execution_status": "not_certified",
+      "source_id": "gw-11e-core-rules:command-phase:battle-shock",
+      "successor": "gw-11e-core-rules:command-phase:battle-shock"
+    }
+  ]
 }

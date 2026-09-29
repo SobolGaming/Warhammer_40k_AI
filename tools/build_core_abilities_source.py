@@ -72,7 +72,7 @@ SCOUT_ALTERNATION_RUNTIME_CONSUMER_IDS = [
     "warhammer40k_core.engine.prebattle:prebattle_action_selection_request",
     "warhammer40k_core.engine.prebattle:prebattle_next_player_id_for_timing_state",
     "warhammer40k_core.engine.prebattle_alternation:align_prebattle_alternation_cursor",
-    "warhammer40k_core.engine.prebattle_alternation:validate_prebattle_alternation_restore",
+    "warhammer40k_core.engine.prebattle_integrity:validate_prebattle_alternation_restore",
     "warhammer40k_core.engine.prebattle_records:PreBattleAlternationCursor",
     "warhammer40k_core.engine.setup_flow:SetupFlow._advance_resolve_prebattle_actions",
 ]
@@ -267,10 +267,49 @@ def build_payload() -> dict[str, object]:
                 runtime_consumer_ids=HAZARDOUS_RUNTIME_CONSUMER_IDS,
             ),
         ],
+        "superseded_records": [
+            _retired_consumer_record(
+                record_id="retired-consumer:validate-prebattle-alternation-restore",
+                source_id="gw-11e-core-abilities:faq:alternating-scout-moves",
+                prior_consumer_id=(
+                    "warhammer40k_core.engine.prebattle_alternation:"
+                    "validate_prebattle_alternation_restore"
+                ),
+                successor=(
+                    "warhammer40k_core.engine.prebattle_integrity:"
+                    "validate_prebattle_alternation_restore"
+                ),
+                reason=(
+                    "validate_prebattle_alternation_restore now lives in prebattle_integrity. "
+                    "The retired prebattle_alternation path is retained and is not a live consumer."
+                ),
+            )
+        ],
         "package_hash": "",
     }
     payload["package_hash"] = _sha256_payload(payload)
     return payload
+
+
+def _retired_consumer_record(
+    *,
+    record_id: str,
+    source_id: str,
+    prior_consumer_id: str,
+    successor: str,
+    reason: str,
+) -> dict[str, object]:
+    return {
+        "record_id": record_id,
+        "source_id": source_id,
+        "kind": "retired_consumer",
+        "prior_text": prior_consumer_id,
+        "prior_sha256": _sha256_text(prior_consumer_id),
+        "successor": successor,
+        "load_support_status": "loaded",
+        "semantic_execution_status": "not_certified",
+        "reason": reason,
+    }
 
 
 def main() -> int:

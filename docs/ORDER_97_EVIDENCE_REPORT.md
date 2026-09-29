@@ -36,9 +36,8 @@ Assertion-bound includes qualified and negative evidence; it does not mean the c
 
 ## Pinned runtime reconciliation
 
-- reviewed_layout: 30
-- selected_excerpt: 73
-- source_repair_required: 8
+- reviewed_layout: 37
+- selected_excerpt: 74
 - superseded: 1
 
 ## Qualifications
@@ -53,7 +52,6 @@ Assertion-bound includes qualified and negative evidence; it does not mean the c
 
 ## Required follow-ups before PFINAL
 
-- **CAUDIT-03 / PSOURCERECON:** Replace label-only Command transcriptions and incomplete large-model/Move Units excerpts with complete selected source records; repair the visibility locator and retired Scouts/attached-unit consumer identities. Preserve provenance, explicit supersessions and separate load/execution status; regenerate runtime identity and revalidate consumers.
 - **C02-10 / P02J:** Reconcile the selected Ld5–8 and WS/BS2–6 limits with the shared characteristic bound policy. The retained probe observes Ld4/9 and WS/BS16. Apply the selected limits through live profile/roll consumers and retain source identity, modifier order and replay.
 - **C17-02 / P17B:** Measure every part of a based FRAME model for whole-distance, Engagement Range and terrain-area membership. Current consumers use only the support base despite a larger body. Repair the shared geometric owner and its range, objective, movement, terrain and placement consumers.
 - **C03-06 / P03F:** An impossible complete setup leaves the unit selected and trapped in placement retries. Restore selected-to-move eligibility as required, preserve its prior location, and expose legal reselection/Remain Stationary/retry through shared facade authority, historical restore and replay.
