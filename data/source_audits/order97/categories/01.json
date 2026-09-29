@@ -2084,6 +2084,18 @@
             "role": "semantic",
             "assertion": "assert _model_wholly_within_any_transport_model(frame, transport_models=(source,), distance_inches=8.5) is False",
             "proves": "Disembark whole-distance placement rejects a based FRAME body that extends outside the distance containing its support base."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_wholly_within_rejects_a_tall_body_inside_the_horizontal_buffer",
+            "role": "semantic",
+            "assertion": "assert context.target_wholly_within_distance(3) is False",
+            "proves": "A tall FRAME body whose footprint fits a three-inch horizontal buffer is still outside the three-dimensional distance."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_wholly_within_rejects_a_tall_body_inside_the_horizontal_buffer",
+            "role": "semantic",
+            "assertion": "assert ordinary.target_wholly_within_distance(3) is True",
+            "proves": "The same support base without FRAME measurement remains wholly within three inches."
           }
         ],
         "qualifications": [

@@ -9,6 +9,7 @@ Neither a navigation miss nor a solver failure is an impossibility certificate.
 
 from __future__ import annotations
 
+import math
 from fractions import Fraction
 from typing import TYPE_CHECKING
 
@@ -98,11 +99,33 @@ def endpoint_excluded_by_terrain(
     return not decide(both(*constraints), ("endpoint_x", "endpoint_y", "endpoint_z"))
 
 
+def _measurement_reach(source: Model) -> tuple[Fraction, Fraction]:
+    radius = source.base.max_radius()
+    top = source.volume.height
+    if source.measures_every_part:
+        for part in source.body_parts:
+            radius = max(
+                radius,
+                math.hypot(part.offset_x_inches, part.offset_y_inches) + part.base.max_radius(),
+            )
+            top = max(top, part.bottom_inches + part.height_inches)
+    return rational(radius) + _SLACK, rational(top)
+
+
+def _goal_targets(goal: MovementGoal) -> tuple[Model, ...]:
+    targets: list[Model] = []
+    for target in goal.models:
+        if target.measures_every_part and target.body_parts:
+            targets.extend(target.rules_distance_subjects())
+        else:
+            targets.append(target)
+    return tuple(targets)
+
+
 def _goal_region(
     source: Model, goal: MovementGoal, x: RealTerm, y: RealTerm, z: RealTerm
 ) -> Formula:
-    radius = rational(source.base.max_radius()) + _SLACK
-    height = rational(source.volume.height)
+    radius, height = _measurement_reach(source)
     horizontal = rational(
         goal.horizontal_inches if goal.range_inches is None else goal.range_inches
     )
@@ -126,7 +149,7 @@ def _goal_region(
                     rational(target.base.max_radius()),
                     *target.volume.vertical_interval(target.pose),
                 )
-                for target in goal.models
+                for target in _goal_targets(goal)
             )
         )
     if goal.disk is not None:

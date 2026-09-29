@@ -92,16 +92,10 @@ class MovementGoal:
     def distance_lower_bound(
         self, model: Model, *, ignores_vertical_distance: bool = False
     ) -> float:
-        subjects = model.rules_distance_subjects()
-        if len(subjects) != 1:
-            return min(
-                self.distance_lower_bound(
-                    subject, ignores_vertical_distance=ignores_vertical_distance
-                )
-                for subject in subjects
+        if model.measures_every_part and model.body_parts:
+            return _anchored_measurement_lower_bound(
+                self, model, ignores_vertical_distance=ignores_vertical_distance
             )
-        if subjects[0] is not model:
-            model = subjects[0]
         # Only the moving footprint can rotate. The target retains its measured
         # footprint/facing. Circular movers are rotation invariant, so their
         # actual separation is a translation lower bound. Other movers retain
@@ -176,6 +170,148 @@ class MovementGoal:
                 self.z_inches - top - self.vertical_inches,
             ),
         )
+
+
+@dataclass(frozen=True, slots=True)
+class _OrbitPart:
+    orbit: float
+    radius: float
+    bottom: float
+    top: float
+
+
+def _anchored_measurement_lower_bound(
+    goal: MovementGoal,
+    model: Model,
+    *,
+    ignores_vertical_distance: bool,
+) -> float:
+    """Lower-bound translation about the parent anchor.
+
+    An offset part orbits that anchor when the model rotates. A circular bound
+    around the part's current center treats that orbit as already fixed and can
+    reject a legal rotation.
+    """
+
+    parts = _orbit_parts(model)
+    if goal.models:
+        return min(
+            _anchored_pair_bound(model.pose, mover, target_part, goal, ignores_vertical_distance)
+            for mover in parts
+            for target in goal.models
+            for target_part in _fixed_measurement_parts(target)
+        )
+    return min(
+        _anchored_region_bound(goal, model.pose, part, ignores_vertical_distance) for part in parts
+    )
+
+
+def _orbit_parts(model: Model) -> tuple[_OrbitPart, ...]:
+    bottom = model.pose.position.z
+    parts = [_OrbitPart(0.0, model.base.max_radius(), bottom, bottom + model.volume.height)]
+    for body in model.body_parts:
+        parts.append(
+            _OrbitPart(
+                math.hypot(body.offset_x_inches, body.offset_y_inches),
+                body.base.max_radius(),
+                bottom + body.bottom_inches,
+                bottom + body.bottom_inches + body.height_inches,
+            )
+        )
+    return tuple(parts)
+
+
+def _fixed_measurement_parts(model: Model) -> tuple[Model, ...]:
+    if model.measures_every_part and model.body_parts:
+        return model.rules_distance_subjects()
+    return (model,)
+
+
+def _anchored_pair_bound(
+    anchor: Pose,
+    mover: _OrbitPart,
+    target: Model,
+    goal: MovementGoal,
+    ignores_vertical_distance: bool,
+) -> float:
+    horizontal = max(
+        0.0,
+        anchor.distance_2d_to(target.pose) - mover.orbit - mover.radius - target.base.max_radius(),
+    )
+    target_bottom, target_top = target.volume.vertical_interval(target.pose)
+    vertical = (
+        0.0
+        if ignores_vertical_distance
+        else _interval_gap(mover.bottom, mover.top, target_bottom, target_top)
+    )
+    if goal.range_inches is not None:
+        return max(0.0, math.hypot(horizontal, vertical) - goal.range_inches)
+    return math.hypot(
+        max(0.0, horizontal - goal.horizontal_inches),
+        0.0 if ignores_vertical_distance else max(0.0, vertical - goal.vertical_inches),
+    )
+
+
+def _anchored_region_bound(
+    goal: MovementGoal,
+    anchor: Pose,
+    part: _OrbitPart,
+    ignores_vertical_distance: bool,
+) -> float:
+    reach = part.orbit + part.radius
+    if goal.disk is not None:
+        pose, base = goal.disk
+        vertical = (
+            0.0
+            if ignores_vertical_distance
+            else max(
+                0.0,
+                part.bottom - pose.position.z - goal.vertical_inches,
+                pose.position.z - part.top - goal.vertical_inches,
+            )
+        )
+        return math.hypot(
+            max(
+                0.0,
+                anchor.distance_2d_to(pose) - reach - base.radius - goal.horizontal_inches,
+            ),
+            vertical,
+        )
+    return math.hypot(
+        max(
+            0.0,
+            min(
+                shapely_backend.point_distance_to_polygon(
+                    anchor.position.x,
+                    anchor.position.y,
+                    polygon,
+                )
+                for polygon in goal.polygons
+            )
+            - reach
+            - goal.horizontal_inches,
+        ),
+        0.0
+        if ignores_vertical_distance
+        else max(
+            0.0,
+            part.bottom - goal.z_inches - goal.vertical_inches,
+            goal.z_inches - part.top - goal.vertical_inches,
+        ),
+    )
+
+
+def _interval_gap(
+    first_bottom: float,
+    first_top: float,
+    second_bottom: float,
+    second_top: float,
+) -> float:
+    if first_top < second_bottom:
+        return second_bottom - first_top
+    if second_top < first_bottom:
+        return first_bottom - second_top
+    return 0.0
 
 
 def _rules_vertical_gap(first: Model, second: Model) -> float:

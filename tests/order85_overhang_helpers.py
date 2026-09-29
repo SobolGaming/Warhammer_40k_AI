@@ -333,10 +333,12 @@ def overhang_charge_session(
     flight: bool = False,
     source_abilities: tuple[DatasheetAbilityDescriptor, ...] = (),
     persisted_permissions: bool = False,
+    enemy_keywords: tuple[str, ...] = (),
 ) -> tuple[LocalGameSession, ChargeMoveProposal]:
     session = overhang_session(
         source_abilities=source_abilities,
         source_keywords=("FLY",) if flight else (),
+        enemy_keywords=enemy_keywords,
         persisted_permissions=persisted_permissions,
     )
     state = session.lifecycle.state

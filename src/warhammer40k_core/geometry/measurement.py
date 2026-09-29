@@ -671,21 +671,57 @@ def _buffered_sources_cover_target(
     distance_inches: float,
     horizontal_only: bool,
 ) -> bool:
+    """Cover the target prism, not merely its footprint at the closest height.
+
+    Horizontal-only measurement ignores height. A three-dimensional check samples
+    every height where a source's vertical distance stops changing, and at each
+    height unions the buffers allowed by that same height. A nearest-gap buffer
+    would accept a target that rises far above an overlapping source.
+    """
+
+    if horizontal_only:
+        return _sources_cover_footprint(sources, target, distance_inches, height=None)
+    heights = [target.bottom, target.top]
+    for source in sources:
+        if target.bottom < source.bottom < target.top:
+            heights.append(source.bottom)
+        if target.bottom < source.top < target.top:
+            heights.append(source.top)
+    return all(
+        _sources_cover_footprint(sources, target, distance_inches, height=height)
+        for height in heights
+    )
+
+
+def _sources_cover_footprint(
+    sources: tuple[_MeasurementPart, ...],
+    target: _MeasurementPart,
+    distance_inches: float,
+    *,
+    height: float | None,
+) -> bool:
     covered = None
     for source in sources:
-        vertical_gap = (
-            0.0
-            if horizontal_only
-            else _vertical_gap(source.bottom, source.top, target.bottom, target.top)
-        )
-        if vertical_gap > distance_inches:
-            continue
-        allowance = math.sqrt((distance_inches * distance_inches) - (vertical_gap * vertical_gap))
+        if height is None:
+            allowance = distance_inches
+        else:
+            vertical = _vertical_distance_to_interval(height, source.bottom, source.top)
+            if vertical > distance_inches:
+                continue
+            allowance = math.sqrt((distance_inches * distance_inches) - (vertical * vertical))
         area = shapely_backend.footprint_for_base(source.base, source.pose).buffer(allowance)
         covered = area if covered is None else covered.union(area)
     if covered is None:
         return False
     return covered.covers(shapely_backend.footprint_for_base(target.base, target.pose))
+
+
+def _vertical_distance_to_interval(height: float, bottom: float, top: float) -> float:
+    if height < bottom:
+        return bottom - height
+    if height > top:
+        return height - top
+    return 0.0
 
 
 def _validate_measurement_subjects(field_name: str, value: object) -> tuple[Model, ...]:

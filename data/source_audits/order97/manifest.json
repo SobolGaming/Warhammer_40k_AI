@@ -50,7 +50,7 @@
     },
     {
       "path": "data/source_audits/order97/categories/01.json",
-      "sha256": "ce09b9c251ad5d54f92f8d1e50c091c38549c5708cafa67182a7d35ebf24822f"
+      "sha256": "97e5e3cb00abf4a775509d4d8732dd518036e9b55ee9da6ada800f1b90c72f01"
     },
     {
       "path": "data/source_audits/order97/categories/02.json",
@@ -114,7 +114,7 @@
     },
     {
       "path": "data/source_audits/order97/categories/17.json",
-      "sha256": "309e34d4a010a2ffa45f47098971f7b44c9463bcea157e751f40cf611731cd41"
+      "sha256": "7c8e9f54a2f41313cd8f748b874d7871f920d3c7c0036cb758701bc24fd06b25"
     },
     {
       "path": "data/source_audits/order97/categories/18.json",
@@ -206,7 +206,7 @@
     },
     {
       "path": "src/warhammer40k_core/_engine_build_manifest.json",
-      "sha256": "c9d6f6a745914e2ef41e8c81f29e47aac04494d2166f41b533b3e6a7a473d6b8"
+      "sha256": "e798c0b46eb294708c504609f48aafe3ef58d22ec5710ff841320d89d75051dd"
     },
     {
       "path": "tests/absent_strength_helpers.py",
@@ -478,7 +478,7 @@
     },
     {
       "path": "tests/order85_overhang_helpers.py",
-      "sha256": "cfe28abc767521c87442e27ef1e8098122deab8c793f45ecf254c35f6ebe36fd"
+      "sha256": "c19b5593753c466d4b1b3ac80120535093ec02972de4cf2e73c31533027e8707"
     },
     {
       "path": "tests/order89_healing_helpers.py",
@@ -742,7 +742,7 @@
     },
     {
       "path": "tests/unit/test_order100_frame_measurement.py",
-      "sha256": "8571acdfe975dc6c2fb135171bd342e31f3be6ee3b2989b46fc4b3c40b9e2078"
+      "sha256": "07c761010f1d601521860ef5a8c574c35fb90b795daab5548f25554908c03cda"
     },
     {
       "path": "tests/unit/test_order36_sequencing.py",

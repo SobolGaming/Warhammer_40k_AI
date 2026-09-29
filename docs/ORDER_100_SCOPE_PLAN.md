@@ -26,12 +26,16 @@ models already use the body as their rules footprint.
 
 `geometry_model_for_placement` sets `measures_every_part` when the model carries
 the canonical `FRAME` keyword. `Model.rules_distance_subjects` then returns the
-support base and each recorded body prism. Range, Engagement Range, wholly-within
-distance, objective control, movement goals and lower bounds, terrain-area
-membership, and disembark whole-distance placement read those subjects. Transit
-collision still uses the moving base; Engagement Range along the path uses the
-full model. Replay derives the flag from the keyword again, so the session
-payload shape is unchanged.
+support base and each recorded body prism. Range, Engagement Range, objective
+control, terrain-area membership, and disembark whole-distance placement read
+those subjects. Wholly-within distance covers every point of each prism, including
+heights above an overlapping source; the horizontal-only path is unchanged.
+Movement lower bounds orbit offset parts around the parent anchor. Endpoint
+exclusion and goal regions use the same parts, so a support-base proof cannot
+certify that a legal body endpoint is impossible. Ordinary models still use
+support-base rules distance. Transit collision still uses the moving base.
+Replay derives the flag from the keyword again, so the session payload shape is
+unchanged.
 
 ## Evidence and retained gates
 

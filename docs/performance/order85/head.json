@@ -1,7 +1,7 @@
 {
   "workload": "order85-witnessed-contact-v1",
-  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:541664771a38cb2384912d73986a9b8d7fcdac578d87d15698cafa1eed6bd5ae",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:541664771a38cb2384912d73986a9b8d7fcdac578d87d15698cafa1eed6bd5ae",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:8096756bb106be0dd72bc6a975b1135492d6bce7b6aad5f0fd55056efef3053c",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8096756bb106be0dd72bc6a975b1135492d6bce7b6aad5f0fd55056efef3053c",
   "cpu": "Apple M5 Pro",
   "memory_bytes": 68719476736,
   "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
@@ -12,27 +12,27 @@
   "fixture": "Canonical one-model character and one-model vehicle, reviewed solid 8-inch cylinder on 120mm base; 100x100 empty board; fixed fixture seed and +10 Charge roll modifier; same body-touch and penetrating paths",
   "hashes": {
     "scripts/measure_order85.py": "9bc3ea520ce94fe6fd5000e41547d005c2b07c5a77bc12bf460ae067a1e8e66c",
-    "tests/order85_overhang_helpers.py": "cfe28abc767521c87442e27ef1e8098122deab8c793f45ecf254c35f6ebe36fd",
+    "tests/order85_overhang_helpers.py": "c19b5593753c466d4b1b3ac80120535093ec02972de4cf2e73c31533027e8707",
     "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
   },
   "rows": [
     {
       "case": "body-touch",
       "samples_seconds": [
-        0.062387874990236014,
-        0.015716750000137836,
-        0.015687374980188906
+        0.06157958402764052,
+        0.015500875015277416,
+        0.015602750005200505
       ],
       "setup_seconds": [
-        2.3168641249649227,
-        0.4506832920014858,
-        0.44915879203472286
+        2.3195062500308268,
+        0.44400758296251297,
+        0.442001125018578
       ],
-      "mean_seconds": 0.031263999990187585,
-      "maximum_seconds": 0.062387874990236014,
-      "median_seconds": 0.015716750000137836,
-      "p95_seconds_nearest_rank": 0.062387874990236014,
-      "submissions_per_second": 31.985670429690913,
+      "mean_seconds": 0.03089440301603948,
+      "maximum_seconds": 0.06157958402764052,
+      "median_seconds": 0.015602750005200505,
+      "p95_seconds_nearest_rank": 0.06157958402764052,
+      "submissions_per_second": 32.368322491320804,
       "statuses": [
         "waiting_for_decision",
         "waiting_for_decision",
@@ -42,20 +42,20 @@
     {
       "case": "body-penetration",
       "samples_seconds": [
-        0.0031387920025736094,
-        0.0028144170064479113,
-        0.0033244999940507114
+        0.0032183750299736857,
+        0.0029274169937707484,
+        0.002843624970410019
       ],
       "setup_seconds": [
-        0.4640016669873148,
-        0.45021024998277426,
-        0.46037124999566004
+        0.4439284999971278,
+        0.4433929169899784,
+        0.444611957995221
       ],
-      "mean_seconds": 0.003092569667690744,
-      "maximum_seconds": 0.0033244999940507114,
-      "median_seconds": 0.0031387920025736094,
-      "p95_seconds_nearest_rank": 0.0033244999940507114,
-      "submissions_per_second": 323.3556903979825,
+      "mean_seconds": 0.0029964723313848176,
+      "maximum_seconds": 0.0032183750299736857,
+      "median_seconds": 0.0029274169937707484,
+      "p95_seconds_nearest_rank": 0.0032183750299736857,
+      "submissions_per_second": 333.7257579608121,
       "statuses": [
         "invalid",
         "invalid",
