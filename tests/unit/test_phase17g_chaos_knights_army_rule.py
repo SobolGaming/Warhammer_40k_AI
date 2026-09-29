@@ -291,7 +291,7 @@ def test_harbingers_historical_leadership_recomputes_from_event_bound_aura() -> 
         active_player_id=state.active_player_id,
     )
 
-    assert resolve_historical_handler(army_rule.historical_harbingers_leadership, context, 7) == 9
+    assert resolve_historical_handler(army_rule.historical_harbingers_leadership, context, 7) == 8
     with pytest.raises(GameLifecycleError, match="historical authority requires"):
         army_rule.historical_harbingers_leadership(cast(Any, object()), 7)
 
@@ -1184,7 +1184,7 @@ def test_harbingers_source_geometry_does_not_expand_to_attached_bodyguards() -> 
 
 def test_delirium_routes_mortal_wound_fnp_choices_and_resumes_command_step() -> None:
     state = battle_state()
-    state.game_id = "phase17g-chaos-knights-delirium-fnp"
+    state.game_id = "order99-delirium-fnp-0"
     _mark_player_as_chaos_knights(state, player_id="player-a")
     decisions = DecisionController()
     _record_real_harbingers_selection(
@@ -1197,7 +1197,7 @@ def test_delirium_routes_mortal_wound_fnp_choices_and_resumes_command_step() -> 
     state.command_step_state = None
     target_unit_id = "army-beta:intercessor-unit-3"
     remove_first_models(state, unit_instance_id=target_unit_id, count=3)
-    _replace_unit_leadership(state, unit_instance_id=target_unit_id, leadership=13)
+    _replace_unit_leadership(state, unit_instance_id=target_unit_id, leadership=8)
     _place_units_near_center(
         state,
         source_unit_id="army-alpha:intercessor-unit-1",
@@ -2269,7 +2269,7 @@ def test_deathly_terror_and_despair_worsen_enemy_leadership_in_aura() -> None:
         )
     )
 
-    assert modified == 9
+    assert modified == 8
 
 
 def test_doom_and_darkness_runtime_modifiers_apply_to_enemy_attacks() -> None:

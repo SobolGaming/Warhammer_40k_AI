@@ -19,7 +19,10 @@ negative additions occupy the subtraction step, independently of priority.
 
 Registered characteristic handlers emit typed operations. The engine combines
 those operations with source-slot-deduplicated generic effects before applying
-the final characteristic bounds. Historical Leadership uses the same operation
+the final characteristic bounds. After that algebra, modified Leadership is
+5–8 and modified Weapon Skill and Ballistic Skill are 2–6. Source operation
+identity and order stay on the trace; the bound is only the final value.
+Historical Leadership uses the same operation
 inventory, ordering and bounds. Generic Leadership effects are reconstructed at
 the original Battle-shock request boundary from loaded RuleIR, source ownership,
 causal creation/activation records, and source-derived expiration boundaries.

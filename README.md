@@ -2,6 +2,11 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 99 / P02J bounds modified Leadership to 5–8 and modified Weapon Skill and
+Ballistic Skill to 2–6 after the shared modifier algebra. Live leadership tests
+and weapon-profile hit rolls use that policy and keep source identity, order,
+and replay. See [scope and evidence](docs/ORDER_99_SCOPE_PLAN.md).
+
 Order 97 / PEVIDENCE adds the complete selected source-block and clause inventory,
 exact assertion receipts, and runtime source reconciliation. Its negative probes
 identify further source and gameplay prerequisites before PFINAL; see the
