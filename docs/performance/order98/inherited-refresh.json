@@ -1,5 +1,5 @@
 {
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
   "execution": "serial, no coverage or competing test/build workers",
   "baseline_policy": "Retain historical baselines, explicit fixture migration proofs, and unchanged numeric budgets/work assertions. Refresh runtime-bound head measurements. Order 98 changes source-package transcription and runtime identity only; it does not change measured gameplay work.",
   "runs": [
@@ -9,14 +9,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order64/head-reconstruction.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 63.995635083003435,
-      "log_sha256": "31c38ab3f332fa0c1bdd46bb4b628c59b0abc2c4a9a7b4e6096344fff6f8fb3e",
-      "report_sha256": "8b9b9e2f3d7e90133beb34d8e8c86a62e7ab2ec99767536a7503fdce2cd6d766"
+      "elapsed_seconds": 64.70065395900747,
+      "log_sha256": "f93c7e1591671513bf77ef413938c8ccd0525092b17108d1ea6aa6de279b602a",
+      "report_sha256": "3793c082420822f251eb3574ef53c1e5d2f0242e862d3fd45513923cad301998"
     },
     {
       "command": [
@@ -24,14 +24,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order65/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 7.537520458979998,
+      "elapsed_seconds": 7.617531833006069,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "7c481090675483cf02124ffd9420d000d0b377334a146ac0b47cd94a5839847a"
+      "report_sha256": "8765876741374d3e0b5c61a3c8e5fda8c0d664c39d1659aaf6fdee7651014b4d"
     },
     {
       "command": [
@@ -39,14 +39,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order66/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 7.828672792005818,
+      "elapsed_seconds": 7.608778625028208,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "6b524520deb485911269021bcb331766210d37b863d19dd2db30b91c50af4078"
+      "report_sha256": "7278f38915c8266d094327ec20e80a93c109a8b3e4550a7eb90bdff2a2a98d81"
     },
     {
       "command": [
@@ -54,14 +54,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order69/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 0.7300437500234693,
+      "elapsed_seconds": 0.7083693330059759,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "a1f4eddd7eae7876160aed21250d7fb2c403164f30378e4905bd8df1a40e4b2f"
+      "report_sha256": "a5bda372e9c78a5a2c20c494abea99346d1e727329daf09b6e20d61e1ff78a24"
     },
     {
       "command": [
@@ -69,14 +69,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order70/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 4.176853917015251,
+      "elapsed_seconds": 4.090162708016578,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "8e6aa9e686c801411a0782bf7a56e107ccddac363f5c1a20b973234b0aefe8b2"
+      "report_sha256": "666d44f829e3222dd281f0b5fb88e50f207489303affce9f4d0a629a76a600b5"
     },
     {
       "command": [
@@ -84,14 +84,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order71/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 4.433595124981366,
+      "elapsed_seconds": 4.194847333012149,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "2b1384536cf9d37ca6add48b85352d334cb3969aa681f0fa273c45633cce3dc2"
+      "report_sha256": "922425f4384557223cc61d4f12fb106574b756e183fccb0ce94926cd830b6ecd"
     },
     {
       "command": [
@@ -99,14 +99,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order72/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 17.41010937502142,
+      "elapsed_seconds": 16.69550120801432,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "ca2afb64268f0f1b72f30f433efb4fb6d16d5288a3843deecbb37c6b73b36dff"
+      "report_sha256": "823bd3a822bd586cd1be2001fff531bd9f17a0b971f22b3e344c73aa848537b9"
     },
     {
       "command": [
@@ -114,14 +114,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order73/r73_001/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 5.311491624976043,
+      "elapsed_seconds": 5.1283865830046125,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "be7827e655ee0c1d9858e2948dc766bfeca42e3c5c60d25f55f76b13766035d2"
+      "report_sha256": "ba1d0d450f1d62b601ed124743025bc53db03123d3831cd0cb3e3e994f174582"
     },
     {
       "command": [
@@ -129,14 +129,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order73/r73_001/geometry-head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 8.703160916978959,
+      "elapsed_seconds": 8.3090479169623,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "cad50c7c976ba446d8354d6e662a85301f478777cc3107b36cf29010e73584bd"
+      "report_sha256": "d0b5573fd3eccf5deeb4fd75e95da494b45ed49db2c41405c8951e528aadd144"
     },
     {
       "command": [
@@ -144,14 +144,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order74/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 6.502739583957009,
+      "elapsed_seconds": 6.236560375022236,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "fac1343f05227130d9da9243cc4a81f5c3108fcb1be31dc55e523652a264da6a"
+      "report_sha256": "6168cd76d7e5b5135e0bb7ec5e29fb6ea5d7eb877ba9e9ad8458835d7731aae1"
     },
     {
       "command": [
@@ -159,14 +159,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order75/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 7.736873125017155,
+      "elapsed_seconds": 7.551477542030625,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "e3d0c01bbc0d788076899b0fc06b729eb8a2df11ebd41d8765b04917325817a9"
+      "report_sha256": "536f3043577c71bcecd07e69946133d24bbc6cae3a67598ee986e7a18f07f7e8"
     },
     {
       "command": [
@@ -174,14 +174,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order76/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 14.610561624984257,
+      "elapsed_seconds": 14.09538012498524,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "5c253449873bcd3c9b999b8e08411fd11d1e3f1b924337a27800526b6d6d5bab"
+      "report_sha256": "c7a28716753c3f4acae110553d5d21e038a8f625319062f03eb21682c1a89ef4"
     },
     {
       "command": [
@@ -189,14 +189,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order77/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 27.61028779100161,
+      "elapsed_seconds": 26.697177082998678,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "e86cac70bc900b550a91c0fce3ff2021b0627bd592d3a8b4908b837267e03889"
+      "report_sha256": "04c8e1d8755dd5511b9d9cfb4d433a3b398c6f16e93daea1e5869b4ba7cdf7ff"
     },
     {
       "command": [
@@ -204,14 +204,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order77/r77_001_boundary/completion-head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 11.58374991704477,
+      "elapsed_seconds": 11.104397999995854,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "a5b8c638e617cd916f85840e2681990bca3f8b67f6c7647de300ac9d92fce400"
+      "report_sha256": "302d88216d72ae36952be92091c8770a1d838895c6ffdaf80d59d12a0c6279e0"
     },
     {
       "command": [
@@ -219,14 +219,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order78/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 4.463559707975946,
+      "elapsed_seconds": 4.195558792038355,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "6896ad788694ffd0a9e4494456e7447cc38160adc3fd6fda9200f173bd6a25a6"
+      "report_sha256": "ccb06bd69e7ea1eb333f2cceca0dd5e3e52114e5e525f232436d4afb0f55cada"
     },
     {
       "command": [
@@ -234,14 +234,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order79/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 9.285685707989614,
+      "elapsed_seconds": 8.781583291012794,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "23c5af24d595d960637008662ab7bd394f466f3f5d22c7ab98ff0ee0e8a08e32"
+      "report_sha256": "6b0e2ea0f022fb19ad6d8fdf9b1ca24a57a3072ec254e36ee040f9c85b4f7eeb"
     },
     {
       "command": [
@@ -249,14 +249,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order83/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 56.54408149997471,
+      "elapsed_seconds": 55.12394404201768,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "219c491f4e87275f90809015485d98e993be67b454c44891453b450da4fe422a"
+      "report_sha256": "05ea1a0b328a66b98d26a490be5009e58957f63dbc0db1435c64c9a0cb67a727"
     },
     {
       "command": [
@@ -264,14 +264,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order84/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 0.48918583296472207,
+      "elapsed_seconds": 0.4933327079634182,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "33cc55491ef3fe1a4009c4269d866082ebe75dd2995cd09322090717b4c83142"
+      "report_sha256": "0986d2f551912acd6755534a08465a347443356423e735f042ce39b35dbfa782"
     },
     {
       "command": [
@@ -279,14 +279,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order85/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 5.846855207986664,
+      "elapsed_seconds": 5.840407292009331,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "f2d83a6ce6513feabc69facbc43868db411a87ab60b99a150dfb588d2ddee75c"
+      "report_sha256": "28621de9685d2e51ca620dcbae26c82eb3b7b48ff88432251a41b84871170802"
     },
     {
       "command": [
@@ -294,14 +294,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order85/rotation-head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 1.245389999996405,
+      "elapsed_seconds": 1.237900250009261,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "b35c2a3719dffe6660ff5668a9940e10d26cff05e16e201847f967d68c8207f2"
+      "report_sha256": "c7e9005a78118b6432d48ee47ad8c8710548997015648a161308b9206c520678"
     },
     {
       "command": [
@@ -309,14 +309,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order86/r86_001/boundary-head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 0.29381491703679785,
+      "elapsed_seconds": 0.28723599994555116,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "0a12b3349420e47153172d378e2da70aba7cf72e256f25470fa7ee22aac5348f"
+      "report_sha256": "2872ba081a8b6bd5f7efabcc9137f3ef0ce6283b059a811076c01b86cff6fe7f"
     },
     {
       "command": [
@@ -324,14 +324,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order80/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 18.060756790975574,
+      "elapsed_seconds": 17.74595720798243,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "9bea1ed53609d2ce06ed750d0a98d3a096c3c9b11cc1670d7294f9e2d5aa1876"
+      "report_sha256": "b568a0b40aba4f14a959d23395a4440168c0575e589de4240ed8e43a9d1c32d1"
     },
     {
       "command": [
@@ -339,15 +339,15 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order80/review-head.json",
         "--ordinary-restore"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 18.4711328750127,
+      "elapsed_seconds": 18.178907791967504,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "1d1ec0f96e6cbe1e04562bd2aa7dcaf8b554b528bc74f4e55f742c149e4737d9"
+      "report_sha256": "421634566c79c8683726c7417582c9c90ca6f21b86051d366fe6d5f8336f5a75"
     },
     {
       "command": [
@@ -355,14 +355,14 @@
         "--runtime-src",
         "src",
         "--revision",
-        "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
         "--output",
         "docs/performance/order86/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 2.8314900000113994,
+      "elapsed_seconds": 2.881155166949611,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "4272d3ee7585602ba61c5b0a2a73fe539d0514dd1ab8358d14e3905f2200789d"
+      "report_sha256": "f14be42dd36030f94892252deb940013696bba799a21ccc1dfb8a8ace0e4323f"
     },
     {
       "command": [
@@ -371,9 +371,9 @@
         "docs/performance/order88/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 10.780424542026594,
+      "elapsed_seconds": 11.405650665983558,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "921d703398207caaf7681510563b8b180e0f45743ed6362eabfa4e44813701b6"
+      "report_sha256": "1b493bf6933607a454c55be6aa0d0cff81a59ca41acc7c0e141ffeb2813b8511"
     },
     {
       "command": [
@@ -382,9 +382,9 @@
         "docs/performance/order96/head.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 25.082193250011187,
+      "elapsed_seconds": 25.788876083039213,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "c7953a0c8cdcdb7b039f741fae2ef2a4107ac10ae1596dc0055d0b27fa3d7923"
+      "report_sha256": "a22fee0082bd71f043df44417933dc2584b80a72338a11278246512b96561882"
     },
     {
       "command": [
@@ -394,9 +394,9 @@
         "docs/performance/order96/head-sustained.json"
       ],
       "exit_code": 0,
-      "elapsed_seconds": 30.521755875030067,
+      "elapsed_seconds": 30.611739917017985,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "report_sha256": "27a581cf537886224ebb86f11de8ebac7966711ee46cfd403cc86ed2a5f52913"
+      "report_sha256": "ceb0a869c9af78511a08da0c94a569389f6c17a75ab3afd89657fdbd14a7ef5c"
     }
   ]
 }

@@ -1309,6 +1309,40 @@
           "observation_sha256": "645e8e96af35d4aefe38c755c2ce6b72579d925865ace9e5b16e5b58158c5b98"
         }
       ],
+      "legacy_controlling_transcriptions": [
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-command-phase",
+          "version": "40k-app-search-index-observed-2026-08-26",
+          "rule_source_id": "gw-11e-core-rules:command-phase:battle-shock",
+          "historical_observation_sha256": "e60b785371c3815fe3a9a2b77ca4dc012c6e5541c95dbcc22f68b5452c576a78",
+          "controlling_transcription_sha256": "b2a5cdecb25d1f89f004062fab75868023e2f557066df4eeb2ba9d94352f2f4e"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-command-phase",
+          "version": "40k-app-search-index-observed-2026-08-26",
+          "rule_source_id": "gw-11e-core-rules:command-phase:gain-core-cp",
+          "historical_observation_sha256": "9809dd16794d824ee12f6b7d6a8e0075e61cabde43c93a9bdfe9b797b5df283a",
+          "controlling_transcription_sha256": "6a09ea8b545e04dfbb0755408986862f7cf19991bb023106cafcbbb63b8e55d0"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-command-phase",
+          "version": "40k-app-search-index-observed-2026-08-26",
+          "rule_source_id": "gw-11e-core-rules:command-phase:start-of-command-phase",
+          "historical_observation_sha256": "9b5ce8b7402b6719772dec0ebca6e477d6f2c9a0ddb3b83f8504d2337d5c6d76",
+          "controlling_transcription_sha256": "539a37c85bcb22ebe08ae017a6e926489bbc8b311680d80514d5151855ed1c31"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-movement-phase",
+          "version": "40k-app-movement-phase-observed-2026-08-30",
+          "rule_source_id": "gw-11e-core-rules:movement-phase:move-units-step",
+          "historical_observation_sha256": "fe123e0660e231a31e550414e2289ee66922b20312e055c69f077ab186e21800",
+          "controlling_transcription_sha256": "7761ce9360aa56e0f00a0e74d3b6095c5b1742523fd1d424d51989e9aeaab982"
+        }
+      ],
       "source_packages": [
         {
           "namespace": "games-workshop",
@@ -1933,6 +1967,7 @@
         }
       ],
       "legacy_observations": [],
+      "legacy_controlling_transcriptions": [],
       "source_packages": [
         {
           "namespace": "core-v2-reviewed-app-mirror",

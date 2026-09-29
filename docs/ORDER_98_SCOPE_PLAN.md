@@ -28,9 +28,12 @@ load status and semantic execution status. Battle-shock stays
 The 2026-08-26 search-index observation remains heading-only. Its observation
 fingerprint is unchanged. Command and Move Units mirror evidence that the
 legacy 40k.app policy authorizes keeps that immutable observation, including
-the historical heading or excerpt transcription. Project-reviewed evidence
-carries the complete selected transcription and must match the controlling
-source row. The official Command PDF remains corroboration; the Battle-shock
+the historical heading or excerpt transcription. A legacy mirror may differ
+from the controlling transcription only when the authority registry pins that
+package, source ID, historical observation, and approved controlling
+transcription. Other legacy-backed rows still reject a mismatch. Project-reviewed
+evidence carries the complete selected transcription and must match the
+controlling source row. The official Command PDF remains corroboration; the Battle-shock
 PDF excerpt stays shorter than the selected row because the selected row
 includes examples.
 

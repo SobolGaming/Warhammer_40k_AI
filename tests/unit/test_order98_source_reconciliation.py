@@ -2,9 +2,22 @@
 
 from __future__ import annotations
 
+import hashlib
 import importlib
+import json
+from dataclasses import replace
 from typing import Any
 
+import pytest
+
+from warhammer40k_core.rules.source_catalog import SourceDocument
+from warhammer40k_core.rules.source_data import RuleSourceText
+from warhammer40k_core.rules.source_evidence import (
+    RuleEvidenceError,
+    RuleEvidenceRecord,
+    RuleSourcePackage,
+    SourceEvidenceCatalog,
+)
 from warhammer40k_core.rules.source_packages.artifact_loader import package_artifact_bytes
 
 _PACKAGE_ROOT = "warhammer40k_core.rules.source_packages.warhammer_40000_11th"
@@ -165,3 +178,67 @@ def test_order98_repairs_the_eight_runtime_source_rows() -> None:
     assert "..." in large.superseded_records[0].prior_text
     for consumer_id in setup.runtime_consumer_ids:
         assert _resolve(consumer_id) is not None
+
+
+def _observation_sha256(payload: Any) -> str:
+    body = dict(payload)
+    body["observation_sha256"] = ""
+    body["load_support_status"] = "not_loaded"
+    body["semantic_execution_status"] = "not_certified"
+    body["runtime_consumer_ids"] = []
+    encoded = json.dumps(body, sort_keys=True, separators=(",", ":")).encode()
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _replace_controlling_text(package: RuleSourcePackage, source_id: str) -> RuleSourcePackage:
+    documents: list[SourceDocument] = []
+    for document in package.source_catalog.documents:
+        source_texts = tuple(
+            RuleSourceText.from_raw(
+                source_id=source.source_id,
+                raw_text=f"{source.raw_text}\nUnauthorized.",
+                objective_scope=source.objective_scope,
+            )
+            if source.source_id == source_id
+            else source
+            for source in document.source_texts
+        )
+        documents.append(replace(document, source_texts=source_texts))
+    catalog = replace(package.source_catalog, documents=tuple(documents))
+    replacement = catalog.source_text_by_id(source_id).raw_text
+    transcription_sha256 = hashlib.sha256(replacement.encode()).hexdigest()
+    records: list[RuleEvidenceRecord] = []
+    for record in package.source_evidence_catalog.records:
+        if (
+            record.rule_source_id != source_id
+            or record.evidence_kind != "project_reviewed_app_transcription"
+        ):
+            records.append(record)
+            continue
+        payload = record.to_payload()
+        payload["transcription_sha256"] = transcription_sha256
+        payload["observation_sha256"] = _observation_sha256(payload)
+        records.append(RuleEvidenceRecord.from_payload(payload))
+    return RuleSourcePackage(
+        source_catalog=catalog,
+        source_evidence_catalog=SourceEvidenceCatalog(records=tuple(records)),
+        evidence_required_source_ids=package.evidence_required_source_ids,
+        source_authority_scope=package.source_authority_scope,
+    )
+
+
+@pytest.mark.parametrize(
+    ("package_name", "source_id"),
+    [
+        ("core_movement_phase_2026_08", "gw-11e-core-rules:movement-phase:fall-back-move"),
+        ("core_movement_phase_2026_08", "gw-11e-core-rules:movement-phase:move-units-step"),
+        ("core_command_phase_2026_08", "gw-11e-core-rules:command-phase:gain-core-cp"),
+    ],
+)
+def test_order98_rejects_unregistered_controlling_text(
+    package_name: str,
+    source_id: str,
+) -> None:
+    package = importlib.import_module(f"{_PACKAGE_ROOT}.{package_name}").source_package()
+    with pytest.raises(RuleEvidenceError, match="does not match its source row"):
+        _replace_controlling_text(package, source_id)

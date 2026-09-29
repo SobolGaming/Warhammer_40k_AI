@@ -1,7 +1,7 @@
 {
   "workload_id": "order65-firing-deck-v1",
-  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d7010cb4cf4be1f41b4c33e6360085188a07144343407a6e2df9f52832e0ea35",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0909729d4ec81a354f965a74d8c4a9df120f28ef86c94ed683c975c3c8ec3036",
   "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
   "python": "3.14.5",
   "cpu": "Apple M5 Pro",
@@ -21,67 +21,67 @@
       "contribute": false,
       "samples": [
         {
-          "preparation_seconds": 2.181045208009891,
-          "declaration_seconds": 0.07916520803701133,
-          "hundred_queries_seconds": 0.00019904202781617641,
+          "preparation_seconds": 2.184989625005983,
+          "declaration_seconds": 0.07787762500811368,
+          "hundred_queries_seconds": 0.00020150002092123032,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.27536687499377877,
-          "declaration_seconds": 0.038689207984134555,
-          "hundred_queries_seconds": 0.0002104580053128302,
+          "preparation_seconds": 0.2810981249785982,
+          "declaration_seconds": 0.04016004200093448,
+          "hundred_queries_seconds": 0.00020408298587426543,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.27568329201312736,
-          "declaration_seconds": 0.039219708007294685,
-          "hundred_queries_seconds": 0.00019462499767541885,
+          "preparation_seconds": 0.2818118340219371,
+          "declaration_seconds": 0.04035824997117743,
+          "hundred_queries_seconds": 0.0002115830429829657,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.27465216600103304,
-          "declaration_seconds": 0.03872524999314919,
-          "hundred_queries_seconds": 0.00020008301362395287,
+          "preparation_seconds": 0.2806794590433128,
+          "declaration_seconds": 0.040214624954387546,
+          "hundred_queries_seconds": 0.00020762498024851084,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.27471875003539026,
-          "declaration_seconds": 0.038641749997623265,
-          "hundred_queries_seconds": 0.0002033329801633954,
+          "preparation_seconds": 0.28097029199125245,
+          "declaration_seconds": 0.04044887499185279,
+          "hundred_queries_seconds": 0.0002133329981006682,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.27499375003390014,
-          "declaration_seconds": 0.039675540989264846,
-          "hundred_queries_seconds": 0.00020820903591811657,
+          "preparation_seconds": 0.2833353750174865,
+          "declaration_seconds": 0.04043833300238475,
+          "hundred_queries_seconds": 0.00020400003995746374,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.2772989999502897,
-          "declaration_seconds": 0.03924562502652407,
-          "hundred_queries_seconds": 0.0001919579808600247,
+          "preparation_seconds": 0.2813977089826949,
+          "declaration_seconds": 0.039858250005636364,
+          "hundred_queries_seconds": 0.0002067500026896596,
           "restricted_queries": 100,
           "complete": true
         }
       ],
       "summary": {
         "declaration_seconds": {
-          "mean": 0.044766041433571706,
-          "median": 0.039219708007294685,
-          "p95": 0.07916520803701133,
-          "maximum": 0.07916520803701133
+          "mean": 0.04562228570492672,
+          "median": 0.04035824997117743,
+          "p95": 0.07787762500811368,
+          "maximum": 0.07787762500811368
         },
         "hundred_queries_seconds": {
-          "mean": 0.00020110114876713072,
-          "median": 0.00020008301362395287,
-          "p95": 0.0002104580053128302,
-          "maximum": 0.0002104580053128302
+          "mean": 0.00020698201011068055,
+          "median": 0.0002067500026896596,
+          "p95": 0.0002133329981006682,
+          "maximum": 0.0002133329981006682
         }
       }
     },
@@ -89,67 +89,67 @@
       "contribute": true,
       "samples": [
         {
-          "preparation_seconds": 0.2775477090035565,
-          "declaration_seconds": 0.071376666019205,
-          "hundred_queries_seconds": 0.00020029098959639668,
+          "preparation_seconds": 0.2822867920040153,
+          "declaration_seconds": 0.0712448749691248,
+          "hundred_queries_seconds": 0.00019091699505224824,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.28378554101800546,
-          "declaration_seconds": 0.03220504196360707,
-          "hundred_queries_seconds": 0.00018875004025176167,
+          "preparation_seconds": 0.28353729099035263,
+          "declaration_seconds": 0.03255633398657665,
+          "hundred_queries_seconds": 0.00020766700617969036,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.27923904202179983,
-          "declaration_seconds": 0.03215641598217189,
-          "hundred_queries_seconds": 0.00019970897119492292,
+          "preparation_seconds": 0.2818325419793837,
+          "declaration_seconds": 0.03305237501626834,
+          "hundred_queries_seconds": 0.00019887503003701568,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.2787874999921769,
-          "declaration_seconds": 0.03171554196160287,
-          "hundred_queries_seconds": 0.00020695797866210341,
+          "preparation_seconds": 0.28219466598238796,
+          "declaration_seconds": 0.03273816697765142,
+          "hundred_queries_seconds": 0.00022254098439589143,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.2822158749913797,
-          "declaration_seconds": 0.03273470903513953,
-          "hundred_queries_seconds": 0.00020108401076868176,
+          "preparation_seconds": 0.29323354200460017,
+          "declaration_seconds": 0.03316741599701345,
+          "hundred_queries_seconds": 0.00020266702631488442,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.2789058749913238,
-          "declaration_seconds": 0.03209374996367842,
-          "hundred_queries_seconds": 0.00019758305279538035,
+          "preparation_seconds": 0.282029333000537,
+          "declaration_seconds": 0.032738582987803966,
+          "hundred_queries_seconds": 0.000212125014513731,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.277639249979984,
-          "declaration_seconds": 0.07000350003363565,
-          "hundred_queries_seconds": 0.0001971669844351709,
+          "preparation_seconds": 0.2834849580540322,
+          "declaration_seconds": 0.07015674997819588,
+          "hundred_queries_seconds": 0.00020691700046882033,
           "restricted_queries": 100,
           "complete": true
         }
       ],
       "summary": {
         "declaration_seconds": {
-          "mean": 0.043183660708434345,
-          "median": 0.03220504196360707,
-          "p95": 0.071376666019205,
-          "maximum": 0.071376666019205
+          "mean": 0.04366492855894778,
+          "median": 0.03305237501626834,
+          "p95": 0.0712448749691248,
+          "maximum": 0.0712448749691248
         },
         "hundred_queries_seconds": {
-          "mean": 0.00019879171824348823,
-          "median": 0.00019970897119492292,
-          "p95": 0.00020695797866210341,
-          "maximum": 0.00020695797866210341
+          "mean": 0.00020595843670889735,
+          "median": 0.00020691700046882033,
+          "p95": 0.00022254098439589143,
+          "maximum": 0.00022254098439589143
         }
       }
     }

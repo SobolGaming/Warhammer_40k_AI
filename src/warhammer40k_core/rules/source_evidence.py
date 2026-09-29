@@ -605,16 +605,34 @@ class RuleSourcePackage:
             expected_transcription_sha256 = hashlib.sha256(
                 source_text.raw_text.encode()
             ).hexdigest()
-            historical_legacy_mirror_ids = {
-                id(record)
-                for record in records
-                if record.evidence_kind == "third_party_mirror"
-                and record.project_authority_policy_id == CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID
-            }
+            authorized_legacy_mirror_ids: set[int] = set()
+            for record in records:
+                if (
+                    record.evidence_kind != "third_party_mirror"
+                    or record.project_authority_policy_id != CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID
+                    or record.transcription_sha256 == expected_transcription_sha256
+                ):
+                    continue
+                try:
+                    registry.authorize_legacy_controlling_transcription(
+                        scope_id=self.source_authority_scope,
+                        namespace=package_id.namespace,
+                        package_name=package_id.package_name,
+                        version=package_id.version,
+                        rule_source_id=source_id,
+                        historical_observation_sha256=record.observation_sha256,
+                        controlling_transcription_sha256=expected_transcription_sha256,
+                    )
+                except SourceAuthorityRegistryError as exc:
+                    raise RuleEvidenceError(
+                        "RuleSourcePackage evidence transcription hash does not match its "
+                        "source row."
+                    ) from exc
+                authorized_legacy_mirror_ids.add(id(record))
             controlling_records = [
                 record
                 for record in records
-                if id(record) not in historical_legacy_mirror_ids
+                if id(record) not in authorized_legacy_mirror_ids
                 and record.evidence_kind
                 in {
                     "owner_supplied_app_transcription",
@@ -632,7 +650,7 @@ class RuleSourcePackage:
             if any(
                 record.transcription_sha256 != expected_transcription_sha256
                 for record in records
-                if id(record) not in historical_legacy_mirror_ids
+                if id(record) not in authorized_legacy_mirror_ids
                 and record not in controlling_records
             ):
                 raise RuleEvidenceError(
