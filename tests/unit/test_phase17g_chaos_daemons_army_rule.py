@@ -2380,7 +2380,8 @@ def test_shadow_of_chaos_uses_phase_start_control_snapshot_for_all_tests() -> No
         result_payload = results_by_unit_id[unit_id]
         modified_roll = cast(dict[str, JsonValue], result_payload["modified_roll"])
         modifiers = cast(list[JsonValue], modified_roll["modifiers"])
-        assert result_payload["passed"] is False
+        assert result_payload["leadership_target"] == 8
+        assert result_payload["passed"] is (cast(int, modified_roll["final_value"]) >= 8)
         assert any(cast(dict[str, JsonValue], modifier)["operand"] == 1 for modifier in modifiers)
 
 

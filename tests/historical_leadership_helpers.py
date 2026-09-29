@@ -45,8 +45,23 @@ from warhammer40k_core.rules.source_data import RuleSourceText
 
 
 def historical_leadership_lifecycle(
-    *, registered: bool = False, duplicate: bool = False, expires: bool = False
+    *,
+    registered: bool = False,
+    duplicate: bool = False,
+    expires: bool = False,
+    game_id: str = "historical-generic-leadership",
+    leadership_effect: str | None = None,
 ) -> GameLifecycle:
+    effect = (
+        "add 1 to the Leadership "
+        + (
+            "characteristic of this model."
+            if duplicate
+            else "characteristic of models in this unit."
+        )
+        if leadership_effect is None
+        else leadership_effect
+    )
     source = RuleSourceText.from_raw(
         objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id="fixture:historical-leadership",
@@ -58,16 +73,12 @@ def historical_leadership_lifecycle(
                 else ""
             )
             + ("until" if duplicate else "Until")
-            + f" the end of the {'phase' if expires else 'turn'}, add 1 to the Leadership "
-            + (
-                "characteristic of this model."
-                if duplicate
-                else "characteristic of models in this unit."
-            )
+            + f" the end of the {'phase' if expires else 'turn'}, "
+            + effect
         ),
     )
     rule_ir = compiled_ability_rule(source.raw_text, source_id=source.source_id)
-    config = phase11c_config(game_id="historical-generic-leadership")
+    config = phase11c_config(game_id=game_id)
     assert config.army_catalog is not None
     catalog = config.army_catalog
     target_sheet = catalog.datasheet_by_id(
@@ -122,7 +133,12 @@ def historical_leadership_lifecycle(
     for army in mustered_armies(config):
         state.record_army_definition(army)
     scenario = create_deterministic_battlefield_scenario(
-        battlefield_id="historical-leadership-battlefield", armies=tuple(state.army_definitions)
+        battlefield_id=(
+            "historical-leadership-battlefield"
+            if game_id == "historical-generic-leadership"
+            else f"{game_id}-battlefield"
+        ),
+        armies=tuple(state.army_definitions),
     )
     state.record_battlefield_state(scenario.battlefield_state)
     target = state.army_definitions[0].units[0]
@@ -172,10 +188,19 @@ def historical_leadership_lifecycle(
 
 
 def completed_historical_leadership_session(
-    *, registered: bool = False, duplicate: bool = False, expires: bool = False
+    *,
+    registered: bool = False,
+    duplicate: bool = False,
+    expires: bool = False,
+    game_id: str = "historical-generic-leadership",
+    leadership_effect: str | None = None,
 ) -> LocalGameSession:
     lifecycle = historical_leadership_lifecycle(
-        registered=registered, duplicate=duplicate, expires=expires
+        registered=registered,
+        duplicate=duplicate,
+        expires=expires,
+        game_id=game_id,
+        leadership_effect=leadership_effect,
     )
     session = LocalGameSession(lifecycle=lifecycle)
     status = session.advance_until_decision_or_terminal()

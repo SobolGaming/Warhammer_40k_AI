@@ -487,7 +487,7 @@ _DEFAULT_MINIMUMS = {
     Characteristic.TOUGHNESS: 1,
     Characteristic.SAVE: 2,
     Characteristic.INVULNERABLE_SAVE: 2,
-    Characteristic.LEADERSHIP: 4,
+    Characteristic.LEADERSHIP: 5,
     Characteristic.OBJECTIVE_CONTROL: 0,
     Characteristic.WEAPON_SKILL: 2,
     Characteristic.BALLISTIC_SKILL: 2,
@@ -498,8 +498,11 @@ _DEFAULT_MINIMUMS = {
     Characteristic.DETECTION_RANGE: TARGETING_RANGE_MINIMUM,
 }
 
+# 02.02.01, after every modifier: Ld is 5+ through 8+; WS and BS are 2+ through 6+.
 _DEFAULT_MAXIMUMS = {
     Characteristic.DETECTION_RANGE: TARGETING_RANGE_MAXIMUM,
-    Characteristic.LEADERSHIP: 9,
+    Characteristic.LEADERSHIP: 8,
+    Characteristic.WEAPON_SKILL: 6,
+    Characteristic.BALLISTIC_SKILL: 6,
     Characteristic.ARMOR_PENETRATION: 0,
 }

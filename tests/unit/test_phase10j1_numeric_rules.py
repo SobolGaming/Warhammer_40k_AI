@@ -152,13 +152,18 @@ def test_same_level_model_cannot_end_on_objective_marker() -> None:
         (Characteristic.MOVEMENT, 2, -5, 1),
         (Characteristic.TOUGHNESS, 2, -5, 1),
         (Characteristic.SAVE, 2, -1, 2),
-        (Characteristic.LEADERSHIP, 6, -5, 4),
-        (Characteristic.LEADERSHIP, 6, 5, 9),
+        (Characteristic.LEADERSHIP, 6, -5, 5),
+        (Characteristic.LEADERSHIP, 6, 5, 8),
+        (Characteristic.LEADERSHIP, 6, 1, 7),
         (Characteristic.OBJECTIVE_CONTROL, 1, -5, 0),
         (Characteristic.RANGE, 12, -20, 1),
         (Characteristic.ATTACKS, 2, -5, 1),
         (Characteristic.WEAPON_SKILL, 3, -5, 2),
+        (Characteristic.WEAPON_SKILL, 4, 10, 6),
+        (Characteristic.WEAPON_SKILL, 3, 1, 4),
         (Characteristic.BALLISTIC_SKILL, 3, -5, 2),
+        (Characteristic.BALLISTIC_SKILL, 6, 10, 6),
+        (Characteristic.BALLISTIC_SKILL, 4, -1, 3),
         (Characteristic.STRENGTH, 4, -10, 1),
         (Characteristic.ARMOR_PENETRATION, -1, 5, 0),
         (Characteristic.DAMAGE, 2, -5, 1),
@@ -180,6 +185,62 @@ def test_characteristic_cap_floor_is_enforced_after_modifiers(
     assert bounded.unbounded_final == raw + operand
     assert bounded.final == expected
     assert stack.resolve().final == expected
+
+
+def test_leadership_and_skill_bounds_follow_complete_modifier_order() -> None:
+    modifiers = (
+        Modifier(
+            modifier_id="set-leadership",
+            source_id="order99:set-leadership",
+            scope=ModifierScope.for_characteristics((Characteristic.LEADERSHIP,)),
+            timing=ModifierTiming.BASE,
+            operation=ModifierOperation.SET,
+            operand=7,
+        ),
+        Modifier(
+            modifier_id="double-leadership",
+            source_id="order99:double-leadership",
+            scope=ModifierScope.for_characteristics((Characteristic.LEADERSHIP,)),
+            timing=ModifierTiming.MULTIPLICATIVE,
+            operation=ModifierOperation.MULTIPLY,
+            operand=2,
+        ),
+        Modifier(
+            modifier_id="worsen-leadership",
+            source_id="order99:worsen-leadership",
+            scope=ModifierScope.for_characteristics((Characteristic.LEADERSHIP,)),
+            timing=ModifierTiming.ADDITIVE,
+            operation=ModifierOperation.ADD,
+            operand=1,
+        ),
+    )
+    bounded = ModifierStack(
+        characteristic=Characteristic.LEADERSHIP,
+        raw_value=6,
+        modifiers=modifiers,
+    ).resolve_bounded()
+
+    assert bounded.base == 7
+    assert bounded.unbounded_final == 15
+    assert bounded.final == 8
+    assert bounded.applied_modifier_ids == (
+        "set-leadership",
+        "double-leadership",
+        "worsen-leadership",
+    )
+    assert tuple(modifier.source_id for modifier in modifiers) == (
+        "order99:set-leadership",
+        "order99:double-leadership",
+        "order99:worsen-leadership",
+    )
+    assert bounded.bound_policy.to_payload() == {
+        "characteristic": "leadership",
+        "minimum": 5,
+        "maximum": 8,
+        "damage_zero_permitted": False,
+    }
+    restored = BoundedCharacteristicValue.from_payload(bounded.to_payload())
+    assert restored == bounded
 
 
 def test_damage_can_be_zero_only_when_bound_policy_explicitly_permits_it() -> None:

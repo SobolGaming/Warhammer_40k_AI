@@ -98,7 +98,11 @@ def test_random_terminal_replacement_retains_source_roll_when_ignored(
     value = resolved_profile_with_modifier_trace(profile)
     assert value.modifier_trace is not None
     assert value.modifier_trace.source_value == 4
-    assert value.modifier_trace.resolve(ignored_modifier_ids=(modifier.modifier_id,)).final == 4
+    ignored_final = 5 if characteristic is Characteristic.LEADERSHIP else 4
+    assert (
+        value.modifier_trace.resolve(ignored_modifier_ids=(modifier.modifier_id,)).final
+        == ignored_final
+    )
     if characteristic is Characteristic.SAVE:
         from warhammer40k_core.engine.save_modifier_operations import profile_trace_for_save
 
@@ -285,7 +289,7 @@ def test_random_leadership_runtime_operations_precede_characteristic_bounds() ->
     profile = RandomProfileValue(
         Characteristic.LEADERSHIP, DiceExpression(1, 6), "source:low-leadership"
     ).evaluate(raw=2, evaluation_id="test:raw-two", target_id=model.model_instance_id)
-    assert profile.final == 4
+    assert profile.final == 5
     model = replace(
         model,
         characteristics=tuple(
@@ -312,7 +316,7 @@ def test_random_leadership_runtime_operations_precede_characteristic_bounds() ->
     )[0]
     assert source == 2
     assert (
-        CharacteristicModifierTrace(Characteristic.LEADERSHIP, source, modifiers).value().final == 4
+        CharacteristicModifierTrace(Characteristic.LEADERSHIP, source, modifiers).value().final == 5
     )
 
 

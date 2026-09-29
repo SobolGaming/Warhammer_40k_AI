@@ -545,7 +545,7 @@ def test_shadow_legion_shade_path_battle_shock_targets_attached_rules_unit() -> 
     strength = cast(dict[str, JsonValue], request["below_half_strength_context"])
     assert request["unit_instance_id"] == attached_id
     assert request["player_id"] == "player-b"
-    assert request["leadership_target"] == 4
+    assert request["leadership_target"] == 5
     assert strength["unit_instance_id"] == attached_id
     assert strength["starting_model_count"] == 6
     assert strength["current_model_count"] == 6

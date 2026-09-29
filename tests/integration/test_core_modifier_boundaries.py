@@ -28,7 +28,12 @@ from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollState
 from warhammer40k_core.core.modified_dice import ModifiedRollResult, ModifiedRollResultPayload
-from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm, RollModifier
+from warhammer40k_core.core.modifiers import (
+    ModifierOperation,
+    ModifierStack,
+    ModifierTerm,
+    RollModifier,
+)
 from warhammer40k_core.core.weapon_profiles import DamageProfile, RangeProfile
 from warhammer40k_core.engine.advance_roll import AdvanceRollRequest, AdvanceRollResult
 from warhammer40k_core.engine.attack_sequence_geometry_targets import (
@@ -1053,3 +1058,187 @@ def test_order37_automatic_increases_use_the_capped_price_for_target_affordabili
     assert state.command_point_total("player-b") == 0
     assert state.stratagem_use_records[-1].command_point_cost == 2
     assert len(state.stratagem_use_records[-1].command_point_modifier_ids) == 5
+
+
+def test_order99_leadership_and_weapon_skill_bounds_reach_live_rolls() -> None:
+    from tests.phase13b_shooting_declaration_helpers import _attack_pool_for_test, _state
+
+    from warhammer40k_core.core.army_catalog import ArmyCatalog
+    from warhammer40k_core.engine.attack_sequence_model import attack_sequence_hit_roll_spec
+    from warhammer40k_core.engine.decision import DiceRollManager
+    from warhammer40k_core.engine.rule_ir_weapon_modifiers import rule_ir_modified_weapon_profile
+    from warhammer40k_core.engine.shooting_targets import BENEFIT_OF_COVER_RULE_ID
+
+    for effect, game_suffix, expected in (
+        (
+            "add 10 to the Leadership characteristic of models in this unit.",
+            "worsen",
+            8,
+        ),
+        (
+            "subtract 10 from the Leadership characteristic of models in this unit.",
+            "improve",
+            5,
+        ),
+    ):
+        session = completed_historical_leadership_session(
+            game_id=f"order99-leadership-{game_suffix}",
+            leadership_effect=effect,
+        )
+        resolved = [
+            event.payload
+            for event in session.lifecycle.decision_controller.event_log.records
+            if event.event_type == "battle_shock_test_resolved"
+        ]
+        assert len(resolved) == 1
+        assert isinstance(resolved[0], dict)
+        result = resolved[0]["battle_shock_result"]
+        assert isinstance(result, dict)
+        request_payload = result["request"]
+        assert isinstance(request_payload, dict)
+        assert request_payload["leadership_target"] == expected
+        finished = session.lifecycle.state
+        assert finished is not None
+        effects = [
+            effect
+            for effect in finished.persisting_effects
+            if effect.source_rule_id == "fixture:historical-leadership"
+        ]
+        assert len(effects) == 1
+        unit = finished.army_definitions[0].units[0]
+        operations = generic_rule_characteristic_operations(
+            state=finished,
+            unit_instance_id=unit.unit_instance_id,
+            model_instance_id=unit.own_models[0].model_instance_id,
+            characteristic=Characteristic.LEADERSHIP,
+        )
+        assert len(operations) == 1
+        source_id = operations[0].source_id
+        assert source_id is not None
+        assert source_id.startswith("fixture:historical-leadership")
+        assert operations[0].operand == (10 if game_suffix == "worsen" else -10)
+        bounded = ModifierStack(
+            characteristic=Characteristic.LEADERSHIP,
+            raw_value=6,
+            modifiers=operations,
+        ).resolve_bounded()
+        assert bounded.unbounded_final == (16 if game_suffix == "worsen" else -4)
+        assert bounded.final == expected
+        assert bounded.applied_modifier_ids == (operations[0].modifier_id,)
+        persisted = session.to_persistence_payload()
+        assert (
+            LocalGameSession.from_persistence_payload(persisted).to_persistence_payload()
+            == persisted
+        )
+        replay = ReplayRunner.from_payload(
+            session.replay_artifact(artifact_id=f"order99-leadership-{game_suffix}")
+        ).run()
+        assert replay.status is ReplayRunStatus.REPRODUCED, replay
+        for viewer in ("player-a", "player-b"):
+            events = session.events_since(EventStreamCursor(), viewer_player_id=viewer)
+            blob = json.dumps(events)
+            assert "0x" not in blob
+            assert "leadership_target" in blob
+
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker, target = units["intercessor-1"], units["enemy"]
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    profiles = {
+        characteristic: next(
+            profile
+            for wargear in catalog.wargear
+            for profile in wargear.weapon_profiles
+            if profile.skill.characteristic is characteristic and profile.skill.is_numeric
+        )
+        for characteristic in (Characteristic.BALLISTIC_SKILL, Characteristic.WEAPON_SKILL)
+    }
+    for characteristic, delta, expected in (
+        (Characteristic.BALLISTIC_SKILL, 10, 6),
+        (Characteristic.BALLISTIC_SKILL, -10, 2),
+        (Characteristic.WEAPON_SKILL, 10, 6),
+        (Characteristic.WEAPON_SKILL, -10, 2),
+    ):
+        source = profiles[characteristic]
+        modified = rule_ir_modified_weapon_profile(
+            parameters={"characteristic": characteristic.value, "delta": delta},
+            profile=source,
+            source_id=f"order99:{characteristic.value}",
+            modifier_id=f"order99:{characteristic.value}:{delta}",
+        )
+        assert modified.skill.raw == source.skill.raw
+        assert modified.skill.final == expected
+        assert modified.skill.applied_modifier_ids == (f"order99:{characteristic.value}:{delta}",)
+        assert f"order99:{characteristic.value}" in modified.source_ids
+        pool = _attack_pool_for_test(
+            attacker=attacker,
+            defender=target,
+            weapon_profile=modified,
+            attacks=1,
+        )
+        spec = attack_sequence_hit_roll_spec(
+            weapon_profile_id=pool.weapon_profile_id,
+            attack_context_id=f"order99-{characteristic.value}-{delta}",
+            attacker_player_id="player-a",
+        )
+        hit = _roll_hit(
+            state=state,
+            manager=DiceRollManager(
+                f"order99-{characteristic.value}-{delta}",
+                injected_results=(
+                    DiceRollResult.from_values(
+                        roll_id="roll-000001",
+                        spec=spec,
+                        values=(4,),
+                        source="rng",
+                    ),
+                ),
+            ),
+            pool=pool,
+            attacker_player_id="player-a",
+            attack_context_id=f"order99-{characteristic.value}-{delta}",
+            source_phase=BattlePhase.SHOOTING,
+        )
+        assert hit.target_number == expected
+        assert HitRoll.from_payload(hit.to_payload()) == hit
+
+    covered_source = profiles[Characteristic.BALLISTIC_SKILL]
+    covered = replace(
+        covered_source,
+        skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 6),
+        skill_modifiers=(),
+    )
+    covered_pool = replace(
+        _attack_pool_for_test(
+            attacker=attacker,
+            defender=target,
+            weapon_profile=covered,
+            attacks=1,
+        ),
+        targeting_rule_ids=(BENEFIT_OF_COVER_RULE_ID,),
+    )
+    covered_spec = attack_sequence_hit_roll_spec(
+        weapon_profile_id=covered_pool.weapon_profile_id,
+        attack_context_id="order99-cover",
+        attacker_player_id="player-a",
+    )
+    covered_hit = _roll_hit(
+        state=state,
+        manager=DiceRollManager(
+            "order99-cover",
+            injected_results=(
+                DiceRollResult.from_values(
+                    roll_id="roll-000001",
+                    spec=covered_spec,
+                    values=(6,),
+                    source="rng",
+                ),
+            ),
+        ),
+        pool=covered_pool,
+        attacker_player_id="player-a",
+        attack_context_id="order99-cover",
+        source_phase=BattlePhase.SHOOTING,
+    )
+    assert covered_hit.target_number == 6
+    assert covered_hit.successful
