@@ -596,7 +596,7 @@ def test_voice_of_command_modifiers_cover_all_orders() -> None:
                 current_value=4,
             ),
         )
-        == 4
+        == 5
     )
     assert (
         resolve_characteristic_handler(

@@ -934,7 +934,7 @@
     },
     {
       "path": "tests/unit/test_phase10o_fall_back.py",
-      "sha256": "ffb02d2b1f6cd8a4e0af226287da4d3935d5d9deadab8036e730237a0c238bbb"
+      "sha256": "6e6c89c60eb243aeef416434094143ba419c77c423661cc2572b0e68fa759e34"
     },
     {
       "path": "tests/unit/test_phase10p_reserves.py",

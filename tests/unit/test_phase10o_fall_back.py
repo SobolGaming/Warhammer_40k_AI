@@ -1038,6 +1038,17 @@ def _advance_voluntary_desperate_escape_to_delirium_fnp(
             )
         )
     fnp_request = _decision_request(status)
+    resolved = tuple(
+        cast(dict[str, JsonValue], event.payload)
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "battle_shock_test_resolved"
+    )
+    result = cast(dict[str, JsonValue], resolved[-1]["battle_shock_result"])
+    request = cast(dict[str, JsonValue], result["request"])
+    modified_roll = cast(dict[str, JsonValue], result["modified_roll"])
+    assert request["leadership_target"] == 8
+    assert result["passed"] is False
+    assert cast(int, modified_roll["final_value"]) < 8
     assert fnp_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
     return lifecycle, status, target_unit_id
 
@@ -1046,8 +1057,7 @@ def _advance_voluntary_desperate_escape_to_delirium_fnp(
 def test_voluntary_desperate_escape_waits_for_delirium_fnp_before_embark(
     with_reroll: bool,
 ) -> None:
-    seed_suffix = 1 if with_reroll else 6
-    game_id = f"phase10o-p09b-delirium-fnp-reroll-{int(with_reroll)}-{seed_suffix}"
+    game_id = "order99-escape-reroll-2" if with_reroll else "order99-escape-fnp-0"
     lifecycle, status, target_unit_id = _advance_voluntary_desperate_escape_to_delirium_fnp(
         game_id=game_id,
         with_reroll=with_reroll,
@@ -1209,7 +1219,7 @@ def test_voluntary_desperate_escape_waits_for_delirium_fnp_before_embark(
 
 
 def test_delirium_destruction_reconciles_identity_without_embark_request() -> None:
-    game_id = "phase10o-p09b-delirium-destroyed-ordered-5"
+    game_id = "order99-escape-destroy-0"
     lifecycle, status, target_unit_id = _advance_voluntary_desperate_escape_to_delirium_fnp(
         game_id=game_id,
         with_reroll=False,
@@ -2258,7 +2268,7 @@ def _catalog_with_chaos_knights_delirium(catalog: ArmyCatalog) -> ArmyCatalog:
                                 and datasheet.datasheet_id == target_datasheet_id
                                 else CharacteristicValue.from_raw(
                                     Characteristic.LEADERSHIP,
-                                    10,
+                                    8,
                                 )
                                 if value.characteristic is Characteristic.LEADERSHIP
                                 else value

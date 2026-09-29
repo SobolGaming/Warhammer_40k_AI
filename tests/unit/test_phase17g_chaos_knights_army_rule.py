@@ -1707,7 +1707,7 @@ def test_deferred_outcome_phase_tamper_rejects_before_provider_mutation() -> Non
     from warhammer40k_core.engine.rule_trigger_state import RuleTrigger, RuleTriggerPayload
 
     lifecycle, bundle, provider_request = _selected_target_delirium_provider_checkpoint(
-        game_id="order34-complete-boundary-phase_tamper-1"
+        game_id="order99-delirium-checkpoint-0"
     )
     payload = deepcopy(lifecycle.to_payload())
     events = payload["decisions"]["event_log"]
@@ -1750,7 +1750,7 @@ def test_deferred_outcome_rejects_missing_parent_batch_completion() -> None:
     from warhammer40k_core.engine.rule_trigger_state import RuleTrigger, RuleTriggerPayload
 
     lifecycle, bundle, provider_request = _selected_target_delirium_provider_checkpoint(
-        game_id="order34-complete-boundary-phase_tamper-1"
+        game_id="order99-delirium-checkpoint-0"
     )
     payload = deepcopy(lifecycle.to_payload())
     events = payload["decisions"]["event_log"]
@@ -2219,7 +2219,11 @@ def test_delirium_lifecycle_restore_rejects_outcome_history_tamper(
     history_kind: str,
 ) -> None:
     lifecycle, bundle = _command_delirium_lifecycle_fixture(
-        game_id=f"phase17g-chaos-knights-delirium-lifecycle-tamper:{history_kind}-ordered-2",
+        game_id=(
+            "order99-delirium-command-0"
+            if history_kind == "pending"
+            else f"phase17g-chaos-knights-delirium-lifecycle-tamper:{history_kind}-ordered-2"
+        ),
         with_feel_no_pain=history_kind == "pending",
     )
     payload = cast(dict[str, Any], deepcopy(lifecycle.to_payload()))
@@ -2497,11 +2501,7 @@ def _record_real_harbingers_selection(
 
 
 def _assert_selected_target_delirium_continuation(*, reroll: bool) -> None:
-    game_id = (
-        "phase17g-selected-target-delirium-reroll-ordered-2"
-        if reroll
-        else "order65-complete-boundary-direct-0"
-    )
+    game_id = "order99-delirium-reroll-1" if reroll else "order65-complete-boundary-direct-0"
     selected_target_record = _selected_target_battle_shock_then_modifier_record()
     extra_contributions: tuple[RuntimeContentContribution, ...] = ()
     if reroll:
@@ -2583,6 +2583,7 @@ def _assert_selected_target_delirium_continuation(*, reroll: bool) -> None:
             result_id=f"{game_id}:reroll-result",
         )
     provider_request = lifecycle.decision_controller.queue.peek_next()
+    _assert_bounded_failed_battle_shock(lifecycle.decision_controller)
     assert status.decision_request == provider_request
     assert provider_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
     assert lifecycle.decision_controller.queue.pending_requests == (provider_request,)
@@ -2629,6 +2630,7 @@ def _selected_target_delirium_provider_checkpoint(
         result_id=f"{game_id}:selected-target-result",
     )
     provider_request = lifecycle.decision_controller.queue.peek_next()
+    _assert_bounded_failed_battle_shock(lifecycle.decision_controller)
     assert status.decision_request == provider_request
     assert provider_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
     return lifecycle, bundle, provider_request
@@ -3054,6 +3056,21 @@ def _queue_selected_target_delirium_request(
         raise AssertionError("selected-target fixture did not queue target selection")
 
 
+def _assert_bounded_failed_battle_shock(decisions: DecisionController) -> None:
+    resolved = tuple(
+        cast(dict[str, JsonValue], event.payload)
+        for event in decisions.event_log.records
+        if event.event_type == "battle_shock_test_resolved"
+    )
+    assert resolved
+    result = cast(dict[str, JsonValue], resolved[-1]["battle_shock_result"])
+    request = cast(dict[str, JsonValue], result["request"])
+    modified_roll = cast(dict[str, JsonValue], result["modified_roll"])
+    assert request["leadership_target"] == 8
+    assert result["passed"] is False
+    assert cast(int, modified_roll["final_value"]) < 8
+
+
 def _events_of_type(
     decisions: DecisionController,
     event_type: str,
@@ -3230,6 +3247,7 @@ def _command_delirium_lifecycle_fixture(
     )
     if outcome is not None:
         status = outcome
+    _assert_bounded_failed_battle_shock(decisions)
     expected_kind = (
         LifecycleStatusKind.WAITING_FOR_DECISION
         if with_feel_no_pain
@@ -3277,7 +3295,7 @@ def _command_delirium_catalog(
                             profile,
                             characteristics=tuple(
                                 (
-                                    CharacteristicValue.from_raw(Characteristic.LEADERSHIP, 13)
+                                    CharacteristicValue.from_raw(Characteristic.LEADERSHIP, 8)
                                     if value.characteristic is Characteristic.LEADERSHIP
                                     else CharacteristicValue.from_raw(
                                         Characteristic.WOUNDS,
