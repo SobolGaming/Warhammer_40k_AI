@@ -31,7 +31,6 @@ def test_strength_consumers_use_the_shared_interaction_query() -> None:
     for module, function in (
         ("attack_sequence_hit_wound.py", "_roll_wound"),
         ("attack_modifier_evaluation.py", "select_wound_modifiers"),
-        ("attack_sequence_hit_wound.py", "_reroll_wound_for_twin_linked_if_needed"),
     ):
         tree = ast.parse((engine / module).read_text())
         owner = next(

@@ -40,6 +40,10 @@ from warhammer40k_core.engine import target_replacement_dispatch as _target_repl
 from warhammer40k_core.engine import unit_split_dispatch as _unit_split_dispatch
 from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attack_reroll_dispatch import (
+    attack_reroll_dispatch_handler,
+    validate_pending_attack_rerolls,
+)
 from warhammer40k_core.engine.attack_sequence import (
     AttackSequence,
     invalid_destroyed_transport_disembark_proposal_status,
@@ -969,6 +973,7 @@ class GameLifecycle:
         )
         from warhammer40k_core.engine.dice_extremum import validate_dice_extremum_history
 
+        validate_pending_attack_rerolls(lifecycle)
         validate_dice_extremum_history(
             state=lifecycle._require_state(), decisions=lifecycle.decision_controller
         )
@@ -1119,6 +1124,7 @@ class GameLifecycle:
         return build_decision_dispatch_registry(
             (
                 modifier_evaluation_dispatch_handler(self),
+                attack_reroll_dispatch_handler(self),
                 dice_extremum_dispatch_handler(
                     state_provider=self._require_state,
                     decisions=self.decision_controller,
@@ -1154,7 +1160,7 @@ class GameLifecycle:
                         pre_validator=self._pre_validate_movement_phase_decision,
                         applier=self._apply_movement_phase_decision,
                     )
-                    for decision_type in _MOVEMENT_DECISION_TYPES
+                    for decision_type in _MOVEMENT_DECISION_TYPES - {DICE_REROLL_DECISION_TYPE}
                 ),
                 *(
                     DecisionDispatchHandler(

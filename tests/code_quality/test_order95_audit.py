@@ -116,3 +116,45 @@ def test_order95_capture_verification_rejects_drift_before_parsing(tmp_path: Pat
         verify_captures(load_audit(), core=path)
     with pytest.raises(ValueError, match="Order 95 changelog capture hash"):
         verify_captures(load_audit(), changelog=path)
+
+
+def test_order95_retired_owner_requires_both_current_successors(tmp_path: Path) -> None:
+    from tools.core_rules_order95_audit import (
+        RETIRED_REFERENCE_SUCCESSORS,
+        ROOT,
+        validate_owner_reference,
+    )
+
+    reference, successors = next(iter(RETIRED_REFERENCE_SUCCESSORS.items()))
+    for successor in successors:
+        relative, _, symbol = successor.partition(":")
+        target = tmp_path / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text((ROOT / relative).read_text())
+    validate_owner_reference(reference, tmp_path)
+    for successor in successors:
+        relative, _, symbol = successor.partition(":")
+        target = tmp_path / relative
+        original = target.read_text()
+        target.write_text(original.replace(f"def {symbol}(", f"def retired_{symbol}("))
+        with pytest.raises(ValueError, match="reference is absent"):
+            validate_owner_reference(reference, tmp_path)
+        target.write_text(original)
+    with pytest.raises(ValueError, match="reference is absent"):
+        validate_owner_reference("unknown.py:unknown", tmp_path)
+
+
+def test_order95_retirement_cannot_hide_a_reintroduced_automatic_owner(tmp_path: Path) -> None:
+    from tools.core_rules_order95_audit import (
+        RETIRED_REFERENCE_SUCCESSORS,
+        ROOT,
+        validate_owner_reference,
+    )
+
+    reference = next(iter(RETIRED_REFERENCE_SUCCESSORS))
+    relative, _, symbol = reference.partition(":")
+    target = tmp_path / relative
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text((ROOT / relative).read_text().replace("def _roll_wound(", f"def {symbol}("))
+    with pytest.raises(ValueError, match="retired owner was reintroduced"):
+        validate_owner_reference(reference, tmp_path)

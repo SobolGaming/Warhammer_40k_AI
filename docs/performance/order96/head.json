@@ -1,0 +1,282 @@
+{
+  "workload": "order96-optional-wound-rerolls-v1",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0a8a1be88a74da7c531c59d5a8efc3e788891db95397c9ed1c6288890d251b69",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "hardware_status": "provisional",
+  "concurrency": 1,
+  "coverage": false,
+  "fixture": "Two units, one model each, no terrain; 12 Torrent/Twin-linked attacks, dash S vs T1",
+  "seeds": [
+    "order88-shooting",
+    "order88-fight"
+  ],
+  "policy": "Submit decline or reroll:0 through LocalGameSession; decline Stratagem opportunities",
+  "timing_boundary": "Pending phase choice through first attack completion; setup and restore separate",
+  "hashes": {
+    "scripts/benchmark_order96_rerolls.py": "e061748ef66b399741d1b579317d1212156498cbfc4b214ec00a4e8a51abfb10",
+    "tests/absent_strength_helpers.py": "f082912488a4cf4ff582a23781325d7ca7da4f7c2a54ce8bb8bf6487da70cfae",
+    "tests/twin_linked_helpers.py": "0333b151949c7761cde49283709e8edad5586725c75ee71611267b1bb600c8d5",
+    "tests/lethal_hits_helpers.py": "f55d0df7ce3137cd11d8d4e530dbee3f12baf00dcdf9e02d15094519c220ba96",
+    "tests/psychic_modifier_helpers.py": "250e1f8a846662a937b7c0b7e3862788e6591e88a2e2b520332cc1526ec7da54",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "phase": "shooting",
+      "accept": false,
+      "setup_seconds": [
+        2.1620184589992277,
+        0.25664816703647375,
+        0.25380737497471273,
+        0.2514062079717405,
+        0.252684417006094
+      ],
+      "samples_seconds": [
+        0.4851025409880094,
+        0.48391016700770706,
+        0.44090291601605713,
+        0.47660862503107637,
+        0.4777247079764493
+      ],
+      "restore_seconds": [
+        0.31396449997555465,
+        0.3131807909812778,
+        0.3079597919713706,
+        0.3107575829490088,
+        0.3123634589719586
+      ],
+      "work_counts": [
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 0,
+          "automatic_weapon_rerolls": 0
+        },
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 0,
+          "automatic_weapon_rerolls": 0
+        },
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 0,
+          "automatic_weapon_rerolls": 0
+        },
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 0,
+          "automatic_weapon_rerolls": 0
+        },
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 0,
+          "automatic_weapon_rerolls": 0
+        }
+      ],
+      "mean": 0.47284979140385985,
+      "median": 0.4777247079764493,
+      "p95_and_maximum": 0.4851025409880094,
+      "restore_mean": 0.3116452249698341,
+      "slices_per_second": 2.1148365044871142
+    },
+    {
+      "phase": "shooting",
+      "accept": true,
+      "setup_seconds": [
+        0.2578234579996206,
+        0.28831466601695865,
+        0.25484795798547566,
+        0.2541082500247285,
+        0.2554349579731934
+      ],
+      "samples_seconds": [
+        0.4691957919858396,
+        0.46041762497043237,
+        0.49792325001908466,
+        0.4658055829931982,
+        0.4688946250244044
+      ],
+      "restore_seconds": [
+        0.3119427500059828,
+        0.31277337501524016,
+        0.31265966698993,
+        0.3520464170142077,
+        0.31451337499311194
+      ],
+      "work_counts": [
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 12,
+          "automatic_weapon_rerolls": 0
+        },
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 12,
+          "automatic_weapon_rerolls": 0
+        },
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 12,
+          "automatic_weapon_rerolls": 0
+        },
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 12,
+          "automatic_weapon_rerolls": 0
+        },
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 12,
+          "automatic_weapon_rerolls": 0
+        }
+      ],
+      "mean": 0.47244737499859185,
+      "median": 0.4688946250244044,
+      "p95_and_maximum": 0.49792325001908466,
+      "restore_mean": 0.32078711680369454,
+      "slices_per_second": 2.1166378583497907
+    },
+    {
+      "phase": "fight",
+      "accept": false,
+      "setup_seconds": [
+        0.5003174170269631,
+        0.4983997499803081,
+        0.4996596670243889,
+        0.502251708006952,
+        0.5005987499607727
+      ],
+      "samples_seconds": [
+        0.34400433296104893,
+        0.34015241701854393,
+        0.34540849999757484,
+        0.3436470839660615,
+        0.3444745000451803
+      ],
+      "restore_seconds": [
+        0.32113450003089383,
+        0.2812019169796258,
+        0.2858222919749096,
+        0.3213896250235848,
+        0.28242395794950426
+      ],
+      "work_counts": [
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 0,
+          "automatic_weapon_rerolls": 0
+        },
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 0,
+          "automatic_weapon_rerolls": 0
+        },
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 0,
+          "automatic_weapon_rerolls": 0
+        },
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 0,
+          "automatic_weapon_rerolls": 0
+        },
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 0,
+          "automatic_weapon_rerolls": 0
+        }
+      ],
+      "mean": 0.3435373667976819,
+      "median": 0.34400433296104893,
+      "p95_and_maximum": 0.34540849999757484,
+      "restore_mean": 0.29839445839170364,
+      "slices_per_second": 2.9108914972528335
+    },
+    {
+      "phase": "fight",
+      "accept": true,
+      "setup_seconds": [
+        0.499177832971327,
+        0.504308708012104,
+        0.4998362079495564,
+        0.5033756659831852,
+        0.5037330000195652
+      ],
+      "samples_seconds": [
+        0.3585092920111492,
+        0.3575572499539703,
+        0.35736791702220216,
+        0.3583773749996908,
+        0.36006820801412687
+      ],
+      "restore_seconds": [
+        0.28334116702899337,
+        0.32115166704170406,
+        0.2836468329769559,
+        0.28688866703305393,
+        0.32576716697076336
+      ],
+      "work_counts": [
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 12,
+          "automatic_weapon_rerolls": 0
+        },
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 12,
+          "automatic_weapon_rerolls": 0
+        },
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 12,
+          "automatic_weapon_rerolls": 0
+        },
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 12,
+          "automatic_weapon_rerolls": 0
+        },
+        {
+          "wounds": 12,
+          "reroll_choices": 12,
+          "rerolls": 12,
+          "automatic_weapon_rerolls": 0
+        }
+      ],
+      "mean": 0.3583760084002279,
+      "median": 0.3583773749996908,
+      "p95_and_maximum": 0.36006820801412687,
+      "restore_mean": 0.3001591002102941,
+      "slices_per_second": 2.7903653608508803
+    }
+  ],
+  "completion_rate": 1.0,
+  "full_game_samples": 0,
+  "full_game_certified": false,
+  "timing_budget": "Diagnostic; owner-deferred provisional component timing gates remain deferred",
+  "work_gate": "12 wounds and 12 submitted choices; at most one reroll per physical die; no synthetic weapon decisions",
+  "baseline_limit": "Base implements the reported bug and is a cost comparison, not a correctness oracle"
+}

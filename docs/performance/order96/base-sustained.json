@@ -1,0 +1,362 @@
+{
+  "workload": "order96-sustained-d3-optional-wound-rerolls-v1",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c62586d84bbcf166e273482e3d8c3815292291dff6007c479dd209dcb51b293b",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "hardware_status": "provisional",
+  "concurrency": 1,
+  "coverage": false,
+  "fixture": "Two units, one model each, no terrain; 12 Twin-linked/Sustained Hits D3 attacks",
+  "seeds": [
+    "psychic-sources",
+    "psychic-sources-fight"
+  ],
+  "policy": "Submit decline or reroll:0 through LocalGameSession; decline Stratagem opportunities",
+  "timing_boundary": "Pending phase choice through first attack completion; setup and restore separate",
+  "hashes": {
+    "scripts/benchmark_order96_rerolls.py": "e061748ef66b399741d1b579317d1212156498cbfc4b214ec00a4e8a51abfb10",
+    "tests/absent_strength_helpers.py": "f082912488a4cf4ff582a23781325d7ca7da4f7c2a54ce8bb8bf6487da70cfae",
+    "tests/twin_linked_helpers.py": "0333b151949c7761cde49283709e8edad5586725c75ee71611267b1bb600c8d5",
+    "tests/lethal_hits_helpers.py": "f55d0df7ce3137cd11d8d4e530dbee3f12baf00dcdf9e02d15094519c220ba96",
+    "tests/psychic_modifier_helpers.py": "250e1f8a846662a937b7c0b7e3862788e6591e88a2e2b520332cc1526ec7da54",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "phase": "shooting",
+      "accept": false,
+      "setup_seconds": [
+        2.1287282909615897,
+        0.2523850419675,
+        0.2500192500301637,
+        0.24937108298763633,
+        0.25230879202717915
+      ],
+      "samples_seconds": [
+        0.33502200001385063,
+        0.3146360830287449,
+        0.28047841700026765,
+        0.31563320802524686,
+        0.32277120801154524
+      ],
+      "restore_seconds": [
+        0.305971416993998,
+        0.29886287497356534,
+        0.298737249977421,
+        0.3024104589712806,
+        0.3092517919722013
+      ],
+      "work_counts": [
+        {
+          "wounds": 10,
+          "reroll_choices": 0,
+          "rerolls": 4,
+          "automatic_weapon_rerolls": 4,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        },
+        {
+          "wounds": 10,
+          "reroll_choices": 0,
+          "rerolls": 4,
+          "automatic_weapon_rerolls": 4,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        },
+        {
+          "wounds": 10,
+          "reroll_choices": 0,
+          "rerolls": 4,
+          "automatic_weapon_rerolls": 4,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        },
+        {
+          "wounds": 10,
+          "reroll_choices": 0,
+          "rerolls": 4,
+          "automatic_weapon_rerolls": 4,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        },
+        {
+          "wounds": 10,
+          "reroll_choices": 0,
+          "rerolls": 4,
+          "automatic_weapon_rerolls": 4,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        }
+      ],
+      "mean": 0.3137081832159311,
+      "median": 0.31563320802524686,
+      "p95_and_maximum": 0.33502200001385063,
+      "restore_mean": 0.30304675857769325,
+      "slices_per_second": 3.187675851323527
+    },
+    {
+      "phase": "shooting",
+      "accept": true,
+      "setup_seconds": [
+        0.2572674169787206,
+        0.2528847500216216,
+        0.25235358299687505,
+        0.2514687499497086,
+        0.2577378749847412
+      ],
+      "samples_seconds": [
+        0.28753866703482345,
+        0.31726674997480586,
+        0.2826511670136824,
+        0.28094954101834446,
+        0.3348809169838205
+      ],
+      "restore_seconds": [
+        0.30247654096456245,
+        0.30218920804327354,
+        0.3348960829898715,
+        0.3032299589831382,
+        0.31028066703584045
+      ],
+      "work_counts": [
+        {
+          "wounds": 10,
+          "reroll_choices": 0,
+          "rerolls": 4,
+          "automatic_weapon_rerolls": 4,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        },
+        {
+          "wounds": 10,
+          "reroll_choices": 0,
+          "rerolls": 4,
+          "automatic_weapon_rerolls": 4,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        },
+        {
+          "wounds": 10,
+          "reroll_choices": 0,
+          "rerolls": 4,
+          "automatic_weapon_rerolls": 4,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        },
+        {
+          "wounds": 10,
+          "reroll_choices": 0,
+          "rerolls": 4,
+          "automatic_weapon_rerolls": 4,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        },
+        {
+          "wounds": 10,
+          "reroll_choices": 0,
+          "rerolls": 4,
+          "automatic_weapon_rerolls": 4,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        }
+      ],
+      "mean": 0.30065740840509536,
+      "median": 0.28753866703482345,
+      "p95_and_maximum": 0.3348809169838205,
+      "restore_mean": 0.3106144916033372,
+      "slices_per_second": 3.3260447673806683
+    },
+    {
+      "phase": "fight",
+      "accept": false,
+      "setup_seconds": [
+        0.49729075003415346,
+        0.49596224998822436,
+        0.4966701249941252,
+        0.49913033400662243,
+        0.4978990000090562
+      ],
+      "samples_seconds": [
+        0.17874616698827595,
+        0.17725745803909376,
+        0.1775927909766324,
+        0.17742895800620317,
+        0.17796145798638463
+      ],
+      "restore_seconds": [
+        0.28032699995674193,
+        0.3218633339856751,
+        0.27996191702550277,
+        0.2824406670406461,
+        0.31785270804539323
+      ],
+      "work_counts": [
+        {
+          "wounds": 14,
+          "reroll_choices": 0,
+          "rerolls": 5,
+          "automatic_weapon_rerolls": 5,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        },
+        {
+          "wounds": 14,
+          "reroll_choices": 0,
+          "rerolls": 5,
+          "automatic_weapon_rerolls": 5,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        },
+        {
+          "wounds": 14,
+          "reroll_choices": 0,
+          "rerolls": 5,
+          "automatic_weapon_rerolls": 5,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        },
+        {
+          "wounds": 14,
+          "reroll_choices": 0,
+          "rerolls": 5,
+          "automatic_weapon_rerolls": 5,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        },
+        {
+          "wounds": 14,
+          "reroll_choices": 0,
+          "rerolls": 5,
+          "automatic_weapon_rerolls": 5,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        }
+      ],
+      "mean": 0.17779736639931798,
+      "median": 0.1775927909766324,
+      "p95_and_maximum": 0.17874616698827595,
+      "restore_mean": 0.29648912521079185,
+      "slices_per_second": 5.6243802720569205
+    },
+    {
+      "phase": "fight",
+      "accept": true,
+      "setup_seconds": [
+        0.49619579198770225,
+        0.4962088749743998,
+        0.4971265419735573,
+        0.49969141703331843,
+        0.5092471659881994
+      ],
+      "samples_seconds": [
+        0.17715266696177423,
+        0.1774026250350289,
+        0.2201322500477545,
+        0.17763354198541492,
+        0.1835748750017956
+      ],
+      "restore_seconds": [
+        0.2800668750423938,
+        0.2794331249897368,
+        0.2829352909466252,
+        0.28133500000694767,
+        0.2796714589931071
+      ],
+      "work_counts": [
+        {
+          "wounds": 14,
+          "reroll_choices": 0,
+          "rerolls": 5,
+          "automatic_weapon_rerolls": 5,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        },
+        {
+          "wounds": 14,
+          "reroll_choices": 0,
+          "rerolls": 5,
+          "automatic_weapon_rerolls": 5,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        },
+        {
+          "wounds": 14,
+          "reroll_choices": 0,
+          "rerolls": 5,
+          "automatic_weapon_rerolls": 5,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        },
+        {
+          "wounds": 14,
+          "reroll_choices": 0,
+          "rerolls": 5,
+          "automatic_weapon_rerolls": 5,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        },
+        {
+          "wounds": 14,
+          "reroll_choices": 0,
+          "rerolls": 5,
+          "automatic_weapon_rerolls": 5,
+          "hits": 12,
+          "distinct_hit_contexts": 12,
+          "critical_hits": 2,
+          "sustained_d3": 2
+        }
+      ],
+      "mean": 0.18717919180635362,
+      "median": 0.17763354198541492,
+      "p95_and_maximum": 0.2201322500477545,
+      "restore_mean": 0.2806883499957621,
+      "slices_per_second": 5.342474183960313
+    }
+  ],
+  "completion_rate": 1.0,
+  "full_game_samples": 0,
+  "full_game_certified": false,
+  "timing_budget": "Diagnostic; owner-deferred provisional component timing gates remain deferred",
+  "work_gate": "One submitted choice per wound; one physical D3 per critical hit; no duplicate hit contexts; at most one reroll per die; no synthetic weapon decisions",
+  "baseline_limit": "Base implements the reported bug and is a cost comparison, not a correctness oracle"
+}

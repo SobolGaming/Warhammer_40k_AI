@@ -7271,3 +7271,33 @@ retained continuations and restriction histories. Ordinary, reaction and retaine
 hosts share validation and completion. Both viewers use the existing public battle
 projection and event redaction. Exact runtime matching still applies to persistence
 and replay; no historical saves are migrated.
+
+## Order 96: optional intrinsic wound rerolls
+
+Twin-linked joins the existing finite `select_dice_reroll` source-backed attack
+family. The engine offers `decline` and `reroll:0` after every eligible physical
+wound roll, including successful and critical wounds. Its stable source rule is
+`weapon-ability:twin-linked`; `attack_context.source_payload` identifies an
+`intrinsic_weapon_reroll` with the attacking model, profile, catalog source IDs
+and selected weapon-ability IDs. The surrounding existing wound context binds
+game, round, phase, rules unit, target, attack identity and exact wound dice.
+
+Intrinsic and granted wound permissions share deterministic source precedence.
+An overlap grants no second roll. A declined source-backed opportunity can be
+followed by eligible Command Re-roll; a rerolled or assigned die cannot receive
+another reroll. Result assignments remain after the reroll windows. The engine
+recomputes the wound and its critical effects on resume.
+
+Adapters submit only a pending engine option through FiniteOptionSubmission and
+GameLifecycle. Malformed, stale or drifted context/options are rejected before
+queue pop and mutation. Pending restoration authenticates the request against the
+issued request, physical dice event, active attack host and current source. The
+same path serves ordinary and retained Shooting/Fight and out-of-phase Shooting,
+even when the current battlefield phase or active player differs from the attack.
+Existing viewer scoping applies; adapters never synthesize rerolls or CP spending.
+
+Ordinary `dice_reroll_declined` / `dice_reroll_resolved` events and DecisionRecords
+replace Twin-linked's former unsubmitted `weapon_ability_reroll_resolved` event.
+Contract 42's existing dice decision, source-context and event envelopes already
+cover these payloads, so no schema version changes. Exact engine-build matching
+continues to reject incompatible old saves/replays without a migration shim.

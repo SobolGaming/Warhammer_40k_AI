@@ -235,7 +235,6 @@ __all__ = (
     "_request_source_backed_damage_reroll_if_available",
     "_request_source_backed_hit_reroll_if_available",
     "_request_source_backed_wound_reroll_if_available",
-    "_reroll_wound_for_twin_linked_if_needed",
     "_resolve_deadly_demise_before_removal",
     "_resolve_deadly_demise_secondary_destroyed_models",
     "_resolve_destroyed_transport_disembark_submission",

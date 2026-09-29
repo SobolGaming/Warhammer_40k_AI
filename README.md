@@ -2,6 +2,11 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 96 / P24K implements optional Twin-linked wound rerolls through the shared
+source-backed decision and resume authority. Successful rolls, declines, source
+overlap, retained attacks and replay use the same path. See
+[scope and evidence](docs/ORDER_96_SCOPE_PLAN.md).
+
 Order 95 / P04E implements optional ranged targets. A selected Shooting unit can
 select no weapons or decline targets for selected physical weapons; Hazardous,
 One Shot and selection restrictions still resolve through the shared engine.
@@ -9,7 +14,7 @@ See [scope and evidence](docs/ORDER_95_SCOPE_PLAN.md).
 
 Current Core status: the retained [Order 95 audit](docs/ORDER_95_AUDIT_REPORT.md)
 found two gameplay gaps and an incomplete clause-evidence inventory after Orders
-1–94. This implementation addresses C04-06. Orders 96–97 remain open and PFINAL
+1–94. Orders 95–96 address C04-06 and C24-11. Order 97 remains open and PFINAL
 is Order 98. Core Rules and full-game performance remain uncertified; see the
 [roadmap](docs/CORE_RULES_REMEDIATION_ROADMAP.md) and
 [evidence limits](docs/ORDER_95_AUDIT_NOTES.md). Historical audit observations remain unchanged.

@@ -1450,7 +1450,7 @@ def test_hatred_eternal_accepted_hit_reroll_resumes_attack_sequence_with_rerolle
     )
     lifecycle, units = shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
-        game_id="drukhari-test-hatred-eternal-consumer-step3-1",
+        game_id="drukhari-test-hatred-eternal-consumer-step3-2",
         catalog=catalog_with_replaced_bolt_profiles((hatred_profile,)),
     )
     state = _lifecycle_state(lifecycle)
@@ -1521,14 +1521,6 @@ def test_hatred_eternal_accepted_hit_reroll_resumes_attack_sequence_with_rerolle
             attacker_player_id="player-a",
         ),
         [1],
-    )
-    fixed_rolls.roll_fixed(
-        attack_sequence_wound_roll_spec(
-            weapon_profile_id=hatred_profile.profile_id,
-            attack_context_id=attack_context_id,
-            attacker_player_id="player-a",
-        ),
-        [6],
     )
 
     reroll_request = _decision_request_from_status(
@@ -1903,7 +1895,7 @@ def test_hatred_eternal_accepted_fight_hit_reroll_resumes_attack_sequence() -> N
             "attacker": Pose.at(10.0, 20.0),
             "enemy": Pose.at(12.0, 20.0),
         },
-        game_id="drukhari-test-hatred-fight-consumer-0002",
+        game_id="drukhari-test-hatred-fight-consumer-0004",
         datasheet_id="core-character-leader",
         model_profile_id="core-character-leader",
         model_count=1,
@@ -1964,14 +1956,6 @@ def test_hatred_eternal_accepted_fight_hit_reroll_resumes_attack_sequence() -> N
             attacker_player_id="player-a",
         ),
         [1],
-    )
-    fixed_rolls.roll_fixed(
-        attack_sequence_wound_roll_spec(
-            weapon_profile_id=weapon_profile_id,
-            attack_context_id=attack_context_id,
-            attacker_player_id="player-a",
-        ),
-        [6],
     )
 
     reroll_request = _decision_request_from_status(

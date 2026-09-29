@@ -465,6 +465,61 @@ def test_aspect_shrine_token_facade_use_resumes_assigned_hit(replacement_value: 
     assert updated_state["current_total"] == replacement_value
 
 
+@pytest.mark.parametrize("reroll", [False, True])
+def test_twin_linked_precedes_wound_assignment_without_reopening_the_die(reroll: bool) -> None:
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
+
+    lifecycle, request = _aspect_shrine_lifecycle_override_request(
+        replacement_value=7, twin_linked=True
+    )
+    initial = lifecycle.to_payload()
+    session = LocalGameSession(lifecycle)
+    assert isinstance(request.payload, dict)
+    roll_id = request.payload["roll_id"]
+    status = session.submit_option(
+        request_id=request.request_id,
+        result_id="order96:before-assignment",
+        option_id="reroll:0" if reroll else "decline",
+    )
+    status = _decline_stratagem_window_if_present(
+        lifecycle, status, result_id="order96:decline-command-before-assignment"
+    )
+    assignment = _decision_request(status)
+    assert assignment.decision_type == DICE_RESULT_OVERRIDE_DECISION_TYPE
+    session = LocalGameSession(GameLifecycle.from_payload(lifecycle.to_payload()))
+    status = session.submit_option(
+        request_id=assignment.request_id, result_id="order96:assign-wound", option_id="use"
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    payload = _event_payload(session.lifecycle, DICE_RESULT_OVERRIDE_EVENT_TYPE)
+    updated = cast(dict[str, JsonValue], payload["updated_roll_state"])
+    assert cast(dict[str, JsonValue], updated["original_result"])["roll_id"] == roll_id
+    assert updated["current_values"] == [7]
+    assert len(cast(list[JsonValue], updated["rerolls"])) == int(reroll)
+    choices = [
+        row
+        for row in session.lifecycle.decision_controller.records
+        if row.request.decision_type == "select_dice_reroll"
+        and isinstance(row.request.payload, dict)
+        and row.request.payload["roll_id"] == roll_id
+    ]
+    assert len(choices) == 1
+    pending = session.lifecycle.pending_decision_request()
+    assert pending is None or not (
+        pending.decision_type == "select_dice_reroll"
+        and isinstance(pending.payload, dict)
+        and pending.payload["roll_id"] == roll_id
+    )
+    replay = ReplayRunner.from_payload(
+        ReplayArtifact.capture(
+            artifact_id="order96-assignment",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        ).to_payload()
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED, replay
+
+
 def test_aspect_shrine_token_facade_rejects_resource_drift_without_popping_request() -> None:
     lifecycle, request = _aspect_shrine_lifecycle_override_request()
     state = _state(lifecycle)
@@ -1903,7 +1958,7 @@ def _shooting_declaration_request_for_aeldari_vehicle(
 
 
 def _aspect_shrine_lifecycle_override_request(
-    *, replacement_value: int = 6
+    *, replacement_value: int = 6, twin_linked: bool = False
 ) -> tuple[GameLifecycle, DecisionRequest]:
     config = _aeldari_config(aspect_shrine_token_count=1)
     # Exercise the generic descriptor with alternate source-fixture values;
@@ -1926,9 +1981,49 @@ def _aspect_shrine_lifecycle_override_request(
             ),
         )
         config = replace(config, army_catalog=catalog)
-    lifecycle, _status = _advance_to_movement_unit_selection(config)
-    _advance_lifecycle_state_to_phase(lifecycle, BattlePhase.SHOOTING)
-    lifecycle = _rehydrate_lifecycle_with_empty_decisions(lifecycle)
+    if twin_linked:
+        config = replace(
+            config,
+            army_catalog=replace(
+                config.army_catalog,
+                wargear=tuple(
+                    replace(
+                        row,
+                        weapon_profiles=tuple(
+                            replace(
+                                profile, keywords=(*profile.keywords, WeaponKeyword.TWIN_LINKED)
+                            )
+                            for profile in row.weapon_profiles
+                        ),
+                    )
+                    for row in config.army_catalog.wargear
+                ),
+            ),
+        )
+    lifecycle, movement_status = _advance_to_movement_unit_selection(config)
+    if twin_linked:
+        from tests.twin_linked_helpers import submit_next
+
+        # Preserve the real phase-boundary history for checkpoint/replay checks.
+        movement_session = LocalGameSession(lifecycle)
+        for _ in range(50):
+            if _state(lifecycle).current_battle_phase is BattlePhase.SHOOTING:
+                break
+            movement_request = _decision_request(movement_status)
+            if movement_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE:
+                movement_status = movement_session.submit_option(
+                    request_id=movement_request.request_id,
+                    option_id=MovementPhaseActionKind.REMAIN_STATIONARY.value,
+                    result_id=f"{movement_request.request_id}:order96-stationary",
+                )
+            else:
+                submit_next(movement_session, movement_request)
+                movement_status = movement_session.advance_until_decision_or_terminal()
+            assert movement_status.status_kind is not LifecycleStatusKind.INVALID
+        assert _state(lifecycle).current_battle_phase is BattlePhase.SHOOTING
+    else:
+        _advance_lifecycle_state_to_phase(lifecycle, BattlePhase.SHOOTING)
+        lifecycle = _rehydrate_lifecycle_with_empty_decisions(lifecycle)
 
     unit_request = _decision_request(
         _decline_stratagem_window_if_present(
@@ -1979,7 +2074,7 @@ def _aspect_shrine_lifecycle_override_request(
             attack_context_id=attack_context_id,
             attacker_player_id="player-a",
         ),
-        [2] if replacement_value == 1 else [1],
+        [6] if twin_linked else [2] if replacement_value == 1 else [1],
     )
     manager.roll_fixed(
         attack_sequence_wound_roll_spec(
@@ -1987,7 +2082,7 @@ def _aspect_shrine_lifecycle_override_request(
             attack_context_id=attack_context_id,
             attacker_player_id="player-a",
         ),
-        [6],
+        [1] if twin_linked else [6],
     )
     status = lifecycle.submit_decision(
         DecisionResult(
@@ -2004,8 +2099,25 @@ def _aspect_shrine_lifecycle_override_request(
         status,
         result_id="aspect-token-decline-hit-command-reroll",
     )
+    if (
+        twin_linked
+        and _decision_request(status).decision_type == DICE_RESULT_OVERRIDE_DECISION_TYPE
+    ):
+        hit_assignment = _decision_request(status)
+        status = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id="order96:decline-hit-assignment",
+                request=hit_assignment,
+                selected_option_id="decline",
+            )
+        )
+        status = _decline_stratagem_window_if_present(
+            lifecycle, status, result_id="order96:decline-wound-command-reroll"
+        )
     request = _decision_request(status)
-    assert request.decision_type == DICE_RESULT_OVERRIDE_DECISION_TYPE
+    assert request.decision_type == (
+        "select_dice_reroll" if twin_linked else DICE_RESULT_OVERRIDE_DECISION_TYPE
+    )
     return lifecycle, request
 
 
