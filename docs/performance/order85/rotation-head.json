@@ -1,7 +1,7 @@
 {
   "workload": "order85-asymmetric-body-contact-search-v1",
-  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:bc6eb667b1a0c8cd2c1b9f1fb83b71cc540a0332c74e988f3227ae4fed1ead4e",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bc6eb667b1a0c8cd2c1b9f1fb83b71cc540a0332c74e988f3227ae4fed1ead4e",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:9e98b1adc7c63d919a1659ab93becf6a1e956e401d0948a464d004f89137376f",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9e98b1adc7c63d919a1659ab93becf6a1e956e401d0948a464d004f89137376f",
   "cpu": "Apple M5 Pro",
   "memory_bytes": 68719476736,
   "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
@@ -15,9 +15,9 @@
     {
       "bearing": 0.0,
       "samples_seconds": [
-        0.4859066249919124,
-        1.9249971956014633e-05,
-        2.040993422269821e-06
+        0.49469579197466373,
+        1.0415969882160425e-05,
+        2.249958924949169e-06
       ],
       "statuses": [
         "reachable",
@@ -28,9 +28,9 @@
     {
       "bearing": 7.0,
       "samples_seconds": [
-        0.47887004096992314,
-        6.040965672582388e-06,
-        1.7090351320803165e-06
+        0.48637883295305073,
+        6.499991286545992e-06,
+        1.6249832697212696e-06
       ],
       "statuses": [
         "reachable",

@@ -28,6 +28,8 @@ from warhammer40k_core.engine.movement_proposals import (
     MovementProposalPayloadPayload,
     MovementProposalRequest,
     ProposalKind,
+    ProposalValidationResult,
+    ProposalValidationResultPayload,
 )
 from warhammer40k_core.engine.mutation_decision_authority import (
     authoritative_decision_records,
@@ -204,10 +206,21 @@ def validate_movement_completion_decision_authority(
         if record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
         and (
             record.request.request_id == payload.get("proposal_request_id")
-            if action == "normal_move"
+            if action != "fall_back" or payload.get("proposal_request_id") is not None
             else _movement_proposal_request_sources(record)
             == (action_record.request.request_id, action_record.result.result_id)
         )
+    )
+    rejected = _rejected_movement_proposal_pairs(
+        event_records=event_records,
+        decision_records=decision_records,
+        mutation_index=mutation_index,
+        proposal_records=proposal_records,
+    )
+    proposal_records = tuple(
+        record
+        for record in proposal_records
+        if (record.request.request_id, record.result.result_id) not in rejected
     )
     if len(proposal_records) != 1:
         raise GameLifecycleError("Primary mission movement proposal authority drifted.")
@@ -269,6 +282,63 @@ def validate_movement_completion_decision_authority(
     ):
         raise GameLifecycleError("Primary mission movement proposal semantics drifted.")
     return proposal
+
+
+def _rejected_movement_proposal_pairs(
+    *,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+    mutation_index: int,
+    proposal_records: tuple[DecisionRecord, ...],
+) -> frozenset[tuple[str, str]]:
+    """Keep authenticated rejected attempts distinct from the accepted completion."""
+    rejected: set[tuple[str, str]] = set()
+    for index, event in enumerate(event_records[:mutation_index]):
+        if event.event_type != "movement_proposal_invalid" or not isinstance(event.payload, dict):
+            continue
+        matches = tuple(
+            record
+            for record in proposal_records
+            if record.request.request_id == event.payload.get("request_id")
+            and record.result.result_id == event.payload.get("result_id")
+        )
+        if not matches:
+            continue
+        record = validate_mutation_decision_closure(
+            event_records=event_records,
+            decision_records=decision_records,
+            mutation_index=index,
+            request_id=matches[0].request.request_id,
+            result_id=matches[0].result.result_id,
+        )
+        request = MovementProposalRequest.from_decision_request_payload(record.request.payload)
+        raw_validation = event.payload.get("proposal_validation")
+        if not isinstance(raw_validation, dict):
+            raise GameLifecycleError("Movement proposal rejection validation is invalid.")
+        validation = ProposalValidationResult.from_payload(
+            cast(ProposalValidationResultPayload, raw_validation)
+        )
+        expected_context: dict[str, JsonValue] = {
+            "game_id": request.game_id,
+            "battle_round": request.battle_round,
+            "active_player_id": request.actor_id,
+            "phase": request.phase,
+            "unit_instance_id": request.unit_instance_id,
+            "movement_phase_action": request.movement_phase_action,
+            "proposal_request_id": request.request_id,
+        }
+        if (
+            validation.is_valid
+            or validation.status != "invalid"
+            or validation.proposal_request_id != request.request_id
+            or validation.proposal_kind is not request.proposal_kind
+            or len(validation.violations) != 1
+            or validation.violations[0].violation_code != event.payload.get("violation_code")
+            or any(event.payload.get(key) != value for key, value in expected_context.items())
+        ):
+            raise GameLifecycleError("Movement proposal rejection authority drifted.")
+        rejected.add((record.request.request_id, record.result.result_id))
+    return frozenset(rejected)
 
 
 def _movement_proposal_request_sources(record: DecisionRecord) -> tuple[str, str]:

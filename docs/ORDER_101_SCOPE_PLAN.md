@@ -72,13 +72,50 @@ contract examples must be regenerated.
 
 ## Validation evidence and remaining merge gates
 
-The current source candidate is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:bc6eb667b1a0c8cd2c1b9f1fb83b71cc540a0332c74e988f3227ae4fed1ead4e`.
-An independent pre-freeze review found no unresolved concrete acceptance defect
-on its verified source/test hashes. Its five distinct legal Embark controls passed,
-and a fresh valid carrier-B snapshot restored exactly while the four-field
-terminal-only carrier-A edit was rejected. This is preliminary source review,
-not exact published-head approval.
+The current repaired source candidate is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:9e98b1adc7c63d919a1659ab93becf6a1e956e401d0948a464d004f89137376f`.
+Its independent pre-freeze retry review found no remaining concrete defect in the
+affected owner. Current isolated measurements completed all 21 Order101 samples in 43.002
+seconds and all 27 inherited workloads with verified report/log hashes and
+unchanged numeric budgets. A progress-file write failed after nine saved
+workloads; those were verified and reused, and only the incomplete tenth receipt
+was repeated before completing the remainder. Successful child-command wall times
+sum to 364.314 seconds; this sum is not an overlapping workflow duration.
+Complete local covered behavior and quality, actual eight-shard hosted CI, and
+both clean reviews on the final published commit remain required.
+
+Fresh Astra review of the prior published head `e9e7d150` found a normally
+reachable save/load failure: ordinary failed Disembark, select another unit,
+Advance, submit a rejected 100-inch path, submit a valid retry, Embark, then load
+the untouched engine-generated snapshot. Restore rejected the movement proposal
+authority even though exact replay succeeded. The same shared defect existed on
+base without the failed-setup prefix. The completion validator counted rejected
+and accepted proposals sharing one action instead of resolving the accepted one.
+
+The bounded repair changes only the existing movement decision authority and its
+Order101 test. Normal Move and Advance bind their explicit terminal proposal ID.
+Fall Back retains its existing completion payload, resolving the same-action
+proposal after excluding exact owner-produced invalid request/result pairs with
+typed diagnostic and canonical request/record closure. Existing action, actor,
+source, witness and physical checks remain; rejected records are retained. No
+schema, generic retry framework or historical geometry recomputation is added.
+
+Six permanent legal facade cases passed exact restore, replay and both viewer
+projections: repeated Normal/Advance rejections with and without failed setup,
+and one/two genuine Fall Back rejections before a six-inch retreat and Embark.
+The independent reviewer separately passed all three move kinds with two real
+rejections each and nine labeled owner-level rejection negatives. These focused
+results and the pre-freeze verdict do not replace final exact-head validation.
+
+The earlier runtime `bc6eb667`, published at `e9e7d150`, passed 10,201 covered
+behavioral cases with zero failures/errors/skips and aggregate coverage with
+branches enabled 85.199%; command wall time was 782.742 seconds. Its complete
+quality suite passed 797 cases in 112.484 seconds. Hosted run
+[36773388347](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/36773388347)
+passed all sixteen jobs, eight actual behavioral shards and coverage in 29m08s.
+Those successes and its earlier clean coding report are archived old-head
+evidence. Astra's demonstrated normal restore defect superseded approval; the
+production repair invalidates their applicability to the new source.
 
 The terminal cargo bridge follows existing authenticated mutations from the
 reconstructed failed-setup boundary through later Embark/Disembark, casualty and
@@ -98,14 +135,15 @@ coverage. The prior full focused iteration had 95 passes and this one transfer
 failure; its changed target was rerun successfully after the complete owner fix.
 The final full covered suite is still mandatory.
 
-Full Ruff/format, mypy, pyright, import boundaries, pre-commit, unchanged eight-shard
+The prior runtime's full Ruff/format, mypy, pyright, import boundaries, pre-commit, unchanged eight-shard
 inventory, generated identity, Order97 receipts/inventory, base-ref contract
 compatibility, TypeScript checks/unit/conformance and installed-wheel gates passed
-on the current source. Isolated Order101 measurement completed 21 samples in
+before the new retry repair. Its isolated Order101 measurement completed 21 samples in
 41.96 seconds and its unchanged budget gate passed. All 27 inherited measurement
 commands completed in 356.14 seconds with exact report/log hashes verified; their
 combined numeric assertions remain part of final quality. Complete local covered
-behavior and quality, full hosted CI and both exact final-head reviews remain pending.
+behavior and quality, full hosted CI and both exact final-head reviews must be
+revalidated on the repaired source.
 
 The previous repair candidate was
 `warhammer40k-core-v2:runtime-tree-sha256-v1:237906fd3b3b8a8251baf68e7081f70fe9a7560eb77a93535f3b999b68c3ddfc`.
@@ -115,8 +153,8 @@ carrier B to a real carrier A while complete engine-generated history remained B
 No fully legal, unedited engine-only path to that contradiction was demonstrated.
 Order 101 retains its existing historical-integrity gates while this location
 bridge is repaired. The completed runtime237 measurements remain archived.
-Published PR #524 head `2a5eaa60` has no clean final review approval. Its earlier
-local/hosted results do not validate the uncommitted repair. Fresh final measurements
+Earlier PR #524 head `2a5eaa60` has no clean final review approval. Its earlier
+local/hosted results do not validate subsequent repairs. Fresh final measurements
 and local/hosted gates remain required before merge.
 
 The earlier independent whole-invariant pre-freeze review accepted eight genuine histories

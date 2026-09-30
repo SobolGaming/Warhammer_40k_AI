@@ -256,6 +256,185 @@ def test_failed_setup_terminal_cargo_accepts_later_real_embark() -> None:
         GameLifecycle.from_payload(forged)
 
 
+def _assert_rejected_proposal_cannot_authorize_completion(session: LocalGameSession) -> None:
+    from warhammer40k_core.engine.movement_decision_authority import (
+        validate_movement_completion_decision_authority,
+    )
+
+    controller = session.lifecycle.decision_controller
+    events = controller.event_log.records
+    rejected = next(event for event in events if event.event_type == "movement_proposal_invalid")
+    assert isinstance(rejected.payload, dict)
+    record = next(
+        record
+        for record in controller.records
+        if record.request.request_id == rejected.payload["request_id"]
+        and record.result.result_id == rejected.payload["result_id"]
+    )
+    assert isinstance(record.result.payload, dict)
+    index, completed = next(
+        (index, event)
+        for index, event in enumerate(events)
+        if event.event_type == "movement_activation_completed"
+    )
+    assert isinstance(completed.payload, dict)
+    # This is a hand-edited pure owner negative, not a generated lifecycle state.
+    changed = deepcopy(completed.payload)
+    changed["proposal_request_id"] = record.request.request_id
+    changed["witness"] = record.result.payload["witness"]
+    with pytest.raises(GameLifecycleError, match="movement proposal authority drifted"):
+        validate_movement_completion_decision_authority(
+            event_records=events,
+            decision_records=controller.records,
+            mutation_index=index,
+            payload=changed,
+        )
+
+
+@pytest.mark.parametrize("action", ["normal_move", "advance"])
+@pytest.mark.parametrize("failed_setup", [False, True])
+def test_movement_retries_then_embark_restore_and_replay(action: str, failed_setup: bool) -> None:
+    from tests.movement_submission_helpers import straight_line_witness_for_state
+
+    from warhammer40k_core.core.ruleset_descriptor import MovementMode
+    from warhammer40k_core.engine.movement_proposals import MovementProposalPayload
+
+    session = two_carrier_disembark_session(nearby_embarking_unit=True)
+    pending_request(session)
+    initial = session.lifecycle.to_payload()
+    if failed_setup:
+        submission = _select_disembark(session, prefix="order101:retry-chain")
+        result = session.submit_parameterized_payload(
+            request_id=submission.proposal_request_id,
+            result_id="order101:retry-chain:failed-setup",
+            payload=validate_json_value(submission.to_payload()),
+        )
+        assert result.status_kind is LifecycleStatusKind.INVALID
+    unit_id = "army-alpha:remaining-unit"
+    for index, option in enumerate((unit_id, action)):
+        request = pending_request(session)
+        result = session.submit_option(
+            request_id=request.request_id,
+            result_id=f"order101:retry-chain:select:{index}",
+            option_id=option,
+        )
+        assert result.status_kind is not LifecycleStatusKind.INVALID, result
+    state = session.lifecycle.state
+    assert state is not None
+    requests: list[str] = []
+    for index, dx in enumerate((100, 80, 0)):
+        request = pending_request(session)
+        requests.append(request.request_id)
+        proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+        result = session.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id=f"order101:retry-chain:path:{index}",
+            payload=validate_json_value(
+                MovementProposalPayload(
+                    proposal_request_id=request.request_id,
+                    proposal_kind=proposal.proposal_kind,
+                    unit_instance_id=unit_id,
+                    movement_phase_action=action,
+                    movement_mode=MovementMode.NORMAL
+                    if action == "normal_move"
+                    else MovementMode.ADVANCE,
+                    witness=straight_line_witness_for_state(state, unit_instance_id=unit_id, dx=dx),
+                ).to_payload()
+            ),
+        )
+        assert (result.status_kind is LifecycleStatusKind.INVALID) == (index < 2), result
+    assert len(set(requests)) == 3
+    request = pending_request(session)
+    assert request.decision_type == "select_embark_transport"
+    result = session.submit_option(
+        request_id=request.request_id,
+        result_id="order101:retry-chain:embark",
+        option_id=TRANSPORT_ID,
+    )
+    assert result.status_kind is not LifecycleStatusKind.INVALID, result
+    snapshot = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(snapshot).to_payload() == snapshot
+    _assert_restore_and_exact_replay(session, initial)
+    assert session.lifecycle.to_payload() == snapshot
+    assert {
+        record["result"]["result_id"]
+        for record in snapshot["decisions"]["records"]
+        if record["request"]["request_id"] in requests
+    } == {f"order101:retry-chain:path:{index}" for index in range(3)}
+    _assert_rejected_proposal_cannot_authorize_completion(session)
+
+
+@pytest.mark.parametrize("rejections", [1, 2])
+def test_fall_back_retries_then_embark_restore_and_replay(rejections: int) -> None:
+    from tests.disembark_eligibility_helpers import disembark_session
+    from tests.movement_submission_helpers import straight_line_witness_for_state
+
+    from warhammer40k_core.core.ruleset_descriptor import MovementMode
+    from warhammer40k_core.engine.movement_proposals import MovementProposalPayload
+    from warhammer40k_core.engine.phases.movement_model import FallBackModeKind
+    from warhammer40k_core.geometry.pose import Pose
+
+    session = disembark_session(
+        embarked_passenger=False,
+        unit_poses={
+            PASSENGER_ID: tuple(
+                Pose.at(x, y) for x, y in ((2.6, 9), (4, 9), (5.4, 9), (3.3, 10.2), (4.7, 10.2))
+            ),
+            TRANSPORT_ID: (Pose.at(4, 19),),
+            "army-beta:enemy-unit": tuple(
+                Pose.at(x, y) for x, y in ((2.6, 7.5), (4, 7.5), (5.4, 7.5), (3.3, 6.3), (4.7, 6.3))
+            ),
+            "army-alpha:remaining-unit": tuple(Pose.at(30 + 2 * index, 30) for index in range(5)),
+        },
+    )
+    pending_request(session)
+    initial = session.lifecycle.to_payload()
+    for index, option in enumerate((PASSENGER_ID, "fall_back:ordered_retreat")):
+        request = pending_request(session)
+        result = session.submit_option(
+            request_id=request.request_id,
+            result_id=f"order101:fall-back-retry:select:{index}",
+            option_id=option,
+        )
+        assert result.status_kind is not LifecycleStatusKind.INVALID, result
+    state = session.lifecycle.state
+    assert state is not None
+    for index in range(rejections + 1):
+        request = pending_request(session)
+        proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+        result = session.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id=f"order101:fall-back-retry:path:{index}",
+            payload=validate_json_value(
+                MovementProposalPayload(
+                    proposal_request_id=request.request_id,
+                    proposal_kind=proposal.proposal_kind,
+                    unit_instance_id=PASSENGER_ID,
+                    movement_phase_action="fall_back",
+                    movement_mode=MovementMode.FALL_BACK,
+                    fall_back_mode=FallBackModeKind.ORDERED_RETREAT.value,
+                    witness=straight_line_witness_for_state(
+                        state, unit_instance_id=PASSENGER_ID, dy=0 if index < rejections else 6
+                    ),
+                ).to_payload()
+            ),
+        )
+        assert (result.status_kind is LifecycleStatusKind.INVALID) == (index < rejections), result
+    request = pending_request(session)
+    assert request.decision_type == "select_embark_transport"
+    result = session.submit_option(
+        request_id=request.request_id,
+        result_id="order101:fall-back-retry:embark",
+        option_id=TRANSPORT_ID,
+    )
+    assert result.status_kind is not LifecycleStatusKind.INVALID, result
+    snapshot = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(snapshot).to_payload() == snapshot
+    _assert_restore_and_exact_replay(session, initial)
+    assert session.lifecycle.to_payload() == snapshot
+    _assert_rejected_proposal_cannot_authorize_completion(session)
+
+
 def test_failed_setup_terminal_cargo_accepts_later_passenger_transfer() -> None:
     from tests.movement_submission_helpers import straight_line_witness_for_state
 
