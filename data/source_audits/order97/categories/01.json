@@ -2114,6 +2114,30 @@
             "role": "semantic",
             "assertion": "assert ordinary_context.target_wholly_within_distance(3) is True",
             "proves": "The ordinary source and ordinary target are wholly within three inches."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_main_prism_uses_full_height_containment_without_extra_body_parts",
+            "role": "semantic",
+            "assertion": "assert ordinary_context.target_wholly_within_distance(3) is True",
+            "proves": "An ordinary target of the same main prism remains wholly within three inches."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_main_prism_uses_full_height_containment_without_extra_body_parts",
+            "role": "semantic",
+            "assertion": "assert frame_context.target_wholly_within_distance(3) is False",
+            "proves": "A FRAME target whose only prism is its main body fails three-inch containment at its top."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_main_prism_uses_full_height_containment_without_extra_body_parts",
+            "role": "semantic",
+            "assertion": "assert duplicated_context.target_wholly_within_distance(3) is False",
+            "proves": "Adding a duplicate of that main prism does not change the FRAME result."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_main_prism_uses_full_height_containment_without_extra_body_parts",
+            "role": "semantic",
+            "assertion": "assert restored.target_wholly_within_distance(3) is False",
+            "proves": "The single-prism FRAME rejection survives a measurement-context payload round trip."
           }
         ],
         "qualifications": [

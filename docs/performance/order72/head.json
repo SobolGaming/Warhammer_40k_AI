@@ -1,7 +1,7 @@
 {
   "workload": "order72-engaging-full-fight-restore-replay-v1",
-  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:161902ae23cba6eb19b2e980ffe3d63346a281569e1d4e9646cbabaf80c61fec",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:161902ae23cba6eb19b2e980ffe3d63346a281569e1d4e9646cbabaf80c61fec",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:bff8549c09ceba3f48f8cbcc1e9ca39bcb2cfb270fa7d72a9498d4caecb8f54f",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bff8549c09ceba3f48f8cbcc1e9ca39bcb2cfb270fa7d72a9498d4caecb8f54f",
   "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
   "python": "3.14.5",
   "cpu": "Apple M5 Pro",
@@ -16,13 +16,13 @@
     "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
   },
   "samples_seconds": [
-    5.6252793750027195,
-    5.60304866702063,
-    5.553574040997773
+    5.554412666009739,
+    5.521462957956828,
+    5.5087776670116
   ],
-  "mean_seconds": 5.593967361007041,
-  "median_seconds": 5.60304866702063,
-  "maximum_seconds": 5.6252793750027195,
+  "mean_seconds": 5.528217763659389,
+  "median_seconds": 5.521462957956828,
+  "maximum_seconds": 5.554412666009739,
   "completion_rate": 1,
   "full_game_certified": false
 }

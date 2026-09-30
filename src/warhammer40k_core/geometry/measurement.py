@@ -680,7 +680,9 @@ class _MeasurementPart:
 
 
 def _measurement_subjects(model: Model) -> tuple[Model, ...]:
-    if not model.measures_every_part or not model.body_parts:
+    """FRAME subjects include the main prism when no extra body part is recorded."""
+
+    if not model.measures_every_part:
         return ()
     return model.rules_distance_subjects()
 

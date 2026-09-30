@@ -197,6 +197,31 @@ def test_cooperating_frame_parts_leave_an_uncovered_interior_height() -> None:
     assert context.target_wholly_within_distance(1) is False
 
 
+def test_frame_main_prism_uses_full_height_containment_without_extra_body_parts() -> None:
+    source = Model("source", Pose.at(10, 10), CircularBase(1), ModelVolume(1))
+    ordinary = Model("target", Pose.at(12.5, 10), CircularBase(0.5), ModelVolume(10))
+    frame = replace(ordinary, measures_every_part=True)
+    duplicated = replace(
+        frame,
+        body_parts=(ModelBodyPart("body", CircularBase(0.5), 0, 0, 0, 10, "body"),),
+    )
+    ordinary_context = DistanceMeasurementContext.from_models(source, ordinary)
+    frame_context = DistanceMeasurementContext.from_models(source, frame)
+    duplicated_context = DistanceMeasurementContext.from_models(source, duplicated)
+    restored = DistanceMeasurementContext.from_payload(
+        json.loads(json.dumps(frame_context.to_payload()))
+    )
+
+    assert ordinary_context.target_wholly_within_distance(3) is True
+    assert frame_context.target_wholly_within_distance(3) is False
+    assert duplicated_context.target_wholly_within_distance(3) is False
+    assert restored.target_wholly_within_distance(3) is False
+    assert ordinary_context.target_wholly_within_distance(3, horizontal_only=True) is True
+    assert frame_context.target_wholly_within_distance(3, horizontal_only=True) is True
+    assert duplicated_context.target_wholly_within_distance(3, horizontal_only=True) is True
+    assert restored.to_payload() == frame_context.to_payload()
+
+
 def test_frame_source_preserves_ordinary_target_support_base_containment() -> None:
     target = Model("target", Pose.at(12.5, 10), CircularBase(0.5), ModelVolume(10))
     ordinary = Model("source", Pose.at(10, 10), CircularBase(1), ModelVolume(1))

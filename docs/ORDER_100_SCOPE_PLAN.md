@@ -29,9 +29,9 @@ the canonical `FRAME` keyword. `Model.rules_distance_subjects` then returns the
 support base and each recorded body prism. Range, Engagement Range, objective
 control, terrain-area membership, and disembark whole-distance placement read
 those subjects. Wholly-within distance requires every point of a FRAME target,
-proved continuously against the union of source parts. An ordinary target keeps
-support-base containment even when the source is FRAME. The horizontal-only
-path is unchanged.
+including a FRAME model whose only prism is its main body, proved continuously
+against the union of source parts. An ordinary target keeps support-base
+containment even when the source is FRAME. The horizontal-only path is unchanged.
 Movement lower bounds orbit offset parts around the parent anchor. Endpoint
 exclusion and goal regions use the same parts, so a support-base proof cannot
 certify that a legal body endpoint is impossible. Ordinary models still use
