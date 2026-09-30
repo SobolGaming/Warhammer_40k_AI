@@ -1,7 +1,7 @@
 """Canonical failed setup continuation and historical-authority corruption probes."""
 
 from copy import deepcopy
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from tests.phase10p_reserves_helpers import decision_request, submit_handler_decision
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -10,6 +10,472 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.lifecycle import GameLifecyclePayload
 from warhammer40k_core.engine.phases.movement import MovementPhaseHandler
+
+if TYPE_CHECKING:
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.healing import HealingEffect
+    from warhammer40k_core.engine.movement_proposals import PlacementProposalPayload
+
+
+def forge_failed_disembark_transport(payload: GameLifecyclePayload, *, transport_id: str) -> None:
+    """Coherently forge one attempt while preserving independent initial cargo."""
+    events = payload["decisions"]["event_log"]
+    receipt = next(event for event in events if event["event_type"] == "movement_setup_failed")
+    authority = receipt["payload"]
+    assert isinstance(authority, dict)
+    rejected = next(
+        record
+        for record in payload["decisions"]["records"]
+        if record["result"]["result_id"] == authority["result_id"]
+    )
+    request = rejected["request"]["payload"]
+    assert isinstance(request, dict)
+    proposal = request["proposal_request"]
+    assert isinstance(proposal, dict)
+    action = next(
+        record
+        for record in payload["decisions"]["records"]
+        if record["result"]["result_id"] == proposal["source_decision_result_id"]
+    )
+
+    def replace_transport(value: object) -> None:
+        if isinstance(value, dict):
+            for key, child in cast(dict[str, JsonValue], value).items():
+                if key == "transport_unit_instance_id":
+                    value[key] = transport_id
+                else:
+                    replace_transport(child)
+        elif isinstance(value, list):
+            for child in cast(list[JsonValue], value):
+                replace_transport(child)
+
+    for record in (action, rejected):
+        replace_transport(record)
+        for event in events:
+            event_payload = event["payload"]
+            if not isinstance(event_payload, dict):
+                continue
+            if (
+                event["event_type"] == "decision_requested"
+                and event_payload.get("request_id") == record["request"]["request_id"]
+            ):
+                event["payload"] = cast(JsonValue, deepcopy(record["request"]))
+            elif (
+                event["event_type"] == "decision_recorded"
+                and event_payload.get("record_id") == record["record_id"]
+            ):
+                event["payload"] = cast(JsonValue, deepcopy(record))
+            elif event["event_type"] in {
+                "disembark_unit_selected",
+                "placement_proposal_requested",
+                "disembark_placement_invalid",
+                "combat_disembark_placement_invalid",
+            } and event_payload.get(
+                "result_id", event_payload.get("source_decision_result_id")
+            ) in {
+                action["result"]["result_id"],
+                rejected["result"]["result_id"],
+            }:
+                replace_transport(event_payload)
+
+
+def two_carrier_disembark_session(
+    *,
+    carrier_id: str = "army-alpha:transport",
+    nearby_embarking_unit: bool = False,
+    close_carriers: bool = False,
+    diameter: float = 5,
+) -> LocalGameSession:
+    """Real mustered friendly carriers; the selected one initially holds passengers."""
+    from dataclasses import replace
+
+    from tests.core_stratagem_helpers import (
+        _clear_terrain,
+        _complete_current_command_for_fixture,  # pyright: ignore[reportPrivateUsage]
+        _config,
+        _mustered_armies,  # pyright: ignore[reportPrivateUsage]
+        _record_default_fixed_secondary_choices_for_missing_players,
+        _replace_unit_poses,
+    )
+    from tests.disembark_eligibility_helpers import PASSENGER_ID, TRANSPORT_ID
+    from tests.large_model_disembark_helpers import large_disembark_config
+    from tests.setup_completion_helpers import enter_battle_for_fixture
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.list_validation import UnitMusterSelection
+    from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+    from warhammer40k_core.engine.reaction_queue import ReactionQueue
+    from warhammer40k_core.engine.transports import TransportCapacityProfile, TransportCargoState
+    from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
+    from warhammer40k_core.geometry.pose import Pose
+
+    base_config = _config()
+    config = large_disembark_config(base_config, diameter=diameter)
+    alpha, beta = config.army_muster_requests
+    config = replace(
+        config,
+        army_muster_requests=(
+            replace(
+                alpha,
+                unit_selections=(
+                    *alpha.unit_selections,
+                    *(
+                        (
+                            replace(
+                                base_config.army_muster_requests[0].unit_selections[0],
+                                unit_selection_id="remaining-unit",
+                            ),
+                        )
+                        if nearby_embarking_unit
+                        else ()
+                    ),
+                    *(
+                        UnitMusterSelection(
+                            unit_selection_id=selection_id,
+                            datasheet_id="core-transport",
+                            model_profile_selections=(
+                                ModelProfileSelection(
+                                    model_profile_id="core-transport",
+                                    model_count=1,
+                                ),
+                            ),
+                        )
+                        for selection_id in ("transport", "other-transport")
+                    ),
+                ),
+            ),
+            beta,
+        ),
+    )
+    state = GameState.from_config(config)
+    armies = _mustered_armies(config)
+    for army in armies:
+        state.record_army_definition(army)
+    state.record_battlefield_state(
+        create_deterministic_battlefield_scenario(
+            battlefield_id="order101-two-carriers", armies=armies
+        ).battlefield_state
+    )
+    _clear_terrain(state)
+    _replace_unit_poses(state, unit_instance_id=TRANSPORT_ID, poses=(Pose.at(10, 10),))
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-alpha:other-transport",
+        poses=(Pose.at(14.5, 10) if close_carriers else Pose.at(30, 30),),
+    )
+    if nearby_embarking_unit:
+        from tests.order60_emergency_disembark_helpers import emergency_disembark_poses_around
+        from warhammer40k_core.engine.damage_allocation import unit_by_id
+
+        remaining = unit_by_id(state=state, unit_instance_id="army-alpha:remaining-unit")
+        _replace_unit_poses(
+            state,
+            unit_instance_id=remaining.unit_instance_id,
+            poses=emergency_disembark_poses_around(
+                center_x=10, center_y=10, count=len(remaining.own_models), step_degrees=40
+            ),
+        )
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(state.battlefield_state.without_unit_placement(PASSENGER_ID))
+    for carrier in (TRANSPORT_ID, "army-alpha:other-transport"):
+        state.record_transport_cargo_state(
+            TransportCargoState(
+                player_id="player-a",
+                transport_unit_instance_id=carrier,
+                capacity_profile=TransportCapacityProfile(
+                    transport_datasheet_id="core-transport",
+                    max_model_count=12,
+                    allowed_keywords=("INFANTRY",),
+                    source_id="order101:two-carriers:capacity",
+                ),
+                embarked_unit_instance_ids=(PASSENGER_ID,) if carrier == carrier_id else (),
+                phase_battle_round=1,
+                started_phase_embarked_unit_instance_ids=(PASSENGER_ID,)
+                if carrier == carrier_id
+                else (),
+            )
+        )
+    decisions = DecisionController()
+    enter_battle_for_fixture(state, decisions=decisions)
+    _record_default_fixed_secondary_choices_for_missing_players(state)
+    lifecycle = GameLifecycle.from_payload(
+        {
+            "config": config.to_payload(),
+            "parameterized_movement_proposals": True,
+            "state": state.to_payload(),
+            "decisions": decisions.to_payload(),
+            "reaction_queue": ReactionQueue().to_payload(),
+        }
+    )
+    return LocalGameSession(_complete_current_command_for_fixture(lifecycle))
+
+
+def swap_terminal_cargo_membership(payload: GameLifecyclePayload) -> None:
+    """Change only current/phase-start cargo on two real compatible friendly carriers."""
+    state = payload["state"]
+    assert state is not None
+    cargos = {row["transport_unit_instance_id"]: row for row in state["transport_cargo_states"]}
+    first, second = cargos["army-alpha:transport"], cargos["army-alpha:other-transport"]
+    for key in ("embarked_unit_instance_ids", "started_phase_embarked_unit_instance_ids"):
+        first[key], second[key] = second[key], first[key]
+
+
+def failed_setup_automatic_record_session() -> tuple[LocalGameSession, GameLifecyclePayload]:
+    """Two failed setups separated by real shooting and its automatic decisions."""
+    from tests.disembark_eligibility_helpers import PASSENGER_ID, TRANSPORT_ID
+    from tests.large_model_disembark_helpers import (
+        large_disembark_placement,
+        large_disembark_session,
+    )
+    from tests.phase13b_shooting_declaration_helpers import (
+        _proposal_from_request,
+    )
+    from tests.psychic_modifier_helpers import pending_request
+    from warhammer40k_core.engine.battlefield_state import BattlefieldPlacementKind
+    from warhammer40k_core.engine.movement_proposals import PlacementProposalPayload, ProposalKind
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+    from warhammer40k_core.engine.stratagems_requests import stratagem_decline_payload
+    from warhammer40k_core.engine.transports import DisembarkModeKind, TransportMovementStatus
+
+    session = large_disembark_session()
+    pending_request(session)
+    initial = session.lifecycle.to_payload()
+    choices = (
+        ("select_movement_unit", PASSENGER_ID),
+        ("select_movement_action", "disembark"),
+        ("submit_placement_proposal", "failed_disembark"),
+        ("select_movement_unit", PASSENGER_ID),
+        ("select_movement_action", "remain_stationary"),
+        ("select_movement_unit", "army-alpha:remaining-unit"),
+        ("select_movement_action", "remain_stationary"),
+        ("select_movement_unit", TRANSPORT_ID),
+        ("select_movement_action", "remain_stationary"),
+        ("submit_stratagem_target_proposal", "decline_stratagem"),
+        ("select_shooting_unit", "army-alpha:remaining-unit"),
+        ("select_shooting_type", "normal"),
+        ("submit_shooting_declaration", "shooting_declaration"),
+        *(("use_stratagem", "decline_stratagem_window"),) * 8,
+        ("select_damage_allocation_model", "army-beta:enemy-unit:core-intercessor-like:001"),
+        ("select_shooting_unit", "complete_shooting_phase"),
+        ("select_charging_unit", "complete_charge_phase"),
+        ("select_movement_unit", "army-beta:enemy-unit"),
+        ("select_movement_action", "remain_stationary"),
+        ("submit_stratagem_target_proposal", "decline_stratagem"),
+        ("select_shooting_unit", "complete_shooting_phase"),
+        ("select_charging_unit", "complete_charge_phase"),
+        ("submit_stratagem_target_proposal", "decline_stratagem"),
+        ("select_movement_unit", PASSENGER_ID),
+        ("select_movement_action", "disembark"),
+        ("submit_placement_proposal", "failed_disembark"),
+    )
+    for index, (decision_type, choice) in enumerate(choices):
+        request = pending_request(session)
+        assert request.decision_type == decision_type, (index, decision_type, request)
+        result_id = f"automatic-probe:{index}"
+        if choice == "failed_disembark":
+            proposal = PlacementProposalPayload(
+                proposal_request_id=request.request_id,
+                proposal_kind=ProposalKind.DISEMBARK,
+                unit_instance_id=PASSENGER_ID,
+                placement_kind=BattlefieldPlacementKind.DISEMBARK,
+                attempted_placement=large_disembark_placement(session, gap=1.01),
+                transport_unit_instance_id=TRANSPORT_ID,
+                disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
+                transport_movement_status=TransportMovementStatus.NOT_MOVED,
+            )
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id=result_id,
+                payload=validate_json_value(proposal.to_payload()),
+            )
+            assert status.status_kind is LifecycleStatusKind.INVALID
+        elif choice == "shooting_declaration":
+            shooting = _proposal_from_request(
+                request=request, target_unit_id="army-beta:enemy-unit"
+            )
+            count = len(session.lifecycle.decision_controller.records)
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id=result_id,
+                payload=validate_json_value(shooting.to_payload()),
+            )
+            assert status.status_kind is not LifecycleStatusKind.INVALID
+            assert len(session.lifecycle.decision_controller.records) > count + 1
+        elif choice == "decline_stratagem":
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id=result_id,
+                payload=stratagem_decline_payload(),
+            )
+            assert status.status_kind is not LifecycleStatusKind.INVALID
+        else:
+            status = session.submit_option(
+                request_id=request.request_id,
+                result_id=result_id,
+                option_id=choice,
+            )
+            assert status.status_kind is not LifecycleStatusKind.INVALID
+    return session, initial
+
+
+def reserve_inventory_session() -> LocalGameSession:
+    """Five living reserve models with an engine-owned declaration history."""
+    from tests.core_stratagem_helpers import (
+        _clear_terrain,
+        _complete_current_command_for_fixture,  # pyright: ignore[reportPrivateUsage]
+        _config,
+        _mustered_armies,  # pyright: ignore[reportPrivateUsage]
+        _record_default_fixed_secondary_choices_for_missing_players,
+    )
+    from tests.setup_completion_helpers import enter_battle_for_fixture
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+    from warhammer40k_core.engine.reaction_queue import ReactionQueue
+    from warhammer40k_core.engine.reserve_arrival_requirements import reposition_destruction_policy
+    from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
+
+    config = _config()
+    state = GameState.from_config(config)
+    armies = _mustered_armies(config)
+    for army in armies:
+        state.record_army_definition(army)
+    state.record_battlefield_state(
+        create_deterministic_battlefield_scenario(
+            battlefield_id="order101-reserve-inventory", armies=armies
+        ).battlefield_state
+    )
+    _clear_terrain(state)
+    unit_id = "army-alpha:intercessor-unit-1"
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(state.battlefield_state.without_unit_placement(unit_id))
+    reserve = ReserveState.declared_before_battle(
+        player_id="player-a",
+        unit_instance_id=unit_id,
+        reserve_kind=ReserveKind.STRATEGIC_RESERVES,
+        destruction_deadline_policy=reposition_destruction_policy(
+            mission_setup=state.mission_setup, destruction_deadline_policy=None
+        ),
+    )
+    state.record_reserve_state(reserve)
+    decisions = DecisionController()
+    decisions.event_log.append(
+        "reserve_unit_declared",
+        {
+            "game_id": state.game_id,
+            "player_id": "player-a",
+            "unit_instance_id": unit_id,
+            "reserve_state": reserve.to_payload(),
+        },
+    )
+    enter_battle_for_fixture(state, decisions=decisions)
+    state.battle_round = 2
+    _record_default_fixed_secondary_choices_for_missing_players(state)
+    lifecycle = GameLifecycle.from_payload(
+        {
+            "config": config.to_payload(),
+            "parameterized_movement_proposals": True,
+            "state": state.to_payload(),
+            "decisions": decisions.to_payload(),
+            "reaction_queue": ReactionQueue().to_payload(),
+        }
+    )
+    return LocalGameSession(_complete_current_command_for_fixture(lifecycle))
+
+
+def failed_setup_before_offboard_revival_session(
+    *, reserves: bool
+) -> tuple[LocalGameSession, HealingEffect, str, tuple[str, ...]]:
+    """A real destroyed Leader is absent from the complete failed cargo setup."""
+    from tests.core_stratagem_helpers import (
+        _complete_current_command_for_fixture,  # pyright: ignore[reportPrivateUsage]
+    )
+    from tests.order90_revival_helpers import offboard_scene
+    from tests.psychic_modifier_helpers import pending_request
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.battlefield_state import (
+        BattlefieldPlacementKind,
+        ModelPlacement,
+        UnitPlacement,
+    )
+    from warhammer40k_core.engine.damage_allocation import model_by_id
+    from warhammer40k_core.engine.movement_proposals import PlacementProposalPayload, ProposalKind
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+    from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+    from warhammer40k_core.engine.transports import DisembarkModeKind, TransportMovementStatus
+    from warhammer40k_core.geometry.pose import Pose
+
+    lifecycle, effect, returned_id = offboard_scene(
+        reserves=reserves,
+        attached=True,
+        revive_leader=True,
+        battle_round=2 if reserves else 1,
+    )
+    _complete_current_command_for_fixture(lifecycle)
+    session = LocalGameSession(lifecycle)
+    state = lifecycle.state
+    assert state is not None
+    assert not model_by_id(state=state, model_instance_id=returned_id).is_alive
+    target = rules_unit_view_by_id(state=state, unit_instance_id="army-alpha:passengers")
+    for chosen in (target.unit_instance_id, "ingress" if reserves else "disembark"):
+        request = pending_request(session)
+        result = session.submit_option(
+            request_id=request.request_id,
+            result_id=f"late-revival:{chosen}",
+            option_id=chosen,
+        )
+        assert result.status_kind is not LifecycleStatusKind.INVALID
+    request = pending_request(session)
+    placement = RulesUnitPlacement(
+        rules_unit_instance_id=target.unit_instance_id,
+        component_unit_placements=tuple(
+            UnitPlacement(
+                army_id="army-alpha",
+                player_id="player-a",
+                unit_instance_id=component.unit.unit_instance_id,
+                model_placements=tuple(
+                    ModelPlacement(
+                        army_id="army-alpha",
+                        player_id="player-a",
+                        unit_instance_id=component.unit.unit_instance_id,
+                        model_instance_id=model.model_instance_id,
+                        pose=Pose.at(100 + index * 2, 100),
+                    )
+                    for index, model in enumerate(component.unit.own_models)
+                    if model.is_alive
+                ),
+            )
+            for component in target.components
+            if any(model.is_alive for model in component.unit.own_models)
+        ),
+    )
+    submission = PlacementProposalPayload(
+        proposal_request_id=request.request_id,
+        proposal_kind=ProposalKind.STRATEGIC_RESERVES if reserves else ProposalKind.DISEMBARK,
+        unit_instance_id=target.unit_instance_id,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES
+        if reserves
+        else BattlefieldPlacementKind.DISEMBARK,
+        attempted_placement=None,
+        attempted_rules_unit_placement=placement,
+        transport_unit_instance_id=None if reserves else "army-alpha:transport",
+        disembark_mode=None if reserves else DisembarkModeKind.TACTICAL_DISEMBARK,
+        transport_movement_status=None if reserves else TransportMovementStatus.NOT_MOVED,
+        restriction_overrides=(),
+    )
+    result = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="late-revival:failed",
+        payload=validate_json_value(submission.to_payload()),
+    )
+    assert result.status_kind is LifecycleStatusKind.INVALID
+    return (
+        session,
+        effect,
+        returned_id,
+        tuple(model.model_instance_id for model in placement.model_placements),
+    )
 
 
 def reselect_failed_ingress(
@@ -95,6 +561,38 @@ def corrupt_failed_setup_authority(payload: GameLifecyclePayload, *, tamper: str
         diagnostic["violations"] = []
     elif tamper == "malformed_violations":
         diagnostic["violations"] = ["not-a-typed-violation"]
+    elif tamper in {
+        "foreign_diagnostic_model",
+        "foreign_diagnostic_unit",
+        "failure_tactical_available",
+        "failure_firing_deck",
+        "failure_emergency",
+        "failure_arrived_reserve",
+        "missing_diagnostic_model",
+        "foreign_diagnostic_blocker",
+        "foreign_diagnostic_source",
+    }:
+        violations = diagnostic["violations"]
+        assert isinstance(violations, list)
+        violation = violations[0]
+        assert isinstance(violation, dict)
+        if tamper == "foreign_diagnostic_model":
+            violation["model_instance_id"] = "foreign-unit:foreign-model"
+        elif tamper == "foreign_diagnostic_unit":
+            violation["unit_instance_id"] = "foreign-unit"
+        elif tamper == "missing_diagnostic_model":
+            violation["model_instance_id"] = None
+        elif tamper == "foreign_diagnostic_blocker":
+            violation["blocker_id"] = "foreign-blocker"
+        elif tamper == "foreign_diagnostic_source":
+            violation["source_rule_id"] = "foreign-source"
+        else:
+            violation["violation_code"] = {
+                "failure_tactical_available": "combat_disembark_tactical_available",
+                "failure_firing_deck": "firing_deck_unit_already_shot",
+                "failure_emergency": "emergency_disembark_not_closest",
+                "failure_arrived_reserve": "reserve_state_not_unarrived",
+            }[tamper]
     elif tamper == "empty_coherency":
         diagnostic["coherency_result"] = {}
     elif tamper == "outer_request_id":
@@ -126,7 +624,13 @@ def corrupt_failed_setup_authority(payload: GameLifecyclePayload, *, tamper: str
             reserve = context["reserve_state"]
             assert isinstance(reserve, dict)
             reserve["entered_reserves_battle_round"] = 99
-        elif tamper in {"physical_model_ids", "physical_owner"}:
+        elif tamper in {
+            "physical_model_ids",
+            "physical_owner",
+            "missing_model",
+            "missing_model_and_diagnostic",
+            "missing_component",
+        }:
             submitted = record["result"]["payload"]
             assert isinstance(submitted, dict)
             attempted = submitted.get("attempted_placement")
@@ -139,11 +643,64 @@ def corrupt_failed_setup_authority(payload: GameLifecyclePayload, *, tamper: str
                 raw_components = rules_unit["component_unit_placements"]
                 assert isinstance(raw_components, list)
                 components = raw_components
+            if tamper == "missing_component":
+                assert len(components) > 1
+                removed = components.pop()
+                assert isinstance(removed, dict)
+                component_ids = context["component_unit_instance_ids"]
+                assert isinstance(component_ids, list)
+                component_ids.remove(removed["unit_instance_id"])
+                model_ids = context["model_instance_ids"]
+                assert isinstance(model_ids, list)
+                removed_models = removed["model_placements"]
+                assert isinstance(removed_models, list)
+                for model in removed_models:
+                    assert isinstance(model, dict)
+                    model_ids.remove(model["model_instance_id"])
             forged_models: list[str] = []
             for component in components:
+                if tamper == "missing_component":
+                    break
                 assert isinstance(component, dict)
                 models = component["model_placements"]
                 assert isinstance(models, list)
+                if tamper in {"missing_model", "missing_model_and_diagnostic"}:
+                    removed = models.pop()
+                    assert isinstance(removed, dict)
+                    removed_id = removed["model_instance_id"]
+                    ids = context["model_instance_ids"]
+                    assert isinstance(ids, list)
+                    ids.remove(removed_id)
+                    if tamper == "missing_model_and_diagnostic":
+                        violations = diagnostic["violations"]
+                        assert isinstance(violations, list)
+                        diagnostic["violations"] = [
+                            item
+                            for item in violations
+                            if isinstance(item, dict)
+                            and item.get("model_instance_id") != removed_id
+                        ]
+                        coherency = diagnostic["coherency_result"]
+                        assert isinstance(coherency, dict)
+                        diagnostic_ids = coherency["model_instance_ids"]
+                        assert isinstance(diagnostic_ids, list)
+                        diagnostic_ids.remove(removed_id)
+                        raw_violations = coherency["violations"]
+                        assert isinstance(raw_violations, list)
+                        retained = [
+                            item
+                            for item in raw_violations
+                            if isinstance(item, dict)
+                            and item.get("model_instance_id") != removed_id
+                        ]
+                        coherency["violations"] = cast(JsonValue, retained)
+                        for item in retained:
+                            related = item["related_model_instance_ids"]
+                            assert isinstance(related, list)
+                            item["related_model_instance_ids"] = [
+                                model_id for model_id in related if model_id != removed_id
+                            ]
+                    break
                 if tamper == "physical_owner":
                     component["player_id"] = "forged-owner"
                 for index, model in enumerate(models):
@@ -175,3 +732,233 @@ def corrupt_failed_setup_authority(payload: GameLifecyclePayload, *, tamper: str
             and event_payload.get("record_id") == record["record_id"]
         ):
             event["payload"] = cast(JsonValue, deepcopy(record))
+
+
+def emergency_component_omission_session() -> tuple[LocalGameSession, PlacementProposalPayload]:
+    """A canonical grouped Emergency Disembark destroys an unplaceable Leader."""
+    from dataclasses import replace
+
+    from tests.order60_emergency_disembark_helpers import emergency_disembark_contact_poses
+    from tests.phase13b_shooting_declaration_helpers import (
+        _apply_shooting_declaration_without_advancing,
+        _attached_enemy_declarations,
+        _attached_enemy_unit_specs,
+        _catalog_with_extra_bolt_profile,
+        _decision_request,
+        _destroyed_transport_hazard_roll_results_for_test,
+        _fixed_roll_result,
+        _proposal_from_request,
+        _ruleset,
+        _select_shooting_unit_and_type,
+        _shooting_lifecycle,
+        _state,
+        _unit_placement_at,
+        _weapon_profile_by_wargear,
+    )
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+    from warhammer40k_core.core.datasheet import BaseSizeDefinition
+    from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
+    from warhammer40k_core.core.weapon_profiles import AttackProfile, DamageProfile
+    from warhammer40k_core.engine.attack_sequence import resolve_attack_sequence_until_blocked
+    from warhammer40k_core.engine.battlefield_state import BattlefieldPlacementKind
+    from warhammer40k_core.engine.dice import DiceRollManager
+    from warhammer40k_core.engine.movement_proposals import (
+        MovementProposalRequest,
+        PlacementProposalPayload,
+    )
+    from warhammer40k_core.engine.phase import LifecycleStatus
+    from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
+    from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+    from warhammer40k_core.engine.saves import SaveKind, saving_throw_roll_spec
+    from warhammer40k_core.engine.transports import (
+        DisembarkModeKind,
+        TransportCapacityProfile,
+        TransportCargoState,
+        TransportMovementStatus,
+    )
+    from warhammer40k_core.geometry.pose import Pose
+
+    profile = replace(
+        _weapon_profile_by_wargear(
+            wargear_id="core-bolt-rifle", weapon_profile_id="core-bolt-rifle:standard"
+        ),
+        profile_id="emergency-geometry-rifle",
+        name="Emergency geometry rifle",
+        attack_profile=AttackProfile.fixed(1),
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 20),
+        damage_profile=DamageProfile.fixed(20),
+        keywords=(),
+        abilities=(),
+    )
+    catalog = _catalog_with_extra_bolt_profile(profile)
+    leader = catalog.datasheet_by_id("core-character-leader")
+    leader = replace(
+        leader,
+        model_profiles=tuple(
+            replace(model, base_size=BaseSizeDefinition.circular(100 * 25.4))
+            for model in leader.model_profiles
+        ),
+    )
+    catalog = replace(
+        catalog,
+        datasheets=tuple(
+            leader if sheet.datasheet_id == leader.datasheet_id else sheet
+            for sheet in catalog.datasheets
+        ),
+    )
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id="order101-emergency-component-omission",
+        enemy_unit_specs=(
+            ("enemy-transport", "core-transport", "core-transport", 1),
+            *_attached_enemy_unit_specs()[:2],
+        ),
+        enemy_attachment_declarations=_attached_enemy_declarations()[:1],
+        catalog=catalog,
+    )
+    state = _state(lifecycle)
+    transport = units["enemy-transport"]
+    passengers = (units["bodyguard-unit"], units["leader-unit"])
+    passenger_ids = tuple(sorted(unit.unit_instance_id for unit in passengers))
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    for unit in passengers:
+        battlefield = battlefield.without_unit_placement(unit.unit_instance_id)
+    state.replace_battlefield_state(replace(battlefield, terrain_features=()))
+    state.record_transport_cargo_state(
+        TransportCargoState(
+            player_id="player-b",
+            transport_unit_instance_id=transport.unit_instance_id,
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id=transport.datasheet_id,
+                max_model_count=10,
+                allowed_keywords=("INFANTRY",),
+            ),
+            embarked_unit_instance_ids=passenger_ids,
+            phase_battle_round=1,
+            started_phase_embarked_unit_instance_ids=passenger_ids,
+        )
+    )
+    view = rules_unit_view_from_armies(
+        armies=tuple(state.army_definitions), unit_instance_id=passenger_ids[0]
+    )
+    models = tuple(
+        model for model in view.alive_models() if model.base_size.diameter_mm != 100 * 25.4
+    )
+    poses = emergency_disembark_contact_poses(models, center_x=35, center_y=35)
+    by_id = {model.model_instance_id: pose for model, pose in zip(models, poses, strict=True)}
+    components = tuple(
+        _unit_placement_at(
+            replace(
+                unit,
+                own_models=tuple(
+                    model for model in unit.own_models if model.model_instance_id in by_id
+                ),
+            ),
+            army_id="army-beta",
+            player_id="player-b",
+            poses=tuple(
+                by_id[model.model_instance_id]
+                for model in unit.own_models
+                if model.model_instance_id in by_id
+            ),
+        )
+        for unit in passengers
+        if any(model.model_instance_id in by_id for model in unit.own_models)
+    )
+    hazard_components = tuple(
+        _unit_placement_at(
+            unit,
+            army_id="army-beta",
+            player_id="player-b",
+            poses=tuple(Pose.at(35, 35) for _ in unit.own_models),
+        )
+        for unit in passengers
+    )
+    placement = RulesUnitPlacement(
+        rules_unit_instance_id=view.unit_instance_id, component_unit_placements=components
+    )
+    selection = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        selection_result_id="select-shooter",
+    )
+    sequence = _apply_shooting_declaration_without_advancing(
+        lifecycle,
+        request=declaration,
+        proposal=_proposal_from_request(
+            request=declaration,
+            target_unit_id=transport.unit_instance_id,
+            weapon_profile_id=profile.profile_id,
+        ),
+        result_id="declare-shooting",
+    )
+    context_id = f"{sequence.sequence_id}:pool-001:attack-001"
+    hit = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {profile.profile_id} attack {context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {profile.profile_id} attack {context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    save = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id="player-b",
+        allocated_model_id=transport.own_models[0].model_instance_id,
+        attack_context_id=context_id,
+    )
+    remaining_sequence, allocated, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "order101-emergency-component-omission",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(roll_id="hit", spec=hit, value=6),
+                _fixed_roll_result(roll_id="wound", spec=wound, value=6),
+                _fixed_roll_result(roll_id="save", spec=save, value=1),
+                *(
+                    roll
+                    for component in hazard_components
+                    for roll in _destroyed_transport_hazard_roll_results_for_test(
+                        component,
+                        values=tuple(6 for _ in component.model_placements),
+                        roll_id_prefix=component.unit_instance_id,
+                    )
+                ),
+            ),
+        ),
+    )
+    phase = state.shooting_phase_state
+    assert phase is not None
+    state.replace_shooting_phase_state(
+        phase.with_attack_sequence_update(
+            attack_sequence=remaining_sequence, allocated_model_ids_this_phase=allocated
+        )
+    )
+    request = MovementProposalRequest.from_decision_request_payload(
+        _decision_request(cast(LifecycleStatus, status)).payload
+    )
+    proposal = PlacementProposalPayload(
+        proposal_request_id=request.request_id,
+        proposal_kind=request.proposal_kind,
+        unit_instance_id=view.unit_instance_id,
+        placement_kind=BattlefieldPlacementKind.DISEMBARK,
+        attempted_placement=None,
+        attempted_rules_unit_placement=placement,
+        transport_unit_instance_id=transport.unit_instance_id,
+        disembark_mode=DisembarkModeKind.EMERGENCY_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED,
+    )
+    return LocalGameSession(lifecycle=lifecycle), proposal

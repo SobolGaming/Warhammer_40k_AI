@@ -750,8 +750,15 @@ def validate_primary_reserve_placement_request_authority(
     proposal_request: MovementProposalRequest,
     submitted: PlacementProposalPayload,
     expected_owner_id: str,
+    historical_living_model_ids_by_component: Mapping[str, frozenset[str]] | None = None,
 ) -> None:
-    """Authenticate request/result authority for accepted and rejected placements."""
+    """Authenticate request/result authority for accepted and rejected placements.
+
+    A failed-setup consumer supplies the shared event-bound living inventory after
+    independently verifying historical ownership. It replaces terminal liveness
+    with exact original-request coverage; accepted-arrival consumers retain their
+    existing current-window checks.
+    """
     if type(submitted) is not PlacementProposalPayload:
         raise GameLifecycleError("Reserve arrival placement submission is malformed.")
     validation = submitted.validation_result_for_request(proposal_request)
@@ -829,6 +836,18 @@ def validate_primary_reserve_placement_request_authority(
         for model in unit.own_models
         if model.is_alive
     }
+    historical_model_ids: set[str] = set()
+    if historical_living_model_ids_by_component is not None:
+        historical_model_ids = {
+            model_id
+            for model_ids in historical_living_model_ids_by_component.values()
+            for model_id in model_ids
+        }
+        authoritative_model_ids.update(historical_model_ids)
+        for component_id, model_ids in historical_living_model_ids_by_component.items():
+            if component_id not in lineage_component_ids:
+                raise GameLifecycleError("Reserve request historical component lineage drift.")
+            authoritative_model_ids_by_component[component_id].update(model_ids)
     handler_id = proposal_context.get("stratagem_handler_id")
     expected_context_keys = {
         "component_unit_instance_ids",
@@ -879,7 +898,10 @@ def validate_primary_reserve_placement_request_authority(
             bool(request_components)
             and set(context_component_ids) == set(request_components)
             and (
-                not arrival_window_is_current or set(living_components) == set(request_components)
+                set(historical_living_model_ids_by_component) == set(request_components)
+                if historical_living_model_ids_by_component is not None
+                else not arrival_window_is_current
+                or set(living_components) == set(request_components)
             ),
         ),
         ("rules-unit owner", submitted_rules_unit.player_id == expected_owner_id),
@@ -910,7 +932,9 @@ def validate_primary_reserve_placement_request_authority(
         ),
         (
             "alive model coverage",
-            not arrival_window_is_current
+            historical_model_ids == submitted_model_ids
+            if historical_living_model_ids_by_component is not None
+            else not arrival_window_is_current
             or currently_alive_model_ids.issubset(submitted_model_ids),
         ),
         (

@@ -31,6 +31,10 @@ from warhammer40k_core.engine.mortal_wound_physical_history import (
     apply_logical_death_physical_authority,
     physical_mortal_wound_damage_snapshot_from_event,
 )
+from warhammer40k_core.engine.movement_decision_authority import (
+    EmbarkMovementCompletion,
+    validated_embark_movement_completions,
+)
 from warhammer40k_core.engine.objective_control_record_authority import (
     objective_control_record_hash,
 )
@@ -172,6 +176,9 @@ def physical_model_authority_before_event(
             decision_records=decision_records,
         )
 
+    embark_movement_completions = validated_embark_movement_completions(
+        event_records=event_records, decision_records=decision_records
+    )
     current = _current_authority_by_model(state=state)
     current_model_ids = frozenset(current)
     initial_model_ids = _initial_model_ids(state=state)
@@ -194,6 +201,7 @@ def physical_model_authority_before_event(
         destruction_by_id=destruction_by_id,
         departure_by_id=departure_by_id,
         no_trigger_destroyed_departure_ids=no_trigger_destroyed_departure_ids,
+        embark_movement_completions=embark_movement_completions,
     )
     if not frozenset(before) <= current_model_ids:
         raise GameLifecycleError("Physical event-bound model inventory drifted.")
@@ -211,6 +219,7 @@ def physical_model_authority_before_event(
         destruction_by_id=destruction_by_id,
         departure_by_id=departure_by_id,
         no_trigger_destroyed_departure_ids=no_trigger_destroyed_departure_ids,
+        embark_movement_completions=embark_movement_completions,
     )
     if forward_anchor is not None:
         anchor_index, checkpoint, anchor_authority = forward_anchor
@@ -238,6 +247,7 @@ def physical_model_authority_before_event(
             destruction_by_id=destruction_by_id,
             departure_by_id=departure_by_id,
             no_trigger_destroyed_departure_ids=no_trigger_destroyed_departure_ids,
+            embark_movement_completions=embark_movement_completions,
         )
     }
     for model_instance_id, current_authority in current.items():
@@ -263,6 +273,7 @@ def physical_model_authority_before_event(
         destruction_by_id=destruction_by_id,
         departure_by_id=departure_by_id,
         no_trigger_destroyed_departure_ids=no_trigger_destroyed_departure_ids,
+        embark_movement_completions=embark_movement_completions,
     )
     for model_instance_id, authority in later.items():
         terminal_authority = current.get(model_instance_id)
@@ -311,6 +322,7 @@ def _forward_scoring_commit_anchor_or_none(
     destruction_by_id: dict[str, PrimaryUnitDestructionState],
     departure_by_id: dict[str, PrimaryBattlefieldDepartureState],
     no_trigger_destroyed_departure_ids: frozenset[str],
+    embark_movement_completions: tuple[EmbarkMovementCompletion, ...],
 ) -> (
     tuple[
         int,
@@ -333,6 +345,7 @@ def _forward_scoring_commit_anchor_or_none(
             destruction_by_id=destruction_by_id,
             departure_by_id=departure_by_id,
             no_trigger_destroyed_departure_ids=no_trigger_destroyed_departure_ids,
+            embark_movement_completions=embark_movement_completions,
         ):
             return None
         if event.event_type != PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT:
@@ -533,6 +546,9 @@ def validate_primary_mission_boundary_physical_authority(
         event_records=event_records,
         decision_records=decision_records,
     )
+    embark_movement_completions = validated_embark_movement_completions(
+        event_records=event_records, decision_records=decision_records
+    )
     current = _current_authority_by_model(state=state)
     current_model_ids = frozenset(current)
     initial_model_ids = _initial_model_ids(state=state)
@@ -554,6 +570,7 @@ def validate_primary_mission_boundary_physical_authority(
         destruction_by_id=destruction_by_id,
         departure_by_id=departure_by_id,
         no_trigger_destroyed_departure_ids=no_trigger_destroyed_departure_ids,
+        embark_movement_completions=embark_movement_completions,
     )
     checkpoint_authority = _checkpoint_authority(
         checkpoint=checkpoint,
@@ -572,6 +589,7 @@ def validate_primary_mission_boundary_physical_authority(
         destruction_by_id=destruction_by_id,
         departure_by_id=departure_by_id,
         no_trigger_destroyed_departure_ids=no_trigger_destroyed_departure_ids,
+        embark_movement_completions=embark_movement_completions,
     )
     for row in checkpoint.model_states:
         preceding = before.get(row.model_instance_id)
@@ -630,8 +648,13 @@ def _physical_authority_by_model(
     destruction_by_id: dict[str, PrimaryUnitDestructionState] | None = None,
     departure_by_id: dict[str, PrimaryBattlefieldDepartureState] | None = None,
     no_trigger_destroyed_departure_ids: frozenset[str] = frozenset(),
+    embark_movement_completions: tuple[EmbarkMovementCompletion, ...] = (),
 ) -> dict[str, _PhysicalAuthority]:
     authority = {} if initial is None else dict(initial)
+    embark_moves = {row.embark_event_id: row for row in embark_movement_completions}
+    completed_embark_moves = frozenset(
+        row.completion_event_id for row in embark_movement_completions
+    )
     applied_fall_back_transitions: dict[tuple[str, str], BattlefieldTransitionBatch] = {}
     applied_direct_mortal_wound_damage: dict[str, set[DamageApplication]] = {}
     for event in event_records:
@@ -649,6 +672,9 @@ def _physical_authority_by_model(
                 )
                 applied.add(damage)
         transition = authoritative_battlefield_transition_batch_or_none(event=event)
+        if (embark_move := embark_moves.get(event.event_id)) is not None:
+            # The accepted move precedes the departure emitted immediately after Embark.
+            transition = embark_move.transition_before_embark
         if event.event_type == "fall_back_move_applied":
             transition = authoritative_battlefield_transition_batch_or_none(
                 event=EventRecord(
@@ -673,6 +699,8 @@ def _physical_authority_by_model(
                 and event.payload.get("fall_back_applied_event_id") is not None
             ):
                 transition = None
+        if event.event_id in completed_embark_moves:
+            transition = None
         if transition is not None:
             _apply_transition(
                 authority=authority,
@@ -758,6 +786,7 @@ def _physical_authority_before_checkpoint(
     destruction_by_id: dict[str, PrimaryUnitDestructionState],
     departure_by_id: dict[str, PrimaryBattlefieldDepartureState],
     no_trigger_destroyed_departure_ids: frozenset[str],
+    embark_movement_completions: tuple[EmbarkMovementCompletion, ...],
 ) -> dict[str, _PhysicalAuthority]:
     return _physical_authority_before_event(
         event_records=event_records,
@@ -771,6 +800,7 @@ def _physical_authority_before_checkpoint(
         destruction_by_id=destruction_by_id,
         departure_by_id=departure_by_id,
         no_trigger_destroyed_departure_ids=no_trigger_destroyed_departure_ids,
+        embark_movement_completions=embark_movement_completions,
     )
 
 
@@ -787,6 +817,7 @@ def _physical_authority_before_event(
     destruction_by_id: dict[str, PrimaryUnitDestructionState],
     departure_by_id: dict[str, PrimaryBattlefieldDepartureState],
     no_trigger_destroyed_departure_ids: frozenset[str],
+    embark_movement_completions: tuple[EmbarkMovementCompletion, ...],
 ) -> dict[str, _PhysicalAuthority]:
     authority: dict[str, _PhysicalAuthority] = {}
     segment_start = 0
@@ -802,6 +833,7 @@ def _physical_authority_before_event(
             destruction_by_id=destruction_by_id,
             departure_by_id=departure_by_id,
             no_trigger_destroyed_departure_ids=no_trigger_destroyed_departure_ids,
+            embark_movement_completions=embark_movement_completions,
         )
         prior_checkpoint = PrimaryMissionBoundaryCheckpoint.from_payload(event.payload)
         seeded = _checkpoint_authority(
@@ -830,6 +862,7 @@ def _physical_authority_before_event(
         destruction_by_id=destruction_by_id,
         departure_by_id=departure_by_id,
         no_trigger_destroyed_departure_ids=no_trigger_destroyed_departure_ids,
+        embark_movement_completions=embark_movement_completions,
     )
 
 

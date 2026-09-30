@@ -72,6 +72,9 @@ def validate_failed_setup_history(
         for event in events
     ):
         return
+    from warhammer40k_core.engine.fight_model_authority_history import (
+        build_model_authority_timeline,
+    )
     from warhammer40k_core.engine.movement_failed_setup_authority import (
         validate_failed_placement_authority,
     )
@@ -87,6 +90,11 @@ def validate_failed_setup_history(
     by_result = {record.result.result_id: record for record in records}
     by_event = {event.event_id: index for index, event in enumerate(events)}
     history = MovementSelectionHistory(records=records, events=events, game_id=state.game_id)
+    model_history = (
+        build_model_authority_timeline(state=state, event_records=events, decision_records=records)
+        if any(event.event_type == "movement_setup_failed" for event in events)
+        else None
+    )
     affected: dict[tuple[int, str, str], bool] = {}
     for index, event in enumerate(events):
         payload = event.payload
@@ -196,6 +204,7 @@ def validate_failed_setup_history(
                 records=records,
                 event_index=by_event,
                 rollback_order=index,
+                model_history=model_history,
             )
             affected[(before.battle_round, before.active_player_id, unit_id)] = False
             history.rollback(before)

@@ -14,7 +14,16 @@ from tests.large_model_disembark_helpers import (
     large_disembark_placement,
     large_disembark_session,
 )
-from tests.order101_failed_setup_helpers import corrupt_failed_setup_authority
+from tests.order101_failed_setup_helpers import (
+    corrupt_failed_setup_authority,
+    emergency_component_omission_session,
+    failed_setup_automatic_record_session,
+    failed_setup_before_offboard_revival_session,
+    forge_failed_disembark_transport,
+    reserve_inventory_session,
+    swap_terminal_cargo_membership,
+    two_carrier_disembark_session,
+)
 from tests.psychic_modifier_helpers import pending_request
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
@@ -122,6 +131,377 @@ def _assert_restore_and_exact_replay(
     assert "object at 0x" not in json.dumps(session.lifecycle.to_payload(), sort_keys=True)
 
 
+@pytest.mark.parametrize("continuation", ["pending", "other_selection", "shooting"])
+def test_failed_setup_binds_terminal_carrier_after_later_selection_or_phase(
+    continuation: str,
+) -> None:
+    from warhammer40k_core.engine.phase import BattlePhase
+    from warhammer40k_core.engine.stratagems_requests import stratagem_decline_payload
+
+    carrier_id = "army-alpha:other-transport"
+    session = two_carrier_disembark_session(carrier_id=carrier_id)
+    pending_request(session)
+    initial = session.lifecycle.to_payload()
+    submission = replace(
+        _select_disembark(session, prefix="order101:terminal-carrier"),
+        transport_unit_instance_id=carrier_id,
+    )
+    result = session.submit_parameterized_payload(
+        request_id=submission.proposal_request_id,
+        result_id="order101:terminal-carrier:failed",
+        payload=validate_json_value(submission.to_payload()),
+    )
+    assert result.status_kind is LifecycleStatusKind.INVALID
+    if continuation == "other_selection":
+        request = pending_request(session)
+        session.submit_option(
+            request_id=request.request_id,
+            result_id="order101:terminal-carrier:other-unit",
+            option_id=TRANSPORT_ID,
+        )
+    elif continuation == "shooting":
+        for index in range(30):
+            request = pending_request(session)
+            state = session.lifecycle.state
+            assert state is not None
+            if state.current_battle_phase is BattlePhase.SHOOTING:
+                break
+            if request.decision_type == "submit_stratagem_target_proposal":
+                result = session.submit_parameterized_payload(
+                    request_id=request.request_id,
+                    result_id=f"order101:terminal-carrier:advance:{index}",
+                    payload=stratagem_decline_payload(),
+                )
+            else:
+                assert request.decision_type in {"select_movement_unit", "select_movement_action"}
+                result = session.submit_option(
+                    request_id=request.request_id,
+                    result_id=f"order101:terminal-carrier:advance:{index}",
+                    option_id=request.options[0].option_id
+                    if request.decision_type == "select_movement_unit"
+                    else "remain_stationary",
+                )
+            assert result.status_kind is not LifecycleStatusKind.INVALID
+        else:
+            raise AssertionError("Failed to leave Movement through recorded choices.")
+    _assert_restore_and_exact_replay(session, initial)
+    snapshot = session.lifecycle.to_payload()
+    forged = deepcopy(snapshot)
+    swap_terminal_cargo_membership(forged)
+    assert forged["decisions"] == snapshot["decisions"]
+    origin = snapshot.get("modifier_evaluation_history_origin")
+    assert origin is not None
+    assert forged.get("modifier_evaluation_history_origin") == origin
+    with pytest.raises(GameLifecycleError, match="terminal cargo location authority drift"):
+        GameLifecycle.from_payload(forged)
+
+
+def test_failed_setup_terminal_cargo_accepts_later_real_embark() -> None:
+    from tests.movement_submission_helpers import straight_line_witness_for_state
+
+    from warhammer40k_core.core.ruleset_descriptor import MovementMode
+    from warhammer40k_core.engine.movement_proposals import MovementProposalPayload
+
+    session = two_carrier_disembark_session(nearby_embarking_unit=True)
+    pending_request(session)
+    initial = session.lifecycle.to_payload()
+    submission = _select_disembark(session, prefix="order101:later-embark")
+    result = session.submit_parameterized_payload(
+        request_id=submission.proposal_request_id,
+        result_id="order101:later-embark:failed",
+        payload=validate_json_value(submission.to_payload()),
+    )
+    assert result.status_kind is LifecycleStatusKind.INVALID
+    for index, option in enumerate(("army-alpha:remaining-unit", "normal_move")):
+        request = pending_request(session)
+        result = session.submit_option(
+            request_id=request.request_id,
+            result_id=f"order101:later-embark:{index}",
+            option_id=option,
+        )
+        assert result.status_kind is not LifecycleStatusKind.INVALID
+    request = pending_request(session)
+    state = session.lifecycle.state
+    assert state is not None
+    proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+    result = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="order101:later-embark:path",
+        payload=validate_json_value(
+            MovementProposalPayload(
+                proposal_request_id=request.request_id,
+                proposal_kind=proposal.proposal_kind,
+                unit_instance_id="army-alpha:remaining-unit",
+                movement_phase_action="normal_move",
+                movement_mode=MovementMode.NORMAL,
+                witness=straight_line_witness_for_state(
+                    state, unit_instance_id="army-alpha:remaining-unit"
+                ),
+            ).to_payload()
+        ),
+    )
+    assert result.status_kind is not LifecycleStatusKind.INVALID
+    request = pending_request(session)
+    assert request.decision_type == "select_embark_transport"
+    result = session.submit_option(
+        request_id=request.request_id,
+        result_id="order101:later-embark:accepted",
+        option_id=TRANSPORT_ID,
+    )
+    assert result.status_kind is not LifecycleStatusKind.INVALID
+    _assert_restore_and_exact_replay(session, initial)
+    forged = deepcopy(session.lifecycle.to_payload())
+    swap_terminal_cargo_membership(forged)
+    with pytest.raises(GameLifecycleError, match="terminal cargo location authority drift"):
+        GameLifecycle.from_payload(forged)
+
+
+def test_failed_setup_terminal_cargo_accepts_later_passenger_transfer() -> None:
+    from tests.movement_submission_helpers import straight_line_witness_for_state
+
+    from warhammer40k_core.core.ruleset_descriptor import MovementMode
+    from warhammer40k_core.engine.movement_proposals import MovementProposalPayload
+    from warhammer40k_core.engine.phase import BattlePhase
+    from warhammer40k_core.engine.stratagems_requests import stratagem_decline_payload
+    from warhammer40k_core.geometry.pose import Pose
+
+    session = two_carrier_disembark_session(close_carriers=True, diameter=1)
+    pending_request(session)
+    initial = session.lifecycle.to_payload()
+    submission = _select_disembark(session, prefix="order101:passenger-transfer")
+    rejected = session.submit_parameterized_payload(
+        request_id=submission.proposal_request_id,
+        result_id="order101:passenger-transfer:failed",
+        payload=validate_json_value(submission.to_payload()),
+    )
+    assert rejected.status_kind is LifecycleStatusKind.INVALID
+    for index, option in enumerate((PASSENGER_ID, "disembark")):
+        request = pending_request(session)
+        result = session.submit_option(
+            request_id=request.request_id,
+            result_id=f"order101:passenger-transfer:retry:{index}",
+            option_id=option,
+        )
+        assert result.status_kind is not LifecycleStatusKind.INVALID
+    request = pending_request(session)
+    placement = large_disembark_placement(session)
+    accepted = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="order101:passenger-transfer:disembarked",
+        payload=validate_json_value(
+            replace(
+                submission,
+                proposal_request_id=request.request_id,
+                attempted_placement=replace(
+                    placement,
+                    model_placements=tuple(
+                        replace(row, pose=Pose.at(7.2 + index * 1.4, 13.25))
+                        for index, row in enumerate(placement.model_placements)
+                    ),
+                ),
+            ).to_payload()
+        ),
+    )
+    assert accepted.status_kind is not LifecycleStatusKind.INVALID, accepted
+    request = pending_request(session)
+    assert request.decision_type == "select_movement_action", request
+    result = session.submit_option(
+        request_id=request.request_id,
+        result_id="order101:passenger-transfer:finish-disembark-action",
+        option_id="normal_move",
+    )
+    assert result.status_kind is not LifecycleStatusKind.INVALID, result
+    request = pending_request(session)
+    state = session.lifecycle.state
+    assert state is not None
+    proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+    result = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="order101:passenger-transfer:finish-disembark-path",
+        payload=validate_json_value(
+            MovementProposalPayload(
+                proposal_request_id=request.request_id,
+                proposal_kind=proposal.proposal_kind,
+                unit_instance_id=PASSENGER_ID,
+                movement_phase_action="normal_move",
+                movement_mode=MovementMode.NORMAL,
+                witness=straight_line_witness_for_state(state, unit_instance_id=PASSENGER_ID),
+            ).to_payload()
+        ),
+    )
+    assert result.status_kind is not LifecycleStatusKind.INVALID, result
+    for index in range(80):
+        request = pending_request(session)
+        state = session.lifecycle.state
+        assert state is not None
+        if (
+            state.battle_round == 2
+            and state.active_player_id == "player-a"
+            and state.current_battle_phase is BattlePhase.MOVEMENT
+        ):
+            break
+        if request.decision_type == "submit_stratagem_target_proposal":
+            result = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id=f"order101:passenger-transfer:advance:{index}",
+                payload=stratagem_decline_payload(),
+            )
+        else:
+            options = {
+                "select_movement_unit": request.options[0].option_id,
+                "select_movement_action": "remain_stationary",
+                "select_shooting_unit": "complete_shooting_phase",
+                "select_charging_unit": "complete_charge_phase",
+            }
+            assert request.decision_type in options, request
+            result = session.submit_option(
+                request_id=request.request_id,
+                result_id=f"order101:passenger-transfer:advance:{index}",
+                option_id=options[request.decision_type],
+            )
+        assert result.status_kind is not LifecycleStatusKind.INVALID, result
+    else:
+        raise AssertionError("Failed to reach the passenger's next Movement phase.")
+    for index, option in enumerate((PASSENGER_ID, "normal_move")):
+        request = pending_request(session)
+        result = session.submit_option(
+            request_id=request.request_id,
+            result_id=f"order101:passenger-transfer:move:{index}",
+            option_id=option,
+        )
+        assert result.status_kind is not LifecycleStatusKind.INVALID
+    request = pending_request(session)
+    state = session.lifecycle.state
+    assert state is not None
+    proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+    result = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="order101:passenger-transfer:path",
+        payload=validate_json_value(
+            MovementProposalPayload(
+                proposal_request_id=request.request_id,
+                proposal_kind=proposal.proposal_kind,
+                unit_instance_id=PASSENGER_ID,
+                movement_phase_action="normal_move",
+                movement_mode=MovementMode.NORMAL,
+                witness=straight_line_witness_for_state(
+                    state, unit_instance_id=PASSENGER_ID, dx=4.5
+                ),
+            ).to_payload()
+        ),
+    )
+    assert result.status_kind is not LifecycleStatusKind.INVALID, result
+    request = pending_request(session)
+    assert request.decision_type == "select_embark_transport", request
+    result = session.submit_option(
+        request_id=request.request_id,
+        result_id="order101:passenger-transfer:embarked",
+        option_id="army-alpha:other-transport",
+    )
+    assert result.status_kind is not LifecycleStatusKind.INVALID, result
+    cargo = state.transport_cargo_state_for_embarked_unit(PASSENGER_ID)
+    assert cargo is not None
+    assert cargo.transport_unit_instance_id == "army-alpha:other-transport"
+    _assert_restore_and_exact_replay(session, initial)
+    drifted_completion = deepcopy(session.lifecycle.to_payload())
+    completion = next(
+        event
+        for event in drifted_completion["decisions"]["event_log"]
+        if event["event_type"] == "movement_activation_completed"
+        and isinstance(event["payload"], dict)
+        and event["payload"].get("result_id") == "order101:passenger-transfer:move:1"
+    )
+    completion_payload = completion["payload"]
+    assert isinstance(completion_payload, dict)
+    transition = completion_payload["transition_batch"]
+    assert isinstance(transition, dict)
+    displacements = transition["displacements"]
+    assert isinstance(displacements, list)
+    assert len(displacements) == 5
+    displacements.pop()
+    with pytest.raises(GameLifecycleError, match="Embark completion context drift"):
+        GameLifecycle.from_payload(drifted_completion)
+    forged = deepcopy(session.lifecycle.to_payload())
+    swap_terminal_cargo_membership(forged)
+    with pytest.raises(GameLifecycleError, match="terminal cargo location authority drift"):
+        GameLifecycle.from_payload(forged)
+
+
+@pytest.mark.parametrize("attached", [False, True])
+def test_cargo_suffix_validator_accepts_real_emergency_disembark(attached: bool) -> None:
+    """Validate an actual emergency owner suffix; this is not a failed-prefix replay."""
+    from tests.emergency_geometry_helpers import emergency_geometry_session
+
+    from warhammer40k_core.engine.transport_cargo_location_history import (
+        validate_transport_cargo_location_suffix,
+    )
+
+    session, submission = emergency_geometry_session(attached=attached, rectangular=False)
+    state = session.lifecycle.state
+    assert state is not None
+    boundary_state = deepcopy(state)
+    initial_event_count = len(session.lifecycle.decision_controller.event_log.records)
+    result = session.submit_parameterized_payload(
+        request_id=submission.proposal_request_id,
+        result_id="order101:emergency-owner:accepted",
+        payload=validate_json_value(submission.to_payload()),
+    )
+    assert result.status_kind is not LifecycleStatusKind.INVALID, result
+    events = session.lifecycle.decision_controller.event_log.records
+    disembarked = next(event for event in events if event.event_type == "unit_disembarked")
+    assert isinstance(disembarked.payload, dict)
+    assert disembarked.payload["active_player_id"] == "player-a"
+    assert pending_request(session).actor_id in state.player_ids
+    validate_transport_cargo_location_suffix(
+        boundary_state=boundary_state,
+        state=state,
+        event_records=events,
+        decision_records=session.lifecycle.decision_controller.records,
+        initial_event_count=initial_event_count,
+        affected_unit_instance_ids=frozenset({submission.unit_instance_id}),
+    )
+
+
+def test_cargo_suffix_validator_accepts_emergency_component_omission() -> None:
+    """Validate a genuine emergency suffix that destroys an omitted physical component."""
+    from warhammer40k_core.engine.destroyed_transport_rules_unit_disembark import (
+        emergency_disembark_omitted_model_evidence_from_event_payload,
+    )
+    from warhammer40k_core.engine.transport_cargo_location_history import (
+        validate_transport_cargo_location_suffix,
+    )
+
+    session, submission = emergency_component_omission_session()
+    state = session.lifecycle.state
+    assert state is not None
+    boundary_state = deepcopy(state)
+    initial_event_count = len(session.lifecycle.decision_controller.event_log.records)
+    result = session.submit_parameterized_payload(
+        request_id=submission.proposal_request_id,
+        result_id="order101:emergency-component:accepted",
+        payload=validate_json_value(submission.to_payload()),
+    )
+    assert result.status_kind is not LifecycleStatusKind.INVALID, result
+    events = session.lifecycle.decision_controller.event_log.records
+    disembarked = next(event for event in events if event.event_type == "unit_disembarked")
+    assert isinstance(disembarked.payload, dict)
+    evidence = emergency_disembark_omitted_model_evidence_from_event_payload(disembarked.payload)
+    assert evidence is not None
+    assert evidence.destroyed_model_instance_ids == (
+        "army-beta:leader-unit:core-character-leader:001",
+    )
+    assert len(evidence.placed_model_instance_ids) == 5
+    assert disembarked.payload["active_player_id"] == "player-a"
+    validate_transport_cargo_location_suffix(
+        boundary_state=boundary_state,
+        state=state,
+        event_records=events,
+        decision_records=session.lifecycle.decision_controller.records,
+        initial_event_count=initial_event_count,
+        affected_unit_instance_ids=frozenset({submission.unit_instance_id}),
+    )
+
+
 @pytest.mark.parametrize("finish", ["retry", "stationary", "other_unit"])
 def test_failed_setup_reselection_restore_both_viewers_and_exact_replay(finish: str) -> None:
     session = large_disembark_session()
@@ -204,6 +584,303 @@ def test_malformed_or_stale_setup_preserves_selection_and_pending_proposal(
     assert pending_request(session) == request
     assert state.movement_phase_state is not None
     assert PASSENGER_ID in state.movement_phase_state.selected_unit_ids
+
+
+@pytest.mark.parametrize("model_index", [0, -1])
+def test_failed_setup_historical_inventory_survives_later_recorded_casualty(
+    model_index: int,
+) -> None:
+    from tests.destruction_occurrence_fixture_helpers import (
+        destroy_rule_model_for_fixture,
+        finish_core_destructions_for_fixture,
+    )
+
+    from warhammer40k_core.engine.damage_allocation import model_by_id
+
+    session = large_disembark_session()
+    pending_request(session)
+    initial = session.lifecycle.to_payload()
+    submission = _select_disembark(session, prefix="order101:later-casualty")
+    result = session.submit_parameterized_payload(
+        request_id=submission.proposal_request_id,
+        result_id="order101:later-casualty:failed",
+        payload=validate_json_value(submission.to_payload()),
+    )
+    assert result.status_kind is LifecycleStatusKind.INVALID
+    request = pending_request(session)
+    session.submit_option(
+        request_id=request.request_id,
+        result_id="order101:later-casualty:reselect",
+        option_id=PASSENGER_ID,
+    )
+    request = pending_request(session)
+    session.submit_option(
+        request_id=request.request_id,
+        result_id="order101:later-casualty:retry-action",
+        option_id="disembark",
+    )
+    request = pending_request(session)
+    accepted_placement = large_disembark_placement(session)
+    result = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="order101:later-casualty:accepted",
+        payload=validate_json_value(
+            replace(
+                submission,
+                proposal_request_id=request.request_id,
+                attempted_placement=accepted_placement,
+            ).to_payload()
+        ),
+    )
+    assert result.status_kind is not LifecycleStatusKind.INVALID
+    _assert_restore_and_exact_replay(session, initial)
+    state = session.lifecycle.state
+    assert state is not None
+    model_id = accepted_placement.model_placements[model_index].model_instance_id
+    destroy_rule_model_for_fixture(
+        state=state,
+        decisions=session.lifecycle.decision_controller,
+        model_id=model_id,
+        destroying_player_id="player-b",
+        source_unit_id=None,
+        source_model_id=None,
+    )
+    finish_core_destructions_for_fixture(
+        state=state, decisions=session.lifecycle.decision_controller
+    )
+    assert not model_by_id(state=state, model_instance_id=model_id).is_alive
+    snapshot = session.lifecycle.to_payload()
+    restored = LocalGameSession(GameLifecycle.from_payload(deepcopy(snapshot)))
+    assert restored.lifecycle.to_payload() == snapshot
+    for viewer in state.player_ids:
+        assert session.view(viewer_player_id=viewer) == restored.view(viewer_player_id=viewer)
+        assert session.events_since(
+            EventStreamCursor(), viewer_player_id=viewer
+        ) == restored.events_since(EventStreamCursor(), viewer_player_id=viewer)
+    corrupted = deepcopy(snapshot)
+    corrupt_failed_setup_authority(corrupted, tamper="missing_model")
+    with pytest.raises(GameLifecycleError, match="physical inventory authority drift"):
+        GameLifecycle.from_payload(corrupted)
+
+
+@pytest.mark.parametrize(
+    "transport_id",
+    [
+        "army-alpha:nonexistent-forged-transport",
+        "army-alpha:other-transport",
+    ],
+)
+def test_failed_setup_rejects_coherent_historical_wrong_carrier(transport_id: str) -> None:
+    session = two_carrier_disembark_session()
+    submission = _select_disembark(session, prefix="order101:carrier-proof")
+    result = session.submit_parameterized_payload(
+        request_id=submission.proposal_request_id,
+        result_id="order101:carrier-proof:failed",
+        payload=validate_json_value(submission.to_payload()),
+    )
+    assert result.status_kind is LifecycleStatusKind.INVALID
+    snapshot = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(deepcopy(snapshot)).to_payload() == snapshot
+    corrupted = deepcopy(snapshot)
+    forge_failed_disembark_transport(corrupted, transport_id=transport_id)
+    assert corrupted["state"] == snapshot["state"]
+    assert "modifier_evaluation_history_origin" in corrupted
+    assert "modifier_evaluation_history_origin" in snapshot
+    assert (
+        corrupted["modifier_evaluation_history_origin"]
+        == snapshot["modifier_evaluation_history_origin"]
+    )
+    with pytest.raises(GameLifecycleError, match=r"historical prior-location .*drift"):
+        GameLifecycle.from_payload(corrupted)
+
+
+@pytest.mark.parametrize("tamper", ["missing", "late", "prefix", "config"])
+def test_failed_setup_rejects_missing_or_unbound_cargo_origin(tamper: str) -> None:
+    session = large_disembark_session()
+    submission = _select_disembark(session, prefix="order101:origin-proof")
+    session.submit_parameterized_payload(
+        request_id=submission.proposal_request_id,
+        result_id="order101:origin-proof:failed",
+        payload=validate_json_value(submission.to_payload()),
+    )
+    snapshot = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(deepcopy(snapshot)).to_payload() == snapshot
+    corrupted = deepcopy(snapshot)
+    assert "modifier_evaluation_history_origin" in corrupted
+    origin = corrupted["modifier_evaluation_history_origin"]
+    if tamper == "missing":
+        del corrupted["modifier_evaluation_history_origin"]
+    elif tamper == "late":
+        del corrupted["modifier_evaluation_history_origin"]
+        late = deepcopy(corrupted)
+        corrupted["modifier_evaluation_history_origin"] = cast(dict[str, JsonValue], late)
+    elif tamper == "config":
+        config = origin["config"]
+        assert isinstance(config, dict)
+        config["game_id"] = "forged-origin-game"
+    else:
+        decisions = origin["decisions"]
+        assert isinstance(decisions, dict)
+        event_log = decisions["event_log"]
+        assert isinstance(event_log, list)
+        event = event_log[0]
+        assert isinstance(event, dict)
+        event["event_type"] = "forged-origin-event"
+    with pytest.raises(GameLifecycleError):
+        GameLifecycle.from_payload(corrupted)
+
+
+@pytest.mark.parametrize(
+    "tamper",
+    [
+        "missing_model_and_diagnostic",
+        "missing_diagnostic_model",
+        "foreign_diagnostic_blocker",
+        "failure_arrived_reserve",
+    ],
+)
+def test_failed_reserve_setup_authenticates_complete_inventory_after_movement_ends(
+    tamper: str,
+) -> None:
+    from tests.order63_reserve_transport_helpers import placement
+
+    from warhammer40k_core.engine.phase import BattlePhase
+    from warhammer40k_core.engine.stratagems_requests import stratagem_decline_payload
+
+    session = reserve_inventory_session()
+    pending_request(session)
+    initial = session.lifecycle.to_payload()
+    for index, choice in enumerate((PASSENGER_ID, "ingress")):
+        request = pending_request(session)
+        result = session.submit_option(
+            request_id=request.request_id,
+            result_id=f"reserve-inventory:{index}",
+            option_id=choice,
+        )
+        assert result.status_kind is not LifecycleStatusKind.INVALID
+    request = pending_request(session)
+    proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+    result = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="reserve-inventory:failed",
+        payload=validate_json_value(
+            PlacementProposalPayload(
+                proposal_request_id=request.request_id,
+                proposal_kind=proposal.proposal_kind,
+                unit_instance_id=PASSENGER_ID,
+                placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+                attempted_placement=placement(session, PASSENGER_ID, x=12, y=12),
+            ).to_payload()
+        ),
+    )
+    assert result.status_kind is LifecycleStatusKind.INVALID
+    for index in range(30):
+        request = pending_request(session)
+        state = session.lifecycle.state
+        assert state is not None
+        if state.current_battle_phase is not BattlePhase.MOVEMENT:
+            break
+        if request.decision_type == "submit_stratagem_target_proposal":
+            result = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id=f"reserve-inventory:advance:{index}",
+                payload=stratagem_decline_payload(),
+            )
+        else:
+            assert request.decision_type in {"select_movement_unit", "select_movement_action"}
+            result = session.submit_option(
+                request_id=request.request_id,
+                result_id=f"reserve-inventory:advance:{index}",
+                option_id=request.options[0].option_id
+                if request.decision_type == "select_movement_unit"
+                else "remain_stationary",
+            )
+        assert result.status_kind is not LifecycleStatusKind.INVALID
+    else:
+        raise AssertionError("Failed to leave Movement through recorded choices.")
+    assert state.current_battle_phase is BattlePhase.SHOOTING
+    _assert_restore_and_exact_replay(session, initial)
+    snapshot = session.lifecycle.to_payload()
+    corrupted = deepcopy(snapshot)
+    corrupt_failed_setup_authority(corrupted, tamper=tamper)
+    assert corrupted["state"] == snapshot["state"]
+    assert "modifier_evaluation_history_origin" in corrupted
+    assert "modifier_evaluation_history_origin" in snapshot
+    assert (
+        corrupted["modifier_evaluation_history_origin"]
+        == snapshot["modifier_evaluation_history_origin"]
+    )
+    with pytest.raises(GameLifecycleError, match=r"authority drift|reconstruction drift"):
+        GameLifecycle.from_payload(corrupted)
+
+
+@pytest.mark.parametrize("reserves", [False, True])
+def test_failed_setup_historical_inventory_survives_later_offboard_leader_revival(
+    reserves: bool,
+) -> None:
+    from warhammer40k_core.engine.damage_allocation import model_by_id
+    from warhammer40k_core.engine.healing import resolve_healing_until_blocked
+
+    session, effect, returned_id, attempted_ids = failed_setup_before_offboard_revival_session(
+        reserves=reserves
+    )
+    assert returned_id not in attempted_ids
+    snapshot = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(deepcopy(snapshot)).to_payload() == snapshot
+    state = session.lifecycle.state
+    assert state is not None
+    _, healing = resolve_healing_until_blocked(
+        state=state,
+        decisions=session.lifecycle.decision_controller,
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        effect=effect,
+    )
+    assert healing is not None
+    request = pending_request(session)
+    assert request.decision_type == "select_movement_unit"
+    session.submit_option(
+        request_id=request.request_id,
+        result_id="late-revival:transport-selection",
+        option_id=TRANSPORT_ID,
+    )
+    request = pending_request(session)
+    assert request.request_id == healing.request_id
+    assert state.movement_phase_state is not None
+    selection_before = state.movement_phase_state.to_payload()
+    result = session.submit_option(
+        request_id=request.request_id,
+        result_id="late-revival:return",
+        option_id=request.options[0].option_id,
+    )
+    assert result.status_kind is not LifecycleStatusKind.INVALID
+    assert model_by_id(state=state, model_instance_id=returned_id).is_alive
+    if reserves:
+        reserve = state.reserve_state_for_unit("army-alpha:passengers")
+        assert reserve is not None
+        assert reserve.is_unarrived
+        assert state.battlefield_state is not None
+        assert returned_id not in state.battlefield_state.placed_model_ids()
+    else:
+        assert returned_id in state.embarked_model_ids()
+    assert state.movement_phase_state.to_payload() == selection_before
+    snapshot = session.lifecycle.to_payload()
+    restored = LocalGameSession(GameLifecycle.from_payload(deepcopy(snapshot)))
+    assert restored.lifecycle.to_payload() == snapshot
+    for viewer in state.player_ids:
+        assert session.view(viewer_player_id=viewer) == restored.view(viewer_player_id=viewer)
+        assert session.events_since(
+            EventStreamCursor(), viewer_player_id=viewer
+        ) == restored.events_since(EventStreamCursor(), viewer_player_id=viewer)
+
+
+def test_failed_setup_history_accepts_real_automatic_attack_records_between_attempts() -> None:
+    session, initial = failed_setup_automatic_record_session()
+    events = session.lifecycle.decision_controller.event_log.records
+    assert sum(event.event_type == "movement_setup_failed" for event in events) == 2
+    assert {"select_resolve_target_unit", "select_attack_weapon_group"} <= {
+        record.request.decision_type for record in session.lifecycle.decision_controller.records
+    }
+    _assert_restore_and_exact_replay(session, initial)
 
 
 @pytest.mark.parametrize("deep_strike", [False, True])
@@ -645,6 +1322,10 @@ def test_failed_attached_setup_preserves_every_embarked_component_and_replays() 
         option.option_id for option in request.options
     }
     _assert_restore_and_exact_replay(session, initial)
+    corrupted = deepcopy(session.lifecycle.to_payload())
+    corrupt_failed_setup_authority(corrupted, tamper="missing_component")
+    with pytest.raises(GameLifecycleError, match="physical inventory authority drift"):
+        GameLifecycle.from_payload(corrupted)
     session.submit_option(
         request_id=request.request_id,
         result_id="order101:attached-reselected",
@@ -677,6 +1358,15 @@ def test_failed_attached_setup_preserves_every_embarked_component_and_replays() 
         "physical_model_ids",
         "physical_owner",
         "outer_request_id",
+        "missing_model",
+        "foreign_diagnostic_model",
+        "foreign_diagnostic_unit",
+        "failure_tactical_available",
+        "failure_firing_deck",
+        "failure_emergency",
+        "missing_diagnostic_model",
+        "foreign_diagnostic_blocker",
+        "foreign_diagnostic_source",
     ],
 )
 def test_failed_disembark_rejects_historical_authority_tamper(combat: bool, tamper: str) -> None:

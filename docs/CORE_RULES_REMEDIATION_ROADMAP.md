@@ -50,6 +50,15 @@ Consolidation responses: owner-confirmed official App v946 (2026-09-21) gives fo
 
 ## Canonical one-PR-at-a-time sequence
 
+The owner approved a separate throughput PR immediately after Order 101 and
+before Order 102 on 2026-09-30. It preserves both local and hosted full-suite
+gates and all independent review requirements. The additional version 963
+source intake is tracked separately in [the approved PR backlog](PR_BACKLOG_2026_09_30.md).
+Existing order numbers and PR IDs are unchanged. Source observations and affected
+consumer mapping must determine which existing orders need updated requirements
+and which additional PRs need explicit scheduling. `PFINAL` cannot close with
+unresolved version 963 intake or newly required repairs.
+
 | Order | PR | Finding(s) | How it is currently done | How it must be done | Controlling maintained App-data locator and operative requirement to pin | Prerequisites | Gate |
 |---:|---|---|---|---|---|---|---|
 | 1 | P15D | C15-04 | Fire Overwatch’s source row omits exact target/Snap wording; Crushing Impact’s row says Vehicle/Strength while runtime supports Monster-or-Vehicle/Toughness; older PDF numbering conflicts with current App headings and one App example has a stale cross-reference. | Correct only source records, stable identifiers, hashes, and provenance to current complete App text. Keep correct runtime behavior; bind by title/operative text and record the stale example reference. | [15.05–15.09](https://www.40k.app/rules/15-stratagems): current headings make Crushing Impact 15.05 and Explosives 15.06; the category 12 example’s contrary number is internal drift. | — | APP-INTERNAL-DRIFT |

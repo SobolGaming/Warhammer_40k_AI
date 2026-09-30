@@ -72,39 +72,102 @@ contract examples must be regenerated.
 
 ## Validation evidence and remaining merge gates
 
-The frozen runtime is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:00e0dca239f06843d109d1591ffab12b5f8844e801e5005f4d4f778c6afd09e3`.
-The 56 Order 101 cases and affected real consumers pass: the focused gate has
-276 passes. The complete covered behavioral invocation has 10,160 passes, zero
-errors/failures/skips, and 18 complete successful worker records. It took 771.10
-seconds. Its initial coverage report failed to open the combined database;
-separate coverage report/XML commands recovered the unchanged saved branch data
-and passed the unchanged gate at 85.1927209112%. Raw failed-command evidence is
-preserved; no additional behavioral run was made for recovery or shard profiling.
-All 3,013 frozen production file hashes matched during recovery. The same
-successful JUnit supplies the complete eight-shard manifest profile, labeled as
-an uncommitted local Mac working tree, its base and runtime identity. It is not
-presented as a hosted Linux profile or as an already committed head.
+The current source candidate is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:bc6eb667b1a0c8cd2c1b9f1fb83b71cc540a0332c74e988f3227ae4fed1ead4e`.
+An independent pre-freeze review found no unresolved concrete acceptance defect
+on its verified source/test hashes. Its five distinct legal Embark controls passed,
+and a fresh valid carrier-B snapshot restored exactly while the four-field
+terminal-only carrier-A edit was rejected. This is preliminary source review,
+not exact published-head approval.
 
-Full Ruff/format, mypy, pyright, all 11 import boundaries, generated identity and
-external contract, pinned-base compatibility, TypeScript client/unit/conformance
-and installed-wheel smoke gates pass. Serial performance completed without
-coverage or competing test/build workers: 21 Order 101 samples took 36.51 seconds,
-and all 27 inherited commands took 359.57 seconds. Baselines and numeric budgets
-remain unchanged; the Mac is provisional reference hardware. The first full
-quality run had 795 passes and a stale AST audit target after extracting the
-shared reserve validator. The audit now requires living-component authority in
-that shared validator and requires both accepted/rejected consumers to call it.
-This test-only repair leaves the frozen runtime unchanged. The independent audit
-repair review and its four deliberate ownership/delegation-removal probes pass.
-The repaired complete quality gate passes all 796 tests, including inherited
-performance budgets; pre-commit also passes.
+The terminal cargo bridge follows existing authenticated mutations from the
+reconstructed failed-setup boundary through later Embark/Disembark, casualty and
+receiving-unit revival. It checks the affected physical components against their
+terminal carrier. A real later nonzero passenger transfer exposed an existing
+restore error: the delayed movement completion was applied after Embark departure.
+Shared movement decision authority now binds that report to its accepted
+pre-Embark move; both model history and Primary physical history use that binding.
+Normal Move, Advance and Fall Back retain their distinct existing authority.
 
-Independent preliminary coding findings about erased completed selections,
-superseded action/rejection authority, and rejected physical/source/context
-history were repaired and independently reprobed. A clean preliminary repair
-review is not final-head approval. A fresh independent exact-head coding review,
-parent Astra audit, every required CI quality/generated/contract gate, both type
-checkers, all eight behavioral shards, and combined branch coverage >=85% remain
-required before merge. Draft-skipped checks are not passes. Core categories
-01–25, faction behavior and complete-game performance are not certified here.
+The genuine failed setup/retry followed by a 4.5-inch move and another carrier
+Embark now restores and replays exactly, including both viewer projections.
+The affected four-case batch passed. Three emergency controls use actual single,
+attached-group and nonempty whole-Leader omission owner events to exercise the
+suffix directly; they do not claim full combined failed-prefix snapshot/replay
+coverage. The prior full focused iteration had 95 passes and this one transfer
+failure; its changed target was rerun successfully after the complete owner fix.
+The final full covered suite is still mandatory.
+
+Full Ruff/format, mypy, pyright, import boundaries, pre-commit, unchanged eight-shard
+inventory, generated identity, Order97 receipts/inventory, base-ref contract
+compatibility, TypeScript checks/unit/conformance and installed-wheel gates passed
+on the current source. Isolated Order101 measurement completed 21 samples in
+41.96 seconds and its unchanged budget gate passed. All 27 inherited measurement
+commands completed in 356.14 seconds with exact report/log hashes verified; their
+combined numeric assertions remain part of final quality. Complete local covered
+behavior and quality, full hosted CI and both exact final-head reviews remain pending.
+
+The previous repair candidate was
+`warhammer40k-core-v2:runtime-tree-sha256-v1:237906fd3b3b8a8251baf68e7081f70fe9a7560eb77a93535f3b999b68c3ddfc`.
+Its preliminary clean verdict was superseded by R101-CR-006: restore accepted
+a snapshot whose four terminal cargo fields were manually changed from a real
+carrier B to a real carrier A while complete engine-generated history remained B.
+No fully legal, unedited engine-only path to that contradiction was demonstrated.
+Order 101 retains its existing historical-integrity gates while this location
+bridge is repaired. The completed runtime237 measurements remain archived.
+Published PR #524 head `2a5eaa60` has no clean final review approval. Its earlier
+local/hosted results do not validate the uncommitted repair. Fresh final measurements
+and local/hosted gates remain required before merge.
+
+The earlier independent whole-invariant pre-freeze review accepted eight genuine histories
+exactly and rejected fourteen coherent forgeries on unchanged source/resource
+hashes. Controls include complete older Reserve setup, genuine later embarked and
+reserve Leader revival, prior Reserve failure followed by failed Rapid Disembark,
+automatic attack records between failures, both attached components and two real
+friendly carriers. Negatives cover omitted living models/components, nonexistent
+or unrelated historical carriers, diagnostic producer drift and missing/late/
+non-prefix/config-drifted origins. These focused controls do not replace full
+validation or final-commit coding/Astra reviews.
+
+Every failed ordinary setup now shares complete historical inventory authority
+and independently reconstructs its exact recorded prefix from the existing
+pre-decision lifecycle origin. The generic historical ownership service retains
+models pruned by catalog replacement. The failed Reserve consumer supplies exact
+living coverage at its original request; accepted-arrival defaults are preserved.
+Actual diagnostic producer fields, initial cargo and prior reserve location are
+rederived through the shared engine. Strict typed envelopes, Combat
+Tactical-available retries and their causal source chains remain distinct.
+
+The Realm retry fixture now uses the real facade and a captured initial payload;
+its rejected attempt preserves location, offers fresh selection and replays
+exactly. Fourteen retry/tamper cases pass. Its old direct-handler fixture lacked
+the independently captured lifecycle origin and was repaired without a restore
+fallback. The earlier fixture checks remain historical evidence; current-source cheap
+gates are listed above, and complete final validation remains pending.
+
+Serial isolated runtime-bound measurements retain all historical baselines,
+workloads and numeric budgets. They must finish before the complete covered local
+behavioral invocation. That single invocation supplies successful JUnit and worker
+timings; no second no-coverage behavioral gate is allowed. Existing committed
+shard-profile metadata is retained as a truthful historical observation of its
+recorded runtime/case inventory, never relabeled as this candidate's measurements.
+The behavioral filename inventory is unchanged by the review repairs.
+
+The prior published runtime `00e0dca2` had 10,160 passing cases in 771.10 seconds.
+Its saved unchanged branch-coverage database recovered at 85.1927209112% after a
+reporter I/O failure, without rerunning tests. All old raw receipts, source hashes,
+JUnit and worker evidence remain archived. Hosted run
+[36726559567](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/36726559567)
+passed all sixteen checks, including eight actual behavioral shards and coverage,
+in 30m03s. These historical results inform throughput work and do not approve the
+new runtime. Local pytest and hosted workflow durations measure different stages.
+
+Final required local quality, complete covered behavior, both full type checkers,
+generated/contract/client/package/import/pre-commit gates, all actual hosted
+behavior shards and combined branch coverage >=85% remain mandatory. Fresh
+independent coding and parent Astra reviews must be clean on the exact final
+published head. Missing/skipped/stale checks and preliminary source review cannot
+approve a merge. The [approved additional backlog](PR_BACKLOG_2026_09_30.md) places
+a separate throughput PR after Order 101 before Order 102 and tracks version 963
+source intake without renumbering existing orders. Core categories 01–25,
+factions and complete-game performance remain uncertified.

@@ -206,7 +206,7 @@
     },
     {
       "path": "src/warhammer40k_core/_engine_build_manifest.json",
-      "sha256": "9ff8509f0cda5c6442e356bd3f2b8222bb9d5854ecdbaad80abd16c5e353b529"
+      "sha256": "ba71469948a3c52c42b407db7c0093bd48c82cb9f6ca26b774160192bab39862"
     },
     {
       "path": "tests/absent_strength_helpers.py",
@@ -414,7 +414,7 @@
     },
     {
       "path": "tests/order101_failed_setup_helpers.py",
-      "sha256": "e4e5496ac33fb9dcfdd74dc2207c23f1671c96be5476f44ce4f0ce77cabb1a06"
+      "sha256": "6c387f7d7c5975fbb9960c862b62b33fd75b6349e3fe5f39d3e0cdff39d36211"
     },
     {
       "path": "tests/order32_visibility_helpers.py",
@@ -750,7 +750,7 @@
     },
     {
       "path": "tests/unit/test_order101_setup_failure.py",
-      "sha256": "3b591690ba8b782c0908f9a561078183be8eb79aba1f68fe860c50aa1934229d"
+      "sha256": "1a0ce388f91a04c1e85c999c878d63d7e4e190efb063ee1c96f6d2f4e04d6489"
     },
     {
       "path": "tests/unit/test_order36_sequencing.py",
@@ -1066,7 +1066,7 @@
     },
     {
       "path": "tests/unit/test_phase17g_chaos_daemons_daemonic_incursion.py",
-      "sha256": "d32972995f8b0f9941dd1278445b1e23b5acd998f6ef99288422af81b170defb"
+      "sha256": "2eceb2791c54846982603e64a67ad594336d530e6135c563bbb62fc488c53f01"
     },
     {
       "path": "tests/unit/test_phase17g_chaos_daemons_shadow_legion.py",

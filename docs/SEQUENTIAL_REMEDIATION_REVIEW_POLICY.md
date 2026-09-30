@@ -1,0 +1,92 @@
+# Approved review policy for subsequent remediation orders
+
+The repository owner approved this policy on 30 September 2026 during Order101.
+It applies to subsequent orders, beginning with `THROUGHPUT-AFTER-101`, then
+Order102 onward. Order101 finishes under its existing acceptance and review gates.
+
+Prioritize complete playable rules and faction support. This priority does not
+expand an order's authorized implementation scope, authorize prohibited content,
+or present load-only faction content as implemented gameplay.
+
+## Blocking findings
+
+Block on incorrect rules, normal legal gameplay failures, and save/load or replay
+failures reproducible from engine-generated valid state. Explicitly required
+trust-boundary failures also block. Every blocking finding must state:
+
+1. The reproduced entry path and exact reviewed head.
+2. The concrete user impact.
+3. Whether normal engine-generated state reaches the failure, including evidence
+   and any unproven step.
+4. The violated order acceptance requirement or explicitly required supported-input
+   boundary.
+
+A source suspicion or hypothetical attack is not a reproduced normal-play defect.
+Distinguish incorrect rules, normal gameplay, genuine save/load/replay, supported
+input validation, and manually modified historical state in the report.
+
+## Separately queued work
+
+Queue deeper tamper resistance and coordinated hand-edited-history findings as
+separate integrity-hardening work when no normal path or necessary supported-input
+boundary is demonstrated. Preserve the reproduction and evidence without claiming
+the queued issue is fixed or that snapshot integrity is universally certified.
+The queue is not authorization to implement or merge that work silently.
+
+Keep review focused on the order's acceptance criteria and affected behavior.
+Expanding implementation or blocking scope requires an explicit decision. A
+reviewer must identify the new scope and why the current acceptance requirement
+cannot be completed locally before asking for expansion.
+
+## Unchanged delivery gates
+
+Preserve required regression tests, positive legal-path controls, truthful source
+evidence, shared engine authority and exact-head validation. This approval removes
+neither the complete local covered behavioral gate nor complete remote CI. Both
+type checkers, all other applicable quality/generated/contract/package gates,
+required behavior shards and coverage thresholds remain mandatory.
+
+Independent coding and fresh parent Astra reviews must be clean under this scoped
+policy on the exact final head. Any subsequent change invalidates stale reviews
+and applicable evidence. This policy grants no merge authorization by itself.
+
+## Required prompt text
+
+Include the following in each subsequent implementation/reviewer prompt and parent
+Astra audit packet, together with the order's explicit acceptance criteria:
+
+> Apply `docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md`. Prioritize the complete
+> playable behavior in this order. Block on incorrect rules, normal legal-play
+> failures, engine-generated valid-state save/load/replay failures, and explicitly
+> required trust-boundary failures. For each blocker provide the reproduced entry
+> path, impact, normal reachability and violated acceptance requirement. Queue
+> coordinated hand-edited-history hardening separately when no necessary supported
+> input boundary or normal path is demonstrated. Keep scope within this order;
+> expansion requires an explicit decision. Preserve positive controls, regression
+> tests, source truthfulness and every required local/remote exact-head gate.
+
+The author must give reviewers the selected source obligations, affected owners,
+consumer paths, supported input boundaries, pending checks and exact base/head.
+Reviewers derive requirements from that evidence rather than treating the author's
+conclusions as approval.
+
+## Subsequent-order model plan and evaluation
+
+Use GPT-6.1 Sol (`gpt-6.1-sol`) with High (`high`) as the default for subsequent
+implementation and separate independent coding review. Leave the active Order101
+configuration undisturbed. Reserve Extra High (`xhigh`) for a specifically
+identified unresolved complex issue; use Ultra (`ultra`) only for an explicitly
+scoped deep audit. Record the issue and requested scope when escalating effort.
+The separate fresh parent Astra audit retains its own required model selection
+and evidence; this Sol plan does not substitute a Sol coding review for Astra.
+
+Verify accepted explicit model/effort selection and retain any limit on resolved
+runtime attestation. Do not silently substitute a model or claim effort tiers have
+independent capacity. No measured speed or quality advantage is asserted here.
+
+For the next few orders, retain timestamped phase transitions and actual command
+durations, review findings and their normal reachability, repair/revalidation
+cycles, invalidated evidence, interruptions and first/final head identities. Track
+elapsed time and rework separately. Concurrent command sums are not wall time;
+unknown active time remains unknown. Evaluate measured results before claiming a
+throughput or quality improvement from this model plan.

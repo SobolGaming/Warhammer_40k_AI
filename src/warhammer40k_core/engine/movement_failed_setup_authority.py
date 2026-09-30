@@ -8,6 +8,9 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.engine.battlefield_state import BattlefieldPlacementKind
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
+from warhammer40k_core.engine.model_ownership_history import (
+    historical_model_ids_by_physical_unit,
+)
 from warhammer40k_core.engine.movement_proposals import (
     MovementProposalRequest,
     PlacementProposalPayload,
@@ -38,6 +41,7 @@ from warhammer40k_core.engine.unit_coherency import (
 )
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.fight_model_authority_history import ModelAuthorityTimeline
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.primary_reserve_entry_provider import (
         PrimaryReserveEntryLifecycleOccurrence,
@@ -56,12 +60,23 @@ def validate_failed_placement_authority(
     records: tuple[DecisionRecord, ...],
     event_index: dict[str, int],
     rollback_order: int,
+    model_history: ModelAuthorityTimeline | None,
 ) -> None:
     """Share reserve authority and close the distinct Disembark producer schema."""
     if rejected.request != proposal.to_decision_request():
         raise GameLifecycleError("Failed setup proposal decision envelope authority drift.")
+    if model_history is None:
+        raise GameLifecycleError("Failed setup requires authenticated model history.")
+    historical_inventory = _validate_failed_setup_physical_authority(
+        state=state,
+        proposal=proposal,
+        submitted=submitted,
+        events=events,
+        records=records,
+        event_index=event_index,
+        model_history=model_history,
+    )
     if proposal.proposal_kind is ProposalKind.DISEMBARK:
-        _validate_disembark_physical_authority(state=state, proposal=proposal, submitted=submitted)
         _validate_disembark_authority(
             state=state,
             proposal=proposal,
@@ -73,6 +88,7 @@ def validate_failed_placement_authority(
             records=records,
             event_index=event_index,
             rollback_order=rollback_order,
+            model_history=model_history,
         )
         return
     validate_primary_reserve_placement_request_authority(
@@ -80,6 +96,7 @@ def validate_failed_placement_authority(
         proposal_request=proposal,
         submitted=submitted,
         expected_owner_id=proposal.actor_id,
+        historical_living_model_ids_by_component=historical_inventory,
     )
     validate_primary_reserve_arrival_request_chain(
         proposal_request=proposal,
@@ -151,12 +168,16 @@ def _validate_reserve_diagnostic(
         raise GameLifecycleError("Failed reserve coherency diagnostic authority drift.")
 
 
-def _validate_disembark_physical_authority(
+def _validate_failed_setup_physical_authority(
     *,
     state: GameState,
     proposal: MovementProposalRequest,
     submitted: PlacementProposalPayload,
-) -> None:
+    events: tuple[EventRecord, ...],
+    records: tuple[DecisionRecord, ...],
+    event_index: dict[str, int],
+    model_history: ModelAuthorityTimeline,
+) -> dict[str, frozenset[str]]:
     views = current_rules_unit_views_for_identity(
         state=state, unit_instance_id=proposal.unit_instance_id
     )
@@ -169,6 +190,27 @@ def _validate_disembark_physical_authority(
     placement = submitted.resolved_rules_unit_placement()
     context = proposal.context or {}
     model_ids = {model.model_instance_id for model in placement.model_placements}
+    requested = _exact_event(
+        events,
+        "decision_requested",
+        validate_json_value(proposal.to_decision_request().to_payload()),
+    )
+    historical_ids = historical_model_ids_by_physical_unit(state)
+    expected_by_component = {
+        component_id: {
+            model_id
+            for model_id in historical_ids[component_id]
+            if model_history.has_living_model_before_event(
+                model_instance_id=model_id,
+                event_index=event_index[requested.event_id],
+            )
+        }
+        for component_id in lineage
+    }
+    expected_components = {
+        component_id for component_id, ids in expected_by_component.items() if ids
+    }
+    expected_models = {model_id for ids in expected_by_component.values() for model_id in ids}
     if (
         placement.rules_unit_instance_id != proposal.unit_instance_id
         or placement.player_id != proposal.actor_id
@@ -176,21 +218,25 @@ def _validate_disembark_physical_authority(
         or context.get("component_unit_instance_ids") != list(placement.component_unit_instance_ids)
         or context.get("model_instance_ids") != sorted(model_ids)
         or not model_ids
+        or set(placement.component_unit_instance_ids) != expected_components
+        or model_ids != expected_models
     ):
-        raise GameLifecycleError("Failed Disembark physical inventory authority drift.")
+        raise GameLifecycleError("Failed setup physical inventory authority drift.")
     for component in placement.component_unit_placements:
         if component.unit_instance_id not in lineage:
-            raise GameLifecycleError("Failed Disembark component lineage authority drift.")
-        army, unit = physical[component.unit_instance_id]
+            raise GameLifecycleError("Failed setup component lineage authority drift.")
+        army = physical[component.unit_instance_id][0]
         if (
             component.army_id != army.army_id
             or component.player_id != army.player_id
             or army.player_id != proposal.actor_id
-            or not {model.model_instance_id for model in component.model_placements}.issubset(
-                {model.model_instance_id for model in unit.own_models}
-            )
+            or {model.model_instance_id for model in component.model_placements}
+            != expected_by_component[component.unit_instance_id]
         ):
-            raise GameLifecycleError("Failed Disembark physical model/owner authority drift.")
+            raise GameLifecycleError("Failed setup physical model/owner authority drift.")
+    return {
+        component_id: frozenset(ids) for component_id, ids in expected_by_component.items() if ids
+    }
 
 
 def validate_failed_reserve_setup_sources(
@@ -239,6 +285,7 @@ def _validate_disembark_authority(
     records: tuple[DecisionRecord, ...],
     event_index: dict[str, int],
     rollback_order: int,
+    model_history: ModelAuthorityTimeline,
 ) -> None:
     context = proposal.context or {}
     expected_keys = {
@@ -297,6 +344,7 @@ def _validate_disembark_authority(
         records=records,
         event_index=event_index,
         selected_order=event_index[selected.event_id],
+        model_history=model_history,
     )
     status = (
         "combat_disembark_placement_invalid"
@@ -322,6 +370,7 @@ def _validate_disembark_request_chain(
     records: tuple[DecisionRecord, ...],
     event_index: dict[str, int],
     selected_order: int,
+    model_history: ModelAuthorityTimeline,
 ) -> None:
     """Walk retained Tactical-available retries without recursive history parsing."""
     upper_order = len(events)
@@ -389,8 +438,14 @@ def _validate_disembark_request_chain(
                 or predecessor.request != previous.to_decision_request()
             ):
                 raise GameLifecycleError("Failed Disembark retry predecessor authority drift.")
-            _validate_disembark_physical_authority(
-                state=state, proposal=previous, submitted=prior_submission
+            _validate_failed_setup_physical_authority(
+                state=state,
+                proposal=previous,
+                submitted=prior_submission,
+                events=events,
+                records=records,
+                event_index=event_index,
+                model_history=model_history,
             )
             expected.update(
                 {
@@ -483,6 +538,38 @@ def _validate_disembark_diagnostic(
     violations = payload.get("violations")
     if not isinstance(violations, list) or not violations:
         raise GameLifecycleError("Failed Disembark diagnostic lacks violations.")
+    submitted = PlacementProposalPayload.from_payload(
+        cast(PlacementProposalPayloadPayload, rejected.result.payload)
+    )
+    placement = submitted.resolved_rules_unit_placement()
+    models = {model.model_instance_id for model in placement.model_placements}
+    units = {proposal.unit_instance_id, *placement.component_unit_instance_ids}
+    ordinary_codes = {
+        TransportOperationViolationCode.TRANSPORT_KEYWORD_REQUIRED,
+        TransportOperationViolationCode.TRANSPORT_DATASHEET_MISMATCH,
+        TransportOperationViolationCode.FRIENDLY_TRANSPORT_REQUIRED,
+        TransportOperationViolationCode.UNIT_NOT_EMBARKED,
+        TransportOperationViolationCode.UNIT_DID_NOT_START_PHASE_EMBARKED,
+        TransportOperationViolationCode.DISEMBARK_DISTANCE,
+        TransportOperationViolationCode.RAPID_DISEMBARK_INGRESS_RESTRICTION,
+        TransportOperationViolationCode.TRANSPORT_ADVANCED_OR_FELL_BACK,
+        TransportOperationViolationCode.ASSAULT_DISEMBARK_PERMISSION_REQUIRED,
+        TransportOperationViolationCode.SHOCK_DISEMBARK_PERMISSION_REQUIRED,
+        TransportOperationViolationCode.SHOCK_DISEMBARK_ENGAGEMENT_SNAPSHOT_DRIFT,
+        TransportOperationViolationCode.TRANSPORT_PLACEMENT_DRIFT,
+        TransportOperationViolationCode.UNIT_PLACEMENT_DRIFT,
+        TransportOperationViolationCode.MODEL_OVERLAP,
+        TransportOperationViolationCode.BATTLEFIELD_EDGE_CROSSED,
+        TransportOperationViolationCode.TERRAIN_ENDPOINT_ILLEGAL,
+        TransportOperationViolationCode.OBJECTIVE_MARKER_ENDPOINT_OVERLAP,
+        TransportOperationViolationCode.ENEMY_ENGAGEMENT_RANGE,
+        TransportOperationViolationCode.UNIT_COHERENCY_BROKEN,
+    }
+    transport_codes = {
+        TransportOperationViolationCode.TRANSPORT_KEYWORD_REQUIRED,
+        TransportOperationViolationCode.TRANSPORT_DATASHEET_MISMATCH,
+        TransportOperationViolationCode.FRIENDLY_TRANSPORT_REQUIRED,
+    }
     for violation in violations:
         if not isinstance(violation, dict):
             raise GameLifecycleError("Failed Disembark diagnostic violation is malformed.")
@@ -494,6 +581,20 @@ def _validate_disembark_diagnostic(
             raise GameLifecycleError("Failed Disembark diagnostic violation is malformed.") from exc
         if violation != typed.to_payload():
             raise GameLifecycleError("Failed Disembark diagnostic violation schema drift.")
+        if status != "combat_disembark_tactical_available" and (
+            typed.violation_code not in ordinary_codes
+            or (typed.model_instance_id is not None and typed.model_instance_id not in models)
+            or (
+                typed.unit_instance_id is not None
+                and typed.unit_instance_id
+                not in (
+                    (context["transport_unit_instance_id"],)
+                    if typed.violation_code in transport_codes
+                    else tuple(units)
+                )
+            )
+        ):
+            raise GameLifecycleError("Failed Disembark diagnostic producer authority drift.")
         if status == "combat_disembark_tactical_available" and (
             len(violations) != 1
             or typed.violation_code
