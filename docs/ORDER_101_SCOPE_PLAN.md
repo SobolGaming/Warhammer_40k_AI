@@ -78,7 +78,7 @@ Its independent pre-freeze retry review found no remaining concrete defect in th
 affected owner. Current isolated measurements completed all 21 Order101 samples in 43.002
 seconds and all 27 inherited workloads with verified report/log hashes and
 unchanged numeric budgets. A progress-file write failed after nine saved
-workloads; those were verified and reused, and only the incomplete tenth receipt
+workloads; those were verified and reused, and only the incomplete row10 receipt
 was repeated before completing the remainder. Successful child-command wall times
 sum to 364.314 seconds; this sum is not an overlapping workflow duration.
 Complete local covered behavior and quality, actual eight-shard hosted CI, and
