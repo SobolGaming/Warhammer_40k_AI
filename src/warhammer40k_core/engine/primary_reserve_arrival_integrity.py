@@ -75,6 +75,8 @@ __all__ = [
     "validate_primary_reserve_arrival_placement_authority",
     "validate_primary_reserve_arrival_request_chain",
     "validate_primary_reserve_arrival_request_source",
+    "validate_primary_reserve_invalid_placement_event",
+    "validate_primary_reserve_placement_request_authority",
 ]
 
 _INITIAL_RESERVE_SOURCE_EVENT_TYPES = frozenset(
@@ -419,7 +421,7 @@ def _validate_placement_retry_predecessor(
         event_records=event_records,
         field_name="Reserve arrival retry predecessor result",
     )
-    _validate_retry_invalid_event(
+    validate_primary_reserve_invalid_placement_event(
         previous_proposal=previous_proposal,
         rejected_submission=rejected_submission,
         rejected_result_id=rejected_result_id,
@@ -438,7 +440,7 @@ def _validate_placement_retry_predecessor(
         raise GameLifecycleError("Reserve arrival retry predecessor ordering drift.")
 
 
-def _validate_retry_invalid_event(
+def validate_primary_reserve_invalid_placement_event(
     *,
     previous_proposal: MovementProposalRequest,
     rejected_submission: PlacementProposalPayload,
@@ -742,19 +744,16 @@ def validate_primary_reserve_arrival_ingress_use_authority(
     )
 
 
-def validate_primary_reserve_arrival_placement_authority(
+def validate_primary_reserve_placement_request_authority(
     *,
     state: GameState,
     proposal_request: MovementProposalRequest,
     submitted: PlacementProposalPayload,
-    transition: BattlefieldTransitionBatch,
     expected_owner_id: str,
 ) -> None:
-    """Re-run immutable request/result and ReserveState placement authority."""
+    """Authenticate request/result authority for accepted and rejected placements."""
     if type(submitted) is not PlacementProposalPayload:
         raise GameLifecycleError("Reserve arrival placement submission is malformed.")
-    if type(transition) is not BattlefieldTransitionBatch:
-        raise GameLifecycleError("Reserve arrival transition is malformed.")
     validation = submitted.validation_result_for_request(proposal_request)
     if not validation.is_valid:
         raise GameLifecycleError("Reserve arrival request/result proposal authority drift.")
@@ -853,7 +852,6 @@ def validate_primary_reserve_arrival_placement_authority(
             )
         if handler_id == GENERIC_RULE_IR_STRATAGEM_HANDLER_ID:
             expected_context_keys.update(("generic_rule_effect", "generic_rule_execution_result"))
-    expected_transition_source_rule_id = source_rule_id_for_placement_kind(submitted.placement_kind)
     expected_component_ids = tuple(sorted(request_components))
     arrival_window_is_current = (
         state.battle_round == proposal_request.battle_round
@@ -929,6 +927,32 @@ def validate_primary_reserve_arrival_placement_authority(
         raise GameLifecycleError(
             "Reserve arrival request ReserveState authority drift: " + ", ".join(drift_fields)
         )
+
+
+def validate_primary_reserve_arrival_placement_authority(
+    *,
+    state: GameState,
+    proposal_request: MovementProposalRequest,
+    submitted: PlacementProposalPayload,
+    transition: BattlefieldTransitionBatch,
+    expected_owner_id: str,
+) -> None:
+    """Re-run immutable request/result and ReserveState placement authority."""
+    if type(submitted) is not PlacementProposalPayload:
+        raise GameLifecycleError("Reserve arrival placement submission is malformed.")
+    if type(transition) is not BattlefieldTransitionBatch:
+        raise GameLifecycleError("Reserve arrival transition is malformed.")
+    validate_primary_reserve_placement_request_authority(
+        state=state,
+        proposal_request=proposal_request,
+        submitted=submitted,
+        expected_owner_id=expected_owner_id,
+    )
+    current_views = current_rules_unit_views_for_identity(
+        state=state, unit_instance_id=proposal_request.unit_instance_id
+    )
+    submitted_rules_unit = submitted.resolved_rules_unit_placement()
+    expected_transition_source_rule_id = source_rule_id_for_placement_kind(submitted.placement_kind)
     if any(
         placement.source_phase != BattlePhase.MOVEMENT.value
         or placement.source_step != "move_units"

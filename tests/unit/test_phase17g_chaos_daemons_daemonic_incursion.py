@@ -7,6 +7,10 @@ from typing import cast
 
 import pytest
 from tests.completed_attack_fixture_helpers import record_attack_completion_for_executor_fixture
+from tests.order101_failed_setup_helpers import (
+    corrupt_failed_setup_authority,
+    reselect_failed_ingress,
+)
 from tests.phase10p_reserves_helpers import (
     base_radius_inches,
     battle_state_with_reserve,
@@ -1619,6 +1623,34 @@ def test_realm_of_chaos_invalid_placement_retry_then_valid_arrival_replays(
     )
 
 
+@pytest.mark.parametrize(
+    "tamper",
+    [
+        "missing_predecessor",
+        "predecessor_authority",
+        "predecessor_order",
+        "missing_invalid_event",
+        "invalid_event_authority",
+        "invalid_event_order",
+        "empty_violations",
+        "missing_source_event",
+        "extra_proposal_context",
+        "wrong_carried_reserve_round",
+        "malformed_violations",
+        "empty_coherency",
+        "outer_request_id",
+    ],
+)
+def test_realm_failed_setup_rejects_historical_authority_tamper(
+    phase17n_realm_retry_payload: GameLifecyclePayload,
+    tamper: str,
+) -> None:
+    payload = deepcopy(phase17n_realm_retry_payload)
+    corrupt_failed_setup_authority(payload, tamper=tamper)
+    with pytest.raises(GameLifecycleError):
+        GameLifecycle.from_payload(payload)
+
+
 @pytest.fixture(scope="module")
 def phase17n_realm_arrival_payload() -> GameLifecyclePayload:
     lifecycle = _config_backed_realm_of_chaos_lifecycle()
@@ -1886,19 +1918,19 @@ def test_realm_of_chaos_replay_rejects_arrival_source_and_event_order_tamper(
         ("invalid_event_order", "retry invalid event ordering drift"),
     ],
 )
-def test_realm_of_chaos_replay_rejects_arrival_retry_chain_tamper(
-    phase17n_realm_retry_payload: GameLifecyclePayload,
+def test_rapid_ingress_replay_rejects_arrival_retry_chain_tamper(
+    phase17n_rapid_ingress_retry_payload: GameLifecyclePayload,
     tamper_kind: str,
     error_match: str,
 ) -> None:
-    payload: GameLifecyclePayload = deepcopy(phase17n_realm_retry_payload)
+    payload: GameLifecyclePayload = deepcopy(phase17n_rapid_ingress_retry_payload)
     final_decision = _decision_record_payload_for_result(
         payload,
-        result_id="phase17n-realm-arrival-retry-place",
+        result_id="phase17n-rapid-ingress-retry:placement",
     )
     rejected_decision = _decision_record_payload_for_result(
         payload,
-        result_id="phase17n-realm-arrival-retry-invalid",
+        result_id="phase17n-rapid-ingress-retry:invalid",
     )
     final_request_id = final_decision["request"]["request_id"]
     rejected_request_id = rejected_decision["request"]["request_id"]
@@ -1909,7 +1941,7 @@ def test_realm_of_chaos_replay_rejects_arrival_retry_chain_tamper(
     )
     invalid_event = _event_record_for_result_id(
         payload,
-        event_type="reinforcement_placement_invalid",
+        event_type="rapid_ingress_placement_invalid",
         result_id=rejected_decision["result"]["result_id"],
     )
 
@@ -3874,9 +3906,13 @@ def _arrive_realm_target_from_reserves(
         )
         if invalid_status is None or invalid_status.status_kind is not LifecycleStatusKind.INVALID:
             raise AssertionError("test requires one rejected reserve placement")
-        placement_request = decisions.queue.peek_next()
-        if placement_request.decision_type != PLACEMENT_PROPOSAL_DECISION_TYPE:
-            raise AssertionError("test requires one retry placement request")
+        placement_request = reselect_failed_ingress(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            unit_id=reserve_state.unit_instance_id,
+            result_id_prefix=result_id_prefix,
+        )
     submit_reserve_placement_payload(
         handler=handler,
         state=state,

@@ -1,0 +1,8 @@
+{
+  "workload": "order101-failed-setup-restore-view-replay-v1",
+  "mean_ratio": 1.2,
+  "mean_additive_seconds": 0.05,
+  "maximum_seconds": 3.0,
+  "rationale": "Matched provisional Mac base means are 1.11 seconds for each cargo case and 1.95 seconds for loaded Deep Strike, with maxima below 1.18 and 1.97 seconds. Allow 20 percent plus 50 milliseconds for serial host variability while requiring every sample below three seconds. This component limit is not a full-game bound. Retain all seven samples per hard case and the incorrect base solely as a cost comparison.",
+  "full_game_certified": false
+}

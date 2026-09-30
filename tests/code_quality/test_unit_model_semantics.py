@@ -566,7 +566,7 @@ def test_p19_semantic_consumers_use_central_living_component_authority() -> None
         ),
         (
             PRIMARY_RESERVE_ARRIVAL_INTEGRITY,
-            ("validate_primary_reserve_arrival_placement_authority",),
+            ("validate_primary_reserve_placement_request_authority",),
         ),
     ):
         for function_name in function_names:
@@ -580,6 +580,22 @@ def test_p19_semantic_consumers_use_central_living_component_authority() -> None
             assert "components" not in attribute_names, (
                 f"{path.relative_to(ROOT)}:{function_name} scans immutable lineage components."
             )
+
+    for path, function_name in (
+        (PRIMARY_RESERVE_ARRIVAL_INTEGRITY, "validate_primary_reserve_arrival_placement_authority"),
+        (ENGINE / "movement_failed_setup_authority.py", "validate_failed_placement_authority"),
+    ):
+        function = _function_node(path=path, function_name=function_name)
+        calls = tuple(
+            node
+            for node in ast.walk(function)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "validate_primary_reserve_placement_request_authority"
+        )
+        assert len(calls) == 1, (
+            f"{path.relative_to(ROOT)}:{function_name} bypasses shared reserve placement authority."
+        )
 
     for path in sorted(ENGINE.rglob("*.py")):
         assert "keyword_contributing_components" not in path.read_text(encoding="utf-8"), (

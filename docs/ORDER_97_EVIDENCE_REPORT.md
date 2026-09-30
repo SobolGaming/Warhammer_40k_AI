@@ -10,7 +10,7 @@ Assertion-bound includes qualified and negative evidence; it does not mean the c
 |---|---:|---:|---:|
 | 01 | 143 | 140 | 3 |
 | 02 | 100 | 95 | 5 |
-| 03 | 62 | 55 | 10 |
+| 03 | 62 | 57 | 8 |
 | 04 | 63 | 60 | 3 |
 | 05 | 82 | 82 | 0 |
 | 06 | 34 | 32 | 3 |
@@ -2365,37 +2365,37 @@ Owners: `src/warhammer40k_core/engine/deployment.py:resolve_deployment_placement
 
 Source `rule:03:03.02:1`, blocks [6]: Failure to set up every required model restores the entire unit to its prior location.
 
-Owners: `src/warhammer40k_core/engine/phases/movement_transports.py:_resolve_disembark_placement_submission`.
+Owners: `src/warhammer40k_core/engine/movement_setup_failure.py:restore_failed_setup_selection`, `src/warhammer40k_core/engine/movement_setup_failure.py:validate_failed_setup_history`, `src/warhammer40k_core/engine/movement_selection_history.py:MovementSelectionHistory.assert_projection`.
 
-`tests/unit/test_order55_disembark.py::test_oversized_disembark_facade_retry_restore_and_exact_replay` (facade: Rejecting an attempted complete disembark leaves the entire cargo unit off the battlefield and offers a fresh placement request.)
+`tests/unit/test_order101_setup_failure.py::test_failed_disembark_restores_selected_to_move_and_prior_location` (facade: Complete rejected setup leaves the entire cargo unit at its prior off-battlefield location, including a 100-inch base that cannot fit at any orientation.); `tests/unit/test_order101_setup_failure.py::test_failed_disembark_restores_selected_to_move_and_prior_location` (facade: Rejected setup retains prior embarked cargo state.); `tests/unit/test_order101_setup_failure.py::test_failed_attached_setup_preserves_every_embarked_component_and_replays` (facade: The attached bodyguard and Leader retain the entire previous cargo state; malformed partial-component submission is atomic.); `tests/unit/test_order101_setup_failure.py::test_failed_ingress_restores_reserve_and_loaded_cargo_reselection` (facade: Deep Strike and Strategic Reserve ingress retain prior reserve and loaded-cargo locations.)
 
 Required before PFINAL: **C03-06 / P03F**.
 
-Qualification: Physical rollback is proven. The associated selected-to-move reset failure is tracked by C03-06/P03F and the precise 03.02.01 obligations; this assertion does not claim eligibility reset.
+Qualification: Order 101 closes the ordinary move-type setup gap. Deployment, mandatory destroyed-Transport setup, revival, and reactive ingress retain their distinct continuations; this evidence does not certify those broader rule families.
 
 ### 03.02.01-obligation-01
 
 Source `rule:03:03.02.01:1`, blocks [1]: A failed complete setup does not consume selected-to-move status.
 
-Owners: `src/warhammer40k_core/engine/phases/movement_transports.py:_resolve_disembark_placement_submission`.
+Owners: `src/warhammer40k_core/engine/movement_setup_failure.py:restore_failed_setup_selection`, `src/warhammer40k_core/engine/movement_setup_failure.py:validate_failed_setup_history`, `src/warhammer40k_core/engine/movement_selection_history.py:MovementSelectionHistory.assert_projection`.
 
-**Evidence gap; prerequisite repair required.**
+`tests/unit/test_order101_setup_failure.py::test_failed_disembark_restores_selected_to_move_and_prior_location` (facade: A rejected complete ordinary setup restores selected-to-move status for both retryable and globally impossible 100-inch cargo bases.); `tests/unit/test_order101_setup_failure.py::test_failed_disembark_restores_selected_to_move_and_prior_location` (facade: Failed setup does not consume an activation.); `tests/unit/test_order101_setup_failure.py::test_failed_setup_keeps_another_units_completed_activation` (invalid: Restore rejects coordinated forged snapshots that erase another unit's already completed activation.); `tests/unit/test_order101_setup_failure.py::test_repeated_failure_cannot_reuse_previous_selection_or_rejection` (invalid: Repeated failed setups authenticate the latest selection and exact rejected decision closure, rejecting superseded authority.)
 
 Required before PFINAL: **C03-06 / P03F**.
 
-Qualification: Evidence gap: Real facade. A 100in base cannot fit within the 44x60in battlefield at any orientation, making complete placement impossible. The invalid result keeps cargo unplaced but retains selection and exposes only placement retry. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding failed-setup-retains-selected-move.
+Qualification: Order 101 closes C03-06/P03F for ordinary Movement-phase disembark and reserve Ingress. Historical Order 97 negative probe JSON remains unchanged discovery evidence.
 
 ### 03.02.01-obligation-02
 
 Source `rule:03:03.02.01:1`, blocks [1]: A unit whose setup failed may later retry or remain stationary.
 
-Owners: `src/warhammer40k_core/engine/phases/movement_transports.py:_resolve_disembark_placement_submission`.
+Owners: `src/warhammer40k_core/engine/movement_setup_failure.py:restore_failed_setup_selection`, `src/warhammer40k_core/engine/movement_setup_failure.py:validate_failed_setup_history`, `src/warhammer40k_core/engine/movement_selection_history.py:MovementSelectionHistory.assert_projection`.
 
-**Evidence gap; prerequisite repair required.**
+`tests/unit/test_order101_setup_failure.py::test_failed_disembark_restores_selected_to_move_and_prior_location` (facade: Fresh reselection exposes legal retry and Remain Stationary through existing finite decision authority.); `tests/unit/test_order101_setup_failure.py::test_failed_setup_reselection_restore_both_viewers_and_exact_replay` (facade: Reselected unit accepts a legal complete setup after a rejected first attempt, using the same shared live/restore facade.); `tests/unit/test_order101_setup_failure.py::test_failed_setup_reselection_restore_both_viewers_and_exact_replay` (facade: Live and restored continuations agree after retry, Remain Stationary, or selecting another legal unit.)
 
 Required before PFINAL: **C03-06 / P03F**.
 
-Qualification: Evidence gap: Real facade. A 100in base cannot fit within the 44x60in battlefield at any orientation, making complete placement impossible. The invalid result keeps cargo unplaced but retains selection and exposes only placement retry. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding failed-setup-retains-selected-move.
+Qualification: Order 101 exercises retry, Remain Stationary, another-unit selection, both viewers, restore, and exact replay. A failed setup does not grant unavailable actions or reactive movement.
 
 ### 03.02.02-obligation-01
 

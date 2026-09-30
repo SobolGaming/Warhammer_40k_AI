@@ -58,7 +58,7 @@
     },
     {
       "path": "data/source_audits/order97/categories/03.json",
-      "sha256": "77b39062d06291303cd205f4ed908077711449a9bd5b94bc6f597facd99e02d4"
+      "sha256": "1e5f98b23d3e0dbad9cfcff967c54b02aae899c93cfa500528d6c65b6d7d3cbe"
     },
     {
       "path": "data/source_audits/order97/categories/04.json",
@@ -206,7 +206,7 @@
     },
     {
       "path": "src/warhammer40k_core/_engine_build_manifest.json",
-      "sha256": "6b0aac3dc5d43758a83aa8ba36c0939b66420d5a046f7bbbe04244a487ae1129"
+      "sha256": "9ff8509f0cda5c6442e356bd3f2b8222bb9d5854ecdbaad80abd16c5e353b529"
     },
     {
       "path": "tests/absent_strength_helpers.py",
@@ -411,6 +411,10 @@
     {
       "path": "tests/optional_shooting_helpers.py",
       "sha256": "4d2663d282dac38329584deb9383bad1ba46425ef881851727a4c09c61d953e0"
+    },
+    {
+      "path": "tests/order101_failed_setup_helpers.py",
+      "sha256": "e4e5496ac33fb9dcfdd74dc2207c23f1671c96be5476f44ce4f0ce77cabb1a06"
     },
     {
       "path": "tests/order32_visibility_helpers.py",
@@ -745,6 +749,10 @@
       "sha256": "dfa892f6486c3d29d09e8f0b7c6a7c5ce1df7f688071f9f652be22e24d610e89"
     },
     {
+      "path": "tests/unit/test_order101_setup_failure.py",
+      "sha256": "3b591690ba8b782c0908f9a561078183be8eb79aba1f68fe860c50aa1934229d"
+    },
+    {
       "path": "tests/unit/test_order36_sequencing.py",
       "sha256": "8b2554966c3956d45e6554841b298e4d23b9612396116f0c8528600f2fd1a1f3"
     },
@@ -766,7 +774,7 @@
     },
     {
       "path": "tests/unit/test_order55_disembark.py",
-      "sha256": "2b93c0b14a1642bf197fb241ae61d74f1ded0e6c5dcb2796740e372209bccdaf"
+      "sha256": "b65f2ac8930433901ed2ffd1f326eb70cc900942e82cdf279a48edfee6ff9152"
     },
     {
       "path": "tests/unit/test_order57_destroyed_referent_measurement.py",
@@ -790,7 +798,7 @@
     },
     {
       "path": "tests/unit/test_order63_reserve_transports.py",
-      "sha256": "c30145b3609b822d95403398a24039cedf843643653ad068ab954f293d39bfc7"
+      "sha256": "5f2a9ffabbcad0a7d8e17f88b1c0e2333d749819bb10efe6b851a6bd9282cdd3"
     },
     {
       "path": "tests/unit/test_order64_reserve_lifetimes.py",
@@ -1058,7 +1066,7 @@
     },
     {
       "path": "tests/unit/test_phase17g_chaos_daemons_daemonic_incursion.py",
-      "sha256": "3148de4e08cfb82edb8a31ce30631c980af0c4c1d7ea082f546fcda57c322ac6"
+      "sha256": "d32972995f8b0f9941dd1278445b1e23b5acd998f6ef99288422af81b170defb"
     },
     {
       "path": "tests/unit/test_phase17g_chaos_daemons_shadow_legion.py",

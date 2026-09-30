@@ -907,7 +907,7 @@ def test_placement_proposal_tuple_contracts_are_fail_fast() -> None:
         )
 
 
-def test_invalid_placement_proposal_returns_invalid_without_mutation() -> None:
+def test_invalid_placement_proposal_preserves_location_and_restores_selection() -> None:
     state, reserve_state, reserve_unit = _battle_state_with_reserve()
     before = state.battlefield_state.to_payload() if state.battlefield_state is not None else None
     handler, decisions, selection_request = _enter_reinforcements_choice(state=state)
@@ -948,14 +948,13 @@ def test_invalid_placement_proposal_returns_invalid_without_mutation() -> None:
     assert len(decisions.records) == before_record_count + 1
     pending_requests = decisions.queue.pending_requests
     assert len(pending_requests) == 1
-    retry_proposal = MovementProposalRequest.from_decision_request_payload(
-        pending_requests[0].payload
-    )
-    assert retry_proposal.request_id != proposal.request_id
-    assert retry_proposal.proposal_kind is proposal.proposal_kind
-    assert retry_proposal.unit_instance_id == proposal.unit_instance_id
-    assert retry_proposal.source_decision_request_id == proposal.source_decision_request_id
-    assert retry_proposal.source_decision_result_id == proposal.source_decision_result_id
+    assert pending_requests[0].decision_type == "select_movement_unit"
+    assert pending_requests[0].request_id != proposal.request_id
+    assert proposal.unit_instance_id in {option.option_id for option in pending_requests[0].options}
+    assert state.movement_phase_state is not None
+    assert proposal.unit_instance_id not in state.movement_phase_state.selected_unit_ids
+    assert proposal.unit_instance_id not in state.movement_phase_state.moved_unit_ids
+    assert state.movement_phase_state.active_selection is None
 
 
 def test_malformed_placement_proposal_payload_returns_typed_invalid_without_mutation() -> None:

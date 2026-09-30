@@ -6323,6 +6323,34 @@ family is added. The current contract covers these payloads; only the authoritat
 runtime identity and its generated examples change. Restore and replay retain
 exact base/hull geometry and selections and use the same engine submission path.
 
+## Order 101: failed move-type setup recovery
+
+Order 101 / P03F changes the continuation after a well-formed rule-invalid
+ordinary Disembark or reserve Ingress setup. The entire unit stays at its prior
+location and its unresolved selected-to-move status is cancelled. A fresh
+existing `select_movement_unit` request allows legal reselection or another unit.
+Reselecting the failed unit emits the ordinary `select_movement_action` options,
+including legal Remain Stationary and another setup. Retry uses fresh recorded
+unit/action/proposal decisions. It does not submit directly against the rejected
+placement request.
+
+The engine emits `movement_setup_failed` with the unit, phase occurrence,
+selection/request/result IDs, preceding invalid-event ID and immutable selected
+source-observation identity. Its before/after movement snapshots are internal
+restore authority and are removed by the shared redaction module for public
+event/status/transport payloads. Public event consumers retain the source and
+decision IDs. No new decision type, finite option family, proposal kind or
+placement payload field is introduced. Stale, malformed and context-drift
+submissions remain atomic pre-record rejections and retain their current pending
+proposal and selection. A Combat Disembark diagnostic that Tactical placement
+is available retains its existing proposal retry; it is not a failed setup.
+
+Restore authenticates failed-setup receipts against recorded decisions and
+invalid-placement events, then verifies later selection rights. Both viewers and
+exact replay use this same engine continuation. Deployment, mandatory destroyed
+Transport/emergency placement, reactive or Stratagem ingress, and revival do not
+gain ordinary movement selection rights from this change.
+
 ## Order 57: measuring to a destroyed model or unit
 
 Order 57 / P05C adds no player-facing decision, option family, proposal kind, or

@@ -104,6 +104,9 @@ _INTERNAL_INGRESS_AUTHORITY_KEYS = frozenset(
 _INTERNAL_REVIVAL_AUTHORITY_KEYS = frozenset(
     {"revival_location", "off_battlefield_revival_history_origin"}
 )
+_INTERNAL_FAILED_SETUP_AUTHORITY_KEYS = frozenset(
+    {"movement_phase_state_before", "movement_phase_state_after"}
+)
 _INTERNAL_BASE_CONTACT_AUTHORITY_KEYS = frozenset(
     {"base_contact_query", "movement_query", "without_overhang_witness"}
 )
@@ -842,6 +845,7 @@ def _without_internal_authority_commitments(value: JsonValue) -> JsonValue:
                 | _INTERNAL_TARGET_REPLACEMENT_AUTHORITY_KEYS
                 | _INTERNAL_BASE_CONTACT_AUTHORITY_KEYS
                 | _INTERNAL_REVIVAL_AUTHORITY_KEYS
+                | _INTERNAL_FAILED_SETUP_AUTHORITY_KEYS
             )
         }
     if isinstance(value, list):

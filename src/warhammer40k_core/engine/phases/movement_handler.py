@@ -360,20 +360,7 @@ class MovementPhaseHandler:
                 decisions=decisions,
             )
 
-        request = DecisionRequest(
-            request_id=state.next_decision_request_id(),
-            decision_type=SELECT_MOVEMENT_UNIT_DECISION_TYPE,
-            actor_id=_active_player_id(state),
-            payload={
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "phase": BattlePhase.MOVEMENT.value,
-                "active_player_id": _active_player_id(state),
-                "source_rule_id": core_movement_phase_2026_08.MOVE_UNITS_STEP_SOURCE_ID,
-            },
-            options=_movement_unit_options(candidates=unit_candidates),
-        )
-        decisions.request_decision(request)
+        request = request_movement_unit_selection(state=state, decisions=decisions)
         return LifecycleStatus.waiting_for_decision(
             stage=GameLifecycleStage.BATTLE,
             decision_request=request,
@@ -731,6 +718,33 @@ class MovementPhaseHandler:
             },
         )
         return None
+
+
+def request_movement_unit_selection(
+    *, state: GameState, decisions: DecisionController
+) -> DecisionRequest:
+    """Ordinary selection and failed setup recovery share one finite authority."""
+    movement_state = state.movement_phase_state
+    if movement_state is None or movement_state.active_selection is not None:
+        raise GameLifecycleError("Movement unit request requires no active selection.")
+    candidates = _movement_unit_candidates(state=state, movement_state=movement_state)
+    if not candidates:
+        raise GameLifecycleError("Movement unit request requires legal candidates.")
+    request = DecisionRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+        actor_id=_active_player_id(state),
+        payload={
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.MOVEMENT.value,
+            "active_player_id": _active_player_id(state),
+            "source_rule_id": core_movement_phase_2026_08.MOVE_UNITS_STEP_SOURCE_ID,
+        },
+        options=_movement_unit_options(candidates=candidates),
+    )
+    decisions.request_decision(request)
+    return request
 
 
 def _complete_move_units_step(
