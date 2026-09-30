@@ -206,7 +206,7 @@
     },
     {
       "path": "src/warhammer40k_core/_engine_build_manifest.json",
-      "sha256": "a98b92d0af7f30b91a93b1075515f4b08907abd2167caac7aa2a0b28bff009bf"
+      "sha256": "6b0aac3dc5d43758a83aa8ba36c0939b66420d5a046f7bbbe04244a487ae1129"
     },
     {
       "path": "tests/absent_strength_helpers.py",

@@ -267,6 +267,11 @@ DIRECT_ENGAGEMENT_RANGE_CALL_ALLOWLIST: Counter[tuple[str, str]] = Counter(
             "src/warhammer40k_core/geometry/collision.py",
             "engagement_query",
         ): 1,
+        # FRAME measurement delegates engagement to each subject's own base check.
+        (
+            "src/warhammer40k_core/geometry/volume.py",
+            "is_within_engagement_range",
+        ): 1,
         (
             "src/warhammer40k_core/geometry/pathing.py",
             "_models_are_in_enemy_engagement_range",

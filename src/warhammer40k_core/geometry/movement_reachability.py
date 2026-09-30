@@ -221,6 +221,23 @@ def _orbit_parts(model: Model) -> tuple[_OrbitPart, ...]:
     return tuple(parts)
 
 
+def _fixed_footprint_gap(anchor: Pose, target: Model) -> float:
+    """Distance from an anchor to a fixed target footprint.
+
+    The mover may rotate. The target does not, so a non-circular target keeps
+    its actual footprint instead of a facing-independent enclosing disk.
+    """
+
+    if type(target.base) is CircularBase:
+        return anchor.distance_2d_to(target.pose) - target.base.radius
+    return shapely_backend.base_footprint_distance_to_point(
+        target.base,
+        target.pose,
+        x=anchor.position.x,
+        y=anchor.position.y,
+    )
+
+
 def _fixed_measurement_parts(model: Model) -> tuple[Model, ...]:
     if model.measures_every_part and model.body_parts:
         return model.rules_distance_subjects()
@@ -234,10 +251,7 @@ def _anchored_pair_bound(
     goal: MovementGoal,
     ignores_vertical_distance: bool,
 ) -> float:
-    horizontal = max(
-        0.0,
-        anchor.distance_2d_to(target.pose) - mover.orbit - mover.radius - target.base.max_radius(),
-    )
+    horizontal = max(0.0, _fixed_footprint_gap(anchor, target) - mover.orbit - mover.radius)
     target_bottom, target_top = target.volume.vertical_interval(target.pose)
     vertical = (
         0.0
@@ -339,7 +353,9 @@ def _fixed_target_horizontal_lower_bound(source: Model, target: Model) -> float:
     if targets[0] is not target:
         target = targets[0]
     if type(source.base) is CircularBase:
-        return source.rules_horizontal_distance_to(target)
+        if source.measures_every_part:
+            return source.rules_horizontal_distance_to(target)
+        return source.base_distance_to(target)
     if type(target.base) is CircularBase:
         center_distance = source.pose.distance_2d_to(target.pose) - target.base.radius
     else:

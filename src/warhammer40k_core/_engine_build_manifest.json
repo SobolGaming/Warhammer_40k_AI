@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bff8549c09ceba3f48f8cbcc1e9ca39bcb2cfb270fa7d72a9498d4caecb8f54f",
-  "fingerprint": "bff8549c09ceba3f48f8cbcc1e9ca39bcb2cfb270fa7d72a9498d4caecb8f54f",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:03db16dacfdb6152c4f6b841cab170561348f4ee29d60b581ce3215c6ab15765",
+  "fingerprint": "03db16dacfdb6152c4f6b841cab170561348f4ee29d60b581ce3215c6ab15765",
   "resource_count": 3036,
   "resources": [
     {
@@ -13190,9 +13190,9 @@
       "sha256": "078a8472be1f06f2edd6dd4bcfa61304b26e5265de6bc967fbfe0053ee381c8e"
     },
     {
-      "byte_length": 31051,
+      "byte_length": 31660,
       "path": "warhammer40k_core/geometry/movement_reachability.py",
-      "sha256": "ffafc8f5c6978dc0bee1b95796ec0a8233d3c634d04800631e62e126f5fee3fe"
+      "sha256": "d106d14bb1f018a34e920fa4e36569f9a800395b33d491361cbe57cc30345a4b"
     },
     {
       "byte_length": 2016,
