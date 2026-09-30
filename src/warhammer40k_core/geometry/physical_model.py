@@ -1,4 +1,8 @@
-"""Shared body-aware physical queries; ordinary rules distances still use bases."""
+"""Shared body-aware physical queries.
+
+Ordinary rules distances use the support base. A model marked to measure every
+part, used for based FRAME models, contributes its body prisms as well.
+"""
 
 from __future__ import annotations
 

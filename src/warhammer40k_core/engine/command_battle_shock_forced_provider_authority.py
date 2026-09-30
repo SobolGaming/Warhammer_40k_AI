@@ -60,7 +60,6 @@ from warhammer40k_core.engine.primary_mission_boundary_physical_authority import
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.volume import Model as GeometryModel
-from warhammer40k_core.geometry.volume import ModelVolume
 from warhammer40k_core.rules.rule_ir import RuleEffectSpec, RuleEffectSpecPayload, RuleIRError
 
 if TYPE_CHECKING:
@@ -567,7 +566,7 @@ def _harbingers_forced_target_ids(
         )
         for unit_id, target_models in candidate_models.items():
             if any(
-                source.base_distance_to(target) <= aura_range
+                source.rules_horizontal_distance_to(target) <= aura_range
                 for source in source_models
                 for target in target_models
             ):
@@ -896,6 +895,8 @@ def _geometry_models(
     model_ids: tuple[str, ...],
     physical_rows: tuple[PhysicalModelAuthority, ...],
 ) -> tuple[GeometryModel, ...]:
+    from warhammer40k_core.engine.battlefield_state import geometry_model_at_pose
+
     physical_by_id = _physical_by_id(physical_rows)
     models_by_id = _models_by_id(state)
     geometries: list[GeometryModel] = []
@@ -906,14 +907,7 @@ def _geometry_models(
         model = models_by_id.get(model_id)
         if model is None or row is None or row.pose is None:
             raise GameLifecycleError("Command forced-test model identity authority drifted.")
-        geometries.append(
-            GeometryModel(
-                model_id=model_id,
-                pose=row.pose,
-                base=model.geometry.base_shape(),
-                volume=ModelVolume(height=model.geometry.height_inches),
-            )
-        )
+        geometries.append(geometry_model_at_pose(model=model, pose=row.pose))
     return tuple(geometries)
 
 

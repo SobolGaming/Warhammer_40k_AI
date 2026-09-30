@@ -368,6 +368,7 @@ def _model_at_pose(model: Model, pose: Pose) -> Model:
         base=model.base,
         volume=model.volume,
         body_parts=model.body_parts,
+        measures_every_part=model.measures_every_part,
     )
 
 

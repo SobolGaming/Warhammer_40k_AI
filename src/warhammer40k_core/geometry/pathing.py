@@ -1670,9 +1670,10 @@ class PathQuery:
             metrics.sampled_pose_count += len(sampled_path)
             for sampled_index, sampled_pose in enumerate(sampled_path):
                 sampled_model = _model_at_pose(current_model, sampled_pose)
+                collision_model = sampled_model
                 if sampled_index != len(sampled_path) - 1:
-                    sampled_model = replace(sampled_model, body_parts=())
-                model_collision = self.collision_set.model_collision_query(sampled_model)
+                    collision_model = replace(sampled_model, body_parts=())
+                model_collision = self.collision_set.model_collision_query(collision_model)
                 metrics.model_collision_broadphase_check_count += (
                     model_collision.broadphase_check_count
                 )
@@ -1685,7 +1686,7 @@ class PathQuery:
                         blocker_id=model_collision.blocker_ids[0],
                         metrics=metrics.to_metrics(),
                     )
-                terrain_collision = self.collision_set.terrain_collision_query(sampled_model)
+                terrain_collision = self.collision_set.terrain_collision_query(collision_model)
                 metrics.terrain_collision_broadphase_check_count += (
                     terrain_collision.broadphase_check_count
                 )

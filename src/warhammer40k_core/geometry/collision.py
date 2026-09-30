@@ -454,10 +454,28 @@ def _engagement_broadphase_match(
     horizontal_inches: float,
     vertical_inches: float,
 ) -> bool:
-    if _model_vertical_gap(moving_model, blocker) > vertical_inches:
+    if _rules_engagement_vertical_gap(moving_model, blocker) > vertical_inches:
         return False
     return _model_center_distance(moving_model, blocker) <= (
-        moving_model.base.max_radius() + blocker.base.max_radius() + horizontal_inches
+        _rules_engagement_radius(moving_model)
+        + _rules_engagement_radius(blocker)
+        + horizontal_inches
+    )
+
+
+def _rules_engagement_radius(model: Model) -> float:
+    if model.measures_every_part:
+        return physical_radius(model)
+    return model.base.max_radius()
+
+
+def _rules_engagement_vertical_gap(first: Model, second: Model) -> float:
+    if not first.measures_every_part and not second.measures_every_part:
+        return _model_vertical_gap(first, second)
+    return min(
+        subject.volume.vertical_gap_to(subject.pose, other.volume, other.pose)
+        for subject in first.rules_distance_subjects()
+        for other in second.rules_distance_subjects()
     )
 
 

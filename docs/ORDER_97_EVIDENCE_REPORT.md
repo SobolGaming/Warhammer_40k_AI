@@ -8,7 +8,7 @@ Assertion-bound includes qualified and negative evidence; it does not mean the c
 
 | Category | Operative requirements | Assertion-bound | Explicit repair/proof gaps |
 |---|---:|---:|---:|
-| 01 | 143 | 139 | 4 |
+| 01 | 143 | 140 | 3 |
 | 02 | 100 | 95 | 5 |
 | 03 | 62 | 55 | 10 |
 | 04 | 63 | 60 | 3 |
@@ -20,11 +20,11 @@ Assertion-bound includes qualified and negative evidence; it does not mean the c
 | 10 | 29 | 29 | 0 |
 | 11 | 23 | 23 | 0 |
 | 12 | 48 | 45 | 3 |
-| 13 | 33 | 27 | 6 |
+| 13 | 33 | 28 | 5 |
 | 14 | 15 | 14 | 1 |
 | 15 | 82 | 82 | 0 |
 | 16 | 14 | 12 | 2 |
-| 17 | 7 | 5 | 2 |
+| 17 | 7 | 6 | 1 |
 | 18 | 57 | 56 | 2 |
 | 19 | 17 | 16 | 1 |
 | 20 | 24 | 24 | 1 |
@@ -52,7 +52,6 @@ Assertion-bound includes qualified and negative evidence; it does not mean the c
 
 ## Required follow-ups before PFINAL
 
-- **C17-02 / P17B:** Measure every part of a based FRAME model for whole-distance, Engagement Range and terrain-area membership. Current consumers use only the support base despite a larger body. Repair the shared geometric owner and its range, objective, movement, terrain and placement consumers.
 - **C03-06 / P03F:** An impossible complete setup leaves the unit selected and trapped in placement retries. Restore selected-to-move eligibility as required, preserve its prior location, and expose legal reselection/Remain Stationary/retry through shared facade authority, historical restore and replay.
 - **C04-07 / P04F:** A weaponless Fight activation emits unit_has_fought despite resolving no melee attacks. Separate selection completion from actual fought status across ordinary and retained hosts without allowing an extra activation; authenticate the distinction in effects, restore, viewers and replay.
 - **C04-08 / P04G:** PRECISION unnecessarily separates otherwise identical attacks against a rules unit with no CHARACTER. Make shared grouping depend on applicable effects against the selected target, preserving deterministic group identity, physical weapons and target replacement.
@@ -864,13 +863,11 @@ Owners: `src/warhammer40k_core/geometry/measurement.py:DistancePredicateEvaluato
 
 Source `rule:01:01.04.01:1`, blocks [4]: FRAME wholly-within measurement includes every part of the model.
 
-Owners: `src/warhammer40k_core/geometry/measurement.py:DistanceMeasurementContext.target_wholly_within_distance`.
+Owners: `src/warhammer40k_core/geometry/measurement.py:DistanceMeasurementContext.target_wholly_within_distance`, `src/warhammer40k_core/geometry/volume.py:Model.rules_distance_subjects`.
 
-**Evidence gap; prerequisite repair required.**
+`tests/unit/test_order100_frame_measurement.py::test_based_frame_wholly_within_includes_every_part` (semantic: An 8.5-inch wholly-within check fails because the based FRAME body extends beyond the distance that contains its support base.); `tests/unit/test_order100_frame_measurement.py::test_based_frame_wholly_within_includes_every_part` (semantic: Disembark whole-distance placement rejects a based FRAME body that extends outside the distance containing its support base.); `tests/unit/test_order100_frame_measurement.py::test_frame_wholly_within_rejects_a_tall_body_inside_the_horizontal_buffer` (semantic: A tall FRAME body whose footprint fits a three-inch horizontal buffer is still outside the three-dimensional distance.); `tests/unit/test_order100_frame_measurement.py::test_frame_wholly_within_rejects_a_tall_body_inside_the_horizontal_buffer` (semantic: The same support base without FRAME measurement remains wholly within three inches.); `tests/unit/test_order100_frame_measurement.py::test_cooperating_frame_parts_leave_an_uncovered_interior_height` (semantic: Source parts that cover the target ends still leave an interior height outside one inch.); `tests/unit/test_order100_frame_measurement.py::test_frame_source_preserves_ordinary_target_support_base_containment` (semantic: Marking the source FRAME, without changing its geometry, keeps ordinary support-base containment.); `tests/unit/test_order100_frame_measurement.py::test_frame_source_preserves_ordinary_target_support_base_containment` (semantic: The ordinary source and ordinary target are wholly within three inches.); `tests/unit/test_order100_frame_measurement.py::test_frame_main_prism_uses_full_height_containment_without_extra_body_parts` (semantic: An ordinary target of the same main prism remains wholly within three inches.); `tests/unit/test_order100_frame_measurement.py::test_frame_main_prism_uses_full_height_containment_without_extra_body_parts` (semantic: A FRAME target whose only prism is its main body fails three-inch containment at its top.); `tests/unit/test_order100_frame_measurement.py::test_frame_main_prism_uses_full_height_containment_without_extra_body_parts` (semantic: Adding a duplicate of that main prism does not change the FRAME result.); `tests/unit/test_order100_frame_measurement.py::test_frame_main_prism_uses_full_height_containment_without_extra_body_parts` (semantic: The single-prism FRAME rejection survives a measurement-context payload round trip.)
 
-Required before PFINAL: **C17-02 / P17B**.
-
-Qualification: Evidence gap: Source-backed synthetic physical geometry through real battlefield conversion; shares the FRAME measurement bug class with category17.02. The based FRAME target has an 8in circular body on a 120mm support base. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding frame-full-body-measurement.
+Qualification: Order 100 measures every part of a based FRAME model. tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json retain the historical support-base observation.
 
 ### 01.04.02-obligation-01
 
@@ -5856,21 +5853,17 @@ Source `faq:603e9b2f-cc24-498c-ac2e-08ad3068f257`, blocks [2]: A model within a 
 
 Owners: `src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext`.
 
-`tests/unit/test_order97_secondary_clause_evidence.py::test_order97_terrain_area_membership_is_vertical_projection` (semantic: Identical horizontal membership is true at ground and ten-inch elevation.)
-
-Required before PFINAL: **C17-02 / P17B**.
+`tests/unit/test_order97_secondary_clause_evidence.py::test_order97_terrain_area_membership_is_vertical_projection` (semantic: Identical horizontal membership is true at ground and ten-inch elevation.); `tests/unit/test_order100_frame_measurement.py::test_based_frame_terrain_and_objective_membership_use_the_body` (semantic: A based FRAME body that overhangs a terrain boundary remains inside that area when the model is elevated.)
 
 ### faq-603e9b2f-cc24-498c-ac2e-08ad3068f257-frame-membership
 
 Source `faq:603e9b2f-cc24-498c-ac2e-08ad3068f257`, blocks [2]: Frame body parts overhanging a terrain boundary place the model within that area.
 
-Owners: `src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext`.
+Owners: `src/warhammer40k_core/geometry/terrain_area_visibility.py:model_intersects_terrain_area`.
 
-**Evidence gap; prerequisite repair required.**
+`tests/unit/test_order100_frame_measurement.py::test_based_frame_terrain_and_objective_membership_use_the_body` (semantic: An overhanging based FRAME body places the model inside the terrain area.); `tests/unit/test_order100_frame_measurement.py::test_based_frame_terrain_and_objective_membership_use_the_body` (semantic: The same support base, measured without the FRAME body, stays outside the terrain area.); `tests/unit/test_order100_frame_measurement.py::test_based_frame_terrain_and_objective_membership_use_the_body` (semantic: Objective control uses the based FRAME body when the support base is outside the control distance.)
 
-Required before PFINAL: **C17-02 / P17B**.
-
-Qualification: Gameplay gap: the body projects into the area but support-base-only membership says outside. See probe_frame_terrain_membership.
+Qualification: Order 100 includes overhanging FRAME body parts in terrain-area membership. tests/order97_gap_probes_09_17.py and gap_observations_09_17.json retain the historical support-base observation.
 
 ### faq-e01c8a02-7a36-4d3b-b168-976b11bd47e8-per-attacker-cover
 
@@ -6812,13 +6805,11 @@ Owners: `src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHa
 
 Source `rule:17:17.02:1`, blocks [1]: Frame model relationships measure from the closest part of the model, even with a base.
 
-Owners: `src/warhammer40k_core/geometry/model_geometry.py:ModelGeometry`.
+Owners: `src/warhammer40k_core/engine/battlefield_state.py:geometry_model_for_placement`, `src/warhammer40k_core/geometry/volume.py:Model.range_to`, `src/warhammer40k_core/geometry/movement_reachability.py:movement_reachability`, `src/warhammer40k_core/geometry/base_contact_proof.py:endpoint_excluded_by_bodies`.
 
-**Evidence gap; prerequisite repair required.**
+`tests/unit/test_order100_frame_measurement.py::test_based_frame_engagement_and_movement_use_the_body` (semantic: A based FRAME body within two inches establishes Engagement Range while its support base remains outside two inches.); `tests/unit/test_order100_frame_measurement.py::test_offset_frame_rotation_is_reachable_within_the_translation_budget` (semantic: Rotating an offset FRAME body about the parent anchor reaches a one-inch goal without the translation a fixed part center would require.); `tests/unit/test_order100_frame_measurement.py::test_frame_body_goal_is_not_certified_unreachable_by_support_base_proximity` (semantic: A legal endpoint beside the FRAME body is not certified impossible by support-base proximity.); `tests/unit/test_order100_frame_measurement.py::test_frame_charge_uses_body_engagement_and_replays_for_both_viewers` (facade: A charge ending engaged with the FRAME body but outside support-base Engagement Range is accepted.); `tests/unit/test_order100_frame_measurement.py::test_frame_charge_uses_body_engagement_and_replays_for_both_viewers` (invalid: The same charge endpoint is rejected when the target is measured from its support base.); `tests/unit/test_order100_frame_measurement.py::test_frame_charge_uses_body_engagement_and_replays_for_both_viewers` (replay: The accepted FRAME charge replays exactly.); `tests/unit/test_order100_frame_measurement.py::test_frame_charge_uses_body_engagement_and_replays_for_both_viewers` (viewer: The first player restores the accepted FRAME charge projection.); `tests/unit/test_order100_frame_measurement.py::test_frame_charge_uses_body_engagement_and_replays_for_both_viewers` (viewer: The second player restores the accepted FRAME charge projection.); `tests/unit/test_order100_frame_measurement.py::test_based_frame_engagement_restores_for_both_viewers_and_replays` (replay: The based FRAME engagement session replays exactly.); `tests/unit/test_order100_frame_measurement.py::test_based_frame_engagement_restores_for_both_viewers_and_replays` (viewer: The first player restores the same based FRAME session projection.); `tests/unit/test_order100_frame_measurement.py::test_based_frame_engagement_restores_for_both_viewers_and_replays` (viewer: The second player restores the same based FRAME session projection.)
 
-Required before PFINAL: **C17-02 / P17B**.
-
-Qualification: Gameplay gap: a based FRAME body within two inches is ignored in favour of its support base outside two inches. See probe_based_frame_measurement; the same measurement family also affects body-aware containment.
+Qualification: Order 100 measures the closest part of a based FRAME model. tests/order97_gap_probes_09_17.py and gap_observations_09_17.json retain the historical support-base observation.
 
 ### 17.02-rotation
 

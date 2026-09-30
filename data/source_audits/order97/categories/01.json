@@ -2069,11 +2069,79 @@
         ],
         "summary": "FRAME wholly-within measurement includes every part of the model.",
         "owners": [
-          "src/warhammer40k_core/geometry/measurement.py:DistanceMeasurementContext.target_wholly_within_distance"
+          "src/warhammer40k_core/geometry/measurement.py:DistanceMeasurementContext.target_wholly_within_distance",
+          "src/warhammer40k_core/geometry/volume.py:Model.rules_distance_subjects"
         ],
-        "evidence": [],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_based_frame_wholly_within_includes_every_part",
+            "role": "semantic",
+            "assertion": "assert context.target_wholly_within_distance(8.5) is False",
+            "proves": "An 8.5-inch wholly-within check fails because the based FRAME body extends beyond the distance that contains its support base."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_based_frame_wholly_within_includes_every_part",
+            "role": "semantic",
+            "assertion": "assert _model_wholly_within_any_transport_model(frame, transport_models=(source,), distance_inches=8.5) is False",
+            "proves": "Disembark whole-distance placement rejects a based FRAME body that extends outside the distance containing its support base."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_wholly_within_rejects_a_tall_body_inside_the_horizontal_buffer",
+            "role": "semantic",
+            "assertion": "assert context.target_wholly_within_distance(3) is False",
+            "proves": "A tall FRAME body whose footprint fits a three-inch horizontal buffer is still outside the three-dimensional distance."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_wholly_within_rejects_a_tall_body_inside_the_horizontal_buffer",
+            "role": "semantic",
+            "assertion": "assert ordinary.target_wholly_within_distance(3) is True",
+            "proves": "The same support base without FRAME measurement remains wholly within three inches."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_cooperating_frame_parts_leave_an_uncovered_interior_height",
+            "role": "semantic",
+            "assertion": "assert context.target_wholly_within_distance(1) is False",
+            "proves": "Source parts that cover the target ends still leave an interior height outside one inch."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_source_preserves_ordinary_target_support_base_containment",
+            "role": "semantic",
+            "assertion": "assert framed_context.target_wholly_within_distance(3) is True",
+            "proves": "Marking the source FRAME, without changing its geometry, keeps ordinary support-base containment."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_source_preserves_ordinary_target_support_base_containment",
+            "role": "semantic",
+            "assertion": "assert ordinary_context.target_wholly_within_distance(3) is True",
+            "proves": "The ordinary source and ordinary target are wholly within three inches."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_main_prism_uses_full_height_containment_without_extra_body_parts",
+            "role": "semantic",
+            "assertion": "assert ordinary_context.target_wholly_within_distance(3) is True",
+            "proves": "An ordinary target of the same main prism remains wholly within three inches."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_main_prism_uses_full_height_containment_without_extra_body_parts",
+            "role": "semantic",
+            "assertion": "assert frame_context.target_wholly_within_distance(3) is False",
+            "proves": "A FRAME target whose only prism is its main body fails three-inch containment at its top."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_main_prism_uses_full_height_containment_without_extra_body_parts",
+            "role": "semantic",
+            "assertion": "assert duplicated_context.target_wholly_within_distance(3) is False",
+            "proves": "Adding a duplicate of that main prism does not change the FRAME result."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_main_prism_uses_full_height_containment_without_extra_body_parts",
+            "role": "semantic",
+            "assertion": "assert restored.target_wholly_within_distance(3) is False",
+            "proves": "The single-prism FRAME rejection survives a measurement-context payload round trip."
+          }
+        ],
         "qualifications": [
-          "Evidence gap: Source-backed synthetic physical geometry through real battlefield conversion; shares the FRAME measurement bug class with category17.02. The based FRAME target has an 8in circular body on a 120mm support base. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding frame-full-body-measurement."
+          "Order 100 measures every part of a based FRAME model. tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json retain the historical support-base observation."
         ]
       }
     ],

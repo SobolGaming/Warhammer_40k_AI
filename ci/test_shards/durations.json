@@ -78,6 +78,7 @@
     "tests/unit/test_mock_event_layout_ui.py": 7.109,
     "tests/unit/test_model_geometry.py": 0.207,
     "tests/unit/test_model_keyword_authority.py": 9.99,
+    "tests/unit/test_order100_frame_measurement.py": 8.29,
     "tests/unit/test_order36_sequencing.py": 71.944,
     "tests/unit/test_order36_timing_authority.py": 63.655,
     "tests/unit/test_order51_flight.py": 49.428,
@@ -299,46 +300,46 @@
   "shard_count": 8,
   "shards": [
     {
-      "duration_seconds": 1652.658,
+      "duration_seconds": 1653.694,
       "shard_id": 1,
       "test_file_count": 35
     },
     {
-      "duration_seconds": 1652.658,
+      "duration_seconds": 1653.694,
       "shard_id": 2,
-      "test_file_count": 36
+      "test_file_count": 35
     },
     {
-      "duration_seconds": 1652.657,
+      "duration_seconds": 1653.694,
       "shard_id": 3,
       "test_file_count": 35
     },
     {
-      "duration_seconds": 1652.659,
+      "duration_seconds": 1653.694,
       "shard_id": 4,
-      "test_file_count": 35
+      "test_file_count": 36
     },
     {
-      "duration_seconds": 1652.658,
+      "duration_seconds": 1653.698,
       "shard_id": 5,
       "test_file_count": 36
     },
     {
-      "duration_seconds": 1652.658,
+      "duration_seconds": 1653.693,
       "shard_id": 6,
       "test_file_count": 36
     },
     {
-      "duration_seconds": 1652.658,
+      "duration_seconds": 1653.694,
       "shard_id": 7,
       "test_file_count": 36
     },
     {
-      "duration_seconds": 1652.658,
+      "duration_seconds": 1653.693,
       "shard_id": 8,
-      "test_file_count": 36
+      "test_file_count": 37
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 13221.264
+  "total_test_duration_seconds": 13229.554
 }

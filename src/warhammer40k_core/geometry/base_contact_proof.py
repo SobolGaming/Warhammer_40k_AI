@@ -29,6 +29,74 @@ from warhammer40k_core.geometry.visibility_algebra import (
 from warhammer40k_core.geometry.volume import Model
 
 
+def _rules_fixed_models(model: Model) -> tuple[Model, ...]:
+    if model.measures_every_part and model.body_parts:
+        return model.rules_distance_subjects()
+    return (model,)
+
+
+def _rules_moving_parts(
+    source: Model,
+    x: RealTerm,
+    y: RealTerm,
+    c: RealTerm,
+    s: RealTerm,
+    z: float,
+) -> tuple[tuple[Footprint, float, float], ...]:
+    if source.measures_every_part and source.body_parts:
+        return _moving_parts(source, x, y, c, s, z)
+    return ((Footprint.moving(source.base, x, y, c, s), z, z + source.volume.height),)
+
+
+def _interval_gap(
+    first_bottom: float,
+    first_top: float,
+    second_bottom: float,
+    second_top: float,
+) -> float:
+    if first_top < second_bottom:
+        return second_bottom - first_top
+    if second_top < first_bottom:
+        return first_bottom - second_top
+    return 0.0
+
+
+def _rules_proximity(
+    predicates: PlacementPredicates,
+    *,
+    source: Model,
+    enemy: Model,
+    x: RealTerm,
+    y: RealTerm,
+    c: RealTerm,
+    s: RealTerm,
+    elevation: float,
+    limit: Fraction,
+) -> Formula | None:
+    rows: list[Formula] = []
+    for shape, bottom, top in _rules_moving_parts(source, x, y, c, s, elevation):
+        for target_part in _rules_fixed_models(enemy):
+            other_bottom, other_top = target_part.volume.vertical_interval(target_part.pose)
+            vertical_gap = _interval_gap(bottom, top, other_bottom, other_top)
+            if limit < rational(vertical_gap):
+                continue
+            horizontal = predicates.scalar()
+            rows.append(
+                both(
+                    horizontal.ge(0),
+                    (horizontal**2 + rational(vertical_gap) ** 2).le(limit**2),
+                    predicates.near(
+                        shape,
+                        Footprint.fixed(target_part.base, target_part.pose),
+                        horizontal,
+                    ),
+                )
+            )
+    if not rows:
+        return None
+    return either(*rows)
+
+
 def _moving_parts(
     source: Model, x: RealTerm, y: RealTerm, c: RealTerm, s: RealTerm, z: float
 ) -> tuple[tuple[Footprint, float, float], ...]:
@@ -62,8 +130,6 @@ def closer_body_endpoint_exists(
     """SAT is a candidate, UNSAT a certificate over all positions and facings."""
     x, y, c, s = (variable(name) for name in ("contact_x", "contact_y", "contact_c", "contact_s"))
     predicates = PlacementPredicates(prefix="contact_aux")
-    base = Footprint.moving(source.base, x, y, c, s)
-    target = Footprint.fixed(enemy.base, enemy.pose)
     limit = rational(current_distance) - Fraction(1, 100_000_000)
     constraints = [
         (c * c + s * s).eq(1),
@@ -74,19 +140,20 @@ def closer_body_endpoint_exists(
     ]
     elevations: list[Formula] = []
     for z in supported_elevations:
-        vertical_gap = max(
-            0.0,
-            enemy.pose.position.z - z - source.volume.height,
-            z - enemy.pose.position.z - enemy.volume.height,
+        proximity = _rules_proximity(
+            predicates,
+            source=source,
+            enemy=enemy,
+            x=x,
+            y=y,
+            c=c,
+            s=s,
+            elevation=z,
+            limit=limit,
         )
-        if limit < rational(vertical_gap):
+        if proximity is None:
             continue
-        horizontal = predicates.scalar()
-        rows = [
-            horizontal.ge(0),
-            (horizontal**2 + rational(vertical_gap) ** 2).le(limit**2),
-            predicates.near(base, target, horizontal),
-        ]
+        rows = [proximity]
         for shape, bottom, top in _moving_parts(source, x, y, c, s, z):
             for target_part in physical_prisms(enemy):
                 other_bottom, other_top = target_part.volume.vertical_interval(target_part.pose)
@@ -145,7 +212,6 @@ def contact_constraints_exclude_endpoint(query: MovementReachabilityQuery) -> bo
         variable(name) for name in ("constraint_x", "constraint_y", "constraint_c", "constraint_s")
     )
     predicates = PlacementPredicates(prefix="constraint_aux")
-    base = Footprint.moving(source.base, x, y, c, s)
     levels = endpoint_support_elevations(
         terrain=query.terrain_context.terrain, features=query.terrain_context.terrain_features
     )
@@ -156,34 +222,36 @@ def contact_constraints_exclude_endpoint(query: MovementReachabilityQuery) -> bo
             if not goal.models:
                 return both()
             rows: list[Formula] = []
-            for target in goal.models:
-                gap = max(
-                    0.0,
-                    target.pose.position.z - elevation - source.volume.height,
-                    elevation - target.pose.position.z - target.volume.height,
-                )
-                if goal.range_inches is None:
-                    if gap <= goal.vertical_inches + 1e-9:
-                        rows.append(
-                            predicates.near(
-                                base,
-                                Footprint.fixed(target.base, target.pose),
-                                term(rational(goal.horizontal_inches + 1e-8)),
+            for mover_shape, mover_bottom, mover_top in _rules_moving_parts(
+                source, x, y, c, s, elevation
+            ):
+                for target in goal.models:
+                    for target_part in _rules_fixed_models(target):
+                        other_bottom, other_top = target_part.volume.vertical_interval(
+                            target_part.pose
+                        )
+                        gap = _interval_gap(mover_bottom, mover_top, other_bottom, other_top)
+                        fixed = Footprint.fixed(target_part.base, target_part.pose)
+                        if goal.range_inches is None:
+                            if gap <= goal.vertical_inches + 1e-9:
+                                rows.append(
+                                    predicates.near(
+                                        mover_shape,
+                                        fixed,
+                                        term(rational(goal.horizontal_inches + 1e-8)),
+                                    )
+                                )
+                        elif gap <= goal.range_inches + 1e-8:
+                            horizontal = predicates.scalar()
+                            rows.append(
+                                both(
+                                    horizontal.ge(0),
+                                    (horizontal**2 + rational(gap) ** 2).le(
+                                        rational(goal.range_inches + 1e-8) ** 2
+                                    ),
+                                    predicates.near(mover_shape, fixed, horizontal),
+                                )
                             )
-                        )
-                elif gap <= goal.range_inches + 1e-8:
-                    horizontal = predicates.scalar()
-                    rows.append(
-                        both(
-                            horizontal.ge(0),
-                            (horizontal**2 + rational(gap) ** 2).le(
-                                rational(goal.range_inches + 1e-8) ** 2
-                            ),
-                            predicates.near(
-                                base, Footprint.fixed(target.base, target.pose), horizontal
-                            ),
-                        )
-                    )
             return either(*rows)
 
         constraints = [near_goal(query.goal), *(near_goal(g) for g in query.required_goals)]

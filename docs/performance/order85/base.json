@@ -12,7 +12,7 @@
   "fixture": "Canonical one-model character and one-model vehicle, reviewed solid 8-inch cylinder on 120mm base; 100x100 empty board; fixed fixture seed and +10 Charge roll modifier; same body-touch and penetrating paths",
   "hashes": {
     "scripts/measure_order85.py": "9bc3ea520ce94fe6fd5000e41547d005c2b07c5a77bc12bf460ae067a1e8e66c",
-    "tests/order85_overhang_helpers.py": "75b571041cd7a9293eece454ec173b293eccc8d9b2db3575f8024533a230d587",
+    "tests/order85_overhang_helpers.py": "c19b5593753c466d4b1b3ac80120535093ec02972de4cf2e73c31533027e8707",
     "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
   },
   "rows": [

@@ -50,7 +50,7 @@
     },
     {
       "path": "data/source_audits/order97/categories/01.json",
-      "sha256": "dda36759f13d2bbd9a9e3d358f0b7e56b5ddc8f10570e9d0f9cba180b399ddca"
+      "sha256": "b988ad059b69a868ed48e6d6462dac701fe3daf9cb5be85e0f060ed365a53c52"
     },
     {
       "path": "data/source_audits/order97/categories/02.json",
@@ -98,7 +98,7 @@
     },
     {
       "path": "data/source_audits/order97/categories/13.json",
-      "sha256": "38f325457aa83977e32e1a3e3f8a237ae3b70db74d4483162294979bb6152aeb"
+      "sha256": "b72b9409932bb7128627d8ef34a9a9ee0fc26d1bfd3b42e4692af39f79199fef"
     },
     {
       "path": "data/source_audits/order97/categories/14.json",
@@ -114,7 +114,7 @@
     },
     {
       "path": "data/source_audits/order97/categories/17.json",
-      "sha256": "d294a942fc032a129a7c80645bbca31dc6c7fa6f24a858d627762cf18d4f2ecd"
+      "sha256": "7c8e9f54a2f41313cd8f748b874d7871f920d3c7c0036cb758701bc24fd06b25"
     },
     {
       "path": "data/source_audits/order97/categories/18.json",
@@ -206,7 +206,7 @@
     },
     {
       "path": "src/warhammer40k_core/_engine_build_manifest.json",
-      "sha256": "4c88fd0336909dc43fb1b981c5e1bdceb3054063f76b3d91acfc60181e7c6220"
+      "sha256": "6b0aac3dc5d43758a83aa8ba36c0939b66420d5a046f7bbbe04244a487ae1129"
     },
     {
       "path": "tests/absent_strength_helpers.py",
@@ -478,7 +478,7 @@
     },
     {
       "path": "tests/order85_overhang_helpers.py",
-      "sha256": "75b571041cd7a9293eece454ec173b293eccc8d9b2db3575f8024533a230d587"
+      "sha256": "c19b5593753c466d4b1b3ac80120535093ec02972de4cf2e73c31533027e8707"
     },
     {
       "path": "tests/order89_healing_helpers.py",
@@ -739,6 +739,10 @@
     {
       "path": "tests/unit/test_model_keyword_authority.py",
       "sha256": "10f59d7b55948ac58c070af08f85f7b2276c9e88e5aaeef5c07313f6053b6b46"
+    },
+    {
+      "path": "tests/unit/test_order100_frame_measurement.py",
+      "sha256": "dfa892f6486c3d29d09e8f0b7c6a7c5ce1df7f688071f9f652be22e24d610e89"
     },
     {
       "path": "tests/unit/test_order36_sequencing.py",
@@ -1135,19 +1139,6 @@
     "Complete-game performance remains deferred under Order 32 and is not certified by this evidence-only change."
   ],
   "followups": [
-    {
-      "finding_id": "C17-02",
-      "pr_id": "P17B",
-      "kind": "gameplay",
-      "description": "Measure every part of a based FRAME model for whole-distance, Engagement Range and terrain-area membership. Current consumers use only the support base despite a larger body. Repair the shared geometric owner and its range, objective, movement, terrain and placement consumers.",
-      "requirement_ids": [
-        "01.04.01-obligation-06",
-        "17.02-measurement",
-        "faq-603e9b2f-cc24-498c-ac2e-08ad3068f257-elevated-membership",
-        "faq-603e9b2f-cc24-498c-ac2e-08ad3068f257-frame-membership"
-      ],
-      "runtime_source_ids": []
-    },
     {
       "finding_id": "C03-06",
       "pr_id": "P03F",

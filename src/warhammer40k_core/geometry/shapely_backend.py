@@ -525,12 +525,13 @@ def bounds_have_point_clear_of_model_footprints(
     legal_area = surface
     for model in blocked_models:
         valid_model = _validate_model("blocked_model", model)
-        legal_area = legal_area.difference(
-            footprint_for_base(valid_model.base, valid_model.pose).buffer(
-                clearance,
-                quad_segs=_FOOTPRINT_QUAD_SEGS,
+        for subject in valid_model.rules_distance_subjects():
+            legal_area = legal_area.difference(
+                footprint_for_base(subject.base, subject.pose).buffer(
+                    clearance,
+                    quad_segs=_FOOTPRINT_QUAD_SEGS,
+                )
             )
-        )
         if legal_area.is_empty:
             return False
     return not legal_area.is_empty

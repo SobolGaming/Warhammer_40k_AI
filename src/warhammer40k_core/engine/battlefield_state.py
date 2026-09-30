@@ -1263,24 +1263,34 @@ class BattlefieldScenario:
         )
 
 
+_FRAME_KEYWORD = "FRAME"
+
+
+def geometry_model_at_pose(*, model: ModelInstance, pose: Pose) -> GeometryModel:
+    if type(model) is not ModelInstance:
+        raise PlacementError("geometry model conversion requires a ModelInstance.")
+    if type(pose) is not Pose:
+        raise PlacementError("geometry model conversion requires a Pose.")
+    return GeometryModel(
+        model_id=model.model_instance_id,
+        pose=pose,
+        base=model.geometry.base_shape(),
+        volume=ModelVolume(height=model.geometry.height_inches),
+        body_parts=model.geometry.body_parts,
+        measures_every_part=_FRAME_KEYWORD in model.keywords,
+    )
+
+
 def geometry_model_for_placement(
     *,
     model: ModelInstance,
     placement: ModelPlacement,
 ) -> GeometryModel:
-    if type(model) is not ModelInstance:
-        raise PlacementError("geometry model conversion requires a ModelInstance.")
     if type(placement) is not ModelPlacement:
         raise PlacementError("geometry model conversion requires a ModelPlacement.")
     if model.model_instance_id != placement.model_instance_id:
         raise PlacementError("geometry model conversion model_instance_id must match placement.")
-    return GeometryModel(
-        model_id=placement.model_instance_id,
-        pose=placement.pose,
-        base=model.geometry.base_shape(),
-        volume=ModelVolume(height=model.geometry.height_inches),
-        body_parts=model.geometry.body_parts,
-    )
+    return geometry_model_at_pose(model=model, pose=placement.pose)
 
 
 def battlefield_placement_kind_from_token(token: object) -> BattlefieldPlacementKind:

@@ -58,6 +58,11 @@ class MovementGoal:
             triangulate_polygon(polygon)
 
     def contains(self, model: Model) -> bool:
+        subjects = model.rules_distance_subjects()
+        if len(subjects) != 1:
+            return any(self.contains(subject) for subject in subjects)
+        if subjects[0] is not model:
+            model = subjects[0]
         if self.models:
             if self.range_inches is not None:
                 return any(model.range_to(target) <= self.range_inches for target in self.models)
@@ -87,6 +92,10 @@ class MovementGoal:
     def distance_lower_bound(
         self, model: Model, *, ignores_vertical_distance: bool = False
     ) -> float:
+        if model.measures_every_part and model.body_parts:
+            return _anchored_measurement_lower_bound(
+                self, model, ignores_vertical_distance=ignores_vertical_distance
+            )
         # Only the moving footprint can rotate. The target retains its measured
         # footprint/facing. Circular movers are rotation invariant, so their
         # actual separation is a translation lower bound. Other movers retain
@@ -101,9 +110,7 @@ class MovementGoal:
                             _fixed_target_horizontal_lower_bound(model, target),
                             0.0
                             if ignores_vertical_distance
-                            else model.volume.vertical_gap_to(
-                                model.pose, target.volume, target.pose
-                            ),
+                            else _rules_vertical_gap(model, target),
                         )
                         - self.range_inches,
                     )
@@ -120,8 +127,7 @@ class MovementGoal:
                     if ignores_vertical_distance
                     else max(
                         0.0,
-                        model.volume.vertical_gap_to(model.pose, target.volume, target.pose)
-                        - self.vertical_inches,
+                        _rules_vertical_gap(model, target) - self.vertical_inches,
                     ),
                 )
                 for target in self.models
@@ -166,6 +172,172 @@ class MovementGoal:
         )
 
 
+@dataclass(frozen=True, slots=True)
+class _OrbitPart:
+    orbit: float
+    radius: float
+    bottom: float
+    top: float
+
+
+def _anchored_measurement_lower_bound(
+    goal: MovementGoal,
+    model: Model,
+    *,
+    ignores_vertical_distance: bool,
+) -> float:
+    """Lower-bound translation about the parent anchor.
+
+    An offset part orbits that anchor when the model rotates. A circular bound
+    around the part's current center treats that orbit as already fixed and can
+    reject a legal rotation.
+    """
+
+    parts = _orbit_parts(model)
+    if goal.models:
+        return min(
+            _anchored_pair_bound(model.pose, mover, target_part, goal, ignores_vertical_distance)
+            for mover in parts
+            for target in goal.models
+            for target_part in _fixed_measurement_parts(target)
+        )
+    return min(
+        _anchored_region_bound(goal, model.pose, part, ignores_vertical_distance) for part in parts
+    )
+
+
+def _orbit_parts(model: Model) -> tuple[_OrbitPart, ...]:
+    bottom = model.pose.position.z
+    parts = [_OrbitPart(0.0, model.base.max_radius(), bottom, bottom + model.volume.height)]
+    for body in model.body_parts:
+        parts.append(
+            _OrbitPart(
+                math.hypot(body.offset_x_inches, body.offset_y_inches),
+                body.base.max_radius(),
+                bottom + body.bottom_inches,
+                bottom + body.bottom_inches + body.height_inches,
+            )
+        )
+    return tuple(parts)
+
+
+def _fixed_footprint_gap(anchor: Pose, target: Model) -> float:
+    """Distance from an anchor to a fixed target footprint.
+
+    The mover may rotate. The target does not, so a non-circular target keeps
+    its actual footprint instead of a facing-independent enclosing disk.
+    """
+
+    if type(target.base) is CircularBase:
+        return anchor.distance_2d_to(target.pose) - target.base.radius
+    return shapely_backend.base_footprint_distance_to_point(
+        target.base,
+        target.pose,
+        x=anchor.position.x,
+        y=anchor.position.y,
+    )
+
+
+def _fixed_measurement_parts(model: Model) -> tuple[Model, ...]:
+    if model.measures_every_part and model.body_parts:
+        return model.rules_distance_subjects()
+    return (model,)
+
+
+def _anchored_pair_bound(
+    anchor: Pose,
+    mover: _OrbitPart,
+    target: Model,
+    goal: MovementGoal,
+    ignores_vertical_distance: bool,
+) -> float:
+    horizontal = max(0.0, _fixed_footprint_gap(anchor, target) - mover.orbit - mover.radius)
+    target_bottom, target_top = target.volume.vertical_interval(target.pose)
+    vertical = (
+        0.0
+        if ignores_vertical_distance
+        else _interval_gap(mover.bottom, mover.top, target_bottom, target_top)
+    )
+    if goal.range_inches is not None:
+        return max(0.0, math.hypot(horizontal, vertical) - goal.range_inches)
+    return math.hypot(
+        max(0.0, horizontal - goal.horizontal_inches),
+        0.0 if ignores_vertical_distance else max(0.0, vertical - goal.vertical_inches),
+    )
+
+
+def _anchored_region_bound(
+    goal: MovementGoal,
+    anchor: Pose,
+    part: _OrbitPart,
+    ignores_vertical_distance: bool,
+) -> float:
+    reach = part.orbit + part.radius
+    if goal.disk is not None:
+        pose, base = goal.disk
+        vertical = (
+            0.0
+            if ignores_vertical_distance
+            else max(
+                0.0,
+                part.bottom - pose.position.z - goal.vertical_inches,
+                pose.position.z - part.top - goal.vertical_inches,
+            )
+        )
+        return math.hypot(
+            max(
+                0.0,
+                anchor.distance_2d_to(pose) - reach - base.radius - goal.horizontal_inches,
+            ),
+            vertical,
+        )
+    return math.hypot(
+        max(
+            0.0,
+            min(
+                shapely_backend.point_distance_to_polygon(
+                    anchor.position.x,
+                    anchor.position.y,
+                    polygon,
+                )
+                for polygon in goal.polygons
+            )
+            - reach
+            - goal.horizontal_inches,
+        ),
+        0.0
+        if ignores_vertical_distance
+        else max(
+            0.0,
+            part.bottom - goal.z_inches - goal.vertical_inches,
+            goal.z_inches - part.top - goal.vertical_inches,
+        ),
+    )
+
+
+def _interval_gap(
+    first_bottom: float,
+    first_top: float,
+    second_bottom: float,
+    second_top: float,
+) -> float:
+    if first_top < second_bottom:
+        return second_bottom - first_top
+    if second_top < first_bottom:
+        return first_bottom - second_top
+    return 0.0
+
+
+def _rules_vertical_gap(first: Model, second: Model) -> float:
+    subjects = second.rules_distance_subjects()
+    if len(subjects) == 1 and subjects[0] is second:
+        return first.volume.vertical_gap_to(first.pose, second.volume, second.pose)
+    return min(
+        first.volume.vertical_gap_to(first.pose, subject.volume, subject.pose)
+        for subject in subjects
+    )
+
+
 def _fixed_target_horizontal_lower_bound(source: Model, target: Model) -> float:
     """Use the range owner's fixed footprint; relax only moving rotations.
 
@@ -175,7 +347,14 @@ def _fixed_target_horizontal_lower_bound(source: Model, target: Model) -> float:
     distance from their center to the fixed target minus their enclosing radius
     is a lower bound for every orientation. This does not certify a legal path.
     """
+    targets = target.rules_distance_subjects()
+    if len(targets) != 1:
+        return min(_fixed_target_horizontal_lower_bound(source, item) for item in targets)
+    if targets[0] is not target:
+        target = targets[0]
     if type(source.base) is CircularBase:
+        if source.measures_every_part:
+            return source.rules_horizontal_distance_to(target)
         return source.base_distance_to(target)
     if type(target.base) is CircularBase:
         center_distance = source.pose.distance_2d_to(target.pose) - target.base.radius

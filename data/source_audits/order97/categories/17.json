@@ -40,11 +40,81 @@
         ],
         "summary": "Frame model relationships measure from the closest part of the model, even with a base.",
         "owners": [
-          "src/warhammer40k_core/geometry/model_geometry.py:ModelGeometry"
+          "src/warhammer40k_core/engine/battlefield_state.py:geometry_model_for_placement",
+          "src/warhammer40k_core/geometry/volume.py:Model.range_to",
+          "src/warhammer40k_core/geometry/movement_reachability.py:movement_reachability",
+          "src/warhammer40k_core/geometry/base_contact_proof.py:endpoint_excluded_by_bodies"
         ],
-        "evidence": [],
+        "evidence": [
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_based_frame_engagement_and_movement_use_the_body",
+            "role": "semantic",
+            "assertion": "assert unit_within_enemy_engagement_range(state=state, unit_instance_id=state.army_definitions[0].units[0].unit_instance_id) is True",
+            "proves": "A based FRAME body within two inches establishes Engagement Range while its support base remains outside two inches."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_offset_frame_rotation_is_reachable_within_the_translation_budget",
+            "role": "semantic",
+            "assertion": "assert result.status is MovementReachabilityStatus.REACHABLE",
+            "proves": "Rotating an offset FRAME body about the parent anchor reaches a one-inch goal without the translation a fixed part center would require."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_body_goal_is_not_certified_unreachable_by_support_base_proximity",
+            "role": "semantic",
+            "assertion": "assert endpoint_excluded_by_bodies(source=mover, targets=(frame,), range_inches=0.5, budget=4, supported_elevations=(0.0,)) is False",
+            "proves": "A legal endpoint beside the FRAME body is not certified impossible by support-base proximity."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_charge_uses_body_engagement_and_replays_for_both_viewers",
+            "role": "facade",
+            "assertion": "assert accepted_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION",
+            "proves": "A charge ending engaged with the FRAME body but outside support-base Engagement Range is accepted."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_charge_uses_body_engagement_and_replays_for_both_viewers",
+            "role": "invalid",
+            "assertion": "assert rejected_status.status_kind is LifecycleStatusKind.INVALID",
+            "proves": "The same charge endpoint is rejected when the target is measured from its support base."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_charge_uses_body_engagement_and_replays_for_both_viewers",
+            "role": "replay",
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED",
+            "proves": "The accepted FRAME charge replays exactly."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_charge_uses_body_engagement_and_replays_for_both_viewers",
+            "role": "viewer",
+            "assertion": "assert restored.view(viewer_player_id='player-a') == accepted.view(viewer_player_id='player-a')",
+            "proves": "The first player restores the accepted FRAME charge projection."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_charge_uses_body_engagement_and_replays_for_both_viewers",
+            "role": "viewer",
+            "assertion": "assert restored.view(viewer_player_id='player-b') == accepted.view(viewer_player_id='player-b')",
+            "proves": "The second player restores the accepted FRAME charge projection."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_based_frame_engagement_restores_for_both_viewers_and_replays",
+            "role": "replay",
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED",
+            "proves": "The based FRAME engagement session replays exactly."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_based_frame_engagement_restores_for_both_viewers_and_replays",
+            "role": "viewer",
+            "assertion": "assert restored.view(viewer_player_id='player-a') == session.view(viewer_player_id='player-a')",
+            "proves": "The first player restores the same based FRAME session projection."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_based_frame_engagement_restores_for_both_viewers_and_replays",
+            "role": "viewer",
+            "assertion": "assert restored.view(viewer_player_id='player-b') == session.view(viewer_player_id='player-b')",
+            "proves": "The second player restores the same based FRAME session projection."
+          }
+        ],
         "qualifications": [
-          "Gameplay gap: a based FRAME body within two inches is ignored in favour of its support base outside two inches. See probe_based_frame_measurement; the same measurement family also affects body-aware containment."
+          "Order 100 measures the closest part of a based FRAME model. tests/order97_gap_probes_09_17.py and gap_observations_09_17.json retain the historical support-base observation."
         ]
       },
       {
