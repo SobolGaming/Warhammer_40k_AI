@@ -189,12 +189,12 @@ being diagnosed; document that reason. Focused subsets may run serially during
 iteration. Any later production change invalidates the aggregate results.
 
 Every behavioral test-file addition, deletion, move, or rename must update the
-committed eight-shard inventory in `ci/test_shards/`. Regenerate
-`durations.json` and `shard-1.txt` through `shard-8.txt` from a representative
+committed twelve-shard inventory in `ci/test_shards/`. Regenerate
+`durations.json` and `shard-1.txt` through `shard-12.txt` from a representative
 JUnit profile as documented in `README.md`; do not commit a behavioral test
 file that is missing from the shard manifests. Before committing any test-file
 change, and before every PR, run this exact fail-closed check:
-`uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8`.
+`uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12`.
 
 Engine behavior tests must use real domain objects or canonical fixtures. This includes movement, shooting, charge, fight, deployment, transports, attached units, damage allocation, replay, decision dispatch, UI routing, and network serialization.
 
@@ -376,7 +376,7 @@ uv run mypy src tests
 uv run pyright
 PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85
 uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov
-uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8
+uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 uv run lint-imports
 uv run pre-commit run --all-files
 

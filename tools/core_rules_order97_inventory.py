@@ -157,7 +157,7 @@ def helper_source_paths(inventory: Inventory, *, root: Path = ROOT) -> set[str]:
                 break
             conftest = parent / "conftest.py"
             if conftest.is_file():
-                relative = str(conftest.relative_to(root))
+                relative = conftest.relative_to(root).as_posix()
                 helpers.add(relative)
                 pending.add(relative)
     while pending:

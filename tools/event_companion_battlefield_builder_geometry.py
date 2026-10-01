@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from collections.abc import Callable
 from dataclasses import dataclass, replace
+from functools import lru_cache
 from typing import Any
 
 from shapely import affinity
@@ -101,6 +102,9 @@ def _rotate_point(x: float, y: float, degrees: float) -> tuple[float, float]:
     return (x * cosine - y * sine, x * sine + y * cosine)
 
 
+# The offline search revisits immutable poses and Shapely geometries. Bound all
+# reuse so a complete 45-layout build cannot retain an unbounded search history.
+@lru_cache(maxsize=4096)
 def area_polygon(
     vertices: tuple[tuple[float, float], ...],
     pose: AreaPose,
@@ -230,6 +234,19 @@ def _polygons_for_poses(
     }
 
 
+@lru_cache(maxsize=65536)
+def _pair_geometry(first: Polygon, second: Polygon, contact: bool) -> tuple[float, float]:
+    overlap = first.intersection(second).area
+    gap = max(0.0, first.distance(second) - _GRID) if contact else 0.0
+    return overlap, gap
+
+
+@lru_cache(maxsize=4096)
+def _outside_area(polygon: Polygon) -> float:
+    board = box(0.0, 0.0, _BOARD_WIDTH, _BOARD_DEPTH)
+    return float(polygon.difference(board).area)
+
+
 def _geometry_score(
     polygons: dict[str, Polygon],
     *,
@@ -244,18 +261,15 @@ def _geometry_score(
         first = polygons[first_id]
         for second_id in ordered_ids[first_index + 1 :]:
             second = polygons[second_id]
-            overlap = first.intersection(second).area
+            pair = frozenset((first_id, second_id))
+            overlap, gap = _pair_geometry(first, second, pair in contact_pairs)
             if overlap > _GEOMETRY_TOLERANCE:
                 overlap_count += 1
                 overlap_total += overlap
-            pair = frozenset((first_id, second_id))
-            if pair in contact_pairs:
-                gap = max(0.0, first.distance(second) - _GRID)
-                if gap > _GEOMETRY_TOLERANCE:
-                    contact_gap_count += 1
-                    contact_gap_total += gap
-    board = box(0.0, 0.0, _BOARD_WIDTH, _BOARD_DEPTH)
-    outside_areas = tuple(polygon.difference(board).area for polygon in polygons.values())
+            if pair in contact_pairs and gap > _GEOMETRY_TOLERANCE:
+                contact_gap_count += 1
+                contact_gap_total += gap
+    outside_areas = tuple(_outside_area(polygon) for polygon in polygons.values())
     outside_count = sum(area > _GEOMETRY_TOLERANCE for area in outside_areas)
     outside_total = sum(area for area in outside_areas if area > _GEOMETRY_TOLERANCE)
     return (

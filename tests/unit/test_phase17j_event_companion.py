@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib
 import json
 import math
 import subprocess
@@ -2151,6 +2152,64 @@ def test_phase17n_light_corner_wall_joints_follow_source_image_registration() ->
 
 
 def test_phase17n_battlefield_builder_reproduces_committed_artifact() -> None:
+    builder_geometry = importlib.import_module("tools.event_companion_battlefield_builder_geometry")
+    vertices = ((0.0, 0.0), (2.0, 0.0), (2.0, 1.0), (0.0, 1.0))
+    pose = builder_geometry.AreaPose(1.0, 1.0, 0.0, "identity", 0.0, 0)
+    polygon_for_pose = builder_geometry.area_polygon
+    polygon_for_pose.cache_clear()
+    first = polygon_for_pose(vertices, pose)
+    assert polygon_for_pose(vertices, pose) is first
+    assert polygon_for_pose.cache_info().hits == 1
+    assert polygon_for_pose.cache_info().maxsize == 4096
+    for candidate in (
+        pose,
+        replace(pose, anchor_x=2.5),
+        replace(pose, anchor_x=4.0),
+        replace(pose, anchor_x=-0.5),
+        replace(pose, rotation=90.0),
+        replace(pose, local_transform="mirror_y_axis"),
+    ):
+        cached = polygon_for_pose(vertices, candidate)
+        assert cached.wkb == polygon_for_pose.__wrapped__(vertices, candidate).wkb
+    with pytest.raises(ValueError, match="Unsupported terrain-area local transform"):
+        polygon_for_pose(vertices, replace(pose, local_transform="unsupported"))
+    with pytest.raises(ValueError, match="invalid polygon"):
+        polygon_for_pose(((0.0, 0.0), (0.0, 0.0), (0.0, 0.0)), pose)
+
+    # Exercise overlaps, contact gaps, board violations, changed contact sets,
+    # and a changed pose against the original uncached calculation.
+    for second_pose in (replace(pose, anchor_x=2.5), replace(pose, anchor_x=4.0)):
+        second = polygon_for_pose(vertices, second_pose)
+        outside = polygon_for_pose(vertices, replace(pose, anchor_x=-0.5))
+        polygons = {"a": first, "b": second, "c": outside}
+        for contacts in (frozenset[frozenset[str]](), frozenset({frozenset({"a", "b"})})):
+            overlaps: list[float] = []
+            gaps: list[float] = []
+            for first_id, second_id in (("a", "b"), ("a", "c"), ("b", "c")):
+                left, right = polygons[first_id], polygons[second_id]
+                overlap = left.intersection(right).area
+                if overlap > 1e-6:
+                    overlaps.append(overlap)
+                if frozenset((first_id, second_id)) in contacts:
+                    gap = max(0.0, left.distance(right) - 0.05)
+                    if gap > 1e-6:
+                        gaps.append(gap)
+            board = builder_geometry.box(0.0, 0.0, 44.0, 60.0)
+            outside_areas = [polygon.difference(board).area for polygon in polygons.values()]
+            outside_areas = [area for area in outside_areas if area > 1e-6]
+            expected = (
+                len(overlaps),
+                round(sum(overlaps), 9),
+                len(gaps),
+                round(sum(gaps), 9),
+                len(outside_areas),
+                round(sum(outside_areas), 9),
+            )
+            assert builder_geometry._geometry_score(polygons, contact_pairs=contacts) == expected
+            assert builder_geometry._geometry_score(polygons, contact_pairs=contacts) == expected
+    assert builder_geometry._pair_geometry.cache_info().maxsize == 65536
+    assert builder_geometry._outside_area.cache_info().maxsize == 4096
+
     repository_root = Path(__file__).resolve().parents[2]
     builder_path = repository_root / "tools/build_event_companion_battlefields.py"
     artifact_path = (

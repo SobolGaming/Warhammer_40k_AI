@@ -854,6 +854,8 @@ def test_exporter_reproduces_committed_ui_contract_payloads(tmp_path: Path) -> N
     )
     for path in paths:
         assert _read_json(tmp_path / path) == _read_json(REPO_ROOT / path)
+        assert b"\r" not in (tmp_path / path).read_bytes()
+        assert (tmp_path / path).read_bytes() == (REPO_ROOT / path).read_bytes()
 
 
 def test_ui_contract_fixtures_expose_stable_joinable_viewer_payloads() -> None:

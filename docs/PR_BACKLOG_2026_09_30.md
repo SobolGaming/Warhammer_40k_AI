@@ -10,6 +10,8 @@ or implemented by this backlog entry.
 
 1. Complete Order 101 / P03F, including its current restore repairs, exact-head
    independent coding/Astra reviews and full validation; verify merged remote main.
+   Completed in [PR #524](https://github.com/SobolGaming/Warhammer_40k_AI/pull/524);
+   remote main verified at `38ce2265b81f2c0b2c9c668dae7536c239095193` on 1 October 2026.
 2. Implement `THROUGHPUT-AFTER-101` as a separate PR before Order 102.
 3. Resume Order 102 onward. Reconcile version 963 full source observations and
    consumer mappings before each affected order; schedule any additional repair
@@ -54,7 +56,7 @@ No safely redundant behavioral tests have been established.
 
 Profile the full 45-layout battlefield generator comparison (reported about nine
 minutes); preserve its complete comparison. Measure Linux worker timings before
-rebalancing: the current eight-shard weights came from an 18-worker Mac invocation,
+rebalancing: at approval, the eight-shard weights came from an 18-worker Mac invocation,
 while hosted shards use four workers. Evaluate 12 shards first. Evaluate 16 only
 after runner allowance and the six other initial jobs are accounted for. Do not
 invent timing profiles or treat missing/skipped shards as passing.
@@ -71,8 +73,14 @@ Published Order 101 head `2a5eaa60` provides historical timing evidence: local
 covered pytest 771.10 seconds; hosted run
 [36726559567](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/36726559567)
 30m03s, longest behavioral job 27m33s including setup/artifacts. These stages
-measure different work. Current Order 101 repairs invalidate that head as final
+measure different work. Subsequent Order 101 repairs invalidated that head as final
 validation for their code; retain the raw evidence for throughput comparison.
+
+The merged Order 101 baseline is `38ce2265b81f2c0b2c9c668dae7536c239095193`:
+local covered validation took 884.9526 seconds on the Mac with 18 workers;
+complete Linux run [36798414956](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/36798414956)
+took 29m17s. These are historical full-validation measurements, not same-host
+Windows optimization comparisons. See the [throughput evidence](performance/THROUGHPUT_AFTER_101.md).
 
 ## Version 963 source intake
 
@@ -116,8 +124,8 @@ belong in a separately scheduled integrity-hardening queue, with evidence retain
 No new hardening implementation is authorized merely by placing it in that queue.
 Complete playable rules and faction support are the priority; existing source,
 positive-control, regression and exact-head local/remote delivery gates remain.
-Subsequent implementation and separate coding review default to GPT-6.1 Sol High;
-Extra High is reserved for a specific unresolved complex issue and Ultra for an
-explicitly scoped deep audit. Preserve the active Order101 configuration and the
-separate Astra audit. Track the next few orders' elapsed time and rework without
+The owner's later direction supersedes the Sol High/Ultra plan: explicitly select
+GPT-6 Astra Extra High for implementation and separate coding review, beginning
+with `THROUGHPUT-AFTER-101`. Preserve the additional fresh parent Astra audit and
+its exact-head verdict. Track the next few orders' elapsed time and rework without
 claiming an unmeasured speed/quality benefit or independent model capacity.

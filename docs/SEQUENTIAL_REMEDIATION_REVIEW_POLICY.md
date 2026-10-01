@@ -72,13 +72,12 @@ conclusions as approval.
 
 ## Subsequent-order model plan and evaluation
 
-Use GPT-6.1 Sol (`gpt-6.1-sol`) with High (`high`) as the default for subsequent
-implementation and separate independent coding review. Leave the active Order101
-configuration undisturbed. Reserve Extra High (`xhigh`) for a specifically
-identified unresolved complex issue; use Ultra (`ultra`) only for an explicitly
-scoped deep audit. Record the issue and requested scope when escalating effort.
-The separate fresh parent Astra audit retains its own required model selection
-and evidence; this Sol plan does not substitute a Sol coding review for Astra.
+The owner's subsequent direction supersedes the earlier Sol High/Ultra plan:
+explicitly select GPT-6 Astra (`gpt-6-astra`) with Extra High (`xhigh`) for
+implementation and separate independent coding review, beginning with
+`THROUGHPUT-AFTER-101`. Preserve the additional fresh parent Astra audit and
+its exact-head verdict; an author's or coding reviewer's selection does not
+satisfy that separate audit. Stop rather than silently substitute a model.
 
 Verify accepted explicit model/effort selection and retain any limit on resolved
 runtime attestation. Do not silently substitute a model or claim effort tiers have

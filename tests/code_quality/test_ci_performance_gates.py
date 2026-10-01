@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 import scripts.build_test_shards as sharding
+from scripts.check_shard_coverage import check_shard_coverage
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW_PATH = ROOT / ".github" / "workflows" / "ci.yml"
@@ -20,7 +21,7 @@ def test_ready_pull_requests_and_merge_groups_trigger_ci() -> None:
     assert "  merge_group:\n    types: [checks_requested]" in trigger_block
 
 
-def test_coverage_gate_is_a_fail_closed_behavior_aggregate() -> None:
+def test_coverage_gate_is_a_fail_closed_behavior_aggregate(tmp_path: Path) -> None:
     workflow = WORKFLOW_PATH.read_text(encoding="utf-8")
     separator = "\n  coverage-gate:\n"
     assert separator in workflow
@@ -31,6 +32,38 @@ def test_coverage_gate_is_a_fail_closed_behavior_aggregate() -> None:
     assert "if: needs.behavior-tests.result != 'success'" in coverage_gate
     assert 'echo "One or more behavioral shards did not succeed."' in coverage_gate
     assert "exit 1" in coverage_gate
+    assert "merge-multiple: true" not in coverage_gate
+    validator = "python scripts/check_shard_coverage.py coverage-data --shard-count 12"
+    combine = "coverage combine coverage-data/behavior-coverage-*"
+    assert coverage_gate.index(validator) < coverage_gate.index(combine)
+
+    for invalid in (None, "missing", "extra", "wrong-name", "empty", "extra-file", "directory"):
+        root = tmp_path / str(invalid)
+        expected = tuple(
+            root / f"behavior-coverage-{shard}" / f".coverage.{shard}" for shard in range(1, 13)
+        )
+        for path in expected:
+            path.parent.mkdir(parents=True)
+            path.write_bytes(b"coverage input admission fixture")
+        if invalid is None:
+            assert check_shard_coverage(root, shard_count=12) == expected
+            continue
+        if invalid == "missing":
+            expected[-1].unlink()
+            expected[-1].parent.rmdir()
+        elif invalid == "extra":
+            (root / "behavior-coverage-13").mkdir()
+        elif invalid == "wrong-name":
+            expected[0].rename(expected[0].with_name(".coverage.2"))
+        elif invalid == "empty":
+            expected[0].write_bytes(b"")
+        elif invalid == "extra-file":
+            expected[0].with_name(".coverage.extra").write_bytes(b"unexpected input")
+        elif invalid == "directory":
+            expected[0].unlink()
+            expected[0].mkdir()
+        with pytest.raises(SystemExit):
+            check_shard_coverage(root, shard_count=12)
 
 
 def test_junit_file_attribute_wins_over_classname() -> None:
@@ -77,6 +110,7 @@ def test_manifest_check_rejects_assignment_drift(
     output_dir = _write_sample_shards(tmp_path=tmp_path, monkeypatch=monkeypatch)
     shard_one = output_dir / "shard-1.txt"
     shard_two = output_dir / "shard-2.txt"
+    assert all(b"\r" not in path.read_bytes() for path in output_dir.iterdir())
     first_entry = shard_one.read_text(encoding="utf-8")
     second_entry = shard_two.read_text(encoding="utf-8")
     shard_one.write_text(second_entry, encoding="utf-8")
@@ -194,7 +228,11 @@ def test_junit_profiles_reject_incomplete_or_invalid_runs(
         sharding._durations_from_junit(report)
 
 
-def test_quality_gate_requires_every_independent_lane_even_when_skipped() -> None:
+def test_quality_gate_requires_every_independent_lane_even_when_skipped(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr("sys.argv", ["build_test_shards.py", "--check"])
+    assert sharding.main() == 0
     workflow = WORKFLOW_PATH.read_text(encoding="utf-8")
     aggregate = workflow.partition("\n  quality-fast:\n")[2].partition("\n  lint:\n")[0]
     assert "if: always()" in aggregate
@@ -204,9 +242,19 @@ def test_quality_gate_requires_every_independent_lane_even_when_skipped() -> Non
     assert "exit 1" in aggregate
     assert "run: npm run test:unit" in workflow
     assert workflow.count("pytest tests/code_quality -q -n auto --dist=worksteal --no-cov") == 1
-    for shard in range(1, 9):
+    behavior = workflow.partition("\n  behavior-tests:\n")[2].partition("\n  coverage-gate:\n")[0]
+    assert "fail-fast: false" in behavior
+    matrix = behavior.partition("      matrix:\n")[2].partition("    steps:\n")[0]
+    assert matrix == "        include:\n" + "".join(
+        f'          - shard_id: "{shard}"\n            manifest: ci/test_shards/shard-{shard}.txt\n'
+        for shard in range(1, 13)
+    )
+    for shard in range(1, 13):
         assert workflow.count(f"manifest: ci/test_shards/shard-{shard}.txt") == 1
-    assert 'test -s "coverage-data/.coverage.${shard}"' in workflow
+    coverage = workflow.partition("\n  coverage-gate:\n")[2]
+    assert "scripts/check_shard_coverage.py coverage-data --shard-count 12" in coverage
+    assert "uv run --no-sync coverage report --fail-under=85" in coverage
+    assert "scripts/build_test_shards.py --check --shard-count 12" in workflow
 
 
 @pytest.mark.parametrize("newline", ["\n", "\r\n", "\r"])

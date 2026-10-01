@@ -17,6 +17,7 @@ from tools.generate_aeldari_yriel_vypers_starfangs_rule_ir import (
     generated_artifact_payload,
 )
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind, CatalogAbilitySupport
 from warhammer40k_core.core.dice import DiceRollResult
@@ -375,6 +376,7 @@ def test_catalog_preserves_datasheet_stats_keywords_composition_and_abilities(
 
 
 def test_catalog_preserves_every_weapon_profile() -> None:
+    catalog = _catalog()
     expected = {
         (PRINCE_YRIEL_ID, "Eye of Wrath"): (6, "3", 2, 6, -2, "2", ("Assault", "Pistol")),
         (PRINCE_YRIEL_ID, "Shuriken pistol"): (
@@ -410,7 +412,7 @@ def test_catalog_preserves_every_weapon_profile() -> None:
     assert {
         (datasheet_id, profile.name): _profile_summary(profile)
         for datasheet_id in (PRINCE_YRIEL_ID, VYPERS_ID, STARFANGS_ID)
-        for wargear in _catalog().wargear
+        for wargear in catalog.wargear
         if wargear.wargear_id.startswith(f"{datasheet_id}:")
         for profile in wargear.weapon_profiles
     } == expected
@@ -608,7 +610,7 @@ def test_piratical_hero_grants_only_while_yriel_is_leading_an_attached_unit() ->
     }
     attached_state = _state_for_armies(attached_armies, stage=GameLifecycleStage.BATTLE)
     attacker = voidreavers.own_models[0]
-    rifle = _weapon_profile(VOIDREAVERS_ID, "Shuriken rifle")
+    rifle = _weapon_profile(catalog, VOIDREAVERS_ID, "Shuriken rifle")
     hit_context = HitRollModifierContext(
         state=attached_state,
         attacking_unit_instance_id=attached_id,
@@ -657,7 +659,7 @@ def test_piratical_hero_grants_only_while_yriel_is_leading_an_attached_unit() ->
         for army in unled_armies
     }
     unled_state = _state_for_armies(unled_armies, stage=GameLifecycleStage.BATTLE)
-    yriel_profile = _weapon_profile(PRINCE_YRIEL_ID, "Spear of Twilight")
+    yriel_profile = _weapon_profile(catalog, PRINCE_YRIEL_ID, "Spear of Twilight")
     unled_context = WeaponProfileModifierContext(
         state=unled_state,
         source_phase=BattlePhase.FIGHT,
@@ -807,6 +809,7 @@ def test_harassment_fire_targets_one_attached_rules_unit_and_suppresses_both_com
     target_model_ids = tuple(
         sorted(model.model_instance_id for model in (*yriel.own_models, *voidreavers.own_models))
     )
+    bright_lance = _weapon_profile(catalog, VYPERS_ID, "Bright lance")
     sequence = AttackSequence(
         sequence_id="attack-sequence:harassment-fire:attached-target",
         attacker_player_id="player-b",
@@ -817,8 +820,8 @@ def test_harassment_fire_targets_one_attached_rules_unit_and_suppresses_both_com
                 attacker_model_instance_id=vypers.own_models[0].model_instance_id,
                 weapon_instance_id="weapon-instance:test:harassment-fire:bright-lance",
                 wargear_id="wargear:harassment-fire:bright-lance",
-                weapon_profile_id=_weapon_profile(VYPERS_ID, "Bright lance").profile_id,
-                weapon_profile=_weapon_profile(VYPERS_ID, "Bright lance"),
+                weapon_profile_id=bright_lance.profile_id,
+                weapon_profile=bright_lance,
                 target_unit_instance_id=attached_id,
                 shooting_type=ShootingType.NORMAL,
                 attacks=1,
@@ -892,12 +895,12 @@ def test_harassment_fire_targets_one_attached_rules_unit_and_suppresses_both_com
         (
             voidreavers.own_models[0].model_instance_id,
             "000002531:shuriken-pistol",
-            _weapon_profile(VOIDREAVERS_ID, "Shuriken pistol"),
+            _weapon_profile(catalog, VOIDREAVERS_ID, "Shuriken pistol"),
         ),
         (
             yriel.own_models[0].model_instance_id,
             "000004193:shuriken-pistol",
-            _weapon_profile(PRINCE_YRIEL_ID, "Shuriken pistol"),
+            _weapon_profile(catalog, PRINCE_YRIEL_ID, "Shuriken pistol"),
         ),
     ):
         assert (
@@ -922,7 +925,7 @@ def test_harassment_fire_targets_one_attached_rules_unit_and_suppresses_both_com
             attacking_rules_unit_id=attached_id,
             attacker_model_id=yriel.own_models[0].model_instance_id,
             wargear_id="000004193:shuriken-pistol",
-            profile=_weapon_profile(PRINCE_YRIEL_ID, "Shuriken pistol"),
+            profile=_weapon_profile(catalog, PRINCE_YRIEL_ID, "Shuriken pistol"),
             target=vypers,
         )
         == -1
@@ -1704,10 +1707,10 @@ def _unit(
     )
 
 
-def _weapon_profile(datasheet_id: str, profile_name: str) -> Any:
+def _weapon_profile(catalog: ArmyCatalog, datasheet_id: str, profile_name: str) -> WeaponProfile:
     return next(
         profile
-        for wargear in _catalog().wargear
+        for wargear in catalog.wargear
         if wargear.wargear_id.startswith(f"{datasheet_id}:")
         for profile in wargear.weapon_profiles
         if profile.name == profile_name
