@@ -53,6 +53,11 @@ cover/
 # Derived serial performance receipts are uploaded as CI artifacts.
 /reports/performance-smoke.json
 /reports/performance-attempts/
+/reports/quality-timing/
+/reports/code-quality.xml
+/reports/behavior-timing/
+/reports/behavior-shard-[1-9].xml
+/reports/behavior-shard-1[0-2].xml
 
 # Translations
 *.mo
