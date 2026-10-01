@@ -31,6 +31,22 @@ extra files. The bounded repair makes those two writers explicitly emit LF and
 adds byte-level checks to the existing exporter regression. No committed contract
 artifact or runtime code changes; the complete base-ref gate remains required.
 
+Native validation uses process-local `PYTHONUTF8=1` before launching Python or
+`uv` (`$env:PYTHONUTF8 = "1"` in PowerShell), with task-local Node 24.18.0 on
+`PATH`. This preserves canonical UTF-8 source/evidence decoding without changing
+the operating-system locale. The complete-gate receipts record the mode.
+Two audit path identifiers use `as_posix()` so native Windows discovers the same
+engine consumer and conftest identities as the committed POSIX inventory.
+The full negative controls and all reviewed source/evidence pins remain intact.
+
+An initial native covered run failed two evidence-file reads under cp1252. A
+temporary explicit-encoding test edit passed complete behavior but changed five
+whole-function AST receipts pinned by Order 97; full quality correctly rejected
+that drift. The test was restored to its exact reviewed bytes, retaining the
+existing inventory identity. Failed receipts and the successful intermediate
+behavior receipt keep their actual revisions; neither substitutes for complete
+validation after this final environment and portability repair.
+
 ## Workloads and measurement boundaries
 
 The baseline is merged main `38ce2265b81f2c0b2c9c668dae7536c239095193`, tree

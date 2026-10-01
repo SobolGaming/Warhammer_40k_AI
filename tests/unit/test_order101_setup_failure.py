@@ -91,9 +91,7 @@ def test_failed_disembark_restores_selected_to_move_and_prior_location(diameter:
     )
     receipt = receipt_event.payload
     assert isinstance(receipt, dict)
-    sources = json.loads(
-        Path("data/source_audits/order97/selected-sources.json").read_text(encoding="utf-8")
-    )
+    sources = json.loads(Path("data/source_audits/order97/selected-sources.json").read_text())
     source = next(row for row in sources if row["row_id"] == "rule:03:03.02.01:1")
     assert receipt["source_observation_row_id"] == source["row_id"]
     assert receipt["source_observation_sha256"] == source["source_sha256"]

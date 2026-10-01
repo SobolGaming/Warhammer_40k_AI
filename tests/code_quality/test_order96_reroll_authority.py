@@ -39,7 +39,7 @@ def test_every_engine_reroll_consumer_has_an_audited_authorizing_decision() -> N
                 for node in calls
             ):
                 continue
-            key = (str(path.relative_to(ENGINE)), owner.name)
+            key = (path.relative_to(ENGINE).as_posix(), owner.name)
             observed.add(key)
             if any(
                 isinstance(node.func, ast.Attribute)
