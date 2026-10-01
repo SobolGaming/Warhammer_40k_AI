@@ -1224,6 +1224,7 @@ def _write_json(path: Path, payload: JsonValue) -> None:
     path.write_text(
         json.dumps(validate_json_value(payload), indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
 
 

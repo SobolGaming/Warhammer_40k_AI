@@ -24,6 +24,13 @@ rounding, all 45 layouts, source-byte authentication and complete output
 comparison remain unchanged. Existing builder tests also compare uncached
 geometry, altered poses/contact sets and invalid inputs with the cached path.
 
+Native Windows contract validation initially failed because its two JSON writers
+emitted CRLF. A retained full regeneration proved all 93 changed files, including
+the manifest, were identical after only CRLF-to-LF conversion, with no missing or
+extra files. The bounded repair makes those two writers explicitly emit LF and
+adds byte-level checks to the existing exporter regression. No committed contract
+artifact or runtime code changes; the complete base-ref gate remains required.
+
 ## Workloads and measurement boundaries
 
 The baseline is merged main `38ce2265b81f2c0b2c9c668dae7536c239095193`, tree
