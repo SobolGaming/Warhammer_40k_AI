@@ -331,12 +331,12 @@ gate after every shard succeeds. Full type checking and architecture checks also
 in CI and run on the `pre-push` pre-commit stage; commit-time hooks are limited to Ruff check and
 format for a shorter edit/commit loop.
 
-The eight behavioral manifests in `ci/test_shards/` use deterministic
+The twelve behavioral manifests in `ci/test_shards/` use deterministic
 largest-processing-time balancing of median per-file durations from complete
 successful Linux CI runs. Verify that every behavioral file appears exactly once:
 
 ```bash
-uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8
+uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 ```
 
 Download the `behavior-report-*` artifacts from each chosen successful run into a
@@ -348,7 +348,7 @@ uv run --no-sync python scripts/build_test_shards.py \
   --profile-source "RUN_URL; commit SHA; ubuntu-latest; 4 workers per shard" \
   --junit reports/run-two \
   --profile-source "RUN_URL; commit SHA; ubuntu-latest; 4 workers per shard" \
-  --shard-count 8
+  --shard-count 12
 ```
 
 A single complete local JUnit XML is also accepted; label its host accurately and
@@ -374,7 +374,7 @@ live conformance, base-ref compatibility, and installed-wheel smoke. Code-qualit
 workers share read-only source/AST data within each process; mutable test fixtures
 and generated temporary output remain independently validated.
 
-Eight standard runners increase behavioral parallel capacity without changing test
+Twelve standard runners increase behavioral parallel capacity without changing test
 selection or the 85% combined branch-coverage gate. Compare several successful CI
 runs before claiming a wall-time reduction: added capacity can increase total runner
 minutes, and cold caches or queued jobs can offset the idealized speedup. Keep main
@@ -413,7 +413,7 @@ CI uploads each shard's JUnit report for future median-duration profiles. Full b
 run for ready pull requests, merge candidates, and pushes to `main`; draft pull requests keep the
 faster quality and parallel type-check feedback without repeatedly running the complete suite.
 The stable `coverage-gate` aggregate fails closed when any behavioral shard does not succeed, then
-combines all eight coverage artifacts and enforces the branch-coverage threshold. Repositories that
+combines all twelve coverage artifacts and enforces the branch-coverage threshold. Repositories that
 enable branch protection can require `quality-fast`, `mypy`, `pyright`, and `coverage-gate` without
 encoding matrix shard names in the protection rule.
 
@@ -969,7 +969,7 @@ uv run mypy src tests
 uv run pyright
 PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85
 uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov
-uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8
+uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 uv run lint-imports
 uv run pre-commit run --all-files
 ```

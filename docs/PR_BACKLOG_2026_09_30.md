@@ -116,8 +116,8 @@ belong in a separately scheduled integrity-hardening queue, with evidence retain
 No new hardening implementation is authorized merely by placing it in that queue.
 Complete playable rules and faction support are the priority; existing source,
 positive-control, regression and exact-head local/remote delivery gates remain.
-Subsequent implementation and separate coding review default to GPT-6.1 Sol High;
-Extra High is reserved for a specific unresolved complex issue and Ultra for an
-explicitly scoped deep audit. Preserve the active Order101 configuration and the
-separate Astra audit. Track the next few orders' elapsed time and rework without
+The owner's later direction supersedes the Sol High/Ultra plan: explicitly select
+GPT-6 Astra Extra High for implementation and separate coding review, beginning
+with `THROUGHPUT-AFTER-101`. Preserve the additional fresh parent Astra audit and
+its exact-head verdict. Track the next few orders' elapsed time and rework without
 claiming an unmeasured speed/quality benefit or independent model capacity.

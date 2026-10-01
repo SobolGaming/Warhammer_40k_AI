@@ -76,7 +76,7 @@ jobs:
         run: uv run --no-sync lint-imports
 
       - name: Verify behavioral shard manifests
-        run: uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8
+        run: uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 
   contract-conformance:
     runs-on: ubuntu-latest
@@ -276,6 +276,14 @@ jobs:
             manifest: ci/test_shards/shard-7.txt
           - shard_id: "8"
             manifest: ci/test_shards/shard-8.txt
+          - shard_id: "9"
+            manifest: ci/test_shards/shard-9.txt
+          - shard_id: "10"
+            manifest: ci/test_shards/shard-10.txt
+          - shard_id: "11"
+            manifest: ci/test_shards/shard-11.txt
+          - shard_id: "12"
+            manifest: ci/test_shards/shard-12.txt
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -375,12 +383,9 @@ jobs:
         with:
           pattern: behavior-coverage-*
           path: coverage-data
-          merge-multiple: true
 
       - name: Combine coverage and enforce branch threshold
         run: |
-          for shard in {1..8}; do
-            test -s "coverage-data/.coverage.${shard}"
-          done
-          uv run --no-sync coverage combine coverage-data
+          uv run --no-sync python scripts/check_shard_coverage.py coverage-data --shard-count 12
+          uv run --no-sync coverage combine coverage-data/behavior-coverage-*
           uv run --no-sync coverage report --fail-under=85

@@ -220,11 +220,12 @@ def _write_manifests(
         stale_manifest.unlink()
     for shard in shards:
         manifest_path = output_dir / f"shard-{shard.shard_id}.txt"
-        manifest_path.write_text("\n".join(shard.test_files) + "\n", encoding="utf-8")
+        manifest_path.write_text("\n".join(shard.test_files) + "\n", encoding="utf-8", newline="\n")
     summary = _summary_payload(shards=shards, durations=durations, profiles=profiles)
     (output_dir / "durations.json").write_text(
         json.dumps(summary, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     _check_manifests(output_dir=output_dir, shard_count=len(shards))
 
