@@ -18,7 +18,7 @@ from warhammer40k_core.rules.source_evidence import (
 
 ARTIFACT_SCHEMA: Final = "core-v2-transports-source-v1"
 EXPECTED_SOURCE_PACKAGE_ID: Final = "gw-11e-core-transports"
-EXPECTED_SOURCE_VERSION: Final = "reviewed-transports-observed-2026-09-03"
+EXPECTED_SOURCE_VERSION: Final = "reviewed-transports-shock-observed-2026-10-01"
 EXPECTED_DOCUMENT_IDENTITIES: Final = (
     (
         "40k-app-transports-2026-09-01",
@@ -32,10 +32,14 @@ EXPECTED_DOCUMENT_IDENTITIES: Final = (
         "https://game-datamissions.com/11th/rules/changelog",
         "2026-09-02T12:30:09-04:00",
         "931",
-        (
-            "gw-11e-core-rules:transports:assault-disembark-move",
-            "gw-11e-core-rules:transports:shock-disembark-move",
-        ),
+        ("gw-11e-core-rules:transports:assault-disembark-move",),
+    ),
+    (
+        "game-datamissions-shock-live-observation-2026-10-01",
+        "https://game-datamissions.com/11th/rules/core-rules",
+        "2026-10-01T12:04:31.127429+00:00",
+        None,
+        ("gw-11e-core-rules:transports:shock-disembark-move",),
     ),
 )
 EXPECTED_RULE_IDENTITIES: Final = (
@@ -58,7 +62,7 @@ EXPECTED_RULE_IDENTITIES: Final = (
         "gw-11e-core-rules:transports:shock-disembark-move",
         "18.07",
         "SHOCK DISEMBARK MOVE",
-        "d8dae354aabcc30c582b66e70939dd67c010055637f86923292c0c76ffe7252c",
+        "3ac2c07c75fc4285319aa4b34bb1a724b28f50dc54a932345271d6a63d518019",
     ),
 )
 EXPECTED_OBSERVATION_SHA256S: Final = (
@@ -66,10 +70,10 @@ EXPECTED_OBSERVATION_SHA256S: Final = (
     "645e8e96af35d4aefe38c755c2ce6b72579d925865ace9e5b16e5b58158c5b98",
     "21dde0c665b4a09fecc0ddc6f4e09ee252b6a3b27af1779f858aa8a4fcfc0dae",
     "afa51f8bbba769ecf4c34cf7acfa62c02addc247f11b42d830cc91bbded0066b",
-    "3c866ae008d4085ac1c09d21b794221bb72eb18d62a9dd7415668733bfb722cc",
-    "cc8a85d4bcd88e7eb0ec3d9228721e5c1e4d1e4287b57d02a18ae3e8b3523efe",
+    "66c10a476ebcb2e85bf0bf13989f1391448aae26ff534a9f95424f564005f80c",
+    "0dc676c4c35f89c6c68e0376743883edc526869beeb642b6b0c8ce09b75ccd5b",
 )
-EXPECTED_PACKAGE_HASH: Final = "a44f8932a0a6e1e557a00e71876691858627c6c3008f519de0b00f5918375b71"
+EXPECTED_PACKAGE_HASH: Final = "ea6696318e007be4b5ef14436bde91b7eada7dc43712790ec8b2f458481476e0"
 
 
 class CoreTransportsSourceArtifactError(ValueError):
@@ -195,7 +199,7 @@ def core_transports_source_artifact_from_json_bytes(
         raise CoreTransportsSourceArtifactError(
             "Transports source artifact schema is invalid."
         ) from exc
-    if len(artifact.rules) != 3 or len(artifact.source_documents) != 2:
+    if len(artifact.rules) != 3 or len(artifact.source_documents) != 3:
         raise CoreTransportsSourceArtifactError(
             "Transports source artifact drifted from its reviewed identity."
         )

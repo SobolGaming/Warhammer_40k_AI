@@ -1,5 +1,11 @@
 # CORE V2 external contract
 
+Contract 42.1 corrects Shock Disembark to the current source while preserving
+atomic proposal validation/mutation and the engine-owned pending-continuation
+protocol. Family schemas and the 42.0 persistence envelope remain unchanged;
+old saves and replays require their exact original runtime. See
+[V963-SHOCK](../docs/V963_SHOCK_SCOPE_PLAN.md).
+
 Contract 42 permits nullable ranged targets and empty ranged declarations.
 Optional selected-weapon inventories retain Hazardous and One Shot authority.
 See [Order 95](../docs/ORDER_95_SCOPE_PLAN.md) and the adapter contract.
@@ -29,7 +35,7 @@ from HealingEffect and requires source-bound engagement evidence on battlefield
 revival events. See [35 to 36 migration](migrations/35-to-36.md).
 
 
-Contract version: `42.0.0`
+Contract version: `42.1.0`
 
 Order 81 / P03E restores the existing pending-proposal contract for all 13
 parameterized families. Interaction conformance examples now preserve the four

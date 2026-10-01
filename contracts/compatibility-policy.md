@@ -1,7 +1,7 @@
 # Compatibility policy
 
 The external contract uses semantic versioning. Its current version is
-`42.0.0`, declared in `openapi.yaml`, `manifest.json`, and
+`42.1.0`, declared in `openapi.yaml`, `manifest.json`, and
 `warhammer40k_core.adapters.external_contract`.
 
 Payload families also carry an explicit `schema_version`. A payload-family
@@ -47,6 +47,15 @@ payload-family version changes, migration notes, and old-client support window
 must be reviewed in the same change.
 
 ## Support window
+
+Contract 42.1 applies the current Shock Disembark source: ordinary unengaged
+setup, no Shock-generated forced Fight response, and charge ineligibility through
+the turn-end boundary. Atomic proposal validation and mutation, rejected-proposal
+handling, and the engine-owned pending-continuation protocol remain unchanged.
+Clients follow engine-authored pending decisions; selected source rules determine
+which queues are emitted. All family versions and the 42.0 persistence envelope remain unchanged.
+Old rule-generated states and replays require their exact original runtime.
+See [V963-SHOCK](../docs/V963_SHOCK_SCOPE_PLAN.md).
 
 Contract 42 permits selected ranged weapons to carry an explicit null target and
 separates selected weapons from actual attacks. Retain 41.x through at least

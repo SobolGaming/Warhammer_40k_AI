@@ -128,6 +128,19 @@
       "samples_per_case": 5,
       "budget_profile": "current-change-relative-v1",
       "workload_id": "order88-numeric-strength-attacks-v1"
+    },
+    "shock_reconstruction": {
+      "driver": "scripts/measure_shock_reconstruction.py",
+      "historical_workload_reference": "docs/performance/current/v963-shock-reconstruction-specific.json",
+      "cases": [
+        "active_shock/restore",
+        "active_shock/replay",
+        "expired_shock/restore",
+        "expired_shock/replay"
+      ],
+      "samples_per_case": 3,
+      "budget_profile": "current-change-relative-v1",
+      "workload_id": "v963-shock-reconstruction-v1"
     }
   },
   "operations": {
@@ -571,6 +584,176 @@
       ],
       "families": [
         "roster"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "source-authority-publication": {
+      "paths": [
+        "src/warhammer40k_core/rules/source_authority_registry.json",
+        "src/warhammer40k_core/rules/source_authority_registry.py"
+      ],
+      "owners": [
+        "@document",
+        "@module"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "shock-source-evidence": {
+      "paths": [
+        "data/source_audits/v963_shock/*"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "shock-source-generation-and-audit": {
+      "paths": [
+        "tools/build_core_transports_source.py",
+        "tools/v963_shock_source.py",
+        "tools/core_rules_order95_audit.py",
+        "tools/core_rules_order97_history.py",
+        "tools/core_rules_order97_inventory.py"
+      ],
+      "owners": [
+        "@module",
+        "_path",
+        "build_audit",
+        "build_historical_payload",
+        "build_payload",
+        "historical_evidence_path",
+        "main",
+        "selected_records",
+        "sha256_payload",
+        "shock_source_text",
+        "verify_source_observation"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "contract-42-1-publication": {
+      "paths": [
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "conformance/typescript/src/contract.ts",
+        "contracts/README.md",
+        "contracts/compatibility-policy.md",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document",
+        "@module"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "shock-regression-controls": {
+      "paths": [
+        "tests/unit/test_phase10q_transports.py",
+        "tests/unit/test_phase14a_source_identity.py",
+        "tests/unit/test_phase18e_server_api.py",
+        "tests/unit/test_v963_shock_disembark.py",
+        "tests/v963_shock_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "_charge_reason",
+        "_forge_last_forced_fight_selection_type",
+        "_last_forced_fight_selection_authority_payloads",
+        "_remove_currently_engaged_from_last_forced_fight_selection",
+        "tactical_shock_session",
+        "test_assault_disembark_places_attached_rules_unit_atomically",
+        "test_forced_fight_source_context_fails_closed_for_malformed_cross_phase_state",
+        "test_order62_new_passenger_engagements_use_facade_and_restore",
+        "test_order62_transport_only_engagement_does_not_force_passenger_fight",
+        "test_p18c_p18d_p18e_transport_source_artifact_is_pinned_typed_and_executable",
+        "test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads",
+        "test_shock_disembark_forced_fight_queue_event_is_public_to_both_players",
+        "test_shock_disembark_resolver_does_not_inherit_transport_engagements",
+        "test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_replay",
+        "test_shock_disembark_without_start_engagements_records_a_skipped_fight_queue",
+        "test_v963_attached_shock_setup_uses_facade_and_checks_every_component",
+        "test_v963_shock_charge_lock_includes_all_turn_end_rules_then_expires",
+        "test_v963_shock_malformed_and_stale_proposals_do_not_pop_or_mutate",
+        "test_v963_shock_rejects_passenger_engagement_without_mutation",
+        "test_v963_shock_unengaged_setup_has_no_queue_and_restores_exactly"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "behavior-shard-inventory": {
+      "paths": [
+        "ci/test_shards/durations.json",
+        "ci/test_shards/shard-*.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "shock-lifecycle-reconstruction": {
+      "paths": [
+        "src/warhammer40k_core/engine/lifecycle_state_validation.py"
+      ],
+      "owners": [
+        "@module",
+        "_validate_disembarked_unit_state_history",
+        "_validate_shock_disembark_fight_history",
+        "_validate_unique_forced_fight_selection_lineages",
+        "validate_disembarked_unit_state_consistency"
+      ],
+      "families": [
+        "reconstruction",
+        "shock_reconstruction"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "shock-placement-replay": {
+      "paths": [
+        "src/warhammer40k_core/engine/phases/movement_placement_proposals.py"
+      ],
+      "owners": [
+        "@module",
+        "_apply_valid_disembark",
+        "_forced_fight_selected_unit_ids_for_current_phase",
+        "_start_shock_disembark_forced_fight_activations"
+      ],
+      "families": [
+        "shock_reconstruction"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "workload-shock-reconstruction": {
+      "paths": [
+        "scripts/measure_shock_reconstruction.py"
+      ],
+      "owners": [
+        "@module",
+        "main",
+        "prepare",
+        "sample"
+      ],
+      "families": [
+        "shock_reconstruction"
       ],
       "sensitive": true,
       "mandatory": true

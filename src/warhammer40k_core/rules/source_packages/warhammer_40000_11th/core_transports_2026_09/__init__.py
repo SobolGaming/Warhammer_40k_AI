@@ -35,7 +35,7 @@ from ._artifacts import (
 )
 
 _ARTIFACT_PATH: Final = "artifacts/package.json"
-EXPECTED_ARTIFACT_SHA256: Final = "1b0f790f63da545c4cd0d509bba52aa3deacaa18dda9f1402491b00beded2e76"
+EXPECTED_ARTIFACT_SHA256: Final = "52731cea96cc3fbadad6dbb79072fca8a7b9c662c519647c39d787edf5a9fda5"
 
 
 def _load_artifact() -> CoreTransportsSourcePackageArtifact:
@@ -85,7 +85,7 @@ def source_package() -> RuleSourcePackage:
     )
     catalog_version = CatalogVersion.dated(
         version_id=SOURCE_VERSION,
-        source_date=date(2026, 9, 3),
+        source_date=date(2026, 10, 1),
     )
     document_ids = tuple(
         SourceDocumentId(package_id=package_id, document_id=document.document_id)
@@ -118,7 +118,7 @@ def source_package() -> RuleSourcePackage:
             RulesetBundle(
                 bundle_id=SOURCE_PACKAGE_ID,
                 ruleset_id=RulesetId.warhammer_40000_eleventh(
-                    version="core-v2-transports-source-observed-2026-09-03"
+                    version="core-v2-transports-shock-observed-2026-10-01"
                 ),
                 package_id=package_id,
                 catalog_version=catalog_version,

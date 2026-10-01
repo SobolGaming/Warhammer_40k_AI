@@ -16,24 +16,17 @@ from warhammer40k_core.engine.physical_engagement import (
 
 from warhammer40k_core.engine import physical_proposal_context as _physical_context
 
-from warhammer40k_core.engine.forced_fight_queue import install_forced_fight_queue
 from warhammer40k_core.engine.phases.movement_imports import *
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
 from warhammer40k_core.engine.phases.movement_rules_unit_disembark import (
     RulesUnitDisembarkResolution,
 )
-from warhammer40k_core.engine.fight_order import (
-    ForcedFightActivationContext,
-    FightPhaseState,
-    FightsFirstRegistry,
-)
 from warhammer40k_core.engine.phases.movement_handler import *
 from warhammer40k_core.engine.phases.movement_reactions import *
 from warhammer40k_core.engine.phases.movement_reinforcements import *
 from warhammer40k_core.engine.phases.movement_transports import *
 from warhammer40k_core.engine.rules_units import (
-    rules_unit_identity_history_contains,
     rules_unit_view_from_armies,
 )
 
@@ -438,15 +431,6 @@ def _apply_valid_disembark(
             else None,
         },
     )
-    if disembark.selection.disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK:
-        _start_shock_disembark_forced_fight_activations(
-            state=state,
-            decisions=decisions,
-            disembark=disembark,
-            disembark_event_id=disembark_event.event_id,
-            post_engaged_ids=post_engaged_ids,
-            ruleset_descriptor=ruleset_descriptor,
-        )
     if disembark.selection.disembark_mode is DisembarkModeKind.TACTICAL_DISEMBARK:
         current_movement_state = state.movement_phase_state
         if current_movement_state is None or current_movement_state.active_selection is None:
@@ -454,112 +438,6 @@ def _apply_valid_disembark(
         state.replace_movement_phase_state(
             current_movement_state.with_pending_setup_event(disembark_event.event_id)
         )
-
-
-def _start_shock_disembark_forced_fight_activations(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    disembark: DisembarkResolution | RulesUnitDisembarkResolution,
-    disembark_event_id: str,
-    post_engaged_ids: tuple[str, ...],
-    ruleset_descriptor: RulesetDescriptor,
-) -> None:
-    disembarked_state = disembark.disembarked_unit_state
-    if disembarked_state is None:
-        raise GameLifecycleError("Shock Disembark requires disembarked unit state.")
-    selected_ids = _forced_fight_selected_unit_ids_for_current_phase(
-        state=state,
-        decisions=decisions,
-    )
-    pending_ids = tuple(
-        unit_id
-        for unit_id in post_engaged_ids
-        if not rules_unit_identity_history_contains(
-            state=state,
-            identity_ids=selected_ids,
-            unit_instance_id=unit_id,
-        )
-    )
-    if not pending_ids:
-        decisions.event_log.append(
-            "forced_fight_activation_queue_skipped",
-            validate_json_value(
-                {
-                    "game_id": state.game_id,
-                    "battle_round": state.battle_round,
-                    "phase": BattlePhase.MOVEMENT.value,
-                    "active_player_id": _active_player_id(state),
-                    "phase_body_status": "forced_fight_activation_queue_skipped",
-                    "source_rule_id": disembarked_state.source_rule_id,
-                    "trigger_event_id": disembark_event_id,
-                    "source_unit_instance_id": disembark.selection.unit_instance_id,
-                    "transport_unit_instance_id": (disembark.selection.transport_unit_instance_id),
-                    "start_engaged_enemy_unit_instance_ids": [],
-                    "post_engaged_enemy_unit_instance_ids": list(post_engaged_ids),
-                    "already_selected_unit_instance_ids": list(selected_ids),
-                }
-            ),
-        )
-        return
-    if state.fight_phase_state is not None:
-        raise GameLifecycleError(
-            "Shock Disembark cannot replace an active Fight activation context."
-        )
-    owners = {
-        rules_unit_view_from_armies(
-            armies=tuple(state.army_definitions),
-            unit_instance_id=unit_id,
-        ).owner_player_id
-        for unit_id in pending_ids
-    }
-    if len(owners) != 1:
-        raise GameLifecycleError("Shock Disembark forced Fight units must share one opponent.")
-    selecting_player_id = next(iter(owners))
-    if selecting_player_id == _active_player_id(state):
-        raise GameLifecycleError("Shock Disembark forced Fight units must belong to the opponent.")
-    context = ForcedFightActivationContext(
-        context_id=f"forced-fight:{disembark_event_id}",
-        source_rule_id=disembarked_state.source_rule_id,
-        trigger_event_id=disembark_event_id,
-        source_phase=BattlePhaseKind.MOVEMENT,
-        source_unit_instance_id=disembark.selection.unit_instance_id,
-        transport_unit_instance_id=disembark.selection.transport_unit_instance_id,
-        selecting_player_id=selecting_player_id,
-        eligible_unit_instance_ids=pending_ids,
-    )
-    install_forced_fight_queue(
-        state=state,
-        decisions=decisions,
-        context=context,
-        policy=ruleset_descriptor.fight_policy,
-    )
-
-
-def _forced_fight_selected_unit_ids_for_current_phase(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-) -> tuple[str, ...]:
-    selected_ids: set[str] = set()
-    for event in decisions.event_log.records:
-        if event.event_type != "fight_activation_selected" or not isinstance(event.payload, dict):
-            continue
-        forced_context = event.payload.get("forced_activation_context")
-        activation = event.payload.get("activation_selection")
-        if not isinstance(forced_context, dict) or not isinstance(activation, dict):
-            continue
-        if (
-            event.payload.get("battle_round") != state.battle_round
-            or event.payload.get("active_player_id") != _active_player_id(state)
-            or forced_context.get("source_phase") != BattlePhase.MOVEMENT.value
-        ):
-            continue
-        unit_id = activation.get("unit_instance_id")
-        if type(unit_id) is not str:
-            raise GameLifecycleError("Forced Fight activation event unit identity is malformed.")
-        selected_ids.add(_validate_identifier("unit_instance_id", unit_id))
-    return tuple(sorted(selected_ids))
 
 
 def _apply_valid_combat_disembark(
