@@ -206,7 +206,7 @@
     },
     {
       "path": "src/warhammer40k_core/_engine_build_manifest.json",
-      "sha256": "77090a63097737b1f624fd7bdd072e9c34781464729e0c1b135f5f261dc1fa74"
+      "sha256": "2f831dd3b558e9ccf8ce0227e1eafdf4ff675a622e3301fb81cf6e1e402483bb"
     },
     {
       "path": "tests/absent_strength_helpers.py",
@@ -750,7 +750,7 @@
     },
     {
       "path": "tests/unit/test_order101_setup_failure.py",
-      "sha256": "0080e2c2f299529fe1cacf3b0aaab31acf55b649d9635d82c4eefb560f6588c1"
+      "sha256": "c76479303b1bb3eb5c5b3824c346f994326e23b627f8d29b54883a406e139521"
     },
     {
       "path": "tests/unit/test_order36_sequencing.py",

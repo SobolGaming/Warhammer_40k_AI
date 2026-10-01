@@ -291,6 +291,47 @@ def _assert_rejected_proposal_cannot_authorize_completion(session: LocalGameSess
         )
 
 
+def _assert_pending_embark_transition_cannot_change_movement_kind(
+    session: LocalGameSession,
+) -> None:
+    from warhammer40k_core.engine.movement_decision_authority import (
+        validated_embark_movement_completions,
+    )
+
+    controller = session.lifecycle.decision_controller
+    events = controller.event_log.records
+    index, requested = next(
+        (index, event)
+        for index, event in enumerate(events)
+        if event.event_type == "decision_requested"
+        and isinstance(event.payload, dict)
+        and event.payload.get("decision_type") == "select_embark_transport"
+    )
+    # Hand-edited pure owner negative; the actual facade checkpoint remains untouched.
+    changed = deepcopy(requested.payload)
+    assert isinstance(changed, dict)
+    request_payload = changed["payload"]
+    assert isinstance(request_payload, dict)
+    context = request_payload["movement_context"]
+    assert isinstance(context, dict)
+    transition = context["transition_batch"]
+    assert isinstance(transition, dict)
+    displacements = transition["displacements"]
+    assert isinstance(displacements, list)
+    displacement = displacements[0]
+    assert isinstance(displacement, dict)
+    displacement["displacement_kind"] = "charge_move"
+    with pytest.raises(GameLifecycleError, match="movement transition witness drifted"):
+        validated_embark_movement_completions(
+            event_records=(
+                *events[:index],
+                replace(requested, payload=changed),
+                *events[index + 1 :],
+            ),
+            decision_records=controller.records,
+        )
+
+
 @pytest.mark.parametrize("action", ["normal_move", "advance"])
 @pytest.mark.parametrize("failed_setup", [False, True])
 def test_movement_retries_then_embark_restore_and_replay(action: str, failed_setup: bool) -> None:
@@ -322,7 +363,7 @@ def test_movement_retries_then_embark_restore_and_replay(action: str, failed_set
     state = session.lifecycle.state
     assert state is not None
     requests: list[str] = []
-    for index, dx in enumerate((100, 80, 0)):
+    for index, dy in enumerate((100, 80, 0.1)):
         request = pending_request(session)
         requests.append(request.request_id)
         proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
@@ -338,7 +379,7 @@ def test_movement_retries_then_embark_restore_and_replay(action: str, failed_set
                     movement_mode=MovementMode.NORMAL
                     if action == "normal_move"
                     else MovementMode.ADVANCE,
-                    witness=straight_line_witness_for_state(state, unit_instance_id=unit_id, dx=dx),
+                    witness=straight_line_witness_for_state(state, unit_instance_id=unit_id, dy=dy),
                 ).to_payload()
             ),
         )
@@ -346,22 +387,29 @@ def test_movement_retries_then_embark_restore_and_replay(action: str, failed_set
     assert len(set(requests)) == 3
     request = pending_request(session)
     assert request.decision_type == "select_embark_transport"
-    result = session.submit_option(
-        request_id=request.request_id,
-        result_id="order101:retry-chain:embark",
-        option_id=TRANSPORT_ID,
-    )
-    assert result.status_kind is not LifecycleStatusKind.INVALID, result
-    snapshot = session.lifecycle.to_payload()
-    assert GameLifecycle.from_payload(snapshot).to_payload() == snapshot
+    checkpoint = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
     _assert_restore_and_exact_replay(session, initial)
-    assert session.lifecycle.to_payload() == snapshot
-    assert {
-        record["result"]["result_id"]
-        for record in snapshot["decisions"]["records"]
-        if record["request"]["request_id"] in requests
-    } == {f"order101:retry-chain:path:{index}" for index in range(3)}
-    _assert_rejected_proposal_cannot_authorize_completion(session)
+    _assert_pending_embark_transition_cannot_change_movement_kind(session)
+    for choice in (TRANSPORT_ID, "decline_embark"):
+        resumed = LocalGameSession(GameLifecycle.from_payload(checkpoint))
+        result = resumed.submit_option(
+            request_id=request.request_id,
+            result_id=f"order101:retry-chain:{choice}",
+            option_id=choice,
+        )
+        assert result.status_kind is not LifecycleStatusKind.INVALID, result
+        snapshot = resumed.lifecycle.to_payload()
+        assert GameLifecycle.from_payload(snapshot).to_payload() == snapshot
+        _assert_restore_and_exact_replay(resumed, initial)
+        assert resumed.lifecycle.to_payload() == snapshot
+        assert {
+            record["result"]["result_id"]
+            for record in snapshot["decisions"]["records"]
+            if record["request"]["request_id"] in requests
+        } == {f"order101:retry-chain:path:{index}" for index in range(3)}
+        _assert_rejected_proposal_cannot_authorize_completion(resumed)
+    assert session.lifecycle.to_payload() == checkpoint
 
 
 @pytest.mark.parametrize("rejections", [1, 2])
@@ -399,8 +447,10 @@ def test_fall_back_retries_then_embark_restore_and_replay(rejections: int) -> No
         assert result.status_kind is not LifecycleStatusKind.INVALID, result
     state = session.lifecycle.state
     assert state is not None
+    requests: list[str] = []
     for index in range(rejections + 1):
         request = pending_request(session)
+        requests.append(request.request_id)
         proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
         result = session.submit_parameterized_payload(
             request_id=request.request_id,
@@ -422,17 +472,29 @@ def test_fall_back_retries_then_embark_restore_and_replay(rejections: int) -> No
         assert (result.status_kind is LifecycleStatusKind.INVALID) == (index < rejections), result
     request = pending_request(session)
     assert request.decision_type == "select_embark_transport"
-    result = session.submit_option(
-        request_id=request.request_id,
-        result_id="order101:fall-back-retry:embark",
-        option_id=TRANSPORT_ID,
-    )
-    assert result.status_kind is not LifecycleStatusKind.INVALID, result
-    snapshot = session.lifecycle.to_payload()
-    assert GameLifecycle.from_payload(snapshot).to_payload() == snapshot
+    checkpoint = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
     _assert_restore_and_exact_replay(session, initial)
-    assert session.lifecycle.to_payload() == snapshot
-    _assert_rejected_proposal_cannot_authorize_completion(session)
+    _assert_pending_embark_transition_cannot_change_movement_kind(session)
+    for choice in (TRANSPORT_ID, "decline_embark"):
+        resumed = LocalGameSession(GameLifecycle.from_payload(checkpoint))
+        result = resumed.submit_option(
+            request_id=request.request_id,
+            result_id=f"order101:fall-back-retry:{choice}",
+            option_id=choice,
+        )
+        assert result.status_kind is not LifecycleStatusKind.INVALID, result
+        snapshot = resumed.lifecycle.to_payload()
+        assert GameLifecycle.from_payload(snapshot).to_payload() == snapshot
+        _assert_restore_and_exact_replay(resumed, initial)
+        assert resumed.lifecycle.to_payload() == snapshot
+        assert {
+            record["result"]["result_id"]
+            for record in snapshot["decisions"]["records"]
+            if record["request"]["request_id"] in requests
+        } == {f"order101:fall-back-retry:path:{index}" for index in range(rejections + 1)}
+        _assert_rejected_proposal_cannot_authorize_completion(resumed)
+    assert session.lifecycle.to_payload() == checkpoint
 
 
 def test_failed_setup_terminal_cargo_accepts_later_passenger_transfer() -> None:

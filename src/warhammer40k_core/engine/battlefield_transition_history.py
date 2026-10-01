@@ -7,6 +7,7 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldTransitionBatchPayload,
     PlacementError,
 )
+from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.geometry.pose import GeometryError
 
@@ -71,6 +72,27 @@ def prior_fall_back_applied_transition_or_none(
         raise GameLifecycleError("Fall Back applied event identity is invalid.")
     if event_index < 0 or event_index >= len(event_records) or event_records[event_index] != event:
         raise GameLifecycleError("Fall Back terminal event index is invalid.")
+    return prior_fall_back_applied_transition_for_payload_or_none(
+        event_records=event_records,
+        event_index=event_index,
+        payload=event.payload,
+        transition=authoritative_battlefield_transition_batch_or_none(event=event),
+    )
+
+
+def prior_fall_back_applied_transition_for_payload_or_none(
+    *,
+    event_records: tuple[EventRecord, ...],
+    event_index: int,
+    payload: dict[str, JsonValue],
+    transition: BattlefieldTransitionBatch | None,
+) -> BattlefieldTransitionBatch | None:
+    """Bind a movement context or terminal report to its actual earlier Fall Back."""
+    applied_event_id = payload.get("fall_back_applied_event_id")
+    if applied_event_id is None:
+        return None
+    if type(applied_event_id) is not str or not applied_event_id:
+        raise GameLifecycleError("Fall Back applied event identity is invalid.")
     matches = tuple(
         candidate
         for candidate in event_records[:event_index]
@@ -81,9 +103,8 @@ def prior_fall_back_applied_transition_or_none(
     applied_payload = matches[0].payload
     if not isinstance(applied_payload, dict):
         raise GameLifecycleError("Fall Back applied event payload is invalid.")
-    terminal_transition = authoritative_battlefield_transition_batch_or_none(event=event)
     raw_applied_transition = applied_payload.get("transition_batch")
-    if terminal_transition is None or not isinstance(raw_applied_transition, dict):
+    if transition is None or not isinstance(raw_applied_transition, dict):
         raise GameLifecycleError("Fall Back applied transition authority is missing.")
     try:
         applied_transition = BattlefieldTransitionBatch.from_payload(
@@ -92,12 +113,12 @@ def prior_fall_back_applied_transition_or_none(
     except (GeometryError, KeyError, PlacementError, TypeError) as exc:
         raise GameLifecycleError("Fall Back applied transition authority is invalid.") from exc
     if (
-        event.payload.get("movement_phase_action") != "fall_back"
+        payload.get("movement_phase_action") != "fall_back"
         or applied_payload.get("movement_phase_action") != "fall_back"
-        or applied_payload.get("request_id") != event.payload.get("request_id")
-        or applied_payload.get("result_id") != event.payload.get("result_id")
-        or applied_payload.get("unit_instance_id") != event.payload.get("unit_instance_id")
-        or applied_transition != terminal_transition
+        or applied_payload.get("request_id") != payload.get("request_id")
+        or applied_payload.get("result_id") != payload.get("result_id")
+        or applied_payload.get("unit_instance_id") != payload.get("unit_instance_id")
+        or applied_transition != transition
     ):
         raise GameLifecycleError("Fall Back applied event authority drifted.")
     return applied_transition
@@ -106,5 +127,6 @@ def prior_fall_back_applied_transition_or_none(
 __all__ = (
     "AUTHORITATIVE_BATTLEFIELD_TRANSITION_EVENT_TYPES",
     "authoritative_battlefield_transition_batch_or_none",
+    "prior_fall_back_applied_transition_for_payload_or_none",
     "prior_fall_back_applied_transition_or_none",
 )

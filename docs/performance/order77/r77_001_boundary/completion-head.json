@@ -1,7 +1,7 @@
 {
   "workload_id": "order77-completed-secondary-restore-v1",
-  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:9e98b1adc7c63d919a1659ab93becf6a1e956e401d0948a464d004f89137376f",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9e98b1adc7c63d919a1659ab93becf6a1e956e401d0948a464d004f89137376f",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
   "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
   "python": "3.14.5",
   "cpu": "Apple M5 Pro",
@@ -15,81 +15,81 @@
     "orjson": "3.11.9"
   },
   "timing_boundary": "Authenticated restore of a completed Cleanse at its engine turn-end boundary. Preparation and equality checking excluded; fixture preparation warms process caches. Fifteen repeated restores of the same serialized save in each fresh runtime process.",
-  "preparation_seconds": 3.05508754204493,
+  "preparation_seconds": 3.1351545830257237,
   "samples": [
     {
       "repeat": 0,
-      "seconds": 0.443442166026216,
+      "seconds": 0.45445245900191367,
       "action_status": "completed"
     },
     {
       "repeat": 1,
-      "seconds": 0.44283808302134275,
+      "seconds": 0.46393349999561906,
       "action_status": "completed"
     },
     {
       "repeat": 2,
-      "seconds": 0.44136166700627655,
+      "seconds": 0.45065529202111065,
       "action_status": "completed"
     },
     {
       "repeat": 3,
-      "seconds": 0.4418744580470957,
+      "seconds": 0.45196295803179964,
       "action_status": "completed"
     },
     {
       "repeat": 4,
-      "seconds": 0.44273979199351743,
+      "seconds": 0.45283583301352337,
       "action_status": "completed"
     },
     {
       "repeat": 5,
-      "seconds": 0.44148966600187123,
+      "seconds": 0.45186024997383356,
       "action_status": "completed"
     },
     {
       "repeat": 6,
-      "seconds": 0.44123062503058463,
+      "seconds": 0.45140350004658103,
       "action_status": "completed"
     },
     {
       "repeat": 7,
-      "seconds": 0.4392210000078194,
+      "seconds": 0.4508949589799158,
       "action_status": "completed"
     },
     {
       "repeat": 8,
-      "seconds": 0.44010937499115244,
+      "seconds": 0.45184329204494134,
       "action_status": "completed"
     },
     {
       "repeat": 9,
-      "seconds": 0.4403320840210654,
+      "seconds": 0.4516388750053011,
       "action_status": "completed"
     },
     {
       "repeat": 10,
-      "seconds": 0.44048570800805464,
+      "seconds": 0.4513652080204338,
       "action_status": "completed"
     },
     {
       "repeat": 11,
-      "seconds": 0.44298245798563585,
+      "seconds": 0.4515104159945622,
       "action_status": "completed"
     },
     {
       "repeat": 12,
-      "seconds": 0.4412035000277683,
+      "seconds": 0.45424254197860137,
       "action_status": "completed"
     },
     {
       "repeat": 13,
-      "seconds": 0.4440050000557676,
+      "seconds": 0.4526229170151055,
       "action_status": "completed"
     },
     {
       "repeat": 14,
-      "seconds": 0.4408018750254996,
+      "seconds": 0.4497709170100279,
       "action_status": "completed"
     }
   ],

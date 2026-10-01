@@ -72,17 +72,48 @@ contract examples must be regenerated.
 
 ## Validation evidence and remaining merge gates
 
-The current repaired source candidate is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:9e98b1adc7c63d919a1659ab93becf6a1e956e401d0948a464d004f89137376f`.
-Its independent pre-freeze retry review found no remaining concrete defect in the
-affected owner. Current isolated measurements completed all 21 Order101 samples in 43.002
+The pending-choice repair candidate is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e`.
+Fresh Astra review of published `11238b7f` demonstrated a normal save/load failure
+after accepted nonzero movement while `select_embark_transport` remained pending.
+The untouched engine-generated Normal Move, Advance and Fall Back checkpoints
+failed physical-history restoration; exact replay and completed Embark controls
+succeeded. This inherited defect affects the promised restored continuation.
+
+The shared movement owner now authenticates the accepted transition at the
+existing canonical Embark-choice request boundary. Physical history consumes it
+once, while later accepted or declined completion must retain its exact original
+action, proposal and context. Voluntary Fall Back retains its authenticated
+earlier applied movement; forced Desperate Escape retains its departure and wound
+evidence. Existing pure transition validation moved into this shared owner;
+consumer owners still call it. No producer fields, serialized schema, authoritative
+event allowlist, geometry recomputation or general retry framework was added.
+
+Six existing permanent facade cases pass pending checkpoint restore, exact replay
+and both viewers, then independently continue through actual Embark and decline.
+Twelve affected controls also pass, including post-move Battle Shock/FNP,
+nonzero passenger transfer and the separately labeled terminal-cargo negatives.
+These focused checks do not replace independent review or final aggregates.
+The current candidate requires its own stable-source review, freeze, isolated
+measurements, complete covered behavior and quality, full hosted CI and both
+clean exact-head reviews before merge.
+
+The preceding runtime `9e98b1ad`, published at `11238b7f`, passed 10,207 covered
+behavioral cases with zero failures/errors/skips at 85.2009% aggregate coverage
+with branches enabled, in 833.394 seconds. Its complete quality suite passed
+797 cases in 114.271 seconds. Hosted run
+[36792225090](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/36792225090)
+passed all sixteen jobs, eight actual behavioral shards and coverage in 29m04s.
+Its independent pre-freeze retry review found no remaining concrete defect at
+that time. Its isolated measurements completed all 21 Order101 samples in 43.002
 seconds and all 27 inherited workloads with verified report/log hashes and
 unchanged numeric budgets. A progress-file write failed after nine saved
 workloads; those were verified and reused, and only the incomplete row10 receipt
 was repeated before completing the remainder. Successful child-command wall times
 sum to 364.314 seconds; this sum is not an overlapping workflow duration.
-Complete local covered behavior and quality, actual eight-shard hosted CI, and
-both clean reviews on the final published commit remain required.
+Those successful receipts are archived historical evidence. The new demonstrated
+pending-choice defect superseded approval, and this production repair invalidates
+their applicability to the new candidate.
 
 Fresh Astra review of the prior published head `e9e7d150` found a normally
 reachable save/load failure: ordinary failed Disembark, select another unit,

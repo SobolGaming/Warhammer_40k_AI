@@ -351,6 +351,7 @@ def _authority_mutations_by_event_index(
         for binding in validated_embark_movement_completions(
             event_records=event_records, decision_records=decision_records
         )
+        if binding.completion_event_id is not None
     )
     for event_index, event in enumerate(event_records):
         event_mutations: list[_AuthorityMutation] = []

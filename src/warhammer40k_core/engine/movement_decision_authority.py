@@ -5,13 +5,16 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
 
-from warhammer40k_core.engine.battlefield_state import BattlefieldTransitionBatch
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldTransitionBatch,
+    BattlefieldTransitionBatchPayload,
+    ModelDisplacementKind,
+)
 from warhammer40k_core.engine.battlefield_transition_history import (
-    authoritative_battlefield_transition_batch_or_none,
-    prior_fall_back_applied_transition_or_none,
+    prior_fall_back_applied_transition_for_payload_or_none,
 )
 from warhammer40k_core.engine.decision_record import DecisionRecord
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_request import DecisionRequest, DecisionRequestPayload
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.flight_decision_authority import (
@@ -38,6 +41,7 @@ from warhammer40k_core.engine.mutation_decision_authority import (
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.phases.movement_model import SELECT_MOVEMENT_ACTION_DECISION_TYPE
+from warhammer40k_core.geometry.pathing import PathWitness
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.decision_controller import DecisionController
@@ -70,15 +74,21 @@ def validate_restored_movement(*, state: GameState, decisions: DecisionControlle
 
 
 _MOVING_ACTION_KINDS = frozenset({"normal_move", "advance", "fall_back"})
+_DISPLACEMENT_KIND_BY_ACTION = {
+    "normal_move": ModelDisplacementKind.NORMAL_MOVE,
+    "advance": ModelDisplacementKind.ADVANCE,
+    "fall_back": ModelDisplacementKind.FALL_BACK,
+}
 
 
 @dataclass(frozen=True, slots=True)
 class EmbarkMovementCompletion:
-    """An accepted pre-Embark move and its later completion report."""
+    """An accepted move at its Embark choice and an optional later completion."""
 
-    embark_event_id: str
-    completion_event_id: str
-    transition_before_embark: BattlefieldTransitionBatch | None
+    request_event_id: str
+    completion_event_id: str | None
+    transition_at_request: BattlefieldTransitionBatch | None
+    movement_payload: dict[str, JsonValue]
 
 
 def validated_embark_movement_completions(
@@ -86,9 +96,122 @@ def validated_embark_movement_completions(
     event_records: tuple[EventRecord, ...],
     decision_records: tuple[DecisionRecord, ...],
 ) -> tuple[EmbarkMovementCompletion, ...]:
-    """Bind each Embark's accepted movement context to its exact delayed report."""
+    """Bind accepted movement at its canonical Embark request, before any choice."""
+    records = authoritative_decision_records(decision_records)
     completed: set[int] = set()
     bindings: list[EmbarkMovementCompletion] = []
+    for index, event in enumerate(event_records):
+        if (
+            event.event_type != "decision_requested"
+            or not isinstance(event.payload, dict)
+            or event.payload.get("decision_type") != "select_embark_transport"
+        ):
+            continue
+        request = DecisionRequest.from_payload(cast(DecisionRequestPayload, event.payload))
+        request_payload = request.payload
+        if not isinstance(request_payload, dict) or request.actor_id != request_payload.get(
+            "active_player_id"
+        ):
+            raise GameLifecycleError("Embark decision authority drift.")
+        context = request_payload.get("movement_context")
+        if not isinstance(context, dict):
+            raise GameLifecycleError("Embark movement context is invalid.")
+        movement_payload = context.get("movement_payload")
+        if not isinstance(movement_payload, dict):
+            raise GameLifecycleError("Embark movement context is invalid.")
+        expected = {
+            **{
+                key: request_payload.get(key)
+                for key in (
+                    "game_id",
+                    "battle_round",
+                    "active_player_id",
+                    "phase",
+                    "unit_instance_id",
+                )
+            },
+            "request_id": _payload_string(context, "action_request_id"),
+            "result_id": _payload_string(context, "action_result_id"),
+            "movement_phase_action": context.get("movement_phase_action"),
+            "witness": context.get("witness"),
+            "displacement_kind": context.get("displacement_kind"),
+            "transition_batch": context.get("transition_batch"),
+            **movement_payload,
+        }
+        proposal = validate_movement_completion_decision_authority(
+            event_records=event_records,
+            decision_records=decision_records,
+            mutation_index=index,
+            payload=expected,
+        )
+        if proposal is None:
+            raise GameLifecycleError("Embark movement transition authority is missing.")
+        transition: BattlefieldTransitionBatch | None = validated_movement_transition(
+            payload=expected,
+            action=_payload_string(expected, "movement_phase_action"),
+            witness=proposal.witness,
+        )
+        matches = tuple(
+            (terminal_index, terminal)
+            for terminal_index, terminal in enumerate(event_records)
+            if terminal.event_type == "movement_activation_completed"
+            and isinstance(terminal.payload, dict)
+            and terminal.payload.get("request_id") == expected["request_id"]
+            and terminal.payload.get("result_id") == expected["result_id"]
+        )
+        if len(matches) > 1 or (matches and (matches[0][0] <= index or matches[0][0] in completed)):
+            raise GameLifecycleError("Embark completion identity drift.")
+        choice_records = tuple(
+            record for record in records if record.request.request_id == request.request_id
+        )
+        if len(choice_records) > 1:
+            raise GameLifecycleError("Embark decision authority drift.")
+        completion_id = None
+        if matches:
+            terminal_index, terminal = matches[0]
+            terminal_payload = terminal.payload
+            if not isinstance(terminal_payload, dict) or any(
+                terminal_payload.get(key) != value for key, value in expected.items()
+            ):
+                raise GameLifecycleError("Embark completion context drift.")
+            if not choice_records:
+                raise GameLifecycleError("Embark decision authority drift.")
+            record = validate_mutation_decision_closure(
+                event_records=event_records,
+                decision_records=decision_records,
+                mutation_index=terminal_index,
+                request_id=request.request_id,
+                result_id=choice_records[0].result.result_id,
+            )
+            if record.request != request:
+                raise GameLifecycleError("Embark decision authority drift.")
+            completion_id = terminal.event_id
+            completed.add(terminal_index)
+        if (
+            prior_fall_back_applied_transition_for_payload_or_none(
+                event_records=event_records,
+                event_index=index,
+                payload=expected,
+                transition=transition,
+            )
+            is not None
+        ):
+            transition = None
+        bindings.append(
+            EmbarkMovementCompletion(event.event_id, completion_id, transition, movement_payload)
+        )
+    _validate_embark_events(
+        event_records=event_records, decision_records=decision_records, bindings=tuple(bindings)
+    )
+    return tuple(bindings)
+
+
+def _validate_embark_events(
+    *,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+    bindings: tuple[EmbarkMovementCompletion, ...],
+) -> None:
     for index, event in enumerate(event_records):
         if event.event_type != "unit_embarked":
             continue
@@ -110,71 +233,87 @@ def validated_embark_movement_completions(
             or not isinstance(request_payload, dict)
         ):
             raise GameLifecycleError("Embark decision authority drift.")
-        context = request_payload.get("movement_context")
-        if not isinstance(context, dict):
-            raise GameLifecycleError("Embark movement context is invalid.")
-        movement_payload = context.get("movement_payload")
-        if not isinstance(movement_payload, dict):
-            raise GameLifecycleError("Embark movement context is invalid.")
-        for key in ("game_id", "battle_round", "active_player_id", "phase", "unit_instance_id"):
-            if request_payload.get(key) != payload.get(key):
-                raise GameLifecycleError("Embark request context drift.")
-        expected = {
-            **{
-                key: payload[key]
-                for key in (
-                    "game_id",
-                    "battle_round",
-                    "active_player_id",
-                    "phase",
-                    "unit_instance_id",
-                )
-            },
-            "request_id": _payload_string(context, "action_request_id"),
-            "result_id": _payload_string(context, "action_result_id"),
-            "movement_phase_action": context.get("movement_phase_action"),
-            "witness": context.get("witness"),
-            "displacement_kind": context.get("displacement_kind"),
-            "transition_batch": context.get("transition_batch"),
-            **movement_payload,
-        }
-        matches = tuple(
-            (terminal_index, terminal)
-            for terminal_index, terminal in enumerate(event_records)
-            if terminal.event_type == "movement_activation_completed"
-            and isinstance(terminal.payload, dict)
-            and terminal.payload.get("request_id") == expected["request_id"]
-            and terminal.payload.get("result_id") == expected["result_id"]
-        )
-        if len(matches) != 1 or matches[0][0] <= index or matches[0][0] in completed:
-            raise GameLifecycleError("Embark completion identity drift.")
-        terminal_index, terminal = matches[0]
-        terminal_payload = terminal.payload
-        if not isinstance(terminal_payload, dict):
-            raise GameLifecycleError("Embark movement completion payload is invalid.")
-        if any(terminal_payload.get(key) != value for key, value in expected.items()):
-            raise GameLifecycleError("Embark completion context drift.")
-        validate_movement_completion_decision_authority(
-            event_records=event_records,
-            decision_records=decision_records,
-            mutation_index=index,
-            payload=terminal_payload,
-        )
-        transition = authoritative_battlefield_transition_batch_or_none(event=terminal)
-        if transition is None:
-            raise GameLifecycleError("Embark movement transition authority is missing.")
-        if (
-            prior_fall_back_applied_transition_or_none(
-                event_records=event_records,
-                event_index=terminal_index,
-                event=terminal,
-            )
-            is not None
+        if any(
+            request_payload.get(key) != payload.get(key)
+            for key in ("game_id", "battle_round", "active_player_id", "phase", "unit_instance_id")
         ):
-            transition = None
-        bindings.append(EmbarkMovementCompletion(event.event_id, terminal.event_id, transition))
-        completed.add(terminal_index)
-    return tuple(bindings)
+            raise GameLifecycleError("Embark request context drift.")
+        request_event = next(
+            candidate
+            for candidate in event_records[:index]
+            if candidate.event_type == "decision_requested"
+            and candidate.payload == record.request.to_payload()
+        )
+        binding = next(
+            (row for row in bindings if row.request_event_id == request_event.event_id), None
+        )
+        if (
+            binding is None
+            or binding.completion_event_id is None
+            or not any(
+                candidate.event_id == binding.completion_event_id
+                for candidate in event_records[index + 1 :]
+            )
+        ):
+            raise GameLifecycleError("Embark completion identity drift.")
+
+
+def movement_event_key(event: EventRecord) -> tuple[str, str]:
+    if not isinstance(event.payload, dict):
+        raise GameLifecycleError("Physical movement event payload is invalid.")
+    request_id = event.payload.get("request_id")
+    result_id = event.payload.get("result_id")
+    if type(request_id) is not str or not request_id or type(result_id) is not str or not result_id:
+        raise GameLifecycleError("Physical movement event decision identity is invalid.")
+    return request_id, result_id
+
+
+def validated_movement_transition(
+    *,
+    payload: dict[str, JsonValue],
+    action: str,
+    witness: PathWitness,
+) -> BattlefieldTransitionBatch:
+    raw_transition = payload.get("transition_batch")
+    if not isinstance(raw_transition, dict):
+        raise GameLifecycleError("Primary mission movement transition authority is missing.")
+    transition = BattlefieldTransitionBatch.from_payload(
+        cast(BattlefieldTransitionBatchPayload, raw_transition)
+    )
+    if transition.placements:
+        raise GameLifecycleError("Primary mission movement transition cannot place models.")
+    expected_kind = _DISPLACEMENT_KIND_BY_ACTION[action]
+    removal_ids = {row.model_instance_id for row in transition.removals}
+    witness_paths = dict(witness.model_paths)
+    if not removal_ids <= set(witness_paths):
+        raise GameLifecycleError("Primary mission movement removal witness drifted.")
+    expected_displaced_ids = {
+        model_id
+        for model_id, poses in witness.model_paths
+        if poses[0] != poses[-1] and model_id not in removal_ids
+    }
+    if {row.model_instance_id for row in transition.displacements} != expected_displaced_ids:
+        raise GameLifecycleError("Primary mission movement transition inventory drifted.")
+    for displacement in transition.displacements:
+        poses = witness_paths[displacement.model_instance_id]
+        if (
+            displacement.displacement_kind is not expected_kind
+            or displacement.start_pose != poses[0]
+            or displacement.end_pose != poses[-1]
+            or displacement.path_witness
+            != PathWitness.for_paths(((displacement.model_instance_id, poses),))
+            or displacement.source_phase != BattlePhase.MOVEMENT.value
+            or displacement.source_step != "move_units"
+            or displacement.source_rule_id is not None
+            or displacement.source_event_id is not None
+        ):
+            raise GameLifecycleError("Primary mission movement transition witness drifted.")
+    raw_kind = payload.get("displacement_kind")
+    if transition.displacements and raw_kind != expected_kind.value:
+        raise GameLifecycleError("Primary mission movement displacement kind drifted.")
+    if not transition.displacements and raw_kind not in {None, expected_kind.value}:
+        raise GameLifecycleError("Primary mission movement displacement kind drifted.")
+    return transition
 
 
 def validate_movement_completion_decision_authority(

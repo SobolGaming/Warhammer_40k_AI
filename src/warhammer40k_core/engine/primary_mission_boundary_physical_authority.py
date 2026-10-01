@@ -23,7 +23,7 @@ from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.destroyed_transport_rules_unit_disembark import (
     emergency_disembark_omitted_model_evidence_from_event_payload,
 )
-from warhammer40k_core.engine.event_log import EventLog, EventRecord
+from warhammer40k_core.engine.event_log import EventLog, EventRecord, JsonValue
 from warhammer40k_core.engine.mortal_wound_application_authority import (
     validate_direct_mortal_wound_application_event_authority,
 )
@@ -33,6 +33,7 @@ from warhammer40k_core.engine.mortal_wound_physical_history import (
 )
 from warhammer40k_core.engine.movement_decision_authority import (
     EmbarkMovementCompletion,
+    movement_event_key,
     validated_embark_movement_completions,
 )
 from warhammer40k_core.engine.objective_control_record_authority import (
@@ -651,7 +652,7 @@ def _physical_authority_by_model(
     embark_movement_completions: tuple[EmbarkMovementCompletion, ...] = (),
 ) -> dict[str, _PhysicalAuthority]:
     authority = {} if initial is None else dict(initial)
-    embark_moves = {row.embark_event_id: row for row in embark_movement_completions}
+    embark_moves = {row.request_event_id: row for row in embark_movement_completions}
     completed_embark_moves = frozenset(
         row.completion_event_id for row in embark_movement_completions
     )
@@ -673,8 +674,8 @@ def _physical_authority_by_model(
                 applied.add(damage)
         transition = authoritative_battlefield_transition_batch_or_none(event=event)
         if (embark_move := embark_moves.get(event.event_id)) is not None:
-            # The accepted move precedes the departure emitted immediately after Embark.
-            transition = embark_move.transition_before_embark
+            # Accepted movement is applied before the Embark choice is requested.
+            transition = embark_move.transition_at_request
         if event.event_type == "fall_back_move_applied":
             transition = authoritative_battlefield_transition_batch_or_none(
                 event=EventRecord(
@@ -683,12 +684,12 @@ def _physical_authority_by_model(
                     payload=event.payload,
                 )
             )
-            event_key = _movement_event_key(event)
+            event_key = movement_event_key(event)
             if transition is None or event_key in applied_fall_back_transitions:
                 raise GameLifecycleError("Fall Back applied transition authority drifted.")
             applied_fall_back_transitions[event_key] = transition
         elif event.event_type == "movement_activation_completed":
-            event_key = _movement_event_key(event)
+            event_key = movement_event_key(event)
             applied_transition = applied_fall_back_transitions.get(event_key)
             if applied_transition is not None:
                 if transition != applied_transition:
@@ -709,6 +710,9 @@ def _physical_authority_by_model(
                 preserve_destroyed_wounds_for_model_ids=(
                     _desperate_escape_transition_model_ids(
                         event=event,
+                        movement_payload=None
+                        if embark_move is None
+                        else embark_move.movement_payload,
                         departure_by_id=departure_by_id,
                     )
                 ),
@@ -969,12 +973,16 @@ def _desperate_escape_transition_model_ids(
     *,
     event: EventRecord,
     departure_by_id: dict[str, PrimaryBattlefieldDepartureState] | None,
+    movement_payload: dict[str, JsonValue] | None = None,
 ) -> frozenset[str]:
-    if event.event_type not in {"fall_back_move_applied", "movement_activation_completed"}:
+    if movement_payload is None and event.event_type not in {
+        "fall_back_move_applied",
+        "movement_activation_completed",
+    }:
         return frozenset()
     if not isinstance(event.payload, dict):
         raise GameLifecycleError("Primary mission movement event payload is invalid.")
-    movement_payload = event.payload
+    movement_payload = event.payload if movement_payload is None else movement_payload
     if event.event_type == "fall_back_move_applied":
         raw_movement_payload = event.payload.get("movement_payload")
         if not isinstance(raw_movement_payload, dict):
@@ -1005,16 +1013,6 @@ def _desperate_escape_transition_model_ids(
     if event_model_ids != departure_model_ids:
         raise GameLifecycleError("Primary mission Desperate Escape departure evidence drifted.")
     return event_model_ids
-
-
-def _movement_event_key(event: EventRecord) -> tuple[str, str]:
-    if not isinstance(event.payload, dict):
-        raise GameLifecycleError("Physical movement event payload is invalid.")
-    request_id = event.payload.get("request_id")
-    result_id = event.payload.get("result_id")
-    if type(request_id) is not str or not request_id or type(result_id) is not str or not result_id:
-        raise GameLifecycleError("Physical movement event decision identity is invalid.")
-    return request_id, result_id
 
 
 def _apply_damage_step(
