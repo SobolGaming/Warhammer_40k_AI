@@ -7,7 +7,10 @@ from pathlib import Path
 
 import pytest
 
-from warhammer40k_core.build_identity import verified_engine_build_identity
+from tests.performance_evidence_helpers import (
+    assert_historical_report,
+    historical_input_bytes,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 ENGINE = ROOT / "src/warhammer40k_core/engine"
@@ -71,7 +74,7 @@ def test_order96_performance_evidence_preserves_submitted_choice_work(suffix: st
     directory = ROOT / "docs/performance/order96"
     base = json.loads((directory / f"base{suffix}.json").read_text())
     head = json.loads((directory / f"head{suffix}.json").read_text())
-    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    assert_historical_report(head)
     for key in (
         "workload",
         "platform",
@@ -88,7 +91,7 @@ def test_order96_performance_evidence_preserves_submitted_choice_work(suffix: st
     ):
         assert base[key] == head[key]
     for path, expected in head["hashes"].items():
-        assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == expected
+        assert hashlib.sha256(historical_input_bytes(path)).hexdigest() == expected
     assert head["concurrency"] == 1
     assert head["coverage"] is False
     assert head["completion_rate"] == 1.0

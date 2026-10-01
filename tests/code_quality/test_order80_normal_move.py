@@ -7,8 +7,11 @@ import hashlib
 import json
 from pathlib import Path
 
+from tests.performance_evidence_helpers import (
+    assert_historical_report,
+    historical_input_bytes,
+)
 from tests.performance_fixture_migration_helpers import assert_order87_fixture_migration
-from warhammer40k_core.build_identity import verified_engine_build_identity
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -51,7 +54,7 @@ def test_order80_matched_occurrence_performance() -> None:
     folder = ROOT / "docs/performance/order80"
     base, head = (json.loads((folder / name).read_bytes()) for name in ("base.json", "head.json"))
     budget = json.loads((folder / "budgets.json").read_bytes())
-    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    assert_historical_report(head)
     for key in (
         "workload",
         "platform",
@@ -67,7 +70,7 @@ def test_order80_matched_occurrence_performance() -> None:
     )
     assert head["workload"] == budget["workload"]
     for path, digest in head["hashes"].items():
-        assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest
+        assert hashlib.sha256(historical_input_bytes(path)).hexdigest() == digest
     assert [row["case"] for row in head["rows"]] == ["finite", "parameterized"]
     for before, after in zip(base["rows"], head["rows"], strict=True):
         assert before["complete"]
@@ -112,7 +115,7 @@ def test_order80_ordinary_restore_matched_performance() -> None:
     )
     budgets = json.loads((folder / "budgets.json").read_bytes())
     assert base["revision"] == "41de85f335073870a60bc7b7fb0661324ee0ec18"
-    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    assert_historical_report(head)
     for key in (
         "workload",
         "platform",
@@ -128,7 +131,7 @@ def test_order80_ordinary_restore_matched_performance() -> None:
     )
     assert head["workload"] == "order80-ordinary-move-authority-v1"
     for path, digest in head["hashes"].items():
-        assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest
+        assert hashlib.sha256(historical_input_bytes(path)).hexdigest() == digest
     assert [row["case"] for row in head["rows"]] == ["standalone", "attached"]
     for before, after in zip(base["rows"], head["rows"], strict=True):
         assert before["complete"]

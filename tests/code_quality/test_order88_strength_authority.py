@@ -8,6 +8,11 @@ from pathlib import Path
 
 from tools.build_core_modifiers_source import ARTIFACT_PATH, AUDIT_PATH, build_payloads
 
+from tests.performance_evidence_helpers import (
+    assert_historical_report,
+    historical_input_bytes,
+    historical_input_text,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_modifiers_2026_09 as source,
 )
@@ -62,11 +67,10 @@ def test_absent_strength_source_is_reproducible_and_authorized() -> None:
 
 
 def test_strength_diagnostic_keeps_matched_inputs_and_work_counts() -> None:
-    from warhammer40k_core.build_identity import verified_engine_build_identity
 
     folder = ROOT / "docs/performance/order88"
     base, head = (json.loads((folder / name).read_text()) for name in ("base.json", "head.json"))
-    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    assert_historical_report(head)
     for key in (
         "workload",
         "platform",
@@ -84,7 +88,7 @@ def test_strength_diagnostic_keeps_matched_inputs_and_work_counts() -> None:
         assert base[key] == head[key], key
     _assert_versioned_strength_fixture_inputs(base["hashes"], head["hashes"])
     for path, digest in head["hashes"].items():
-        assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest
+        assert hashlib.sha256(historical_input_bytes(path)).hexdigest() == digest
     assert not head["full_game_certified"]
     assert head["full_game_samples"] == 0
     for before, after in zip(base["rows"], head["rows"], strict=True):
@@ -97,7 +101,7 @@ def test_strength_diagnostic_keeps_matched_inputs_and_work_counts() -> None:
 
 def _assert_versioned_strength_fixture_inputs(base: dict[str, str], head: dict[str, str]) -> None:
     proof = json.loads(
-        (ROOT / "docs/performance/order93/inherited-fixture-migration.json").read_text()
+        historical_input_text("docs/performance/order93/inherited-fixture-migration.json")
     )["strength_fixture_migration"]
     helper = "tests/psychic_modifier_helpers.py"
     assert proof["schema_version"] == 1
@@ -105,11 +109,15 @@ def _assert_versioned_strength_fixture_inputs(base: dict[str, str], head: dict[s
     assert proof["comparison_revision"] == "d7bcb10bd9e34b1eabb060465be7f9517d8417eb"
     assert (
         proof["comparison_runtime_build_id"]
-        == json.loads((ROOT / "docs/performance/order93/base.json").read_text())["runtime_build_id"]
+        == json.loads(historical_input_text("docs/performance/order93/base.json"))[
+            "runtime_build_id"
+        ]
     )
     assert (
         proof["historical_baseline_runtime_build_id"]
-        == json.loads((ROOT / "docs/performance/order88/base.json").read_text())["runtime_build_id"]
+        == json.loads(historical_input_text("docs/performance/order88/base.json"))[
+            "runtime_build_id"
+        ]
     )
     assert proof["entrypoint"] == "strength_session"
     assert proof["entrypoint_kwargs"] == {"strength": 1}
@@ -120,7 +128,7 @@ def _assert_versioned_strength_fixture_inputs(base: dict[str, str], head: dict[s
         if name == helper:
             assert base[name] == migration["base_sha256"]
             assert head[name] == migration["head_sha256"]
-            assert head[name] == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+            assert head[name] == hashlib.sha256(historical_input_bytes(name)).hexdigest()
         else:
             assert base[name] == head[name], name
     assert [row["phase"] for row in proof["cases"]] == ["shooting", "fight"]

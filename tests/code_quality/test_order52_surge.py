@@ -6,6 +6,10 @@ from pathlib import Path
 import pytest
 from tools.build_core_surge_source import ARTIFACT_PATH, AUDIT_PATH, build_payloads
 
+from tests.performance_evidence_helpers import (
+    assert_historical_report,
+    historical_input_bytes,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_surge_2026_09 as source,
 )
@@ -173,14 +177,12 @@ def test_order75_live_and_restore_share_fixed_target_bound() -> None:
     assert "target.base, target.pose" in ast.unparse(tree)
 
 
-def test_order75_fixed_target_surge_has_matched_current_runtime_evidence() -> None:
+def test_order75_fixed_target_surge_has_matched_historical_runtime_evidence() -> None:
     import hashlib
-
-    from warhammer40k_core.build_identity import verified_engine_build_identity
 
     folder = ROOT / "docs/performance/order75"
     base, head = (json.loads((folder / name).read_text()) for name in ("base.json", "head.json"))
-    assert head["runtime_id"] == verified_engine_build_identity().build_id
+    assert_historical_report(head)
     for key in (
         "workload_id",
         "platform",
@@ -197,7 +199,7 @@ def test_order75_fixed_target_surge_has_matched_current_runtime_evidence() -> No
     ):
         assert base[key] == head[key], key
     for name, digest in head["hashes"].items():
-        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
+        assert hashlib.sha256(historical_input_bytes(name)).hexdigest() == digest
     for report, accepted in ((base, False), (head, True)):
         assert len(report["samples"]) == report["completed_submissions"] == 9
         assert report["full_game_certified"] is False

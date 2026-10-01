@@ -663,6 +663,15 @@ Build in this order:
 
 Current status:
 
+Performance validation uses the owner-approved
+[v3 tiered policy](docs/performance/PERFORMANCE_POLICY.md): immutable historical
+evidence, an exact-base change assessment and real current-runtime smoke on every
+PR, then matched detailed comparisons for relevant sensitive operations and
+complete-game profiling at rules-complete milestones. Before full quality tests,
+run `uv run --no-sync python -m scripts.check_performance_policy --base-ref <exact-PR-base-SHA>`
+serially. A changed global runtime identity alone does not refresh all history;
+missing applicable evidence still fails closed.
+
 - Core rules infrastructure through movement, shooting, charge, fight, setup,
   reserves, transports, missions, replay, source ingestion, catalog generation,
   rule IR, generic rule execution, and adapter decision submission is in place.

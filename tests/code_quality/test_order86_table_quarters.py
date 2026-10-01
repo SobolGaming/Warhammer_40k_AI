@@ -10,6 +10,10 @@ from pathlib import Path
 
 from tools.build_core_table_quarters_source import ARTIFACT_PATH, AUDIT_PATH, build_payloads
 
+from tests.performance_evidence_helpers import (
+    assert_historical_report,
+    historical_input_bytes,
+)
 from tests.performance_fixture_migration_helpers import assert_order87_fixture_migration
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_table_quarters_2026_09 as source,
@@ -61,12 +65,11 @@ def test_quarter_containment_keeps_exact_values_until_the_final_predicate() -> N
 
 
 def test_quarter_query_matched_cost_and_result_gate() -> None:
-    from warhammer40k_core.build_identity import verified_engine_build_identity
 
     folder = ROOT / "docs/performance/order86"
     base, head = (json.loads((folder / name).read_text()) for name in ("base.json", "head.json"))
     budget = json.loads((folder / "budget.json").read_text())
-    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    assert_historical_report(head)
     for key in (
         "workload",
         "cpu",
@@ -81,7 +84,7 @@ def test_quarter_query_matched_cost_and_result_gate() -> None:
         base["hashes"], head["hashes"], changed_file="tests/phase11c_command_phase_helpers.py"
     )
     for name, digest in head["hashes"].items():
-        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
+        assert hashlib.sha256(historical_input_bytes(name)).hexdigest() == digest
     assert head["workload"] == budget["workload"]
     assert not head["full_game_certified"]
     for before, after in zip(base["rows"], head["rows"], strict=True):
@@ -101,7 +104,6 @@ def test_quarter_query_matched_cost_and_result_gate() -> None:
 
 
 def test_r86_001_rotated_boundary_cost_and_result_gate() -> None:
-    from warhammer40k_core.build_identity import verified_engine_build_identity
 
     folder = ROOT / "docs/performance/order86/r86_001"
     base, head = (
@@ -110,7 +112,7 @@ def test_r86_001_rotated_boundary_cost_and_result_gate() -> None:
     )
     budget = json.loads((folder / "boundary-budget.json").read_text())
     assert base["revision"] == "79d76f8bd6c174b65f2ab17754beb39f07b6f918"
-    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    assert_historical_report(head)
     for key in (
         "workload",
         "cpu",
@@ -123,7 +125,7 @@ def test_r86_001_rotated_boundary_cost_and_result_gate() -> None:
     ):
         assert base[key] == head[key], key
     for name, digest in head["hashes"].items():
-        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
+        assert hashlib.sha256(historical_input_bytes(name)).hexdigest() == digest
     assert head["workload"] == budget["workload"]
     assert not head["full_game_certified"]
     for before, after in zip(base["rows"], head["rows"], strict=True):

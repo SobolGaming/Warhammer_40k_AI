@@ -7,7 +7,11 @@ import hashlib
 import json
 from pathlib import Path
 
-from warhammer40k_core.build_identity import verified_engine_build_identity
+from tests.performance_evidence_helpers import (
+    assert_historical_report,
+    historical_input_bytes,
+    historical_input_text,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 ENGINE = ROOT / "src/warhammer40k_core/engine"
@@ -65,7 +69,7 @@ def test_order76_matched_proposal_cost_and_pure_rejection_evidence() -> None:
     folder = ROOT / "docs/performance/order76"
     base, head = (json.loads((folder / name).read_text()) for name in ("base.json", "head.json"))
     budgets = json.loads((folder / "budgets.json").read_text())
-    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    assert_historical_report(head)
     for key in (
         "workload_id",
         "platform",
@@ -81,7 +85,7 @@ def test_order76_matched_proposal_cost_and_pure_rejection_evidence() -> None:
         assert base[key] == head[key], key
     _assert_fixture_migration(base["hashes"], head["hashes"])
     for name, digest in head["hashes"].items():
-        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest, name
+        assert hashlib.sha256(historical_input_bytes(name)).hexdigest() == digest, name
     assert len(base["samples"]) == len(head["samples"]) == head["completed_submissions"] == 30
     assert head["full_game_certified"] is False
     for old, new in zip(base["samples"], head["samples"], strict=True):
@@ -102,7 +106,7 @@ def test_order76_matched_proposal_cost_and_pure_rejection_evidence() -> None:
 
 def _assert_fixture_migration(base: dict[str, str], head: dict[str, str]) -> None:
     migration = json.loads(
-        (ROOT / "docs/performance/order80/order76-fixture-migration.json").read_text()
+        historical_input_text("docs/performance/order80/order76-fixture-migration.json")
     )
     changed = "tests/phase15c_fight_order_helpers.py"
     assert migration["changed_file"] == changed
@@ -112,7 +116,7 @@ def _assert_fixture_migration(base: dict[str, str], head: dict[str, str]) -> Non
     assert {name: value for name, value in base.items() if name != changed} == {
         name: value for name, value in head.items() if name != changed
     }
-    tree = ast.parse((ROOT / changed).read_text())
+    tree = ast.parse(historical_input_text(changed))
     function = next(
         node
         for node in tree.body
