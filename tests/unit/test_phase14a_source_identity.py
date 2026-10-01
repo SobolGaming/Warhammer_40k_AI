@@ -496,10 +496,8 @@ def test_p18c_p18d_p18e_transport_source_artifact_is_pinned_typed_and_executable
     assert shock_rule.transcription_sha256 == (
         core_transports_2026_09.SHOCK_DISEMBARK_TRANSCRIPTION_SHA256
     )
-    assert "must still be engaged with that enemy unit" in shock_rule.source_text
-    assert "your opponent must select each of those units, one at a time" in (
-        shock_rule.source_text
-    )
+    assert "not eligible to declare a charge until the end of the turn" in shock_rule.source_text
+    assert "your opponent must select" not in shock_rule.source_text
     for rule in rules:
         evidence = package.source_evidence_catalog.records_for_source_id(rule.source_id)
         assert rule.load_support_status == "loaded"

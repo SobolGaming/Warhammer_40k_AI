@@ -5,9 +5,13 @@ import argparse
 import copy
 import hashlib
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from tools import v963_shock_source as current_shock  # noqa: E402
+
 ARTIFACT_PATH = (
     ROOT
     / "src"
@@ -176,7 +180,7 @@ def _evidence_rows(
     return [review, mirror]
 
 
-def build_payload() -> dict[str, object]:
+def build_historical_payload() -> dict[str, object]:
     emergency_transcription_sha256 = _sha256_text(EMERGENCY_SOURCE_TEXT)
     assault_transcription_sha256 = _sha256_text(ASSAULT_SOURCE_TEXT)
     shock_transcription_sha256 = _sha256_text(SHOCK_SOURCE_TEXT)
@@ -301,19 +305,94 @@ def build_payload() -> dict[str, object]:
     return payload
 
 
+def build_payload() -> dict[str, object]:
+    payload = build_historical_payload()
+    payload["source_version"] = "reviewed-transports-shock-observed-2026-10-01"
+    documents = payload["source_documents"]
+    rules = payload["rules"]
+    evidence = payload["evidence"]
+    assert isinstance(documents, list)
+    assert isinstance(rules, list)
+    assert isinstance(evidence, list)
+    documents[1]["rule_source_ids"] = ["gw-11e-core-rules:transports:assault-disembark-move"]
+    documents.append(
+        {
+            "document_id": "game-datamissions-shock-live-observation-2026-10-01",
+            "source_title": "Game Datamissions current Core Rules Shock Disembark observation",
+            "source_url": current_shock.SOURCE_URL,
+            "observed_at": current_shock.OBSERVED_AT,
+            "app_version": None,
+            "project_authority_policy_id": current_shock.POLICY_ID,
+            "rule_source_ids": [current_shock.SOURCE_ID],
+        }
+    )
+    consumers = [
+        "warhammer40k_core.engine.transport_disembark_geometry:append_disembark_endpoint_violations",
+        "warhammer40k_core.engine.shock_disembark_history:validate_shock_disembark_engagement_history",
+        "warhammer40k_core.engine.shock_disembark:shock_disembark_restriction_overrides",
+        "warhammer40k_core.engine.phases.movement_transports:_disembark_candidates_for_movement_unit",
+        "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",
+        "warhammer40k_core.engine.charge_eligibility:charge_unit_ineligibility_reason",
+        "warhammer40k_core.engine.game_state:GameState.expire_shock_disembark_after_turn_end",
+        "warhammer40k_core.engine.game_state:GameState.clear_turn_action_states",
+        "warhammer40k_core.engine.transports:resolve_disembark",
+    ]
+    text = current_shock.shock_source_text()
+    text_hash = _sha256_text(text)
+    rules[2].update(
+        source_text=text, transcription_sha256=text_hash, runtime_consumer_ids=consumers
+    )
+    audit_rows = current_shock.build_audit()["rows"]
+    assert isinstance(audit_rows, list)
+    evidence[4:] = _evidence_rows(
+        rule_source_id=current_shock.SOURCE_ID,
+        rule_slug="shock-disembark-move",
+        section_id="18.07",
+        section_heading="SHOCK DISEMBARK MOVE",
+        transcription_sha256=text_hash,
+        runtime_consumer_ids=consumers,
+        provider_name="Game Datamissions",
+        source_url=current_shock.SOURCE_URL,
+        observed_at=current_shock.OBSERVED_AT,
+        app_version=None,
+        project_authority_policy_id=current_shock.POLICY_ID,
+        review_audit_id=current_shock.AUDIT_ID,
+        review_audit_row_id=current_shock.ROW_ID,
+        review_audit_observation_sha256=audit_rows[0]["source_observation_sha256"],
+        mirror_evidence_id="game-datamissions-live-2026-10-01:shock-disembark-move",
+    )
+    payload["package_hash"] = ""
+    payload["package_hash"] = _sha256_payload(payload)
+    return payload
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Build the reviewed 18.05 through 18.07 Transport source artifact."
     )
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-    rendered = json.dumps(build_payload(), indent=2, sort_keys=True) + "\n"
-    if args.check:
-        if not ARTIFACT_PATH.is_file() or ARTIFACT_PATH.read_text(encoding="utf-8") != rendered:
-            raise SystemExit("Transports source artifact is stale.")
-        return 0
-    ARTIFACT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    ARTIFACT_PATH.write_text(rendered, encoding="utf-8", newline="\n")
+    current_shock.verify_source_observation()
+    for path, payload in (
+        (ARTIFACT_PATH, build_payload()),
+        (current_shock.AUDIT_PATH, current_shock.build_audit()),
+    ):
+        rendered = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+        if args.check:
+            if not path.is_file() or path.read_text(encoding="utf-8") != rendered:
+                raise SystemExit(f"Transports source artifact is stale: {path}")
+        else:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(rendered, encoding="utf-8", newline="\n")
+    historical = (
+        current_shock.DIRECTORY
+        / "baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_transports_2026_09/artifacts/package.json.txt"
+    )
+    if (
+        historical.read_text(encoding="utf-8")
+        != json.dumps(build_historical_payload(), indent=2, sort_keys=True) + "\n"
+    ):
+        raise SystemExit("Historical Transports source artifact drifted.")
     return 0
 
 

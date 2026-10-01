@@ -2,6 +2,12 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+V963-SHOCK adopts the timestamped current 18.07 observation: ordinary coherent,
+unengaged setup, no Shock forced Fight response, and charge ineligibility through
+turn-end rules. See [source, scope and evidence](docs/V963_SHOCK_SCOPE_PLAN.md).
+The original Order 97 inventory remains historical; its superseded Shock
+assertions validate against five authenticated baseline copies.
+
 Order 101 / P03F restores ordinary Movement selection rights when complete
 disembark or reserve Ingress setup fails. Prior cargo/reserve location remains
 unchanged, and a fresh unit selection permits retry or legal Remain Stationary.
@@ -873,8 +879,8 @@ missing applicable evidence still fails closed.
   and verify it offline with
   `uv run python tools/build_core_emergency_disembark_placement_source.py` and
   the same command plus `--check`.
-- P18C/P18D/P18E's reviewed 18.05 Emergency Disembark and App-data v931 18.06
-  Assault Disembark and 18.07 Shock Disembark wording are pinned in
+- P18C/P18D/P18E's reviewed 18.05 Emergency, v931 18.06 Assault and the
+  October 1 timestamped current 18.07 Shock Disembark wording are pinned in
   `core_transports_2026_09/artifacts/package.json`; refresh and verify it
   offline with `uv run python tools/build_core_transports_source.py` and the
   same command plus `--check`.
@@ -1066,10 +1072,10 @@ See [scope and proof](docs/ORDER_61_SCOPE_PLAN.md),
 [contract 27 migration](contracts/migrations/26-to-27.md), and verify the reviewed
 source with `uv run python tools/build_core_embark_setup_turn_source.py --check`.
 
-Order 62 derives Shock Disembark forced Fights from enemies engaged with the
-passengers after setup, including newly engaged enemies. Starting Transport
-engagements confer no passenger obligation. See [scope and owner resolution](docs/ORDER_62_SCOPE_PLAN.md)
-and [contract 28 migration](contracts/migrations/27-to-28.md).
+Historical Order 62 permitted engaged Shock setup and forced enemy Fights.
+V963-SHOCK supersedes those consequences with ordinary unengaged setup and the
+current charge restriction. The [Order 62 source record](docs/ORDER_62_SCOPE_PLAN.md)
+and [contract 28 migration](contracts/migrations/27-to-28.md) remain historical.
 
 
 Order 63 allows loaded reserve Transports to ingress while their cargo remains

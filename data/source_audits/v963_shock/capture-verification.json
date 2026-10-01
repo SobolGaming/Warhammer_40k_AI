@@ -1,0 +1,111 @@
+{
+  "observed_at": "2026-10-01T12:04:31.127429+00:00",
+  "source_authority": "Game Datamissions maintained mirror, non-affiliated; existing accepted hostname; live-body actual timestamp, not asserted App-data963",
+  "raw": [
+    {
+      "filename": "changelog.html",
+      "requested_url": "https://game-datamissions.com/11th/rules/changelog",
+      "started_at": "2026-10-01T12:04:30.502670+00:00",
+      "finished_at": "2026-10-01T12:04:30.792915+00:00",
+      "seconds": 0.29024610004853457,
+      "exit_code": 0,
+      "stderr": "",
+      "transfer": {
+        "http_code": 200,
+        "redirects": 0,
+        "url_effective": "https://game-datamissions.com/11th/rules/changelog"
+      },
+      "sha256": "64ecd26644424f89e7a4760a037680d380a295b20ec24fa3a017066e255cc9fa",
+      "bytes": 85282,
+      "matches_researcher_capture": true,
+      "capture_path": "data/source_audits/v963_shock/captures/changelog.html"
+    },
+    {
+      "filename": "core-rules.html",
+      "requested_url": "https://game-datamissions.com/11th/rules/core-rules",
+      "started_at": "2026-10-01T12:04:30.502915+00:00",
+      "finished_at": "2026-10-01T12:04:30.738375+00:00",
+      "seconds": 0.23546640004497021,
+      "exit_code": 0,
+      "stderr": "",
+      "transfer": {
+        "http_code": 200,
+        "redirects": 0,
+        "url_effective": "https://game-datamissions.com/11th/rules/core-rules"
+      },
+      "sha256": "e3a570737daa7dad215efce14d606e95e7cd194df2d7d61bed9a2353caeb8744",
+      "bytes": 61599,
+      "matches_researcher_capture": true,
+      "capture_path": "data/source_audits/v963_shock/captures/core-rules.html"
+    },
+    {
+      "filename": "core-page.js",
+      "requested_url": "https://game-datamissions.com/_next/static/chunks/app/11th/rules/core-rules/page-40b1308bf97ccf3b.js",
+      "started_at": "2026-10-01T12:04:30.503393+00:00",
+      "finished_at": "2026-10-01T12:04:30.750341+00:00",
+      "seconds": 0.24695689999498427,
+      "exit_code": 0,
+      "stderr": "",
+      "transfer": {
+        "http_code": 200,
+        "redirects": 0,
+        "url_effective": "https://game-datamissions.com/_next/static/chunks/app/11th/rules/core-rules/page-40b1308bf97ccf3b.js"
+      },
+      "sha256": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026",
+      "bytes": 216294,
+      "matches_researcher_capture": true,
+      "capture_path": "data/source_audits/v963_shock/captures/core-page.js"
+    }
+  ],
+  "verifier_exit_code": 0,
+  "canonical_records": [
+    {
+      "filename": "new-faqs-963.canonical.json",
+      "actual_sha256": "8e34cdaeb52d67819851bfde49be83637af94aaf984287f52a304fe7c000461f",
+      "expected_sha256": "8e34cdaeb52d67819851bfde49be83637af94aaf984287f52a304fe7c000461f",
+      "matches_original_capture": true
+    },
+    {
+      "filename": "rule-12.04-current.canonical.json",
+      "actual_sha256": "b2f8d6ccce816982361827cd18acf04d8f6fe5484a6509f31ae662e4dd8c29cb",
+      "expected_sha256": "b2f8d6ccce816982361827cd18acf04d8f6fe5484a6509f31ae662e4dd8c29cb",
+      "matches_original_capture": true
+    },
+    {
+      "filename": "rule-12.08-current.canonical.json",
+      "actual_sha256": "77265cccee43898c3bb7eb10b5c4bc05dc17623e3232b2a663c5dce29deceb94",
+      "expected_sha256": "77265cccee43898c3bb7eb10b5c4bc05dc17623e3232b2a663c5dce29deceb94",
+      "matches_original_capture": true
+    },
+    {
+      "filename": "rule-18.07-changelog-931.canonical.json",
+      "actual_sha256": "3bade330c3bfa77125776f8576c21f9f105510ae6dc3237dabcab79e281cc9eb",
+      "expected_sha256": "3bade330c3bfa77125776f8576c21f9f105510ae6dc3237dabcab79e281cc9eb",
+      "matches_original_capture": true
+    },
+    {
+      "filename": "rule-18.07-changelog-963.canonical.json",
+      "actual_sha256": "a56810f516db95f23e7bd274c06e12eca48c7bacf92f38c46d491545103925e1",
+      "expected_sha256": "a56810f516db95f23e7bd274c06e12eca48c7bacf92f38c46d491545103925e1",
+      "matches_original_capture": true
+    },
+    {
+      "filename": "rule-18.07-current.canonical.json",
+      "actual_sha256": "1747a6ed39b7eeb9a7e5d45284cddea38c3148e9bbeeab30fadd00fc475dbd93",
+      "expected_sha256": "1747a6ed39b7eeb9a7e5d45284cddea38c3148e9bbeeab30fadd00fc475dbd93",
+      "matches_original_capture": true
+    },
+    {
+      "filename": "weaponless-faq-current.canonical.json",
+      "actual_sha256": "8d4f6b7b01b92637f2848b261fe07f970ef819f1ee867b889e885d1bdcbb1ada",
+      "expected_sha256": "8d4f6b7b01b92637f2848b261fe07f970ef819f1ee867b889e885d1bdcbb1ada",
+      "matches_original_capture": true
+    }
+  ],
+  "comparison_checks": {
+    "v931_full_body_contains_v963_before_suffix": true,
+    "v946_has_no_18_07_changes": true,
+    "all_selected_canonical_records_match": true
+  },
+  "verified": true
+}

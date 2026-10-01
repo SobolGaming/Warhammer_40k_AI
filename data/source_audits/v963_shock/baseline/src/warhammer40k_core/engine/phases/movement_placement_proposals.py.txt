@@ -1,0 +1,655 @@
+# ruff: noqa: E501,F401,F403,F405,I001
+# pyright: reportUnusedImport=false
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from warhammer40k_core.engine.physical_proposal_validation import (
+    proposal_error_field as _key_error_field,
+    parse_movement_proposal_payload,
+    proposal_payload_parse_failure as _proposal_payload_parse_failure,
+)
+
+from warhammer40k_core.engine.physical_engagement import (
+    current_physically_engaged_enemy_rules_unit_ids,
+)
+
+from warhammer40k_core.engine import physical_proposal_context as _physical_context
+
+from warhammer40k_core.engine.forced_fight_queue import install_forced_fight_queue
+from warhammer40k_core.engine.phases.movement_imports import *
+from warhammer40k_core.engine.phases.movement_model import *
+from warhammer40k_core.engine.phases.movement_state import *
+from warhammer40k_core.engine.phases.movement_rules_unit_disembark import (
+    RulesUnitDisembarkResolution,
+)
+from warhammer40k_core.engine.fight_order import (
+    ForcedFightActivationContext,
+    FightPhaseState,
+    FightsFirstRegistry,
+)
+from warhammer40k_core.engine.phases.movement_handler import *
+from warhammer40k_core.engine.phases.movement_reactions import *
+from warhammer40k_core.engine.phases.movement_reinforcements import *
+from warhammer40k_core.engine.phases.movement_transports import *
+from warhammer40k_core.engine.rules_units import (
+    rules_unit_identity_history_contains,
+    rules_unit_view_from_armies,
+)
+
+# fmt: off
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.mission_setup import MissionSetup
+    from warhammer40k_core.engine.phases.movement_model import SELECT_MOVEMENT_UNIT_DECISION_TYPE, SELECT_MOVEMENT_ACTION_DECISION_TYPE, SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE, SELECT_EMBARK_TRANSPORT_DECISION_TYPE, DECLINE_EMBARK_OPTION_ID, MovementPhaseStepKind, MovementPhaseActionKind, MovementUnitLocationKind, FallBackModeKind, DesperateEscapeRequirementReason, _MOVEMENT_ACTIONS_OUTSIDE_ENEMY_ENGAGEMENT, _MOVEMENT_ACTIONS_INSIDE_ENEMY_ENGAGEMENT, _ADVANCE_REROLL_KEYWORD, _ADVANCED_UNIT_CLEANUP_POINT, _FELL_BACK_UNIT_CLEANUP_POINT, _DESPERATE_ESCAPE_ROLL_TYPE, _empty_ability_indexes, _MovementProposalParseResult, _PlacementProposalParseResult, MovementUnitSelectionPayload, PendingMovementActionSelectionPayload, MovementPhaseStatePayload, MovementActionAvailabilityContextPayload, MovementActionAvailabilityResultPayload, MovementDistanceRecordPayload, AdvanceRollRequestPayload, AdvanceRollResultPayload, MovementDiceRecordPayload, AdvancedUnitStatePayload, DesperateEscapeRequirementPayload, DesperateEscapeRollPayload, FellBackUnitStatePayload, FallBackActionResultPayload, MovementActionAvailabilityContext, MovementActionAvailabilityResult, AdvanceRollRequest, AdvanceRollResult, MovementDiceRecord, AdvancedUnitState, DesperateEscapeRequirement, DesperateEscapeRoll, FellBackUnitState, MovementUnitSelection, PendingMovementActionSelection, DisembarkCandidate, MovementDistanceRecord
+    from warhammer40k_core.engine.phases.movement_state import MovementPhaseState, NormalMoveResolution, AdvanceMoveResolution, FallBackActionResult, _ResolvedUnitMove
+    from warhammer40k_core.engine.phases.movement_handler import MovementPhaseHandler, _complete_move_units_step
+    from warhammer40k_core.engine.phases.movement_reactions import _request_selected_to_move_stratagem_if_available, _friendly_unit_fell_back_context_from_event, _friendly_unit_fell_back_timing_window_id, _stratagem_used_for_context, _selected_to_fall_back_trigger_payload, _selected_to_fall_back_timing_window_id, _selected_to_move_timing_window_id, _stratagem_use_payload_factory, _stratagem_target_proposal_payload_factory, _movement_end_surge_distance_roll_spec, _eligible_triggered_movement_units_from_grants, _movement_end_surge_grant_distance_bonus, _movement_end_surge_event_already_processed
+    from warhammer40k_core.engine.phases.movement_reinforcements import _eligible_reinforcement_reserve_states, _required_reinforcement_reserve_states, _overdue_required_reinforcement_reserve_states, _request_reinforcement_placement, _reserve_placement_kinds_for_unit, _reserve_proposal_kind, _request_placement_proposal_retry, _optional_proposal_context_string, _resolve_reinforcement_placement_submission, _reserve_arrival_distance_grants, _unit_for_reserve_state, _apply_valid_reinforcement_placement
+    from warhammer40k_core.engine.phases.movement_transports import _request_disembark_placement, _resolve_disembark_placement_submission, _allowed_disembark_modes_for_placement_request, _resolve_combat_disembark_placement_submission, _disembark_candidates_for_movement_unit
+    from warhammer40k_core.engine.phases.movement_action_decisions import _request_movement_action, _apply_movement_action_decision, _decline_advance_move_grant_option, _advance_move_grant_option, _apply_advance_move_grant_decision, _assert_advance_move_grant_still_available, _record_movement_action_grant_effects, _movement_action_grant_unit_effect_target_ids, _movement_action_grant_effect_expiration, _resolve_pending_movement_action_after_grants, _resolve_pending_advance_action, _request_pending_movement_action_proposal, _request_movement_proposal, _forced_desperate_escape_sources_for_unit, _forced_desperate_escape_source_rule_ids_from_context, _request_movement_proposal_retry
+    from warhammer40k_core.engine.phases.movement_resolution_flow import _apply_movement_proposal_decision, _action_result_from_proposal_request, _reject_invalid_proposal, _reject_invalid_movement_resolution, _apply_advance_roll_reroll_decision, _resolve_and_apply_advance_move, _advance_move_grants_from_context, _selected_advance_move_grant_hook_ids_from_context, _apply_advance_move_grants, _grant_ranged_weapon_keywords
+    from warhammer40k_core.engine.phases.movement_fall_back_embark import _apply_desperate_escape_model_selection_decision, _apply_fall_back_result, _request_embark_after_move_or_complete_activation, _complete_activation_then_request_post_normal_disembark_if_available, _post_move_embark_options, _apply_embark_transport_selection_decision, _apply_valid_embark, _complete_movement_activation, _complete_movement_activation_with_record_ids, _maximum_model_distance_inches_from_witness
+    from warhammer40k_core.engine.phases.movement_options_dice import _mission_action_state_is_active_for_unit, _movement_action_options, _advance_roll_request_for_action, _roll_advance_dice, _record_advance_roll_resolved_event, _advance_roll_reroll_request, _dice_roll_manager_for_state, _advance_reroll_permission_for_unit, _roll_desperate_escape_dice, _desperate_escape_model_selection_request, _desperate_escape_model_selection_options
+    from warhammer40k_core.engine.phases.movement_resolvers import resolve_normal_move, resolve_advance_move, resolve_fall_back_move, _resolve_unit_move, _default_move_witness, _default_fall_back_witness, _movement_transition_batch, _fall_back_transition_batch, _normal_move_transition_batch, _movement_action_availability_result
+    from warhammer40k_core.engine.phases.movement_geometry import _movement_action_availability_context, _enemy_engagement_model_ids_for_unit, _enemy_engaged_unit_ids_for_unit_placement, _desperate_escape_requirements_for_fall_back, _enemy_model_ids_crossed_by_witness, _sampled_witness_transit_poses, _interpolate_pose, _model_at_pose, _geometry_models_for_unit_placement, _friendly_geometry_models_for_path, _enemy_geometry_models_for_player, _friendly_vehicle_monster_model_ids, _enemy_vehicle_monster_model_ids_for_player, _unit_has_vehicle_or_monster_keyword, _unit_has_deep_strike_keyword, _canonical_keyword, _validate_ability_index_mapping, _ability_index_for_player, _validate_move_witness_matches_unit, _path_result_with_aircraft_violations, _normal_move_violation_code
+    from warhammer40k_core.engine.phases.movement_validation import _movement_action_invalid_payload, assert_move_units_step_complete_for_reinforcements, _remaining_move_units_unit_ids, _normal_move_invalid_message, _ensure_movement_phase_state, _validate_movement_phase_state, _battlefield_scenario, _movement_unit_options, _active_player_id, movement_phase_action_kind_from_token, fall_back_mode_kind_from_token, movement_phase_step_kind_from_token, desperate_escape_requirement_reason_from_token, movement_mode_for_phase_action, _movement_mode_from_payload, _movement_mode_from_proposal_submission, _fall_back_mode_from_payload, _fall_back_mode_from_proposal_submission, _movement_action_option_id, _movement_action_label, _movement_modes_for_action_options, _unit_can_take_to_the_skies, _fall_back_modes_for_parameterized_option, _fall_back_result_with_mode, _fall_back_mode_violation_code, _model_movement_inches, _model_base_movement_inches, _model_movement_budget_inches, _movement_distance_modifier_inches, _movement_mode_for_action, _temporary_movement_keywords_for_unit, _movement_bonus_inches_for_unit, _effective_movement_keywords, _model_default_movement_distance_inches, _modified_movement_inches, _runtime_modifier_registry, _default_move_end_pose, _ruleset_descriptor_for_handler, _mission_setup_for_live_reinforcements, _objective_markers_for_state, _active_movement_selection, _ensure_transport_cargo_phase_states, _unit_instance_by_id, _unit_has_keyword, _transport_status_for_movement_action, _movement_completion_context_payload, _transport_operation_invalid_payload, _request_payload_for_result, _decision_payload_object, _payload_string, _payload_object, _payload_json_object, _identifier_list_from_json_object, _payload_positive_int, _optional_payload_path_witness, _payload_model_displacement_kind, _payload_transition_batch, _payload_json_array, _validate_json_object, _validate_movement_action_tuple, _validate_transport_restriction_override_tuple, _validate_path_validation_result_tuple, _validate_terrain_path_legality_result_tuple, _validate_desperate_escape_reason_tuple, _validate_desperate_escape_requirement_tuple, _validate_desperate_escape_roll_tuple, _validate_identifier_tuple, _validate_movement_distance_records, _validate_objective_marker_tuple, _validate_identifier, _validate_positive_int, _validate_non_negative_finite_number, _validate_bool
+# fmt: on
+
+__all__ = (
+    "_apply_placement_proposal_decision",
+    "_apply_valid_combat_disembark",
+    "_apply_valid_disembark",
+    "_key_error_field",
+    "_missing_disembark_proposal_field",
+    "_parse_movement_proposal_submission_or_invalid",
+    "_parse_placement_proposal_submission_or_invalid",
+    "_proposal_payload_parse_failure",
+)
+
+
+def _parse_movement_proposal_submission_or_invalid(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    decisions: DecisionController,
+) -> _MovementProposalParseResult:
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    submission = parse_movement_proposal_payload(
+        proposal_request=proposal_request,
+        payload=result.payload,
+    )
+    if isinstance(submission, ProposalValidationResult):
+        return _reject_invalid_proposal(
+            state=state,
+            result=result,
+            proposal_validation=submission,
+            message="Movement proposal payload is malformed.",
+        )
+    return (proposal_request, submission)
+
+
+def _parse_placement_proposal_submission_or_invalid(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    decisions: DecisionController,
+) -> _PlacementProposalParseResult:
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    try:
+        submission = PlacementProposalPayload.from_payload(
+            cast(PlacementProposalPayloadPayload, _decision_payload_object(result.payload))
+        )
+    except (GameLifecycleError, GeometryError, PlacementError, KeyError, TypeError) as exc:
+        return _reject_invalid_proposal(
+            state=state,
+            result=result,
+            proposal_validation=_proposal_payload_parse_failure(
+                proposal_request=proposal_request,
+                error=exc,
+                default_field="attempted_placement",
+            ),
+            message="Placement proposal payload is malformed.",
+        )
+    return (proposal_request, submission)
+
+
+def invalid_placement_proposal_submission_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+) -> LifecycleStatus | None:
+    placement_parsed = _parse_placement_proposal_submission_or_invalid(
+        state=state,
+        request=request,
+        result=result,
+        decisions=decisions,
+    )
+    if isinstance(placement_parsed, LifecycleStatus):
+        return placement_parsed
+    proposal_request, placement_submission = placement_parsed
+    if proposal_request.proposal_kind is ProposalKind.DISEMBARK:
+        missing = _missing_disembark_proposal_field(placement_submission)
+        if missing is not None:
+            return _reject_invalid_proposal(
+                state=state,
+                result=result,
+                proposal_validation=ProposalValidationResult.invalid(
+                    proposal_request_id=proposal_request.request_id,
+                    proposal_kind=proposal_request.proposal_kind,
+                    violation_code="proposal_payload_missing_field",
+                    message=f"Disembark placement proposal missing {missing}.",
+                    field=missing,
+                ),
+                message="Disembark placement proposal is incomplete.",
+            )
+    spatial_status = _physical_context.invalid_physical_proposal_spatial_context_status(
+        state=state,
+        decisions=decisions,
+        request=request,
+        result=result,
+    )
+    if spatial_status is not None:
+        return spatial_status
+    proposal_validation = placement_submission.validation_result_for_request(proposal_request)
+    if not proposal_validation.is_valid:
+        return _reject_invalid_proposal(
+            state=state,
+            result=result,
+            proposal_validation=proposal_validation,
+            message="Placement proposal does not match the pending request.",
+        )
+    if proposal_request.proposal_kind is ProposalKind.DISEMBARK:
+        movement_state = state.movement_phase_state
+        if movement_state is None or placement_submission.transport_unit_instance_id is None:
+            raise GameLifecycleError(
+                "Disembark prevalidation requires movement and Transport state."
+            )
+        candidates = _disembark_candidates_for_movement_unit(
+            state=state,
+            movement_state=movement_state,
+            unit_instance_id=placement_submission.unit_instance_id,
+            transport_unit_instance_id=placement_submission.transport_unit_instance_id,
+            ruleset_descriptor=ruleset_descriptor,
+        )
+        # Combat placement is the existing Tactical-impossible proposal alternative.
+        mode = placement_submission.disembark_mode
+        if mode is DisembarkModeKind.COMBAT_DISEMBARK:
+            mode = DisembarkModeKind.TACTICAL_DISEMBARK
+        current = next((c for c in candidates if c.disembark_mode is mode), None)
+        if (
+            current is None
+            or current.transport_movement_status
+            is not placement_submission.transport_movement_status
+            or current.restriction_overrides != placement_submission.restriction_overrides
+            or current.start_engaged_enemy_unit_instance_ids
+            != (placement_submission.start_engaged_enemy_unit_instance_ids or ())
+        ):
+            return _reject_invalid_proposal(
+                state=state,
+                result=result,
+                proposal_validation=ProposalValidationResult.invalid(
+                    proposal_request_id=proposal_request.request_id,
+                    proposal_kind=proposal_request.proposal_kind,
+                    violation_code="proposal_disembark_eligibility_drift",
+                    message="Disembark eligibility or permitting source changed.",
+                    field="disembark_mode",
+                    status="stale",
+                ),
+                message="Disembark eligibility or permitting source changed.",
+            )
+    return None
+
+
+def _apply_placement_proposal_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    reserve_arrival_distance_hooks: ReserveArrivalDistanceHookRegistry,
+    reserve_arrival_restriction_hooks: ReserveArrivalRestrictionHookRegistry,
+) -> LifecycleStatus | None:
+    _validate_movement_phase_state(state)
+    active_player_id = _active_player_id(state)
+    if result.actor_id != active_player_id:
+        raise GameLifecycleError("Placement proposal actor must be the active player.")
+    record = decisions.record_for_result(result)
+    parsed = _parse_placement_proposal_submission_or_invalid(
+        state=state,
+        request=record.request,
+        result=result,
+        decisions=decisions,
+    )
+    if isinstance(parsed, LifecycleStatus):
+        return parsed
+    proposal_request, submission = parsed
+    if proposal_request.proposal_kind is ProposalKind.DISEMBARK:
+        missing = _missing_disembark_proposal_field(submission)
+        if missing is not None:
+            return _reject_invalid_proposal(
+                state=state,
+                result=result,
+                proposal_validation=ProposalValidationResult.invalid(
+                    proposal_request_id=proposal_request.request_id,
+                    proposal_kind=proposal_request.proposal_kind,
+                    violation_code="proposal_payload_missing_field",
+                    message=f"Disembark placement proposal missing {missing}.",
+                    field=missing,
+                ),
+                message="Disembark placement proposal is incomplete.",
+            )
+    proposal_validation = submission.validation_result_for_request(proposal_request)
+    if not proposal_validation.is_valid:
+        return _reject_invalid_proposal(
+            state=state,
+            result=result,
+            proposal_validation=proposal_validation,
+            message="Placement proposal does not match the pending request.",
+        )
+
+    if proposal_request.proposal_kind in (
+        ProposalKind.REINFORCEMENT,
+        ProposalKind.DEEP_STRIKE,
+        ProposalKind.STRATEGIC_RESERVES,
+    ):
+        status = _resolve_reinforcement_placement_submission(
+            state=state,
+            result=result,
+            decisions=decisions,
+            ruleset_descriptor=ruleset_descriptor,
+            reserve_arrival_distance_hooks=reserve_arrival_distance_hooks,
+            reserve_arrival_restriction_hooks=reserve_arrival_restriction_hooks,
+            unit_instance_id=submission.unit_instance_id,
+            placement_kind=submission.placement_kind,
+            attempted_placement=submission.resolved_rules_unit_placement(),
+            large_model_exceptions=submission.large_model_exceptions,
+        )
+        if (
+            status is not None
+            and status.status_kind is LifecycleStatusKind.INVALID
+            and proposal_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
+        ):
+            from warhammer40k_core.engine.movement_setup_failure import (
+                restore_failed_setup_selection,
+            )
+
+            restore_failed_setup_selection(state=state, decisions=decisions, result=result)
+        return status
+
+    if proposal_request.proposal_kind is ProposalKind.DISEMBARK:
+        if (
+            submission.transport_unit_instance_id is None
+            or submission.disembark_mode is None
+            or submission.transport_movement_status is None
+            or (
+                submission.disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK
+                and submission.start_engaged_enemy_unit_instance_ids is None
+            )
+        ):
+            raise GameLifecycleError("Complete Disembark placement submission drifted.")
+        status = _resolve_disembark_placement_submission(
+            state=state,
+            result=result,
+            decisions=decisions,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_instance_id=submission.unit_instance_id,
+            transport_unit_instance_id=submission.transport_unit_instance_id,
+            attempted_placement=submission.resolved_rules_unit_placement(),
+            disembark_mode=submission.disembark_mode,
+            transport_movement_status=submission.transport_movement_status,
+            restriction_overrides=submission.restriction_overrides,
+            start_engaged_enemy_unit_instance_ids=(
+                submission.start_engaged_enemy_unit_instance_ids or ()
+            ),
+        )
+        if (
+            status is not None
+            and status.status_kind is LifecycleStatusKind.INVALID
+            and proposal_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
+        ):
+            if (
+                isinstance(status.payload, dict)
+                and status.payload.get("phase_body_status") == "combat_disembark_tactical_available"
+            ):
+                _request_placement_proposal_retry(
+                    state=state,
+                    decisions=decisions,
+                    proposal_request=proposal_request,
+                    rejected_result=result,
+                )
+            else:
+                from warhammer40k_core.engine.movement_setup_failure import (
+                    restore_failed_setup_selection,
+                )
+
+                restore_failed_setup_selection(state=state, decisions=decisions, result=result)
+        return status
+
+    raise GameLifecycleError("Unsupported placement proposal kind.")
+
+
+def _missing_disembark_proposal_field(submission: PlacementProposalPayload) -> str | None:
+    if submission.transport_unit_instance_id is None:
+        return "transport_unit_instance_id"
+    if submission.disembark_mode is None:
+        return "disembark_mode"
+    if submission.transport_movement_status is None:
+        return "transport_movement_status"
+    if (
+        submission.disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK
+        and submission.start_engaged_enemy_unit_instance_ids is None
+    ):
+        return "start_engaged_enemy_unit_instance_ids"
+    return None
+
+
+def _apply_valid_disembark(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    disembark: DisembarkResolution | RulesUnitDisembarkResolution,
+    result: DecisionResult,
+    ruleset_descriptor: RulesetDescriptor,
+) -> None:
+    from warhammer40k_core.engine.move_completion_triggers import record_move_completion_event
+
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Disembark placement requires battlefield_state.")
+    if disembark.updated_cargo_state is None or disembark.disembarked_unit_state is None:
+        raise GameLifecycleError("Valid DisembarkResolution requires state records.")
+    if isinstance(disembark, RulesUnitDisembarkResolution):
+        from warhammer40k_core.engine.phases.movement_rules_unit_disembark import (
+            apply_rules_unit_disembark_to_battlefield,
+        )
+
+        updated_battlefield = apply_rules_unit_disembark_to_battlefield(
+            battlefield_state=battlefield_state,
+            disembark=disembark,
+        )
+    else:
+        updated_battlefield = apply_disembark_to_battlefield(
+            battlefield_state=battlefield_state,
+            disembark=disembark,
+        )
+    state.replace_battlefield_state(updated_battlefield)
+    state.replace_transport_cargo_state(disembark.updated_cargo_state)
+    state.record_disembarked_unit_state(disembark.disembarked_unit_state)
+    movement_state = state.movement_phase_state
+    if movement_state is None or movement_state.active_selection is None:
+        raise GameLifecycleError("Disembark requires active movement selection.")
+    if movement_state.active_selection.unit_instance_id != disembark.selection.unit_instance_id:
+        raise GameLifecycleError("Disembark active movement selection drift.")
+    if disembark.selection.disembark_mode in {
+        DisembarkModeKind.RAPID_DISEMBARK,
+        DisembarkModeKind.ASSAULT_DISEMBARK,
+        DisembarkModeKind.SHOCK_DISEMBARK,
+    }:
+        state.replace_movement_phase_state(
+            movement_state.with_activation_complete(
+                disembark.selection.unit_instance_id,
+                maximum_model_distance_inches=0.0,
+                maximum_model_horizontal_distance_inches=0.0,
+            )
+        )
+    post_engaged_ids = (
+        current_physically_engaged_enemy_rules_unit_ids(
+            state=state, unit_instance_id=disembark.selection.unit_instance_id
+        )
+        if disembark.selection.disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK
+        else ()
+    )
+    disembark_event = record_move_completion_event(
+        state=state,
+        decisions=decisions,
+        event_type="unit_disembarked",
+        payload={
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": disembark.disembarked_unit_state.turn_player_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": disembark.selection.unit_instance_id,
+            "transport_unit_instance_id": disembark.selection.transport_unit_instance_id,
+            "disembark_mode": disembark.selection.disembark_mode.value,
+            "transport_movement_status": disembark.selection.transport_movement_status.value,
+            "restriction_overrides": [
+                validate_json_value(override.to_payload())
+                for override in disembark.selection.restriction_overrides
+            ],
+            "start_engaged_enemy_unit_instance_ids": list(
+                disembark.selection.start_engaged_enemy_unit_instance_ids
+            ),
+            "post_engaged_enemy_unit_instance_ids": list(post_engaged_ids),
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "phase_body_status": "unit_disembarked",
+            "updated_cargo_state": validate_json_value(disembark.updated_cargo_state.to_payload()),
+            "disembarked_unit_state": validate_json_value(
+                disembark.disembarked_unit_state.to_payload()
+            ),
+            "transition_batch": validate_json_value(disembark.transition_batch.to_payload())
+            if disembark.transition_batch is not None
+            else None,
+        },
+    )
+    if disembark.selection.disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK:
+        _start_shock_disembark_forced_fight_activations(
+            state=state,
+            decisions=decisions,
+            disembark=disembark,
+            disembark_event_id=disembark_event.event_id,
+            post_engaged_ids=post_engaged_ids,
+            ruleset_descriptor=ruleset_descriptor,
+        )
+    if disembark.selection.disembark_mode is DisembarkModeKind.TACTICAL_DISEMBARK:
+        current_movement_state = state.movement_phase_state
+        if current_movement_state is None or current_movement_state.active_selection is None:
+            raise GameLifecycleError("Tactical Disembark setup boundary lost active selection.")
+        state.replace_movement_phase_state(
+            current_movement_state.with_pending_setup_event(disembark_event.event_id)
+        )
+
+
+def _start_shock_disembark_forced_fight_activations(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    disembark: DisembarkResolution | RulesUnitDisembarkResolution,
+    disembark_event_id: str,
+    post_engaged_ids: tuple[str, ...],
+    ruleset_descriptor: RulesetDescriptor,
+) -> None:
+    disembarked_state = disembark.disembarked_unit_state
+    if disembarked_state is None:
+        raise GameLifecycleError("Shock Disembark requires disembarked unit state.")
+    selected_ids = _forced_fight_selected_unit_ids_for_current_phase(
+        state=state,
+        decisions=decisions,
+    )
+    pending_ids = tuple(
+        unit_id
+        for unit_id in post_engaged_ids
+        if not rules_unit_identity_history_contains(
+            state=state,
+            identity_ids=selected_ids,
+            unit_instance_id=unit_id,
+        )
+    )
+    if not pending_ids:
+        decisions.event_log.append(
+            "forced_fight_activation_queue_skipped",
+            validate_json_value(
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "active_player_id": _active_player_id(state),
+                    "phase_body_status": "forced_fight_activation_queue_skipped",
+                    "source_rule_id": disembarked_state.source_rule_id,
+                    "trigger_event_id": disembark_event_id,
+                    "source_unit_instance_id": disembark.selection.unit_instance_id,
+                    "transport_unit_instance_id": (disembark.selection.transport_unit_instance_id),
+                    "start_engaged_enemy_unit_instance_ids": [],
+                    "post_engaged_enemy_unit_instance_ids": list(post_engaged_ids),
+                    "already_selected_unit_instance_ids": list(selected_ids),
+                }
+            ),
+        )
+        return
+    if state.fight_phase_state is not None:
+        raise GameLifecycleError(
+            "Shock Disembark cannot replace an active Fight activation context."
+        )
+    owners = {
+        rules_unit_view_from_armies(
+            armies=tuple(state.army_definitions),
+            unit_instance_id=unit_id,
+        ).owner_player_id
+        for unit_id in pending_ids
+    }
+    if len(owners) != 1:
+        raise GameLifecycleError("Shock Disembark forced Fight units must share one opponent.")
+    selecting_player_id = next(iter(owners))
+    if selecting_player_id == _active_player_id(state):
+        raise GameLifecycleError("Shock Disembark forced Fight units must belong to the opponent.")
+    context = ForcedFightActivationContext(
+        context_id=f"forced-fight:{disembark_event_id}",
+        source_rule_id=disembarked_state.source_rule_id,
+        trigger_event_id=disembark_event_id,
+        source_phase=BattlePhaseKind.MOVEMENT,
+        source_unit_instance_id=disembark.selection.unit_instance_id,
+        transport_unit_instance_id=disembark.selection.transport_unit_instance_id,
+        selecting_player_id=selecting_player_id,
+        eligible_unit_instance_ids=pending_ids,
+    )
+    install_forced_fight_queue(
+        state=state,
+        decisions=decisions,
+        context=context,
+        policy=ruleset_descriptor.fight_policy,
+    )
+
+
+def _forced_fight_selected_unit_ids_for_current_phase(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+) -> tuple[str, ...]:
+    selected_ids: set[str] = set()
+    for event in decisions.event_log.records:
+        if event.event_type != "fight_activation_selected" or not isinstance(event.payload, dict):
+            continue
+        forced_context = event.payload.get("forced_activation_context")
+        activation = event.payload.get("activation_selection")
+        if not isinstance(forced_context, dict) or not isinstance(activation, dict):
+            continue
+        if (
+            event.payload.get("battle_round") != state.battle_round
+            or event.payload.get("active_player_id") != _active_player_id(state)
+            or forced_context.get("source_phase") != BattlePhase.MOVEMENT.value
+        ):
+            continue
+        unit_id = activation.get("unit_instance_id")
+        if type(unit_id) is not str:
+            raise GameLifecycleError("Forced Fight activation event unit identity is malformed.")
+        selected_ids.add(_validate_identifier("unit_instance_id", unit_id))
+    return tuple(sorted(selected_ids))
+
+
+def _apply_valid_combat_disembark(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    combat_disembark: CombatDisembark,
+    tactical_resolution: DisembarkResolution,
+    result: DecisionResult,
+) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.move_completion_triggers import record_move_completion_event
+
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Combat Disembark placement requires battlefield_state.")
+    disembark = combat_disembark.placement
+    if disembark.updated_cargo_state is None or disembark.disembarked_unit_state is None:
+        raise GameLifecycleError("Valid Combat Disembark requires state records.")
+    state.replace_battlefield_state(
+        apply_combat_disembark_to_battlefield(
+            battlefield_state=battlefield_state,
+            disembark=combat_disembark,
+        )
+    )
+    state.replace_transport_cargo_state(disembark.updated_cargo_state)
+    state.record_disembarked_unit_state(disembark.disembarked_unit_state)
+    movement_state = state.movement_phase_state
+    if movement_state is None or movement_state.active_selection is None:
+        raise GameLifecycleError("Combat Disembark requires active movement selection.")
+    if movement_state.active_selection.unit_instance_id != disembark.selection.unit_instance_id:
+        raise GameLifecycleError("Combat Disembark active movement selection drift.")
+    state.replace_movement_phase_state(
+        movement_state.with_activation_complete(
+            disembark.selection.unit_instance_id,
+            maximum_model_distance_inches=0.0,
+            maximum_model_horizontal_distance_inches=0.0,
+        )
+    )
+    record_move_completion_event(
+        state=state,
+        decisions=decisions,
+        event_type="unit_disembarked",
+        payload={
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": disembark.disembarked_unit_state.turn_player_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": disembark.selection.unit_instance_id,
+            "transport_unit_instance_id": disembark.selection.transport_unit_instance_id,
+            "disembark_mode": disembark.selection.disembark_mode.value,
+            "transport_movement_status": disembark.selection.transport_movement_status.value,
+            "restriction_overrides": [
+                validate_json_value(override.to_payload())
+                for override in disembark.selection.restriction_overrides
+            ],
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "phase_body_status": "unit_disembarked",
+            "updated_cargo_state": validate_json_value(disembark.updated_cargo_state.to_payload()),
+            "disembarked_unit_state": validate_json_value(
+                disembark.disembarked_unit_state.to_payload()
+            ),
+            "transition_batch": validate_json_value(disembark.transition_batch.to_payload())
+            if disembark.transition_batch is not None
+            else None,
+            "tactical_fallback_violations": [
+                validate_json_value(violation.to_payload())
+                for violation in tactical_resolution.violations
+            ],
+        },
+    )
+    routed = apply_transport_hazard_mortal_wounds(
+        state=state,
+        decisions=decisions,
+        disembark=combat_disembark,
+        dice_manager=_dice_roll_manager_for_state(state=state, decisions=decisions),
+    )
+    if routed.pending_mortal_wound_request is not None:
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=routed.pending_mortal_wound_request,
+            payload={
+                "phase": BattlePhase.MOVEMENT.value,
+                "battle_round": state.battle_round,
+                "active_player_id": disembark.selection.player_id,
+                "unit_instance_id": disembark.selection.unit_instance_id,
+                "transport_unit_instance_id": disembark.selection.transport_unit_instance_id,
+                "disembark_mode": disembark.selection.disembark_mode.value,
+                "decision_type": routed.pending_mortal_wound_request.decision_type,
+                "phase_body_status": "transport_hazard_feel_no_pain_required",
+            },
+        )
+    return None

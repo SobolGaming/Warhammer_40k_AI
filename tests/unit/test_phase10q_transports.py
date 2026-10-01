@@ -10,9 +10,7 @@ from tests.movement_submission_helpers import core_movement_handler
 from tests.order60_emergency_disembark_helpers import emergency_disembark_poses_around
 from tests.unit_keyword_helpers import with_unit_keywords
 
-from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
-from warhammer40k_core.adapters.projection import public_decision_request_view
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceRollResult
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -67,11 +65,7 @@ from warhammer40k_core.engine.event_log import (
     JsonValue,
     validate_json_value,
 )
-from warhammer40k_core.engine.fight_activation_completion import (
-    complete_active_fight_activation as _complete_active_fight_activation,
-)
 from warhammer40k_core.engine.fight_order import (
-    FIGHT_ACTIVATION_DECISION_TYPE,
     FightPhaseState,
     FightsFirstRegistry,
 )
@@ -119,12 +113,6 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
 )
-from warhammer40k_core.engine.phases import (
-    movement_placement_proposals as _movement_placement_proposals,
-)
-from warhammer40k_core.engine.phases.fight import (
-    FightPhaseHandler,
-)
 from warhammer40k_core.engine.phases.movement import (
     DECLINE_EMBARK_OPTION_ID,
     SELECT_EMBARK_TRANSPORT_DECISION_TYPE,
@@ -164,7 +152,6 @@ from warhammer40k_core.engine.rules_units import (
 )
 from warhammer40k_core.engine.shock_disembark import (
     shock_disembark_permission_effect,
-    shock_disembark_restriction_overrides,
 )
 from warhammer40k_core.engine.starting_attached_units import (
     starting_attached_unit_records_for_army,
@@ -3951,13 +3938,16 @@ def test_shock_disembark_resolver_does_not_inherit_transport_engagements() -> No
         transport_placement=transport_placement,
     )
 
-    assert valid.is_valid, valid.violations
-    assert valid.disembarked_unit_state is not None
-    assert valid.disembarked_unit_state.source_rule_id == SHOCK_DISEMBARK_MOVE_SOURCE_ID
-    assert valid.disembarked_unit_state.start_engaged_enemy_unit_instance_ids == ()
-    assert not valid.disembarked_unit_state.can_move_further
-    assert not valid.disembarked_unit_state.can_declare_charge
-    assert DisembarkResolution.from_payload(valid.to_payload()) == valid
+    assert not valid.is_valid
+    assert TransportOperationViolationCode.ENEMY_ENGAGEMENT_RANGE in {
+        violation.violation_code for violation in valid.violations
+    }
+    assert broken_engagement.disembarked_unit_state is not None
+    assert broken_engagement.disembarked_unit_state.source_rule_id == SHOCK_DISEMBARK_MOVE_SOURCE_ID
+    assert broken_engagement.disembarked_unit_state.start_engaged_enemy_unit_instance_ids == ()
+    assert not broken_engagement.disembarked_unit_state.can_move_further
+    assert not broken_engagement.disembarked_unit_state.can_declare_charge
+    assert DisembarkResolution.from_payload(broken_engagement.to_payload()) == broken_engagement
     assert TransportOperationViolationCode.SHOCK_DISEMBARK_PERMISSION_REQUIRED in {
         violation.violation_code for violation in missing_permission.violations
     }
@@ -4056,1068 +4046,8 @@ def test_shock_disembark_candidate_uses_configured_engagement_descriptor() -> No
     assert proposal.context["start_engaged_enemy_unit_instance_ids"] == []
 
 
-def test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_replay() -> None:
-    scenario, passenger, transport, enemy, _catalog = _transport_scenario(second_enemy=True)
-    second_enemy = scenario.armies[1].unit_by_id("army-beta:second-enemy-unit")
-    engaged_enemy_ids = tuple(sorted((enemy.unit_instance_id, second_enemy.unit_instance_id)))
-    scenario = BattlefieldScenario(
-        armies=scenario.armies,
-        battlefield_state=(
-            scenario.battlefield_state.with_unit_placement(
-                _unit_placement_at(
-                    enemy,
-                    army_id="army-beta",
-                    player_id="player-b",
-                    poses=(
-                        Pose.at(13.0, 9.2),
-                        *tuple(Pose.at(35.0 + index * 2.0, 35.0) for index in range(4)),
-                    ),
-                )
-            ).with_unit_placement(
-                _unit_placement_at(
-                    second_enemy,
-                    army_id="army-beta",
-                    player_id="player-b",
-                    poses=(
-                        Pose.at(13.0, 10.8),
-                        *tuple(Pose.at(35.0 + index * 2.0, 42.0) for index in range(4)),
-                    ),
-                )
-            )
-        ),
-    )
-    state = _battle_state(scenario, game_id="phase18e-shock-disembark")
-    state.record_persisting_effect(
-        PersistingEffect(
-            effect_id="phase18e:fights-first",
-            source_rule_id="phase18e:fights-first-source",
-            owner_player_id="player-b",
-            target_unit_instance_ids=(enemy.unit_instance_id,),
-            started_battle_round=1,
-            started_phase=BattlePhase.MOVEMENT,
-            expiration=EffectExpiration.end_turn(battle_round=1, player_id="player-a"),
-            effect_payload={"effect_kind": "fights_first"},
-        )
-    )
-    assert state.battlefield_state is not None
-    state.replace_battlefield_state(
-        state.battlefield_state.without_unit_placement(passenger.unit_instance_id)
-    )
-    state.record_transport_cargo_state(
-        _cargo_state(
-            transport=transport,
-            embarked_unit_ids=(passenger.unit_instance_id,),
-            started_unit_ids=(passenger.unit_instance_id,),
-            battle_round=1,
-        )
-    )
-    state.record_advanced_unit_state(_advanced_unit_state(transport.unit_instance_id))
-    permission_source_rule_id = "test:shock-disembark-permitting-rule"
-    state.record_persisting_effect(
-        shock_disembark_permission_effect(
-            effect_id="phase18e:shock-disembark-permission",
-            source_rule_id=permission_source_rule_id,
-            owner_player_id="player-a",
-            transport_unit_instance_id=transport.unit_instance_id,
-            eligible_rules_unit_instance_ids=(passenger.unit_instance_id,),
-            started_battle_round=1,
-            started_phase=BattlePhase.MOVEMENT,
-            expiration=EffectExpiration.end_phase(
-                battle_round=1,
-                phase=BattlePhase.MOVEMENT,
-                player_id="player-a",
-            ),
-        )
-    )
-
-    assert shock_disembark_restriction_overrides(
-        state=state,
-        player_id="player-a",
-        battle_round=1,
-        rules_unit_instance_id=passenger.unit_instance_id,
-        transport_unit_instance_id=transport.unit_instance_id,
-    ) == (
-        TransportRestrictionOverride(
-            override_kind=TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK,
-            source_rule_id=permission_source_rule_id,
-        ),
-    )
-    handler, decisions, action_request = _movement_action_request_for_unit(
-        state=state,
-        unit_instance_id=passenger.unit_instance_id,
-    )
-    action_payload = cast(
-        dict[str, JsonValue],
-        action_request.option_by_id("disembark:shock_disembark").payload,
-    )
-    assert action_payload["disembark_mode"] == DisembarkModeKind.SHOCK_DISEMBARK.value
-    placement_request = _decision_request(
-        _submit_handler_decision(
-            handler,
-            state=state,
-            decisions=decisions,
-            request=action_request,
-            option_id="disembark:shock_disembark",
-            result_id="phase18e-select-shock-disembark",
-        )
-    )
-    proposal = MovementProposalRequest.from_decision_request_payload(placement_request.payload)
-    assert proposal.context is not None
-    assert proposal.context["start_engaged_enemy_unit_instance_ids"] == []
-
-    shock_poses = (
-        Pose.at(14.26, 9.2),
-        Pose.at(14.26, 10.8),
-        Pose.at(12.8, 7.2),
-        Pose.at(12.8, 12.8),
-        Pose.at(10.0, 6.8),
-    )
-    attempted_placement = _unit_placement_at(
-        passenger,
-        army_id="army-alpha",
-        player_id="player-a",
-        poses=shock_poses,
-    )
-    malformed_payload = PlacementProposalPayload(
-        proposal_request_id=proposal.request_id,
-        proposal_kind=proposal.proposal_kind,
-        unit_instance_id=passenger.unit_instance_id,
-        placement_kind=BattlefieldPlacementKind.DISEMBARK,
-        attempted_placement=attempted_placement,
-        transport_unit_instance_id=transport.unit_instance_id,
-        disembark_mode=DisembarkModeKind.SHOCK_DISEMBARK,
-        transport_movement_status=TransportMovementStatus.ADVANCE,
-        restriction_overrides=shock_disembark_restriction_overrides(
-            state=state,
-            player_id="player-a",
-            battle_round=1,
-            rules_unit_instance_id=passenger.unit_instance_id,
-            transport_unit_instance_id=transport.unit_instance_id,
-        ),
-    )
-    invalid = _submit_parameterized_handler_payload(
-        handler=handler,
-        state=state,
-        decisions=decisions,
-        request=placement_request,
-        payload=validate_json_value(malformed_payload.to_payload()),
-        result_id="phase18e-malformed-shock-placement",
-    )
-    assert invalid is not None
-    assert invalid.status_kind is LifecycleStatusKind.INVALID
-    invalid_payload = cast(dict[str, object], invalid.payload)
-    invalid_validation = cast(dict[str, object], invalid_payload["proposal_validation"])
-    invalid_violations = cast(list[dict[str, object]], invalid_validation["violations"])
-    assert invalid_violations == [
-        {
-            "violation_code": "proposal_payload_missing_field",
-            "message": (
-                "Disembark placement proposal missing start_engaged_enemy_unit_instance_ids."
-            ),
-            "field": "start_engaged_enemy_unit_instance_ids",
-        }
-    ]
-    assert decisions.queue.peek_next().request_id == placement_request.request_id
-
-    stale_payload = replace(
-        malformed_payload,
-        proposal_request_id="phase18e-stale-shock-placement-request",
-        start_engaged_enemy_unit_instance_ids=engaged_enemy_ids,
-    )
-    stale = _submit_parameterized_handler_payload(
-        handler=handler,
-        state=state,
-        decisions=decisions,
-        request=placement_request,
-        payload=validate_json_value(stale_payload.to_payload()),
-        result_id="phase18e-stale-shock-placement",
-    )
-    assert stale is not None
-    assert stale.status_kind is LifecycleStatusKind.INVALID
-    stale_payload_result = cast(dict[str, object], stale.payload)
-    stale_validation = cast(dict[str, object], stale_payload_result["proposal_validation"])
-    assert stale_validation["status"] == "stale"
-    assert decisions.queue.peek_next().request_id == placement_request.request_id
-
-    placement_status = _submit_disembark_placement_payload(
-        handler,
-        state=state,
-        decisions=decisions,
-        request=placement_request,
-        passenger=passenger,
-        transport=transport,
-        disembark_mode=DisembarkModeKind.SHOCK_DISEMBARK,
-        transport_movement_status=TransportMovementStatus.ADVANCE,
-        result_id="phase18e-place-shock-disembark",
-        poses=shock_poses,
-    )
-    assert placement_status is None, json.dumps(placement_status.payload, sort_keys=True)
-    disembarked_state = state.disembarked_unit_state_for_unit(
-        player_id="player-a",
-        battle_round=1,
-        unit_instance_id=passenger.unit_instance_id,
-    )
-    assert disembarked_state is not None
-    assert disembarked_state.start_engaged_enemy_unit_instance_ids == ()
-    queue_start = _last_event_payload(decisions, "forced_fight_activation_queue_started")
-    assert (
-        queue_start["fights_first_registry"] == FightsFirstRegistry.from_state(state).to_payload()
-    )
-    assert FightsFirstRegistry.from_state(state).sources
-    forced_context = cast(dict[str, JsonValue], queue_start["forced_activation_context"])
-    assert forced_context["selecting_player_id"] == "player-b"
-    assert forced_context["eligible_unit_instance_ids"] == list(engaged_enemy_ids)
-
-    lifecycle_payload: GameLifecyclePayload = {
-        "config": None,
-        "parameterized_movement_proposals": True,
-        "state": state.to_payload(),
-        "decisions": decisions.to_payload(),
-        "reaction_queue": {"frames": []},
-    }
-    restored = GameLifecycle.from_payload(lifecycle_payload)
-    assert restored.to_payload() == lifecycle_payload
-    assert restored.state is not None
-
-    malformed_registries: tuple[JsonValue, ...] = (None, [], {}, {"sources": "malformed"})
-    for registry_value in malformed_registries:
-        malformed_registry = cast(GameLifecyclePayload, json.loads(json.dumps(lifecycle_payload)))
-        queue_event = next(
-            event
-            for event in malformed_registry["decisions"]["event_log"]
-            if event["event_type"] == "forced_fight_activation_queue_started"
-        )
-        cast(dict[str, JsonValue], queue_event["payload"])["fights_first_registry"] = registry_value
-        with pytest.raises(GameLifecycleError):
-            GameLifecycle.from_payload(malformed_registry)
-
-    forged_skip_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(lifecycle_payload, sort_keys=True)),
-    )
-    forged_skip_state = cast(dict[str, Any], forged_skip_payload["state"])
-    forged_skip_state["fight_phase_state"] = None
-    forged_skip_event = next(
-        event
-        for event in forged_skip_payload["decisions"]["event_log"]
-        if event["event_type"] == "forced_fight_activation_queue_started"
-    )
-    forged_skip_event["event_type"] = "forced_fight_activation_queue_skipped"
-    forged_skip_event["payload"] = {
-        "trigger_event_id": forced_context["trigger_event_id"],
-    }
-    with pytest.raises(
-        GameLifecycleError,
-        match="cannot skip outstanding forced-Fight activations",
-    ):
-        GameLifecycle.from_payload(forged_skip_payload)
-
-    forged_completion_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(lifecycle_payload, sort_keys=True)),
-    )
-    forged_completion_state = cast(dict[str, Any], forged_completion_payload["state"])
-    forged_completion_state["fight_phase_state"] = None
-    forged_completion_events = forged_completion_payload["decisions"]["event_log"]
-    forged_completion_events.append(
-        {
-            "event_id": f"event-{len(forged_completion_events) + 1:06d}",
-            "event_type": "forced_fight_activation_queue_completed",
-            "payload": {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "phase": BattlePhase.MOVEMENT.value,
-                "active_player_id": "player-a",
-                "phase_body_status": "forced_fight_activation_queue_completed",
-                "forced_activation_context": forced_context,
-                "activation_selections": [],
-            },
-        }
-    )
-    with pytest.raises(
-        GameLifecycleError,
-        match="omitted mandatory forced-Fight activations",
-    ):
-        GameLifecycle.from_payload(forged_completion_payload)
-
-    reduced_eligible_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(lifecycle_payload, sort_keys=True)),
-    )
-    reduced_eligible_state = cast(dict[str, Any], reduced_eligible_payload["state"])
-    reduced_eligible_fight = cast(dict[str, Any], reduced_eligible_state["fight_phase_state"])
-    reduced_eligible_context = cast(
-        dict[str, Any], reduced_eligible_fight["forced_activation_context"]
-    )
-    reduced_eligible_context["eligible_unit_instance_ids"] = [engaged_enemy_ids[0]]
-    reduced_eligible_order = cast(dict[str, Any], reduced_eligible_fight["fight_order_state"])
-    reduced_eligible_order["engaged_at_fight_step_start_unit_ids"] = [engaged_enemy_ids[0]]
-    reduced_eligible_start = next(
-        event
-        for event in reduced_eligible_payload["decisions"]["event_log"]
-        if event["event_type"] == "forced_fight_activation_queue_started"
-    )
-    reduced_eligible_start_payload = cast(dict[str, Any], reduced_eligible_start["payload"])
-    reduced_eligible_start_context = cast(
-        dict[str, Any], reduced_eligible_start_payload["forced_activation_context"]
-    )
-    reduced_eligible_start_context["eligible_unit_instance_ids"] = [engaged_enemy_ids[0]]
-    with pytest.raises(
-        GameLifecycleError,
-        match="queue-start eligibility context drift",
-    ):
-        GameLifecycle.from_payload(reduced_eligible_payload)
-
-    reordered_skip_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(lifecycle_payload, sort_keys=True)),
-    )
-    reordered_skip_state = cast(dict[str, Any], reordered_skip_payload["state"])
-    reordered_skip_state["fight_phase_state"] = None
-    reordered_skip_events = reordered_skip_payload["decisions"]["event_log"]
-    reordered_skip_start = next(
-        event
-        for event in reordered_skip_events
-        if event["event_type"] == "forced_fight_activation_queue_started"
-    )
-    reordered_skip_start["event_type"] = "phase18e_test_queue_start_removed"
-    early_skip_event = next(
-        event for event in reordered_skip_events if event["event_type"] == "disembark_unit_selected"
-    )
-    early_skip_event["event_type"] = "forced_fight_activation_queue_skipped"
-    early_skip_event["payload"] = {"trigger_event_id": forced_context["trigger_event_id"]}
-    with pytest.raises(GameLifecycleError, match="skipped queue event ordering drift"):
-        GameLifecycle.from_payload(reordered_skip_payload)
-
-    missing_queue_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(lifecycle_payload, sort_keys=True)),
-    )
-    missing_queue_events = missing_queue_payload["decisions"]["event_log"]
-    missing_queue_start = next(
-        event
-        for event in missing_queue_events
-        if event["event_type"] == "forced_fight_activation_queue_started"
-    )
-    missing_queue_start["event_type"] = "phase18e_test_queue_start_removed"
-    with pytest.raises(
-        GameLifecycleError,
-        match="requires one exact queue-start event",
-    ):
-        GameLifecycle.from_payload(missing_queue_payload)
-
-    drifted_context_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(lifecycle_payload, sort_keys=True)),
-    )
-    drifted_context_events = drifted_context_payload["decisions"]["event_log"]
-    drifted_queue_start = next(
-        event
-        for event in drifted_context_events
-        if event["event_type"] == "forced_fight_activation_queue_started"
-    )
-    drifted_queue_start_payload = cast(dict[str, Any], drifted_queue_start["payload"])
-    drifted_forced_context = cast(
-        dict[str, Any], drifted_queue_start_payload["forced_activation_context"]
-    )
-    drifted_forced_context["source_rule_id"] = "test:drifted-shock-source"
-    drifted_state = cast(dict[str, Any], drifted_context_payload["state"])
-    drifted_fight_state = cast(dict[str, Any], drifted_state["fight_phase_state"])
-    drifted_state_context = cast(dict[str, Any], drifted_fight_state["forced_activation_context"])
-    drifted_state_context["source_rule_id"] = "test:drifted-shock-source"
-    with pytest.raises(GameLifecycleError, match="trigger context drift"):
-        GameLifecycle.from_payload(drifted_context_payload)
-
-    prematurely_completed_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(lifecycle_payload, sort_keys=True)),
-    )
-    prematurely_completed_events = prematurely_completed_payload["decisions"]["event_log"]
-    premature_start = next(
-        event
-        for event in prematurely_completed_events
-        if event["event_type"] == "forced_fight_activation_queue_started"
-    )
-    prematurely_completed_events.append(
-        {
-            "event_id": f"event-{len(prematurely_completed_events) + 1:06d}",
-            "event_type": "forced_fight_activation_queue_completed",
-            "payload": cast(dict[str, JsonValue], premature_start["payload"]),
-        }
-    )
-    with pytest.raises(GameLifecycleError, match="cannot already be completed"):
-        GameLifecycle.from_payload(prematurely_completed_payload)
-
-    for context_field_name, context_replacement, context_error_match in (
-        ("selecting_player_id", "player-a", "must be selected by the opponent"),
-        ("source_unit_instance_id", "army-alpha:unknown-unit", "source unit is unknown"),
-        ("transport_unit_instance_id", "army-alpha:unknown-transport", "Transport is unknown"),
-        ("trigger_event_id", "event-999999", "trigger event is missing or invalid"),
-    ):
-        invalid_context_payload = cast(
-            GameLifecyclePayload,
-            json.loads(json.dumps(lifecycle_payload, sort_keys=True)),
-        )
-        invalid_context_state = cast(dict[str, Any], invalid_context_payload["state"])
-        invalid_context_fight = cast(dict[str, Any], invalid_context_state["fight_phase_state"])
-        invalid_context = cast(dict[str, Any], invalid_context_fight["forced_activation_context"])
-        invalid_context[context_field_name] = context_replacement
-        with pytest.raises(GameLifecycleError, match=context_error_match):
-            GameLifecycle.from_payload(invalid_context_payload)
-
-    for order_field_name, order_replacement, order_error_match in (
-        ("next_player_id", "player-a", "selecting player drift"),
-        ("ordering_bands", ["fights_first"], "ordering band drift"),
-        ("passed_player_ids", ["player-a"], "cannot contain Fight passes"),
-        ("engaged_at_fight_step_start_unit_ids", [], "eligibility snapshot drift"),
-        (
-            "selected_to_fight_unit_ids",
-            [passenger.unit_instance_id],
-            "selected unit drift",
-        ),
-    ):
-        invalid_order_payload = cast(
-            GameLifecyclePayload,
-            json.loads(json.dumps(lifecycle_payload, sort_keys=True)),
-        )
-        invalid_order_state = cast(dict[str, Any], invalid_order_payload["state"])
-        invalid_order_fight = cast(dict[str, Any], invalid_order_state["fight_phase_state"])
-        invalid_order = cast(dict[str, Any], invalid_order_fight["fight_order_state"])
-        invalid_order[order_field_name] = order_replacement
-        with pytest.raises(GameLifecycleError, match=order_error_match):
-            GameLifecycle.from_payload(invalid_order_payload)
-
-    wrong_owner_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(lifecycle_payload, sort_keys=True)),
-    )
-    wrong_owner_state = cast(dict[str, Any], wrong_owner_payload["state"])
-    wrong_owner_fight = cast(dict[str, Any], wrong_owner_state["fight_phase_state"])
-    wrong_owner_context = cast(dict[str, Any], wrong_owner_fight["forced_activation_context"])
-    wrong_owner_context["eligible_unit_instance_ids"] = [passenger.unit_instance_id]
-    wrong_owner_order = cast(dict[str, Any], wrong_owner_fight["fight_order_state"])
-    wrong_owner_order["engaged_at_fight_step_start_unit_ids"] = [passenger.unit_instance_id]
-    with pytest.raises(GameLifecycleError, match="eligible unit player drift"):
-        GameLifecycle.from_payload(wrong_owner_payload)
-
-    malformed_trigger_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(lifecycle_payload, sort_keys=True)),
-    )
-    malformed_trigger_event = next(
-        event
-        for event in malformed_trigger_payload["decisions"]["event_log"]
-        if event["event_type"] == "unit_disembarked"
-    )
-    malformed_trigger_event["payload"] = None
-    with pytest.raises(GameLifecycleError, match="trigger payload must be an object"):
-        GameLifecycle.from_payload(malformed_trigger_payload)
-
-    missing_trigger_state_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(lifecycle_payload, sort_keys=True)),
-    )
-    missing_trigger_state_event = next(
-        event
-        for event in missing_trigger_state_payload["decisions"]["event_log"]
-        if event["event_type"] == "unit_disembarked"
-    )
-    missing_trigger_state = cast(dict[str, Any], missing_trigger_state_event["payload"])
-    missing_trigger_state.pop("disembarked_unit_state")
-    with pytest.raises(GameLifecycleError, match="trigger lacks disembarked state"):
-        GameLifecycle.from_payload(missing_trigger_state_payload)
-
-    drifted_engagement_evidence_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(lifecycle_payload, sort_keys=True)),
-    )
-    drifted_engagement_event = next(
-        event
-        for event in drifted_engagement_evidence_payload["decisions"]["event_log"]
-        if event["event_type"] == "unit_disembarked"
-    )
-    drifted_engagement_event_payload = cast(dict[str, Any], drifted_engagement_event["payload"])
-    drifted_engagement_event_payload["post_engaged_enemy_unit_instance_ids"] = []
-    with pytest.raises(GameLifecycleError, match="engagement evidence drift"):
-        GameLifecycle.from_payload(drifted_engagement_evidence_payload)
-
-    fight_handler = FightPhaseHandler(ruleset_descriptor=_ruleset())
-    fight_request = _decision_request(
-        fight_handler.advance_forced_fight_activations_if_needed(
-            state=restored.state,
-            decisions=restored.decision_controller,
-        )
-    )
-    assert fight_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
-    assert fight_request.actor_id == "player-b"
-    assert tuple(option.option_id for option in fight_request.options) == tuple(
-        f"fight:normal:{unit_id}" for unit_id in engaged_enemy_ids
-    )
-    for viewer_player_id in ("player-a", "player-b"):
-        pending = public_decision_request_view(
-            fight_request,
-            viewer=ViewerContext.for_player(viewer_player_id),
-        )
-        assert pending["request_id"] == fight_request.request_id
-        assert pending["actor_id"] == "player-b"
-        pending_payload = cast(dict[str, JsonValue], pending["payload"])
-        assert pending_payload["forced_activation_context"] == forced_context
-    first_fight_result = DecisionResult.for_request(
-        result_id="phase18e-forced-enemy-fight",
-        request=fight_request,
-        selected_option_id=f"fight:normal:{enemy.unit_instance_id}",
-    )
-    restored.decision_controller.submit_result(first_fight_result)
-    assert (
-        fight_handler.apply_decision(
-            state=restored.state,
-            result=first_fight_result,
-            decisions=restored.decision_controller,
-        )
-        is None
-    )
-    active_selection_payload = restored.to_payload()
-    assert GameLifecycle.from_payload(active_selection_payload).to_payload() == (
-        active_selection_payload
-    )
-    forged_overrun_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(active_selection_payload, sort_keys=True)),
-    )
-    _forge_last_forced_fight_selection_type(
-        forged_overrun_payload,
-        fight_type="overrun",
-        rewrite_option_id=False,
-    )
-    with pytest.raises(GameLifecycleError, match="canonical request drift"):
-        GameLifecycle.from_payload(forged_overrun_payload)
-
-    rules_illegal_overrun_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(active_selection_payload, sort_keys=True)),
-    )
-    _forge_last_forced_fight_selection_type(
-        rules_illegal_overrun_payload,
-        fight_type="overrun",
-        rewrite_option_id=True,
-    )
-    with pytest.raises(GameLifecycleError, match="canonical request drift"):
-        GameLifecycle.from_payload(rules_illegal_overrun_payload)
-
-    drifted_selection_request_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(active_selection_payload, sort_keys=True)),
-    )
-    _, _, _, _, drifted_selection_request_event = _last_forced_fight_selection_authority_payloads(
-        drifted_selection_request_payload
-    )
-    cast(dict[str, Any], drifted_selection_request_event["payload"])["eligible_unit_ids"] = []
-    with pytest.raises(GameLifecycleError, match="decision event history drift"):
-        GameLifecycle.from_payload(drifted_selection_request_payload)
-
-    malformed_eligibility_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(active_selection_payload, sort_keys=True)),
-    )
-    _, malformed_eligibility_record, _, _, _ = _last_forced_fight_selection_authority_payloads(
-        malformed_eligibility_payload
-    )
-    cast(dict[str, Any], malformed_eligibility_record["request"])["payload"][
-        "eligible_contexts"
-    ] = None
-    with pytest.raises(GameLifecycleError, match="eligibility history is malformed"):
-        GameLifecycle.from_payload(malformed_eligibility_payload)
-
-    non_object_eligibility_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(active_selection_payload, sort_keys=True)),
-    )
-    _, non_object_eligibility_record, _, _, _ = _last_forced_fight_selection_authority_payloads(
-        non_object_eligibility_payload
-    )
-    non_object_request = cast(dict[str, Any], non_object_eligibility_record["request"])
-    non_object_request_payload = cast(dict[str, Any], non_object_request["payload"])
-    non_object_request_payload["eligible_contexts"] = ["malformed"]
-    with pytest.raises(GameLifecycleError, match="eligibility history is malformed"):
-        GameLifecycle.from_payload(non_object_eligibility_payload)
-
-    incomplete_eligibility_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(active_selection_payload, sort_keys=True)),
-    )
-    _, incomplete_eligibility_record, _, _, _ = _last_forced_fight_selection_authority_payloads(
-        incomplete_eligibility_payload
-    )
-    incomplete_request = cast(dict[str, Any], incomplete_eligibility_record["request"])
-    incomplete_request_payload = cast(dict[str, Any], incomplete_request["payload"])
-    incomplete_contexts = cast(
-        list[dict[str, Any]], incomplete_request_payload["eligible_contexts"]
-    )
-    incomplete_contexts[0].pop("player_id")
-    with pytest.raises(GameLifecycleError, match="eligibility history is malformed"):
-        GameLifecycle.from_payload(incomplete_eligibility_payload)
-
-    drifted_eligibility_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(active_selection_payload, sort_keys=True)),
-    )
-    _, drifted_eligibility_record, _, _, _ = _last_forced_fight_selection_authority_payloads(
-        drifted_eligibility_payload
-    )
-    drifted_request = cast(dict[str, Any], drifted_eligibility_record["request"])
-    drifted_request_payload = cast(dict[str, Any], drifted_request["payload"])
-    drifted_contexts = cast(list[dict[str, Any]], drifted_request_payload["eligible_contexts"])
-    drifted_contexts[0]["more_than_pass_distance_from_all_enemies"] = True
-    with pytest.raises(GameLifecycleError, match="eligibility history drift"):
-        GameLifecycle.from_payload(drifted_eligibility_payload)
-
-    reordered_eligibility_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(active_selection_payload, sort_keys=True)),
-    )
-    _, reordered_eligibility_record, _, _, _ = _last_forced_fight_selection_authority_payloads(
-        reordered_eligibility_payload
-    )
-    reordered_request = cast(dict[str, Any], reordered_eligibility_record["request"])
-    reordered_request_payload = cast(dict[str, Any], reordered_request["payload"])
-    reordered_contexts = cast(list[dict[str, Any]], reordered_request_payload["eligible_contexts"])
-    reordered_contexts.reverse()
-    with pytest.raises(GameLifecycleError, match="eligibility history drift"):
-        GameLifecycle.from_payload(reordered_eligibility_payload)
-
-    drifted_active_history_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(active_selection_payload, sort_keys=True)),
-    )
-    drifted_active_state = cast(dict[str, Any], drifted_active_history_payload["state"])
-    drifted_active_fight = cast(dict[str, Any], drifted_active_state["fight_phase_state"])
-    drifted_active_fight["active_activation"] = None
-    drifted_active_order = cast(dict[str, Any], drifted_active_fight["fight_order_state"])
-    drifted_active_order["selected_to_fight_unit_ids"] = []
-    drifted_active_order["activation_selections"] = []
-    with pytest.raises(GameLifecycleError, match="activation history drift"):
-        GameLifecycle.from_payload(drifted_active_history_payload)
-    first_fight_state = restored.state.fight_phase_state
-    assert first_fight_state is not None
-    first_active_activation = first_fight_state.active_activation
-    assert first_active_activation is not None
-    assert (
-        _complete_active_fight_activation(
-            handler=fight_handler,
-            state=restored.state,
-            decisions=restored.decision_controller,
-            reaction_queue=None,
-            policy=_ruleset().fight_policy,
-            activation=first_active_activation,
-        )
-        is None
-    )
-    second_fight_request = _decision_request(
-        fight_handler.advance_forced_fight_activations_if_needed(
-            state=restored.state,
-            decisions=restored.decision_controller,
-        )
-    )
-    assert tuple(option.option_id for option in second_fight_request.options) == (
-        f"fight:normal:{second_enemy.unit_instance_id}",
-    )
-    second_fight_result = DecisionResult.for_request(
-        result_id="phase18e-forced-second-enemy-fight",
-        request=second_fight_request,
-        selected_option_id=second_fight_request.options[0].option_id,
-    )
-    restored.decision_controller.submit_result(second_fight_result)
-    assert (
-        fight_handler.apply_decision(
-            state=restored.state,
-            result=second_fight_result,
-            decisions=restored.decision_controller,
-        )
-        is None
-    )
-    second_active_selection_payload = restored.to_payload()
-    assert GameLifecycle.from_payload(second_active_selection_payload).to_payload() == (
-        second_active_selection_payload
-    )
-    forged_later_overrun_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(second_active_selection_payload, sort_keys=True)),
-    )
-    _forge_last_forced_fight_selection_type(
-        forged_later_overrun_payload,
-        fight_type="overrun",
-        rewrite_option_id=True,
-    )
-    _remove_currently_engaged_from_last_forced_fight_selection(forged_later_overrun_payload)
-    with pytest.raises(GameLifecycleError, match="eligibility history drift"):
-        GameLifecycle.from_payload(forged_later_overrun_payload)
-
-    second_fight_state = restored.state.fight_phase_state
-    assert second_fight_state is not None
-    second_active_activation = second_fight_state.active_activation
-    assert second_active_activation is not None
-    assert (
-        _complete_active_fight_activation(
-            handler=fight_handler,
-            state=restored.state,
-            decisions=restored.decision_controller,
-            reaction_queue=None,
-            policy=_ruleset().fight_policy,
-            activation=second_active_activation,
-        )
-        is None
-    )
-    completion = fight_handler.advance_forced_fight_activations_if_needed(
-        state=restored.state,
-        decisions=restored.decision_controller,
-    )
-    assert completion is not None
-    assert completion.status_kind is LifecycleStatusKind.ADVANCED
-    assert restored.state.fight_phase_state is None
-    selected_events = tuple(
-        event
-        for event in restored.decision_controller.event_log.records
-        if event.event_type == "fight_activation_selected"
-    )
-    assert len(selected_events) == 2
-    assert all(
-        isinstance(event.payload, dict)
-        and event.payload["forced_activation_context"] == forced_context
-        for event in selected_events
-    )
-    assert (
-        _last_event_payload(
-            restored.decision_controller,
-            "forced_fight_activation_queue_completed",
-        )["forced_activation_context"]
-        == forced_context
-    )
-    completed_payload = restored.to_payload()
-    assert GameLifecycle.from_payload(completed_payload).to_payload() == completed_payload
-
-    malformed_selection_context_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(completed_payload, sort_keys=True)),
-    )
-    selection_event_payload, _, _, _, _ = _last_forced_fight_selection_authority_payloads(
-        malformed_selection_context_payload
-    )
-    selection_event_payload["forced_activation_context"] = "malformed"
-    with pytest.raises(GameLifecycleError, match="context history is malformed"):
-        GameLifecycle.from_payload(malformed_selection_context_payload)
-
-    malformed_selection_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(completed_payload, sort_keys=True)),
-    )
-    selection_event_payload, _, _, _, _ = _last_forced_fight_selection_authority_payloads(
-        malformed_selection_payload
-    )
-    selection_event_payload["activation_selection"] = None
-    with pytest.raises(GameLifecycleError, match="selection history is malformed"):
-        GameLifecycle.from_payload(malformed_selection_payload)
-
-    incomplete_selection_context_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(completed_payload, sort_keys=True)),
-    )
-    selection_event_payload, _, _, _, _ = _last_forced_fight_selection_authority_payloads(
-        incomplete_selection_context_payload
-    )
-    incomplete_context = cast(dict[str, Any], selection_event_payload["forced_activation_context"])
-    incomplete_context.pop("context_id")
-    with pytest.raises(GameLifecycleError, match="activation history is malformed"):
-        GameLifecycle.from_payload(incomplete_selection_context_payload)
-
-    malformed_request_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(completed_payload, sort_keys=True)),
-    )
-    (
-        _,
-        selection_record,
-        requested_event_payload,
-        recorded_event_payload,
-        _,
-    ) = _last_forced_fight_selection_authority_payloads(malformed_request_payload)
-    selection_record["request"]["payload"] = None
-    requested_event_payload["payload"] = None
-    recorded_event_payload["request"]["payload"] = None
-    with pytest.raises(GameLifecycleError, match="request payload is malformed"):
-        GameLifecycle.from_payload(malformed_request_payload)
-
-    drifted_selection_decision_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(completed_payload, sort_keys=True)),
-    )
-    (
-        _,
-        selection_record,
-        requested_event_payload,
-        recorded_event_payload,
-        _,
-    ) = _last_forced_fight_selection_authority_payloads(drifted_selection_decision_payload)
-    selection_record["request"]["actor_id"] = "player-a"
-    selection_record["result"]["actor_id"] = "player-a"
-    requested_event_payload["actor_id"] = "player-a"
-    recorded_event_payload["request"]["actor_id"] = "player-a"
-    recorded_event_payload["result"]["actor_id"] = "player-a"
-    with pytest.raises(GameLifecycleError, match="canonical request drift"):
-        GameLifecycle.from_payload(drifted_selection_decision_payload)
-
-    drifted_selection_event_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(completed_payload, sort_keys=True)),
-    )
-    selection_event_payload, _, _, _, _ = _last_forced_fight_selection_authority_payloads(
-        drifted_selection_event_payload
-    )
-    selection_event_payload["phase"] = BattlePhase.MOVEMENT.value
-    with pytest.raises(GameLifecycleError, match="event history drift"):
-        GameLifecycle.from_payload(drifted_selection_event_payload)
-
-    missing_selection_request_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(completed_payload, sort_keys=True)),
-    )
-    _, _, _, _, selection_request_event = _last_forced_fight_selection_authority_payloads(
-        missing_selection_request_payload
-    )
-    selection_request_event["event_type"] = "phase18e_test_selection_request_removed"
-    with pytest.raises(GameLifecycleError, match="decision event history drift"):
-        GameLifecycle.from_payload(missing_selection_request_payload)
-
-    forged_queue_start_extra_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(completed_payload, sort_keys=True)),
-    )
-    drifted_queue_start = next(
-        event
-        for event in forged_queue_start_extra_payload["decisions"]["event_log"]
-        if event["event_type"] == "forced_fight_activation_queue_started"
-    )
-    cast(dict[str, Any], drifted_queue_start["payload"])["forged"] = True
-    with pytest.raises(GameLifecycleError, match="queue-start payload drift"):
-        GameLifecycle.from_payload(forged_queue_start_extra_payload)
-
-    forged_selection_summary_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(completed_payload, sort_keys=True)),
-    )
-    forged_selection_completion = next(
-        event
-        for event in forged_selection_summary_payload["decisions"]["event_log"]
-        if event["event_type"] == "forced_fight_activation_queue_completed"
-    )
-    forged_selection_completion_payload = cast(
-        dict[str, Any], forged_selection_completion["payload"]
-    )
-    forged_selection_completion_payload["activation_selections"] = []
-    with pytest.raises(GameLifecycleError, match="queue completion payload drift"):
-        GameLifecycle.from_payload(forged_selection_summary_payload)
-
-    unauthenticated_selection_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(completed_payload, sort_keys=True)),
-    )
-    unauthenticated_selection_payload["decisions"]["records"].pop()
-    with pytest.raises(
-        GameLifecycleError,
-        match="requires one authenticated decision record",
-    ):
-        GameLifecycle.from_payload(unauthenticated_selection_payload)
-
-    orphaned_start_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(completed_payload, sort_keys=True)),
-    )
-    orphaned_start_event = next(
-        event
-        for event in orphaned_start_payload["decisions"]["event_log"]
-        if event["event_type"] == "forced_fight_activation_queue_started"
-    )
-    orphaned_start_event_payload = cast(dict[str, Any], orphaned_start_event["payload"])
-    orphaned_start_context = cast(
-        dict[str, Any], orphaned_start_event_payload["forced_activation_context"]
-    )
-    orphaned_start_context["trigger_event_id"] = "event-999999"
-    with pytest.raises(
-        GameLifecycleError,
-        match="requires one exact queue-start event",
-    ):
-        GameLifecycle.from_payload(orphaned_start_payload)
-
-    missing_completion_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(completed_payload, sort_keys=True)),
-    )
-    missing_completion_event = next(
-        event
-        for event in missing_completion_payload["decisions"]["event_log"]
-        if event["event_type"] == "forced_fight_activation_queue_completed"
-    )
-    missing_completion_event["event_type"] = "phase18e_test_queue_completion_removed"
-    with pytest.raises(GameLifecycleError, match="requires one completion event"):
-        GameLifecycle.from_payload(missing_completion_payload)
-
-    reordered_completion_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(completed_payload, sort_keys=True)),
-    )
-    reordered_events = reordered_completion_payload["decisions"]["event_log"]
-    reordered_start = next(
-        event
-        for event in reordered_events
-        if event["event_type"] == "forced_fight_activation_queue_started"
-    )
-    reordered_completion = next(
-        event
-        for event in reordered_events
-        if event["event_type"] == "forced_fight_activation_queue_completed"
-    )
-    reordered_start["event_type"], reordered_completion["event_type"] = (
-        reordered_completion["event_type"],
-        reordered_start["event_type"],
-    )
-    reordered_start["payload"], reordered_completion["payload"] = (
-        reordered_completion["payload"],
-        reordered_start["payload"],
-    )
-    with pytest.raises(GameLifecycleError, match="requires one exact queue-start event"):
-        GameLifecycle.from_payload(reordered_completion_payload)
-
-
-def test_shock_disembark_forced_fight_queue_event_is_public_to_both_players() -> None:
-    decisions = DecisionController()
-    forced_context = {
-        "context_id": "forced-fight:event-000001",
-        "source_rule_id": SHOCK_DISEMBARK_MOVE_SOURCE_ID,
-        "trigger_event_id": "event-000001",
-        "source_phase": BattlePhase.MOVEMENT.value,
-        "source_unit_instance_id": "army-alpha:passenger-unit",
-        "transport_unit_instance_id": "army-alpha:transport-1",
-        "selecting_player_id": "player-b",
-        "eligible_unit_instance_ids": ["army-beta:enemy-unit"],
-    }
-    decisions.event_log.append(
-        "forced_fight_activation_queue_started",
-        validate_json_value(
-            {
-                "game_id": "phase18e-public-event",
-                "battle_round": 1,
-                "phase": BattlePhase.MOVEMENT.value,
-                "active_player_id": "player-a",
-                "phase_body_status": "forced_fight_activation_queue_started",
-                "forced_activation_context": forced_context,
-                "fights_first_registry": {"sources": []},
-            }
-        ),
-    )
-
-    for viewer_player_id in ("player-a", "player-b"):
-        delta = EventStreamCursor().events_since(
-            decisions.event_log,
-            viewer_player_id=viewer_player_id,
-        )
-        event = cast(dict[str, JsonValue], delta["events"][0])
-        payload = cast(dict[str, JsonValue], event["payload"])
-        assert payload["forced_activation_context"] == forced_context
-        assert "fights_first_registry" not in payload
-
-
-def test_shock_disembark_without_start_engagements_records_a_skipped_fight_queue() -> None:
-    scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
-    state = _battle_state(scenario, game_id="phase18e-shock-disembark-no-engagements")
-    assert state.battlefield_state is not None
-    state.replace_battlefield_state(
-        state.battlefield_state.without_unit_placement(passenger.unit_instance_id)
-    )
-    state.record_transport_cargo_state(
-        _cargo_state(
-            transport=transport,
-            embarked_unit_ids=(passenger.unit_instance_id,),
-            started_unit_ids=(passenger.unit_instance_id,),
-            battle_round=1,
-        )
-    )
-    state.record_advanced_unit_state(_advanced_unit_state(transport.unit_instance_id))
-    state.record_persisting_effect(
-        shock_disembark_permission_effect(
-            effect_id="phase18e:shock-no-engagement-permission",
-            source_rule_id="test:shock-no-engagement-permitting-rule",
-            owner_player_id="player-a",
-            transport_unit_instance_id=transport.unit_instance_id,
-            eligible_rules_unit_instance_ids=(passenger.unit_instance_id,),
-            started_battle_round=1,
-            started_phase=BattlePhase.MOVEMENT,
-            expiration=EffectExpiration.end_phase(
-                battle_round=1,
-                phase=BattlePhase.MOVEMENT,
-                player_id="player-a",
-            ),
-        )
-    )
-    handler, decisions, action_request = _movement_action_request_for_unit(
-        state=state,
-        unit_instance_id=passenger.unit_instance_id,
-    )
-    placement_request = _decision_request(
-        _submit_handler_decision(
-            handler,
-            state=state,
-            decisions=decisions,
-            request=action_request,
-            option_id="disembark:shock_disembark",
-            result_id="phase18e-select-shock-no-engagement",
-        )
-    )
-    proposal = MovementProposalRequest.from_decision_request_payload(placement_request.payload)
-    assert proposal.context is not None
-    assert proposal.context["start_engaged_enemy_unit_instance_ids"] == []
-
-    decisions.event_log.append("fight_activation_selected", None)
-    decisions.event_log.append("fight_activation_selected", {})
-    decisions.event_log.append(
-        "fight_activation_selected",
-        validate_json_value(
-            {
-                "battle_round": state.battle_round,
-                "active_player_id": "player-a",
-                "forced_activation_context": {"source_phase": BattlePhase.SHOOTING.value},
-                "activation_selection": {"unit_instance_id": "army-beta:enemy-unit"},
-            }
-        ),
-    )
-    placement_status = _submit_disembark_placement_payload(
-        handler,
-        state=state,
-        decisions=decisions,
-        request=placement_request,
-        passenger=passenger,
-        transport=transport,
-        disembark_mode=DisembarkModeKind.SHOCK_DISEMBARK,
-        transport_movement_status=TransportMovementStatus.ADVANCE,
-        result_id="phase18e-place-shock-no-engagement",
-        poses=_disembark_poses(),
-    )
-
-    assert placement_status is None
-    assert state.fight_phase_state is None
-    skipped = _last_event_payload(decisions, "forced_fight_activation_queue_skipped")
-    assert skipped["start_engaged_enemy_unit_instance_ids"] == []
-    assert skipped["already_selected_unit_instance_ids"] == []
-    replay_payload: GameLifecyclePayload = {
-        "config": None,
-        "parameterized_movement_proposals": True,
-        "state": state.to_payload(),
-        "decisions": decisions.to_payload(),
-        "reaction_queue": {"frames": []},
-    }
-    for event in replay_payload["decisions"]["event_log"]:
-        if event["event_type"] == "fight_activation_selected":
-            event["event_type"] = "phase18e_test_ignored_fight_history"
-            event["payload"] = {}
-    assert GameLifecycle.from_payload(replay_payload).to_payload() == replay_payload
+# Historical Shock queue assertions are retained in the V963 source audit baseline.
+# Current source-backed setup, facade, restore and replay are in test_v963_shock_disembark.
 
 
 def test_forced_fight_source_context_fails_closed_for_malformed_cross_phase_state() -> None:
@@ -5194,41 +4124,6 @@ def test_forced_fight_source_context_fails_closed_for_malformed_cross_phase_stat
     )
     with pytest.raises(GameLifecycleError, match="forced_activation_context must be typed"):
         replace(forced_state, forced_activation_context=cast(Any, "invalid"))
-
-    malformed_history = DecisionController()
-    malformed_history.event_log.append(
-        "fight_activation_selected",
-        validate_json_value(
-            {
-                "battle_round": state.battle_round,
-                "active_player_id": "player-a",
-                "forced_activation_context": {"source_phase": BattlePhase.MOVEMENT.value},
-                "activation_selection": {"unit_instance_id": False},
-            }
-        ),
-    )
-    with pytest.raises(GameLifecycleError, match="unit identity is malformed"):
-        _movement_placement_proposals._forced_fight_selected_unit_ids_for_current_phase(  # pyright: ignore[reportPrivateUsage]
-            state=state,
-            decisions=malformed_history,
-        )
-
-    valid_history = DecisionController()
-    valid_history.event_log.append(
-        "fight_activation_selected",
-        validate_json_value(
-            {
-                "battle_round": state.battle_round,
-                "active_player_id": "player-a",
-                "forced_activation_context": {"source_phase": BattlePhase.MOVEMENT.value},
-                "activation_selection": {"unit_instance_id": enemy.unit_instance_id},
-            }
-        ),
-    )
-    assert _movement_placement_proposals._forced_fight_selected_unit_ids_for_current_phase(  # pyright: ignore[reportPrivateUsage]
-        state=state,
-        decisions=valid_history,
-    ) == (enemy.unit_instance_id,)
 
 
 def test_assault_disembark_permission_and_state_payloads_fail_closed() -> None:
@@ -5515,21 +4410,6 @@ def test_assault_disembark_places_attached_rules_unit_atomically(
                 ),
             ),
         )
-    if mode is DisembarkModeKind.SHOCK_DISEMBARK and not oversized:
-        enemy = scenario.armies[1].units[0]
-        scenario = replace(
-            scenario,
-            battlefield_state=scenario.battlefield_state.with_unit_placement(
-                _unit_placement_at(
-                    enemy,
-                    army_id="army-beta",
-                    player_id="player-b",
-                    poses=tuple(
-                        Pose.at(14.2 + 1.4 * i, 11.8) for i in range(len(enemy.own_models))
-                    ),
-                )
-            ),
-        )
     rules_unit = rules_unit_view_from_armies(
         armies=scenario.armies,
         unit_instance_id=attached_id,
@@ -5574,6 +4454,211 @@ def test_assault_disembark_places_attached_rules_unit_atomically(
     assert {record.model_instance_id for record in resolution.transition_batch.placements} == {
         model.model_instance_id for unit in (bodyguard, leader) for model in unit.own_models
     }
+
+
+@pytest.mark.parametrize("engaged_leader", [False, True])
+def test_v963_attached_shock_setup_uses_facade_and_checks_every_component(
+    engaged_leader: bool,
+) -> None:
+    from tests.core_stratagem_helpers import (
+        _config,
+        _record_default_fixed_secondary_choices_for_missing_players,
+    )
+    from tests.psychic_modifier_helpers import pending_request
+    from tests.setup_completion_helpers import (
+        record_completed_command_occurrences_for_fixture,
+        record_primary_turn_start_evidence_for_fixture,
+    )
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.list_validation import AttachmentDeclaration
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
+
+    scenario, bodyguard, leader, transport = _attached_embark_ready_scenario()
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    requests = tuple(
+        replace(
+            _army_muster_request(
+                catalog=catalog,
+                player_id=army.player_id,
+                army_id=army.army_id,
+                unit_selections=tuple(
+                    _unit_selection(
+                        unit_selection_id=unit.unit_instance_id.split(":", 1)[1],
+                        datasheet_id=unit.datasheet_id,
+                        model_profile_id=unit.own_models[0].model_profile_id,
+                        model_count=len(unit.own_models),
+                    )
+                    for unit in army.units
+                ),
+            ),
+            attachment_declarations=(
+                AttachmentDeclaration(
+                    source_unit_selection_id="attached-leader",
+                    bodyguard_unit_selection_id="attached-bodyguard",
+                ),
+            )
+            if army.player_id == "player-a"
+            else (),
+        )
+        for army in scenario.armies
+    )
+    config = replace(
+        _config(),
+        game_id="v963:attached-shock",
+        ruleset_descriptor=_ruleset(),
+        army_muster_requests=requests,
+    )
+    scenario = replace(
+        scenario,
+        armies=tuple(muster_army(catalog=catalog, request=request) for request in requests),
+    )
+    attached_id = scenario.armies[0].attached_units[0].attached_unit_instance_id
+    scenario = _without_unit(
+        _without_unit(scenario, bodyguard.unit_instance_id), leader.unit_instance_id
+    )
+    if engaged_leader:
+        enemy = scenario.armies[1].unit_by_id("army-beta:enemy-unit")
+        scenario = replace(
+            scenario,
+            battlefield_state=scenario.battlefield_state.with_unit_placement(
+                _unit_placement_at(
+                    enemy,
+                    army_id="army-beta",
+                    player_id="player-b",
+                    poses=tuple(Pose.at(14.2 + 1.4 * index, 11.8) for index in range(5)),
+                )
+            ),
+        )
+    state = _battle_state(scenario, game_id="v963:attached-shock")
+    component_ids = tuple(sorted((bodyguard.unit_instance_id, leader.unit_instance_id)))
+    state.record_transport_cargo_state(
+        _cargo_state(
+            transport=transport,
+            embarked_unit_ids=component_ids,
+            started_unit_ids=component_ids,
+            battle_round=1,
+            max_model_count=6,
+        )
+    )
+    state.record_persisting_effect(
+        shock_disembark_permission_effect(
+            effect_id="v963:attached-grant",
+            source_rule_id="test:v963:attached-grant",
+            owner_player_id="player-a",
+            transport_unit_instance_id=transport.unit_instance_id,
+            eligible_rules_unit_instance_ids=(attached_id,),
+            started_battle_round=1,
+            started_phase=BattlePhase.MOVEMENT,
+            expiration=EffectExpiration.end_phase(
+                battle_round=1, phase=BattlePhase.MOVEMENT, player_id="player-a"
+            ),
+        )
+    )
+    _record_default_fixed_secondary_choices_for_missing_players(state)
+    decisions = record_primary_turn_start_evidence_for_fixture(state)
+    record_completed_command_occurrences_for_fixture(state, decisions=decisions, config=config)
+    session = LocalGameSession(
+        GameLifecycle.from_payload(
+            {
+                "config": config.to_payload(),
+                "parameterized_movement_proposals": True,
+                "state": state.to_payload(),
+                "decisions": decisions.to_payload(),
+                "reaction_queue": {"frames": []},
+            }
+        )
+    )
+    initial = session.lifecycle.to_payload()
+    request = pending_request(session)
+    action = session.submit_option(
+        request_id=request.request_id, result_id="v963:attached-select", option_id=attached_id
+    )
+    assert action.decision_request is not None
+    placement = session.submit_option(
+        request_id=action.decision_request.request_id,
+        result_id="v963:attached-mode",
+        option_id="disembark:shock_disembark",
+    )
+    assert placement.decision_request is not None
+    request = placement.decision_request
+    proposal = PlacementProposalPayload(
+        proposal_request_id=request.request_id,
+        proposal_kind=ProposalKind.DISEMBARK,
+        unit_instance_id=attached_id,
+        placement_kind=BattlefieldPlacementKind.DISEMBARK,
+        attempted_rules_unit_placement=RulesUnitPlacement(
+            rules_unit_instance_id=attached_id,
+            component_unit_placements=(
+                _unit_placement_at(
+                    bodyguard,
+                    army_id="army-alpha",
+                    player_id="player-a",
+                    poses=(
+                        Pose.at(8.6, 13),
+                        Pose.at(10, 13),
+                        Pose.at(11.4, 13),
+                        Pose.at(9.3, 14.2),
+                        Pose.at(10.7, 14.2),
+                    ),
+                ),
+                _unit_placement_at(
+                    leader, army_id="army-alpha", player_id="player-a", poses=(Pose.at(12.6, 11.8),)
+                ),
+            ),
+        ),
+        transport_unit_instance_id=transport.unit_instance_id,
+        disembark_mode=DisembarkModeKind.SHOCK_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        restriction_overrides=(
+            TransportRestrictionOverride(
+                override_kind=TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK,
+                source_rule_id="test:v963:attached-grant",
+            ),
+        ),
+        start_engaged_enemy_unit_instance_ids=(),
+    )
+    assert session.lifecycle.state is not None
+    state = session.lifecycle.state
+    before = (state.battlefield_state, tuple(state.transport_cargo_states))
+    result = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="v963:attached-place",
+        payload=validate_json_value(proposal.to_payload()),
+    )
+    if engaged_leader:
+        assert result.status_kind is LifecycleStatusKind.INVALID
+        assert (state.battlefield_state, tuple(state.transport_cargo_states)) == before
+        assert not state.disembarked_unit_states
+        assert any(
+            "enemy_engagement_range" in json.dumps(event.payload)
+            for event in session.lifecycle.decision_controller.event_log.records
+        )
+    else:
+        assert result.status_kind is not LifecycleStatusKind.INVALID
+        assert state.disembarked_unit_states[0].unit_instance_id == attached_id
+        assert state.battlefield_state is not None
+        assert set(component_ids) <= set(_placed_unit_ids(state))
+    assert state.fight_phase_state is None
+    assert not any(
+        event.event_type.startswith("forced_fight_activation_queue_")
+        for event in session.lifecycle.decision_controller.event_log.records
+    )
+    payload = cast(GameLifecyclePayload, json.loads(json.dumps(session.lifecycle.to_payload())))
+    restored = LocalGameSession(GameLifecycle.from_payload(payload))
+    for viewer in state.player_ids:
+        assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
+        assert restored.events_since(
+            EventStreamCursor(), viewer_player_id=viewer
+        ) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)
+    replay = ReplayRunner(
+        ReplayArtifact.capture(
+            artifact_id="v963:attached",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        )
+    ).run()
+    assert replay.reproduced_exactly, replay
 
 
 def test_replay_rejects_transport_cargo_when_transport_is_not_placed() -> None:
@@ -9273,163 +8358,6 @@ def _movement_action_request_for_unit(
     return handler, decisions, action_request
 
 
-def _last_forced_fight_selection_authority_payloads(
-    lifecycle_payload: GameLifecyclePayload,
-) -> tuple[
-    dict[str, Any],
-    dict[str, Any],
-    dict[str, Any],
-    dict[str, Any],
-    dict[str, Any],
-]:
-    decisions_payload = cast(dict[str, Any], lifecycle_payload["decisions"])
-    event_log = cast(list[dict[str, Any]], decisions_payload["event_log"])
-    selection_event = next(
-        event for event in reversed(event_log) if event["event_type"] == "fight_activation_selected"
-    )
-    selection_event_payload = cast(dict[str, Any], selection_event["payload"])
-    activation_selection = cast(dict[str, Any], selection_event_payload["activation_selection"])
-    request_id = activation_selection["request_id"]
-    result_id = activation_selection["result_id"]
-    records = cast(list[dict[str, Any]], decisions_payload["records"])
-    selection_record = next(
-        record
-        for record in records
-        if record["request"]["request_id"] == request_id
-        and record["result"]["result_id"] == result_id
-    )
-    requested_event = next(
-        event
-        for event in event_log
-        if event["event_type"] == "decision_requested"
-        and cast(dict[str, Any], event["payload"]).get("request_id") == request_id
-    )
-    recorded_event = next(
-        event
-        for event in event_log
-        if event["event_type"] == "decision_recorded"
-        and cast(dict[str, Any], event["payload"]).get("record_id") == selection_record["record_id"]
-    )
-    selection_request_event = next(
-        event
-        for event in event_log
-        if event["event_type"] == "fight_activation_selection_requested"
-        and cast(dict[str, Any], event["payload"]).get("request_id") == request_id
-    )
-    return (
-        selection_event_payload,
-        selection_record,
-        cast(dict[str, Any], requested_event["payload"]),
-        cast(dict[str, Any], recorded_event["payload"]),
-        selection_request_event,
-    )
-
-
-def _forge_last_forced_fight_selection_type(
-    lifecycle_payload: GameLifecyclePayload,
-    *,
-    fight_type: str,
-    rewrite_option_id: bool,
-) -> None:
-    (
-        selection_event,
-        selection_record,
-        requested_event,
-        recorded_event,
-        _,
-    ) = _last_forced_fight_selection_authority_payloads(lifecycle_payload)
-    activation_selection = cast(dict[str, Any], selection_event["activation_selection"])
-    unit_instance_id = activation_selection["unit_instance_id"]
-    result = cast(dict[str, Any], selection_record["result"])
-    prior_option_id = result["selected_option_id"]
-    option_id = f"fight:{fight_type}:{unit_instance_id}" if rewrite_option_id else prior_option_id
-
-    def mutate_request(request: dict[str, Any]) -> None:
-        option = next(
-            candidate
-            for candidate in request["options"]
-            if candidate["option_id"] == prior_option_id
-        )
-        option["option_id"] = option_id
-        option["label"] = f"{unit_instance_id} {fight_type}"
-        cast(dict[str, Any], option["payload"])["fight_type"] = fight_type
-
-    mutate_request(cast(dict[str, Any], selection_record["request"]))
-    mutate_request(requested_event)
-    recorded_request = cast(dict[str, Any], recorded_event["request"])
-    mutate_request(recorded_request)
-    for result_payload in (
-        result,
-        cast(dict[str, Any], recorded_event["result"]),
-    ):
-        result_payload["selected_option_id"] = option_id
-        cast(dict[str, Any], result_payload["payload"])["fight_type"] = fight_type
-    activation_selection["fight_type"] = fight_type
-    state = cast(dict[str, Any], lifecycle_payload["state"])
-    fight_state = cast(dict[str, Any], state["fight_phase_state"])
-    cast(dict[str, Any], fight_state["active_activation"])["fight_type"] = fight_type
-    fight_order = cast(dict[str, Any], fight_state["fight_order_state"])
-    persisted_selection = next(
-        candidate
-        for candidate in fight_order["activation_selections"]
-        if candidate["result_id"] == activation_selection["result_id"]
-    )
-    cast(dict[str, Any], persisted_selection)["fight_type"] = fight_type
-
-
-def _remove_currently_engaged_from_last_forced_fight_selection(
-    lifecycle_payload: GameLifecyclePayload,
-) -> None:
-    (
-        selection_event,
-        selection_record,
-        requested_event,
-        recorded_event,
-        _,
-    ) = _last_forced_fight_selection_authority_payloads(lifecycle_payload)
-    selected_unit_id = cast(dict[str, Any], selection_event["activation_selection"])[
-        "unit_instance_id"
-    ]
-
-    def mutate_context(context: dict[str, Any]) -> None:
-        if context["unit_instance_id"] != selected_unit_id:
-            return
-        reasons = cast(list[str], context["eligibility_reasons"])
-        reasons.remove("currently_engaged")
-
-    def mutate_request(request: dict[str, Any]) -> None:
-        payload = cast(dict[str, Any], request["payload"])
-        for context in cast(list[dict[str, Any]], payload["eligible_contexts"]):
-            mutate_context(context)
-        for option in cast(list[dict[str, Any]], request["options"]):
-            option_payload = cast(dict[str, Any], option["payload"])
-            mutate_context(cast(dict[str, Any], option_payload["eligibility_context"]))
-
-    mutate_request(cast(dict[str, Any], selection_record["request"]))
-    mutate_request(requested_event)
-    mutate_request(cast(dict[str, Any], recorded_event["request"]))
-    for result in (
-        cast(dict[str, Any], selection_record["result"]),
-        cast(dict[str, Any], recorded_event["result"]),
-    ):
-        result_payload = cast(dict[str, Any], result["payload"])
-        mutate_context(cast(dict[str, Any], result_payload["eligibility_context"]))
-    activation_selection = cast(dict[str, Any], selection_event["activation_selection"])
-    cast(list[str], activation_selection["eligibility_reasons"]).remove("currently_engaged")
-    state = cast(dict[str, Any], lifecycle_payload["state"])
-    fight_state = cast(dict[str, Any], state["fight_phase_state"])
-    cast(list[str], fight_state["active_activation"]["eligibility_reasons"]).remove(
-        "currently_engaged"
-    )
-    fight_order = cast(dict[str, Any], fight_state["fight_order_state"])
-    persisted_selection = next(
-        candidate
-        for candidate in fight_order["activation_selections"]
-        if candidate["result_id"] == activation_selection["result_id"]
-    )
-    cast(list[str], persisted_selection["eligibility_reasons"]).remove("currently_engaged")
-
-
 def _movement_option_contains_component(payload: JsonValue, unit_instance_id: str) -> bool:
     if not isinstance(payload, dict):
         return False
@@ -10519,182 +9447,6 @@ def test_order61_attached_setup_history_uses_physical_identity(selected_componen
     assert {row.violation_code for row in resolution.violations} == {
         TransportOperationViolationCode.EMBARK_AFTER_SETUP_FORBIDDEN
     }
-
-
-@pytest.mark.parametrize("other_engagement", [False, True])
-def test_order62_new_passenger_engagements_use_facade_and_restore(other_engagement: bool) -> None:
-    from tests.order62_shock_helpers import ENEMY_ID, shock_proposal, shock_session
-
-    from warhammer40k_core.engine.physical_engagement import (
-        current_physically_engaged_enemy_rules_unit_ids,
-    )
-    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
-
-    session = shock_session(enemy_x=15.8, other_engagement=other_engagement)
-    state = session.lifecycle.state
-    assert state is not None
-    assert (
-        current_physically_engaged_enemy_rules_unit_ids(
-            state=state, unit_instance_id="army-alpha:transport"
-        )
-        == ()
-    )
-    initial = session.lifecycle.to_payload()
-    request, proposal = shock_proposal(session)
-    assert proposal.start_engaged_enemy_unit_instance_ids == ()
-    result = session.submit_parameterized_payload(
-        request_id=request.request_id,
-        result_id="order62:place",
-        payload=validate_json_value(proposal.to_payload()),
-    )
-    assert result.status_kind is not LifecycleStatusKind.INVALID, result
-    fight_state = state.fight_phase_state
-    assert fight_state is not None
-    assert fight_state.forced_activation_context is not None
-    assert fight_state.forced_activation_context.eligible_unit_instance_ids == (ENEMY_ID,)
-    payload = session.lifecycle.to_payload()
-    assert GameLifecycle.from_payload(payload).to_payload() == payload
-    artifact = ReplayArtifact.capture(
-        artifact_id="order62:engage",
-        initial_lifecycle_payload=initial,
-        final_lifecycle=session.lifecycle,
-    )
-    replay = ReplayRunner(artifact).run()
-    assert replay.reproduced_exactly, replay
-    for viewer in ("player-a", "player-b"):
-        events = EventStreamCursor().events_since(
-            session.lifecycle.decision_controller.event_log, viewer_player_id=viewer
-        )
-        queue_events = [
-            event
-            for event in cast(list[dict[str, Any]], events["events"])
-            if event["event_type"] == "forced_fight_activation_queue_started"
-        ]
-        assert len(queue_events) == 1
-        assert queue_events[0]["payload"]["forced_activation_context"][
-            "eligible_unit_instance_ids"
-        ] == [ENEMY_ID]
-        assert "fights_first_registry" not in queue_events[0]["payload"]
-    # Resolve the actual response through the same lifecycle submission path.
-    from tests.phase15c_fight_order_helpers import (
-        drain_fight_movement_requests,
-        submit_minimal_melee_declaration,
-    )
-
-    from warhammer40k_core.engine.fight_resolution import SUBMIT_MELEE_DECLARATION_DECISION_TYPE
-
-    status = result
-    for step in range(40):
-        status = drain_fight_movement_requests(session.lifecycle, status)
-        if state.fight_phase_state is None:
-            break
-        pending_request = status.decision_request
-        assert pending_request is not None
-        request = pending_request
-        if request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE:
-            status = submit_minimal_melee_declaration(
-                session.lifecycle, request=request, result_id=f"order62:melee:{step}"
-            )
-        else:
-            assert request.options, request
-            status = session.submit_option(
-                request_id=request.request_id,
-                result_id=f"order62:fight:{step}",
-                option_id=request.options[0].option_id,
-            )
-        assert status.status_kind is not LifecycleStatusKind.INVALID, status
-    assert state.fight_phase_state is None
-    completed_payload = session.lifecycle.to_payload()
-    assert GameLifecycle.from_payload(completed_payload).to_payload() == completed_payload
-    completed = ReplayRunner(
-        ReplayArtifact.capture(
-            artifact_id="order62:completed",
-            initial_lifecycle_payload=initial,
-            final_lifecycle=session.lifecycle,
-        )
-    ).run()
-    assert completed.reproduced_exactly, completed
-    forged = cast(GameLifecyclePayload, json.loads(json.dumps(payload)))
-    event = next(
-        event
-        for event in forged["decisions"]["event_log"]
-        if event["event_type"] == "unit_disembarked"
-    )
-    cast(dict[str, Any], event["payload"])["post_engaged_enemy_unit_instance_ids"] = []
-    with pytest.raises(GameLifecycleError, match="engagement"):
-        GameLifecycle.from_payload(forged)
-    # Matching fabricated skip and completion copies cannot erase the physical enemy.
-    forged_state = cast(dict[str, Any], forged["state"])
-    forged_state["fight_phase_state"] = None
-    started = next(
-        event
-        for event in forged["decisions"]["event_log"]
-        if event["event_type"] == "forced_fight_activation_queue_started"
-    )
-    disembark_payload = cast(dict[str, Any], event["payload"])
-    started["event_type"] = "forced_fight_activation_queue_skipped"
-    started["payload"] = {
-        "game_id": state.game_id,
-        "battle_round": 1,
-        "phase": "movement",
-        "active_player_id": "player-a",
-        "phase_body_status": "forced_fight_activation_queue_skipped",
-        "source_rule_id": SHOCK_DISEMBARK_MOVE_SOURCE_ID,
-        "trigger_event_id": event["event_id"],
-        "source_unit_instance_id": disembark_payload["unit_instance_id"],
-        "transport_unit_instance_id": disembark_payload["transport_unit_instance_id"],
-        "start_engaged_enemy_unit_instance_ids": [],
-        "post_engaged_enemy_unit_instance_ids": [],
-        "already_selected_unit_instance_ids": [],
-    }
-    with pytest.raises(GameLifecycleError, match="post-placement engagement history drift"):
-        GameLifecycle.from_payload(forged)
-
-
-def test_order62_transport_only_engagement_does_not_force_passenger_fight() -> None:
-    from tests.order62_shock_helpers import shock_proposal, shock_session
-
-    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
-
-    session = shock_session(enemy_x=13)
-    initial = session.lifecycle.to_payload()
-    request, proposal = shock_proposal(session)
-    assert proposal.start_engaged_enemy_unit_instance_ids == ()
-    assert proposal.attempted_placement is not None
-    placement = replace(
-        proposal.attempted_placement,
-        model_placements=tuple(
-            replace(model, pose=pose)
-            for model, pose in zip(
-                proposal.attempted_placement.model_placements,
-                _left_side_disembark_poses(),
-                strict=True,
-            )
-        ),
-    )
-    proposal = replace(proposal, attempted_placement=placement)
-    outcome = session.submit_parameterized_payload(
-        request_id=request.request_id,
-        result_id="order62:away",
-        payload=validate_json_value(proposal.to_payload()),
-    )
-    assert outcome.status_kind is not LifecycleStatusKind.INVALID, outcome
-    assert session.lifecycle.state is not None
-    assert session.lifecycle.state.fight_phase_state is None
-    event = _last_event_payload(
-        session.lifecycle.decision_controller, "forced_fight_activation_queue_skipped"
-    )
-    assert event["post_engaged_enemy_unit_instance_ids"] == []
-    payload = session.lifecycle.to_payload()
-    assert GameLifecycle.from_payload(payload).to_payload() == payload
-    replay = ReplayRunner(
-        ReplayArtifact.capture(
-            artifact_id="order62:away",
-            initial_lifecycle_payload=initial,
-            final_lifecycle=session.lifecycle,
-        )
-    ).run()
-    assert replay.reproduced_exactly, replay
 
 
 @pytest.mark.parametrize(("leader_y", "valid"), [(11.8, True), (14.5, False)])

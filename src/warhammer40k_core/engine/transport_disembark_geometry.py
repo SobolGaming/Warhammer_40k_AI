@@ -142,8 +142,7 @@ def append_disembark_endpoint_violations(
                     ),
                 ).unit_instance_id
                 if not oversized and (
-                    mode
-                    in {DisembarkModeKind.EMERGENCY_DISEMBARK, DisembarkModeKind.SHOCK_DISEMBARK}
+                    mode is DisembarkModeKind.EMERGENCY_DISEMBARK
                     or enemy_unit_id in allowed_engagement_units
                 ):
                     continue

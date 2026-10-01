@@ -392,6 +392,7 @@ class BattleRoundFlow:
                 completed=True,
                 resolution_order=_END_WINDOW_RESOLUTION_ORDER,
             )
+            state.expire_shock_disembark_after_turn_end()
             if state.active_player_id == state.turn_order[-1]:
                 round_end_window = boundary_context(
                     state, TimingTriggerKind.END_BATTLE_ROUND
