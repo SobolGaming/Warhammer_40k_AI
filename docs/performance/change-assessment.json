@@ -16,11 +16,11 @@
     },
     ".gitignore": {
       "before_sha256": "ea980539ba25983e1e94b3dc2cc9e99f12db51d82cb3bf22c0cf04a67c3af7ff",
-      "after_sha256": "8df48b31e09ea8458cb6c545283ac59405d9dec8d0fabb2f3fc795970549b19c",
+      "after_sha256": "bdea2be51cc41f822adc3854c480e7280d0408b090933cea5e3c4dfd9da4dcf4",
       "owners": {
         "@document": {
           "before": "ea980539ba25983e1e94b3dc2cc9e99f12db51d82cb3bf22c0cf04a67c3af7ff",
-          "after": "8df48b31e09ea8458cb6c545283ac59405d9dec8d0fabb2f3fc795970549b19c"
+          "after": "bdea2be51cc41f822adc3854c480e7280d0408b090933cea5e3c4dfd9da4dcf4"
         }
       }
     },
@@ -482,7 +482,7 @@
     },
     "tests/code_quality/test_performance_policy.py": {
       "before_sha256": null,
-      "after_sha256": "73d4b85682033ae16b45cf6a343fe8e044222eb404932a8087aaf6e785f696a0",
+      "after_sha256": "ff040858cc4c061e07aaa47441aa6fdf74cf9e516b33e4e33e797e280ae5b6fc",
       "owners": {
         "@module": {
           "before": null,
@@ -570,7 +570,7 @@
         },
         "test_smoke_outputs_do_not_change_assessed_inputs_or_hide_unrelated_reports": {
           "before": null,
-          "after": "11ae1463ef556b2590f8f59b457d85d4b5542c745e3bb23f59979b4c21ae343f"
+          "after": "5c1b1f054a05e328e59d444db48d901ee99267db8e24aee47762e751340d1c13"
         },
         "test_smoke_validation_rejects_incomplete_stale_or_slow_attempts": {
           "before": null,

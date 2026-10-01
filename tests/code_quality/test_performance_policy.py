@@ -522,6 +522,7 @@ def test_smoke_outputs_do_not_change_assessed_inputs_or_hide_unrelated_reports()
         "reports/performance-smoke.json",
         "reports/performance-attempts/example/result.json",
         "reports/quality-timing/gw0.json",
+        "reports/timing/gw0.json",
         "reports/code-quality.xml",
         "reports/behavior-timing/gw0.json",
         "reports/behavior-shard-1.xml",
