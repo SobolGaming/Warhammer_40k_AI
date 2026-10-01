@@ -249,6 +249,27 @@ class MovementPhaseState:
             pending_desperate_escape_battle_shock_continuation=None,
         )
 
+    def without_failed_setup_selection(self, unit_instance_id: str) -> Self:
+        """An aborted move-type setup does not spend this unit's selection."""
+        if (
+            self.step is not MovementPhaseStepKind.MOVE_UNITS
+            or self.move_units_completed
+            or self.active_selection is None
+            or self.active_selection.unit_instance_id != unit_instance_id
+            or unit_instance_id in self.moved_unit_ids
+            or self.pending_action is not None
+            or self.pending_setup_event_id is not None
+            or self.pending_desperate_escape_battle_shock_continuation is not None
+        ):
+            raise GameLifecycleError("Failed setup requires an unresolved active selection.")
+        return replace(
+            self,
+            selected_unit_ids=tuple(
+                selected for selected in self.selected_unit_ids if selected != unit_instance_id
+            ),
+            active_selection=None,
+        )
+
     def with_pending_action(self, pending_action: PendingMovementActionSelection) -> Self:
         if type(pending_action) is not PendingMovementActionSelection:
             raise GameLifecycleError(

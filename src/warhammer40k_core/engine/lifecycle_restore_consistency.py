@@ -156,6 +156,9 @@ def validate_payload_consistency(
         state=state,
         event_records=event_records,
     )
+    from warhammer40k_core.engine.movement_setup_failure import validate_failed_setup_history
+
+    validate_failed_setup_history(state=state, events=event_records, records=decision_records)
     validate_movement_phase_state_consistency(
         state=state,
         event_records=event_records,

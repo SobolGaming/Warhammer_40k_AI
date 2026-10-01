@@ -1,15 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
-from warhammer40k_core.engine.battlefield_state import (
-    BattlefieldTransitionBatch,
-    BattlefieldTransitionBatchPayload,
-    ModelDisplacementKind,
-)
 from warhammer40k_core.engine.battlefield_transition_history import (
     prior_fall_back_applied_transition_or_none,
 )
@@ -20,11 +15,12 @@ from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.movement_decision_authority import (
     validate_movement_completion_decision_authority,
+    validated_movement_transition,
 )
 from warhammer40k_core.engine.mutation_decision_authority import (
     validate_mutation_decision_closure,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.phases.shooting_model import (
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
 )
@@ -32,13 +28,6 @@ from warhammer40k_core.engine.weapon_declaration import (
     ShootingDeclarationProposalRequest,
     shooting_declaration_proposal_from_json,
 )
-from warhammer40k_core.geometry.pathing import PathWitness
-
-_DISPLACEMENT_KIND_BY_ACTION = {
-    "normal_move": ModelDisplacementKind.NORMAL_MOVE,
-    "advance": ModelDisplacementKind.ADVANCE,
-    "fall_back": ModelDisplacementKind.FALL_BACK,
-}
 
 
 def validate_primary_mission_mutation_decision_closure(
@@ -78,7 +67,7 @@ def validate_primary_mission_movement_event_decision_authority(
         mutation_index=mutation_index,
         event=event_records[mutation_index],
     )
-    _validate_movement_transition(
+    validated_movement_transition(
         payload=payload,
         action=_payload_string(payload, "movement_phase_action"),
         witness=proposal.witness,
@@ -140,53 +129,6 @@ def validate_primary_mission_shooting_event_decision_authority(
         or proposal.visibility_cache_key != payload.get("visibility_cache_key")
     ):
         raise GameLifecycleError("Primary mission shooting decision semantics drifted.")
-
-
-def _validate_movement_transition(
-    *,
-    payload: dict[str, JsonValue],
-    action: str,
-    witness: PathWitness,
-) -> None:
-    raw_transition = payload.get("transition_batch")
-    if not isinstance(raw_transition, dict):
-        raise GameLifecycleError("Primary mission movement transition authority is missing.")
-    transition = BattlefieldTransitionBatch.from_payload(
-        cast(BattlefieldTransitionBatchPayload, raw_transition)
-    )
-    if transition.placements:
-        raise GameLifecycleError("Primary mission movement transition cannot place models.")
-    expected_kind = _DISPLACEMENT_KIND_BY_ACTION[action]
-    removal_ids = {row.model_instance_id for row in transition.removals}
-    witness_paths = dict(witness.model_paths)
-    if not removal_ids <= set(witness_paths):
-        raise GameLifecycleError("Primary mission movement removal witness drifted.")
-    expected_displaced_ids = {
-        model_id
-        for model_id, poses in witness.model_paths
-        if poses[0] != poses[-1] and model_id not in removal_ids
-    }
-    if {row.model_instance_id for row in transition.displacements} != expected_displaced_ids:
-        raise GameLifecycleError("Primary mission movement transition inventory drifted.")
-    for displacement in transition.displacements:
-        poses = witness_paths[displacement.model_instance_id]
-        if (
-            displacement.displacement_kind is not expected_kind
-            or displacement.start_pose != poses[0]
-            or displacement.end_pose != poses[-1]
-            or displacement.path_witness
-            != PathWitness.for_paths(((displacement.model_instance_id, poses),))
-            or displacement.source_phase != BattlePhase.MOVEMENT.value
-            or displacement.source_step != "move_units"
-            or displacement.source_rule_id is not None
-            or displacement.source_event_id is not None
-        ):
-            raise GameLifecycleError("Primary mission movement transition witness drifted.")
-    raw_kind = payload.get("displacement_kind")
-    if transition.displacements and raw_kind != expected_kind.value:
-        raise GameLifecycleError("Primary mission movement displacement kind drifted.")
-    if not transition.displacements and raw_kind not in {None, expected_kind.value}:
-        raise GameLifecycleError("Primary mission movement displacement kind drifted.")
 
 
 def _validate_prior_fall_back_application(

@@ -2,6 +2,12 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 101 / P03F restores ordinary Movement selection rights when complete
+disembark or reserve Ingress setup fails. Prior cargo/reserve location remains
+unchanged, and a fresh unit selection permits retry or legal Remain Stationary.
+Ordered history authenticates restore, continuation and exact replay. See
+[scope and evidence](docs/ORDER_101_SCOPE_PLAN.md).
+
 Order 100 / P17B measures every part of a based FRAME model for whole-distance,
 Engagement Range, objective control, movement, terrain-area membership, and
 disembark placement. Ordinary models still measure from the support base. See

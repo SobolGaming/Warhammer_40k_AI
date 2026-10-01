@@ -1,0 +1,689 @@
+{
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+  "execution": "serial, no coverage or competing test/build workers; each process timeout 600 seconds",
+  "baseline_policy": "Preserve historical baselines and numeric budgets. Remeasure runtime-bound head workloads on this connected Mac after Order101 changes; no baseline relabeling or hard-case removal.",
+  "runs": [
+    {
+      "command": [
+        "scripts/measure_ingress_reconstruction.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order64/head-reconstruction.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_ingress_reconstruction",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order64/head-reconstruction.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 63.43752570898505,
+      "log_sha256": "c8633e9f148bfc3f0244a14b710f909906ec7e96d14f2f3867f34430e5be8cd6",
+      "report_sha256": "226a76188a360358037f9645a19aad8e4185d28d93fc8dcdf4d802fc0a67f474"
+    },
+    {
+      "command": [
+        "scripts/measure_order65.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order65/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order65",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order65/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 7.571563250035979,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "ad74bb8c6d958a5de9a4403a87d5163998d0c5f8dca825c12a7cc432234ed412"
+    },
+    {
+      "command": [
+        "scripts/measure_order66.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order66/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order66",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order66/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 7.572875583020505,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "0a2c024e6b06654ae90a791fd5a4af174f5ffc95ef5673bb50ae159c80a493f9"
+    },
+    {
+      "command": [
+        "scripts/measure_order68.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order69/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order68",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order69/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.828766458958853,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "9a6f230260256913230596773cde6b49fab5d1144a1f1d2d380e2c9292c4c20b"
+    },
+    {
+      "command": [
+        "scripts/measure_order70.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order70/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order70",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order70/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.0859944589901716,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "3ae3236cea315ca73c5be5a7ecf87c896fc067e2b7685bdd88a43b4a89c872db"
+    },
+    {
+      "command": [
+        "scripts/measure_order71.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order71/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order71",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order71/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.200505416025408,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "5d9f567ca22c88cde638eac84c5a524917aa59ef75d661f3ebb2191de2a9c9c9"
+    },
+    {
+      "command": [
+        "scripts/measure_order72.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order72/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order72",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order72/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 17.075292083027307,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "a34b1b52a8de6c6514d0d3872c78502f003e3072184b54b8b6f08835e391a87e"
+    },
+    {
+      "command": [
+        "scripts/measure_order60.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order73/r73_001/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order60",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order73/r73_001/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.1519922919687815,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "20e375a8ac255c3a3ffef5b36dcaccf33c8280c55605396bad63c326f81e55e4"
+    },
+    {
+      "command": [
+        "scripts/measure_order73.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order73/r73_001/geometry-head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order73",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order73/r73_001/geometry-head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 8.146510792023037,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "88d6b09d54f64d0375e4f480a05d5c5201655f92088e866ec4d58f7fcd0f1d72"
+    },
+    {
+      "command": [
+        "scripts/measure_order74.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order74/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order74",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order74/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.197514041035902,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "103e6dfedc37612e78c6eb6fa65cfc956baa418061be3925c8680816451c7c91"
+    },
+    {
+      "command": [
+        "scripts/measure_order75.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order75/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order75",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order75/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 7.328913584002294,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "1906a8c98df294a0ff71d22c3fcada47cc8a1041f3a34e28504daaf145f4789b"
+    },
+    {
+      "command": [
+        "scripts/measure_order76.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order76/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order76",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order76/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 14.008932625001762,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "6ab0aa85227035f027936c80d4a6c9dce5ea19ace52e45846f8524f6ce0b5827"
+    },
+    {
+      "command": [
+        "scripts/measure_order77.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order77/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order77",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order77/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 26.531973125005607,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "264e4baf1d00962b37de622715040c8dcc957241320bc278b9fb955a11c38721"
+    },
+    {
+      "command": [
+        "scripts/measure_order77_completion.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order77/r77_001_boundary/completion-head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order77_completion",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order77/r77_001_boundary/completion-head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 11.407283624983393,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "235c4d3c54d7f5f5f46ff9741431fdcbb712bd6209346ddd946ec7dcc2d390d2"
+    },
+    {
+      "command": [
+        "scripts/measure_order78.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order78/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order78",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order78/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.2254944169544615,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "32bbe7bdc10fa4c51e6add753d5c44dc80aa239f1aa6011b89beb78823d64e28"
+    },
+    {
+      "command": [
+        "scripts/measure_order79.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order79/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order79",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order79/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 8.680611249990761,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "c6a2e672aa2b3f0cebbe4aa0198025731928d39c56158973ce9e87b70db315c1"
+    },
+    {
+      "command": [
+        "scripts/measure_order82.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order83/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order82",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order83/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 54.31138812500285,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "e528997fe2a6a7a86d597fe1bc8002455a9b5e5f3ac08edbe24ef7211745317d"
+    },
+    {
+      "command": [
+        "scripts/measure_order84.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order84/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order84",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order84/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.6060322919511236,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "ef513cabc1f8e100620aba5e6b1b2252b65f5944d694ec5f3633adabe98d31fb"
+    },
+    {
+      "command": [
+        "scripts/measure_order85.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order85/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order85",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order85/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.001656082982663,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "5d21c5e9beb723b8950f5cb19dfe17c5f9a39c60384486fc82698ddbca86cc8e"
+    },
+    {
+      "command": [
+        "scripts/measure_order85_rotation.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order85/rotation-head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order85_rotation",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order85/rotation-head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.370608999975957,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "b6b6c09e5b5f840b12a2abd234986a3406d4f7ea27c4f8079015bd6200d7cf8a"
+    },
+    {
+      "command": [
+        "scripts/measure_order86_boundaries.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order86/r86_001/boundary-head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order86_boundaries",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order86/r86_001/boundary-head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.37446133396588266,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "5872bf05cd26d3af12896345adec311d3af0756a86abad661f5b4191593a6140"
+    },
+    {
+      "command": [
+        "scripts/measure_order80.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order80/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order80",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order80/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 17.637904833012726,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "df3ef0987a9feca61afaef76862aed170a00176e13cde4acf312fce7c5605553"
+    },
+    {
+      "command": [
+        "scripts/measure_order80.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order80/review-head.json",
+        "--ordinary-restore"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order80",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order80/review-head.json",
+        "--ordinary-restore"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 18.09893983299844,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "145f0a4b78783f7c0a21dd5787f75808f9b2a88a7f9dec3d56abb0479d25f88b"
+    },
+    {
+      "command": [
+        "scripts/measure_order86.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order86/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.measure_order86",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+        "--output",
+        "docs/performance/order86/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.9215219999896362,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "eca6b970edceccb728fe40a27c422bfd8c9a75402f1148e82c336f8667b65768"
+    },
+    {
+      "command": [
+        "scripts/benchmark_order88_strength.py",
+        "--output",
+        "docs/performance/order88/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.benchmark_order88_strength",
+        "--output",
+        "docs/performance/order88/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 10.722363209002651,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "5510b372953c5bfc2b2d3700e16ccd26f8c98772a5898f3874f99084c40cf53c"
+    },
+    {
+      "command": [
+        "scripts/benchmark_order96_rerolls.py",
+        "--output",
+        "docs/performance/order96/head.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.benchmark_order96_rerolls",
+        "--output",
+        "docs/performance/order96/head.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 25.23730279202573,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "2b936e9edc42599648df3ebab8dfff750a70a7fa0e1d6d1269ffb1c09dd99674"
+    },
+    {
+      "command": [
+        "scripts/benchmark_order96_rerolls.py",
+        "--sustained",
+        "--output",
+        "docs/performance/order96/head-sustained.json"
+      ],
+      "invocation": [
+        "/Users/andrzej.gorski/Documents/Codex/2026-09-29/task-2/repository/.venv/bin/python3",
+        "-m",
+        "scripts.benchmark_order96_rerolls",
+        "--sustained",
+        "--output",
+        "docs/performance/order96/head-sustained.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 30.74360354198143,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report_sha256": "45560c20f7ff117d6bdb386e96a63d37065d474aab1b40ff1f404e81da9feb4f"
+    }
+  ]
+}

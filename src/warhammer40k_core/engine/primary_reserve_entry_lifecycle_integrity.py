@@ -289,6 +289,16 @@ def validate_primary_reserve_entry_lifecycle_integrity(
         *aircraft_occurrences,
         *registered_occurrences,
     )
+    from warhammer40k_core.engine.movement_failed_setup_authority import (
+        validate_failed_reserve_setup_sources,
+    )
+
+    validate_failed_reserve_setup_sources(
+        events=event_records,
+        records=decision_records,
+        event_index=event_index_by_id,
+        reserve_entry_occurrences=all_entry_occurrences,
+    )
     relevant_player_ids: dict[str, str] = {}
     for occurrence in all_entry_occurrences:
         player_id = _required_identifier(

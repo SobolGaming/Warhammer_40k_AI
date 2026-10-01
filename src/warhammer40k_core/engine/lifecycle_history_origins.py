@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.engine import healing_off_battlefield_history as revival
 from warhammer40k_core.engine import ingress_placement_history as ingress
 from warhammer40k_core.engine import modifier_evaluation_history as modifiers
+from warhammer40k_core.engine import movement_failed_setup_history as failed_setup
 from warhammer40k_core.engine import psychic_modifier_history_origin as psychic
 
 if TYPE_CHECKING:
@@ -96,6 +97,9 @@ def restore(lifecycle: GameLifecycle, payload: GameLifecyclePayload) -> None:
 
 
 def validate(lifecycle: GameLifecycle) -> None:
+    failed_setup.validate_failed_setup_origin(
+        lifecycle=lifecycle, origin=lifecycle._modifier_evaluation_history_origin
+    )
     modifiers.validate_modifier_origin(lifecycle, lifecycle._modifier_evaluation_history_origin)
     psychic.validate_psychic_history_origin(
         lifecycle=lifecycle, origin=lifecycle._psychic_modifier_history_origin

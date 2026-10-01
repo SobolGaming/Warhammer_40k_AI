@@ -1,7 +1,7 @@
 {
   "workload": "order79-turn-end-control-v2",
-  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:03db16dacfdb6152c4f6b841cab170561348f4ee29d60b581ce3215c6ab15765",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:03db16dacfdb6152c4f6b841cab170561348f4ee29d60b581ce3215c6ab15765",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
   "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
   "python": "3.14.5",
   "cpu": "Apple M5 Pro",
@@ -20,14 +20,14 @@
     {
       "case": "player-b",
       "samples_seconds": [
-        0.10236358299152926,
-        0.05824895802652463,
-        0.05774762498913333,
-        0.059349458024371415,
-        0.06464441696880385
+        0.05977312498725951,
+        0.05585416703252122,
+        0.05529541696887463,
+        0.055026707996148616,
+        0.056879290961660445
       ],
-      "mean_seconds": 0.0684708082000725,
-      "maximum_seconds": 0.10236358299152926,
+      "mean_seconds": 0.05656574158929288,
+      "maximum_seconds": 0.05977312498725951,
       "complete": true,
       "controllers": [
         null,
@@ -40,14 +40,14 @@
     {
       "case": "player-a",
       "samples_seconds": [
-        0.05230937496526167,
-        0.046426957997027785,
-        0.04603829199913889,
-        0.04841645801207051,
-        0.0460915410076268
+        0.044407458044588566,
+        0.04591258300933987,
+        0.044262208975851536,
+        0.04426066600717604,
+        0.04422224999871105
       ],
-      "mean_seconds": 0.04785652479622513,
-      "maximum_seconds": 0.05230937496526167,
+      "mean_seconds": 0.04461303320713341,
+      "maximum_seconds": 0.04591258300933987,
       "complete": true,
       "controllers": [
         null,

@@ -308,7 +308,7 @@ def test_oversized_disembark_facade_retry_restore_and_exact_replay(
     if prevalidation:
         # Rejected pre-pop diagnostics are checkpoint history, not DecisionRecords.
         initial = session.lifecycle.to_payload()
-    # Well-formed illegal endpoints retain the cargo and expose a fresh retry.
+    # Well-formed failed setup retains the cargo and restores movement selection.
     rejected = session.submit_parameterized_payload(
         request_id=request.request_id,
         result_id="outside-one-inch",
@@ -321,6 +321,21 @@ def test_oversized_disembark_facade_retry_restore_and_exact_replay(
     assert rejected.status_kind is LifecycleStatusKind.INVALID
     assert state.battlefield_state is not None
     assert state.battlefield_state.unit_placement_or_none(PASSENGER_ID) is None
+    request = pending_request(session)
+    assert request.decision_type == "select_movement_unit"
+    assert state.movement_phase_state is not None
+    assert PASSENGER_ID not in state.movement_phase_state.selected_unit_ids
+    session.submit_option(
+        request_id=request.request_id, result_id="reselect-cargo", option_id=PASSENGER_ID
+    )
+    request = pending_request(session)
+    session.submit_option(
+        request_id=request.request_id,
+        result_id="retry-disembark",
+        option_id="disembark"
+        if mode is DisembarkModeKind.TACTICAL_DISEMBARK
+        else f"disembark:{mode.value}",
+    )
     request = pending_request(session)
     submission = replace(submission, proposal_request_id=request.request_id)
     restored_pending = LocalGameSession(

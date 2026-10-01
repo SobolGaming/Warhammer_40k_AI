@@ -275,12 +275,11 @@ def _apply_placement_proposal_decision(
             and status.status_kind is LifecycleStatusKind.INVALID
             and proposal_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
         ):
-            _request_placement_proposal_retry(
-                state=state,
-                decisions=decisions,
-                proposal_request=proposal_request,
-                rejected_result=result,
+            from warhammer40k_core.engine.movement_setup_failure import (
+                restore_failed_setup_selection,
             )
+
+            restore_failed_setup_selection(state=state, decisions=decisions, result=result)
         return status
 
     if proposal_request.proposal_kind is ProposalKind.DISEMBARK:
@@ -314,12 +313,22 @@ def _apply_placement_proposal_decision(
             and status.status_kind is LifecycleStatusKind.INVALID
             and proposal_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
         ):
-            _request_placement_proposal_retry(
-                state=state,
-                decisions=decisions,
-                proposal_request=proposal_request,
-                rejected_result=result,
-            )
+            if (
+                isinstance(status.payload, dict)
+                and status.payload.get("phase_body_status") == "combat_disembark_tactical_available"
+            ):
+                _request_placement_proposal_retry(
+                    state=state,
+                    decisions=decisions,
+                    proposal_request=proposal_request,
+                    rejected_result=result,
+                )
+            else:
+                from warhammer40k_core.engine.movement_setup_failure import (
+                    restore_failed_setup_selection,
+                )
+
+                restore_failed_setup_selection(state=state, decisions=decisions, result=result)
         return status
 
     raise GameLifecycleError("Unsupported placement proposal kind.")

@@ -42,6 +42,71 @@ def test_order63_source_generator_is_reproducible() -> None:
     )
 
 
+def test_failed_setup_restore_uses_independent_origin_and_shared_engine_replay() -> None:
+    wiring = ast.parse((ENGINE / "lifecycle_history_origins.py").read_text(encoding="utf-8"))
+    validate = next(
+        node
+        for node in wiring.body
+        if isinstance(node, ast.FunctionDef) and node.name == "validate"
+    )
+    calls = {
+        node.func.attr
+        for node in ast.walk(validate)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+    }
+    assert "validate_failed_setup_origin" in calls
+    owner = ast.parse((ENGINE / "movement_failed_setup_history.py").read_text(encoding="utf-8"))
+    attributes = {node.attr for node in ast.walk(owner) if isinstance(node, ast.Attribute)}
+    assert {"from_payload", "submit_decision"} <= attributes
+    assert "replace_transport_cargo_state" not in attributes
+    assert "decision_controller" not in {
+        target.attr
+        for node in ast.walk(owner)
+        if isinstance(node, ast.Assign)
+        for target in node.targets
+        if isinstance(target, ast.Attribute)
+    }
+    names = {
+        node.func.id
+        for node in ast.walk(owner)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    assert "advance_recorded_automatic_progress" in names
+    assert "validate_transport_cargo_location_suffix" in names
+    cargo_history = ast.parse((ENGINE / "transport_cargo_location_history.py").read_text())
+    cargo_attributes = {
+        node.attr for node in ast.walk(cargo_history) if isinstance(node, ast.Attribute)
+    }
+    assert "transport_cargo_state_for_embarked_unit" in cargo_attributes
+    assert not {
+        "replace_transport_cargo_state",
+        "replace_reserve_state",
+        "replace_battlefield_state",
+        "replace_army_definition",
+    }.intersection(cargo_attributes)
+    families = {
+        node.value
+        for node in ast.walk(owner)
+        if isinstance(node, ast.Constant) and isinstance(node.value, str)
+    }
+    assert {
+        "disembark_placement_invalid",
+        "combat_disembark_placement_invalid",
+        "reinforcement_placement_invalid",
+    } <= families
+    authority = ast.parse((ENGINE / "movement_failed_setup_authority.py").read_text())
+    calls_by_name = {
+        node.func.id: node
+        for node in ast.walk(authority)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    assert "historical_model_ids_by_physical_unit" in calls_by_name
+    reserve_call = calls_by_name["validate_primary_reserve_placement_request_authority"]
+    assert "historical_living_model_ids_by_component" in {
+        keyword.arg for keyword in reserve_call.keywords
+    }
+
+
 def test_order63_matched_measurement_gate() -> None:
     folder = ROOT / "docs/performance/order63"
     base = json.loads((folder / "base.json").read_text(encoding="utf-8"))

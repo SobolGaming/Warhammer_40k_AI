@@ -34,6 +34,9 @@ from warhammer40k_core.engine.model_logical_death import (
     MODEL_LOGICAL_DEATH_RECORDED_EVENT,
     model_logical_death_record_from_event,
 )
+from warhammer40k_core.engine.movement_decision_authority import (
+    validated_embark_movement_completions,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_battlefield_departure import (
     PrimaryBattlefieldDepartureState,
@@ -233,6 +236,7 @@ def build_model_authority_timeline(
     mutations_by_index = _authority_mutations_by_event_index(
         state=state,
         event_records=event_records,
+        decision_records=decision_records,
         catalog_history=catalog_history,
         model_unit_by_id=model_unit_by_id,
         restoration_model_ids_by_index=restoration_model_ids_by_index,
@@ -328,6 +332,7 @@ def _authority_mutations_by_event_index(
     *,
     state: GameState,
     event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
     catalog_history: _CatalogHistory,
     model_unit_by_id: dict[str, str],
     restoration_model_ids_by_index: dict[int, tuple[str, ...]],
@@ -341,6 +346,13 @@ def _authority_mutations_by_event_index(
         replacement.event_index: replacement for replacement in catalog_history.replacements
     }
     mutations: dict[int, tuple[_AuthorityMutation, ...]] = {}
+    completed_embark_moves = frozenset(
+        binding.completion_event_id
+        for binding in validated_embark_movement_completions(
+            event_records=event_records, decision_records=decision_records
+        )
+        if binding.completion_event_id is not None
+    )
     for event_index, event in enumerate(event_records):
         event_mutations: list[_AuthorityMutation] = []
         if event_index in catalog_history.mirror_event_indexes:
@@ -402,8 +414,32 @@ def _authority_mutations_by_event_index(
                     model_unit_by_id=model_unit_by_id,
                 )
             )
+        elif event.event_type == "unit_embarked":
+            payload = _event_payload(event, field_name="Embark")
+            embark_transition = _transition_payload(payload.get("transition_batch"), "Embark")
+            carrier_id = _payload_identifier(payload, key="transport_unit_instance_id")
+            if (
+                embark_transition.placements
+                or embark_transition.displacements
+                or not embark_transition.removals
+                or any(
+                    row.removal_kind is not BattlefieldRemovalKind.EMBARK
+                    or row.destination_id != carrier_id
+                    for row in embark_transition.removals
+                )
+            ):
+                raise GameLifecycleError("Fight model authority Embark removal drift.")
+            event_mutations.extend(
+                _physical_transition_mutations(
+                    transition=embark_transition,
+                    known_model_ids=frozenset(model_unit_by_id),
+                    source=event.event_type,
+                )
+            )
         else:
             transition = authoritative_battlefield_transition_batch_or_none(event=event)
+            if event.event_id in completed_embark_moves:
+                transition = None
             if (
                 transition is not None
                 and prior_fall_back_applied_transition_or_none(

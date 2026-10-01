@@ -1,0 +1,103 @@
+{
+  "workload": "order101-failed-setup-restore-view-replay-v1",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "host_role": "provisional",
+  "concurrency": 1,
+  "timing_boundary": "Finite unit/action submission, rejected complete placement, serialization/restore, both viewer/event consumers and exact replay; canonical fixture preparation excluded",
+  "scenario": "Seven serial samples each: five-inch cargo, globally impossible 100-inch cargo, loaded Deep Strike carrier; no policy search or full game",
+  "hashes": {
+    "scripts/measure_order101.py": "aa2a5bdaaaf26d8746cb800c482e3403092d7fa37741809abe5caba1741b6069",
+    "tests/large_model_disembark_helpers.py": "66d786d39b1200f53bad26f2edad923c346895b8deccf1e3b58a649345c4e980",
+    "tests/disembark_eligibility_helpers.py": "0dc8cae31e6419b2d4605f32718320243c89ca6fc958ca92dd4e160e9cd3a1cb",
+    "tests/order63_reserve_transport_helpers.py": "4712ff4f47cb9939f11d67298eec960a4373ecbcff3444c526c21209723da3f4",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "case": "cargo-5",
+      "samples_seconds": [
+        1.345545416988898,
+        1.304942165967077,
+        1.3040630419855006,
+        1.3053715839632787,
+        1.324484791024588,
+        1.3506145830033347,
+        1.3262899999972433
+      ],
+      "mean_seconds": 1.3230445118471315,
+      "median_seconds": 1.324484791024588,
+      "p95_seconds": 1.3506145830033347,
+      "maximum_seconds": 1.3506145830033347,
+      "selected_after_failure": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "completion_rate": 1
+    },
+    {
+      "case": "cargo-100",
+      "samples_seconds": [
+        1.3329781659995206,
+        1.355927208031062,
+        1.3213244579965249,
+        1.3288977919728495,
+        1.354828917013947,
+        1.324567665986251,
+        1.3197762919589877
+      ],
+      "mean_seconds": 1.3340429284227346,
+      "median_seconds": 1.3288977919728495,
+      "p95_seconds": 1.355927208031062,
+      "maximum_seconds": 1.355927208031062,
+      "selected_after_failure": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "completion_rate": 1
+    },
+    {
+      "case": "loaded-deep-strike",
+      "samples_seconds": [
+        2.137478207994718,
+        2.1722188749699853,
+        2.146613791992422,
+        2.1599912910023704,
+        2.1787009579711594,
+        2.148181917029433,
+        2.1433744160458446
+      ],
+      "mean_seconds": 2.1552227795722763,
+      "median_seconds": 2.148181917029433,
+      "p95_seconds": 2.1787009579711594,
+      "maximum_seconds": 2.1787009579711594,
+      "selected_after_failure": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "completion_rate": 1
+    }
+  ],
+  "coverage": false,
+  "full_game_certified": false,
+  "base_correctness": "The uncorrected main retains selection. Its timings are a cost comparison, not a correctness oracle."
+}

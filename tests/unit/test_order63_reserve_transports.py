@@ -217,6 +217,15 @@ def test_rule_invalid_inherited_edge_retries_then_replays() -> None:
     )
     assert outcome.status_kind is LifecycleStatusKind.INVALID
     request = pending_request(session)
+    assert request.decision_type == "select_movement_unit"
+    session.submit_option(
+        request_id=request.request_id, result_id="order63:reselect", option_id=PASSENGER_ID
+    )
+    request = pending_request(session)
+    session.submit_option(
+        request_id=request.request_id, result_id="order63:retry-disembark", option_id="disembark"
+    )
+    request = pending_request(session)
     assert proposal.attempted_placement is not None
     legal = replace(
         proposal,
