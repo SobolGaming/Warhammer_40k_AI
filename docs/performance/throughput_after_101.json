@@ -332,5 +332,691 @@
     "raw_job_duration_sum_seconds": 12836,
     "limits": "Different work and hosts; raw job durations are not billed cost. No whole-suite Windows speedup is established."
   },
-  "hosted_twelve_shard_status": "Pending complete measured trial and final profile refresh"
+  "hosted_twelve_shard_status": "Initial complete trial authenticated; final twelve manifests use that trial alone. Final publication CI and exact-head review results are reported on PR525.",
+  "hosted_twelve_shard_trial": {
+    "run_url": "https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/36820420185",
+    "head": "71d10b08111de11ae148103e83394035d4a9f877",
+    "execution_merge_sha": "aaba9716eb29fc8252c51dc3bb92bfcd352e03d1",
+    "execution_tree_matches_head": true,
+    "started_at": "2026-10-01T05:34:27Z",
+    "updated_at": "2026-10-01T05:57:13Z",
+    "all_20_jobs_passed": true,
+    "behavioral_cases": 10207,
+    "behavioral_files": 287,
+    "exact_baseline_behavioral_nodeids_preserved": true,
+    "quality_cases": 797,
+    "exact_baseline_quality_nodeids_preserved": true,
+    "actual_workers_per_behavior_shard": 4,
+    "coverage_gate": {
+      "threshold_percent": 85,
+      "branch_tracking": true,
+      "succeeded": true,
+      "reported_rounded_combined_percent": 85
+    },
+    "assessment": {
+      "run_id": 36820420185,
+      "head": "71d10b08111de11ae148103e83394035d4a9f877",
+      "cases": 10207,
+      "files": 287,
+      "shards": 12,
+      "wall_seconds": 1366.0,
+      "actual_nodeids_equal_baseline": true,
+      "baseline_wall_seconds": 1757.0,
+      "wall_seconds_saved": 391.0,
+      "wall_reduction_percent": 22.253841775754125,
+      "run_elapsed_to_last_job_seconds": 1365.0,
+      "observed_max_concurrent_jobs": 18,
+      "allowance_qualification": "Observed concurrency does not establish runner allowance or authorize 16 shards.",
+      "job_seconds_sum": 12708.0,
+      "runner_minutes_raw_sum": 211.8,
+      "baseline_runner_minutes_raw_sum": 213.93333333333334,
+      "cost_qualification": "Raw job duration only, not billed minutes, multipliers, or monetary cost.",
+      "job_setup_range_seconds": [
+        33.0,
+        46.0
+      ],
+      "behavior_step_range_seconds": [
+        582.0,
+        1206.0
+      ],
+      "behavior_queue_range_seconds": [
+        2.0,
+        3.0
+      ],
+      "last_behavior_shard": 4,
+      "coverage_job_seconds": 73.0,
+      "coverage_after_last_behavior_seconds": 76.0,
+      "aggregate_junit_worker_seconds": 37963.759999999995,
+      "largest_files": [
+        [
+          "tests/unit/test_phase18l_session_persistence.py",
+          1960.3460000000002
+        ],
+        [
+          "tests/unit/test_phase13b_shooting_declarations.py",
+          1056.9699999999991
+        ],
+        [
+          "tests/unit/test_physical_proposal_prevalidation.py",
+          973.6279999999999
+        ],
+        [
+          "tests/unit/test_phase17n_step5g_pairing_certification_layout_b.py",
+          860.7180000000003
+        ],
+        [
+          "tests/unit/test_aeldari_yriel_vypers_starfangs_datasheets.py",
+          818.5249999999999
+        ],
+        [
+          "tests/unit/test_phase12c_core_stratagems.py",
+          818.092
+        ],
+        [
+          "tests/unit/test_stratagem_retained_destruction.py",
+          817.3239999999998
+        ],
+        [
+          "tests/unit/test_phase17n_step5g_pairing_certification_layout_c.py",
+          743.6530000000001
+        ],
+        [
+          "tests/unit/test_order101_setup_failure.py",
+          699.6949999999999
+        ],
+        [
+          "tests/unit/test_crushing_impact.py",
+          649.184
+        ],
+        [
+          "tests/integration/test_core_modifier_boundaries.py",
+          601.5829999999997
+        ],
+        [
+          "tests/unit/test_order93_attack_modifiers.py",
+          574.427
+        ]
+      ],
+      "largest_cases": [
+        {
+          "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_psychic_facade_preserves_historical_uses_after_phase_and_round_transitions",
+          "seconds": 381.585,
+          "shard": 10
+        },
+        {
+          "nodeid": "tests/unit/test_phase18l_session_persistence.py::test_phase18l_sqlite_restart_restores_idempotency_cursors_and_exact_role_views",
+          "seconds": 285.123,
+          "shard": 4
+        },
+        {
+          "nodeid": "tests/unit/test_critical_hits.py::test_critical_consumers_through_facade_restore_and_replay[fight]",
+          "seconds": 193.798,
+          "shard": 8
+        },
+        {
+          "nodeid": "tests/unit/test_phase18g_18h_session_security.py::test_phase18g_publishes_revision_retention_and_bounds_cursor_state",
+          "seconds": 176.116,
+          "shard": 12
+        },
+        {
+          "nodeid": "tests/unit/test_ws14_attack_sequence_runtime_hooks.py::test_order93_save_damage_subsets_use_facade_restore_and_exact_replay[True]",
+          "seconds": 165.81,
+          "shard": 11
+        },
+        {
+          "nodeid": "tests/unit/test_phase18l_session_persistence.py::test_phase18l_recorded_invalid_command_is_durable_and_idempotent",
+          "seconds": 149.643,
+          "shard": 4
+        },
+        {
+          "nodeid": "tests/unit/test_phase18l_session_persistence.py::test_phase18l_valid_alternate_branch_snapshot_fails_exact_history_chain",
+          "seconds": 143.77,
+          "shard": 4
+        },
+        {
+          "nodeid": "tests/unit/reporting/test_support_renderers.py::test_faction_support_renderer_preserves_section_order",
+          "seconds": 141.522,
+          "shard": 6
+        },
+        {
+          "nodeid": "tests/unit/reporting/test_chaos_daemons_support_report.py::test_chaos_daemons_report_preserves_faction_sections_and_attachment_evidence",
+          "seconds": 141.504,
+          "shard": 4
+        },
+        {
+          "nodeid": "tests/unit/test_crushing_impact.py::test_crushing_impact_finishes_deadly_demise_before_resuming_charge[False]",
+          "seconds": 140.732,
+          "shard": 5
+        },
+        {
+          "nodeid": "tests/unit/test_phase17j_event_companion.py::test_phase17n_battlefield_builder_reproduces_committed_artifact",
+          "seconds": 122.625,
+          "shard": 10
+        },
+        {
+          "nodeid": "tests/unit/test_order86_table_quarters.py::test_primary_secondary_scores_restore_views_and_exact_replay[player-a-0.01]",
+          "seconds": 122.586,
+          "shard": 9
+        }
+      ],
+      "jobs": [
+        {
+          "name": "lint",
+          "queue_seconds": 2.0,
+          "job_seconds": 42.0,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "started_at": "2026-10-01T05:35:07Z",
+          "completed_at": "2026-10-01T05:35:49Z"
+        },
+        {
+          "name": "behavior-shard-3",
+          "queue_seconds": 2.0,
+          "job_seconds": 785.0,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "started_at": "2026-10-01T05:35:07Z",
+          "completed_at": "2026-10-01T05:48:12Z"
+        },
+        {
+          "name": "code-quality",
+          "queue_seconds": 2.0,
+          "job_seconds": 872.0,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "started_at": "2026-10-01T05:35:07Z",
+          "completed_at": "2026-10-01T05:49:39Z"
+        },
+        {
+          "name": "behavior-shard-1",
+          "queue_seconds": 2.0,
+          "job_seconds": 750.0,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "started_at": "2026-10-01T05:35:07Z",
+          "completed_at": "2026-10-01T05:47:37Z"
+        },
+        {
+          "name": "behavior-shard-8",
+          "queue_seconds": 2.0,
+          "job_seconds": 625.0,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "started_at": "2026-10-01T05:35:07Z",
+          "completed_at": "2026-10-01T05:45:32Z"
+        },
+        {
+          "name": "behavior-shard-2",
+          "queue_seconds": 2.0,
+          "job_seconds": 911.0,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "started_at": "2026-10-01T05:35:07Z",
+          "completed_at": "2026-10-01T05:50:18Z"
+        },
+        {
+          "name": "contract-conformance",
+          "queue_seconds": 3.0,
+          "job_seconds": 349.0,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "started_at": "2026-10-01T05:35:08Z",
+          "completed_at": "2026-10-01T05:40:57Z"
+        },
+        {
+          "name": "behavior-shard-10",
+          "queue_seconds": 2.0,
+          "job_seconds": 697.0,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "started_at": "2026-10-01T05:35:07Z",
+          "completed_at": "2026-10-01T05:46:44Z"
+        },
+        {
+          "name": "semantic-audit-macos",
+          "queue_seconds": 9.0,
+          "job_seconds": 157.0,
+          "labels": [
+            "macos-latest"
+          ],
+          "started_at": "2026-10-01T05:35:14Z",
+          "completed_at": "2026-10-01T05:37:51Z"
+        },
+        {
+          "name": "pyright",
+          "queue_seconds": 2.0,
+          "job_seconds": 174.0,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "started_at": "2026-10-01T05:35:07Z",
+          "completed_at": "2026-10-01T05:38:01Z"
+        },
+        {
+          "name": "behavior-shard-5",
+          "queue_seconds": 3.0,
+          "job_seconds": 887.0,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "started_at": "2026-10-01T05:35:08Z",
+          "completed_at": "2026-10-01T05:49:55Z"
+        },
+        {
+          "name": "behavior-shard-11",
+          "queue_seconds": 2.0,
+          "job_seconds": 1163.0,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "started_at": "2026-10-01T05:35:07Z",
+          "completed_at": "2026-10-01T05:54:30Z"
+        },
+        {
+          "name": "mypy",
+          "queue_seconds": 4.0,
+          "job_seconds": 114.0,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "started_at": "2026-10-01T05:35:09Z",
+          "completed_at": "2026-10-01T05:37:03Z"
+        },
+        {
+          "name": "behavior-shard-4",
+          "queue_seconds": 3.0,
+          "job_seconds": 1248.0,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "started_at": "2026-10-01T05:35:08Z",
+          "completed_at": "2026-10-01T05:55:56Z"
+        },
+        {
+          "name": "behavior-shard-7",
+          "queue_seconds": 3.0,
+          "job_seconds": 962.0,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "started_at": "2026-10-01T05:35:08Z",
+          "completed_at": "2026-10-01T05:51:10Z"
+        },
+        {
+          "name": "behavior-shard-12",
+          "queue_seconds": 2.0,
+          "job_seconds": 1021.0,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "started_at": "2026-10-01T05:35:07Z",
+          "completed_at": "2026-10-01T05:52:08Z"
+        },
+        {
+          "name": "behavior-shard-6",
+          "queue_seconds": 2.0,
+          "job_seconds": 786.0,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "started_at": "2026-10-01T05:35:07Z",
+          "completed_at": "2026-10-01T05:48:13Z"
+        },
+        {
+          "name": "behavior-shard-9",
+          "queue_seconds": 2.0,
+          "job_seconds": 1089.0,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "started_at": "2026-10-01T05:35:07Z",
+          "completed_at": "2026-10-01T05:53:16Z"
+        },
+        {
+          "name": "quality-fast",
+          "queue_seconds": 4.0,
+          "job_seconds": 3.0,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "started_at": "2026-10-01T05:49:43Z",
+          "completed_at": "2026-10-01T05:49:46Z"
+        },
+        {
+          "name": "coverage-gate",
+          "queue_seconds": 2.0,
+          "job_seconds": 73.0,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "started_at": "2026-10-01T05:55:59Z",
+          "completed_at": "2026-10-01T05:57:12Z"
+        }
+      ],
+      "qualification": "Observed cross-run hosted CI comparison; shared-runner variability and queueing are included. Local component timings separately isolate the changes. JUnit sums are worker work, not wall time."
+    },
+    "quality_lane": {
+      "baseline_job_seconds": 672,
+      "trial_job_seconds": 872,
+      "baseline_controller_seconds": 627.425340281,
+      "trial_controller_seconds": 826.1250272699999,
+      "qualification": "This lane was slower in the observed trial. No claim that every lane improved; cross-run shared-runner and xdist variation are not isolated causal measurements."
+    },
+    "reports": [
+      {
+        "shard": 1,
+        "cases": 1051,
+        "files": 25,
+        "workers": 4,
+        "junit_sha256": "ca12f037055b1a354a59b4eb6212c8914f9840c8fbfd30743e2a9c083c1ff9a5",
+        "zip_sha256": "684d5bdcc8b4bcb9ecafa7cedba2be2b953050f4dd3dd97526a11ba2c5abe85d",
+        "platforms": [
+          "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+        ],
+        "python": [
+          "3.14.5"
+        ],
+        "cpu_counts": [
+          4
+        ]
+      },
+      {
+        "shard": 2,
+        "cases": 515,
+        "files": 23,
+        "workers": 4,
+        "junit_sha256": "5db03800d5df1d4064aa863a2635e885c285036bef40131ea4ecf1b4dc1a62c1",
+        "zip_sha256": "5371e979012d560cbc1e9983355605b03faaeea9efbaad47c385f407138e425f",
+        "platforms": [
+          "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+        ],
+        "python": [
+          "3.14.5"
+        ],
+        "cpu_counts": [
+          4
+        ]
+      },
+      {
+        "shard": 3,
+        "cases": 476,
+        "files": 23,
+        "workers": 4,
+        "junit_sha256": "19f86904098ce48b6469380833351bb7d5f2439d363ab283bf3d40ae3157b427",
+        "zip_sha256": "edea81c933d213b0d0c39542e1a40659cbbc1a936e7a67f43eb236dea2ff3a54",
+        "platforms": [
+          "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+        ],
+        "python": [
+          "3.14.5"
+        ],
+        "cpu_counts": [
+          4
+        ]
+      },
+      {
+        "shard": 4,
+        "cases": 1031,
+        "files": 25,
+        "workers": 4,
+        "junit_sha256": "6097e0952918dc6dc41c26c229f2cdae6baad8b801d6613951026865264ed951",
+        "zip_sha256": "c4b8c371d1232c32b1bbafe54e855a5ff5b654fb84a6e9ed7b97b2bb5fa41f64",
+        "platforms": [
+          "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+        ],
+        "python": [
+          "3.14.5"
+        ],
+        "cpu_counts": [
+          4
+        ]
+      },
+      {
+        "shard": 5,
+        "cases": 942,
+        "files": 23,
+        "workers": 4,
+        "junit_sha256": "f1b79e31265849590e9bcce5d49f8ddcb6999cf50cc8d4ff52dcd1ee3169afe7",
+        "zip_sha256": "72cc9548db5d16e94cb089f7ec7da0ef67740e34327bfcaa4b4c7acf940b429c",
+        "platforms": [
+          "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+        ],
+        "python": [
+          "3.14.5"
+        ],
+        "cpu_counts": [
+          4
+        ]
+      },
+      {
+        "shard": 6,
+        "cases": 843,
+        "files": 24,
+        "workers": 4,
+        "junit_sha256": "40bfa3d89f33130d751f00ae3d3572c6b28811afeca96e9f1c8f80a76764f30f",
+        "zip_sha256": "f1dfb7b86a53f60518d92681a1cb709f7b2ea135ebefcaaf8c8d3f500d506096",
+        "platforms": [
+          "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+        ],
+        "python": [
+          "3.14.5"
+        ],
+        "cpu_counts": [
+          4
+        ]
+      },
+      {
+        "shard": 7,
+        "cases": 1102,
+        "files": 24,
+        "workers": 4,
+        "junit_sha256": "fa429ed79edec049fcab69c181c2ee47af43a05a2073e73b233a81834030f1b5",
+        "zip_sha256": "41d0c5ee70b0847d602b710bde66994a3d146c6fc9bdf5f5377f141efe7791da",
+        "platforms": [
+          "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+        ],
+        "python": [
+          "3.14.5"
+        ],
+        "cpu_counts": [
+          4
+        ]
+      },
+      {
+        "shard": 8,
+        "cases": 721,
+        "files": 23,
+        "workers": 4,
+        "junit_sha256": "73656a559ded947352d5c028764db9dc50b284b6bfaff42874b970a13b13ed31",
+        "zip_sha256": "238f725369d34250993817102b6b77ece966cb35c94e25d1cfa184eda3e4c6cf",
+        "platforms": [
+          "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+        ],
+        "python": [
+          "3.14.5"
+        ],
+        "cpu_counts": [
+          4
+        ]
+      },
+      {
+        "shard": 9,
+        "cases": 505,
+        "files": 24,
+        "workers": 4,
+        "junit_sha256": "272ccd1c23566d34d47584b0abafa5601800e8a0ff9b66169773b4693a472fac",
+        "zip_sha256": "f3ab73c4374724ab4240d658adcf97e7d330e492c6c2d261973fb5752b40d37e",
+        "platforms": [
+          "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+        ],
+        "python": [
+          "3.14.5"
+        ],
+        "cpu_counts": [
+          4
+        ]
+      },
+      {
+        "shard": 10,
+        "cases": 1112,
+        "files": 24,
+        "workers": 4,
+        "junit_sha256": "deea8e4312272db1bf02acda561c8deda1b2adfeba3862e627de155eab8e3142",
+        "zip_sha256": "66af30486f66cf56efd04bb6c29c5b2d4b95359a0af1e7ca8906e231176a987e",
+        "platforms": [
+          "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+        ],
+        "python": [
+          "3.14.5"
+        ],
+        "cpu_counts": [
+          4
+        ]
+      },
+      {
+        "shard": 11,
+        "cases": 1218,
+        "files": 25,
+        "workers": 4,
+        "junit_sha256": "08e32fe3057ad0ef43f2fd0245e11c3030eb5ff57f94b50e7da320f3ca669293",
+        "zip_sha256": "a71cb9dd0de706c9b29f09078ba1a44fff44eef3ed682a7667cb0f72fea06168",
+        "platforms": [
+          "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+        ],
+        "python": [
+          "3.14.5"
+        ],
+        "cpu_counts": [
+          4
+        ]
+      },
+      {
+        "shard": 12,
+        "cases": 691,
+        "files": 24,
+        "workers": 4,
+        "junit_sha256": "f94706f4257f7992a0cb6d8add46f9be1b8af78d94369f508faa652bab74f63a",
+        "zip_sha256": "dfa8b397a3c3b027ce46493cf34b010d6a0785747178dd1ccb2a11f7c15c91af",
+        "platforms": [
+          "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+        ],
+        "python": [
+          "3.14.5"
+        ],
+        "cpu_counts": [
+          4
+        ]
+      }
+    ],
+    "evidence_sha256": {
+      "analysis.json": "cf4fd3ed6d81138bc670667413d9c6bf206691cd904e3442edeaf221cc788ba0",
+      "assessment.json": "1ccd1d0fcd620cfa9d37815ee532327916c884c750aa53d30d12bf0845e25af3",
+      "quality-assessment.json": "1bf62c5a6966bce8f30ee9be6bef9e754162d5b07fb20cee9640ac83ff157a9e",
+      "collection-receipt.json": "b775ac94f459f5642aa87426932803d0a91199316e8d418689aa85545177ce0a",
+      "coverage-job.log": "0aac4e4384a51792313a5724e923cb54c603232260568f5f2aaa696f6668decb"
+    }
+  },
+  "final_profile": {
+    "source": "https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/36820420185; head=71d10b08111de11ae148103e83394035d4a9f877; merge=aaba9716eb29fc8252c51dc3bb92bfcd352e03d1; ubuntu-latest Python3.14.5; 12 complete shards with 4 workers each; coverage enabled; 10207 passed cases and 287 files",
+    "profile_count": 1,
+    "complete_junit_sha256": [
+      "08e32fe3057ad0ef43f2fd0245e11c3030eb5ff57f94b50e7da320f3ca669293",
+      "19f86904098ce48b6469380833351bb7d5f2439d363ab283bf3d40ae3157b427",
+      "272ccd1c23566d34d47584b0abafa5601800e8a0ff9b66169773b4693a472fac",
+      "40bfa3d89f33130d751f00ae3d3572c6b28811afeca96e9f1c8f80a76764f30f",
+      "5db03800d5df1d4064aa863a2635e885c285036bef40131ea4ecf1b4dc1a62c1",
+      "6097e0952918dc6dc41c26c229f2cdae6baad8b801d6613951026865264ed951",
+      "73656a559ded947352d5c028764db9dc50b284b6bfaff42874b970a13b13ed31",
+      "ca12f037055b1a354a59b4eb6212c8914f9840c8fbfd30743e2a9c083c1ff9a5",
+      "deea8e4312272db1bf02acda561c8deda1b2adfeba3862e627de155eab8e3142",
+      "f1b79e31265849590e9bcce5d49f8ddcb6999cf50cc8d4ff52dcd1ee3169afe7",
+      "f94706f4257f7992a0cb6d8add46f9be1b8af78d94369f508faa652bab74f63a",
+      "fa429ed79edec049fcab69c181c2ee47af43a05a2073e73b233a81834030f1b5"
+    ],
+    "total_worker_test_seconds": 37963.76,
+    "initial_trial_shard_worker_seconds_range": [
+      2105.552,
+      4345.808
+    ],
+    "rebalanced_shard_worker_seconds_range": [
+      3163.642,
+      3163.653
+    ],
+    "qualification": "Weights come only from the complete covered twelve-shard trial, not partial reports or Windows timings. Work sums and balanced assignments are not wall-time predictions; final hosted CI measures the revised assignment."
+  },
+  "runner_allowance_observation": {
+    "observed_at": "2026-10-01T05:10:06.855564+00:00",
+    "owner": "SobolGaming",
+    "owner_type": "Organization",
+    "repository_visibility": "public",
+    "authenticated_org_plan": "free",
+    "plan_receipt": "runner-org-plan-context.json",
+    "official_documentation": "https://docs.github.com/en/actions/reference/limits#job-concurrency-limits-for-github-hosted-runners",
+    "documented_standard_runner_concurrency": 20,
+    "documented_macos_sub_limit": 5,
+    "qualifications": [
+      "Plan identity verified by authenticated org API. Table describes standard plan allowance; custom support-adjusted limits and currently available organization-wide capacity are not independently exposed.",
+      "Other organization workflows can share the allowance. Observed concurrency is not a direct capacity entitlement measurement.",
+      "Twelve shards remain selected; no sixteen-shard trial or workflow change is authorized by this receipt alone. Evaluate actual twelve-shard bottlenecks first."
+    ],
+    "independent_initial_jobs": {
+      "behavior_shards_current": 12,
+      "other_jobs": 6,
+      "current_total": 18,
+      "hypothetical_sixteen_total": 22
+    },
+    "source_quotation_words": 0
+  },
+  "local_complete_validation": {
+    "behavior": {
+      "head": "71d10b08111de11ae148103e83394035d4a9f877",
+      "tree": "b4813e32b1e717e77ff5b22058e92274593c46a2",
+      "python_utf8": "1",
+      "total_cases": 10207,
+      "worker_count": 64,
+      "files": 287,
+      "tracked_inputs_unchanged": 5297,
+      "duration_seconds": 1243.5366127999732,
+      "coverage_totals": {
+        "covered_lines": 202691,
+        "num_statements": 227255,
+        "percent_covered": 85.20052262107757,
+        "percent_covered_display": "85",
+        "missing_lines": 24564,
+        "excluded_lines": 2882,
+        "percent_statements_covered": 89.19099689775803,
+        "percent_statements_covered_display": "89",
+        "num_branches": 88844,
+        "num_partial_branches": 20089,
+        "covered_branches": 66627,
+        "missing_branches": 22217,
+        "percent_branches_covered": 74.99324658952771,
+        "percent_branches_covered_display": "75"
+      },
+      "receipt": "local-covered-71d10b08-authenticated.json",
+      "receipt_sha256": "e0ffa86cb94585889c410769abcca38fe2c79fc9c93f74e6fb2cafd68ecdb318"
+    },
+    "quality": {
+      "head": "71d10b08111de11ae148103e83394035d4a9f877",
+      "tree": "b4813e32b1e717e77ff5b22058e92274593c46a2",
+      "python_utf8": "1",
+      "total_cases": 797,
+      "worker_count": 64,
+      "files": 108,
+      "tracked_inputs_unchanged": 5297,
+      "duration_seconds": 335.2871962999925,
+      "coverage_totals": null,
+      "receipt": "local-quality-71d10b08-authenticated.json",
+      "receipt_sha256": "88a5fb3fb8db63ae0a2c571df047a26603a1061394bb71e1b1fe3ea025462cf3"
+    },
+    "final_applicability": "The successful covered receipt remains at its true 71d head. The final delta is limited to the thirteen shard/profile files and these two dedicated reports, with every other tracked input unchanged. A complete hash/diff and consumer review authenticates that applicability; any behavioral input change requires revalidation. Full local quality and hosted CI run on the final publication head."
+  }
 }

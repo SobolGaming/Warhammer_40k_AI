@@ -2,7 +2,8 @@
 
 This approved slice reduces repeated test and offline-generator work and trials
 twelve complete behavioral CI shards. It does not change game rules, packaged
-runtime code, source packages, the roadmap, or the 85% branch-coverage gate.
+runtime code, source packages, roadmap order or acceptance requirements, or the
+85% combined coverage gate with branch tracking.
 Full-game performance certification remains outside this validation workload.
 
 ## Preserved behavior and bounded reuse
@@ -103,27 +104,70 @@ measured revision; they must not relabel its timing receipts as a later head.
 Complete local/hosted validation and both final-head reviews remain separate
 delivery requirements.
 
-## Complete Linux evidence and twelve-shard trial
+## Complete Linux evidence and measured twelve-shard trial
 
-Initial weights come from [run 36798414956](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/36798414956),
-with all eight successful Linux shards, four actual workers per shard, 10,207
-unique successful cases and 287 behavioral files. The raw reports and timing
-inventories are authenticated; committed duration metadata preserves report
-hashes and provenance. Windows generation writes LF manifests for Bash consumers.
-No test file or node is removed.
+The initial twelve assignments used all eight successful reports from
+[run 36798414956](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/36798414956).
+The complete twelve-shard [trial run 36820420185](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/36820420185)
+then passed all 20 jobs at published head
+`71d10b08111de11ae148103e83394035d4a9f877`. Its synthetic merge
+`aaba9716eb29fc8252c51dc3bb92bfcd352e03d1` has the same tree as that head.
+All twelve archive digests, complete worker collections and setup/call/teardown
+records were authenticated: 10,207 unique successful behavioral cases in 287
+files, four actual workers per shard, and exactly the baseline node-ID set.
+The separate quality report preserves all 797 successful baseline cases.
+The combined coverage gate passed with branch tracking and the unchanged 85%
+threshold.
 
-The historical hosted wall time is 29 minutes 17 seconds. The historical local
-covered run is 884.9526 seconds on a different Mac with 18 workers; it is not a
-same-host comparison with Windows. Idealized shard-weight estimates do not
-establish hosted wall time or runner allowance. Sixteen shards are not selected.
+Observed hosted wall time fell from 29m17s to 22m46s, a 6m31s (22.25%) reduction.
+This is one complete cross-run observation, including shared-runner variation and
+queueing, rather than an isolated causal timing experiment. Raw summed job time
+was 211.8 runner-minutes versus 213.9333; these are not billed minutes or monetary
+cost. Not every lane improved: full quality took 872 seconds versus 672 seconds,
+with controller durations of 826.1250 versus 627.4253 seconds.
 
-The ready-PR trial must execute all twelve shards and authenticate their complete
-case inventories, actual workers, timings and combined branch coverage. The
-coverage gate admits exactly twelve named artifact directories, each containing
-exactly its nonempty named coverage file, before combining. Missing, extra,
-misnamed, empty or non-file inputs fail closed. Full local covered behavior,
-quality without coverage, both type checkers, generated/base-ref checks,
-TypeScript client/conformance, wheel smoke and pre-commit remain required.
+Behavior setup took 33–46 seconds per job, test steps 582–1,206 seconds, and the
+final coverage job 73 seconds. Shard 4 was last; its session-persistence file
+accounted for 1,960.346 worker-test seconds. The longest individual trial case
+took 381.585 seconds. These tails and file-weight changes motivate refreshing the
+assignments while retaining every case and the existing work-stealing scheduler.
+The final twelve manifests use only this complete Linux trial, with its twelve
+original JUnit hashes and provenance committed in `ci/test_shards/durations.json`.
+Their balanced work totals are estimates of worker work, not promised wall time;
+the final hosted run measures the revised assignment. Windows writes canonical LF
+manifest bytes for Bash consumers.
+
+Twelve shards remain selected. The authenticated organization API reported the
+Free plan, whose [documented standard hosted limit](https://docs.github.com/en/actions/reference/limits#job-concurrency-limits-for-github-hosted-runners)
+is 20 concurrent jobs (five macOS). Twelve behavioral shards plus six initially
+independent lanes total 18 jobs; sixteen shards would total 22. Custom support
+limits and currently available organization-wide capacity were not exposed.
+Observed peak concurrency was 18; that observation alone is not an allowance.
+No sixteen-shard trial or gate removal is claimed.
+
+The complete native Windows covered run at the same published head passed all
+10,207 cases in 1,243.5366128 seconds with 85.2005226% combined coverage and branch
+tracking. Full quality then passed all 797 cases in 335.2871963 seconds without
+coverage. Both used 64 work-stealing workers and recorded `PYTHONUTF8=1`; all
+5,297 tracked inputs stayed unchanged. The historical 884.9526-second local result
+came from a different Mac with 18 workers and is not a same-host comparison.
+
+That successful local behavioral receipt keeps its true `71d10b08` revision.
+The final metadata update changes only the thirteen shard/profile files and these
+two dedicated performance reports. Complete input hashes and the exact diff,
+together with the behavioral consumer review, establish its applicability;
+workflow, source, test bodies/helpers, configuration, lockfile and source/generated
+data stay byte-identical. Any behavioral input change requires revalidation.
+Full local quality and complete hosted CI run on the final publication head;
+both exact-head reviews remain required. Final results are reported on
+[PR525](https://github.com/SobolGaming/Warhammer_40k_AI/pull/525).
+
+The coverage gate admits exactly twelve named artifact directories, each
+containing exactly its nonempty named coverage file, before combining. Missing,
+extra, misnamed, empty or non-file inputs fail closed. Both type checkers,
+generated/base-ref checks, TypeScript client/conformance, wheel smoke and
+pre-commit remain required. The measured trial did not reach a 16-minute hosted
+target and does not authorize removing the full local covered gate.
 
 Apply `docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md`: prioritize complete playable
 behavior, normal legal-play failures, engine-generated valid-state persistence
