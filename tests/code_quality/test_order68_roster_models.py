@@ -9,6 +9,10 @@ import subprocess
 import sys
 from pathlib import Path
 
+from tests.performance_evidence_helpers import (
+    historical_input_bytes,
+)
+
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -96,7 +100,8 @@ def test_order68_matched_roster_validation_cost() -> None:
     assert [row["unit_count"] for row in head["rows"]] == [2, 4, 20]
     for name, digest in head["hashes"].items():
         assert (
-            hashlib.sha256((ROOT / name).read_bytes().replace(b"\r\n", b"\n")).hexdigest() == digest
+            hashlib.sha256(historical_input_bytes(name).replace(b"\r\n", b"\n")).hexdigest()
+            == digest
         )
     for before, after in zip(base["rows"], head["rows"], strict=True):
         assert before["unit_count"] == after["unit_count"]

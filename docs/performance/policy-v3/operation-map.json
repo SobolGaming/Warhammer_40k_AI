@@ -1,0 +1,581 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "schema": "reviewed-operation-map-v1",
+  "families": {
+    "visibility": {
+      "driver": "scripts/measure_order78.py",
+      "historical_workload_reference": "docs/performance/order78/head.json",
+      "cases": [
+        "dense-outside",
+        "dense-inside",
+        "attached-outside",
+        "light-outside",
+        "not-hidden",
+        "fully-visible",
+        "associated-policy-only-woods"
+      ],
+      "samples_per_case": 7,
+      "budget_profile": "current-change-relative-v1",
+      "workload_id": "order78-gone-to-ground-v2"
+    },
+    "reconstruction": {
+      "driver": "scripts/measure_ingress_reconstruction.py",
+      "historical_workload_reference": "docs/performance/order64/head-reconstruction.json",
+      "cases": [
+        "ingress/restore",
+        "ingress/fork",
+        "rapid_disembark/restore",
+        "rapid_disembark/fork",
+        "later_decision/restore",
+        "later_decision/fork"
+      ],
+      "samples_per_case": 7,
+      "budget_profile": "current-change-relative-v1",
+      "workload_id": "loaded-ingress-reconstruction-v1"
+    },
+    "setup": {
+      "driver": "scripts/measure_order101.py",
+      "historical_workload_reference": "docs/performance/order101/head.json",
+      "cases": [
+        "cargo-5",
+        "cargo-100",
+        "loaded-deep-strike"
+      ],
+      "samples_per_case": 7,
+      "budget_profile": "current-change-relative-v1",
+      "workload_id": "order101-failed-setup-restore-view-replay-v1"
+    },
+    "roster": {
+      "driver": "scripts/measure_order68.py",
+      "historical_workload_reference": "docs/performance/order69/head.json",
+      "cases": [
+        "2",
+        "4",
+        "20"
+      ],
+      "samples_per_case": 7,
+      "budget_profile": "current-change-relative-v1",
+      "workload_id": "order68-roster-validation-v1"
+    },
+    "fight": {
+      "driver": "scripts/measure_order72.py",
+      "historical_workload_reference": "docs/performance/order72/head.json",
+      "cases": [
+        "complete-fight-phase"
+      ],
+      "samples_per_case": 3,
+      "budget_profile": "current-change-relative-v1",
+      "workload_id": "order72-engaging-full-fight-restore-replay-v1"
+    },
+    "revival": {
+      "driver": "scripts/measure_order82.py",
+      "historical_workload_reference": "docs/performance/order83/head.json",
+      "cases": [
+        "unengaged-control",
+        "same-enemy-unit",
+        "attached",
+        "retained-enemy",
+        "new-enemy-unit"
+      ],
+      "samples_per_case": 3,
+      "budget_profile": "current-change-relative-v1",
+      "workload_id": "order82-revival-engagement-v1"
+    },
+    "dice": {
+      "driver": "scripts/benchmark_order96_rerolls.py",
+      "historical_workload_reference": "docs/performance/order96/head.json",
+      "cases": [
+        "shooting/false",
+        "shooting/true",
+        "fight/false",
+        "fight/true"
+      ],
+      "samples_per_case": 5,
+      "budget_profile": "current-change-relative-v1",
+      "workload_id": "order96-optional-wound-rerolls-v1"
+    },
+    "objective_control": {
+      "driver": "scripts/measure_order86.py",
+      "historical_workload_reference": "docs/performance/order86/head.json",
+      "cases": [
+        "0.01",
+        "0.01968503937007874",
+        "0.02",
+        "4.0"
+      ],
+      "samples_per_case": 10,
+      "budget_profile": "current-change-relative-v1",
+      "workload_id": "order86-five-model-quarter-witness-v1"
+    },
+    "movement": {
+      "driver": "scripts/measure_order80.py",
+      "historical_workload_reference": "docs/performance/order80/head.json",
+      "cases": [
+        "finite",
+        "parameterized"
+      ],
+      "samples_per_case": 3,
+      "budget_profile": "current-change-relative-v1",
+      "workload_id": "order80-normal-move-occurrence-v1"
+    },
+    "strength": {
+      "driver": "scripts/benchmark_order88_strength.py",
+      "historical_workload_reference": "docs/performance/order88/head.json",
+      "cases": [
+        "shooting",
+        "fight"
+      ],
+      "samples_per_case": 5,
+      "budget_profile": "current-change-relative-v1",
+      "workload_id": "order88-numeric-strength-attacks-v1"
+    }
+  },
+  "operations": {
+    "geometry-search": {
+      "paths": [
+        "src/warhammer40k_core/geometry/*"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "visibility",
+        "movement",
+        "setup"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "visibility-query": {
+      "paths": [
+        "src/warhammer40k_core/core/visibility*",
+        "src/warhammer40k_core/engine/shooting_terrain_visibility*"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "visibility"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "cache-policy": {
+      "paths": [
+        "src/warhammer40k_core/*"
+      ],
+      "owners": [
+        "*cache*",
+        "*Cache*"
+      ],
+      "families": [
+        "visibility",
+        "reconstruction"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "serialization-replay": {
+      "paths": [
+        "src/warhammer40k_core/engine/replay.py",
+        "src/warhammer40k_core/engine/lifecycle.py",
+        "src/warhammer40k_core/adapters/local_session.py",
+        "src/warhammer40k_core/engine/game_state.py"
+      ],
+      "owners": [
+        "*to_payload",
+        "*from_payload",
+        "*to_persistence_payload",
+        "*from_persistence_payload",
+        "*fork",
+        "*run",
+        "*replay*"
+      ],
+      "families": [
+        "reconstruction"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "transport-rule-branch": {
+      "paths": [
+        "src/warhammer40k_core/engine/*disembark*",
+        "src/warhammer40k_core/engine/*transport*"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "setup"
+      ],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "phase-rule-branch": {
+      "paths": [
+        "src/warhammer40k_core/engine/game_state.py",
+        "src/warhammer40k_core/engine/battle_round_flow.py",
+        "src/warhammer40k_core/engine/turn_end_boundary.py",
+        "src/warhammer40k_core/engine/lifecycle_state_validation.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "reconstruction",
+        "fight"
+      ],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fight-rule-branch": {
+      "paths": [
+        "src/warhammer40k_core/engine/*fight*",
+        "src/warhammer40k_core/engine/phases/fight*",
+        "src/warhammer40k_core/engine/consolidation*"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "fight"
+      ],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "movement-rule-branch": {
+      "paths": [
+        "src/warhammer40k_core/engine/*movement*",
+        "src/warhammer40k_core/engine/phases/movement*",
+        "src/warhammer40k_core/engine/charge_eligibility.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "movement",
+        "setup"
+      ],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "source-record": {
+      "paths": [
+        "src/warhammer40k_core/rules/source_packages/*",
+        "src/warhammer40k_core/_engine_build_manifest.json"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "setup"
+      ],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "runtime-dependency": {
+      "paths": [
+        "pyproject.toml",
+        "uv.lock"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "visibility",
+        "reconstruction",
+        "setup",
+        "roster",
+        "fight",
+        "revival",
+        "dice",
+        "objective_control",
+        "movement",
+        "strength"
+      ],
+      "sensitive": true,
+      "mandatory": false
+    },
+    "development-dependency": {
+      "paths": [
+        "pyproject.toml",
+        "uv.lock"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "workload-visibility": {
+      "paths": [
+        "scripts/measure_order78.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "visibility"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "fixture-visibility": {
+      "paths": [
+        "tests/order78*",
+        "tests/phase13b_shooting_declaration_helpers.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "visibility"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "workload-reconstruction": {
+      "paths": [
+        "scripts/measure_ingress_reconstruction.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "reconstruction"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "fixture-reconstruction": {
+      "paths": [
+        "tests/order63*",
+        "tests/disembark_eligibility_helpers.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "reconstruction"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "workload-setup": {
+      "paths": [
+        "scripts/measure_order101.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "setup"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "fixture-setup": {
+      "paths": [
+        "tests/large_model_disembark_helpers.py",
+        "tests/order63_reserve_transport_helpers.py",
+        "tests/psychic_modifier_helpers.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "setup"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "workload-roster": {
+      "paths": [
+        "scripts/measure_order68.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "roster"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "workload-fight": {
+      "paths": [
+        "scripts/measure_order72.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "fight"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "fixture-fight": {
+      "paths": [
+        "tests/phase15c_fight_order_helpers.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "fight"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "workload-revival": {
+      "paths": [
+        "scripts/measure_order82.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "revival"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "fixture-revival": {
+      "paths": [
+        "tests/order82_revival_helpers.py",
+        "tests/order83_revival_helpers.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "revival"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "workload-dice": {
+      "paths": [
+        "scripts/benchmark_order96_rerolls.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "dice"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "fixture-dice": {
+      "paths": [
+        "tests/dice_result_semantics_helpers.py",
+        "tests/command_reroll_cost_helpers.py",
+        "tests/psychic_modifier_helpers.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "dice"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "workload-objective_control": {
+      "paths": [
+        "scripts/measure_order86.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "objective_control"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "fixture-objective_control": {
+      "paths": [
+        "tests/phase11c_command_phase_helpers.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "objective_control"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "workload-movement": {
+      "paths": [
+        "scripts/measure_order80.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "movement"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "fixture-movement": {
+      "paths": [
+        "tests/normal_move_occurrence_helpers.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "movement"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "workload-strength": {
+      "paths": [
+        "scripts/benchmark_order88_strength.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "strength"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "fixture-strength": {
+      "paths": [
+        "tests/psychic_modifier_helpers.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "strength"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "roster-catalog": {
+      "paths": [
+        "src/warhammer40k_core/core/army_catalog.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "roster"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    }
+  },
+  "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
+  "full_game_profiles": {}
+}

@@ -10,6 +10,11 @@ import subprocess
 import sys
 from pathlib import Path
 
+from tests.performance_evidence_helpers import (
+    assert_historical_report,
+    historical_input_bytes,
+)
+
 ROOT = Path(__file__).resolve().parents[2]
 ENGINE = ROOT / "src/warhammer40k_core/engine"
 
@@ -46,7 +51,6 @@ def test_firing_deck_source_artifacts_are_reproducible() -> None:
 
 
 def test_firing_deck_matched_performance_evidence() -> None:
-    from warhammer40k_core.build_identity import verified_engine_build_identity
 
     folder = ROOT / "docs/performance/order65"
     base = json.loads((folder / "base.json").read_text(encoding="utf-8"))
@@ -66,10 +70,11 @@ def test_firing_deck_matched_performance_evidence() -> None:
     ):
         assert base[key] == head[key], key
     assert head["workload_id"] == budgets["workload_id"]
-    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    assert_historical_report(head)
     for name, digest in head["hashes"].items():
         assert (
-            hashlib.sha256((ROOT / name).read_bytes().replace(b"\r\n", b"\n")).hexdigest() == digest
+            hashlib.sha256(historical_input_bytes(name).replace(b"\r\n", b"\n")).hexdigest()
+            == digest
         )
     for baseline, current in zip(base["rows"], head["rows"], strict=True):
         assert baseline["contribute"] == current["contribute"]

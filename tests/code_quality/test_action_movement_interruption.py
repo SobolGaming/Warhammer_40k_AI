@@ -9,7 +9,11 @@ from pathlib import Path
 
 import pytest
 
-from warhammer40k_core.build_identity import verified_engine_build_identity
+from tests.performance_evidence_helpers import (
+    assert_historical_report,
+    historical_input_bytes,
+    historical_input_text,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 ENGINE = ROOT / "src/warhammer40k_core/engine"
@@ -86,7 +90,7 @@ def test_order77_matched_completed_move_cost_evidence(baseline: str) -> None:
     folder = ROOT / "docs/performance/order77"
     base, head = (json.loads((folder / name).read_text()) for name in (baseline, "head.json"))
     budgets = json.loads((folder / "budgets.json").read_text())
-    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    assert_historical_report(head)
     for key in (
         "workload_id",
         "platform",
@@ -102,7 +106,7 @@ def test_order77_matched_completed_move_cost_evidence(baseline: str) -> None:
         assert base[key] == head[key], key
     _assert_versioned_fixture_inputs(base["hashes"], head["hashes"])
     for name, digest in head["hashes"].items():
-        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest, name
+        assert hashlib.sha256(historical_input_bytes(name)).hexdigest() == digest, name
     assert len(base["samples"]) == len(head["samples"]) == budgets["required_completed_submissions"]
     assert head["full_game_certified"] is False
     for old, new in zip(base["samples"], head["samples"], strict=True):
@@ -129,7 +133,7 @@ def test_order77_completed_secondary_restore_cost_evidence(baseline: str) -> Non
     base = json.loads((folder / baseline / "completion-base.json").read_text())
     head = json.loads((folder / "r77_001_boundary/completion-head.json").read_text())
     budgets = json.loads((folder / "budgets.json").read_text())
-    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    assert_historical_report(head)
     for key in (
         "workload_id",
         "platform",
@@ -144,7 +148,7 @@ def test_order77_completed_secondary_restore_cost_evidence(baseline: str) -> Non
         assert base[key] == head[key], key
     _assert_versioned_fixture_inputs(base["hashes"], head["hashes"])
     for name, digest in head["hashes"].items():
-        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest, name
+        assert hashlib.sha256(historical_input_bytes(name)).hexdigest() == digest, name
     assert head["full_game_certified"] is False
     # Reuse the existing fifteen-sample requirement and unchanged restore budgets.
     assert len(base["samples"]) == len(head["samples"]) == budgets["required_completed_submissions"]
@@ -159,11 +163,11 @@ def test_order77_completed_secondary_restore_cost_evidence(baseline: str) -> Non
 
 def _assert_versioned_fixture_inputs(base: dict[str, str], head: dict[str, str]) -> None:
     migration = json.loads(
-        (ROOT / "docs/performance/order79/inherited-fixture-migration.json").read_text()
+        historical_input_text("docs/performance/order79/inherited-fixture-migration.json")
     )
     changes = migration["changed_files"]
     occurrence_migration = json.loads(
-        (ROOT / "docs/performance/order80/inherited-fixture-migration.json").read_text()
+        historical_input_text("docs/performance/order80/inherited-fixture-migration.json")
     )["changed_files"]
     assert set(occurrence_migration) == {"tests/phase17n_primary_mission_helpers.py"}
     assert set(changes) == {
@@ -171,14 +175,14 @@ def _assert_versioned_fixture_inputs(base: dict[str, str], head: dict[str, str])
         "tests/phase17n_primary_mission_helpers.py",
     }
     quarter_migration = json.loads(
-        (ROOT / "docs/performance/order86/inherited-fixture-migration.json").read_text()
+        historical_input_text("docs/performance/order86/inherited-fixture-migration.json")
     )["changed_files"]
     assert set(quarter_migration) == {
         "tests/phase17n_secondary_certification_fixtures.py",
         "tests/phase17n_step6g_secondary_certification_helpers.py",
     }
     movement_proof = json.loads(
-        (ROOT / "docs/performance/order93/inherited-fixture-migration.json").read_text()
+        historical_input_text("docs/performance/order93/inherited-fixture-migration.json")
     )
     movement_migration = movement_proof["changed_files"]
     movement_helper = "tests/action_movement_interruption_helpers.py"
@@ -187,13 +191,15 @@ def _assert_versioned_fixture_inputs(base: dict[str, str], head: dict[str, str])
     assert movement_proof["base_revision"] == "d7bcb10bd9e34b1eabb060465be7f9517d8417eb"
     assert (
         movement_proof["runtime_build_id"]
-        == json.loads((ROOT / "docs/performance/order93/base.json").read_text())["runtime_build_id"]
+        == json.loads(historical_input_text("docs/performance/order93/base.json"))[
+            "runtime_build_id"
+        ]
     )
     assert movement_proof["entrypoint"] == "action_movement_session"
     assert movement_proof["entrypoint_kwargs"] == {"pause_after_move": True}
     assert (
         movement_migration[movement_helper]["head_sha256"]
-        == hashlib.sha256((ROOT / movement_helper).read_bytes()).hexdigest()
+        == hashlib.sha256(historical_input_bytes(movement_helper)).hexdigest()
     )
     assert [row["case"] for row in movement_proof["cases"]] == [
         "translation",
@@ -241,7 +247,7 @@ def _assert_versioned_fixture_inputs(base: dict[str, str], head: dict[str, str])
     # whole-file changes are confined to separate turn-end fixture functions.
     expected = migration["unchanged_primary_fixture_entrypoints"]
     assert set(expected) == {"phase17n_event_setup", "phase17n_state_with_setup"}
-    tree = ast.parse((ROOT / "tests/phase17n_primary_mission_helpers.py").read_text())
+    tree = ast.parse(historical_input_text("tests/phase17n_primary_mission_helpers.py"))
     actual = {
         node.name: hashlib.sha256(ast.dump(node, include_attributes=False).encode()).hexdigest()
         for node in tree.body

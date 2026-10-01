@@ -9,7 +9,10 @@ import subprocess
 import sys
 from pathlib import Path
 
-from warhammer40k_core.build_identity import verified_engine_build_identity
+from tests.performance_evidence_helpers import (
+    assert_historical_report,
+    historical_input_bytes,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -47,7 +50,7 @@ def test_order72_matched_engaging_fight_restore_replay_cost() -> None:
     base = json.loads((folder / "base.json").read_bytes())
     head = json.loads((folder / "head.json").read_bytes())
     budget = json.loads((folder / "budgets.json").read_bytes())
-    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    assert_historical_report(head)
     for key in (
         "workload",
         "platform",
@@ -64,7 +67,8 @@ def test_order72_matched_engaging_fight_restore_replay_cost() -> None:
     assert head["workload"] == budget["workload"]
     for name, digest in head["hashes"].items():
         assert (
-            hashlib.sha256((ROOT / name).read_bytes().replace(b"\r\n", b"\n")).hexdigest() == digest
+            hashlib.sha256(historical_input_bytes(name).replace(b"\r\n", b"\n")).hexdigest()
+            == digest
         )
     assert len(base["samples_seconds"]) == len(head["samples_seconds"]) == budget["samples"]
     assert base["completion_rate"] == head["completion_rate"] == 1

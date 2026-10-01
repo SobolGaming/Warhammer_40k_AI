@@ -9,6 +9,10 @@ from pathlib import Path
 
 from tools.build_core_base_contact_source import ARTIFACT_PATH, AUDIT_PATH, build_payloads
 
+from tests.performance_evidence_helpers import (
+    assert_historical_report,
+    historical_input_bytes,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_base_contact_2026_09 import (
     DEEMED_BASE_CONTACT_SOURCE_ID,
     EXPECTED_ARTIFACT_SHA256,
@@ -43,12 +47,11 @@ def test_contact_consumers_and_movement_producers_use_shared_authority() -> None
 
 
 def test_contact_slice_cost_preserves_matched_inputs_and_results() -> None:
-    from warhammer40k_core.build_identity import verified_engine_build_identity
 
     folder = ROOT / "docs/performance/order85"
     base, head = (json.loads((folder / p).read_text()) for p in ("base.json", "head.json"))
     budget = json.loads((folder / "budget.json").read_text())
-    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    assert_historical_report(head)
     for key in (
         "workload",
         "cpu",
@@ -63,7 +66,7 @@ def test_contact_slice_cost_preserves_matched_inputs_and_results() -> None:
         assert base[key] == head[key], key
     assert head["workload"] == budget["workload"]
     for name, digest in head["hashes"].items():
-        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
+        assert hashlib.sha256(historical_input_bytes(name)).hexdigest() == digest
     for before, after in zip(base["rows"], head["rows"], strict=True):
         assert before["case"] == after["case"]
         assert len(after["samples_seconds"]) == len(before["samples_seconds"]) == budget["samples"]
@@ -111,14 +114,13 @@ def test_charge_contact_permissions_have_one_live_and_historical_owner() -> None
 
 
 def test_asymmetric_body_search_has_matched_performance_evidence() -> None:
-    from warhammer40k_core.build_identity import verified_engine_build_identity
 
     folder = ROOT / "docs/performance/order85"
     base, head = (
         json.loads((folder / p).read_text()) for p in ("rotation-base.json", "rotation-head.json")
     )
     budget = json.loads((folder / "budget.json").read_text())
-    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    assert_historical_report(head)
     for key in (
         "workload",
         "cpu",
@@ -131,7 +133,7 @@ def test_asymmetric_body_search_has_matched_performance_evidence() -> None:
         assert base[key] == head[key], key
     assert (
         head["script_sha256"]
-        == hashlib.sha256((ROOT / "scripts/measure_order85_rotation.py").read_bytes()).hexdigest()
+        == hashlib.sha256(historical_input_bytes("scripts/measure_order85_rotation.py")).hexdigest()
     )
     for before, after in zip(base["rows"], head["rows"], strict=True):
         assert before["bearing"] == after["bearing"]

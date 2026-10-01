@@ -9,6 +9,7 @@ from typing import cast
 
 from scripts.tacoma_2026_source_audit import audit_tacoma_2026_sources
 
+from tests.performance_evidence_helpers import historical_input_bytes
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.interaction_metadata import (
     InteractionKind,
@@ -309,16 +310,18 @@ def test_order81_matched_projection_component_budget() -> None:
     assert (
         head["script_sha256"]
         == hashlib.sha256(
-            (ROOT / "scripts/benchmark_order81_projection.py").read_bytes()
+            historical_input_bytes("scripts/benchmark_order81_projection.py")
         ).hexdigest()
     )
     assert (
         head["fixture_sha256"]
-        == hashlib.sha256((ROOT / "tests/order81_projection_helpers.py").read_bytes()).hexdigest()
+        == hashlib.sha256(historical_input_bytes("tests/order81_projection_helpers.py")).hexdigest()
     )
     assert (
         head["phase_fixture_sha256"]
-        == hashlib.sha256((ROOT / "tests/healing_phase_start_helpers.py").read_bytes()).hexdigest()
+        == hashlib.sha256(
+            historical_input_bytes("tests/healing_phase_start_helpers.py")
+        ).hexdigest()
     )
     assert len(base["rows"]) == len(head["rows"]) == 2
     for before, after in zip(base["rows"], head["rows"], strict=True):

@@ -340,13 +340,14 @@ uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 ```
 
 Download the `behavior-report-*` artifacts from each chosen successful run into a
-separate directory, then regenerate (repeat both options for additional runs):
+separate directory outside the checkout, then regenerate (repeat both options for
+additional runs). Downloaded profiles are supplied inputs, not generated source:
 
 ```bash
 uv run --no-sync python scripts/build_test_shards.py \
-  --junit reports/run-one \
+  --junit ../behavior-reports/run-one \
   --profile-source "RUN_URL; commit SHA; ubuntu-latest; 4 workers per shard" \
-  --junit reports/run-two \
+  --junit ../behavior-reports/run-two \
   --profile-source "RUN_URL; commit SHA; ubuntu-latest; 4 workers per shard" \
   --shard-count 12
 ```
@@ -662,6 +663,15 @@ Build in this order:
    [standing performance policy](docs/performance/PERFORMANCE_POLICY.md).
 
 Current status:
+
+Performance validation uses the owner-approved
+[v3 tiered policy](docs/performance/PERFORMANCE_POLICY.md): immutable historical
+evidence, an exact-base change assessment and real current-runtime smoke on every
+PR, then matched detailed comparisons for relevant sensitive operations and
+complete-game profiling at rules-complete milestones. Before full quality tests,
+run `uv run --no-sync python -m scripts.check_performance_policy --base-ref <exact-PR-base-SHA>`
+serially. A changed global runtime identity alone does not refresh all history;
+missing applicable evidence still fails closed.
 
 - Core rules infrastructure through movement, shooting, charge, fight, setup,
   reserves, transports, missions, replay, source ingestion, catalog generation,

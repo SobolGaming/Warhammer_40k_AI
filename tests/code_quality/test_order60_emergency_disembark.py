@@ -11,7 +11,9 @@ from tools.build_core_emergency_disembark_placement_source import (
     build_payloads,
 )
 
-from warhammer40k_core.build_identity import verified_engine_build_identity
+from tests.performance_evidence_helpers import (
+    assert_historical_report,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_emergency_disembark_placement_2026_09 as source,
 )
@@ -167,7 +169,7 @@ def test_order73_geometry_performance_preserves_base_outcomes_and_complete_head(
             assert base[field] == head[field], field
         assert head["completion_rate"] == 1
         if evidence_directory:
-            assert head["revision"] == verified_engine_build_identity().build_id
+            assert_historical_report(head)
             assert base["completion_rate"] == 1
             assert all(row["complete"] and row["valid"] for row in base["samples"])
         assert head["full_game_certified"] is False

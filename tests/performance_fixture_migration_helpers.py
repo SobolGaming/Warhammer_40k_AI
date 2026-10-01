@@ -7,6 +7,10 @@ import hashlib
 import json
 from pathlib import Path
 
+from tests.performance_evidence_helpers import (
+    historical_input_text,
+)
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -14,7 +18,7 @@ def assert_order87_fixture_migration(
     base: dict[str, str], head: dict[str, str], *, changed_file: str
 ) -> None:
     migration = json.loads(
-        (ROOT / "docs/performance/order87/inherited-fixture-migration.json").read_text()
+        historical_input_text("docs/performance/order87/inherited-fixture-migration.json")
     )["changed_files"][changed_file]
     assert base.keys() == head.keys()
     assert base[changed_file] == migration["base_sha256"]
@@ -22,7 +26,7 @@ def assert_order87_fixture_migration(
     assert {name: digest for name, digest in base.items() if name != changed_file} == {
         name: digest for name, digest in head.items() if name != changed_file
     }
-    tree = ast.parse((ROOT / changed_file).read_text())
+    tree = ast.parse(historical_input_text(changed_file))
     if changed_file == "tests/normal_move_occurrence_helpers.py":
         added_import = next(
             node
@@ -55,7 +59,7 @@ def assert_order87_fixture_migration(
         keyword = next(item for item in call.keywords if item.arg == "catalog")
         assert ast.dump(keyword.value) == "Name(id='catalog', ctx=Load())"
         call.keywords.remove(keyword)
-        measurement = ast.parse((ROOT / "scripts/measure_order80.py").read_text())
+        measurement = ast.parse(historical_input_text("scripts/measure_order80.py"))
         calls = [
             node
             for node in ast.walk(measurement)
@@ -85,7 +89,7 @@ def assert_order87_fixture_migration(
             "destroy_models_with_recorded_mortal_wounds",
         ]
         # The measured operation constructs an undamaged squad and queries its quarter.
-        measurement = ast.parse((ROOT / "scripts/measure_order86.py").read_text())
+        measurement = ast.parse(historical_input_text("scripts/measure_order86.py"))
         assert not any(
             isinstance(node, ast.Name) and node.id in changed_functions
             for node in ast.walk(measurement)

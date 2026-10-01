@@ -4,7 +4,10 @@ import hashlib
 import json
 from pathlib import Path
 
-from warhammer40k_core.build_identity import current_engine_build_id
+from tests.performance_evidence_helpers import (
+    assert_historical_report,
+    historical_input_bytes,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -27,7 +30,7 @@ def test_failed_setup_component_keeps_matched_hard_cases_and_budget() -> None:
     ):
         assert base[field] == head[field], field
     assert head["workload"] == budgets["workload"]
-    assert head["runtime_build_id"] == current_engine_build_id()
+    assert_historical_report(head)
     assert head["host_role"] == "provisional"
     assert head["concurrency"] == 1
     assert base["coverage"] is False
@@ -36,7 +39,7 @@ def test_failed_setup_component_keeps_matched_hard_cases_and_budget() -> None:
     assert head["full_game_certified"] is False
     assert budgets["full_game_certified"] is False
     for filename, digest in head["hashes"].items():
-        assert hashlib.sha256((ROOT / filename).read_bytes()).hexdigest() == digest
+        assert hashlib.sha256(historical_input_bytes(filename)).hexdigest() == digest
     assert [row["case"] for row in head["rows"]] == ["cargo-5", "cargo-100", "loaded-deep-strike"]
     for before, after in zip(base["rows"], head["rows"], strict=True):
         assert before["case"] == after["case"]
