@@ -46,7 +46,7 @@ def main() -> int:
         action="append",
         help="Run URL, commit and runner description, one per --junit.",
     )
-    parser.add_argument("--shard-count", type=int, default=8)
+    parser.add_argument("--shard-count", type=int, default=12)
     parser.add_argument(
         "--output-dir",
         type=Path,

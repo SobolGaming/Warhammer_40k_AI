@@ -56,7 +56,7 @@ No safely redundant behavioral tests have been established.
 
 Profile the full 45-layout battlefield generator comparison (reported about nine
 minutes); preserve its complete comparison. Measure Linux worker timings before
-rebalancing: the current eight-shard weights came from an 18-worker Mac invocation,
+rebalancing: at approval, the eight-shard weights came from an 18-worker Mac invocation,
 while hosted shards use four workers. Evaluate 12 shards first. Evaluate 16 only
 after runner allowance and the six other initial jobs are accounted for. Do not
 invent timing profiles or treat missing/skipped shards as passing.
@@ -73,8 +73,14 @@ Published Order 101 head `2a5eaa60` provides historical timing evidence: local
 covered pytest 771.10 seconds; hosted run
 [36726559567](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/36726559567)
 30m03s, longest behavioral job 27m33s including setup/artifacts. These stages
-measure different work. Current Order 101 repairs invalidate that head as final
+measure different work. Subsequent Order 101 repairs invalidated that head as final
 validation for their code; retain the raw evidence for throughput comparison.
+
+The merged Order 101 baseline is `38ce2265b81f2c0b2c9c668dae7536c239095193`:
+local covered validation took 884.9526 seconds on the Mac with 18 workers;
+complete Linux run [36798414956](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/36798414956)
+took 29m17s. These are historical full-validation measurements, not same-host
+Windows optimization comparisons. See the [throughput evidence](performance/THROUGHPUT_AFTER_101.md).
 
 ## Version 963 source intake
 

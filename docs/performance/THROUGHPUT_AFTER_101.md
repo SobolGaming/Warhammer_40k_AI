@@ -57,8 +57,35 @@ An earlier overlapping warm-up is retained and excluded with that reason.
 The separate baseline diagnostic measured catalog construction counts of
 3/6/3 for weapon inventory/Harassment Fire/Piratical Hero. The complete baseline
 profile measured 1,638,510 area-polygon constructions and 115,933 geometry-score
-calls. Final comparative results and gate receipts must identify their actual
-measured source revision; this document does not yet certify a final head.
+calls.
+
+Measured head `a835a65b5017c30adb7ecfda4a952bbbd808e0f7` completed focused samples
+in 57.2138798 and 57.1577422 seconds, and generator samples in 148.7646463 and
+147.6513555 seconds. Mean reductions are 74.87% and 52.86% respectively, for
+these workloads only. Every invocation succeeded. Two samples do not establish
+a population tail; the machine-readable nearest-rank p95 equals the observed
+maximum. [Numeric results](throughput_after_101.json) retain UTC sample times,
+receipt hashes, commands' input hashes, machine metadata and scope limitations.
+
+The workload-driver hash is identical across base/head. Earlier base-focused
+launcher receipts predate the added launcher hash/environment metadata and
+dedicated pytest temp root; no authenticated identical launcher-hash claim is
+made. The subprocess workloads are unchanged, and neither selected test uses a
+temporary-path fixture. All raw receipts, including failed setup/type/lint and
+contract-portability iterations, remain separate from successful timing samples.
+
+Separate head diagnostics measured one catalog construction per affected test
+and four distinct mutable states, matching the base state count. The complete
+generator still performed 115,933 geometry-score evaluations across all 45 layouts. Area-polygon
+construction fell to 67,097; actual cache hits/misses/current capacities are
+recorded in the numeric evidence. Windows measured a 105,111,552-byte peak working
+set for that cProfile-instrumented process, including native Shapely allocations.
+This is not a baseline memory comparison or an unprofiled timing sample.
+
+Later CLI/default, manifest and explanatory-document changes retain this true
+measured revision; they must not relabel its timing receipts as a later head.
+Complete local/hosted validation and both final-head reviews remain separate
+delivery requirements.
 
 ## Complete Linux evidence and twelve-shard trial
 

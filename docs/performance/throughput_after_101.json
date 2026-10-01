@@ -1,0 +1,336 @@
+{
+  "workload_id": "validation-throughput-after-101-v1",
+  "scope": "Two existing catalog tests and complete 45-layout offline builder; not full games or whole-suite speedup",
+  "base_revision": "38ce2265b81f2c0b2c9c668dae7536c239095193",
+  "measured_head_revision": "a835a65b5017c30adb7ecfda4a952bbbd808e0f7",
+  "machine": {
+    "utc": "2026-10-01T02:17:53.4927903Z",
+    "computer": "DESKTOP-E9A8G46",
+    "os": "Microsoft Windows NT 10.0.26200.0",
+    "logical_processors": 64,
+    "processor": "AMD64 Family 23 Model 49 Stepping 0, AuthenticAMD",
+    "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor ",
+    "node": "v24.19.0",
+    "uv": "uv 0.11.14 (3fdfdc7d4 2026-05-12 x86_64-pc-windows-msvc)",
+    "python": "Python 3.14.5",
+    "git": "git version 2.55.0.windows.5"
+  },
+  "memory": {
+    "utc": "2026-10-01T02:22:30.2825889Z",
+    "total_physical_bytes": 137327259648,
+    "free_physical_kib": 103876536,
+    "total_visible_kib": 134108652,
+    "logical_processors": 64,
+    "processors": 1
+  },
+  "measurement": "Fresh processes, serial, no coverage/profiler/competing test workers; command startup included",
+  "sample_limit": "Two samples per workload/revision; p95 is nearest-rank maximum and does not estimate a population tail",
+  "launcher_limit": "Identical workload-driver SHA and subprocess workload; original base-focused launcher lacks later runner-SHA/environment fields. Launcher metadata and a dedicated pytest temp root were added afterward. Neither selected test uses tmp_path; do not claim an authenticated identical launcher hash.",
+  "exclusions": [
+    {
+      "name": "base-focused-1",
+      "reason": "Initial warm-up overlapped other setup; retained separately, excluded from comparison"
+    }
+  ],
+  "workloads": {
+    "focused": {
+      "base": {
+        "samples": [
+          {
+            "name": "base-focused-sample-1",
+            "started_at": "2026-10-01T02:23:22.078333+00:00",
+            "finished_at": "2026-10-01T02:27:11.163991+00:00",
+            "duration_seconds": 229.08589330001269,
+            "exit_code": 0,
+            "receipt": "20261001T022322077333Z-base-focused-sample-1.json",
+            "receipt_sha256": "a36d247380665266ca37c1c8bf98924bc7c555ff95249bc31a055dc86bdaee04"
+          },
+          {
+            "name": "base-focused-sample-2",
+            "started_at": "2026-10-01T02:27:11.278990+00:00",
+            "finished_at": "2026-10-01T02:30:57.358990+00:00",
+            "duration_seconds": 226.08039019990247,
+            "exit_code": 0,
+            "receipt": "20261001T022711278990Z-base-focused-sample-2.json",
+            "receipt_sha256": "522a44656d586c0b1c611c222d2de96e826dc5e80c8883f392176e21c1c70b8a"
+          }
+        ],
+        "count": 2,
+        "completion_rate": 1.0,
+        "mean_seconds": 227.58314174995758,
+        "median_seconds": 227.58314174995758,
+        "p95_nearest_rank_seconds": 229.08589330001269,
+        "maximum_seconds": 229.08589330001269,
+        "units_per_second": 0.008787997145225159
+      },
+      "head": {
+        "samples": [
+          {
+            "name": "head-focused-sample-1",
+            "started_at": "2026-10-01T03:18:26.678726+00:00",
+            "finished_at": "2026-10-01T03:19:23.892573+00:00",
+            "duration_seconds": 57.21387979993597,
+            "exit_code": 0,
+            "receipt": "20261001T031826678726Z-head-focused-sample-1.json",
+            "receipt_sha256": "c5fac95efb4169fffb01778594e60a542c02a714a6401903775505951baf1f7a"
+          },
+          {
+            "name": "head-focused-sample-2",
+            "started_at": "2026-10-01T03:19:24.015573+00:00",
+            "finished_at": "2026-10-01T03:20:21.172626+00:00",
+            "duration_seconds": 57.157742199953645,
+            "exit_code": 0,
+            "receipt": "20261001T031924014573Z-head-focused-sample-2.json",
+            "receipt_sha256": "772c1bfa57f9496badd8ea94a83f59b4c23b9c18b247e669d2847f2807253b14"
+          }
+        ],
+        "count": 2,
+        "completion_rate": 1.0,
+        "mean_seconds": 57.185810999944806,
+        "median_seconds": 57.185810999944806,
+        "p95_nearest_rank_seconds": 57.21387979993597,
+        "maximum_seconds": 57.21387979993597,
+        "units_per_second": 0.034973710524135615
+      },
+      "units_per_invocation": 2,
+      "mean_reduction_percent": 74.87256280925499,
+      "base_inputs": {
+        "utc": "2026-10-01T02:23:21.903753+00:00",
+        "head": "38ce2265b81f2c0b2c9c668dae7536c239095193",
+        "files_sha256": {
+          "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+          "pyproject.toml": "b0fed8cc1f2a25bec5821a96f50e0d7da47ec5e9e8e17df528cd6f69c6d67192",
+          "tools/build_event_companion_battlefields.py": "f9cc1b51588f85494d73495fbaa2c436156ca15d306b8801aeb575ba157b3c31",
+          "tools/event_companion_battlefield_builder_geometry.py": "943355b806307419b409dc2609c8557346341a5951bc5013d5819662d54d7bb9",
+          "tests/unit/test_aeldari_yriel_vypers_starfangs_datasheets.py": "5f81e2719509095686a408a5212fe1eb04630cb2999bc22fef8f2d1c36e8af56",
+          "src/warhammer40k_core/_engine_build_manifest.json": "2f831dd3b558e9ccf8ce0227e1eafdf4ff675a622e3301fb81cf6e1e402483bb",
+          "data/source_audits/event_companion_2026_06/phase17n_event_companion_battlefields_pages_9_53_extraction.json": "a3e9392adeb52696902a016e3c3529933d1e99f3bfd67069d607410d8e1c137f",
+          "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/artifacts/event-companion-battlefields.json": "028670e0b1d965b7be90a95ba76f6bc74e7e26d3d1fd93b3dbf9e76e105d9b7f"
+        },
+        "script_sha256": "b976eb7452481ca33094f3d701cc1a79761c514504d54b2b2ef19ac5a5a9adca"
+      },
+      "head_inputs": {
+        "utc": "2026-10-01T03:18:26.512725+00:00",
+        "head": "a835a65b5017c30adb7ecfda4a952bbbd808e0f7",
+        "files_sha256": {
+          "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+          "pyproject.toml": "b0fed8cc1f2a25bec5821a96f50e0d7da47ec5e9e8e17df528cd6f69c6d67192",
+          "tools/build_event_companion_battlefields.py": "f9cc1b51588f85494d73495fbaa2c436156ca15d306b8801aeb575ba157b3c31",
+          "tools/event_companion_battlefield_builder_geometry.py": "c2ad130715c14a2cea3a287ba4d4587c4e16931b3439bd597b52aa11b555bf41",
+          "tests/unit/test_aeldari_yriel_vypers_starfangs_datasheets.py": "a6f279f5e750de53a9ffa9034dd9f800908f29c24fbcf11e2c67a13e106855d8",
+          "src/warhammer40k_core/_engine_build_manifest.json": "2f831dd3b558e9ccf8ce0227e1eafdf4ff675a622e3301fb81cf6e1e402483bb",
+          "data/source_audits/event_companion_2026_06/phase17n_event_companion_battlefields_pages_9_53_extraction.json": "a3e9392adeb52696902a016e3c3529933d1e99f3bfd67069d607410d8e1c137f",
+          "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/artifacts/event-companion-battlefields.json": "028670e0b1d965b7be90a95ba76f6bc74e7e26d3d1fd93b3dbf9e76e105d9b7f"
+        },
+        "script_sha256": "b976eb7452481ca33094f3d701cc1a79761c514504d54b2b2ef19ac5a5a9adca"
+      }
+    },
+    "layout": {
+      "base": {
+        "samples": [
+          {
+            "name": "base-layout-sample-1",
+            "started_at": "2026-10-01T02:36:12.262031+00:00",
+            "finished_at": "2026-10-01T02:41:24.401772+00:00",
+            "duration_seconds": 312.14029160002246,
+            "exit_code": 0,
+            "receipt": "20261001T023612261031Z-base-layout-sample-1.json",
+            "receipt_sha256": "ae299176ea4cd823f88965b3b6f081878d51156f6655e9c082d27ab57bb2d073"
+          },
+          {
+            "name": "base-layout-sample-2",
+            "started_at": "2026-10-01T02:41:24.510772+00:00",
+            "finished_at": "2026-10-01T02:46:41.229276+00:00",
+            "duration_seconds": 316.71825849998277,
+            "exit_code": 0,
+            "receipt": "20261001T024124509772Z-base-layout-sample-2.json",
+            "receipt_sha256": "3f65773b3a0fc9fa1bbdc0e7c509fdb141be5e5799768b70c1e9c988f897bfed"
+          }
+        ],
+        "count": 2,
+        "completion_rate": 1.0,
+        "mean_seconds": 314.4292750500026,
+        "median_seconds": 314.4292750500026,
+        "p95_nearest_rank_seconds": 316.71825849998277,
+        "maximum_seconds": 316.71825849998277,
+        "units_per_second": 0.1431164448438963
+      },
+      "head": {
+        "samples": [
+          {
+            "name": "head-layout-sample-1",
+            "started_at": "2026-10-01T03:20:21.470626+00:00",
+            "finished_at": "2026-10-01T03:22:50.235790+00:00",
+            "duration_seconds": 148.76464629999828,
+            "exit_code": 0,
+            "receipt": "20261001T032021470626Z-head-layout-sample-1.json",
+            "receipt_sha256": "a77f619d34f3d24e2ab4f7f3122f7bbc866a300b10cc508fd1097fe20b499e07"
+          },
+          {
+            "name": "head-layout-sample-2",
+            "started_at": "2026-10-01T03:22:50.366961+00:00",
+            "finished_at": "2026-10-01T03:25:18.018020+00:00",
+            "duration_seconds": 147.65135549998377,
+            "exit_code": 0,
+            "receipt": "20261001T032250365956Z-head-layout-sample-2.json",
+            "receipt_sha256": "38ee303e2624a2bb78bb2b10834c6db677defaf240e37b124ff202cf8a67b1df"
+          }
+        ],
+        "count": 2,
+        "completion_rate": 1.0,
+        "mean_seconds": 148.20800089999102,
+        "median_seconds": 148.20800089999102,
+        "p95_nearest_rank_seconds": 148.76464629999828,
+        "maximum_seconds": 148.76464629999828,
+        "units_per_second": 0.3036273327130663
+      },
+      "units_per_invocation": 45,
+      "mean_reduction_percent": 52.86443958616067,
+      "base_inputs": {
+        "utc": "2026-10-01T02:36:12.102032+00:00",
+        "head": "38ce2265b81f2c0b2c9c668dae7536c239095193",
+        "files_sha256": {
+          "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+          "pyproject.toml": "b0fed8cc1f2a25bec5821a96f50e0d7da47ec5e9e8e17df528cd6f69c6d67192",
+          "tools/build_event_companion_battlefields.py": "f9cc1b51588f85494d73495fbaa2c436156ca15d306b8801aeb575ba157b3c31",
+          "tools/event_companion_battlefield_builder_geometry.py": "943355b806307419b409dc2609c8557346341a5951bc5013d5819662d54d7bb9",
+          "tests/unit/test_aeldari_yriel_vypers_starfangs_datasheets.py": "5f81e2719509095686a408a5212fe1eb04630cb2999bc22fef8f2d1c36e8af56",
+          "src/warhammer40k_core/_engine_build_manifest.json": "2f831dd3b558e9ccf8ce0227e1eafdf4ff675a622e3301fb81cf6e1e402483bb",
+          "data/source_audits/event_companion_2026_06/phase17n_event_companion_battlefields_pages_9_53_extraction.json": "a3e9392adeb52696902a016e3c3529933d1e99f3bfd67069d607410d8e1c137f",
+          "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/artifacts/event-companion-battlefields.json": "028670e0b1d965b7be90a95ba76f6bc74e7e26d3d1fd93b3dbf9e76e105d9b7f"
+        },
+        "script_sha256": "b976eb7452481ca33094f3d701cc1a79761c514504d54b2b2ef19ac5a5a9adca"
+      },
+      "head_inputs": {
+        "utc": "2026-10-01T03:20:21.307626+00:00",
+        "head": "a835a65b5017c30adb7ecfda4a952bbbd808e0f7",
+        "files_sha256": {
+          "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+          "pyproject.toml": "b0fed8cc1f2a25bec5821a96f50e0d7da47ec5e9e8e17df528cd6f69c6d67192",
+          "tools/build_event_companion_battlefields.py": "f9cc1b51588f85494d73495fbaa2c436156ca15d306b8801aeb575ba157b3c31",
+          "tools/event_companion_battlefield_builder_geometry.py": "c2ad130715c14a2cea3a287ba4d4587c4e16931b3439bd597b52aa11b555bf41",
+          "tests/unit/test_aeldari_yriel_vypers_starfangs_datasheets.py": "a6f279f5e750de53a9ffa9034dd9f800908f29c24fbcf11e2c67a13e106855d8",
+          "src/warhammer40k_core/_engine_build_manifest.json": "2f831dd3b558e9ccf8ce0227e1eafdf4ff675a622e3301fb81cf6e1e402483bb",
+          "data/source_audits/event_companion_2026_06/phase17n_event_companion_battlefields_pages_9_53_extraction.json": "a3e9392adeb52696902a016e3c3529933d1e99f3bfd67069d607410d8e1c137f",
+          "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/artifacts/event-companion-battlefields.json": "028670e0b1d965b7be90a95ba76f6bc74e7e26d3d1fd93b3dbf9e76e105d9b7f"
+        },
+        "script_sha256": "b976eb7452481ca33094f3d701cc1a79761c514504d54b2b2ef19ac5a5a9adca"
+      }
+    }
+  },
+  "catalog_diagnostics": {
+    "base": {
+      "phase": "base",
+      "instrumented_diagnostic_not_timing": true,
+      "tests": {
+        "test_catalog_preserves_every_weapon_profile": {
+          "package_constructions": 3,
+          "assertions_passed": true
+        },
+        "test_harassment_fire_targets_one_attached_rules_unit_and_suppresses_both_components": {
+          "package_constructions": 6,
+          "assertions_passed": true
+        },
+        "test_piratical_hero_grants_only_while_yriel_is_leading_an_attached_unit": {
+          "package_constructions": 3,
+          "assertions_passed": true
+        }
+      },
+      "immutable_wargear_nested_objects": {
+        "tuple": 16513,
+        "Wargear": 3756,
+        "WeaponProfile": 3912,
+        "RangeProfile": 3912,
+        "AttackProfile": 3912,
+        "CharacteristicValue": 11736,
+        "DamageProfile": 3912,
+        "DiceExpression": 1380,
+        "AbilityDescriptor": 1644,
+        "AbilityParameter": 1512
+      },
+      "distinct_states": 4,
+      "build_objects_retained_to_check_identity": 12
+    },
+    "head": {
+      "phase": "head",
+      "instrumented_diagnostic_not_timing": true,
+      "tests": {
+        "test_catalog_preserves_every_weapon_profile": {
+          "package_constructions": 1,
+          "assertions_passed": true
+        },
+        "test_harassment_fire_targets_one_attached_rules_unit_and_suppresses_both_components": {
+          "package_constructions": 1,
+          "assertions_passed": true
+        },
+        "test_piratical_hero_grants_only_while_yriel_is_leading_an_attached_unit": {
+          "package_constructions": 1,
+          "assertions_passed": true
+        }
+      },
+      "immutable_wargear_nested_objects": {
+        "tuple": 4129,
+        "Wargear": 939,
+        "WeaponProfile": 978,
+        "RangeProfile": 978,
+        "AttackProfile": 978,
+        "CharacteristicValue": 2934,
+        "DamageProfile": 978,
+        "DiceExpression": 345,
+        "AbilityDescriptor": 411,
+        "AbilityParameter": 378
+      },
+      "distinct_states": 4,
+      "build_objects_retained_to_check_identity": 3
+    }
+  },
+  "generator_diagnostic": {
+    "diagnostic_only": true,
+    "head": "a835a65b5017c30adb7ecfda4a952bbbd808e0f7",
+    "started_at": "2026-10-01T03:26:38.725185+00:00",
+    "finished_at": "2026-10-01T03:29:46.654046+00:00",
+    "complete_45_layout_check": "passed",
+    "script_sha256": "0e85887f5c31de790646aafdc90b32566c7c6c04ab6630a6e9b635feed7ce69e",
+    "geometry_sha256": "c2ad130715c14a2cea3a287ba4d4587c4e16931b3439bd597b52aa11b555bf41",
+    "python_version": "3.14.5 (main, May 10 2026, 20:29:46) [MSC v.1944 64 bit (AMD64)]",
+    "shapely_version": "2.1.2",
+    "geos_version": "3.13.1",
+    "memory_measurement": "GetProcessMemoryInfo of this cProfile-instrumented process; includes native allocations",
+    "peak_working_set_bytes": 105111552,
+    "working_set_bytes": 77586432,
+    "caches": {
+      "area_polygon": {
+        "hits": 1571413,
+        "misses": 67097,
+        "maxsize": 4096,
+        "currsize": 4096
+      },
+      "_pair_geometry": {
+        "hits": 11092341,
+        "misses": 1034115,
+        "maxsize": 65536,
+        "currsize": 65536
+      },
+      "_outside_area": {
+        "hits": 1598270,
+        "misses": 65810,
+        "maxsize": 4096,
+        "currsize": 4096
+      }
+    }
+  },
+  "baseline_generator_profile": {
+    "area_polygon_calls": 1638510,
+    "geometry_score_calls": 115933,
+    "layout_rows": 45,
+    "diagnostic_only": true
+  },
+  "historical_full_validation": {
+    "local_mac_18_workers_seconds": 884.9526,
+    "hosted_baseline_run_id": 36798414956,
+    "hosted_wall_seconds": 1757,
+    "raw_job_duration_sum_seconds": 12836,
+    "limits": "Different work and hosts; raw job durations are not billed cost. No whole-suite Windows speedup is established."
+  },
+  "hosted_twelve_shard_status": "Pending complete measured trial and final profile refresh"
+}

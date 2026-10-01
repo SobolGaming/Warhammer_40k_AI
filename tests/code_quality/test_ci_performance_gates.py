@@ -228,7 +228,11 @@ def test_junit_profiles_reject_incomplete_or_invalid_runs(
         sharding._durations_from_junit(report)
 
 
-def test_quality_gate_requires_every_independent_lane_even_when_skipped() -> None:
+def test_quality_gate_requires_every_independent_lane_even_when_skipped(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr("sys.argv", ["build_test_shards.py", "--check"])
+    assert sharding.main() == 0
     workflow = WORKFLOW_PATH.read_text(encoding="utf-8")
     aggregate = workflow.partition("\n  quality-fast:\n")[2].partition("\n  lint:\n")[0]
     assert "if: always()" in aggregate
