@@ -578,6 +578,28 @@
         }
       }
     },
+    "tests/code_quality/test_phase14a_source_identity.py": {
+      "before_sha256": "ca140b4ccc1a7633eeef5f57f8e7d801d3ec21c6606d1fce6d73b9116d091d36",
+      "after_sha256": "22146cd184b4267c71b482cba021cd31387c8df1bd4a0d27f1157647cbc93e8b",
+      "owners": {
+        "_without_non_edition_references": {
+          "before": null,
+          "after": "e2f2407fcd476e5542f3d0a732b0d4fda2077a617277c42edc4e263c20027d5d"
+        },
+        "test_active_code_tests_and_docs_do_not_reference_retired_edition_ids": {
+          "before": "4bc0c4c838c3581e2165a4981b17e47360b0f96de0115fd3c85aeb76b1fa57a3",
+          "after": "655d9188731811f19bfd6fb6d479c9d24fe045566950ec676346371f4ea9ceb0"
+        },
+        "test_edition_audit_does_not_exempt_near_miss_phase_references": {
+          "before": null,
+          "after": "859f37cfbd67c9de07cd62bd3d7614982bdfe5ba7d42afed50c7979e37b02184"
+        },
+        "test_edition_audit_recognizes_the_exact_quoted_phase_test_filename": {
+          "before": null,
+          "after": "86a9c52e1968ce451afe606fb73c8fffec3efc600e51d9adf46267df4c01f72c"
+        }
+      }
+    },
     "tests/code_quality/test_phase18i_interaction_contract.py": {
       "before_sha256": "ce403dacbf89216afdec79ddbf878255e7c2f14d613839ea6a6d1c6b3e63ac4e",
       "after_sha256": "dd583f22252248c5128a44b2a99708ef88294d89de88d52c8553521b4049cd17",
@@ -987,6 +1009,14 @@
       "operations": [],
       "selected_families": [],
       "rationale": "Required governance tooling/tests/CI validate applicability and run bounded real current workloads; this policy-only change leaves production runtime and historical benchmark drivers untouched.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/code_quality/test_phase14a_source_identity.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Edition-identity audit recognizes only one exact quoted existing Phase10E provenance filename, while preserving real retired-edition tokens, near-miss rejection and all scanned paths; no runtime or measured-work change.",
       "source_obligation": null,
       "unchanged_work": null
     },
