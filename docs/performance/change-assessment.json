@@ -14,6 +14,16 @@
         }
       }
     },
+    ".gitignore": {
+      "before_sha256": "ea980539ba25983e1e94b3dc2cc9e99f12db51d82cb3bf22c0cf04a67c3af7ff",
+      "after_sha256": "7ccf37e49d62f4cb7493d0e4174d06dd4289ead1b2e088839f170503a055ae04",
+      "owners": {
+        "@document": {
+          "before": "ea980539ba25983e1e94b3dc2cc9e99f12db51d82cb3bf22c0cf04a67c3af7ff",
+          "after": "7ccf37e49d62f4cb7493d0e4174d06dd4289ead1b2e088839f170503a055ae04"
+        }
+      }
+    },
     "AGENTS.md": {
       "before_sha256": "a3f0daf107d13c471957d295a9eae855cd3f6242a1df0f1515d8648fe174a6eb",
       "after_sha256": "76801ae91602ab66a164e7d4500294977bd92725ca78026472ddfcd23f20e309",
@@ -472,7 +482,7 @@
     },
     "tests/code_quality/test_performance_policy.py": {
       "before_sha256": null,
-      "after_sha256": "ac2d2d5b5b24dc0bc30283de9ac6593555c41fcf8f704b57ac8dc14d7699a7cc",
+      "after_sha256": "afc867bf101ca695521aaed62678600cb4e296441492df145adabe02d4119aeb",
       "owners": {
         "@module": {
           "before": null,
@@ -557,6 +567,10 @@
         "test_sensitive_operations_cannot_be_downgraded_or_omitted": {
           "before": null,
           "after": "96d6bbacb35335e12e4e5a355f8092502f28a13496d2f9c0dc706ac53655b4ea"
+        },
+        "test_smoke_outputs_do_not_change_assessed_inputs_or_hide_unrelated_reports": {
+          "before": null,
+          "after": "9ae8d4196965e2ba772e9b03f65246999479f944801ebb73ec04b671e97bcbd1"
         },
         "test_smoke_validation_rejects_incomplete_stale_or_slow_attempts": {
           "before": null,
@@ -713,6 +727,14 @@
   },
   "rows": {
     ".github/workflows/ci.yml": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Required governance tooling/tests/CI validate applicability and run bounded real current workloads; this policy-only change leaves production runtime and historical benchmark drivers untouched.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    ".gitignore": {
       "category": "governance",
       "operations": [],
       "selected_families": [],

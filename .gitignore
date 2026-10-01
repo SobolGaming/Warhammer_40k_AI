@@ -50,6 +50,9 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
+# Derived serial performance receipts are uploaded as CI artifacts.
+/reports/performance-smoke.json
+/reports/performance-attempts/
 
 # Translations
 *.mo

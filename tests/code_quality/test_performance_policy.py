@@ -515,6 +515,18 @@ def test_current_smoke_is_in_the_required_serial_ci_lane() -> None:
     assert "needs: [lint, contract-conformance, code-quality" in workflow
 
 
+def test_smoke_outputs_do_not_change_assessed_inputs_or_hide_unrelated_reports() -> None:
+    from tools.performance_policy import git
+
+    outputs = (
+        "reports/performance-smoke.json",
+        "reports/performance-attempts/example/result.json",
+    )
+    assert set(git(ROOT, "check-ignore", *outputs).decode().splitlines()) == set(outputs)
+    with pytest.raises(subprocess.CalledProcessError):
+        git(ROOT, "check-ignore", "reports/unrelated-source.json")
+
+
 def test_a_recognized_neighbor_cannot_cover_an_unknown_changed_owner() -> None:
     path = "src/warhammer40k_core/engine/lifecycle.py"
     value, changes, mapping = _assessment(
