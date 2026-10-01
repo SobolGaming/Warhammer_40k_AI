@@ -340,13 +340,14 @@ uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 ```
 
 Download the `behavior-report-*` artifacts from each chosen successful run into a
-separate directory, then regenerate (repeat both options for additional runs):
+separate directory outside the checkout, then regenerate (repeat both options for
+additional runs). Downloaded profiles are supplied inputs, not generated source:
 
 ```bash
 uv run --no-sync python scripts/build_test_shards.py \
-  --junit reports/run-one \
+  --junit ../behavior-reports/run-one \
   --profile-source "RUN_URL; commit SHA; ubuntu-latest; 4 workers per shard" \
-  --junit reports/run-two \
+  --junit ../behavior-reports/run-two \
   --profile-source "RUN_URL; commit SHA; ubuntu-latest; 4 workers per shard" \
   --shard-count 12
 ```
