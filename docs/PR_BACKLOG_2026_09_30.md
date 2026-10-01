@@ -10,6 +10,8 @@ or implemented by this backlog entry.
 
 1. Complete Order 101 / P03F, including its current restore repairs, exact-head
    independent coding/Astra reviews and full validation; verify merged remote main.
+   Completed in [PR #524](https://github.com/SobolGaming/Warhammer_40k_AI/pull/524);
+   remote main verified at `38ce2265b81f2c0b2c9c668dae7536c239095193` on 1 October 2026.
 2. Implement `THROUGHPUT-AFTER-101` as a separate PR before Order 102.
 3. Resume Order 102 onward. Reconcile version 963 full source observations and
    consumer mappings before each affected order; schedule any additional repair
