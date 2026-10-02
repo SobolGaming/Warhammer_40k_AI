@@ -7300,6 +7300,31 @@ hosts share validation and completion. Both viewers use the existing public batt
 projection and event redaction. Exact runtime matching still applies to persistence
 and replay; no historical saves are migrated.
 
+## Order 102: Fight selection completion (Contract 42.2)
+
+The public `fight_selection_completed` event records one consumed Fight
+selection before any armed retained cleanup. Its payload carries game, round,
+Fight phase, the full activation selection, nullable `attack_sequence_id`, and
+`has_fought`; a forced context is included only for an actual forced selection.
+The existing `unit_has_fought` event now requires an executed melee attack,
+including a miss or automatic hit, bound to the same completed executor. An empty
+or weaponless selection emits no actual-fought event and opens no after-fought
+window. Existing once-only eligibility still consumes that selection.
+
+`fight_activation_completed` remains the final selection event. Armed retained
+cleanup may pause before it; restoring and resuming cannot repeat either event.
+An empty retained selection completes while the model remains present until the
+existing end-of-phase cleanup. Engaging retains its forced selection owner;
+Shock disembark does not create one.
+
+This minor version documents corrected event semantics and one additive event.
+The event-delta envelope already accepts open event names and JSON payloads.
+No decision, submission-validation, mutation or visibility protocol changes;
+schema family versions and immutable 42.0 persistence contract remain unchanged.
+Normal JSON persistence, both viewer projections/event streams and exact replay
+use the same authority. Saves and replay still require the exact engine build;
+there is no migration of earlier histories.
+
 ## Order 96: optional intrinsic wound rerolls
 
 Twin-linked joins the existing finite `select_dice_reroll` source-backed attack

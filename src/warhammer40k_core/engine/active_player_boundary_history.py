@@ -227,7 +227,7 @@ def _fold_scopes(
         completed = [
             prior
             for prior in decisions.event_log.records[:index]
-            if prior.event_type == "unit_has_fought"
+            if prior.event_type == "fight_selection_completed"
             and isinstance(prior.payload, dict)
             and prior.payload.get("activation_selection") == selected
         ]

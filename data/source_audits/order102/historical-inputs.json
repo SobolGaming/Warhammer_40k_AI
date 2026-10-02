@@ -1,0 +1,25 @@
+{
+  "reviewed_commit": "8007555ef23e85c11d39b294acec02bd83fc3271",
+  "also_present_at_base": "ba3e3898e53bce6d8c23570e1ddaa224af59d55c",
+  "purpose": "Authenticate unchanged original Order97 assertion inventory, not current Order102 semantic compliance. Current tests still execute in normal suites.",
+  "current_evidence": "docs/ORDER_102_SCOPE_PLAN.md",
+  "files": [
+    {
+      "path": "tests/unit/test_phase15c_fight_order.py",
+      "historical_path": "data/source_audits/order102/baseline/tests/unit/test_phase15c_fight_order.py.txt",
+      "sha256": "0f3d5232ae42bb718ff0da4e6a1cb50017acbed5d317c6d468c1cd938c312f4b",
+      "bytes": 305916,
+      "order97_file_pin": "0f3d5232ae42bb718ff0da4e6a1cb50017acbed5d317c6d468c1cd938c312f4b"
+    },
+    {
+      "path": "tests/completed_attack_fixture_helpers.py",
+      "historical_path": "data/source_audits/order102/baseline/tests/completed_attack_fixture_helpers.py.txt",
+      "sha256": "b6bf51193ee90beb5a08af3df8943848c47f2c90aeec8cd8ee82674c10a741ca",
+      "bytes": 19339,
+      "order97_file_pin": "b6bf51193ee90beb5a08af3df8943848c47f2c90aeec8cd8ee82674c10a741ca"
+    }
+  ],
+  "addressed_requirements": [
+    "04.03.05-obligation-04"
+  ]
+}

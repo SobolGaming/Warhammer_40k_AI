@@ -1,950 +1,780 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "ae5005f4eb13378190018718c287abd94fb9320d",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:de19a3758fe8f3cf8272f0fd0bc6cfa83179f39824b9104c25dd046090cdc851",
-  "operation_map_sha256": "4c5dc1b5208f5afa0a2444281557f11b9d86fce0f5c31df5adaef9234b887b0d",
+  "base": "ba3e3898e53bce6d8c23570e1ddaa224af59d55c",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0291fd08bb730575da8e064d519fdc083a22f27b98ab5aa5e076055dc5a18a46",
+  "operation_map_sha256": "f47974f7ce6c1e06aa1e58af051ce91e99d5a57f8378e4c9e9364defdfd0864d",
   "changes": {
     "README.md": {
-      "before_sha256": "9bdaa7517d7871066f383ae0c427aca163bb83360cb9238d365453832228e0fd",
-      "after_sha256": "6fedfb7d04ba056c5772bad924926a18de219a463eaafb4381c5937a968f7317",
+      "before_sha256": "6fedfb7d04ba056c5772bad924926a18de219a463eaafb4381c5937a968f7317",
+      "after_sha256": "e178de8abefe259403a2a0c60a6c7a4fffc197b766b846eaba72144be19a66c7",
       "owners": {
         "@document": {
-          "before": "9bdaa7517d7871066f383ae0c427aca163bb83360cb9238d365453832228e0fd",
-          "after": "6fedfb7d04ba056c5772bad924926a18de219a463eaafb4381c5937a968f7317"
+          "before": "6fedfb7d04ba056c5772bad924926a18de219a463eaafb4381c5937a968f7317",
+          "after": "e178de8abefe259403a2a0c60a6c7a4fffc197b766b846eaba72144be19a66c7"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "b89aa269092f8ca05722214804eab9e9bc5ed117fad7d1110ff1f56ccfa09a5d",
-      "after_sha256": "22a714b177447c6f8b44dbf0956d72a26feca9454d117182666e9915a7421885",
+      "before_sha256": "22a714b177447c6f8b44dbf0956d72a26feca9454d117182666e9915a7421885",
+      "after_sha256": "44c76a23ffed87e0cc07c018afa065dc79d8947577a8a258c17ac4ca51bbe424",
       "owners": {
         "@document": {
-          "before": "b89aa269092f8ca05722214804eab9e9bc5ed117fad7d1110ff1f56ccfa09a5d",
-          "after": "22a714b177447c6f8b44dbf0956d72a26feca9454d117182666e9915a7421885"
+          "before": "22a714b177447c6f8b44dbf0956d72a26feca9454d117182666e9915a7421885",
+          "after": "44c76a23ffed87e0cc07c018afa065dc79d8947577a8a258c17ac4ca51bbe424"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "ea6f3441ea480626144ead815d08110376fe15739fb14f9c9528059025cada4f",
-      "after_sha256": "30291e9429c08511184249aaa1c97899ebe55a27d5d30bdbc5906795233b8a67",
+      "before_sha256": "30291e9429c08511184249aaa1c97899ebe55a27d5d30bdbc5906795233b8a67",
+      "after_sha256": "2a181a038e268be85b176ca2c074f17fb21b01160596fb6632c095f8ff8ba92b",
       "owners": {
         "@document": {
-          "before": "ea6f3441ea480626144ead815d08110376fe15739fb14f9c9528059025cada4f",
-          "after": "30291e9429c08511184249aaa1c97899ebe55a27d5d30bdbc5906795233b8a67"
+          "before": "30291e9429c08511184249aaa1c97899ebe55a27d5d30bdbc5906795233b8a67",
+          "after": "2a181a038e268be85b176ca2c074f17fb21b01160596fb6632c095f8ff8ba92b"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "fb880d5cdb518342ddce8432294bbef7a21bbb2b94c07d40722e7ba529ffe15e",
-      "after_sha256": "7b6b87317b1eac6b7bf0efd1fd46d10f9c0dfe79b2787867ef6c9ec077d78f18",
+      "before_sha256": "7b6b87317b1eac6b7bf0efd1fd46d10f9c0dfe79b2787867ef6c9ec077d78f18",
+      "after_sha256": "abef9643df6e5a0d8074885b8ade3cb377bd8ed25c0a416f348cf6f08c7d9259",
       "owners": {
         "@document": {
-          "before": "fb880d5cdb518342ddce8432294bbef7a21bbb2b94c07d40722e7ba529ffe15e",
-          "after": "7b6b87317b1eac6b7bf0efd1fd46d10f9c0dfe79b2787867ef6c9ec077d78f18"
+          "before": "7b6b87317b1eac6b7bf0efd1fd46d10f9c0dfe79b2787867ef6c9ec077d78f18",
+          "after": "abef9643df6e5a0d8074885b8ade3cb377bd8ed25c0a416f348cf6f08c7d9259"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "3383e9d1c33ca2c4b08cec60592c10e292a5bf2b5ed2ca3c99730dfdbdbfa955",
-      "after_sha256": "93ac261044785d518e79b6434e11c0b4335b32433762ef9bc6f002f9350aea7d",
+      "before_sha256": "93ac261044785d518e79b6434e11c0b4335b32433762ef9bc6f002f9350aea7d",
+      "after_sha256": "b41d7d819613f4a917bd9139440e80be1c132cc0d4492beb848e7321fdcddefa",
       "owners": {
         "@document": {
-          "before": "3383e9d1c33ca2c4b08cec60592c10e292a5bf2b5ed2ca3c99730dfdbdbfa955",
-          "after": "93ac261044785d518e79b6434e11c0b4335b32433762ef9bc6f002f9350aea7d"
+          "before": "93ac261044785d518e79b6434e11c0b4335b32433762ef9bc6f002f9350aea7d",
+          "after": "b41d7d819613f4a917bd9139440e80be1c132cc0d4492beb848e7321fdcddefa"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "a88061af9add24e5dc7ca5d937ae0c0160fc6ca85a8fedc222608ac2e76f133d",
-      "after_sha256": "6e0377ebba06d5b07f8f53666f020ed3799a8f73bdcfcd82fd66d796d4cf04e1",
+      "before_sha256": "6e0377ebba06d5b07f8f53666f020ed3799a8f73bdcfcd82fd66d796d4cf04e1",
+      "after_sha256": "c17b550f3ab5b9a6c3cdeb1b1d1fb9e7c341ca6f91ae000a2fda44a7c44d643b",
       "owners": {
         "@document": {
-          "before": "a88061af9add24e5dc7ca5d937ae0c0160fc6ca85a8fedc222608ac2e76f133d",
-          "after": "6e0377ebba06d5b07f8f53666f020ed3799a8f73bdcfcd82fd66d796d4cf04e1"
+          "before": "6e0377ebba06d5b07f8f53666f020ed3799a8f73bdcfcd82fd66d796d4cf04e1",
+          "after": "c17b550f3ab5b9a6c3cdeb1b1d1fb9e7c341ca6f91ae000a2fda44a7c44d643b"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "b0047262c12ea1ec7ff2befe8733c5f2c3dc828e87ee30a10c62d68a606faf75",
-      "after_sha256": "ebbf7d6f241d061ff91707aa1ea41deb6f0e29208dd4f48e8dbeac692d30749e",
+      "before_sha256": "ebbf7d6f241d061ff91707aa1ea41deb6f0e29208dd4f48e8dbeac692d30749e",
+      "after_sha256": "5d438e875205040b35626d1308550c8ff3e68f9927ecea66852abf6d0fff5613",
       "owners": {
         "@document": {
-          "before": "b0047262c12ea1ec7ff2befe8733c5f2c3dc828e87ee30a10c62d68a606faf75",
-          "after": "ebbf7d6f241d061ff91707aa1ea41deb6f0e29208dd4f48e8dbeac692d30749e"
+          "before": "ebbf7d6f241d061ff91707aa1ea41deb6f0e29208dd4f48e8dbeac692d30749e",
+          "after": "5d438e875205040b35626d1308550c8ff3e68f9927ecea66852abf6d0fff5613"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "14434963d59708119f0e3b13448658936d34cf98312763b433c406bcb7acf56f",
-      "after_sha256": "c9067863b4f4192fab8be7a06d2bada734a532f14a92e45bc137fb56bc5fc4f9",
+      "before_sha256": "c9067863b4f4192fab8be7a06d2bada734a532f14a92e45bc137fb56bc5fc4f9",
+      "after_sha256": "e0136ced145e563a015c29deb7020deea4be88854fded0e8234f697e67e78c1d",
       "owners": {
         "@document": {
-          "before": "14434963d59708119f0e3b13448658936d34cf98312763b433c406bcb7acf56f",
-          "after": "c9067863b4f4192fab8be7a06d2bada734a532f14a92e45bc137fb56bc5fc4f9"
+          "before": "c9067863b4f4192fab8be7a06d2bada734a532f14a92e45bc137fb56bc5fc4f9",
+          "after": "e0136ced145e563a015c29deb7020deea4be88854fded0e8234f697e67e78c1d"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "39bff3912dcc7153ed03858e258531944db41fc4efbb9f19f636c63e41767d62",
-      "after_sha256": "d44afe848786e20abaa16941ff8c6339ecbdcdfd4f887aa8f4edb34d30049dbd",
+      "before_sha256": "d44afe848786e20abaa16941ff8c6339ecbdcdfd4f887aa8f4edb34d30049dbd",
+      "after_sha256": "70530de2791d44a65d944fe38e7c5ec987239e4553717f7c48c8fdd2b55e2528",
       "owners": {
         "@document": {
-          "before": "39bff3912dcc7153ed03858e258531944db41fc4efbb9f19f636c63e41767d62",
-          "after": "d44afe848786e20abaa16941ff8c6339ecbdcdfd4f887aa8f4edb34d30049dbd"
+          "before": "d44afe848786e20abaa16941ff8c6339ecbdcdfd4f887aa8f4edb34d30049dbd",
+          "after": "70530de2791d44a65d944fe38e7c5ec987239e4553717f7c48c8fdd2b55e2528"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "1701cae77dea9d94c09622190f755b3f3dc3e2ee052cc48176763d316b339291",
-      "after_sha256": "47f195d4c8a05c4dfb665213cb4b690d3195fb241c651b9684eef3a9009fb5aa",
+      "before_sha256": "47f195d4c8a05c4dfb665213cb4b690d3195fb241c651b9684eef3a9009fb5aa",
+      "after_sha256": "f60ca3fdb2d22ec9c1fd2552a65af70d6f3eb3489317c99e55ccf5414497fd86",
       "owners": {
         "@document": {
-          "before": "1701cae77dea9d94c09622190f755b3f3dc3e2ee052cc48176763d316b339291",
-          "after": "47f195d4c8a05c4dfb665213cb4b690d3195fb241c651b9684eef3a9009fb5aa"
+          "before": "47f195d4c8a05c4dfb665213cb4b690d3195fb241c651b9684eef3a9009fb5aa",
+          "after": "f60ca3fdb2d22ec9c1fd2552a65af70d6f3eb3489317c99e55ccf5414497fd86"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "ad42c552bd9a056bdaae1ac616bcd1e548201609f62b232660cdc57c8b8029e9",
-      "after_sha256": "be85a4f2c2922f3368f27403e32b26162f2727f7c2a73b9a2f6575b056122a49",
+      "before_sha256": "be85a4f2c2922f3368f27403e32b26162f2727f7c2a73b9a2f6575b056122a49",
+      "after_sha256": "ea6f44939be5c767afc5462177cb2230b77a2f52e597756eef2adf13c2b1f684",
       "owners": {
         "@document": {
-          "before": "ad42c552bd9a056bdaae1ac616bcd1e548201609f62b232660cdc57c8b8029e9",
-          "after": "be85a4f2c2922f3368f27403e32b26162f2727f7c2a73b9a2f6575b056122a49"
+          "before": "be85a4f2c2922f3368f27403e32b26162f2727f7c2a73b9a2f6575b056122a49",
+          "after": "ea6f44939be5c767afc5462177cb2230b77a2f52e597756eef2adf13c2b1f684"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "53e47a80b87752a6729a7e9e868c18b129c4b13a3250ad41732635c57d6ee693",
-      "after_sha256": "3f9d2c3bd045929be1ad69af65a2f5573a591a0f2f38e2cae6c43e1b2f979523",
+      "before_sha256": "3f9d2c3bd045929be1ad69af65a2f5573a591a0f2f38e2cae6c43e1b2f979523",
+      "after_sha256": "660d6ae1a6db4285181f093b190519f69b4fbfc1cbcf8146b7e2f457441bd1d6",
       "owners": {
         "@document": {
-          "before": "53e47a80b87752a6729a7e9e868c18b129c4b13a3250ad41732635c57d6ee693",
-          "after": "3f9d2c3bd045929be1ad69af65a2f5573a591a0f2f38e2cae6c43e1b2f979523"
+          "before": "3f9d2c3bd045929be1ad69af65a2f5573a591a0f2f38e2cae6c43e1b2f979523",
+          "after": "660d6ae1a6db4285181f093b190519f69b4fbfc1cbcf8146b7e2f457441bd1d6"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "5e7bd843d60d8ba1afff7777f1733f0f08c42e4648e73cdd0d94f979b6c11f5f",
-      "after_sha256": "156f41c20cffd4a9035dd078021bfd0de4e018b83c85467c97d89338865c2288",
+      "before_sha256": "156f41c20cffd4a9035dd078021bfd0de4e018b83c85467c97d89338865c2288",
+      "after_sha256": "5dcd776866d8d0b99e3709a228b9ee44a1ff69068cc81cdd93ec67303badf08e",
       "owners": {
         "@document": {
-          "before": "5e7bd843d60d8ba1afff7777f1733f0f08c42e4648e73cdd0d94f979b6c11f5f",
-          "after": "156f41c20cffd4a9035dd078021bfd0de4e018b83c85467c97d89338865c2288"
+          "before": "156f41c20cffd4a9035dd078021bfd0de4e018b83c85467c97d89338865c2288",
+          "after": "5dcd776866d8d0b99e3709a228b9ee44a1ff69068cc81cdd93ec67303badf08e"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "bfef1495a39c1deaa5d4c0bc5d7f78cf920517b0350cfb8712d11678d3c675cd",
-      "after_sha256": "20063c1f111772b77eddec56af3187d17198b474a943f6391c06098954ed9ea6",
+      "before_sha256": "20063c1f111772b77eddec56af3187d17198b474a943f6391c06098954ed9ea6",
+      "after_sha256": "a81c9af109d1ac33c3a689bf3a243bb9f5b43f23da3440f4edb0cac48df0ea19",
       "owners": {
         "@document": {
-          "before": "bfef1495a39c1deaa5d4c0bc5d7f78cf920517b0350cfb8712d11678d3c675cd",
-          "after": "20063c1f111772b77eddec56af3187d17198b474a943f6391c06098954ed9ea6"
+          "before": "20063c1f111772b77eddec56af3187d17198b474a943f6391c06098954ed9ea6",
+          "after": "a81c9af109d1ac33c3a689bf3a243bb9f5b43f23da3440f4edb0cac48df0ea19"
         }
       }
     },
     "conformance/typescript/src/contract.ts": {
-      "before_sha256": "ea56660e3e50d0514afe227a9087819727cc80aedb40f2caf4a9dcf49a80a60a",
-      "after_sha256": "c298296711771ab40241bda78d6e7006150908821eaf6a312013a38da9f1c06b",
+      "before_sha256": "c298296711771ab40241bda78d6e7006150908821eaf6a312013a38da9f1c06b",
+      "after_sha256": "c165c2c52f968da47d12c0f2115cf85bf699852ef87ed921d445b7c04fc41a49",
       "owners": {
         "@document": {
-          "before": "ea56660e3e50d0514afe227a9087819727cc80aedb40f2caf4a9dcf49a80a60a",
-          "after": "c298296711771ab40241bda78d6e7006150908821eaf6a312013a38da9f1c06b"
+          "before": "c298296711771ab40241bda78d6e7006150908821eaf6a312013a38da9f1c06b",
+          "after": "c165c2c52f968da47d12c0f2115cf85bf699852ef87ed921d445b7c04fc41a49"
         }
       }
     },
     "contracts/README.md": {
-      "before_sha256": "1acf2b4b1bf9b65798c21fb046847d67a332495ddb1463701c5c1d790ca69d64",
-      "after_sha256": "9e5043244c97d30b564c0d4e5d5cb406ee2f21aed81e4be50922fd257e207fc3",
+      "before_sha256": "9e5043244c97d30b564c0d4e5d5cb406ee2f21aed81e4be50922fd257e207fc3",
+      "after_sha256": "1706adcc3a07dc3da43b73e55f4157391a3545396d1597ac152cfa41d5797377",
       "owners": {
         "@document": {
-          "before": "1acf2b4b1bf9b65798c21fb046847d67a332495ddb1463701c5c1d790ca69d64",
-          "after": "9e5043244c97d30b564c0d4e5d5cb406ee2f21aed81e4be50922fd257e207fc3"
+          "before": "9e5043244c97d30b564c0d4e5d5cb406ee2f21aed81e4be50922fd257e207fc3",
+          "after": "1706adcc3a07dc3da43b73e55f4157391a3545396d1597ac152cfa41d5797377"
         }
       }
     },
     "contracts/compatibility-policy.md": {
-      "before_sha256": "7695ee013730ef273bdafd6d04b7dfb5796b4945ba64e0843feffa353ae3e04d",
-      "after_sha256": "6d918ae18a54f37a70f7c1697afcd4c723f4364fe8e8b27b2642a310cd598940",
+      "before_sha256": "6d918ae18a54f37a70f7c1697afcd4c723f4364fe8e8b27b2642a310cd598940",
+      "after_sha256": "788b1233184aa87943916ea67710211ddf2a5b4e98d624ce4b6d118131b4bc2f",
       "owners": {
         "@document": {
-          "before": "7695ee013730ef273bdafd6d04b7dfb5796b4945ba64e0843feffa353ae3e04d",
-          "after": "6d918ae18a54f37a70f7c1697afcd4c723f4364fe8e8b27b2642a310cd598940"
+          "before": "6d918ae18a54f37a70f7c1697afcd4c723f4364fe8e8b27b2642a310cd598940",
+          "after": "788b1233184aa87943916ea67710211ddf2a5b4e98d624ce4b6d118131b4bc2f"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "27cb2add02b99b3cb2e89a9465cc880cd97c4194b2d952ff578889686d2da592",
-      "after_sha256": "26c2a4b5100228de4e272d05d1a648755b19786af896755f3a446c1f4d92273f",
+      "before_sha256": "26c2a4b5100228de4e272d05d1a648755b19786af896755f3a446c1f4d92273f",
+      "after_sha256": "f02a07068f7eb19a6e778e256eb702400bcd458842f9cc323d366a5f6cde560a",
       "owners": {
         "@document": {
-          "before": "27cb2add02b99b3cb2e89a9465cc880cd97c4194b2d952ff578889686d2da592",
-          "after": "26c2a4b5100228de4e272d05d1a648755b19786af896755f3a446c1f4d92273f"
+          "before": "26c2a4b5100228de4e272d05d1a648755b19786af896755f3a446c1f4d92273f",
+          "after": "f02a07068f7eb19a6e778e256eb702400bcd458842f9cc323d366a5f6cde560a"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "f49029aaa4a2da1d96317e6a8f987fc4e398f97bb7288360ffc10a538b208f9c",
-      "after_sha256": "382891cb7488136f9280741a2b01802aa084fd76b2e5bf1844aa641fe217d717",
+      "before_sha256": "382891cb7488136f9280741a2b01802aa084fd76b2e5bf1844aa641fe217d717",
+      "after_sha256": "4f6f8ea2cd75a8ae48f42be00afc0749788b520b43967854737f4a81d4b7f6c0",
       "owners": {
         "@document": {
-          "before": "f49029aaa4a2da1d96317e6a8f987fc4e398f97bb7288360ffc10a538b208f9c",
-          "after": "382891cb7488136f9280741a2b01802aa084fd76b2e5bf1844aa641fe217d717"
+          "before": "382891cb7488136f9280741a2b01802aa084fd76b2e5bf1844aa641fe217d717",
+          "after": "4f6f8ea2cd75a8ae48f42be00afc0749788b520b43967854737f4a81d4b7f6c0"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "45ca2e280eab0471961d49daa7c41a3b2acee8ae15c135c60237935c10cd6215",
-      "after_sha256": "1939968028d783e7605cac874eb736ec40a2fade68240f05fd3fbcb2cb7aedcf",
+      "before_sha256": "1939968028d783e7605cac874eb736ec40a2fade68240f05fd3fbcb2cb7aedcf",
+      "after_sha256": "a811bd2f8b1af832b28169c62ec98068ff55cbdcac0d8e1184871d274c029e46",
       "owners": {
         "@document": {
-          "before": "45ca2e280eab0471961d49daa7c41a3b2acee8ae15c135c60237935c10cd6215",
-          "after": "1939968028d783e7605cac874eb736ec40a2fade68240f05fd3fbcb2cb7aedcf"
+          "before": "1939968028d783e7605cac874eb736ec40a2fade68240f05fd3fbcb2cb7aedcf",
+          "after": "a811bd2f8b1af832b28169c62ec98068ff55cbdcac0d8e1184871d274c029e46"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "04f99afb6d10d154903aa1172ecf70b2cf6449d385c51e54bbd51d78fcb67db4",
-      "after_sha256": "cd29e8cae0848752a5169d7cd2a51175d200ea04899c595572338db69e422d59",
+      "before_sha256": "cd29e8cae0848752a5169d7cd2a51175d200ea04899c595572338db69e422d59",
+      "after_sha256": "ec5b71fc0611e5721abc7aa65857a92288d33c6419c4a5f9407210b0eeaf9fa5",
       "owners": {
         "@document": {
-          "before": "04f99afb6d10d154903aa1172ecf70b2cf6449d385c51e54bbd51d78fcb67db4",
-          "after": "cd29e8cae0848752a5169d7cd2a51175d200ea04899c595572338db69e422d59"
+          "before": "cd29e8cae0848752a5169d7cd2a51175d200ea04899c595572338db69e422d59",
+          "after": "ec5b71fc0611e5721abc7aa65857a92288d33c6419c4a5f9407210b0eeaf9fa5"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "30937248b6375b2350df3a70e9d89d385c7a5ccbcc4738331270098270481910",
-      "after_sha256": "2460e6ea971bc40f97b38ef976074bdc8aa8965fb0af204a97671c42ad81f3ce",
+      "before_sha256": "2460e6ea971bc40f97b38ef976074bdc8aa8965fb0af204a97671c42ad81f3ce",
+      "after_sha256": "ab29b43788b1327e76b97cbfeed7f0c6ab1639468f643bd02f548e5c5e0566f5",
       "owners": {
         "@document": {
-          "before": "30937248b6375b2350df3a70e9d89d385c7a5ccbcc4738331270098270481910",
-          "after": "2460e6ea971bc40f97b38ef976074bdc8aa8965fb0af204a97671c42ad81f3ce"
+          "before": "2460e6ea971bc40f97b38ef976074bdc8aa8965fb0af204a97671c42ad81f3ce",
+          "after": "ab29b43788b1327e76b97cbfeed7f0c6ab1639468f643bd02f548e5c5e0566f5"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "d4313a2cbe4fee9758424597923aba808c76812d88a44a1ef0ff981c2899cbff",
-      "after_sha256": "0be5c1c6cce5fe976cb61bf48bfef083d8bae3e67fe376eb10da2bf65ea9919c",
+      "before_sha256": "0be5c1c6cce5fe976cb61bf48bfef083d8bae3e67fe376eb10da2bf65ea9919c",
+      "after_sha256": "457320b220a3d0ea29d4bfa8656aaf59b39797be585c706a091a773b45422174",
       "owners": {
         "@document": {
-          "before": "d4313a2cbe4fee9758424597923aba808c76812d88a44a1ef0ff981c2899cbff",
-          "after": "0be5c1c6cce5fe976cb61bf48bfef083d8bae3e67fe376eb10da2bf65ea9919c"
+          "before": "0be5c1c6cce5fe976cb61bf48bfef083d8bae3e67fe376eb10da2bf65ea9919c",
+          "after": "457320b220a3d0ea29d4bfa8656aaf59b39797be585c706a091a773b45422174"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "256a04bc26561f73e7c525ef27d5904c11251c058f09c8dd8e596aa9f5564e4b",
-      "after_sha256": "88e52542e2ed29470703d82d6de17bc33164cc54bf7f88d40704f0741c9d37bd",
+      "before_sha256": "88e52542e2ed29470703d82d6de17bc33164cc54bf7f88d40704f0741c9d37bd",
+      "after_sha256": "931990e40031114e3b885b0db9eed4330d2d02a7d6d16e060ad06ead4c279398",
       "owners": {
         "@document": {
-          "before": "256a04bc26561f73e7c525ef27d5904c11251c058f09c8dd8e596aa9f5564e4b",
-          "after": "88e52542e2ed29470703d82d6de17bc33164cc54bf7f88d40704f0741c9d37bd"
+          "before": "88e52542e2ed29470703d82d6de17bc33164cc54bf7f88d40704f0741c9d37bd",
+          "after": "931990e40031114e3b885b0db9eed4330d2d02a7d6d16e060ad06ead4c279398"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "2c0853a174b666883f228214a55bfe0785834ef088c5ef260f7c42d7a515f3d8",
-      "after_sha256": "3e2e195458bc5daf7982b12699d43dacf1f3a4c1b40ae82481a7b6e349b74178",
+      "before_sha256": "3e2e195458bc5daf7982b12699d43dacf1f3a4c1b40ae82481a7b6e349b74178",
+      "after_sha256": "66383ff7a957ae1af29bf0d5df6b7601fd5bb9afc7525266b0e64766063e9b8f",
       "owners": {
         "@document": {
-          "before": "2c0853a174b666883f228214a55bfe0785834ef088c5ef260f7c42d7a515f3d8",
-          "after": "3e2e195458bc5daf7982b12699d43dacf1f3a4c1b40ae82481a7b6e349b74178"
+          "before": "3e2e195458bc5daf7982b12699d43dacf1f3a4c1b40ae82481a7b6e349b74178",
+          "after": "66383ff7a957ae1af29bf0d5df6b7601fd5bb9afc7525266b0e64766063e9b8f"
         }
       }
     },
     "contracts/openapi.yaml": {
-      "before_sha256": "35a915975237f2d4322a4608d365a6a1cc260acce025938943e52dc9c430f64b",
-      "after_sha256": "f49eca5d4f2744b61f286b38bbf7c9f1ad3943f27168f6cad832ed34ad4ca986",
+      "before_sha256": "f49eca5d4f2744b61f286b38bbf7c9f1ad3943f27168f6cad832ed34ad4ca986",
+      "after_sha256": "5f9b047efd97961e4e847e5e2af4414fb5a05f8510dae18411aa6a9e54c7d948",
       "owners": {
         "@document": {
-          "before": "35a915975237f2d4322a4608d365a6a1cc260acce025938943e52dc9c430f64b",
-          "after": "f49eca5d4f2744b61f286b38bbf7c9f1ad3943f27168f6cad832ed34ad4ca986"
+          "before": "f49eca5d4f2744b61f286b38bbf7c9f1ad3943f27168f6cad832ed34ad4ca986",
+          "after": "5f9b047efd97961e4e847e5e2af4414fb5a05f8510dae18411aa6a9e54c7d948"
         }
       }
     },
-    "data/source_audits/v963_shock/baseline/src/warhammer40k_core/_engine_build_manifest.json.txt": {
+    "data/source_audits/order102/baseline/tests/completed_attack_fixture_helpers.py.txt": {
       "before_sha256": null,
-      "after_sha256": "2f831dd3b558e9ccf8ce0227e1eafdf4ff675a622e3301fb81cf6e1e402483bb",
+      "after_sha256": "b6bf51193ee90beb5a08af3df8943848c47f2c90aeec8cd8ee82674c10a741ca",
       "owners": {
         "@document": {
           "before": null,
-          "after": "2f831dd3b558e9ccf8ce0227e1eafdf4ff675a622e3301fb81cf6e1e402483bb"
+          "after": "b6bf51193ee90beb5a08af3df8943848c47f2c90aeec8cd8ee82674c10a741ca"
         }
       }
     },
-    "data/source_audits/v963_shock/baseline/src/warhammer40k_core/engine/phases/movement_placement_proposals.py.txt": {
+    "data/source_audits/order102/baseline/tests/unit/test_phase15c_fight_order.py.txt": {
       "before_sha256": null,
-      "after_sha256": "2e07b9495d1344d23284a89a4c1b4bd4ca21c096e02857f8aeb612e6855bfdd3",
+      "after_sha256": "0f3d5232ae42bb718ff0da4e6a1cb50017acbed5d317c6d468c1cd938c312f4b",
       "owners": {
         "@document": {
           "before": null,
-          "after": "2e07b9495d1344d23284a89a4c1b4bd4ca21c096e02857f8aeb612e6855bfdd3"
+          "after": "0f3d5232ae42bb718ff0da4e6a1cb50017acbed5d317c6d468c1cd938c312f4b"
         }
       }
     },
-    "data/source_audits/v963_shock/baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_transports_2026_09/artifacts/package.json.txt": {
+    "data/source_audits/order102/historical-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "1b0f790f63da545c4cd0d509bba52aa3deacaa18dda9f1402491b00beded2e76",
+      "after_sha256": "c8e782fcab38c6944174b981cf8ebc9d37e2d4e8f073b3ed722ba759f8d54362",
       "owners": {
         "@document": {
           "before": null,
-          "after": "1b0f790f63da545c4cd0d509bba52aa3deacaa18dda9f1402491b00beded2e76"
-        }
-      }
-    },
-    "data/source_audits/v963_shock/baseline/tests/unit/test_phase10q_transports.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "31039152b2cd9c1be4e39ff7d93904fe7994104658aab19c9626d69b804412e1",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "31039152b2cd9c1be4e39ff7d93904fe7994104658aab19c9626d69b804412e1"
-        }
-      }
-    },
-    "data/source_audits/v963_shock/baseline/tests/unit/test_phase14a_source_identity.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "0e8e042f24d08950ed93931359d1670747e6bf8f66710b82813149dcf016ffb9",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "0e8e042f24d08950ed93931359d1670747e6bf8f66710b82813149dcf016ffb9"
-        }
-      }
-    },
-    "data/source_audits/v963_shock/capture-verification.json": {
-      "before_sha256": null,
-      "after_sha256": "9182c04b6aab193f39519c813db9c17d0532bf9f3be11dc5572fa6832e3a48c2",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "9182c04b6aab193f39519c813db9c17d0532bf9f3be11dc5572fa6832e3a48c2"
-        }
-      }
-    },
-    "data/source_audits/v963_shock/captures/changelog.html": {
-      "before_sha256": null,
-      "after_sha256": "64ecd26644424f89e7a4760a037680d380a295b20ec24fa3a017066e255cc9fa",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "64ecd26644424f89e7a4760a037680d380a295b20ec24fa3a017066e255cc9fa"
-        }
-      }
-    },
-    "data/source_audits/v963_shock/captures/core-page.js": {
-      "before_sha256": null,
-      "after_sha256": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026"
-        }
-      }
-    },
-    "data/source_audits/v963_shock/captures/core-rules.html": {
-      "before_sha256": null,
-      "after_sha256": "e3a570737daa7dad215efce14d606e95e7cd194df2d7d61bed9a2353caeb8744",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "e3a570737daa7dad215efce14d606e95e7cd194df2d7d61bed9a2353caeb8744"
-        }
-      }
-    },
-    "data/source_audits/v963_shock/comparison.json": {
-      "before_sha256": null,
-      "after_sha256": "e43ab28845186639b542f5d4cab5a7227441bcd0bfd986847ba0fa4dd00fcf04",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "e43ab28845186639b542f5d4cab5a7227441bcd0bfd986847ba0fa4dd00fcf04"
-        }
-      }
-    },
-    "data/source_audits/v963_shock/historical-inputs.json": {
-      "before_sha256": null,
-      "after_sha256": "51689e786d64ca281d7513bdd4e6b968aed65eeefd73a6dad1bb591d05de29b7",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "51689e786d64ca281d7513bdd4e6b968aed65eeefd73a6dad1bb591d05de29b7"
-        }
-      }
-    },
-    "data/source_audits/v963_shock/selected-records.json": {
-      "before_sha256": null,
-      "after_sha256": "cf540b36de3a31ed1902a67330b0243519ce14c84b85fb46feb0f88885b02b00",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "cf540b36de3a31ed1902a67330b0243519ce14c84b85fb46feb0f88885b02b00"
-        }
-      }
-    },
-    "data/source_audits/v963_shock/source.audit.json": {
-      "before_sha256": null,
-      "after_sha256": "f24d49093541eceb784b96435533f2ee008d663f6c2392de9c22e2648cb1a913",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "f24d49093541eceb784b96435533f2ee008d663f6c2392de9c22e2648cb1a913"
+          "after": "c8e782fcab38c6944174b981cf8ebc9d37e2d4e8f073b3ed722ba759f8d54362"
         }
       }
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "209aded0b2333a6e3f51fc6df9b6cff7509e1006dc07fa566e81988026b932e2",
-      "after_sha256": "eead7c035addb9de2026a634b1a5dc0fd70638ec12ef2d0905ffb2ac8dda5ed3",
+      "before_sha256": "eead7c035addb9de2026a634b1a5dc0fd70638ec12ef2d0905ffb2ac8dda5ed3",
+      "after_sha256": "45f6fb2ec8492548968b24696333893e9b4df20456d3a49f775342fa4c1f0d0b",
       "owners": {
         "@document": {
-          "before": "209aded0b2333a6e3f51fc6df9b6cff7509e1006dc07fa566e81988026b932e2",
-          "after": "eead7c035addb9de2026a634b1a5dc0fd70638ec12ef2d0905ffb2ac8dda5ed3"
+          "before": "eead7c035addb9de2026a634b1a5dc0fd70638ec12ef2d0905ffb2ac8dda5ed3",
+          "after": "45f6fb2ec8492548968b24696333893e9b4df20456d3a49f775342fa4c1f0d0b"
         }
       }
     },
-    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "16725fce19ffc10dbf104eeb26ece97d8fd5e1fd688f00d84968814fe3f055b2",
-      "after_sha256": "5de758933cc5f48560c3a3b52877989f9a003bedebcd55f303fb5f24674615c9",
-      "owners": {
-        "@document": {
-          "before": "16725fce19ffc10dbf104eeb26ece97d8fd5e1fd688f00d84968814fe3f055b2",
-          "after": "5de758933cc5f48560c3a3b52877989f9a003bedebcd55f303fb5f24674615c9"
-        }
-      }
-    },
-    "docs/PR_BACKLOG_2026_09_30.md": {
-      "before_sha256": "c72bba3c493505bed47d070a06ac5100d1f974b1005b4da46d30fdc00ca96cdf",
-      "after_sha256": "abfd21c5f4f99fb8bafeca9ba70ce5e8f8b58ed4a24ef65aa023cfe343e0fd7b",
-      "owners": {
-        "@document": {
-          "before": "c72bba3c493505bed47d070a06ac5100d1f974b1005b4da46d30fdc00ca96cdf",
-          "after": "abfd21c5f4f99fb8bafeca9ba70ce5e8f8b58ed4a24ef65aa023cfe343e0fd7b"
-        }
-      }
-    },
-    "docs/V963_SHOCK_SCOPE_PLAN.md": {
+    "docs/ORDER_102_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "ef41b911bea21fdcb7dc0753c6ce634149a89d7ddb2126ca11dd85d436d38f06",
+      "after_sha256": "773b79ce9cdcda53e1159d434bc21f691e1b55d420a5571d1d22b7023205d178",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ef41b911bea21fdcb7dc0753c6ce634149a89d7ddb2126ca11dd85d436d38f06"
+          "after": "773b79ce9cdcda53e1159d434bc21f691e1b55d420a5571d1d22b7023205d178"
         }
       }
     },
-    "docs/performance/current/v963-shock-reconstruction-generic.json": {
+    "docs/performance/current/order102-fight-selection-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "32266d942db00f90e38a7e10887b0f56b8d27153c9280f3c5e58307b6e957af0",
+      "after_sha256": "ca39bf086270215b3e2e5b1ac83b9620cb874d98241862f55fa25195c247e249",
       "owners": {
         "@document": {
           "before": null,
-          "after": "32266d942db00f90e38a7e10887b0f56b8d27153c9280f3c5e58307b6e957af0"
-        }
-      }
-    },
-    "docs/performance/current/v963-shock-reconstruction-specific.json": {
-      "before_sha256": null,
-      "after_sha256": "4b0e854dd279d95ebd7465bc7a448816701132f46011f6322edd067f17e3bd29",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "4b0e854dd279d95ebd7465bc7a448816701132f46011f6322edd067f17e3bd29"
+          "after": "ca39bf086270215b3e2e5b1ac83b9620cb874d98241862f55fa25195c247e249"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "a535c1fa4a07bf4a17e13289a08620e025687603e2105e2cfd1c515ca854a155",
-      "after_sha256": "0b967420f97c20acbc28b66827a62d269fe909b7aa239eda734d55bed3b6203e",
+      "before_sha256": "0b967420f97c20acbc28b66827a62d269fe909b7aa239eda734d55bed3b6203e",
+      "after_sha256": "80960c3d0a12ff966a74d10672c434c0db666df7607839eef083cbd6838acd97",
       "owners": {
         "@document": {
-          "before": "a535c1fa4a07bf4a17e13289a08620e025687603e2105e2cfd1c515ca854a155",
-          "after": "0b967420f97c20acbc28b66827a62d269fe909b7aa239eda734d55bed3b6203e"
+          "before": "0b967420f97c20acbc28b66827a62d269fe909b7aa239eda734d55bed3b6203e",
+          "after": "80960c3d0a12ff966a74d10672c434c0db666df7607839eef083cbd6838acd97"
         }
       }
     },
-    "scripts/measure_shock_reconstruction.py": {
+    "scripts/measure_fight_selection_reconstruction.py": {
       "before_sha256": null,
-      "after_sha256": "f9a750bddeacecac6dca0a3d3e4c5c03a3ac6347596fa4d8ae827d0b5f5638d5",
+      "after_sha256": "5a4a12bf2ad847791a6c97e36748239760efb50bd7468f5c5efef5a5060abf62",
       "owners": {
         "@module": {
           "before": null,
-          "after": "7ee023ce858548e489204c2c942586f88fc895ca6aec1e377b8896d4d58171f4"
+          "after": "66b7e1c05f9e1dfb6627f6e12b276cc291fdbfb6850f26f462726cae3abe2c37"
+        },
+        "inventory": {
+          "before": null,
+          "after": "663fe288ba9979bf0e8a38b20fcb5bc7b97aa03aa04392553c711bf399ad7abb"
         },
         "main": {
           "before": null,
-          "after": "a9237ce384fa285c9346b730f1d05d6689cc31aa3d2314fbf6a71f47efe25187"
+          "after": "7c6a2ae61687ea682b93fbd38c11b237cfcd70daddb63ec293adcff67f740a7f"
         },
         "prepare": {
           "before": null,
-          "after": "f48e1daca673fdb29c1abe44f112fb06c4edca5a88b20f3f152bb3b6591b1a0e"
+          "after": "5bcc9a2d40afcd71c56271696393b7c79540c0625ceec0d46f4b8d914c1b2781"
         },
-        "sample": {
+        "reconstruct": {
           "before": null,
-          "after": "a3c9bbec6babe21c8814a06c3b2f830f6b8063538e04784031af02670514b29f"
+          "after": "a9b0fcf015c013de47629635de2640686c52ae4c595db654cb3bd3148e1c9fba"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "2f831dd3b558e9ccf8ce0227e1eafdf4ff675a622e3301fb81cf6e1e402483bb",
-      "after_sha256": "fdb60164ab115d2211055fd934d97f173fe21a3ddc23db16ec035c671ced834a",
+      "before_sha256": "fdb60164ab115d2211055fd934d97f173fe21a3ddc23db16ec035c671ced834a",
+      "after_sha256": "56fd0a6ec6e2b1bab17c6cd7eac26d1aa297cb01509409fdaac5cb3afb6a90bd",
       "owners": {
         "@document": {
-          "before": "2f831dd3b558e9ccf8ce0227e1eafdf4ff675a622e3301fb81cf6e1e402483bb",
-          "after": "fdb60164ab115d2211055fd934d97f173fe21a3ddc23db16ec035c671ced834a"
+          "before": "fdb60164ab115d2211055fd934d97f173fe21a3ddc23db16ec035c671ced834a",
+          "after": "56fd0a6ec6e2b1bab17c6cd7eac26d1aa297cb01509409fdaac5cb3afb6a90bd"
         }
       }
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
-      "before_sha256": "cf02ecdc58726ba39d1270473dbfa0e6c878a044f8a1afff547229aa8a7c76f7",
-      "after_sha256": "81e16e8afaebde8eaff32fa5cb03bf01445ecdc229aae177b42a33727e6c2383",
+      "before_sha256": "81e16e8afaebde8eaff32fa5cb03bf01445ecdc229aae177b42a33727e6c2383",
+      "after_sha256": "d4fc814d7da5297cef42f58554570fbac74c53258692fe912ea2e712f3f3d921",
       "owners": {
         "@module": {
-          "before": "df80de68af310d2ab33dd95dc05478bd506d3993daab0013ba6f027fdc3e094d",
-          "after": "e04b0360dbce4772d9d4acc5d1b3db34b2865c2d567f393280a9cc7c5c57ebd1"
+          "before": "e04b0360dbce4772d9d4acc5d1b3db34b2865c2d567f393280a9cc7c5c57ebd1",
+          "after": "5532c5a7e04cdf72432ead274ae3b4b656145fffc1eff85d1b2118657e2ea99b"
         }
       }
     },
-    "src/warhammer40k_core/engine/battle_round_flow.py": {
-      "before_sha256": "33b8ba3f65b078ae47f7ca3c3016b14921dadae9187d61f969b0a19d7461efc6",
-      "after_sha256": "91fad3b4c5d84e45ff1907d44a31c790de0b55527cc77b824fd48ff8bd7914c6",
+    "src/warhammer40k_core/engine/active_player_boundary_history.py": {
+      "before_sha256": "7f1b02a757cc9adb47039665de7aa73a25159b696c9a04229191f6c69473dfba",
+      "after_sha256": "91a378e54ccd4adf9e336a30deb6ab9e5ec1d598820896d667bb9dd7392ad931",
       "owners": {
-        "BattleRoundFlow.advance": {
-          "before": "18f746659a977a7a793cf7e3dc1b005178fd7ec97033e646fbf8a26c09bddc34",
-          "after": "f214407a7d8c1abfd1d9085b0bb5dd44ab9ba5b2710892eb4ab6094a5b142568"
+        "_fold_scopes": {
+          "before": "fbbaea19ded543af0803e1325b6d58fa9f716bd4d4526fd0a79e7714fc842055",
+          "after": "e7bd25f04638211c8b4ae341a1b26d6b3a63942d63a23268ec5bde100eaa0e31"
         }
       }
     },
-    "src/warhammer40k_core/engine/game_state.py": {
-      "before_sha256": "0271f60259ebff9f7d243475cec52b182e9c303cb642fdfcd1cdd43a4043269c",
-      "after_sha256": "b4654fdf1da4636c736e1c9b39f7d1885ed5f203b7b2ae99ccd1a8b059f92cf3",
+    "src/warhammer40k_core/engine/active_player_scope_history.py": {
+      "before_sha256": "b39e6129719e1915e886fd9eef95a610543e0f04392fcfdcac117e17decbb9c4",
+      "after_sha256": "6d7266a45b419cc715b210dd98b0ec96340491cc598a4b9265402ef903f0fab6",
       "owners": {
         "@module": {
-          "before": "de02734c276680547fdb983e1d0ca4e0d56be12afc1467fc43ada2f60ed3a037",
-          "after": "32173a2750eda66052f1a7b8d00cfaa962009dd0aae6fac859d573f4e786d30a"
+          "before": "fa87d36053eb854802c88bd6d3c9844fa2350d543b10b6fcf1e79f164ef4b729",
+          "after": "23134b52733b7d862027c6bddbd3c185e7f223a5ed38a1671027e9aab5943e44"
         },
-        "GameState.advance_to_next_battle_phase": {
-          "before": "e21fce59e6e6dedcfe5b11407cc1b53eeaf0870c4f0b64cb470a73317472a77e",
-          "after": "df0778d660badeb75ac557d4cedbbced22d2ef0493dd4c9e461e2202cc9f773c"
+        "validate_active_player_history": {
+          "before": "b356ae510160308f4d431730c86cae2f1473a4583d331303935d101449e08128",
+          "after": "5a7f020a8ca85183da72b77235ba63243e9ee6e2fac054e6676a27535d1b424c"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/consolidation_continuation_history.py": {
+      "before_sha256": "7d16f987c3c9ff3fae765ac2eb5b4f3c571fc70d39d4edf1783a9cb21ab3217d",
+      "after_sha256": "d4a42d8f65f7e8bcab0333068652f993912848556f91fdac44f53f9bc5357cbb",
+      "owners": {
+        "consolidation_continuation_before_event": {
+          "before": "a40343cba41e33e724407d6e856c7296cca200d337375d62c532cab9c77af44a",
+          "after": "f936f4d3450f27c618019109ceb8a8092c3fcbb3f3a45f343747db4b47479f23"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/decision.py": {
+      "before_sha256": "cf103d477e5af761ab882fb8031c43e58d14d566998aaa6dd3e6d5b4fdcd5447",
+      "after_sha256": "f5ab638ec1766e603f5c16dc18ec5b963c4e88a06573cc80f4cffcfd8a52d51b",
+      "owners": {
+        "@module": {
+          "before": "9550d09df3e61f2abea3bfa45b09d7bfcc4a92360cf4b3ce0162f73e00dbb837",
+          "after": "74efcd5c3c1a7bdec343eef8799291b3516f400c405932753312d2eff6948474"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/fight_activation_completion.py": {
+      "before_sha256": "d255fec8ce3a3812a8228b5843d2554198a298e44ac3a92e073b37e9290a81c3",
+      "after_sha256": "280ef09867592a8825f3ad1dac5cdd313a98471fc4126a32d56bc920763f619b",
+      "owners": {
+        "@module": {
+          "before": "731d949eb55f83ff07df3f02a9da0efee3599c010b2bd14b97ba3428a5bbb666",
+          "after": "495e074338f326e7d23c2f2236bcdbe2dc39465859008ac4ae501bc0d76af269"
         },
-        "GameState.clear_turn_action_states": {
-          "before": "d208e42667b63bd159023a6d56799ea824d2e04a9c9745ee5977eae47e3ee0bc",
-          "after": "e625909453234739134775bb3b6ab2253e2996f4a4deea4aa5addb3124c4d713"
+        "complete_active_fight_activation": {
+          "before": "c62b8dc3802d59ff2a3f805d010123206cda6c569f1e0c8c6bed3b83bc9ccd4a",
+          "after": "4dea9b2347f5ffc1740a6265b7d892a5d32849a41c563473727fa1c8dc4bdc1c"
         },
-        "GameState.expire_shock_disembark_after_turn_end": {
+        "completed_activation_event": {
+          "before": "b713414823d5c6802fbeb7e04b6ac260f36dea6441f3395faa7bda5f2098a691",
+          "after": "8d29a8c78f12997772936872cf3699c90b75e5a2c6590de5b8770a10feecd65d"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/fight_continuation_checkpoint.py": {
+      "before_sha256": "de0d33a438b39bbf27213db69fa0adacfd6384dac3acf8210431e513d7497cd6",
+      "after_sha256": "1dce4352f6d396fb2045bf911adeebd3d0a4f36b4dc8b127f2c881bc89f70351",
+      "owners": {
+        "reconstruct_fight_continuation_checkpoint": {
+          "before": "5cabc3cf77a786d2ed1037b383ffc6ea3c7b97d407a83ea24a0e0cab7d8f8767",
+          "after": "06fc43e036fb9154059fe435ea5183f87a1b9277c94e72d89fba51902919df0d"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/fight_selection_completion.py": {
+      "before_sha256": null,
+      "after_sha256": "06d5c004db6767c8fb22498ec8ff2c58d1411202047c61449c05ba9304a29be2",
+      "owners": {
+        "@module": {
           "before": null,
-          "after": "e2ec8f1f53e81024016d70b0b91b708f292bc008397e35118bf22c90e6feab5e"
+          "after": "25dfa46fd6cdb5d4652aca1c640843d3dd108292c3ca49a5f9a3f7d60943ddbc"
+        },
+        "_object": {
+          "before": null,
+          "after": "8252b8e45c9ad2ae50bc25c55d4598c85bac7b575a79af4b10ad4629d00b6621"
+        },
+        "actual_fought_payload": {
+          "before": null,
+          "after": "21e5d5dfc55ca758745a3d4f760da47c48306a3da7d7b9e5b876c1936acaa09c"
+        },
+        "fight_selection_attack_evidence": {
+          "before": null,
+          "after": "090f535c85b063e4f86da7791d2c096c3fcd515ef78923f29a142641d0d759df"
+        },
+        "validate_fight_selection_completion_history": {
+          "before": null,
+          "after": "ef5ae065be67bcf8a961819e7e1eb721da7311a99fc5fdc999130ec46747e50e"
         }
       }
     },
     "src/warhammer40k_core/engine/lifecycle_state_validation.py": {
-      "before_sha256": "1d3f9eb48c546a107eae02fdad96d5cdbe6a5c7fbd50dee3a5331f5a3b981ed3",
-      "after_sha256": "f76ea4c8be4b2fa469e658c59a3f24ffb33c4e887febf686d108df74d72c0676",
+      "before_sha256": "f76ea4c8be4b2fa469e658c59a3f24ffb33c4e887febf686d108df74d72c0676",
+      "after_sha256": "ca333ae5f8daf2f85b4e390af6cffd7b4f7050c0f781141540c3e89c52838b3d",
       "owners": {
-        "@module": {
-          "before": "f12e31d8432c4cf9075fe9cf496271f6bd748d1f8d076b4d099c64cf5d1d2c30",
-          "after": "74b2585a7f4a221f03bbfb254b2776b23f0e460a01c5236d4071d959b97a6370"
-        },
-        "_validate_disembarked_unit_state_history": {
-          "before": "5b8dae2587b5246cbe1173274cf565246d04e924ea9fbaf0fe9137b1fe3e4b8b",
-          "after": "2e88148e94cffec476416a597b25d1c2f8a2b774311c770a5dcaacac7117c2fc"
-        },
-        "_validate_shock_disembark_fight_history": {
-          "before": "02ba2c2543ae014145c593ca4cc0b042f837d5d1b7f3aec2deebae88e33be9f6",
-          "after": null
-        },
-        "_validate_unique_forced_fight_selection_lineages": {
-          "before": "b054f9d57d6406bed800524e7f8b96be5f533fe5f364bb8a327a41cff7badb41",
-          "after": null
-        },
-        "validate_disembarked_unit_state_consistency": {
-          "before": "7d384f43fee057b32008265412a8edbb9455bff3e2dd62dc20a098f39c1249d4",
-          "after": "6e5f562b113924166f7cec0add10ada41431e708f2957f5621771cb4ecddd887"
+        "validate_fight_phase_state_consistency": {
+          "before": "e36f4163cba097a2fa4e373e357cb756ac9d5a10a074c33d1f1f91b95602e922",
+          "after": "dc9a4542d3a237f7a821bdbab600420d7eb468073d02433ab806c126151a42c9"
         }
       }
     },
-    "src/warhammer40k_core/engine/phases/movement_placement_proposals.py": {
-      "before_sha256": "2e07b9495d1344d23284a89a4c1b4bd4ca21c096e02857f8aeb612e6855bfdd3",
-      "after_sha256": "aa6dc2c85f9221d1c7a7d39f3ac918d587f7fc017512e10e929b1e6c4308f267",
-      "owners": {
-        "@module": {
-          "before": "a887d60f57a9cd222664028ac444c803193c6b889c8cb08ac677764a8b12466c",
-          "after": "bfb76c9fef0d9d037b6460f3134ceea031a2501e2fb91cb137c40be1ecb2ed89"
-        },
-        "_apply_valid_disembark": {
-          "before": "ed8dbfe7995c31459edaaa05f64602f928bbe04ea3a38124682c31e9b8221c80",
-          "after": "111c2fa0b957474eef505b95301343cd7ca39b7820274d5b7170647916d9465b"
-        },
-        "_forced_fight_selected_unit_ids_for_current_phase": {
-          "before": "9b7f85291e04b8c4d2c75fa6797673344e25f61350944fcd8795d1aa2430f568",
-          "after": null
-        },
-        "_start_shock_disembark_forced_fight_activations": {
-          "before": "5ed2f832a1dc44b490fa96508c6c7a6f23b24221a87db1f35eece9d847280444",
-          "after": null
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/shock_disembark_history.py": {
-      "before_sha256": "ae3c1c9a5d7676a2ae9592be1372b8e10f20b8643e6a46b29f87f4b73dcc9681",
-      "after_sha256": "2c8ac0bdabcfab30289d2d4c12279d7b814be5f9febe0d8bb19c3867f512eb00",
-      "owners": {
-        "@module": {
-          "before": "7fb217c07f38218aa47eb282ea3c522313b2d57381adea0c4fdc14033879b2d6",
-          "after": "d9767662a5cba1de290e291aa02bc838446fecaa0923a39750167ebb3763a2ff"
-        },
-        "validate_shock_disembark_engagement_history": {
-          "before": "c0e684a58c1df44563659b1c85e8f7e0ea641ba3030b890e42706dce7a1c4899",
-          "after": "b70d2f766cf21691b109b44c698897116bcb1904b04d27ee7d740e508a84cede"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/transport_disembark_geometry.py": {
-      "before_sha256": "978468bdefa67f56d8ee656c050db0f8d0a8c696f947ea4f0d1d0c5116c591e7",
-      "after_sha256": "5c3d6da3ef371144d7323d94ce034bc386a8405b389d5a875a1f482c32ef0f74",
-      "owners": {
-        "append_disembark_endpoint_violations": {
-          "before": "0502c4ae03f045607edd937cc318694d2d5b0348b9cdb1c2fdfaf7e2faa7af65",
-          "after": "19ffd683b89bf6bc8e42562359ac3d11c3a7978815716c981606f0e6e804499f"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_authority_registry.json": {
-      "before_sha256": "db51f5f293ed6e014e87d3e4af0c3722dd786322252662e77b116337dc471e16",
-      "after_sha256": "d501fabab0914b80a26bf88d0b2e520a2c12b46aaedfcf0c43fada87b0716dff",
-      "owners": {
-        "@document": {
-          "before": "db51f5f293ed6e014e87d3e4af0c3722dd786322252662e77b116337dc471e16",
-          "after": "d501fabab0914b80a26bf88d0b2e520a2c12b46aaedfcf0c43fada87b0716dff"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_authority_registry.py": {
-      "before_sha256": "8879613a66fabac9762166efcdb26712f24c59cfecf1d39443db1b20a196b584",
-      "after_sha256": "a1b5a229b3699ae45d2ca2b99e9ad074f4c46dfd287d7c971b236f1cfdeb77b7",
-      "owners": {
-        "@module": {
-          "before": "2adc53ce197d5ab6ed0c2e544058012e067ded6cc7d4c4f394c04b6bc3d69543",
-          "after": "f2f6514cf0b7aa8c7616f732c87c1bae06e8d6be1be9719d6cab3abda220c3c8"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_transports_2026_09/__init__.py": {
-      "before_sha256": "982dd834042f321a325f1c34aa1d64aada8318317fc6c20e7dbfcdb883e05319",
-      "after_sha256": "421137c3bad0819d99225d63159e9b97ab130822eec71f9750f4f67aea4825f0",
-      "owners": {
-        "@module": {
-          "before": "27a3e9e19ea130181284214dfa6bc4f1c8f65c4f60c5f1c07cc57d4ec1d67cbb",
-          "after": "4849e292d83cf881ab5d1b55154811666724df69b66405fbf2182ebad33908de"
-        },
-        "source_package": {
-          "before": "032e2b46827d75e3cfa5e73b6169bb2d357e8b93007b053deffe7c9d046cbd87",
-          "after": "ec1299d996728605fb42c15e62b1756465e68d21ad07f7e34ec25044c9c951d6"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_transports_2026_09/_artifacts.py": {
-      "before_sha256": "2b768227b48a5c33bdc3282d810a69b64d69ec308e0a7f815fee62191e1f136b",
-      "after_sha256": "c79fc0fad16f342b3af0890b202230dfe3d9126f9447f80e42fdce557964c9ad",
-      "owners": {
-        "@module": {
-          "before": "8e9ff5580b5de55641c6a48b1da5ec87099b59d6a06fbb234acd30df9b056a51",
-          "after": "f0f66a939867d07d73121484ce0650bfddb945291c02ea92a68b3d2b5e23ae57"
-        },
-        "core_transports_source_artifact_from_json_bytes": {
-          "before": "1f0540b2dec4bf080502981b9e07e3c991d03cb344a7520b94a0d9a41128d83e",
-          "after": "f4ce81e98122405ab54cb94d68f7d55e4ca2a172fd2561579e5088eac4742c8e"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_transports_2026_09/artifacts/package.json": {
-      "before_sha256": "1b0f790f63da545c4cd0d509bba52aa3deacaa18dda9f1402491b00beded2e76",
-      "after_sha256": "52731cea96cc3fbadad6dbb79072fca8a7b9c662c519647c39d787edf5a9fda5",
-      "owners": {
-        "@document": {
-          "before": "1b0f790f63da545c4cd0d509bba52aa3deacaa18dda9f1402491b00beded2e76",
-          "after": "52731cea96cc3fbadad6dbb79072fca8a7b9c662c519647c39d787edf5a9fda5"
-        }
-      }
-    },
-    "tests/code_quality/test_order55_disembark.py": {
-      "before_sha256": "4459c087fa80fd9352a690d7489e18386dd1894763f1f53071e7e59cde3a5c13",
-      "after_sha256": "2d1a4cb69ccbdaa8bbbc607e0c8296810ad1706fca0abd6747ac4e873f5ed3cd",
-      "owners": {
-        "test_all_disembark_consumers_use_the_shared_endpoint_authority": {
-          "before": "3545c67899e997b524aaaf76feb54517f407e968b6b67ef58bb3804cd9f9e622",
-          "after": "6798d1f4e41dbe56611858e669086668bfbc42186370cca1a18ef278c7d0fcd3"
-        }
-      }
-    },
-    "tests/code_quality/test_phase14i_14h_closeout.py": {
-      "before_sha256": "6b07d1edceea55da3ad7aa63442fc3bdb952f1f071e14431962a6232a95eeb98",
-      "after_sha256": "5edd42bf0225c4a02b0d633f4d3022b36e8a13d45beabdab760cab831f428ea5",
-      "owners": {
-        "test_p18e_shock_disembark_is_source_bound_and_reuses_canonical_fight_activation": {
-          "before": "aca13122786f725cf3e5126a74155d413f89ad6bd4d94e649cf7935331fd4a31",
-          "after": null
-        },
-        "test_p18e_shock_disembark_is_source_bound_without_forced_fight_production": {
-          "before": null,
-          "after": "f5aceef03e9dd165b8f23094c7459426921bd7602cff967c22730e485792a33d"
-        },
-        "test_shared_engaging_forced_fight_authority_remains_canonical": {
-          "before": null,
-          "after": "e3076544df841b4f5ecb39993b7f9c6a80eea4df1520fa32ef8c4f2df754b7e9"
-        }
-      }
-    },
-    "tests/code_quality/test_shock_disembark_authority.py": {
-      "before_sha256": "2b8296410c494163b2f74e2d853489a505e66815082ec98f6ecb7475d34f7e09",
-      "after_sha256": "954970a90129c26a431a2b47c70bb5c4452223b57aa5e793a2f1d81c399ddc87",
-      "owners": {
-        "@module": {
-          "before": "f7fab30719023b8f623b343030a9541f91645a252ffdac0ee2b6c1738956d633",
-          "after": "0f2b52e1a78b175d67e6ff4f2665ab1220e099aedcf79dbcf82481aa1fa41a75"
-        },
-        "test_shock_has_no_queue_producer_or_mandatory_restore_disposition": {
-          "before": null,
-          "after": "d989d8fc3e2047195d2942dd38516854d45bfc535455e67dd9dbb02da1a322c8"
-        },
-        "test_shock_queue_and_restore_use_post_placement_authority": {
-          "before": "7eff9b20aa614cfad7dd07f8d64456bb673d2049f58e5e9577e1ca06a64f0ed8",
-          "after": null
-        }
-      }
-    },
-    "tests/code_quality/test_v963_shock_source.py": {
+    "tests/code_quality/test_order102_fight_completion_ownership.py": {
       "before_sha256": null,
-      "after_sha256": "3d4b35b36180c2f9781ddf18a779f4aa051c69d410bfec6867d8c8013d63c9f6",
+      "after_sha256": "970490c9a26e006675c2eb100901cbd2a6bc9c5f7d2a0e042eaeff6ac4d96870",
       "owners": {
         "@module": {
           "before": null,
-          "after": "151bd101e52778f6906902f6db04acf6464751c7f75dbf2e95cd1cf37acbb059"
+          "after": "df65c9998ba3c4f4acc48f76069a460ae03457a0c9d84e4bc9e3572b733abb93"
         },
-        "test_v963_full_observation_reproduces_and_qualifies_version_and_supersession": {
+        "test_actual_fought_has_one_shared_conditional_producer": {
           "before": null,
-          "after": "8248c5509e415aadac9ac8aa6d25be5a1c7324ad9c86bf2b946b2aedcb5cb42c"
+          "after": "322fb1dc521865196a2c09b57ac4ab6862d32e8f23bdd66c11304499d20de2b7"
         },
-        "test_v963_historical_mapping_rejects_missing_or_changed_archive": {
+        "test_selection_history_and_actual_fought_effects_keep_distinct_owners": {
           "before": null,
-          "after": "ad1040de5cb9fa8855fe110bd2429ae100f31d9776cf3b6b7087e7aadcd994a4"
-        },
-        "test_v963_order95_retirement_keeps_old_proof_and_requires_current_controls": {
-          "before": null,
-          "after": "d1369dcdcfc2a7a84209c083d0e21e85f95096bd5e8f2af5fae4112323006670"
+          "after": "ca915fed47a3fef7f3bcb9d85cf538da987e1f7b496bf57e965a19b0e2d42a21"
         }
       }
     },
-    "tests/unit/test_phase10q_transports.py": {
-      "before_sha256": "31039152b2cd9c1be4e39ff7d93904fe7994104658aab19c9626d69b804412e1",
-      "after_sha256": "52a3659d356a2167e8c3a5ebea8d560b2bcac42d5e273445d186297d98e704da",
+    "tests/code_quality/test_order102_historical_evidence.py": {
+      "before_sha256": null,
+      "after_sha256": "de57e5092a28d7bffb91e36737c3d16a2862a4df751c4e6197f79b14038ca99e",
       "owners": {
         "@module": {
-          "before": "7b741f31ede18f0c623bae124d389a655d2fa8a9bd8cceb63266e3ce6c5baecd",
-          "after": "e916149d4cc1ba5ff5af762ef1085de1c0e2f41cd21603b9c153f59ceef33edf"
-        },
-        "_forge_last_forced_fight_selection_type": {
-          "before": "756032b33704ac953ec4ee04394b5e228cfedd16acf19c8d0ebbab0d6df58ae3",
-          "after": null
-        },
-        "_last_forced_fight_selection_authority_payloads": {
-          "before": "a312bfcb3867b8d969fa3d10dbbf4beecc6bb27f23e02358b1db2090e7f7e2d1",
-          "after": null
-        },
-        "_remove_currently_engaged_from_last_forced_fight_selection": {
-          "before": "bd7b7587814d628655ebd49efcef9378a421b622862d9aa4e17cb1cb62723fac",
-          "after": null
-        },
-        "test_assault_disembark_places_attached_rules_unit_atomically": {
-          "before": "082853937781bd6165971047d9d62122cdabbb66c0473c5dd98c01b8b058fe56",
-          "after": "bbf50bf3c976ef149cd35d5c7fa98d99e6b641c50a67738e2433bd573899c6c2"
-        },
-        "test_forced_fight_source_context_fails_closed_for_malformed_cross_phase_state": {
-          "before": "a952604b4ff38088c6470e5655d165636b7b979a6d1823ff07a8870ef58d125a",
-          "after": "f93a0017145e7a6ee9ee55d96bcfca6b4050b08b508dc47d8bc602bec08f9589"
-        },
-        "test_order62_new_passenger_engagements_use_facade_and_restore": {
-          "before": "dc901fcf72e28a58efdd6268d16c43356cff0e387091367653f6ed854a6e7636",
-          "after": null
-        },
-        "test_order62_transport_only_engagement_does_not_force_passenger_fight": {
-          "before": "ab40a6cc0dbecb820e38d1686c1118620f3db5f88f25550b6c8c85189e2dbdfe",
-          "after": null
-        },
-        "test_shock_disembark_forced_fight_queue_event_is_public_to_both_players": {
-          "before": "057732ad43128189fd7b9f6bad54f415ccd8827577665c8c7d5ee2b79479a46e",
-          "after": null
-        },
-        "test_shock_disembark_resolver_does_not_inherit_transport_engagements": {
-          "before": "faec4e4288a77e076b022b74bcac607f799b60fdbb763f5724b440bfdf93f45d",
-          "after": "9f236cdbabd60522a1f5d9a62da68a5eb67f61f2fb210949c1f3cc6160a693f8"
-        },
-        "test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_replay": {
-          "before": "44bab9291d238fe7b03221c4e6ae02e8d4d55f9d87750f6e855a0bef8bea15d9",
-          "after": null
-        },
-        "test_shock_disembark_without_start_engagements_records_a_skipped_fight_queue": {
-          "before": "c2195d749c88bd4a9b3d1bcf9668aa53b2cbb75aa3efedaf628caa1ff4c5a9ed",
-          "after": null
-        },
-        "test_v963_attached_shock_setup_uses_facade_and_checks_every_component": {
           "before": null,
-          "after": "b64764919dabac2f308f199bc7e4c5efc823acd43d8705ef6c48bce93ab969c3"
+          "after": "ad63567fd767cc05643bae374202b2608feb8a4d21c3f5288731cdc4836460a0"
+        },
+        "test_order102_original_assertions_are_immutable_and_fail_closed": {
+          "before": null,
+          "after": "75d5cf746646e47786becc1191a06b1d58bd969afe01c17066a422387fcf9318"
         }
       }
     },
-    "tests/unit/test_phase14a_source_identity.py": {
-      "before_sha256": "0e8e042f24d08950ed93931359d1670747e6bf8f66710b82813149dcf016ffb9",
-      "after_sha256": "704d5bdb5b99fb523fd62d1807a71123d1dc52ebc5354eabb0987523e4097e90",
+    "tests/completed_attack_fixture_helpers.py": {
+      "before_sha256": "b6bf51193ee90beb5a08af3df8943848c47f2c90aeec8cd8ee82674c10a741ca",
+      "after_sha256": "a2084dac07d61e24082e7fea10b74036368287db2a57aaed033bd57ae6253229",
       "owners": {
-        "test_p18c_p18d_p18e_transport_source_artifact_is_pinned_typed_and_executable": {
-          "before": "0eb3ab7cb02c2d858e5b5f0183a8380322a817ee3af4714cc5b33c53e6a4715a",
-          "after": "af85cae5f1cb2a7d5797234d1acf91eb23a8baca4d67eeec0a8e6d548bc2c61a"
+        "record_melee_declaration_for_executor_fixture": {
+          "before": "4b2260452ad5cebd146ce68d07f1622036bafa25bbe8dac5462313fa065d1dea",
+          "after": "6fc960b632f1f61f94d6b8f9b53d221ecc63ebd93ee3aec9f8fd3d43bb1e85a8"
+        }
+      }
+    },
+    "tests/fight_completion_helpers.py": {
+      "before_sha256": null,
+      "after_sha256": "3bc485324fc70af0165c39ea60c80a26c07fae76473a7e70ed2a24ed271d757e",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "f926c49848d8225b80255989d1152b5b1249bc12aa506b5e84d731eb2af75fca"
+        },
+        "assert_completion_round_trip": {
+          "before": null,
+          "after": "943cffcd2a7bd46799b71aa897f96ac032f96eaf20010b48f99796eb883cf712"
+        },
+        "completion_session": {
+          "before": null,
+          "after": "bfdeab4bb9019ba777fdf8979d54824d67c5cd248e4941227a03bdd5e57c9d0d"
+        },
+        "drive_to_completion": {
+          "before": null,
+          "after": "3872e487695dc2823c676d92846a7efe83a35c6acb05f5f1ee99b0f73e1f030a"
+        },
+        "engaging_completion_session": {
+          "before": null,
+          "after": "2904fa3b31dd07d850c19966ebef78c9bba0628213085b295a4cb71026bdff56"
+        },
+        "submit_completion_request": {
+          "before": null,
+          "after": "86e6e0867f9ce41c21340aad39e69a2e343d1a13883604c6014c6649acac8488"
+        }
+      }
+    },
+    "tests/fight_completion_positive_helpers.py": {
+      "before_sha256": null,
+      "after_sha256": "8657bd7a9c40da943584bb57ff2cc9f4d3ac4798584811779a5b4440dc03e4d7",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "2ff6f66ab964abdf0a09b05d17d31d2833ab5c24da01ea14597ea0a5fbb4cad1"
+        },
+        "armed_fight_control_catalog": {
+          "before": null,
+          "after": "f416c42f3cf45b1ff8d631b426d9c110c2c7afc56a0dd2b94c2115f0011b831b"
+        },
+        "assert_completed_melee": {
+          "before": null,
+          "after": "94a915ae275536ff81e7ceb4e2b811a218191223daf50d6c15b52744cab0dda8"
+        }
+      }
+    },
+    "tests/integration/test_horror_split_materialization.py": {
+      "before_sha256": "076f251e3f05c8af3423882f147aaf9085344140c6c419abf73e5c2e910f5c36",
+      "after_sha256": "b3299fa7d04a9cfd257ed205d99cd9f546a93463ae9de1a9343926d3328a284d",
+      "owners": {
+        "_record_split_interrupt_activation": {
+          "before": null,
+          "after": "d928b4fb980f9b37c19089e9cba9b120a7a704cca93828fedcca8e55d9d4118a"
+        },
+        "_split_scenario": {
+          "before": "092650a7de0b147f2b46c1a14b56a2b4c79213190f12d97d9c8887700dbcc29b",
+          "after": "7b7a1cd4aaaa82d1cc477b37c4f90aee945787cae59639f7421a191db77e87a0"
+        },
+        "test_fight_interrupt_split_resumes_completed_activation_and_resolves_reaction_frame": {
+          "before": "e5d37756a53303a9c2389b46c643b6a0c6fde345d9d647787219bdd3c812614f",
+          "after": "835ebb8c009e4f27c332d5b638cc785a1cbe3de3b7f048b9e54a38c8e5f0639d"
+        }
+      }
+    },
+    "tests/integration/test_ws13_adapter_phase_families.py": {
+      "before_sha256": "27099f7f0e641a836e6d76a3bc6084624a12f1ff2f7b30c2524eec4507dfbef7",
+      "after_sha256": "58d2c2eb9974cba72f03133b3cc22b9c102eaff791cdcf4e2bfcdc0df36b8c30",
+      "owners": {
+        "test_local_session_routes_fight_devastating_mortal_model_and_fnp_choices": {
+          "before": "7b934ee5167e148f6063f912317a9a8635427eb97c856c1d712c8b618087b32b",
+          "after": "4d721dc2d2c026239bfd3559b0afdc5581e3ec2e875c31529285fba3d610cc01"
+        }
+      }
+    },
+    "tests/unit/test_aeldari_shroud_runners_wraithblades_datasheets.py": {
+      "before_sha256": "0d3c53603be0d7bdd01d560c4d4afc7e96c6ffb854457de00a43329778ecf422",
+      "after_sha256": "868b492b5ef63155807096a3550e3d1cb2cc85e809d2ade53920ad34dd09aef4",
+      "owners": {
+        "_resolve_malevolent_attack": {
+          "before": "0dad097bcb489b9f554dc5807c295bbbe8b66d3d3c5771143c6c92c74045e63e",
+          "after": "a77c2b5a8a31c5579e3f68a74e9a2ab1e0ad79498529a94115212d92914d6e26"
+        }
+      }
+    },
+    "tests/unit/test_fight_selection_completion.py": {
+      "before_sha256": null,
+      "after_sha256": "b2e36e6de18500044387eff7abe62267954ed321c053957989aac0a2f82616fb",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "43b72dd19d8abf4745686cf1ca304e2794409a90309dbaf781bdc319dadf20ca"
+        },
+        "test_actual_melee_attempt_counts_even_when_it_misses_or_hits_automatically": {
+          "before": null,
+          "after": "e89634b7292077df432af48a6a90ebb1e9add22b011a3425ff40fc076995afec"
+        },
+        "test_armed_retained_fight_cleanup_preserves_completion_across_restore": {
+          "before": null,
+          "after": "a61ae4bb4d42038c38cbd838935ff7d8a1d90d21bd6ed33958181ac4e612ea11"
+        },
+        "test_armed_selection_without_a_melee_target_completes_without_fighting": {
+          "before": null,
+          "after": "2b8910ace8e9ba0f5842a500e731d01b178b804a8b07ec31c4a4ec9ffac8b909"
+        },
+        "test_empty_retained_selection_waits_for_phase_end_cleanup_across_restore": {
+          "before": null,
+          "after": "8d7309a4bd8ec45933671280ee1ab16306325968ded58a95056f1e5aa4b7649d"
+        },
+        "test_engaging_response_preserves_empty_selection_and_resumes_once": {
+          "before": null,
+          "after": "66fa82028650d13f0c7adced850ed6fc8c0e3be2d2dbbbf9fc99c1447394af3f"
+        },
+        "test_selection_completion_records_only_actual_fights_and_preserves_timing": {
+          "before": null,
+          "after": "869b9b8e53bae05acb2b08b459276906337a96bec04c1f285339e83e760c8e79"
+        }
+      }
+    },
+    "tests/unit/test_phase15c_fight_order.py": {
+      "before_sha256": "0f3d5232ae42bb718ff0da4e6a1cb50017acbed5d317c6d468c1cd938c312f4b",
+      "after_sha256": "fb020dd91f658a8d96b3116a0cd657e1d46a943362f722dceb7e4a44311c0fd0",
+      "owners": {
+        "@module": {
+          "before": "e8bab924b0c4a9368954003ca7a83aac0816d456e64c890185303ed8cceb28f3",
+          "after": "076307c227bb352823533a83d6120e46a1bf020c72cd758fa5260c4f75448841"
+        },
+        "_drain_fight_movement_requests": {
+          "before": "7f41b0047b70b7149b7d26f2e83249aa7055bcaef167a67741b569953a19c947",
+          "after": "38ca32221eee2712b6bab77bc264595c08f624cb400105510e3532bbdb8b74ba"
+        },
+        "_overrun_interrupt_lifecycle": {
+          "before": "a60f6a1f071b3ec99babe81e85774fc2f7c8cb661e8be039cced3c5020b4e66e",
+          "after": "2edc89ed1480e04ebc39fc78795f071076f7ecb4e88e92b8978c25c4c3b9fdf1"
+        },
+        "_record_fight_on_death_cleanup": {
+          "before": "7308c39b473fdbff2de8f586680eeef683ced8b89a83b956d7a7d22c4e22cb62",
+          "after": "74482f0e780ea658b396399145a5633f1b088f16982b98f801c325f09a269d15"
+        },
+        "_resolve_phase15d_activation": {
+          "before": "8af21797e256f11642a41691b284b7c2838dfd751f6febbd3358d8d95c9bffdd",
+          "after": "167bee6dd4b4229461d3a53c1831d6fddbba9ece3dbab5734e78b2f1995682d9"
+        },
+        "_trigger_overrun_interrupt_request": {
+          "before": "a354f7785fecf0977adf02232c322487771902ced3b01801af9c1286b468764c",
+          "after": "8f54d3d0252b01a47e435f872a1ad20ce4467b63d834e87e48071dc9efa15974"
+        },
+        "test_counteroffensive_acceptance_continues_reaction_to_melee_subflow": {
+          "before": "c025b9c0623cf22edcb522a170bb066066c52e10a490773eb382eae3f71e1a4f",
+          "after": "75aa5312f5df8e4196daa03bdfeb7f01c7e1072cd9390f8106d1b464d68d796d"
+        },
+        "test_counteroffensive_epic_challenge_decline_continues_reaction_to_melee": {
+          "before": "4882d808e0589d441b6628afcbbacc09609d9f5e514b11c1d2d7d44922824829",
+          "after": "65487a9076bbe669e4cc80efcddc71bb21a2e9360dc662af03f215726489a508"
+        },
+        "test_fight_interrupt_decline_records_once_and_resumes_parent_sequence": {
+          "before": "9a4b6484323f483e1b2c853d19317409a8a4ac86faf3b476498d7a28438a096e",
+          "after": "ba6f756f3f52a9eeade29767749ae89af692d9db96cf218a42a09e1e0cc1ee08"
+        },
+        "test_fight_interrupt_source_is_not_offered_again_after_accepted_interrupt": {
+          "before": "991f9a43b7e8a92e6439b548a4550e2ff1305c4a09afcd79b866bf5b4b94822d",
+          "after": "c9ee9366158efcf5327346a1e538c1acc6139b382ce86c7d8b44468b5af03416"
+        },
+        "test_fight_interrupt_source_is_not_offered_again_after_decline": {
+          "before": "05247917dba876ca1f9a66e8cdb62c2827cd940937df28ff4062b3117630e4f5",
+          "after": "febec0389f54fd4f09afb83112464fe8093537f395818d74427073603750580f"
+        },
+        "test_fight_interrupt_uses_reaction_queue_once_and_resumes_parent_sequence": {
+          "before": "d259f31a0011671bdac5ffe4a89c574c38bd2c681c39c562c19416b79e09d790",
+          "after": "4f9a1ae2039640ef63d846f1216b656ca98fca44a239cf6deeb399c47814b490"
+        },
+        "test_fight_on_death_models_and_survivors_share_one_normal_activation": {
+          "before": "72459899c051b67c52128c545fc0e68abb74282c53f928132c3934d13d2aecf5",
+          "after": "63e9974bc7c48872d84493b8d9e37dd0fc984a9c7dd5097f4a9a8203873456c8"
+        },
+        "test_order70_conditional_leader_grant_uses_retained_presence": {
+          "before": "fce13e3f4c331d712528ea06442e2c1e827bbf255cd4060dfcce498a2d4ba1a0",
+          "after": "144b3daef79ddc9383c434cfab5bde9d0dc4a6e160700f082f8aab9893ec5e7b"
+        },
+        "test_order70_fight_order_rechecks_casualties_and_retained_cleanup": {
+          "before": "b52b93c3c764821a53814f4589e15967c96123ea4fae1bf41dc46a6f2a2e6022",
+          "after": "5b4ddd517db7114ff6da477359d8d65f0e5ca24bb0aa30f5662a792b74183b66"
+        },
+        "test_p12_full_fight_phase_reconstructs_ordinary_continuation_and_forced_overrun": {
+          "before": "fc44cf46ebe0be68d2d3e38a2ddc33be82189ddb233e62db987e84c4c41dd31d",
+          "after": "a919208b7890ea545189cd24db445c300bcf7ef60c072d669193baf1a5103864"
+        },
+        "test_phase15d_interrupt_melee_declaration_continues_reaction_to_attack_sequence": {
+          "before": "427fa2c95fb0919b87281e31eac58be992af8ea6d1623bc07acd57c428065ffa",
+          "after": "b6882103a6d649b0808aa2c82d53bf1dcadb559dbaef90e58d9fe4958d76ab6c"
+        },
+        "test_phase15d_restore_authenticates_target_living_at_fight_movement_terminal_event": {
+          "before": "5619cf5c75b2d1ffb62d43199f564f22352433c2d22225b6d8c087db2a98c5bc",
+          "after": "3774388a6ec640d36dfad5174d897100c945e16224424f571d07e47db819f0d9"
+        },
+        "test_phase15d_restore_rejects_pending_fight_movement_after_retained_target_is_removed": {
+          "before": "f2d1743c4723499bccefdb161aea5afd45558e0f119fa02b7c59e4dfd8b3ccff",
+          "after": "a61cc76d105cc4792846cf364edc42079c9a74a6880a6e79a765d72cae21f89a"
+        },
+        "test_restore_rejects_destroyed_model_revived_without_restoration_or_fight_movement": {
+          "before": "92c93aad3a8fbfe304a2e64633f1dec43487991ba7d34c400eddce64b766c18b",
+          "after": "e2e570b69bb22b7203cb57a7d40023554f9b88f6c522a2d13c4cfa15f3151e27"
+        }
+      }
+    },
+    "tests/unit/test_phase17_emperors_children_daemon_prince.py": {
+      "before_sha256": "ceabe9c878c7ade90198f29551bf49f0c44f257c263d1bba6886d33e1bf585c3",
+      "after_sha256": "5652264421a7914031515f82fb4bf640831bcc33c889167af7aedbf72c84a5ec",
+      "owners": {
+        "@module": {
+          "before": "4271ab9fa481a646898e54dc41ca628754ab3006c66f7238d12e443983de1d81",
+          "after": "de45c104eef5a857e0f2103bfba5e94bd9eb115e715839b626f15cdff8f29a70"
+        },
+        "_ecstatic_death_chain_session": {
+          "before": "92cb380d88d331b981c89bcf5a27a75d0b91243e00c12e7adf794f936e2d8c1e",
+          "after": "a6da6c9d30963f5d3839e6e0d819acd87acf29d011d717ae57dd204d0ad168b4"
+        },
+        "test_ecstatic_death_chain_uses_ordinary_fight_alternation_without_nesting": {
+          "before": "4c0ce47b68847c2170a4aae76938d960ccca05cb29b7b48a1e44c2b7076efb24",
+          "after": "e029b382f00ee37e8a6d21cc20498224d4a1256a6ccab04afb12d56771d2f586"
         }
       }
     },
     "tests/unit/test_phase18e_server_api.py": {
-      "before_sha256": "ebed4f4f546031175d6ba6af1047f17f72751e11b53bd09bda5379f7f99e23a4",
-      "after_sha256": "8833de051e3b8b366a14195610f9c6f5b7dfcdb80a8f8cc10cee179ae485949b",
+      "before_sha256": "8833de051e3b8b366a14195610f9c6f5b7dfcdb80a8f8cc10cee179ae485949b",
+      "after_sha256": "0b3a500bfe428f65137ab3153c82152036d616d0a22de4a8caef4449788eb816",
       "owners": {
         "test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads": {
-          "before": "c8c45e91c8b767440457b8a351d3784d3e2cecfdfd93ae826b4c2525cb1a673b",
-          "after": "1bfd39a98ea319aa948b2afeb4e3d3c9ac313d36f8f0d64a5b11048fb8ce8696"
-        }
-      }
-    },
-    "tests/unit/test_v963_shock_disembark.py": {
-      "before_sha256": null,
-      "after_sha256": "90dc173f104a0cfcf3cb5d3697023e7507e30b450dd07cf95d3ec7f303d528d1",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "25619bcd3b42cb1f364b5d2857dab8e766a087729ba0ac131e3697d3b9a05c17"
-        },
-        "_charge_reason": {
-          "before": null,
-          "after": "75f4a15273256ce736f546c7d96fc0fac3a31dfa7bcf3a5d6529a6ed14d16e78"
-        },
-        "test_v963_shock_charge_lock_includes_all_turn_end_rules_then_expires": {
-          "before": null,
-          "after": "06cd6b0ee9e380242067ae1d92edd8a181297215ddf0a318038b32113445c4e8"
-        },
-        "test_v963_shock_malformed_and_stale_proposals_do_not_pop_or_mutate": {
-          "before": null,
-          "after": "1208d046f28ba3d59c886e39f09ddf9c5e87336070f203355446d4e7c4ec38cb"
-        },
-        "test_v963_shock_rejects_passenger_engagement_without_mutation": {
-          "before": null,
-          "after": "9dc371561ba103542d7869f634e871e0971282c169a057a1457624e7d499374a"
-        },
-        "test_v963_shock_unengaged_setup_has_no_queue_and_restores_exactly": {
-          "before": null,
-          "after": "8d9d3244d30fa902251c13f829bbb1ec99910c3dafc7bd5ff987b357caaa7a7d"
-        }
-      }
-    },
-    "tests/v963_shock_helpers.py": {
-      "before_sha256": null,
-      "after_sha256": "3a482bf1094c160e96ccb2d41d0f8c835d62274a7d639898d45da66a8fc0c6c5",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "21b1dc4368906f4e0fe968f58d23c09f5b14819471f50cc2f70a843fa74a2850"
-        },
-        "tactical_shock_session": {
-          "before": null,
-          "after": "d3a3ca28e627399936faa0b510f9bfe9d616b0c9bb1f59924bcf96c2b9a270bf"
-        }
-      }
-    },
-    "tools/build_core_transports_source.py": {
-      "before_sha256": "f88dc848b025c36d913c9eed67da1a74e83ffb00b3a0fce71f708c891e41562e",
-      "after_sha256": "db7bf67fd021c61939f2f750eb220c4d789d6d629d9e183e24ef1b761ca7100d",
-      "owners": {
-        "@module": {
-          "before": "1215d46d379781228a01ec1bc69f50cf6a8e341fd6d6d4550cbcd051eceb2b21",
-          "after": "45edbf95a2dc6a23c6b8d51ef1315d91eec604ad54f63bcc8e7fdaa905f9757b"
-        },
-        "build_historical_payload": {
-          "before": null,
-          "after": "eee311b987b79ab61580cee3b8fae0787d03257956a5bf24ce7f8e4809764fdf"
-        },
-        "build_payload": {
-          "before": "89a48c47ff8af5cc710793fc1fa7696d28ec9cdca85d10735b891a01a84c8bfc",
-          "after": "095fb339d13011ca6daa8903f033582fd3156d6f2c43674d6ec5f7a2ad3d817f"
-        },
-        "main": {
-          "before": "57023480fd704f9995f4149d4b11c02ba3a75d0d4301f33d27e4f6b81ce733be",
-          "after": "b4bb194f3dfb9c2f633790d4d628aca7d50a195da1a0244a1e2ff563dfa564a5"
-        }
-      }
-    },
-    "tools/core_rules_order95_audit.py": {
-      "before_sha256": "952f11ae8d704bb15b4db891d2656bd3a062594644554c087e3a3eb534b60aec",
-      "after_sha256": "24b2c0088b0d5fd775b1565df333f89586006fc7d83fda27a0b6bbb677133f0d",
-      "owners": {
-        "@module": {
-          "before": "b366b9ca32cd8c9447cb585b7a010fb1999c2ef26d85696f1605ee5e6fa2250e",
-          "after": "a5c1d956baa3c7ca7f8e5537e6bb0468dee7b52cc3b6531910830812a364eb5c"
+          "before": "1bfd39a98ea319aa948b2afeb4e3d3c9ac313d36f8f0d64a5b11048fb8ce8696",
+          "after": "32dd4af9512b9999128b8ba15d3b66878d75f23b734311f3b84f10a49697ae06"
         }
       }
     },
     "tools/core_rules_order97_history.py": {
-      "before_sha256": null,
-      "after_sha256": "58f7cfc37d8bd5b0a9d918cb85a81d5f3aa9eb4212aac204ae51a303fecee0d3",
+      "before_sha256": "58f7cfc37d8bd5b0a9d918cb85a81d5f3aa9eb4212aac204ae51a303fecee0d3",
+      "after_sha256": "afdb248495b679df6491eeff3616eeb51422ea83db5bed599017ad1770adec7d",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "b5dc57795661ab5be4b4eb596d2602016c1d031a17a0e0029595c426d521cd09"
+          "before": "b5dc57795661ab5be4b4eb596d2602016c1d031a17a0e0029595c426d521cd09",
+          "after": "d07a9268a479538e7f044540faae03afb6815109944453780ed91c3bbafa7af1"
         },
         "historical_evidence_path": {
-          "before": null,
-          "after": "6fcdec7603960748c5aed1ded46b93b4221aa3d91596f07aefbb2dff04268a66"
-        }
-      }
-    },
-    "tools/core_rules_order97_inventory.py": {
-      "before_sha256": "69dacad80c53b66264916c300d566129c9bedc48b5125ea65e7b2fd1dc5855e0",
-      "after_sha256": "fe6298c193fdba5d2b09cf48938336846a8acbd876836eb57a953a3bdd1abf6d",
-      "owners": {
-        "@module": {
-          "before": "dfdc8f778e0ce758c18292b4b36d6bf531c0a75564ed9774d65536f52e9f0df6",
-          "after": "6e1fb0330c4f67fb4d947153c2f014e04ca78ef7b1ec828c334d4b14d54cece2"
-        },
-        "_path": {
-          "before": "9b2ef128c2fd4b9584541a54f7f92d46fd63e50576ffa80490c5a982c28a3f49",
-          "after": "44c4884f8fdb15d72e48a8edb2c213eb42c32ce123430c93cf2abf70fd54ead2"
-        }
-      }
-    },
-    "tools/v963_shock_source.py": {
-      "before_sha256": null,
-      "after_sha256": "918ab523a8eda1c711456a3c94bae7b4b49ae506c087b014c24ec8211ce8537e",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "a20843132fffaaa0f29f4e528fba6eec665a7b75440959900da8cdda5cfccf1a"
-        },
-        "build_audit": {
-          "before": null,
-          "after": "7dcb98f02c8ca94bdee62073327e62e5194c60463e04722f954d7a8e6d9fdb1b"
-        },
-        "selected_records": {
-          "before": null,
-          "after": "08806c64d4eb6d2879a2c28d81596dec48bfa2bbe712db85ab671f430347816b"
-        },
-        "sha256_payload": {
-          "before": null,
-          "after": "c1f3651fa15ef8bd37511d1de6779c3673cf629632ed58bc066579d93138ca2b"
-        },
-        "shock_source_text": {
-          "before": null,
-          "after": "a2b0f7beeae908f2ca3aaa048a26c7027e91f0b693069b005354fdfcffdfda7d"
-        },
-        "verify_source_observation": {
-          "before": null,
-          "after": "c85972af00e5300b51f16e2ecef324c9341e7bd832ef5d19e9367049118aff62"
+          "before": "6fcdec7603960748c5aed1ded46b93b4221aa3d91596f07aefbb2dff04268a66",
+          "after": "f82e541815f618add6d1b5f20a09325daabf760b58e3a112a44538c6fc35a720"
         }
       }
     }
@@ -954,7 +784,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the bounded current Shock source, preserve historical authority and audit only superseded Shock expectations; this document or quality control changes no runtime algorithm or measured workload.",
+      "rationale": "Publish reviewed bounded Fight-completion source, immutable archive integrity, contract semantics or fresh performance evidence. These documentation and quality-control inputs do not change runtime execution or the measured workload; all prior failures remain qualified.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -964,9 +794,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Register the new Shock regression file in the existing twelve-shard inventory using the retained complete successful Windows JUnit profile, with truthful host/provenance labeling.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only CI test scheduling metadata changes; no runtime owner, measured scenario, fixture semantics or test selection is reduced, and every behavioral file remains present exactly once."
+      "rationale": "Generate all twelve behavioral shards from one complete passing current covered Windows run, preserving every current file exactly once and recording the real host/runtime/input provenance. Only scheduling metadata changes after the tested source freeze; final Git applicability proves all executed inputs remain identical.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only test scheduling metadata changes. No runtime, test, fixture, workload, configuration, lock, generated runtime or contract input changes, and no behavioral test is dropped. The complete current profile is Windows evidence, not hosted Linux timing."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -974,9 +804,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Register the new Shock regression file in the existing twelve-shard inventory using the retained complete successful Windows JUnit profile, with truthful host/provenance labeling.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only CI test scheduling metadata changes; no runtime owner, measured scenario, fixture semantics or test selection is reduced, and every behavioral file remains present exactly once."
+      "rationale": "Generate all twelve behavioral shards from one complete passing current covered Windows run, preserving every current file exactly once and recording the real host/runtime/input provenance. Only scheduling metadata changes after the tested source freeze; final Git applicability proves all executed inputs remain identical.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only test scheduling metadata changes. No runtime, test, fixture, workload, configuration, lock, generated runtime or contract input changes, and no behavioral test is dropped. The complete current profile is Windows evidence, not hosted Linux timing."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -984,9 +814,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Register the new Shock regression file in the existing twelve-shard inventory using the retained complete successful Windows JUnit profile, with truthful host/provenance labeling.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only CI test scheduling metadata changes; no runtime owner, measured scenario, fixture semantics or test selection is reduced, and every behavioral file remains present exactly once."
+      "rationale": "Generate all twelve behavioral shards from one complete passing current covered Windows run, preserving every current file exactly once and recording the real host/runtime/input provenance. Only scheduling metadata changes after the tested source freeze; final Git applicability proves all executed inputs remain identical.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only test scheduling metadata changes. No runtime, test, fixture, workload, configuration, lock, generated runtime or contract input changes, and no behavioral test is dropped. The complete current profile is Windows evidence, not hosted Linux timing."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -994,9 +824,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Register the new Shock regression file in the existing twelve-shard inventory using the retained complete successful Windows JUnit profile, with truthful host/provenance labeling.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only CI test scheduling metadata changes; no runtime owner, measured scenario, fixture semantics or test selection is reduced, and every behavioral file remains present exactly once."
+      "rationale": "Generate all twelve behavioral shards from one complete passing current covered Windows run, preserving every current file exactly once and recording the real host/runtime/input provenance. Only scheduling metadata changes after the tested source freeze; final Git applicability proves all executed inputs remain identical.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only test scheduling metadata changes. No runtime, test, fixture, workload, configuration, lock, generated runtime or contract input changes, and no behavioral test is dropped. The complete current profile is Windows evidence, not hosted Linux timing."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -1004,9 +834,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Register the new Shock regression file in the existing twelve-shard inventory using the retained complete successful Windows JUnit profile, with truthful host/provenance labeling.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only CI test scheduling metadata changes; no runtime owner, measured scenario, fixture semantics or test selection is reduced, and every behavioral file remains present exactly once."
+      "rationale": "Generate all twelve behavioral shards from one complete passing current covered Windows run, preserving every current file exactly once and recording the real host/runtime/input provenance. Only scheduling metadata changes after the tested source freeze; final Git applicability proves all executed inputs remain identical.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only test scheduling metadata changes. No runtime, test, fixture, workload, configuration, lock, generated runtime or contract input changes, and no behavioral test is dropped. The complete current profile is Windows evidence, not hosted Linux timing."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -1014,9 +844,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Register the new Shock regression file in the existing twelve-shard inventory using the retained complete successful Windows JUnit profile, with truthful host/provenance labeling.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only CI test scheduling metadata changes; no runtime owner, measured scenario, fixture semantics or test selection is reduced, and every behavioral file remains present exactly once."
+      "rationale": "Generate all twelve behavioral shards from one complete passing current covered Windows run, preserving every current file exactly once and recording the real host/runtime/input provenance. Only scheduling metadata changes after the tested source freeze; final Git applicability proves all executed inputs remain identical.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only test scheduling metadata changes. No runtime, test, fixture, workload, configuration, lock, generated runtime or contract input changes, and no behavioral test is dropped. The complete current profile is Windows evidence, not hosted Linux timing."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -1024,9 +854,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Register the new Shock regression file in the existing twelve-shard inventory using the retained complete successful Windows JUnit profile, with truthful host/provenance labeling.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only CI test scheduling metadata changes; no runtime owner, measured scenario, fixture semantics or test selection is reduced, and every behavioral file remains present exactly once."
+      "rationale": "Generate all twelve behavioral shards from one complete passing current covered Windows run, preserving every current file exactly once and recording the real host/runtime/input provenance. Only scheduling metadata changes after the tested source freeze; final Git applicability proves all executed inputs remain identical.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only test scheduling metadata changes. No runtime, test, fixture, workload, configuration, lock, generated runtime or contract input changes, and no behavioral test is dropped. The complete current profile is Windows evidence, not hosted Linux timing."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -1034,9 +864,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Register the new Shock regression file in the existing twelve-shard inventory using the retained complete successful Windows JUnit profile, with truthful host/provenance labeling.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only CI test scheduling metadata changes; no runtime owner, measured scenario, fixture semantics or test selection is reduced, and every behavioral file remains present exactly once."
+      "rationale": "Generate all twelve behavioral shards from one complete passing current covered Windows run, preserving every current file exactly once and recording the real host/runtime/input provenance. Only scheduling metadata changes after the tested source freeze; final Git applicability proves all executed inputs remain identical.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only test scheduling metadata changes. No runtime, test, fixture, workload, configuration, lock, generated runtime or contract input changes, and no behavioral test is dropped. The complete current profile is Windows evidence, not hosted Linux timing."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -1044,9 +874,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Register the new Shock regression file in the existing twelve-shard inventory using the retained complete successful Windows JUnit profile, with truthful host/provenance labeling.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only CI test scheduling metadata changes; no runtime owner, measured scenario, fixture semantics or test selection is reduced, and every behavioral file remains present exactly once."
+      "rationale": "Generate all twelve behavioral shards from one complete passing current covered Windows run, preserving every current file exactly once and recording the real host/runtime/input provenance. Only scheduling metadata changes after the tested source freeze; final Git applicability proves all executed inputs remain identical.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only test scheduling metadata changes. No runtime, test, fixture, workload, configuration, lock, generated runtime or contract input changes, and no behavioral test is dropped. The complete current profile is Windows evidence, not hosted Linux timing."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -1054,9 +884,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Register the new Shock regression file in the existing twelve-shard inventory using the retained complete successful Windows JUnit profile, with truthful host/provenance labeling.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only CI test scheduling metadata changes; no runtime owner, measured scenario, fixture semantics or test selection is reduced, and every behavioral file remains present exactly once."
+      "rationale": "Generate all twelve behavioral shards from one complete passing current covered Windows run, preserving every current file exactly once and recording the real host/runtime/input provenance. Only scheduling metadata changes after the tested source freeze; final Git applicability proves all executed inputs remain identical.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only test scheduling metadata changes. No runtime, test, fixture, workload, configuration, lock, generated runtime or contract input changes, and no behavioral test is dropped. The complete current profile is Windows evidence, not hosted Linux timing."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -1064,9 +894,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Register the new Shock regression file in the existing twelve-shard inventory using the retained complete successful Windows JUnit profile, with truthful host/provenance labeling.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only CI test scheduling metadata changes; no runtime owner, measured scenario, fixture semantics or test selection is reduced, and every behavioral file remains present exactly once."
+      "rationale": "Generate all twelve behavioral shards from one complete passing current covered Windows run, preserving every current file exactly once and recording the real host/runtime/input provenance. Only scheduling metadata changes after the tested source freeze; final Git applicability proves all executed inputs remain identical.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only test scheduling metadata changes. No runtime, test, fixture, workload, configuration, lock, generated runtime or contract input changes, and no behavioral test is dropped. The complete current profile is Windows evidence, not hosted Linux timing."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -1074,9 +904,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Register the new Shock regression file in the existing twelve-shard inventory using the retained complete successful Windows JUnit profile, with truthful host/provenance labeling.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only CI test scheduling metadata changes; no runtime owner, measured scenario, fixture semantics or test selection is reduced, and every behavioral file remains present exactly once."
+      "rationale": "Generate all twelve behavioral shards from one complete passing current covered Windows run, preserving every current file exactly once and recording the real host/runtime/input provenance. Only scheduling metadata changes after the tested source freeze; final Git applicability proves all executed inputs remain identical.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only test scheduling metadata changes. No runtime, test, fixture, workload, configuration, lock, generated runtime or contract input changes, and no behavioral test is dropped. The complete current profile is Windows evidence, not hosted Linux timing."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -1084,9 +914,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Register the new Shock regression file in the existing twelve-shard inventory using the retained complete successful Windows JUnit profile, with truthful host/provenance labeling.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only CI test scheduling metadata changes; no runtime owner, measured scenario, fixture semantics or test selection is reduced, and every behavioral file remains present exactly once."
+      "rationale": "Generate all twelve behavioral shards from one complete passing current covered Windows run, preserving every current file exactly once and recording the real host/runtime/input provenance. Only scheduling metadata changes after the tested source freeze; final Git applicability proves all executed inputs remain identical.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only test scheduling metadata changes. No runtime, test, fixture, workload, configuration, lock, generated runtime or contract input changes, and no behavioral test is dropped. The complete current profile is Windows evidence, not hosted Linux timing."
     },
     "conformance/typescript/src/contract.ts": {
       "category": "rule_semantics",
@@ -1094,9 +924,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish contract bundle 42.1 and regenerated runtime/source identities for the normative Shock correction, retaining existing payload families, persistence envelope and submission protocol.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only published version/source/build metadata changes; serialization, deserialization, replay, transport algorithms and all supported client family shapes remain unchanged."
+      "rationale": "Publish contract 42.2 and regenerated examples/build identity for the corrected event semantics. The event type remains open with arbitrary JSON payload, persistence runtime matching remains exact, immutable 42.0 baseline/family versions and submission protocol remain unchanged.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only contract version/generated identity publication changes here. No supported decision, submission, mutation, viewer or persistence schema algorithm is changed; exact-base and oldest-major compatibility plus real client conformance remain required."
     },
     "contracts/README.md": {
       "category": "rule_semantics",
@@ -1104,9 +934,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish contract bundle 42.1 and regenerated runtime/source identities for the normative Shock correction, retaining existing payload families, persistence envelope and submission protocol.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only published version/source/build metadata changes; serialization, deserialization, replay, transport algorithms and all supported client family shapes remain unchanged."
+      "rationale": "Publish contract 42.2 and regenerated examples/build identity for the corrected event semantics. The event type remains open with arbitrary JSON payload, persistence runtime matching remains exact, immutable 42.0 baseline/family versions and submission protocol remain unchanged.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only contract version/generated identity publication changes here. No supported decision, submission, mutation, viewer or persistence schema algorithm is changed; exact-base and oldest-major compatibility plus real client conformance remain required."
     },
     "contracts/compatibility-policy.md": {
       "category": "rule_semantics",
@@ -1114,9 +944,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish contract bundle 42.1 and regenerated runtime/source identities for the normative Shock correction, retaining existing payload families, persistence envelope and submission protocol.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only published version/source/build metadata changes; serialization, deserialization, replay, transport algorithms and all supported client family shapes remain unchanged."
+      "rationale": "Publish contract 42.2 and regenerated examples/build identity for the corrected event semantics. The event type remains open with arbitrary JSON payload, persistence runtime matching remains exact, immutable 42.0 baseline/family versions and submission protocol remain unchanged.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only contract version/generated identity publication changes here. No supported decision, submission, mutation, viewer or persistence schema algorithm is changed; exact-base and oldest-major compatibility plus real client conformance remain required."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -1124,9 +954,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish contract bundle 42.1 and regenerated runtime/source identities for the normative Shock correction, retaining existing payload families, persistence envelope and submission protocol.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only published version/source/build metadata changes; serialization, deserialization, replay, transport algorithms and all supported client family shapes remain unchanged."
+      "rationale": "Publish contract 42.2 and regenerated examples/build identity for the corrected event semantics. The event type remains open with arbitrary JSON payload, persistence runtime matching remains exact, immutable 42.0 baseline/family versions and submission protocol remain unchanged.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only contract version/generated identity publication changes here. No supported decision, submission, mutation, viewer or persistence schema algorithm is changed; exact-base and oldest-major compatibility plus real client conformance remain required."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -1134,9 +964,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish contract bundle 42.1 and regenerated runtime/source identities for the normative Shock correction, retaining existing payload families, persistence envelope and submission protocol.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only published version/source/build metadata changes; serialization, deserialization, replay, transport algorithms and all supported client family shapes remain unchanged."
+      "rationale": "Publish contract 42.2 and regenerated examples/build identity for the corrected event semantics. The event type remains open with arbitrary JSON payload, persistence runtime matching remains exact, immutable 42.0 baseline/family versions and submission protocol remain unchanged.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only contract version/generated identity publication changes here. No supported decision, submission, mutation, viewer or persistence schema algorithm is changed; exact-base and oldest-major compatibility plus real client conformance remain required."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -1144,9 +974,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish contract bundle 42.1 and regenerated runtime/source identities for the normative Shock correction, retaining existing payload families, persistence envelope and submission protocol.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only published version/source/build metadata changes; serialization, deserialization, replay, transport algorithms and all supported client family shapes remain unchanged."
+      "rationale": "Publish contract 42.2 and regenerated examples/build identity for the corrected event semantics. The event type remains open with arbitrary JSON payload, persistence runtime matching remains exact, immutable 42.0 baseline/family versions and submission protocol remain unchanged.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only contract version/generated identity publication changes here. No supported decision, submission, mutation, viewer or persistence schema algorithm is changed; exact-base and oldest-major compatibility plus real client conformance remain required."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -1154,9 +984,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish contract bundle 42.1 and regenerated runtime/source identities for the normative Shock correction, retaining existing payload families, persistence envelope and submission protocol.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only published version/source/build metadata changes; serialization, deserialization, replay, transport algorithms and all supported client family shapes remain unchanged."
+      "rationale": "Publish contract 42.2 and regenerated examples/build identity for the corrected event semantics. The event type remains open with arbitrary JSON payload, persistence runtime matching remains exact, immutable 42.0 baseline/family versions and submission protocol remain unchanged.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only contract version/generated identity publication changes here. No supported decision, submission, mutation, viewer or persistence schema algorithm is changed; exact-base and oldest-major compatibility plus real client conformance remain required."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -1164,9 +994,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish contract bundle 42.1 and regenerated runtime/source identities for the normative Shock correction, retaining existing payload families, persistence envelope and submission protocol.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only published version/source/build metadata changes; serialization, deserialization, replay, transport algorithms and all supported client family shapes remain unchanged."
+      "rationale": "Publish contract 42.2 and regenerated examples/build identity for the corrected event semantics. The event type remains open with arbitrary JSON payload, persistence runtime matching remains exact, immutable 42.0 baseline/family versions and submission protocol remain unchanged.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only contract version/generated identity publication changes here. No supported decision, submission, mutation, viewer or persistence schema algorithm is changed; exact-base and oldest-major compatibility plus real client conformance remain required."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -1174,9 +1004,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish contract bundle 42.1 and regenerated runtime/source identities for the normative Shock correction, retaining existing payload families, persistence envelope and submission protocol.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only published version/source/build metadata changes; serialization, deserialization, replay, transport algorithms and all supported client family shapes remain unchanged."
+      "rationale": "Publish contract 42.2 and regenerated examples/build identity for the corrected event semantics. The event type remains open with arbitrary JSON payload, persistence runtime matching remains exact, immutable 42.0 baseline/family versions and submission protocol remain unchanged.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only contract version/generated identity publication changes here. No supported decision, submission, mutation, viewer or persistence schema algorithm is changed; exact-base and oldest-major compatibility plus real client conformance remain required."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -1184,9 +1014,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish contract bundle 42.1 and regenerated runtime/source identities for the normative Shock correction, retaining existing payload families, persistence envelope and submission protocol.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only published version/source/build metadata changes; serialization, deserialization, replay, transport algorithms and all supported client family shapes remain unchanged."
+      "rationale": "Publish contract 42.2 and regenerated examples/build identity for the corrected event semantics. The event type remains open with arbitrary JSON payload, persistence runtime matching remains exact, immutable 42.0 baseline/family versions and submission protocol remain unchanged.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only contract version/generated identity publication changes here. No supported decision, submission, mutation, viewer or persistence schema algorithm is changed; exact-base and oldest-major compatibility plus real client conformance remain required."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -1194,9 +1024,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish contract bundle 42.1 and regenerated runtime/source identities for the normative Shock correction, retaining existing payload families, persistence envelope and submission protocol.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only published version/source/build metadata changes; serialization, deserialization, replay, transport algorithms and all supported client family shapes remain unchanged."
+      "rationale": "Publish contract 42.2 and regenerated examples/build identity for the corrected event semantics. The event type remains open with arbitrary JSON payload, persistence runtime matching remains exact, immutable 42.0 baseline/family versions and submission protocol remain unchanged.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only contract version/generated identity publication changes here. No supported decision, submission, mutation, viewer or persistence schema algorithm is changed; exact-base and oldest-major compatibility plus real client conformance remain required."
     },
     "contracts/openapi.yaml": {
       "category": "rule_semantics",
@@ -1204,185 +1034,61 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish contract bundle 42.1 and regenerated runtime/source identities for the normative Shock correction, retaining existing payload families, persistence envelope and submission protocol.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only published version/source/build metadata changes; serialization, deserialization, replay, transport algorithms and all supported client family shapes remain unchanged."
+      "rationale": "Publish contract 42.2 and regenerated examples/build identity for the corrected event semantics. The event type remains open with arbitrary JSON payload, persistence runtime matching remains exact, immutable 42.0 baseline/family versions and submission protocol remain unchanged.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only contract version/generated identity publication changes here. No supported decision, submission, mutation, viewer or persistence schema algorithm is changed; exact-base and oldest-major compatibility plus real client conformance remain required."
     },
-    "data/source_audits/v963_shock/baseline/src/warhammer40k_core/_engine_build_manifest.json.txt": {
+    "data/source_audits/order102/baseline/tests/completed_attack_fixture_helpers.py.txt": {
       "category": "rule_semantics",
       "operations": [
-        "shock-source-evidence"
+        "order102-historical-evidence"
       ],
       "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
+      "rationale": "Retain exact original Order97 reviewed Git bytes and add a bounded authenticated archive resolver for the still-operative requirement. Original inventory, report, assertion ASTs and V963 mapping remain unchanged; missing or corrupt mapped evidence fails without fallback to edited current tests.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "No current gameplay search, cache, serialization, replay algorithm or measured shared fixture changes in this owner. This input publishes metadata or supports source-qualified regression and immutable historical-evidence validation; changed runtime scans are separately selected and measured."
     },
-    "data/source_audits/v963_shock/baseline/src/warhammer40k_core/engine/phases/movement_placement_proposals.py.txt": {
+    "data/source_audits/order102/baseline/tests/unit/test_phase15c_fight_order.py.txt": {
       "category": "rule_semantics",
       "operations": [
-        "shock-source-evidence"
+        "order102-historical-evidence"
       ],
       "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
+      "rationale": "Retain exact original Order97 reviewed Git bytes and add a bounded authenticated archive resolver for the still-operative requirement. Original inventory, report, assertion ASTs and V963 mapping remain unchanged; missing or corrupt mapped evidence fails without fallback to edited current tests.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "No current gameplay search, cache, serialization, replay algorithm or measured shared fixture changes in this owner. This input publishes metadata or supports source-qualified regression and immutable historical-evidence validation; changed runtime scans are separately selected and measured."
     },
-    "data/source_audits/v963_shock/baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_transports_2026_09/artifacts/package.json.txt": {
+    "data/source_audits/order102/historical-inputs.json": {
       "category": "rule_semantics",
       "operations": [
-        "shock-source-evidence"
+        "order102-historical-evidence"
       ],
       "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
-    },
-    "data/source_audits/v963_shock/baseline/tests/unit/test_phase10q_transports.py.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "shock-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
-    },
-    "data/source_audits/v963_shock/baseline/tests/unit/test_phase14a_source_identity.py.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "shock-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
-    },
-    "data/source_audits/v963_shock/capture-verification.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "shock-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
-    },
-    "data/source_audits/v963_shock/captures/changelog.html": {
-      "category": "rule_semantics",
-      "operations": [
-        "shock-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
-    },
-    "data/source_audits/v963_shock/captures/core-page.js": {
-      "category": "rule_semantics",
-      "operations": [
-        "shock-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
-    },
-    "data/source_audits/v963_shock/captures/core-rules.html": {
-      "category": "rule_semantics",
-      "operations": [
-        "shock-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
-    },
-    "data/source_audits/v963_shock/comparison.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "shock-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
-    },
-    "data/source_audits/v963_shock/historical-inputs.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "shock-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
-    },
-    "data/source_audits/v963_shock/selected-records.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "shock-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
-    },
-    "data/source_audits/v963_shock/source.audit.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "shock-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
+      "rationale": "Retain exact original Order97 reviewed Git bytes and add a bounded authenticated archive resolver for the still-operative requirement. Original inventory, report, assertion ASTs and V963 mapping remain unchanged; missing or corrupt mapped evidence fails without fallback to edited current tests.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "No current gameplay search, cache, serialization, replay algorithm or measured shared fixture changes in this owner. This input publishes metadata or supports source-qualified regression and immutable historical-evidence validation; changed runtime scans are separately selected and measured."
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the bounded current Shock source, preserve historical authority and audit only superseded Shock expectations; this document or quality control changes no runtime algorithm or measured workload.",
+      "rationale": "Publish reviewed bounded Fight-completion source, immutable archive integrity, contract semantics or fresh performance evidence. These documentation and quality-control inputs do not change runtime execution or the measured workload; all prior failures remain qualified.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+    "docs/ORDER_102_SCOPE_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the bounded current Shock source, preserve historical authority and audit only superseded Shock expectations; this document or quality control changes no runtime algorithm or measured workload.",
+      "rationale": "Publish reviewed bounded Fight-completion source, immutable archive integrity, contract semantics or fresh performance evidence. These documentation and quality-control inputs do not change runtime execution or the measured workload; all prior failures remain qualified.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "docs/PR_BACKLOG_2026_09_30.md": {
+    "docs/performance/current/order102-fight-selection-reconstruction.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the bounded current Shock source, preserve historical authority and audit only superseded Shock expectations; this document or quality control changes no runtime algorithm or measured workload.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/V963_SHOCK_SCOPE_PLAN.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the bounded current Shock source, preserve historical authority and audit only superseded Shock expectations; this document or quality control changes no runtime algorithm or measured workload.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/current/v963-shock-reconstruction-generic.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Publish fresh matched actual-base/current component samples under the reviewed v3 envelope, retaining original sample counts, semantic completion, exact measured inputs and explicit prior failure qualifications. This immutable evidence record changes no runtime or workload.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/current/v963-shock-reconstruction-specific.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Publish fresh matched actual-base/current component samples under the reviewed v3 envelope, retaining original sample counts, semantic completion, exact measured inputs and explicit prior failure qualifications. This immutable evidence record changes no runtime or workload.",
+      "rationale": "Publish reviewed bounded Fight-completion source, immutable archive integrity, contract semantics or fresh performance evidence. These documentation and quality-control inputs do not change runtime execution or the measured workload; all prior failures remain qualified.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -1390,20 +1096,20 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the bounded current Shock source, preserve historical authority and audit only superseded Shock expectations; this document or quality control changes no runtime algorithm or measured workload.",
+      "rationale": "Publish reviewed bounded Fight-completion source, immutable archive integrity, contract semantics or fresh performance evidence. These documentation and quality-control inputs do not change runtime execution or the measured workload; all prior failures remain qualified.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "scripts/measure_shock_reconstruction.py": {
+    "scripts/measure_fight_selection_reconstruction.py": {
       "category": "measured_workload",
       "operations": [
-        "workload-shock-reconstruction"
+        "order102-measure-fight-selection-reconstruction"
       ],
       "selected_families": [
-        "shock_reconstruction"
+        "fight_selection_reconstruction"
       ],
-      "rationale": "Add four declared Shock checkpoint/operation cases with three samples each; unchanged Order 62 facade fixture prepares separate legal active/expired histories on each runtime, with preparation and assertions outside reconstruction timings.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
+      "rationale": "Introduce the reviewed common facade driver and fixtures: eight successful base/head restore/replay operations with three samples each, full untrimmed bounded histories and armed executor evidence. Preserve the actual-base armed-pending restore failure and separately report three current-only successful restores without a matched budget claim.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
       "unchanged_work": null
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
@@ -1412,9 +1118,9 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Publish the timestamped 18.07 source, provenance and exact engine build identity while preserving the unchanged Emergency/Assault records and the original archived source.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Generated source/hash values and a package accessor are updated; existing eager validation, source loading, cache behavior and execution algorithms remain unchanged."
+      "rationale": "Regenerate the exact engine runtime identity for the reviewed Fight-completion correction. This generated digest publication changes no execution algorithm; all underlying changed owners have their own explicit assessment.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "No current gameplay search, cache, serialization, replay algorithm or measured shared fixture changes in this owner. This input publishes metadata or supports source-qualified regression and immutable historical-evidence validation; changed runtime scans are separately selected and measured."
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
@@ -1422,176 +1128,211 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish contract bundle 42.1 and regenerated runtime/source identities for the normative Shock correction, retaining existing payload families, persistence envelope and submission protocol.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Only published version/source/build metadata changes; serialization, deserialization, replay, transport algorithms and all supported client family shapes remain unchanged."
+      "rationale": "Publish contract 42.2 and regenerated examples/build identity for the corrected event semantics. The event type remains open with arbitrary JSON payload, persistence runtime matching remains exact, immutable 42.0 baseline/family versions and submission protocol remain unchanged.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "Only contract version/generated identity publication changes here. No supported decision, submission, mutation, viewer or persistence schema algorithm is changed; exact-base and oldest-major compatibility plus real client conformance remain required."
     },
-    "src/warhammer40k_core/engine/battle_round_flow.py": {
+    "src/warhammer40k_core/engine/active_player_boundary_history.py": {
+      "category": "serialization_or_replay_work",
+      "operations": [
+        "order102-active-player-boundary-history"
+      ],
+      "selected_families": [
+        "fight_selection_reconstruction"
+      ],
+      "rationale": "Separate authenticated pre-cleanup selection completion from actual melee-derived fought events, adapt history reconstruction and the exact executor-closed pending scope, and validate completion against accepted decisions/executor history. Eight matched operations cover changed scans/production; current-only armed-pending restore covers the constant-time repaired scope exclusion. No long-history or full-game claim.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": null
+    },
+    "src/warhammer40k_core/engine/active_player_scope_history.py": {
+      "category": "serialization_or_replay_work",
+      "operations": [
+        "order102-active-player-scope-history"
+      ],
+      "selected_families": [
+        "fight_selection_reconstruction"
+      ],
+      "rationale": "Separate authenticated pre-cleanup selection completion from actual melee-derived fought events, adapt history reconstruction and the exact executor-closed pending scope, and validate completion against accepted decisions/executor history. Eight matched operations cover changed scans/production; current-only armed-pending restore covers the constant-time repaired scope exclusion. No long-history or full-game claim.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": null
+    },
+    "src/warhammer40k_core/engine/consolidation_continuation_history.py": {
+      "category": "serialization_or_replay_work",
+      "operations": [
+        "order102-consolidation-continuation-history"
+      ],
+      "selected_families": [
+        "fight_selection_reconstruction"
+      ],
+      "rationale": "Separate authenticated pre-cleanup selection completion from actual melee-derived fought events, adapt history reconstruction and the exact executor-closed pending scope, and validate completion against accepted decisions/executor history. Eight matched operations cover changed scans/production; current-only armed-pending restore covers the constant-time repaired scope exclusion. No long-history or full-game claim.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": null
+    },
+    "src/warhammer40k_core/engine/decision.py": {
       "category": "rule_semantics",
       "operations": [
-        "phase-rule-branch"
+        "order102-rng-event-classification"
       ],
       "selected_families": [],
-      "rationale": "Change only the source-defined Shock eligibility/lifetime branch and retire its obsolete queue production/history requirement while retaining the shared Engaging and placement owners.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "No search algorithm, cache, serializer, replay loop, data structure or measured fixture changes. Existing grouped geometry and engine decision/restore paths remain; a bounded Shock branch is changed or removed."
+      "rationale": "Register the new selection-completion event in the existing RNG-neutral event classification. No RNG consumption, random distribution or replay algorithm is changed by this constant metadata entry.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "No current gameplay search, cache, serialization, replay algorithm or measured shared fixture changes in this owner. This input publishes metadata or supports source-qualified regression and immutable historical-evidence validation; changed runtime scans are separately selected and measured."
     },
-    "src/warhammer40k_core/engine/game_state.py": {
-      "category": "rule_semantics",
+    "src/warhammer40k_core/engine/fight_activation_completion.py": {
+      "category": "serialization_or_replay_work",
       "operations": [
-        "phase-rule-branch"
+        "order102-fight-activation-completion"
       ],
-      "selected_families": [],
-      "rationale": "Change only the source-defined Shock eligibility/lifetime branch and retire its obsolete queue production/history requirement while retaining the shared Engaging and placement owners.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "No search algorithm, cache, serializer, replay loop, data structure or measured fixture changes. Existing grouped geometry and engine decision/restore paths remain; a bounded Shock branch is changed or removed."
+      "selected_families": [
+        "fight_selection_reconstruction"
+      ],
+      "rationale": "Separate authenticated pre-cleanup selection completion from actual melee-derived fought events, adapt history reconstruction and the exact executor-closed pending scope, and validate completion against accepted decisions/executor history. Eight matched operations cover changed scans/production; current-only armed-pending restore covers the constant-time repaired scope exclusion. No long-history or full-game claim.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": null
+    },
+    "src/warhammer40k_core/engine/fight_continuation_checkpoint.py": {
+      "category": "serialization_or_replay_work",
+      "operations": [
+        "order102-fight-continuation-checkpoint"
+      ],
+      "selected_families": [
+        "fight_selection_reconstruction"
+      ],
+      "rationale": "Separate authenticated pre-cleanup selection completion from actual melee-derived fought events, adapt history reconstruction and the exact executor-closed pending scope, and validate completion against accepted decisions/executor history. Eight matched operations cover changed scans/production; current-only armed-pending restore covers the constant-time repaired scope exclusion. No long-history or full-game claim.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": null
+    },
+    "src/warhammer40k_core/engine/fight_selection_completion.py": {
+      "category": "serialization_or_replay_work",
+      "operations": [
+        "order102-fight-selection-completion"
+      ],
+      "selected_families": [
+        "fight_selection_reconstruction"
+      ],
+      "rationale": "Separate authenticated pre-cleanup selection completion from actual melee-derived fought events, adapt history reconstruction and the exact executor-closed pending scope, and validate completion against accepted decisions/executor history. Eight matched operations cover changed scans/production; current-only armed-pending restore covers the constant-time repaired scope exclusion. No long-history or full-game claim.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": null
     },
     "src/warhammer40k_core/engine/lifecycle_state_validation.py": {
       "category": "serialization_or_replay_work",
       "operations": [
-        "shock-lifecycle-reconstruction"
+        "order102-lifecycle-state-validation"
       ],
       "selected_families": [
-        "reconstruction",
-        "shock_reconstruction"
+        "fight_selection_reconstruction"
       ],
-      "rationale": "Remove the unconditional restored event-history traversal and obsolete active/historical Shock forced-Fight scans; measure unchanged generic reconstruction plus real active and expired Shock restore/replay on actual base/head runtimes.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
+      "rationale": "Separate authenticated pre-cleanup selection completion from actual melee-derived fought events, adapt history reconstruction and the exact executor-closed pending scope, and validate completion against accepted decisions/executor history. Eight matched operations cover changed scans/production; current-only armed-pending restore covers the constant-time repaired scope exclusion. No long-history or full-game claim.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
       "unchanged_work": null
     },
-    "src/warhammer40k_core/engine/phases/movement_placement_proposals.py": {
-      "category": "serialization_or_replay_work",
+    "tests/code_quality/test_order102_fight_completion_ownership.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Publish reviewed bounded Fight-completion source, immutable archive integrity, contract semantics or fresh performance evidence. These documentation and quality-control inputs do not change runtime execution or the measured workload; all prior failures remain qualified.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/code_quality/test_order102_historical_evidence.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Publish reviewed bounded Fight-completion source, immutable archive integrity, contract semantics or fresh performance evidence. These documentation and quality-control inputs do not change runtime execution or the measured workload; all prior failures remain qualified.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/completed_attack_fixture_helpers.py": {
+      "category": "rule_semantics",
       "operations": [
-        "shock-placement-replay"
+        "order102-executor-declaration-fixture"
+      ],
+      "selected_families": [],
+      "rationale": "Add normal facade empty/armed/no-target/miss/automatic-hit/retained/Engaging controls; repair ranged-only positives, exact injected executor selection provenance and the EC casualty-chain fixture while preserving real attack, model/FNP, replay, materialization and once-only assertions. Historical Order97 test/helper bytes remain archived. These regression-only owners are not imported by the timed driver, but the complete declared fixture inventory changed, so fresh base/head measurements replace applicability of the preserved original comparison.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "No current gameplay search, cache, serialization, replay algorithm or measured shared fixture changes in this owner. This input publishes metadata or supports source-qualified regression and immutable historical-evidence validation; changed runtime scans are separately selected and measured."
+    },
+    "tests/fight_completion_helpers.py": {
+      "category": "measured_workload",
+      "operations": [
+        "order102-fight-completion-helpers"
       ],
       "selected_families": [
-        "shock_reconstruction"
+        "fight_selection_reconstruction"
       ],
-      "rationale": "Remove the obsolete Shock queue producer and its selection-history traversal, reached by actual legal Shock replay; preserve the independent 12.08 Engaging producer.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
+      "rationale": "Introduce the reviewed common facade driver and fixtures: eight successful base/head restore/replay operations with three samples each, full untrimmed bounded histories and armed executor evidence. Preserve the actual-base armed-pending restore failure and separately report three current-only successful restores without a matched budget claim.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
       "unchanged_work": null
     },
-    "src/warhammer40k_core/engine/shock_disembark_history.py": {
+    "tests/fight_completion_positive_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "transport-rule-branch"
+        "order102-regression-controls"
       ],
       "selected_families": [],
-      "rationale": "Change only the source-defined Shock eligibility/lifetime branch and retire its obsolete queue production/history requirement while retaining the shared Engaging and placement owners.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "No search algorithm, cache, serializer, replay loop, data structure or measured fixture changes. Existing grouped geometry and engine decision/restore paths remain; a bounded Shock branch is changed or removed."
+      "rationale": "Add normal facade empty/armed/no-target/miss/automatic-hit/retained/Engaging controls; repair ranged-only positives, exact injected executor selection provenance and the EC casualty-chain fixture while preserving real attack, model/FNP, replay, materialization and once-only assertions. Historical Order97 test/helper bytes remain archived. These regression-only owners are not imported by the timed driver, but the complete declared fixture inventory changed, so fresh base/head measurements replace applicability of the preserved original comparison.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "No current gameplay search, cache, serialization, replay algorithm or measured shared fixture changes in this owner. This input publishes metadata or supports source-qualified regression and immutable historical-evidence validation; changed runtime scans are separately selected and measured."
     },
-    "src/warhammer40k_core/engine/transport_disembark_geometry.py": {
+    "tests/integration/test_horror_split_materialization.py": {
       "category": "rule_semantics",
       "operations": [
-        "transport-rule-branch"
+        "order102-horror-executor-regression"
       ],
       "selected_families": [],
-      "rationale": "Change only the source-defined Shock eligibility/lifetime branch and retire its obsolete queue production/history requirement while retaining the shared Engaging and placement owners.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "No search algorithm, cache, serializer, replay loop, data structure or measured fixture changes. Existing grouped geometry and engine decision/restore paths remain; a bounded Shock branch is changed or removed."
+      "rationale": "Add normal facade empty/armed/no-target/miss/automatic-hit/retained/Engaging controls; repair ranged-only positives, exact injected executor selection provenance and the EC casualty-chain fixture while preserving real attack, model/FNP, replay, materialization and once-only assertions. Historical Order97 test/helper bytes remain archived. These regression-only owners are not imported by the timed driver, but the complete declared fixture inventory changed, so fresh base/head measurements replace applicability of the preserved original comparison.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "No current gameplay search, cache, serialization, replay algorithm or measured shared fixture changes in this owner. This input publishes metadata or supports source-qualified regression and immutable historical-evidence validation; changed runtime scans are separately selected and measured."
     },
-    "src/warhammer40k_core/rules/source_authority_registry.json": {
+    "tests/integration/test_ws13_adapter_phase_families.py": {
       "category": "rule_semantics",
       "operations": [
-        "source-authority-publication"
+        "order102-ws13-executor-regression"
       ],
       "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
+      "rationale": "Add normal facade empty/armed/no-target/miss/automatic-hit/retained/Engaging controls; repair ranged-only positives, exact injected executor selection provenance and the EC casualty-chain fixture while preserving real attack, model/FNP, replay, materialization and once-only assertions. Historical Order97 test/helper bytes remain archived. These regression-only owners are not imported by the timed driver, but the complete declared fixture inventory changed, so fresh base/head measurements replace applicability of the preserved original comparison.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "No current gameplay search, cache, serialization, replay algorithm or measured shared fixture changes in this owner. This input publishes metadata or supports source-qualified regression and immutable historical-evidence validation; changed runtime scans are separately selected and measured."
     },
-    "src/warhammer40k_core/rules/source_authority_registry.py": {
+    "tests/unit/test_aeldari_shroud_runners_wraithblades_datasheets.py": {
       "category": "rule_semantics",
       "operations": [
-        "source-authority-publication"
+        "order102-malevolent-executor-regression"
       ],
       "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
+      "rationale": "Add normal facade empty/armed/no-target/miss/automatic-hit/retained/Engaging controls; repair ranged-only positives, exact injected executor selection provenance and the EC casualty-chain fixture while preserving real attack, model/FNP, replay, materialization and once-only assertions. Historical Order97 test/helper bytes remain archived. These regression-only owners are not imported by the timed driver, but the complete declared fixture inventory changed, so fresh base/head measurements replace applicability of the preserved original comparison.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "No current gameplay search, cache, serialization, replay algorithm or measured shared fixture changes in this owner. This input publishes metadata or supports source-qualified regression and immutable historical-evidence validation; changed runtime scans are separately selected and measured."
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_transports_2026_09/__init__.py": {
+    "tests/unit/test_fight_selection_completion.py": {
       "category": "rule_semantics",
       "operations": [
-        "source-record"
+        "order102-regression-controls"
       ],
       "selected_families": [],
-      "rationale": "Publish the timestamped 18.07 source, provenance and exact engine build identity while preserving the unchanged Emergency/Assault records and the original archived source.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Generated source/hash values and a package accessor are updated; existing eager validation, source loading, cache behavior and execution algorithms remain unchanged."
+      "rationale": "Add normal facade empty/armed/no-target/miss/automatic-hit/retained/Engaging controls; repair ranged-only positives, exact injected executor selection provenance and the EC casualty-chain fixture while preserving real attack, model/FNP, replay, materialization and once-only assertions. Historical Order97 test/helper bytes remain archived. These regression-only owners are not imported by the timed driver, but the complete declared fixture inventory changed, so fresh base/head measurements replace applicability of the preserved original comparison.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "No current gameplay search, cache, serialization, replay algorithm or measured shared fixture changes in this owner. This input publishes metadata or supports source-qualified regression and immutable historical-evidence validation; changed runtime scans are separately selected and measured."
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_transports_2026_09/_artifacts.py": {
+    "tests/unit/test_phase15c_fight_order.py": {
       "category": "rule_semantics",
       "operations": [
-        "source-record"
+        "order102-regression-controls"
       ],
       "selected_families": [],
-      "rationale": "Publish the timestamped 18.07 source, provenance and exact engine build identity while preserving the unchanged Emergency/Assault records and the original archived source.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Generated source/hash values and a package accessor are updated; existing eager validation, source loading, cache behavior and execution algorithms remain unchanged."
+      "rationale": "Add normal facade empty/armed/no-target/miss/automatic-hit/retained/Engaging controls; repair ranged-only positives, exact injected executor selection provenance and the EC casualty-chain fixture while preserving real attack, model/FNP, replay, materialization and once-only assertions. Historical Order97 test/helper bytes remain archived. These regression-only owners are not imported by the timed driver, but the complete declared fixture inventory changed, so fresh base/head measurements replace applicability of the preserved original comparison.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "No current gameplay search, cache, serialization, replay algorithm or measured shared fixture changes in this owner. This input publishes metadata or supports source-qualified regression and immutable historical-evidence validation; changed runtime scans are separately selected and measured."
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_transports_2026_09/artifacts/package.json": {
+    "tests/unit/test_phase17_emperors_children_daemon_prince.py": {
       "category": "rule_semantics",
       "operations": [
-        "source-record"
+        "order102-ec-chain-regression"
       ],
       "selected_families": [],
-      "rationale": "Publish the timestamped 18.07 source, provenance and exact engine build identity while preserving the unchanged Emergency/Assault records and the original archived source.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Generated source/hash values and a package accessor are updated; existing eager validation, source loading, cache behavior and execution algorithms remain unchanged."
-    },
-    "tests/code_quality/test_order55_disembark.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the bounded current Shock source, preserve historical authority and audit only superseded Shock expectations; this document or quality control changes no runtime algorithm or measured workload.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tests/code_quality/test_phase14i_14h_closeout.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the bounded current Shock source, preserve historical authority and audit only superseded Shock expectations; this document or quality control changes no runtime algorithm or measured workload.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tests/code_quality/test_shock_disembark_authority.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the bounded current Shock source, preserve historical authority and audit only superseded Shock expectations; this document or quality control changes no runtime algorithm or measured workload.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tests/code_quality/test_v963_shock_source.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the bounded current Shock source, preserve historical authority and audit only superseded Shock expectations; this document or quality control changes no runtime algorithm or measured workload.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tests/unit/test_phase10q_transports.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "shock-regression-controls"
-      ],
-      "selected_families": [],
-      "rationale": "Replace only superseded Shock expectations with real-object positive/negative setup, lifetime, facade, JSON restore, both-viewer and exact-replay controls; preserve shared Engaging and adjacent transport tests.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Regression-only test and tactical-pause fixture owners change; no existing performance driver or shared measurement fixture changes, and source/runtime algorithm work is unchanged beyond the assessed Shock semantics."
-    },
-    "tests/unit/test_phase14a_source_identity.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "shock-regression-controls"
-      ],
-      "selected_families": [],
-      "rationale": "Replace only superseded Shock expectations with real-object positive/negative setup, lifetime, facade, JSON restore, both-viewer and exact-replay controls; preserve shared Engaging and adjacent transport tests.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Regression-only test and tactical-pause fixture owners change; no existing performance driver or shared measurement fixture changes, and source/runtime algorithm work is unchanged beyond the assessed Shock semantics."
+      "rationale": "Add normal facade empty/armed/no-target/miss/automatic-hit/retained/Engaging controls; repair ranged-only positives, exact injected executor selection provenance and the EC casualty-chain fixture while preserving real attack, model/FNP, replay, materialization and once-only assertions. Historical Order97 test/helper bytes remain archived. These regression-only owners are not imported by the timed driver, but the complete declared fixture inventory changed, so fresh base/head measurements replace applicability of the preserved original comparison.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "No current gameplay search, cache, serialization, replay algorithm or measured shared fixture changes in this owner. This input publishes metadata or supports source-qualified regression and immutable historical-evidence validation; changed runtime scans are separately selected and measured."
     },
     "tests/unit/test_phase18e_server_api.py": {
       "category": "rule_semantics",
@@ -1599,49 +1340,9 @@
         "shock-regression-controls"
       ],
       "selected_families": [],
-      "rationale": "Replace only superseded Shock expectations with real-object positive/negative setup, lifetime, facade, JSON restore, both-viewer and exact-replay controls; preserve shared Engaging and adjacent transport tests.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Regression-only test and tactical-pause fixture owners change; no existing performance driver or shared measurement fixture changes, and source/runtime algorithm work is unchanged beyond the assessed Shock semantics."
-    },
-    "tests/unit/test_v963_shock_disembark.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "shock-regression-controls"
-      ],
-      "selected_families": [],
-      "rationale": "Replace only superseded Shock expectations with real-object positive/negative setup, lifetime, facade, JSON restore, both-viewer and exact-replay controls; preserve shared Engaging and adjacent transport tests.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Regression-only test and tactical-pause fixture owners change; no existing performance driver or shared measurement fixture changes, and source/runtime algorithm work is unchanged beyond the assessed Shock semantics."
-    },
-    "tests/v963_shock_helpers.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "shock-regression-controls"
-      ],
-      "selected_families": [],
-      "rationale": "Replace only superseded Shock expectations with real-object positive/negative setup, lifetime, facade, JSON restore, both-viewer and exact-replay controls; preserve shared Engaging and adjacent transport tests.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Regression-only test and tactical-pause fixture owners change; no existing performance driver or shared measurement fixture changes, and source/runtime algorithm work is unchanged beyond the assessed Shock semantics."
-    },
-    "tools/build_core_transports_source.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "shock-source-generation-and-audit"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
-    },
-    "tools/core_rules_order95_audit.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "shock-source-generation-and-audit"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
+      "rationale": "Add normal facade empty/armed/no-target/miss/automatic-hit/retained/Engaging controls; repair ranged-only positives, exact injected executor selection provenance and the EC casualty-chain fixture while preserving real attack, model/FNP, replay, materialization and once-only assertions. Historical Order97 test/helper bytes remain archived. These regression-only owners are not imported by the timed driver, but the complete declared fixture inventory changed, so fresh base/head measurements replace applicability of the preserved original comparison.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "No current gameplay search, cache, serialization, replay algorithm or measured shared fixture changes in this owner. This input publishes metadata or supports source-qualified regression and immutable historical-evidence validation; changed runtime scans are separately selected and measured."
     },
     "tools/core_rules_order97_history.py": {
       "category": "rule_semantics",
@@ -1649,35 +1350,14 @@
         "shock-source-generation-and-audit"
       ],
       "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
-    },
-    "tools/core_rules_order97_inventory.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "shock-source-generation-and-audit"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
-    },
-    "tools/v963_shock_source.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "shock-source-generation-and-audit"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the original authenticated source/assertion history and publish the selected complete current Shock source through the existing source-generation and authority mechanisms.",
-      "source_obligation": "Current complete 18.07 requires ordinary 03.02 unengaged coherent setup, no Shock forced Fight response and charge ineligibility through the owner's END_TURN; unchanged 12.08 Engaging remains supported.",
-      "unchanged_work": "Offline source extraction, immutable evidence mapping or registry identity values change; no gameplay search, cache, serializer, replay algorithm or current measurement workload changes."
+      "rationale": "Retain exact original Order97 reviewed Git bytes and add a bounded authenticated archive resolver for the still-operative requirement. Original inventory, report, assertion ASTs and V963 mapping remain unchanged; missing or corrupt mapped evidence fails without fallback to edited current tests.",
+      "source_obligation": "04.03.05-obligation-04 and the weaponless FAQ separate once-only Fight selection from actual melee-derived fought status; full 05.04.05 retains an empty-selected destroyed model until phase end. Preserve armed cleanup, live Engaging, Shock no-queue, both timing consumers, normal save/load, viewers and exact replay.",
+      "unchanged_work": "No current gameplay search, cache, serialization, replay algorithm or measured shared fixture changes in this owner. This input publishes metadata or supports source-qualified regression and immutable historical-evidence validation; changed runtime scans are separately selected and measured."
     }
   },
   "milestone": "ordinary",
   "comparisons": {
-    "reconstruction": "docs/performance/current/v963-shock-reconstruction-generic.json",
-    "shock_reconstruction": "docs/performance/current/v963-shock-reconstruction-specific.json"
+    "fight_selection_reconstruction": "docs/performance/current/order102-fight-selection-reconstruction.json"
   },
   "full_game": null
 }

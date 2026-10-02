@@ -1622,7 +1622,11 @@ def test_local_session_routes_fight_devastating_mortal_model_and_fnp_choices() -
         decisions=lifecycle.decision_controller, selection=activation
     )
     record_melee_declaration_for_executor_fixture(
-        state=state, decisions=lifecycle.decision_controller, sequence=sequence, result_id=result_id
+        state=state,
+        decisions=lifecycle.decision_controller,
+        sequence=sequence,
+        result_id=result_id,
+        activation=activation,
     )
     remaining, allocated_ids, status = resolve_attack_sequence_until_blocked(
         state=state,

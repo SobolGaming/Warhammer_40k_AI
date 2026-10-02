@@ -1,5 +1,10 @@
 # CORE V2 external contract
 
+Contract 42.2 separates Fight selection completion from actual melee-derived
+fought status. It adds one public event inside the existing event envelope and
+preserves final completion, submissions, visibility and exact-runtime persistence.
+See [Order 102](../docs/ORDER_102_SCOPE_PLAN.md).
+
 Contract 42.1 corrects Shock Disembark to the current source while preserving
 atomic proposal validation/mutation and the engine-owned pending-continuation
 protocol. Family schemas and the 42.0 persistence envelope remain unchanged;
@@ -35,7 +40,7 @@ from HealingEffect and requires source-bound engagement evidence on battlefield
 revival events. See [35 to 36 migration](migrations/35-to-36.md).
 
 
-Contract version: `42.1.0`
+Contract version: `42.2.0`
 
 Order 81 / P03E restores the existing pending-proposal contract for all 13
 parameterized families. Interaction conformance examples now preserve the four
