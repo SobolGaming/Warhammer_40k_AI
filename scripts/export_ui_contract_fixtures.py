@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from collections.abc import Sequence
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -198,6 +199,7 @@ def build_ui_contract_bundle() -> UiContractBundle:
     )
 
     fixtures: dict[str, JsonValue] = {
+        "attached_charge_view.json": _attached_charge_view(),
         "hidden_secondary_redaction_view.json": validate_json_value(
             cast(JsonValue, hidden_session.view(viewer_player_id=PLAYER_B))
         ),
@@ -231,6 +233,18 @@ def build_ui_contract_bundle() -> UiContractBundle:
         },
         proposal_payload_examples=_proposal_payload_examples(),
     )
+
+
+def _attached_charge_view() -> JsonValue:
+    # Direct script execution must resolve the same canonical test fixtures as
+    # pytest, including when --check writes into a separate output directory.
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from tests.charge_distance_helpers import select_targets
+    from tests.charge_endpoint_helpers import attached_charge_session, select_attached_source
+
+    session = attached_charge_session()
+    select_targets(session, select_attached_source(session), ("army-beta:enemy",))
+    return validate_json_value(cast(JsonValue, session.view(viewer_player_id=PLAYER_A)))
 
 
 def _battlefield_geometry_conformance_example() -> BattlefieldViewPayload:
@@ -521,6 +535,7 @@ def _conformance_model(
         "entity_kind": "model",
         "model_instance_id": model_id,
         "unit_instance_id": unit_id,
+        "rules_unit_instance_id": unit_id,
         "owner_player_id": PLAYER_A,
         "state": "placed",
         "pose": pose,

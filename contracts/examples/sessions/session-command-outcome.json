@@ -1,8 +1,8 @@
 {
   "accepted": true,
   "checkpoint": {
-    "event_cursor": "ffumgf4V1Wk9vI6yutKgh1G_bP9DONzRQ_KV_2_buUiV9qsfvPU1n0cXfnRU8PT0",
-    "projection_state_hash": "34744d158e282659b43a4d0cade72f5973114fb4ea8a3083aefc974bf21c5171",
+    "event_cursor": "XTckTpuZV_qx8YQDm7q5GkWiv3r7SYjRvsc--Z1fiF73bSzK7JoB_z7JpQgYyII_",
+    "projection_state_hash": "34838f0fe526d567eee6438dd76883fa06ad69171333b01e1d6e32e6e40a5468",
     "session_revision": 2,
     "viewer_player_id": null,
     "visibility_role": "administrator"
@@ -10,18 +10,18 @@
   "command_id": "phase18f-contract-command-000001",
   "committed": true,
   "event_range": {
-    "from_cursor": "ErIT4RdcRu2AWizTfm399IppugIlNunT1Z03BVsud_ym1QkmVh-JdjOxibIUvlMW",
-    "to_cursor": "ffumgf4V1Wk9vI6yutKgh1G_bP9DONzRQ_KV_2_buUiV9qsfvPU1n0cXfnRU8PT0"
+    "from_cursor": "_V_xrZmsUUGGSTmE6l7EoxrzKjmKm5Er58_U9-_-ldrNcuBB3eSzE75Ik7zyqMM4",
+    "to_cursor": "XTckTpuZV_qx8YQDm7q5GkWiv3r7SYjRvsc--Z1fiF73bSzK7JoB_z7JpQgYyII_"
   },
   "operation": "close_session",
   "outcome_code": "command_committed",
-  "schema_version": "session-command-outcome-v43-contract",
+  "schema_version": "session-command-outcome-v44-contract",
   "session": {
     "catalog_id": "phase9a-canonical",
     "created_at": "2026-07-18T20:00:00Z",
-    "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:46532413fcc67215c90ffb287308def0301b72559576fe3103a1880b9463d19b",
+    "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:189895f28d6817d8ff5e77feefe40c0c351fd8a05b064bd78de81182cf164674",
     "engine_version": "0.1.0",
-    "event_cursor": "ffumgf4V1Wk9vI6yutKgh1G_bP9DONzRQ_KV_2_buUiV9qsfvPU1n0cXfnRU8PT0",
+    "event_cursor": "XTckTpuZV_qx8YQDm7q5GkWiv3r7SYjRvsc--Z1fiF73bSzK7JoB_z7JpQgYyII_",
     "game_id": "phase18e-contract-session",
     "last_activity_at": "2026-07-18T20:00:00Z",
     "lifecycle_status": {
@@ -33,7 +33,7 @@
       "stage": "setup",
       "status_kind": "waiting_for_decision"
     },
-    "projection_state_hash": "34744d158e282659b43a4d0cade72f5973114fb4ea8a3083aefc974bf21c5171",
+    "projection_state_hash": "34838f0fe526d567eee6438dd76883fa06ad69171333b01e1d6e32e6e40a5468",
     "rules_overlay_ids": [],
     "ruleset_descriptor_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
     "ruleset_id": {
@@ -41,8 +41,8 @@
       "game": "warhammer_40000",
       "version": "core-v2-setup-prebattle-ui-smoke"
     },
-    "schema_version": "session-metadata-v43-contract",
-    "server_contract_version": "43.0.0",
+    "schema_version": "session-metadata-v44-contract",
+    "server_contract_version": "44.0.0",
     "session_id": "session-phase18e-contract-session",
     "session_revision": 2,
     "session_state": "closed",

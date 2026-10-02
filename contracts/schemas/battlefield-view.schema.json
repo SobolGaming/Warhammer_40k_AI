@@ -34,7 +34,7 @@
       "$ref": "#/$defs/render"
     },
     "schema_version": {
-      "const": "battlefield-view-v4-phase17n-step3",
+      "const": "battlefield-view-v5-rules-unit-membership",
       "type": "string"
     }
   },
@@ -358,6 +358,14 @@
         "unit_instance_id": {
           "minLength": 1,
           "type": "string"
+        },
+        "rules_unit_instance_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "Current canonical rules-unit actor; null while this viewer cannot know formation membership. Physical ownership remains unit_instance_id."
         }
       },
       "required": [
@@ -368,7 +376,8 @@
         "state",
         "pose",
         "geometry",
-        "state_context"
+        "state_context",
+        "rules_unit_instance_id"
       ],
       "type": "object"
     },

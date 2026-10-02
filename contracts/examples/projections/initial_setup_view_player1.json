@@ -2955,6 +2955,7 @@
           "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:001",
           "owner_player_id": "player-a",
           "pose": null,
+          "rules_unit_instance_id": "army-alpha:intercessor-unit-1",
           "state": "undeployed",
           "state_context": {
             "reserve_kind": null,
@@ -3001,6 +3002,7 @@
           "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:002",
           "owner_player_id": "player-a",
           "pose": null,
+          "rules_unit_instance_id": "army-alpha:intercessor-unit-1",
           "state": "undeployed",
           "state_context": {
             "reserve_kind": null,
@@ -3047,6 +3049,7 @@
           "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:003",
           "owner_player_id": "player-a",
           "pose": null,
+          "rules_unit_instance_id": "army-alpha:intercessor-unit-1",
           "state": "undeployed",
           "state_context": {
             "reserve_kind": null,
@@ -3093,6 +3096,7 @@
           "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:004",
           "owner_player_id": "player-a",
           "pose": null,
+          "rules_unit_instance_id": "army-alpha:intercessor-unit-1",
           "state": "undeployed",
           "state_context": {
             "reserve_kind": null,
@@ -3139,6 +3143,7 @@
           "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:005",
           "owner_player_id": "player-a",
           "pose": null,
+          "rules_unit_instance_id": "army-alpha:intercessor-unit-1",
           "state": "undeployed",
           "state_context": {
             "reserve_kind": null,
@@ -3185,6 +3190,7 @@
           "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:001",
           "owner_player_id": "player-b",
           "pose": null,
+          "rules_unit_instance_id": null,
           "state": "undeployed",
           "state_context": {
             "reserve_kind": null,
@@ -3231,6 +3237,7 @@
           "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:002",
           "owner_player_id": "player-b",
           "pose": null,
+          "rules_unit_instance_id": null,
           "state": "undeployed",
           "state_context": {
             "reserve_kind": null,
@@ -3277,6 +3284,7 @@
           "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:003",
           "owner_player_id": "player-b",
           "pose": null,
+          "rules_unit_instance_id": null,
           "state": "undeployed",
           "state_context": {
             "reserve_kind": null,
@@ -3323,6 +3331,7 @@
           "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:004",
           "owner_player_id": "player-b",
           "pose": null,
+          "rules_unit_instance_id": null,
           "state": "undeployed",
           "state_context": {
             "reserve_kind": null,
@@ -3369,6 +3378,7 @@
           "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:005",
           "owner_player_id": "player-b",
           "pose": null,
+          "rules_unit_instance_id": null,
           "state": "undeployed",
           "state_context": {
             "reserve_kind": null,
@@ -6834,7 +6844,7 @@
         }
       }
     },
-    "authoritative_geometry_hash": "7665d5ece63c9def23075e92ca1358146e6401abc518956ea7458525628d681f",
+    "authoritative_geometry_hash": "940be1c0cc70c59a24495f6167581262d7a9467acb9ac716e9dda9631453466c",
     "battlefield_id": "ui-contract-initial:take-and-hold-vs-purge-the-foe-layout-3-deployment:battlefield",
     "bounds": {
       "max_x_inches": 44.0,
@@ -7912,7 +7922,7 @@
         }
       }
     },
-    "schema_version": "battlefield-view-v4-phase17n-step3"
+    "schema_version": "battlefield-view-v5-rules-unit-membership"
   },
   "current_battle_phase": null,
   "current_setup_step": "select_secondary_missions",
@@ -14836,7 +14846,7 @@
   },
   "primary_rules_unit_turn_start_snapshots": [],
   "projection_schema": "game-view-v13-random-profiles",
-  "projection_state_hash": "4ac401ec8ff50e9f93fb200246388c651630e3532005efcc42646ad503c51622",
+  "projection_state_hash": "6c55daabe1cea33305bbd004f78a3817d12334a39425b23fb60100d2790abd45",
   "public_command_point_ledgers": [
     {
       "command_points": 0,

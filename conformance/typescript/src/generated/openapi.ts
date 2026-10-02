@@ -272,7 +272,7 @@ export interface components {
             projection_state_hash: string; rules_overlay_ids: string[]; ruleset_descriptor_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
-            schema_version: "session-metadata-v43-contract"; server_contract_version: string; session_id: string;
+            schema_version: "session-metadata-v44-contract"; server_contract_version: string; session_id: string;
             session_revision: number;
             /** @enum {string} */
             session_state: "created" | "active" | "terminal" | "closed"; source_hash: string; source_package_id: string;
@@ -679,7 +679,7 @@ export interface components {
             /** @enum {string} */
             outcome_code: "command_committed" | "proposal_invalid" | "rule_path_unsupported";
             /** @constant */
-            schema_version: "session-command-outcome-v43-contract"; session: components["schemas"]["session-metadata.schema"];
+            schema_version: "session-command-outcome-v44-contract"; session: components["schemas"]["session-metadata.schema"];
         } & ({
             /** @constant */
             accepted?: true;
@@ -753,6 +753,8 @@ export interface components {
             /** @enum {string} */
             state: "placed" | "destroyed" | "embarked" | "reserves" | "removed" | "undeployed";
             state_context: components["schemas"]["battlefield-view--model_state_context.schema"]; unit_instance_id: string;
+            /** @description Current canonical rules-unit actor; null while this viewer cannot know formation membership. Physical ownership remains unit_instance_id. */
+            rules_unit_instance_id: string | null;
         };
         "battlefield-view--objective.schema": {
             /** @constant */
@@ -857,7 +859,7 @@ export interface components {
             interaction: components["schemas"]["battlefield-view--interaction.schema"];
             render: components["schemas"]["battlefield-view--render.schema"];
             /** @constant */
-            schema_version: "battlefield-view-v4-phase17n-step3";
+            schema_version: "battlefield-view-v5-rules-unit-membership";
         };
         mission_setup: {
             /** @enum {unknown} */

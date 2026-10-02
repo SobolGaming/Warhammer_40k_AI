@@ -13,6 +13,35 @@ import {
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const contractRoot = resolve(repositoryRoot, "contracts");
 
+test("public Charge actor resolves every physical component and model", () => {
+  const registry = new ContractRegistry(contractRoot);
+  const view = registry.validate<SessionProjection["projection"]>(
+    "game-view.schema.json",
+    parseJsonFile(resolve(contractRoot, "examples/projections/attached_charge_view.json")),
+  );
+  const request = view.pending_decision;
+  assert.ok(request);
+  const payload = request.payload as { proposal_request: { unit_instance_id: string } };
+  const actor = payload.proposal_request.unit_instance_id;
+  assert.ok(view.battlefield_view);
+  const models = Object.values(view.battlefield_view.authoritative.models_by_id)
+    .filter((model) => model.rules_unit_instance_id === actor && model.state === "placed");
+  assert.equal(models.length, 6);
+  assert.equal(new Set(models.map((model) => model.unit_instance_id)).size, 2);
+  assert.ok(models.every((model) => model.unit_instance_id !== actor && model.pose !== null));
+  const witnessStarts = models.map((model) => ({
+    model_id: model.model_instance_id,
+    start: model.pose,
+    physical_owner: model.unit_instance_id,
+  }));
+  assert.equal(new Set(witnessStarts.map((entry) => entry.model_id)).size, 6);
+  const missingMembership = structuredClone(view.battlefield_view);
+  const first = Object.values(missingMembership.authoritative.models_by_id)[0];
+  assert.ok(first);
+  Reflect.deleteProperty(first, "rules_unit_instance_id");
+  assert.throws(() => registry.validate("battlefield-view.schema.json", missingMembership));
+});
+
 test("generated client round-trips the Phase 18J battlefield coordinate contract", () => {
   const registry = new ContractRegistry(contractRoot);
   const gameView = registry.validate<SessionProjection["projection"]>(

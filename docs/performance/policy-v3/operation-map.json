@@ -1798,6 +1798,98 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "issue532-public-membership-projection": {
+      "paths": [
+        "src/warhammer40k_core/adapters/battlefield_projection.py"
+      ],
+      "owners": [
+        "@module",
+        "BattlefieldModelEntityPayload",
+        "_model_entities"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "issue532-contract44-publication": {
+      "paths": [
+        "conformance/typescript/src/battlefield-conformance.test.ts",
+        "conformance/typescript/src/contract.ts",
+        "conformance/typescript/src/generated/openapi.ts",
+        "contracts/README.md",
+        "contracts/compatibility-policy.md",
+        "contracts/compatibility/44.0.0-shape.json",
+        "contracts/examples/battlefield/geometry-conformance.json",
+        "contracts/examples/events/initial-player-a.json",
+        "contracts/examples/events/initial-player-b.json",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/projections/attached_charge_view.json",
+        "contracts/examples/projections/hidden_secondary_redaction_view.json",
+        "contracts/examples/projections/initial_setup_view_player1.json",
+        "contracts/examples/projections/initial_setup_view_player2.json",
+        "contracts/examples/projections/post_deployment_view.json",
+        "contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_a.json",
+        "contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_b.json",
+        "contracts/examples/projections/visible_modifier_datacard_view.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/migrations/43-to-44.md",
+        "contracts/openapi.yaml",
+        "contracts/redaction-policy.md",
+        "contracts/schemas/battlefield-view.schema.json",
+        "contracts/schemas/session-command-outcome.schema.json",
+        "contracts/schemas/session-command-result.schema.json",
+        "contracts/schemas/session-metadata.schema.json",
+        "contracts/schemas/session-persistence.schema.json",
+        "scripts/export_ui_contract_fixtures.py",
+        "scripts/mock_event_layout_ui_assets/viewer.js",
+        "src/warhammer40k_core/adapters/external_contract.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_attached_charge_view",
+        "_conformance_model",
+        "build_ui_contract_bundle"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "issue532-client-regressions": {
+      "paths": [
+        "tests/public_membership_helpers.py",
+        "tests/unit/test_mock_event_layout_ui.py",
+        "tests/unit/test_phase18d_ui_contract_artifacts.py",
+        "tests/unit/test_phase18e_server_api.py",
+        "tests/unit/test_public_rules_unit_membership.py"
+      ],
+      "owners": [
+        "@module",
+        "_models",
+        "_public_charge",
+        "attached_split_config",
+        "test_casualty_and_physical_removal_keep_lineage_but_refresh_witness_membership",
+        "test_current_contract_preserves_model_projections_and_advances_visibility_wrappers",
+        "test_membership_tracks_private_split_reveal_and_checkpoint",
+        "test_mock_event_layout_ui_consumes_exact_battlefield_projections",
+        "test_mock_event_layout_ui_embeds_projection_and_interactive_3d_controls",
+        "test_phase17n_projection_family_versions_cover_the_new_closed_shapes",
+        "test_phase18e_command_result_schema_requires_accepted_commands_to_be_committed",
+        "test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads",
+        "test_public_charge_invalid_witness_is_atomic_and_can_retry",
+        "test_public_client_completes_charge_and_restores_current_membership",
+        "test_session_metadata_contract_version_accepts_current_major_releases"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

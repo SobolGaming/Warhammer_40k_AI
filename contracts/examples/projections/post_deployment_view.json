@@ -3149,6 +3149,7 @@
               "z_inches": 0.0
             }
           },
+          "rules_unit_instance_id": "army-alpha:intercessor-unit-1",
           "state": "placed",
           "state_context": {
             "reserve_kind": null,
@@ -3202,6 +3203,7 @@
               "z_inches": 0.0
             }
           },
+          "rules_unit_instance_id": "army-alpha:intercessor-unit-1",
           "state": "placed",
           "state_context": {
             "reserve_kind": null,
@@ -3255,6 +3257,7 @@
               "z_inches": 0.0
             }
           },
+          "rules_unit_instance_id": "army-alpha:intercessor-unit-1",
           "state": "placed",
           "state_context": {
             "reserve_kind": null,
@@ -3308,6 +3311,7 @@
               "z_inches": 0.0
             }
           },
+          "rules_unit_instance_id": "army-alpha:intercessor-unit-1",
           "state": "placed",
           "state_context": {
             "reserve_kind": null,
@@ -3361,6 +3365,7 @@
               "z_inches": 0.0
             }
           },
+          "rules_unit_instance_id": "army-alpha:intercessor-unit-1",
           "state": "placed",
           "state_context": {
             "reserve_kind": null,
@@ -3414,6 +3419,7 @@
               "z_inches": 0.0
             }
           },
+          "rules_unit_instance_id": "army-beta:intercessor-unit-2",
           "state": "placed",
           "state_context": {
             "reserve_kind": null,
@@ -3467,6 +3473,7 @@
               "z_inches": 0.0
             }
           },
+          "rules_unit_instance_id": "army-beta:intercessor-unit-2",
           "state": "placed",
           "state_context": {
             "reserve_kind": null,
@@ -3520,6 +3527,7 @@
               "z_inches": 0.0
             }
           },
+          "rules_unit_instance_id": "army-beta:intercessor-unit-2",
           "state": "placed",
           "state_context": {
             "reserve_kind": null,
@@ -3573,6 +3581,7 @@
               "z_inches": 0.0
             }
           },
+          "rules_unit_instance_id": "army-beta:intercessor-unit-2",
           "state": "placed",
           "state_context": {
             "reserve_kind": null,
@@ -3626,6 +3635,7 @@
               "z_inches": 0.0
             }
           },
+          "rules_unit_instance_id": "army-beta:intercessor-unit-2",
           "state": "placed",
           "state_context": {
             "reserve_kind": null,
@@ -7091,7 +7101,7 @@
         }
       }
     },
-    "authoritative_geometry_hash": "eee6afdaf1fe3d88d55f277d91d5e7a87a79e1e394c0fd41bcb44bf57676e1de",
+    "authoritative_geometry_hash": "0fc904917416850d1ef55b5af099e06278ffd0bcf6f2f776f49e1c212e216ce8",
     "battlefield_id": "ui-contract-post-deployment:take-and-hold-vs-purge-the-foe-layout-3-deployment:battlefield",
     "bounds": {
       "max_x_inches": 44.0,
@@ -8174,7 +8184,7 @@
         }
       }
     },
-    "schema_version": "battlefield-view-v4-phase17n-step3"
+    "schema_version": "battlefield-view-v5-rules-unit-membership"
   },
   "current_battle_phase": "movement",
   "current_setup_step": null,
@@ -15119,7 +15129,7 @@
     }
   ],
   "projection_schema": "game-view-v13-random-profiles",
-  "projection_state_hash": "d6e80b778fa5d847ca13e4350d7480b544940a1fc6f41bd50177a6a3061bbf10",
+  "projection_state_hash": "a9c3b709ae77119f553e21668c217cb958d13e2e6cec5efdceaca2e8c5ac629e",
   "public_command_point_ledgers": [
     {
       "command_points": 1,
