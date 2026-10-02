@@ -1895,7 +1895,7 @@ def test_hatred_eternal_accepted_fight_hit_reroll_resumes_attack_sequence() -> N
             "attacker": Pose.at(10.0, 20.0),
             "enemy": Pose.at(12.0, 20.0),
         },
-        game_id="drukhari-test-hatred-fight-consumer-0004",
+        game_id="order103-fixture-05-01",
         datasheet_id="core-character-leader",
         model_profile_id="core-character-leader",
         model_count=1,

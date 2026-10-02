@@ -40,6 +40,7 @@ from warhammer40k_core.engine.attack_sequence import (
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedHookRegistry,
 )
+from warhammer40k_core.engine.attack_sequence_selection import target_has_character_for_attack_group
 from warhammer40k_core.engine.battlefield_presence import (
     battlefield_scenario_for_state,
     rules_unit_has_present_model,
@@ -1201,6 +1202,9 @@ def invalid_fight_attack_sequence_selection_status(
     current_groups = gathered_attack_groups_for_target(
         attack_sequence=attack_sequence,
         target_unit_instance_id=selected_group.target_unit_instance_id,
+        target_has_character=target_has_character_for_attack_group(
+            state=state, target_unit_instance_id=selected_group.target_unit_instance_id
+        ),
     )
     if selected_group.group_id not in {group.group_id for group in current_groups}:
         return LifecycleStatus.invalid(

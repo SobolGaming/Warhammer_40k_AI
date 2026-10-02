@@ -259,7 +259,7 @@ def test_both_players_accept_fidelity_in_fight_and_replay_through_completion() -
     catalog, rifle, second = fidelity_replacement_catalog(distinct_weapon_groups=True)
     lifecycle, units = fight_lifecycle(
         catalog=catalog,
-        game_id="order56-two-fidelity-0",
+        game_id="order103-fixture-08-01",
         alpha_unit_ids=("alpha", "ally"),
         enemy_unit_ids=("enemy",),
         model_count=1,

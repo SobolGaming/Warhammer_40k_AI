@@ -186,6 +186,7 @@ from warhammer40k_core.engine.attack_sequence_hazardous import (
     _hazardous_source_context_from_payload,
     _hazardous_source_context_payload,
 )
+from warhammer40k_core.engine.attack_sequence_selection import target_has_character_for_attack_group
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
@@ -4426,6 +4427,9 @@ def test_phase14h_pending_grouped_damage_payload_validates_fail_fast() -> None:
         attack_pools=(*sequence.attack_pools, second_pool),
     ).with_selected_target_unit(defender.unit_instance_id)
     gathered_group = gathered_attack_groups_for_target(
+        target_has_character=target_has_character_for_attack_group(
+            state=_state(lifecycle), target_unit_instance_id=defender.unit_instance_id
+        ),
         attack_sequence=gathered_sequence,
         target_unit_instance_id=defender.unit_instance_id,
     )[0]
@@ -9567,6 +9571,9 @@ def test_phase14l_identical_attack_signature_and_gathered_group_payloads() -> No
     )
 
     groups = gathered_attack_groups_for_target(
+        target_has_character=target_has_character_for_attack_group(
+            state=_state(lifecycle), target_unit_instance_id=defender.unit_instance_id
+        ),
         attack_sequence=sequence,
         target_unit_instance_id=defender.unit_instance_id,
     )
@@ -9579,7 +9586,10 @@ def test_phase14l_identical_attack_signature_and_gathered_group_payloads() -> No
         first_pool.weapon_instance_id,
         second_pool.weapon_instance_id,
     )
-    assert "attacks" not in identical_attack_signature(first_pool).to_payload()
+    assert (
+        "attacks"
+        not in identical_attack_signature(first_pool, target_has_character=False).to_payload()
+    )
     assert groups[0].signature.attacker_model_instance_id == first_pool.attacker_model_instance_id
     assert groups[0].signature.target_visible_model_ids == first_pool.target_visible_model_ids
     assert groups[0].signature.target_in_range_model_ids == first_pool.target_in_range_model_ids
@@ -9667,7 +9677,9 @@ def test_phase14l_identical_attack_signature_and_gathered_group_payloads() -> No
             weapon_profile=lethal_profile,
         ),
     )
-    signatures = {identical_attack_signature(pool) for pool in different_pools}
+    signatures = {
+        identical_attack_signature(pool, target_has_character=False) for pool in different_pools
+    }
     assert len(signatures) == len(different_pools)
     matching_id_only_pools = (
         first_pool,
@@ -9678,7 +9690,15 @@ def test_phase14l_identical_attack_signature_and_gathered_group_payloads() -> No
             weapon_profile=replace(base_profile, profile_id="phase14l-equal-profile-id"),
         ),
     )
-    assert len({identical_attack_signature(pool) for pool in matching_id_only_pools}) == 1
+    assert (
+        len(
+            {
+                identical_attack_signature(pool, target_has_character=False)
+                for pool in matching_id_only_pools
+            }
+        )
+        == 1
+    )
 
 
 def test_phase14l_precision_visibility_provenance_prevents_unsafe_gathering() -> None:
@@ -9723,6 +9743,9 @@ def test_phase14l_precision_visibility_provenance_prevents_unsafe_gathering() ->
     )
 
     groups = gathered_attack_groups_for_target(
+        target_has_character=target_has_character_for_attack_group(
+            state=_state(lifecycle), target_unit_instance_id=defender.unit_instance_id
+        ),
         attack_sequence=sequence,
         target_unit_instance_id=defender.unit_instance_id,
     )
@@ -9763,6 +9786,9 @@ def test_phase14l_attacker_observer_provenance_prevents_unsafe_cover_gathering()
     )
 
     groups = gathered_attack_groups_for_target(
+        target_has_character=target_has_character_for_attack_group(
+            state=_state(lifecycle), target_unit_instance_id=defender.unit_instance_id
+        ),
         attack_sequence=sequence,
         target_unit_instance_id=defender.unit_instance_id,
     )
@@ -9808,6 +9834,9 @@ def test_phase14l_range_and_firing_deck_provenance_prevent_unsafe_gathering() ->
     )
 
     groups = gathered_attack_groups_for_target(
+        target_has_character=target_has_character_for_attack_group(
+            state=_state(lifecycle), target_unit_instance_id=defender.unit_instance_id
+        ),
         attack_sequence=sequence,
         target_unit_instance_id=defender.unit_instance_id,
     )
@@ -9925,6 +9954,9 @@ def test_phase14l_shooting_test1_gathered_save_order_regression() -> None:
         attack_pools=(*bolt_pools, heavy_pool),
     ).with_selected_target_unit(defender.unit_instance_id)
     groups = gathered_attack_groups_for_target(
+        target_has_character=target_has_character_for_attack_group(
+            state=_state(lifecycle), target_unit_instance_id=defender.unit_instance_id
+        ),
         attack_sequence=sequence,
         target_unit_instance_id=defender.unit_instance_id,
     )
@@ -10055,6 +10087,9 @@ def test_phase14l_gathered_attack_state_fails_fast_on_malformed_shapes() -> None
         attack_pools=(pool,),
     ).with_selected_target_unit(defender.unit_instance_id)
     group = gathered_attack_groups_for_target(
+        target_has_character=target_has_character_for_attack_group(
+            state=_state(lifecycle), target_unit_instance_id=defender.unit_instance_id
+        ),
         attack_sequence=sequence,
         target_unit_instance_id=defender.unit_instance_id,
     )[0]
@@ -10112,6 +10147,7 @@ def test_phase14l_gathered_attack_state_fails_fast_on_malformed_shapes() -> None
         )
     with pytest.raises(GameLifecycleError, match="must be an IdenticalAttackSignature"):
         GatheredAttackGroup(
+            target_has_character=group.target_has_character,
             group_id=group.group_id,
             target_unit_instance_id=group.target_unit_instance_id,
             signature=cast(Any, group.signature.to_payload()),
@@ -10121,6 +10157,7 @@ def test_phase14l_gathered_attack_state_fails_fast_on_malformed_shapes() -> None
         )
     with pytest.raises(GameLifecycleError, match="total attacks drift"):
         GatheredAttackGroup(
+            target_has_character=group.target_has_character,
             group_id=group.group_id,
             target_unit_instance_id=group.target_unit_instance_id,
             signature=group.signature,
@@ -10130,6 +10167,7 @@ def test_phase14l_gathered_attack_state_fails_fast_on_malformed_shapes() -> None
         )
     with pytest.raises(GameLifecycleError, match="contribution target drift"):
         GatheredAttackGroup(
+            target_has_character=group.target_has_character,
             group_id=group.group_id,
             target_unit_instance_id=group.target_unit_instance_id,
             signature=group.signature,
@@ -10162,7 +10200,8 @@ def test_phase14l_gathered_attack_state_fails_fast_on_malformed_shapes() -> None
                 pool,
                 weapon_profile_id=missing_descriptor_profile.profile_id,
                 weapon_profile=missing_descriptor_profile,
-            )
+            ),
+            target_has_character=False,
         )
 
 
@@ -10188,6 +10227,9 @@ def test_phase14l_attack_sequence_round_trips_current_gathered_group_json_safe()
         attack_pools=(pool,),
     ).with_selected_target_unit(defender.unit_instance_id)
     group = gathered_attack_groups_for_target(
+        target_has_character=target_has_character_for_attack_group(
+            state=_state(lifecycle), target_unit_instance_id=defender.unit_instance_id
+        ),
         attack_sequence=sequence,
         target_unit_instance_id=defender.unit_instance_id,
     )[0]

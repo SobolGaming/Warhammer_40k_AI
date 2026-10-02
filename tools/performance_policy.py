@@ -12,6 +12,8 @@ import subprocess
 from pathlib import Path
 from typing import cast
 
+from tools.performance_order103_exception import RECOGNITION, validate_owner_recognition
+
 POLICY = "rules-engine-performance-v3"
 ASSESSMENT = "docs/performance/change-assessment.json"
 MAP = "docs/performance/policy-v3/operation-map.json"
@@ -319,7 +321,7 @@ def validate_comparison(
     specification: dict[str, object],
     base_runtime_id: str,
     expected_inputs: dict[str, str],
-) -> None:
+) -> list[dict[str, object]]:
     _keys(
         report,
         {
@@ -333,7 +335,8 @@ def validate_comparison(
             "base",
             "head",
             "historical_failures",
-        },
+        }
+        | ({"owner_exception"} if "owner_exception" in report else set()),
     )
     if (
         report["policy"],
@@ -393,6 +396,8 @@ def validate_comparison(
     if set(cases) != base_samples.keys() or set(cases) != head_samples.keys():
         raise ValueError("Hard comparison cases were omitted or changed.")
     count = specification["samples_per_case"]
+    recognized = validate_owner_recognition(report)
+    approved_failures: list[dict[str, object]] = []
     for case in cases:
         measurements = []
         for side in (base_samples, head_samples):
@@ -406,13 +411,26 @@ def validate_comparison(
                 raise ValueError("Invalid measured duration.")
             measurements.append(cast(list[float], values))
         old, new = measurements
-        if (
-            statistics.mean(new) > 1.25 * statistics.mean(old) + 0.05
-            or max(new) > 1.5 * max(old) + 0.10
-        ):
+        mean_limit = 1.25 * statistics.mean(old) + 0.05
+        if max(new) > 1.5 * max(old) + 0.10:
             raise ValueError(f"Current relative budget exceeded: {family}/{case}")
+        if statistics.mean(new) > mean_limit:
+            if not recognized or case != RECOGNITION["case"]:
+                raise ValueError(f"Current relative budget exceeded: {family}/{case}")
+            approved_failures.append(
+                {
+                    **RECOGNITION,
+                    "family": family,
+                    "numerical_budget_passed": False,
+                    "measured_seconds": statistics.mean(new),
+                    "budget_seconds": mean_limit,
+                }
+            )
+    if recognized and len(approved_failures) != 1:
+        raise ValueError("Unused owner performance exception.")
     if not isinstance(report["historical_failures"], list):
         raise TypeError("Historical failure qualification must remain explicit.")
+    return approved_failures
 
 
 def _validate_host(value: object) -> None:

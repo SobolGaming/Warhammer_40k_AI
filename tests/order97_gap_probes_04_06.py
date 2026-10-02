@@ -22,6 +22,7 @@ from warhammer40k_core.engine.attack_sequence import (
     AttackSequence,
     gathered_attack_groups_for_target,
 )
+from warhammer40k_core.engine.attack_sequence_selection import target_has_character_for_attack_group
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.hazard import hazard_mortal_wounds_per_failed_roll
 from warhammer40k_core.engine.list_validation import UnitMusterSelection
@@ -81,7 +82,10 @@ def mixed_hazard() -> dict[str, object]:
 
 
 def precision_grouping() -> dict[str, object]:
+    """Observe the current runtime; original negative evidence remains immutable."""
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = lifecycle.state
+    assert state is not None
     attacker, target = units["intercessor-1"], units["enemy"]
     base = replace(_first_weapon_profile(lifecycle, attacker), keywords=(), abilities=())
     first = _attack_pool_for_test(
@@ -99,7 +103,11 @@ def precision_grouping() -> dict[str, object]:
         attack_pools=(first, second),
     )
     groups = gathered_attack_groups_for_target(
-        attack_sequence=sequence, target_unit_instance_id=target.unit_instance_id
+        target_has_character=target_has_character_for_attack_group(
+            state=state, target_unit_instance_id=target.unit_instance_id
+        ),
+        attack_sequence=sequence,
+        target_unit_instance_id=target.unit_instance_id,
     )
     return {
         "requirement_ids": ["faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01"],

@@ -271,7 +271,7 @@ def failed_setup_automatic_record_session() -> tuple[LocalGameSession, GameLifec
     for index, (decision_type, choice) in enumerate(choices):
         request = pending_request(session)
         assert request.decision_type == decision_type, (index, decision_type, request)
-        result_id = f"automatic-probe:{index}"
+        result_id = f"order103-fixture-00-00:{index}"
         if choice == "failed_disembark":
             proposal = PlacementProposalPayload(
                 proposal_request_id=request.request_id,

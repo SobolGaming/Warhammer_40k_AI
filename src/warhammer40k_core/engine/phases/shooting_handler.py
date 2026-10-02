@@ -1,6 +1,8 @@
 # ruff: noqa: E501,F401,F403,F405,I001
 # pyright: reportUnusedImport=false
 from __future__ import annotations
+
+from warhammer40k_core.engine.attack_sequence_selection import target_has_character_for_attack_group
 from warhammer40k_core.engine.phase import LifecycleStatusKind
 
 from warhammer40k_core.engine.shooting_target_replacement import request_shooting_target_replacement
@@ -781,6 +783,9 @@ class ShootingPhaseHandler:
         current_groups = gathered_attack_groups_for_target(
             attack_sequence=attack_sequence,
             target_unit_instance_id=selected_group.target_unit_instance_id,
+            target_has_character=target_has_character_for_attack_group(
+                state=state, target_unit_instance_id=selected_group.target_unit_instance_id
+            ),
         )
         if selected_group.group_id not in {group.group_id for group in current_groups}:
             return LifecycleStatus.invalid(

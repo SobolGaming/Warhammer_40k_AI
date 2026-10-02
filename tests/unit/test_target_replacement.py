@@ -4,6 +4,7 @@ from dataclasses import replace
 
 import pytest
 
+from warhammer40k_core.engine.attack_sequence_selection import target_has_character_for_attack_group
 from warhammer40k_core.engine.decision_request import DecisionError
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.target_replacement import (
@@ -943,7 +944,11 @@ def test_already_gathered_attacks_are_not_retargeted() -> None:
         units["old"].unit_instance_id
     )
     group = gathered_attack_groups_for_target(
-        attack_sequence=sequence, target_unit_instance_id=units["old"].unit_instance_id
+        target_has_character=target_has_character_for_attack_group(
+            state=state, target_unit_instance_id=units["old"].unit_instance_id
+        ),
+        attack_sequence=sequence,
+        target_unit_instance_id=units["old"].unit_instance_id,
     )[0]
     gathered = sequence.with_current_gathered_group(group)
     assert (

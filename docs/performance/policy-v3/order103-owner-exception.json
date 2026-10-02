@@ -1,0 +1,30 @@
+{
+  "status": "EXPLICIT_OWNER_APPROVAL_FOR_SINGLE_EXISTING_FAILURE",
+  "recorded_by": "/root",
+  "parent_thread": "01a0efa7-1ce0-70b0-a637-75c1615f80ef",
+  "approval_source": "Parent delegation supplied exact assistant proposal and user response as transcript evidence.",
+  "assistant_message_id": "Sentinel_f70040c8e93081919740a685b777cec2",
+  "assistant_proposal": "Order 103 needs one performance exception: a Shooting case averaged 2.481 seconds against a 2.262-second limit, while processing 15 legitimate wound decisions instead of 10. The other 27 checks passed, and profiling found no substantial implementation defect. I recommend documenting this single exception and continuing correctness tests, reviews and CI. Approve?",
+  "user_message_id": "Sentinel_7628b26d7bbc8191a7417362dfd866fd",
+  "user_response": "yes",
+  "user_response_at": "2026-10-02T11:20:34Z",
+  "order": "Order103 / P04G / C04-08",
+  "base": "133956de896c0db222158a086e672cc04649c096",
+  "measured_input_digest": "03f49ddff44dbaa9f6025082829b520ba8174c912cf301634ce7cc33a2652306",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:81b436feba3835847aef40a9d90e94ad5ced81c6a62cc445583b7ace2f10247e",
+  "family": "dice_sustained",
+  "case": "shooting/true",
+  "metric": "mean",
+  "measured_seconds": 2.481014919979498,
+  "original_budget_seconds": 2.262186475022463,
+  "failure_receipt": "detailed-serial2/root-failed-budget-authentication.json",
+  "failure_receipt_sha256": "9c21d23e2c3bc74738ffb715475aa414c181752638e78140cf0d42ac383bf17b",
+  "scope": "Document and recognize this single already-measured mean failure as owner-approved for Order103 delivery. Retain all failed samples and unchanged original numerical budget. Do not claim it passed.",
+  "not_authorized": [
+    "Any broader exception or threshold change",
+    "Changing seeds, removing hard cases, normalizing time by work count or relabeling measurements",
+    "Broad engine optimization or benchmark expansion",
+    "Skipping any other correctness, quality, review, CI or merge-protection gate"
+  ],
+  "required_next": "Reconcile stopped processes and current source/evidence; maintain sole Astra Extra High author and independent coding reviewer; preserve exact-head applicability and separate parent fresh Astra audit; finish fresh covered behavior, quality, publication and hosted CI. Send parent exact-head packet promptly."
+}

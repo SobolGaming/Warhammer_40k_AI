@@ -11,24 +11,28 @@ from warhammer40k_core.engine.stratagems import stratagem_decline_payload
 
 
 def submit_next(
-    session: LocalGameSession, request: DecisionRequest, *, reroll: bool = False
+    session: LocalGameSession,
+    request: DecisionRequest,
+    *,
+    reroll: bool = False,
+    result_id_suffix: str = "fixture-choice",
 ) -> None:
     if request.decision_type == "select_dice_reroll":
         status = session.submit_option(
             request_id=request.request_id,
-            result_id=f"{request.request_id}:fixture-choice",
+            result_id=f"{request.request_id}:{result_id_suffix}",
             option_id="reroll:0" if reroll else "decline",
         )
     elif request.decision_type == "submit_stratagem_target_proposal":
         status = session.submit_parameterized_payload(
             request_id=request.request_id,
-            result_id=f"{request.request_id}:fixture-choice",
+            result_id=f"{request.request_id}:{result_id_suffix}",
             payload=stratagem_decline_payload(),
         )
     elif request.decision_type == "use_stratagem":
         status = session.submit_option(
             request_id=request.request_id,
-            result_id=f"{request.request_id}:fixture-choice",
+            result_id=f"{request.request_id}:{result_id_suffix}",
             option_id="decline_stratagem_window",
         )
     else:
@@ -49,11 +53,18 @@ def reach_wound_reroll(session: LocalGameSession) -> DecisionRequest:
     raise AssertionError("No optional wound reroll was reached.")
 
 
-def complete_optional_attack(session: LocalGameSession, *, reroll: bool = False) -> None:
+def complete_optional_attack(
+    session: LocalGameSession,
+    *,
+    reroll: bool = False,
+    result_id_suffix: str = "fixture-choice",
+) -> None:
     for _ in range(150):
         if attack_completed(session):
             return
-        submit_next(session, pending_request(session), reroll=reroll)
+        submit_next(
+            session, pending_request(session), reroll=reroll, result_id_suffix=result_id_suffix
+        )
     raise AssertionError("Attack did not complete.")
 
 

@@ -7316,6 +7316,8 @@ def _resolve_phase15d_activation(
         current.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
         and current.decision_request is not None
     ):
+        if _state(lifecycle).current_battle_phase is not BattlePhase.FIGHT:
+            return current
         submission_count += 1
         assert submission_count <= 64, (
             current,

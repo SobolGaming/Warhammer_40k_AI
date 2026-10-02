@@ -8187,7 +8187,7 @@ def test_attached_action_history_retains_identity_through_round_trip_and_termina
         initial_lifecycle_payload=terminal_payload,
         final_lifecycle=terminal_lifecycle,
     )
-    assert terminal_artifact.schema_version == "replay-artifact-v35-modifier-occurrences"
+    assert terminal_artifact.schema_version == "replay-artifact-v36-target-aware-attack-groups"
     replay_snapshot = GameLifecycle.from_payload(terminal_artifact.initial_lifecycle_payload)
     replay_snapshot_state = replay_snapshot.state
     assert replay_snapshot_state is not None

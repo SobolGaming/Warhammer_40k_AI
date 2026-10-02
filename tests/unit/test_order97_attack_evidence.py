@@ -30,6 +30,7 @@ from warhammer40k_core.engine.attack_sequence import (
     AttackSequence,
     gathered_attack_groups_for_target,
 )
+from warhammer40k_core.engine.attack_sequence_selection import target_has_character_for_attack_group
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.hazard import (
@@ -208,10 +209,17 @@ def test_identical_attack_grouping_separates_each_characteristic(
         attack_pools=(pool, copy),
     )
     identical = gathered_attack_groups_for_target(
-        attack_sequence=sequence, target_unit_instance_id=target.unit_instance_id
+        target_has_character=target_has_character_for_attack_group(
+            state=state, target_unit_instance_id=target.unit_instance_id
+        ),
+        attack_sequence=sequence,
+        target_unit_instance_id=target.unit_instance_id,
     )
     assert len(identical) == 1
     different = gathered_attack_groups_for_target(
+        target_has_character=target_has_character_for_attack_group(
+            state=state, target_unit_instance_id=target.unit_instance_id
+        ),
         attack_sequence=replace(
             sequence, attack_pools=(pool, replace(copy, weapon_profile=changed))
         ),

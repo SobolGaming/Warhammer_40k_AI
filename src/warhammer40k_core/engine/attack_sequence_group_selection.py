@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.attack_sequence_selection import target_has_character_for_attack_group
+
 from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
 
 from typing import TYPE_CHECKING
@@ -125,6 +127,9 @@ def _select_or_request_next_gathered_group(
         groups = gathered_attack_groups_for_target(
             attack_sequence=current,
             target_unit_instance_id=target_unit_instance_id,
+            target_has_character=target_has_character_for_attack_group(
+                state=state, target_unit_instance_id=target_unit_instance_id
+            ),
         )
         if not groups:
             current = current.without_selected_target_unit()

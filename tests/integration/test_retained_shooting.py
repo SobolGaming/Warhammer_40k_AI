@@ -135,10 +135,8 @@ def test_order_30_retained_shooter_keeps_range_restriction_and_ability_geometry(
 def test_order_30_for_the_chapter_shoots_after_own_hazardous_death(with_feel_no_pain: bool) -> None:
     lifecycle, units = _compact_shooting_lifecycle(
         catalog=for_the_chapter_catalog(hazardous=True),
-        # Preserve own-Hazardous death with Order 84 retention evidence hashes.
-        game_id="order84-own-hazard-fnp-1"
-        if with_feel_no_pain
-        else "order56-own-hazard-0-order64-4",
+        # Contract 43 group payloads/IDs change RNG history; retain both own-Hazardous branches.
+        game_id="order103-fixture-02-01" if with_feel_no_pain else "order103-fixture-09-00",
         enemy_model_count=5,
     )
     state = lifecycle.state
@@ -1068,8 +1066,8 @@ def test_order_30_unending_fidelity_rejects_a_model_that_already_fought() -> Non
 
 @pytest.mark.parametrize(
     ("game_id", "child_before_parent"),
-    # Contract 41 authenticated SaveOption evidence changes retention hashes.
-    [("order93-nested-retained-3", False), ("order93-child-first-retained-0", True)],
+    # Rebind the child-first branch for Contract 43 group payload/ID RNG history.
+    [("order93-nested-retained-3", False), ("order103-fixture-07-00", True)],
 )
 def test_order_30_nested_retained_shooting_restores_each_parent_and_redacts_authority(
     game_id: str,
@@ -1268,7 +1266,7 @@ def test_order_30_multiple_hazardous_casualties_keep_each_pending_authority() ->
     )
     lifecycle, units = _shooting_lifecycle(
         catalog=catalog,
-        game_id="order36-multi-hazard-5-order64-2",
+        game_id="order103-fixture-14-00",
         alpha_unit_ids=("intercessor-1",),
         alpha_unit_specs=(
             ("intercessor-1", "core-intercessor-like-infantry", "core-intercessor-like", 5),
@@ -1414,11 +1412,9 @@ def test_r34_001_action_blocks_nested_retained_shooting_before_acceptance(titani
         )
     lifecycle, units = _compact_shooting_lifecycle(
         catalog=catalog,
-        # Contract 41 authenticates new SaveOption evidence in retention hashes;
-        # re-anchor the non-Titanic fixture to retain the nested casualty branch.
-        game_id="order56-nested-action-10-order64-1"
-        if titanic
-        else "order93-nested-action-retention-4",
+        # Contract 43 group payloads/IDs change RNG history; re-anchor only
+        # the non-Titanic fixture to retain the nested casualty branch.
+        game_id="order56-nested-action-10-order64-1" if titanic else "order103-fixture-11-02",
         alpha_unit_ids=("intercessor-1", "intercessor-2"),
         enemy_model_count=3,
     )

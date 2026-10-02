@@ -92,6 +92,26 @@ reviewed. The checker verifies the declared coverage/triggers/evidence; independ
 exact-head review must judge semantic classification and dependency-role accuracy.
 There is no skip/exempt flag or environment-variable bypass.
 
+### Single owner-approved Order103 failure
+
+On 2026-10-02 at 11:20:34 UTC the owner approved delivery recognition of
+exactly one already-measured failure: Order103 `dice_sustained/shooting/true`
+mean 2.481014919979498 seconds against the unchanged 2.262186475022463-second
+limit. The recorded approval is `policy-v3/order103-owner-exception.json`.
+The original five base/head samples, exact base/runtime/host/workload and
+input identities remain immutable. The result is an **owner-approved failure**,
+never a numerical pass. Its maximum and all other inequalities remain required.
+
+Enforcement recognizes only the fixed approval and complete original comparison
+fingerprint. A changed, missing, unused or unrelated recognition fails closed.
+`policy-v3/order103-exception-applicability.json` separately authenticates the
+four exact policy/checker/quality input changes needed to implement recognition;
+the measured inventory and digest are retained. No engine, workload, fixture or
+lock change can inherit those samples. Live smoke always binds the complete
+current input inventory and reports approved failures explicitly. This approval
+creates no general exception, threshold change, optimization authorization or
+waiver of correctness, reviews, CI, smoke or aggregate gates.
+
 ## Current-change budgets and historical qualification
 
 `current-change-relative-v1` is a new versioned engineering envelope: arithmetic
