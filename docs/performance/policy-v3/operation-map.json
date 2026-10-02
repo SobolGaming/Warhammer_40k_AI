@@ -1630,6 +1630,40 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "issue535-order97-history": {
+      "paths": [
+        "tools/core_rules_order97_history.py"
+      ],
+      "owners": [
+        "@module",
+        "historical_evidence_path"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "issue535-order97-map": {
+      "paths": [
+        "data/source_audits/issue535/historical-inputs.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "issue535-order97-archive": {
+      "paths": [
+        "data/source_audits/issue535/baseline/tests/unit/test_phase16b_prebattle.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

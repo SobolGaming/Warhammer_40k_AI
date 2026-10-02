@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "ff0b2db17106e7e0493929d6ab9ddb15c44aa476",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:88213efa85870baf8a965f488f0b87ca4fbf2d604a5f49af32cf7f068a3c798f",
-  "operation_map_sha256": "0e2150bb8a9079779b52edc8235776263ad2a66a28ae3aeeb7b0efbd797360c4",
+  "operation_map_sha256": "348361dedd27b8a80d8c6fb3a4b7e241989f397386139fa2487c0aedc5af7a00",
   "changes": {
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "346df1d4c34a573329d672c3b62893f84fb752a0880484012103af06319f0209",
@@ -84,23 +84,43 @@
         }
       }
     },
-    "docs/ISSUE_535_SCOUT_HISTORY.md": {
+    "data/source_audits/issue535/baseline/tests/unit/test_phase16b_prebattle.py.txt": {
       "before_sha256": null,
-      "after_sha256": "4e2591bb480947ae3c7afaaf18b59292e73efec66a6de4c56ded0e3a8efe2790",
+      "after_sha256": "c1fcf7728167c259abfd08e08565aa2c1f637837751afd8d40b29f6f258959fb",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4e2591bb480947ae3c7afaaf18b59292e73efec66a6de4c56ded0e3a8efe2790"
+          "after": "c1fcf7728167c259abfd08e08565aa2c1f637837751afd8d40b29f6f258959fb"
+        }
+      }
+    },
+    "data/source_audits/issue535/historical-inputs.json": {
+      "before_sha256": null,
+      "after_sha256": "5c0f44902158da51de3279bc7d44c9e2a13a2f4c2d3ce1c67d02925e3e851c95",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "5c0f44902158da51de3279bc7d44c9e2a13a2f4c2d3ce1c67d02925e3e851c95"
+        }
+      }
+    },
+    "docs/ISSUE_535_SCOUT_HISTORY.md": {
+      "before_sha256": null,
+      "after_sha256": "bf4cb51081cbbc00d85df0bf143bd9ff6c5956f5867101408931e65390d59863",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "bf4cb51081cbbc00d85df0bf143bd9ff6c5956f5867101408931e65390d59863"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "d0cb2ab96a2bddc3aa68c03d36adee62c541e698c4798206a2c97a8353f51452",
-      "after_sha256": "47e3a337bc3b3ec48779a889a85f3e80f9d240468f89817fcf77651db431f3dd",
+      "after_sha256": "0d97eb42f242fc13c78797ba48a71b4597773ec5250336b31899d8aa0d5dc0da",
       "owners": {
         "@document": {
           "before": "d0cb2ab96a2bddc3aa68c03d36adee62c541e698c4798206a2c97a8353f51452",
-          "after": "47e3a337bc3b3ec48779a889a85f3e80f9d240468f89817fcf77651db431f3dd"
+          "after": "0d97eb42f242fc13c78797ba48a71b4597773ec5250336b31899d8aa0d5dc0da"
         }
       }
     },
@@ -125,6 +145,20 @@
         "authoritative_battlefield_transition_batch_or_none": {
           "before": "a0aeb1ade3a012fa5abd30789779dcf5cff6c038fdcb05581784d1cd916bf288",
           "after": "c907827cc2199355613c3869281eb30b65d1901703a6a74b47c0f3a40970b296"
+        }
+      }
+    },
+    "tests/code_quality/test_order97_inventory.py": {
+      "before_sha256": "fa07f90bd411fbe97c5a16bdf23c638904a006fdbc85766f03b951735f43f352",
+      "after_sha256": "e214eb810a41cadfccde83a3ad92519b541d5dc745f338715cb4a733705dee2b",
+      "owners": {
+        "@module": {
+          "before": "a65a8772b4fba12333d29ddb9cc3008c06c6187e80bd749cdaac78cd2b6aeb0f",
+          "after": "3be63683830ddbdd83cbfac78a0dda90fa7c929c70b60a045146817058faed94"
+        },
+        "test_issue535_original_scout_assertions_remain_exact_and_fail_closed": {
+          "before": null,
+          "after": "ce5b94fb4a6ee26fbe3df8b3b2fc4f9831779b5df54d642b80bf0e12f5d073ab"
         }
       }
     },
@@ -191,6 +225,20 @@
         "test_scout_physical_history_rejects_malformed_transition": {
           "before": null,
           "after": "4a1f278f5c941109895316746c89853ffe6e5ea2ba966ed41ab864e41b53a280"
+        }
+      }
+    },
+    "tools/core_rules_order97_history.py": {
+      "before_sha256": "f7ad023ca9519c10f7bbdfc9b4005dfd327547fc1aff9826cec523efdd966a0a",
+      "after_sha256": "15b00ead54c398ce624d6cc7ec57684f35fcf266c5bcdc6a87a813aab833e9a3",
+      "owners": {
+        "@module": {
+          "before": "21dd66232d89da2eab3fcf48448357b1f32947426811abd5eea311949d9c786f",
+          "after": "9737cc00d0e820d90b8a5a447b00a7a6f03ab99d3f3a9e1baf540b13d5f8d04d"
+        },
+        "historical_evidence_path": {
+          "before": "7e347324eab963be1a123fcf6eadc13ccde380340b7e26a4e5c82ededb1a7902",
+          "after": "0241fe97a7fdcf67cfb0df650c5b6c671c955f8a37206ebe52924ded3ce71aed"
         }
       }
     }
@@ -284,6 +332,26 @@
       "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
       "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
     },
+    "data/source_audits/issue535/baseline/tests/unit/test_phase16b_prebattle.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue535-order97-archive"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
+      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+    },
+    "data/source_audits/issue535/historical-inputs.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue535-order97-map"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
+      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+    },
     "docs/ISSUE_535_SCOUT_HISTORY.md": {
       "category": "governance",
       "operations": [],
@@ -320,6 +388,14 @@
       "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
       "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
     },
+    "tests/code_quality/test_order97_inventory.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
+      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+    },
     "tests/code_quality/test_unit_model_semantics.py": {
       "category": "governance",
       "operations": [],
@@ -343,6 +419,17 @@
       "category": "rule_semantics",
       "operations": [
         "issue535-scout-history-regression"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
+      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+    },
+    "tools/core_rules_order97_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue535-order97-history",
+        "shock-source-generation-and-audit"
       ],
       "selected_families": [],
       "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",

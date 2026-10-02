@@ -1,0 +1,17 @@
+{
+  "reviewed_commit": "8007555ef23e85c11d39b294acec02bd83fc3271",
+  "also_present_at_base": "ff0b2db17106e7e0493929d6ab9ddb15c44aa476",
+  "purpose": "Authenticate the unchanged original Order 97 assertion inventory after additive Issue 535 parser regressions. This archive is historical evidence, not current Scout semantic compliance; current tests still execute in normal suites.",
+  "current_evidence": "docs/ISSUE_535_SCOUT_HISTORY.md",
+  "files": [
+    {
+      "path": "tests/unit/test_phase16b_prebattle.py",
+      "historical_path": "data/source_audits/issue535/baseline/tests/unit/test_phase16b_prebattle.py.txt",
+      "git_revision": "8007555ef23e85c11d39b294acec02bd83fc3271",
+      "git_path": "tests/unit/test_phase16b_prebattle.py",
+      "sha256": "c1fcf7728167c259abfd08e08565aa2c1f637837751afd8d40b29f6f258959fb",
+      "bytes": 104510,
+      "order97_file_pin": "c1fcf7728167c259abfd08e08565aa2c1f637837751afd8d40b29f6f258959fb"
+    }
+  ]
+}

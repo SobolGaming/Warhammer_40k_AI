@@ -52,3 +52,19 @@ shared-registry architecture audit also binds Scout's emitted event to the regis
 No new behavioral file is added. Full correctness, generated-artifact, contract,
 type, quality and serial live performance gates remain required on the final head;
 focused evidence alone is not the final validation certificate.
+
+
+## Historical Order 97 evidence
+
+Order 97 pins the complete original pre-battle test module. Its 104,510 bytes
+remain at `data/source_audits/issue535/baseline/tests/unit/test_phase16b_prebattle.py.txt`,
+with the original `c1fcf772...` hash. The fixed-hash `historical-inputs.json` mapping
+records the reviewed commit and exact PR base, which contain identical bytes.
+The original inventory identity, file pin, assertion receipts, categories and
+runtime reconciliation remain unchanged. Missing or corrupt archive/map data
+fails closed through the existing offline resolver.
+
+The live module adds three parser regressions and imports; all 78 existing
+function/class ASTs remain identical to the PR base. Current Scout behavior is
+validated by the live regression suites described above. The retained archive
+authenticates the historical record and does not certify current compliance.
