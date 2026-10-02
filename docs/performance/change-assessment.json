@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "5c07fb65010627249b344fa61c65c3b7a36b2a3c",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:189895f28d6817d8ff5e77feefe40c0c351fd8a05b064bd78de81182cf164674",
-  "operation_map_sha256": "95a469898b20234bb5a02040eb4d8c9556d5deb9d25fa7f245e46bc4d0b72d72",
+  "operation_map_sha256": "1210f7b33175825aaae6941ef773bbe4aec10c9b8911515b03543f595b8b6594",
   "changes": {
     "ci/test_shards/durations.json": {
       "before_sha256": "a35aa0fc472cbb4b785960337f7b0198fe133b97f2a3218d100a2fd5ff491ce8",
@@ -476,11 +476,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "cf4277353d09efb4d7f5983e10c68530051a264fab93d8da7b47bce309998c5e",
-      "after_sha256": "90861cbdc74e1227298c260bdb1fc861981a3d761707ef496fb375b5cfe4b557",
+      "after_sha256": "8ad5ae02afceb3d8c6f0232f883d29a44bd2dd323672b92f94dd8a4f0e262e8c",
       "owners": {
         "@document": {
           "before": "cf4277353d09efb4d7f5983e10c68530051a264fab93d8da7b47bce309998c5e",
-          "after": "90861cbdc74e1227298c260bdb1fc861981a3d761707ef496fb375b5cfe4b557"
+          "after": "8ad5ae02afceb3d8c6f0232f883d29a44bd2dd323672b92f94dd8a4f0e262e8c"
         }
       }
     },
@@ -551,6 +551,16 @@
         "@module": {
           "before": "22fa8a38a03d58382ce0b5852e26f15f995e326711f88bfc0574707973941d03",
           "after": "2a4581877914f32170bd5e744420d96f7d39f06c8e1403477336ce2f349c1ed6"
+        }
+      }
+    },
+    "tests/fixtures/phase18a_projection_join_sample.json": {
+      "before_sha256": "72bb86b896bd6be2431960b4f4b3110b43ddf8f3c4f56b28d49e415347d4cbfa",
+      "after_sha256": "ae19ae56273b5f5c6c09e44e84dea683171c428ed7e26692e02b0c2334de7058",
+      "owners": {
+        "@document": {
+          "before": "72bb86b896bd6be2431960b4f4b3110b43ddf8f3c4f56b28d49e415347d4cbfa",
+          "after": "ae19ae56273b5f5c6c09e44e84dea683171c428ed7e26692e02b0c2334de7058"
         }
       }
     },
@@ -1201,6 +1211,16 @@
         "contract-42-1-publication",
         "issue532-contract44-publication",
         "order103-src-warhammer40k_core-adapters-external_contract"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
+      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+    },
+    "tests/fixtures/phase18a_projection_join_sample.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue532-client-regressions"
       ],
       "selected_families": [],
       "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",

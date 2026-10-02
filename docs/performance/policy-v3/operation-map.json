@@ -1864,6 +1864,7 @@
     },
     "issue532-client-regressions": {
       "paths": [
+        "tests/fixtures/phase18a_projection_join_sample.json",
         "tests/public_membership_helpers.py",
         "tests/unit/test_mock_event_layout_ui.py",
         "tests/unit/test_phase18d_ui_contract_artifacts.py",
@@ -1871,6 +1872,7 @@
         "tests/unit/test_public_rules_unit_membership.py"
       ],
       "owners": [
+        "@document",
         "@module",
         "_models",
         "_public_charge",
