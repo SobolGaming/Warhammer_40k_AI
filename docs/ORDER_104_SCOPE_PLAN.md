@@ -54,6 +54,16 @@ states round-trip through persistence, continue to attack completion, preserve
 both viewer projections/event streams and reproduce exactly through ReplayRunner.
 The existing stale proposal boundary rejects without mutation.
 
+Existing retained-model regressions now assert the selected firing model's exact
+range evidence separately from complete target visibility, with a nearer-observer
+control preserving the retained base's range contribution. Two own-Hazardous-death
+fixtures use deterministic game IDs that still reach their original death and
+retained-shot assertions after the corrected evidence changes event history.
+The original Order 97 pinned shooting-phase test bytes are retained in the fixed
+`data/source_audits/order104/historical-inputs.json` mapping; the earlier Order 103
+archive already retains the original shooting-declaration test. No historical
+manifest hashes are replaced, and live regressions continue in the normal suite.
+
 Contract 44.1 already defines separate `target_visible_model_ids`,
 `target_in_range_model_ids` and complete line-of-sight witnesses. Correcting their
 contents does not add or remove fields or option families; the adapter contract

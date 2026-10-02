@@ -13309,7 +13309,16 @@ def test_phase13e_mixed_fight_on_death_target_replays_geometry_and_living_alloca
     living_model_ids = tuple(model.model_instance_id for model in defender.own_models[1:])
     assert awaiting_model_id in candidate.target_in_range_model_ids
     assert awaiting_model_id in candidate.target_visible_model_ids
-    assert candidate.target_in_range_model_ids == (awaiting_model_id, *living_model_ids)
+    # Complete visibility can choose an observer whose range is supplied only
+    # by the retained model; the visible living models still receive allocation.
+    assert candidate.target_in_range_model_ids == (awaiting_model_id,)
+    models = {model.model_id: model for model in scenario.placed_geometry_models()}
+    assert candidate.observer_model_id is not None
+    observer = models[candidate.observer_model_id]
+    range_inches = weapon_profile.range_profile.distance_inches
+    assert range_inches is not None
+    assert observer.range_to(models[awaiting_model_id]) <= range_inches
+    assert all(observer.range_to(models[model_id]) > range_inches for model_id in living_model_ids)
     assert candidate.target_visible_model_ids == (awaiting_model_id, *living_model_ids)
     assert awaiting_model_id not in allocation_context.alive_model_ids
     assert allocation_context.alive_model_ids == living_model_ids

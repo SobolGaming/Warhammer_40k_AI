@@ -2018,8 +2018,12 @@
         "ci/test_shards/shard-7.txt",
         "ci/test_shards/shard-8.txt",
         "ci/test_shards/shard-9.txt",
+        "tests/code_quality/test_order97_inventory.py",
+        "tests/integration/test_retained_shooting.py",
         "tests/range_visibility_helpers.py",
-        "tests/unit/test_order104_range_visibility.py"
+        "tests/unit/test_order104_range_visibility.py",
+        "tests/unit/test_phase13b_shooting_declarations.py",
+        "tests/unit/test_phase13b_shooting_phase_declarations.py"
       ],
       "owners": [
         "@document",
@@ -2029,8 +2033,27 @@
         "test_different_enemy_units_cannot_combine_range_and_visibility",
         "test_facade_accepts_separate_witnesses_with_restore_continuation_and_replay",
         "test_hidden_near_model_still_supplies_rapid_fire_half_range",
+        "test_order_30_for_the_chapter_shoots_after_own_hazardous_death",
+        "test_original_assertions_remain_exact_and_fail_closed",
+        "test_phase13e_mixed_fight_on_death_target_replays_geometry_and_living_allocation",
         "test_range_and_visibility_use_independent_models_with_complete_witnesses",
+        "test_retained_base_alone_establishes_mixed_target_engagement_context",
         "test_visibility_does_not_replace_required_weapon_range"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order104-historical-evidence": {
+      "paths": [
+        "data/source_audits/order104/baseline/tests/unit/test_phase13b_shooting_phase_declarations.py.txt",
+        "data/source_audits/order104/historical-inputs.json",
+        "tools/core_rules_order97_history.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "historical_evidence_path"
       ],
       "families": [],
       "sensitive": false,

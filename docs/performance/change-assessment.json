@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "fc12fa214642f1b1f2a31b56be7323b7d76dbebc",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7c1b35ca1948018391a7eb72d8c708973121d651afac3ccb887b22d38168512d",
-  "operation_map_sha256": "fe271cb6fd99c17e6bc8a65c48824a19a2c9dc49bc5be921188dbe1ad90c18dd",
+  "operation_map_sha256": "80333d14010f82af1816d94c3b1dcfde2812b9de98e3e92abdd18debecb0ded8",
   "changes": {
     "README.md": {
       "before_sha256": "73e3615d6600911967331475d01d439b6e25286ed942e09f493d13dcb0a5457c",
@@ -224,6 +224,26 @@
         }
       }
     },
+    "data/source_audits/order104/baseline/tests/unit/test_phase13b_shooting_phase_declarations.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "eb2288b80e5a93ec2f5d644988ccbb5f045947d2937137d43da6880e2b9c1837",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "eb2288b80e5a93ec2f5d644988ccbb5f045947d2937137d43da6880e2b9c1837"
+        }
+      }
+    },
+    "data/source_audits/order104/historical-inputs.json": {
+      "before_sha256": null,
+      "after_sha256": "229bf8b5f6803dc7857ed44fc3cf997cf944ab5c8d900234dd7b8dd0d4df6263",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "229bf8b5f6803dc7857ed44fc3cf997cf944ab5c8d900234dd7b8dd0d4df6263"
+        }
+      }
+    },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "before_sha256": "dea5d82258ad97685225af964121bef78ef6014b7cccc09c0e06f3b4f476170e",
       "after_sha256": "fdf762106542f3a07137c5aa162430656bf5b38e52861e5e43120b6ae051cef7",
@@ -246,21 +266,21 @@
     },
     "docs/ORDER_104_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "0840ba02cedda852bdf9d19d5072bb6785d335541e53f66a888944db99ecdc98",
+      "after_sha256": "2add2ac1e0d5fc4b9593ece97ab0b1e51dfd1103bb881798f95242b98961c0fa",
       "owners": {
         "@document": {
           "before": null,
-          "after": "0840ba02cedda852bdf9d19d5072bb6785d335541e53f66a888944db99ecdc98"
+          "after": "2add2ac1e0d5fc4b9593ece97ab0b1e51dfd1103bb881798f95242b98961c0fa"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "371eeecf6e00644167d4bbb3c13652fa651e5b48c5a8a0e716324fb5f79fd7b2",
-      "after_sha256": "1fdb458305d261a6c590735b18c1ac431ae7b83beb93b094b2a235dd5306a9b0",
+      "after_sha256": "eb240368dbd9158fa59565da15b6d1cc6602bdc40f9d1de705c085a66fc9d889",
       "owners": {
         "@document": {
           "before": "371eeecf6e00644167d4bbb3c13652fa651e5b48c5a8a0e716324fb5f79fd7b2",
-          "after": "1fdb458305d261a6c590735b18c1ac431ae7b83beb93b094b2a235dd5306a9b0"
+          "after": "eb240368dbd9158fa59565da15b6d1cc6602bdc40f9d1de705c085a66fc9d889"
         }
       }
     },
@@ -293,6 +313,30 @@
         "_target_candidate": {
           "before": "55e62d0a0fc0dc16566d4d6fb7baedffa1b82df715529158a93cc60ff87e7cc1",
           "after": "90bbe593b2c3dbe4fb7415feb252573c08ebec472b49efa2d4a603679a2c0775"
+        }
+      }
+    },
+    "tests/code_quality/test_order97_inventory.py": {
+      "before_sha256": "cd3e257be956f62d995210d6b137097156bb2849ae12fddb870384d1994db6d4",
+      "after_sha256": "a98f3cd6d26fd7428180437ee00cdaf19754d41200c93d31a8d1fe47b79ec2fb",
+      "owners": {
+        "@module": {
+          "before": "aa05a8ad70e0bfee3925c989f8be4347c02fa924859b445adb4ef281f0af49ee",
+          "after": "8239bc607792c6218f57547453a7d42d3afa8d32ed9d904c85f952d4f621bae3"
+        },
+        "test_original_assertions_remain_exact_and_fail_closed": {
+          "before": "e9aa176168f08a9e839d853d0541a3e123950eac2b80d29537551c0f5ecd2df9",
+          "after": "629d384dd5a994a7bc91f2be6174021381d6a12d4c8aecd102f3ea01169e8213"
+        }
+      }
+    },
+    "tests/integration/test_retained_shooting.py": {
+      "before_sha256": "bd7df29729ad3b7357cab2ed49eba427bfa838492e5916f92411b057297228cf",
+      "after_sha256": "01b0ae41c5cc85b342352a61932ea962e281a750ea258a2c1cee579bb73f8dac",
+      "owners": {
+        "test_order_30_for_the_chapter_shoots_after_own_hazardous_death": {
+          "before": "809da172101e0b96b9f19315454cb32b588530d541142d4b5b88435b9c6ac993",
+          "after": "c7590e3c9c7498df07b07bfedd25f7245004bac44e36651b2e7f7d7e9b7769a1"
         }
       }
     },
@@ -341,6 +385,40 @@
         "test_visibility_does_not_replace_required_weapon_range": {
           "before": null,
           "after": "616083ca6b6718b7cd8649648e77b9a908ace28fce54019e9382318fd5fa63b4"
+        }
+      }
+    },
+    "tests/unit/test_phase13b_shooting_declarations.py": {
+      "before_sha256": "7058214ec9f8540a5ca78a9b2a3150954c2d676838ba6d464e04cd50e997b238",
+      "after_sha256": "7f3db2643ba583f649f989b05054f928731fe456c9e08d6b958706cb48b700ab",
+      "owners": {
+        "test_phase13e_mixed_fight_on_death_target_replays_geometry_and_living_allocation": {
+          "before": "b2fa00bb409aef9ab13dac75d6c3cee5eb663a0d683dc52f80d3a2c778240d16",
+          "after": "caf109a0da214e7e373616f10897964cc6f416bfa9ac9bff0f1342c0c3cf571d"
+        }
+      }
+    },
+    "tests/unit/test_phase13b_shooting_phase_declarations.py": {
+      "before_sha256": "eb2288b80e5a93ec2f5d644988ccbb5f045947d2937137d43da6880e2b9c1837",
+      "after_sha256": "fccb77a79c0cc9d8413f4a87dcc32065fbb92a2e1fe376bf801fca5640b97b9e",
+      "owners": {
+        "test_retained_base_alone_establishes_mixed_target_engagement_context": {
+          "before": "fb206bd389dbc5f6f7e00fac84bcef365034109ff64ec9e4b271b1bb44e2fe96",
+          "after": "10ab17f76a351c8de252a25174a3e8620b74bd0d1d765563f13a51df4a3bbf05"
+        }
+      }
+    },
+    "tools/core_rules_order97_history.py": {
+      "before_sha256": "b7aaffafb2109364f65262bdb23d3e0470692e1a9cd58ce6945060836d16ef4c",
+      "after_sha256": "ee913d8989627a04e1c5df2e1da430935e2b3fb46185e8036ebfa7bd650dc2e8",
+      "owners": {
+        "@module": {
+          "before": "51fd0365ac20032ff718fed47fd7f24e5fc621c1351febaa49b5da8ee4f7474d",
+          "after": "2097289ee79c088cf907f05da9c98b5cbd8d6cd99764de9cd0710f8c4c94c7c5"
+        },
+        "historical_evidence_path": {
+          "before": "3215bddafa5fac07041c91ad2fb1eb4f990124fdcc0463737917f8de495b4c34",
+          "after": "9e68f5ddd645dae89c28266572f2a229da76c1627166d26b35611623ed9b9d42"
         }
       }
     }
@@ -622,6 +700,26 @@
       "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
       "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
+    "data/source_audits/order104/baseline/tests/unit/test_phase13b_shooting_phase_declarations.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order104-historical-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+    },
+    "data/source_audits/order104/historical-inputs.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order104-historical-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+    },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
@@ -674,6 +772,25 @@
       "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
       "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
+    "tests/code_quality/test_order97_inventory.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+    },
+    "tests/integration/test_retained_shooting.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order103-tests-integration-test_retained_shooting",
+        "order104-client-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+    },
     "tests/range_visibility_helpers.py": {
       "category": "rule_semantics",
       "operations": [
@@ -688,6 +805,39 @@
       "category": "rule_semantics",
       "operations": [
         "order104-client-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+    },
+    "tests/unit/test_phase13b_shooting_declarations.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order104-client-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+    },
+    "tests/unit/test_phase13b_shooting_phase_declarations.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order104-client-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+    },
+    "tools/core_rules_order97_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue534-order97-history",
+        "issue535-order97-history",
+        "order104-historical-evidence",
+        "shock-source-generation-and-audit"
       ],
       "selected_families": [],
       "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",

@@ -2835,23 +2835,7 @@ def test_retained_base_alone_establishes_mixed_target_engagement_context() -> No
     assert with_retained_base.violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT
     assert with_retained_base.target_visible_model_ids
     assert retained_model_id in with_retained_base.target_visible_model_ids
-    # Equal complete visibility selects the first observer; its range evidence
-    # must not borrow the later observers' range to the retained model.
-    assert with_retained_base.observer_model_id == attacker.own_models[0].model_instance_id
-    assert with_retained_base.target_in_range_model_ids == tuple(
-        model.model_instance_id for model in target.own_models[1:]
-    )
-    nearer_observer = shooting_target_candidate_for_model(
-        scenario=retained_scenario,
-        ruleset_descriptor=_ruleset(),
-        attacker_unit=attacker,
-        attacker_model_instance_id=attacker.own_models[-1].model_instance_id,
-        weapon_profile=profile,
-        target_unit_id=target.unit_instance_id,
-    )
-    assert nearer_observer.violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT
-    assert retained_model_id in nearer_observer.target_visible_model_ids
-    assert retained_model_id in nearer_observer.target_in_range_model_ids
+    assert retained_model_id in with_retained_base.target_in_range_model_ids
 
 
 def test_target_side_engagement_rejects_engaged_infantry_and_applies_big_guns() -> None:
