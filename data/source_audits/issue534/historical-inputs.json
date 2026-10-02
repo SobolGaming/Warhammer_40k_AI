@@ -1,0 +1,17 @@
+{
+  "reviewed_commit": "8007555ef23e85c11d39b294acec02bd83fc3271",
+  "also_present_at_base": "262baafa102972d2f0f6acbd2b0ebdea5a2c7512",
+  "purpose": "Authenticate the unchanged original Order 97 assertion inventory after additive Issue 534 reserve deadline continuation regressions. This archive is historical evidence, not current reserve semantic compliance; current tests still execute in normal suites.",
+  "current_evidence": "docs/ISSUE_534_RESERVE_DESTRUCTION.md",
+  "files": [
+    {
+      "path": "tests/unit/test_order64_reserve_lifetimes.py",
+      "historical_path": "data/source_audits/issue534/baseline/tests/unit/test_order64_reserve_lifetimes.py.txt",
+      "git_revision": "8007555ef23e85c11d39b294acec02bd83fc3271",
+      "git_path": "tests/unit/test_order64_reserve_lifetimes.py",
+      "sha256": "93853589f0f45bd115d87ca6ef07467af5442b7ad8822e08c8683c973b15ea2e",
+      "bytes": 14378,
+      "order97_file_pin": "93853589f0f45bd115d87ca6ef07467af5442b7ad8822e08c8683c973b15ea2e"
+    }
+  ]
+}

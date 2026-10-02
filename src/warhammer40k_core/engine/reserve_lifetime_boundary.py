@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.battlefield_state import BattlefieldRemovalKind
+from warhammer40k_core.engine.damage_allocation import model_by_id
 from warhammer40k_core.engine.missions import (
     mission_scoring_policies_from_setup,
     reserve_destruction_policy_from_scoring_policy,
@@ -14,6 +15,14 @@ from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStag
 from warhammer40k_core.engine.reserve_destruction import (
     final_turn_cleanup_policy,
     resolve_unarrived_reserve_destruction,
+)
+from warhammer40k_core.engine.reserves import (
+    ReserveDestructionResult,
+    ReserveStatus,
+    apply_reserve_destruction_to_battlefield,
+)
+from warhammer40k_core.engine.rule_model_destruction_unplaced import (
+    destroy_unplaced_model_without_reactions,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
@@ -92,3 +101,76 @@ def validate_final_turn_destruction(state: GameState) -> None:
         row.destroyed_battle_round != final_round for row in terminal
     ):
         raise GameLifecycleError("Final-turn reserve destruction round drift.")
+
+
+def apply_destruction(state: GameState, *, destruction: ReserveDestructionResult) -> None:
+    """Keep logical health, reserve routes and battlefield removals consistent."""
+    from warhammer40k_core.engine.primary_destruction_evidence import (
+        PrimaryUnattributedDestructionCause,
+    )
+    from warhammer40k_core.engine.primary_unit_destruction_tracking import (
+        record_primary_unit_destructions_for_destroyed_models,
+    )
+
+    if state.battlefield_state is None:
+        raise GameLifecycleError("Reserve destruction requires battlefield_state.")
+    terminal_reserve_states = tuple(
+        prior_state
+        for prior_state, updated_state in zip(
+            state.reserve_states,
+            destruction.updated_reserve_states,
+            strict=True,
+        )
+        if prior_state.status is ReserveStatus.IN_RESERVES
+        and updated_state.status is ReserveStatus.DESTROYED
+    )
+    for reserve_state in terminal_reserve_states:
+        cargo_state = state.transport_cargo_state_for_transport(reserve_state.unit_instance_id)
+        if cargo_state is None:
+            if reserve_state.embarked_unit_instance_ids:
+                raise GameLifecycleError(
+                    "transport_cargo_states unarrived reserve route cargo drift."
+                )
+            continue
+        if cargo_state.embarked_unit_instance_ids != reserve_state.embarked_unit_instance_ids:
+            raise GameLifecycleError("transport_cargo_states unarrived reserve route cargo drift.")
+    terminal_transport_ids = {
+        reserve_state.unit_instance_id for reserve_state in terminal_reserve_states
+    }
+    updated_battlefield_state = apply_reserve_destruction_to_battlefield(
+        battlefield_state=state.battlefield_state,
+        destruction=destruction,
+    )
+    terminal_cargo_transport_ids = tuple(
+        cargo_state.transport_unit_instance_id
+        for cargo_state in state.transport_cargo_states
+        if cargo_state.transport_unit_instance_id in terminal_transport_ids
+    )
+    # Reserve deadlines remove models without invoking destroyed-model rules.
+    # Previously destroyed members remain part of the removal/lineage record.
+    for model_id in destruction.destroyed_model_instance_ids:
+        if model_by_id(state=state, model_instance_id=model_id).is_alive:
+            destroy_unplaced_model_without_reactions(state=state, model_instance_id=model_id)
+    state.replace_battlefield_state(updated_battlefield_state)
+    for reserve_state in destruction.updated_reserve_states:
+        state.replace_reserve_state(reserve_state)
+    for transport_id in terminal_cargo_transport_ids:
+        state.remove_transport_cargo_state(transport_id)
+    record_primary_unit_destructions_for_destroyed_models(
+        state=state,
+        destroyed_model_instance_ids=destruction.destroyed_model_instance_ids,
+        destruction_attribution=None,
+        source_model_destroyed_event_id=None,
+        source_rules_unit_objective_proximity_witness=None,
+        destroyed_rules_unit_objective_proximity_witness=None,
+        unattributed_cause=PrimaryUnattributedDestructionCause.RESERVE_DEADLINE,
+        source_mutation_id=(
+            f"{destruction.policy.source_id}:round-{destruction.battle_round:02d}:"
+            f"{'end-of-battle' if destruction.end_of_battle else 'round-boundary'}"
+        ),
+        left_battlefield=False,
+        source_id=(
+            f"{destruction.policy.source_id}:round-{destruction.battle_round:02d}:"
+            f"{'end-of-battle' if destruction.end_of_battle else 'round-boundary'}"
+        ),
+    )

@@ -44,6 +44,8 @@ from warhammer40k_core.engine.primary_battlefield_departure import (
 from warhammer40k_core.engine.primary_historical_events import (
     PRIMARY_BATTLEFIELD_DEPARTURE_RECORDED_EVENT,
     PRIMARY_RESERVE_ENTRY_MUTATION_EVENT,
+    PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT,
+    primary_destruction_recorded_state_payload,
 )
 from warhammer40k_core.engine.primary_reserve_entry_provider import (
     PrimaryReserveEntryProvider,
@@ -414,6 +416,15 @@ def _authority_mutations_by_event_index(
                     model_unit_by_id=model_unit_by_id,
                 )
             )
+        elif event.event_type == PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT:
+            event_mutations.extend(
+                _reserve_deadline_destruction_mutations(
+                    state=state,
+                    event=event,
+                    event_records=event_records,
+                    prior_mutations=mutations,
+                )
+            )
         elif event.event_type == "unit_embarked":
             payload = _event_payload(event, field_name="Embark")
             embark_transition = _transition_payload(payload.get("transition_batch"), "Embark")
@@ -476,6 +487,54 @@ def _authority_mutations_by_event_index(
             )
         mutations[event_index] = tuple(event_mutations)
     return mutations
+
+
+def _reserve_deadline_destruction_mutations(
+    *,
+    state: GameState,
+    event: EventRecord,
+    event_records: tuple[EventRecord, ...],
+    prior_mutations: dict[int, tuple[_AuthorityMutation, ...]],
+) -> tuple[_AuthorityMutation, ...]:
+    from warhammer40k_core.engine.primary_destruction_evidence import (
+        PrimaryUnattributedDestructionCause,
+    )
+    from warhammer40k_core.engine.scoring import PrimaryUnitDestructionState
+
+    payload = _event_payload(event, field_name="Primary unit destruction")
+    destruction = PrimaryUnitDestructionState.from_payload(
+        primary_destruction_recorded_state_payload(payload.get("primary_unit_destruction_state"))
+    )
+    if destruction.unattributed_cause is not PrimaryUnattributedDestructionCause.RESERVE_DEADLINE:
+        return ()
+    if destruction not in state.primary_unit_destruction_states:
+        raise GameLifecycleError("Fight reserve destruction event authority drifted.")
+    model_ids = historical_rules_unit_model_ids(
+        state=state,
+        event_records=event_records,
+        unit_instance_id=destruction.destroyed_unit_instance_id,
+    )
+    # Initial models are living; recorded deaths/restorations determine which
+    # members were still alive at this deadline. Do not resurrect prior casualties
+    # when reversing an attached-unit or carrier/cargo cleanup.
+    living_before = dict.fromkeys(model_ids, True)
+    for mutations in prior_mutations.values():
+        for mutation in mutations:
+            if mutation.model_instance_id in model_ids and mutation.after_living is not None:
+                living_before[mutation.model_instance_id] = mutation.after_living
+    return tuple(
+        _AuthorityMutation(
+            model_instance_id=model_id,
+            after_exists=True,
+            after_living=False,
+            after_placed=False,
+            before_exists=True,
+            before_living=living_before[model_id],
+            before_placed=False,
+            source=PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT,
+        )
+        for model_id in sorted(model_ids)
+    )
 
 
 def _embedded_transport_hazard_destruction_mutations(
