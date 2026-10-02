@@ -1970,6 +1970,71 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order104-range-visibility-authority": {
+      "paths": [
+        "src/warhammer40k_core/engine/shooting_targets.py"
+      ],
+      "owners": [
+        "_LineOfSightRangeEvidence",
+        "_best_line_of_sight_range_evidence",
+        "_plunging_fire_applies",
+        "_target_candidate"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order104-contract-publication": {
+      "paths": [
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order104-client-regressions": {
+      "paths": [
+        "ci/test_shards/durations.json",
+        "ci/test_shards/shard-1.txt",
+        "ci/test_shards/shard-10.txt",
+        "ci/test_shards/shard-11.txt",
+        "ci/test_shards/shard-12.txt",
+        "ci/test_shards/shard-2.txt",
+        "ci/test_shards/shard-3.txt",
+        "ci/test_shards/shard-4.txt",
+        "ci/test_shards/shard-5.txt",
+        "ci/test_shards/shard-6.txt",
+        "ci/test_shards/shard-7.txt",
+        "ci/test_shards/shard-8.txt",
+        "ci/test_shards/shard-9.txt",
+        "tests/range_visibility_helpers.py",
+        "tests/unit/test_order104_range_visibility.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "range_visibility_scene",
+        "test_detection_and_visibility_remain_required",
+        "test_different_enemy_units_cannot_combine_range_and_visibility",
+        "test_facade_accepts_separate_witnesses_with_restore_continuation_and_replay",
+        "test_hidden_near_model_still_supplies_rapid_fire_half_range",
+        "test_range_and_visibility_use_independent_models_with_complete_witnesses",
+        "test_visibility_does_not_replace_required_weapon_range"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

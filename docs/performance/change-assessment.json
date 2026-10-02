@@ -1,416 +1,346 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "e3be9908ee9f8778ed7f6390ff1ea032e795d105",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7e6f1a71a4ae347f98fa512cbcee8f8c9c03b409cf65c8464b55831daa6c6d54",
-  "operation_map_sha256": "7215841d0fe975e2b8c1fc10edcc51b161f6ae436cb26d230c4e9b92e78e6efe",
+  "base": "fc12fa214642f1b1f2a31b56be7323b7d76dbebc",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7c1b35ca1948018391a7eb72d8c708973121d651afac3ccb887b22d38168512d",
+  "operation_map_sha256": "fe271cb6fd99c17e6bc8a65c48824a19a2c9dc49bc5be921188dbe1ad90c18dd",
   "changes": {
     "README.md": {
-      "before_sha256": "a3eacecefca1a2b9fa8d86ec6d2134960d4df2b81ca8f8967875edf89c4031ce",
-      "after_sha256": "73e3615d6600911967331475d01d439b6e25286ed942e09f493d13dcb0a5457c",
+      "before_sha256": "73e3615d6600911967331475d01d439b6e25286ed942e09f493d13dcb0a5457c",
+      "after_sha256": "a4fd5f093ac4be76fe54e4246a699c38d333025efe94ad993e527ce753a3769c",
       "owners": {
         "@document": {
-          "before": "a3eacecefca1a2b9fa8d86ec6d2134960d4df2b81ca8f8967875edf89c4031ce",
-          "after": "73e3615d6600911967331475d01d439b6e25286ed942e09f493d13dcb0a5457c"
+          "before": "73e3615d6600911967331475d01d439b6e25286ed942e09f493d13dcb0a5457c",
+          "after": "a4fd5f093ac4be76fe54e4246a699c38d333025efe94ad993e527ce753a3769c"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "a5cd3768c49c0098fe7a84fb0aa3662c5fbac81e307d26c3e50ee3c7b0413769",
-      "after_sha256": "169a3151e265b8a7043cbf02e2308addbe71302d2fd0f14e4b2714c0f9aa7771",
+      "before_sha256": "169a3151e265b8a7043cbf02e2308addbe71302d2fd0f14e4b2714c0f9aa7771",
+      "after_sha256": "311b06ac470b395c4280c5ebbc806bb9fa872138aac0bcc9f07cb5be720f6f80",
       "owners": {
         "@document": {
-          "before": "a5cd3768c49c0098fe7a84fb0aa3662c5fbac81e307d26c3e50ee3c7b0413769",
-          "after": "169a3151e265b8a7043cbf02e2308addbe71302d2fd0f14e4b2714c0f9aa7771"
+          "before": "169a3151e265b8a7043cbf02e2308addbe71302d2fd0f14e4b2714c0f9aa7771",
+          "after": "311b06ac470b395c4280c5ebbc806bb9fa872138aac0bcc9f07cb5be720f6f80"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "014dea0939c76173367c46444db7dc83774b61dc7d6d64349d73fef64b69f90f",
-      "after_sha256": "6a11b05c53a6de4215bf0eacf7c3d8ff48dc410cd38d009d5bd3cc39f1cf26c0",
+      "before_sha256": "6a11b05c53a6de4215bf0eacf7c3d8ff48dc410cd38d009d5bd3cc39f1cf26c0",
+      "after_sha256": "6518dd02bb7d141df4561ef1000fc7b3b2dd18d33a51b9ac8eb534c4c7103c33",
       "owners": {
         "@document": {
-          "before": "014dea0939c76173367c46444db7dc83774b61dc7d6d64349d73fef64b69f90f",
-          "after": "6a11b05c53a6de4215bf0eacf7c3d8ff48dc410cd38d009d5bd3cc39f1cf26c0"
+          "before": "6a11b05c53a6de4215bf0eacf7c3d8ff48dc410cd38d009d5bd3cc39f1cf26c0",
+          "after": "6518dd02bb7d141df4561ef1000fc7b3b2dd18d33a51b9ac8eb534c4c7103c33"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "844e154e5636915f494a87e028e0169194a4e403eecf28b477a4503568176e7d",
-      "after_sha256": "07fff556ee04b57d9dbda52749da5253cfec088e2b0756543fd25137f57404e7",
+      "before_sha256": "07fff556ee04b57d9dbda52749da5253cfec088e2b0756543fd25137f57404e7",
+      "after_sha256": "7ee901049464be1622daa95a619ef46c33e2af57342af008a4a0d858947dee8b",
       "owners": {
         "@document": {
-          "before": "844e154e5636915f494a87e028e0169194a4e403eecf28b477a4503568176e7d",
-          "after": "07fff556ee04b57d9dbda52749da5253cfec088e2b0756543fd25137f57404e7"
+          "before": "07fff556ee04b57d9dbda52749da5253cfec088e2b0756543fd25137f57404e7",
+          "after": "7ee901049464be1622daa95a619ef46c33e2af57342af008a4a0d858947dee8b"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "a5cefea2bb4bf456dcafdfc8e454d1ddca762d1bd099d1dcb8105e5479db5578",
-      "after_sha256": "1bf79462b579f6d625206390a3a092a9d089a51140242d41077d154fed37c803",
+      "before_sha256": "1bf79462b579f6d625206390a3a092a9d089a51140242d41077d154fed37c803",
+      "after_sha256": "c52171e4db3672d3a3d9691fdfc1aa3b61f4e02353ad4a7caebb6db0d9ba271d",
       "owners": {
         "@document": {
-          "before": "a5cefea2bb4bf456dcafdfc8e454d1ddca762d1bd099d1dcb8105e5479db5578",
-          "after": "1bf79462b579f6d625206390a3a092a9d089a51140242d41077d154fed37c803"
+          "before": "1bf79462b579f6d625206390a3a092a9d089a51140242d41077d154fed37c803",
+          "after": "c52171e4db3672d3a3d9691fdfc1aa3b61f4e02353ad4a7caebb6db0d9ba271d"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "d84df0bffeea7766bfcd7a4e7713078a122becd16ad05ddf99220c58b20600ea",
-      "after_sha256": "712d9e66875e8ecea4c97d66e8a3ef0fb4800c0f8edaeabd62e6d3c1e39600e0",
+      "before_sha256": "712d9e66875e8ecea4c97d66e8a3ef0fb4800c0f8edaeabd62e6d3c1e39600e0",
+      "after_sha256": "778819ee79788fac682792ecfbb75049baa10fca7c3edc3bd73fe064d2ee0408",
       "owners": {
         "@document": {
-          "before": "d84df0bffeea7766bfcd7a4e7713078a122becd16ad05ddf99220c58b20600ea",
-          "after": "712d9e66875e8ecea4c97d66e8a3ef0fb4800c0f8edaeabd62e6d3c1e39600e0"
+          "before": "712d9e66875e8ecea4c97d66e8a3ef0fb4800c0f8edaeabd62e6d3c1e39600e0",
+          "after": "778819ee79788fac682792ecfbb75049baa10fca7c3edc3bd73fe064d2ee0408"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "2356f0047504a300744a2584854120a418e6c486db5c0fdebeccdd93801ad7cf",
-      "after_sha256": "6c661aa205d1f7e0c033a78a4cfef66dc44b82066dc43969fabce88d6af6d247",
+      "before_sha256": "6c661aa205d1f7e0c033a78a4cfef66dc44b82066dc43969fabce88d6af6d247",
+      "after_sha256": "c3f696f76d140af0c4473617fde26bcbe3a22b01b46e77af32409fad5543f01a",
       "owners": {
         "@document": {
-          "before": "2356f0047504a300744a2584854120a418e6c486db5c0fdebeccdd93801ad7cf",
-          "after": "6c661aa205d1f7e0c033a78a4cfef66dc44b82066dc43969fabce88d6af6d247"
+          "before": "6c661aa205d1f7e0c033a78a4cfef66dc44b82066dc43969fabce88d6af6d247",
+          "after": "c3f696f76d140af0c4473617fde26bcbe3a22b01b46e77af32409fad5543f01a"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "a96fc0700dc1e8c9f0f7dcc38fcdec96346deda068e2f91f048284bb74dc5520",
-      "after_sha256": "55f06cfb1d1bc1fff73b354e22acfb7c762b2d72636166884ca21b9d3c648b5a",
+      "before_sha256": "55f06cfb1d1bc1fff73b354e22acfb7c762b2d72636166884ca21b9d3c648b5a",
+      "after_sha256": "d96f93795d967f5f97dbf38c5ca0be421af985c4565a0288ecaf35d9af70d69b",
       "owners": {
         "@document": {
-          "before": "a96fc0700dc1e8c9f0f7dcc38fcdec96346deda068e2f91f048284bb74dc5520",
-          "after": "55f06cfb1d1bc1fff73b354e22acfb7c762b2d72636166884ca21b9d3c648b5a"
+          "before": "55f06cfb1d1bc1fff73b354e22acfb7c762b2d72636166884ca21b9d3c648b5a",
+          "after": "d96f93795d967f5f97dbf38c5ca0be421af985c4565a0288ecaf35d9af70d69b"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "639e5985ea19d78a5d1ffb19aeea35004c0442ad184494da0d1aef9441f8e55f",
-      "after_sha256": "ed8e81759a17332ffec21999ea2f57a8380225af60cdfafbdee99feae9be4f88",
+      "before_sha256": "ed8e81759a17332ffec21999ea2f57a8380225af60cdfafbdee99feae9be4f88",
+      "after_sha256": "c5a5cc2fd5c7ba77683d9998c65e34a19c25bd3a5b59b268a591d96b22985dbb",
       "owners": {
         "@document": {
-          "before": "639e5985ea19d78a5d1ffb19aeea35004c0442ad184494da0d1aef9441f8e55f",
-          "after": "ed8e81759a17332ffec21999ea2f57a8380225af60cdfafbdee99feae9be4f88"
+          "before": "ed8e81759a17332ffec21999ea2f57a8380225af60cdfafbdee99feae9be4f88",
+          "after": "c5a5cc2fd5c7ba77683d9998c65e34a19c25bd3a5b59b268a591d96b22985dbb"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "182cf3c9d73ec185a503b4a25652e2d245333440ade90f93078c476768338c50",
-      "after_sha256": "6e2005500359bf31b5e5b867b52f81230de4e91563ebe94d57ef608881a981cc",
+      "before_sha256": "6e2005500359bf31b5e5b867b52f81230de4e91563ebe94d57ef608881a981cc",
+      "after_sha256": "28c2f296aae86df51ce39a0853f9271ef4aa49c18248b08ce1f4799bbdea3306",
       "owners": {
         "@document": {
-          "before": "182cf3c9d73ec185a503b4a25652e2d245333440ade90f93078c476768338c50",
-          "after": "6e2005500359bf31b5e5b867b52f81230de4e91563ebe94d57ef608881a981cc"
+          "before": "6e2005500359bf31b5e5b867b52f81230de4e91563ebe94d57ef608881a981cc",
+          "after": "28c2f296aae86df51ce39a0853f9271ef4aa49c18248b08ce1f4799bbdea3306"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "92c27adaa51bb42631d6dd3ae987d1d75132eddb027a554320e0e1c1b69e00c4",
-      "after_sha256": "e2c38cf6ec2a6f1d46840101451f90181471ff0cfdf0a0a9766caa859f9dae5c",
+      "before_sha256": "e2c38cf6ec2a6f1d46840101451f90181471ff0cfdf0a0a9766caa859f9dae5c",
+      "after_sha256": "e6bdbec918f950cea30b7bf28754ff5fb3b651cc683bfa73706de5fa7e531ded",
       "owners": {
         "@document": {
-          "before": "92c27adaa51bb42631d6dd3ae987d1d75132eddb027a554320e0e1c1b69e00c4",
-          "after": "e2c38cf6ec2a6f1d46840101451f90181471ff0cfdf0a0a9766caa859f9dae5c"
+          "before": "e2c38cf6ec2a6f1d46840101451f90181471ff0cfdf0a0a9766caa859f9dae5c",
+          "after": "e6bdbec918f950cea30b7bf28754ff5fb3b651cc683bfa73706de5fa7e531ded"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "92d246bf2408c64d4f2a65740bff637d1c51a7934481fb75eb0e17f6b5256f46",
-      "after_sha256": "f25fb7bba968dee79aea3d9db2302a9f25e124a78df5252663214894e27196b6",
+      "before_sha256": "f25fb7bba968dee79aea3d9db2302a9f25e124a78df5252663214894e27196b6",
+      "after_sha256": "ea1bb92b350fcd0a5cea7fc4f836b3a3718eed6d0390a08548d9db1e00996cad",
       "owners": {
         "@document": {
-          "before": "92d246bf2408c64d4f2a65740bff637d1c51a7934481fb75eb0e17f6b5256f46",
-          "after": "f25fb7bba968dee79aea3d9db2302a9f25e124a78df5252663214894e27196b6"
+          "before": "f25fb7bba968dee79aea3d9db2302a9f25e124a78df5252663214894e27196b6",
+          "after": "ea1bb92b350fcd0a5cea7fc4f836b3a3718eed6d0390a08548d9db1e00996cad"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "39957b4080ab8ca87507843a8eead113287ce1f941d3c680e77626df603a9ee9",
-      "after_sha256": "eb2bcc03517f2e3de7616885693ebfa3042b73f54082c9db948d39682bc065f5",
+      "before_sha256": "eb2bcc03517f2e3de7616885693ebfa3042b73f54082c9db948d39682bc065f5",
+      "after_sha256": "84ce770da3894a14648f3fdcee97bf6285a8f7fd564ede5df9ac0e527cd3697d",
       "owners": {
         "@document": {
-          "before": "39957b4080ab8ca87507843a8eead113287ce1f941d3c680e77626df603a9ee9",
-          "after": "eb2bcc03517f2e3de7616885693ebfa3042b73f54082c9db948d39682bc065f5"
+          "before": "eb2bcc03517f2e3de7616885693ebfa3042b73f54082c9db948d39682bc065f5",
+          "after": "84ce770da3894a14648f3fdcee97bf6285a8f7fd564ede5df9ac0e527cd3697d"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "3ed7aa621906abbcda3ce81144ed48f5017830b7935393405506ec908e259ec3",
-      "after_sha256": "3f5733620eeb64623d626db7a3a9da25385d6c5ef381e25d175679280d300928",
+      "before_sha256": "3f5733620eeb64623d626db7a3a9da25385d6c5ef381e25d175679280d300928",
+      "after_sha256": "767a2d66b861889198c62b8fca92add6c6927c4bd1f091409f68ad9e6af0a47b",
       "owners": {
         "@document": {
-          "before": "3ed7aa621906abbcda3ce81144ed48f5017830b7935393405506ec908e259ec3",
-          "after": "3f5733620eeb64623d626db7a3a9da25385d6c5ef381e25d175679280d300928"
-        }
-      }
-    },
-    "conformance/typescript/src/contract.ts": {
-      "before_sha256": "87580a383d56d30636cf47bf23e2be6e4fa84780d2f97b060430c2a081eb895e",
-      "after_sha256": "c1ea2881e73f76ccbea8f65b72313498bdd25448cd6eca6e138060e3c7cb7356",
-      "owners": {
-        "@document": {
-          "before": "87580a383d56d30636cf47bf23e2be6e4fa84780d2f97b060430c2a081eb895e",
-          "after": "c1ea2881e73f76ccbea8f65b72313498bdd25448cd6eca6e138060e3c7cb7356"
-        }
-      }
-    },
-    "contracts/README.md": {
-      "before_sha256": "35cf25af4bc389d0408e79e45c8b2fcd055a71e4ab3230659da55f19a7cd782e",
-      "after_sha256": "f0a8fb250e5f1d76822a55cf97f99083afb4e0b95f8b952f98353ae09b04e6b6",
-      "owners": {
-        "@document": {
-          "before": "35cf25af4bc389d0408e79e45c8b2fcd055a71e4ab3230659da55f19a7cd782e",
-          "after": "f0a8fb250e5f1d76822a55cf97f99083afb4e0b95f8b952f98353ae09b04e6b6"
-        }
-      }
-    },
-    "contracts/compatibility-policy.md": {
-      "before_sha256": "2ef3317b6fb953ac5d9bc0d735acb91447a88d425032f949881ef151257289f2",
-      "after_sha256": "51430907620b9fbd8b42c511d114f45f53fdb8a669ca2e5b1be3e82fa6d3b4f0",
-      "owners": {
-        "@document": {
-          "before": "2ef3317b6fb953ac5d9bc0d735acb91447a88d425032f949881ef151257289f2",
-          "after": "51430907620b9fbd8b42c511d114f45f53fdb8a669ca2e5b1be3e82fa6d3b4f0"
+          "before": "3f5733620eeb64623d626db7a3a9da25385d6c5ef381e25d175679280d300928",
+          "after": "767a2d66b861889198c62b8fca92add6c6927c4bd1f091409f68ad9e6af0a47b"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "5c74e80664f6418ce1686f92287378c78cd0dcfca47a88c65f00224906ea7fbc",
-      "after_sha256": "df6946382e250439f3fe45abe60a681dd7fef8b3d7347761bdeac9202cbac033",
+      "before_sha256": "df6946382e250439f3fe45abe60a681dd7fef8b3d7347761bdeac9202cbac033",
+      "after_sha256": "ddc6ea6781b750468202f72bc9ee57ec4a9fba62001402947a900c9eb4a75ee6",
       "owners": {
         "@document": {
-          "before": "5c74e80664f6418ce1686f92287378c78cd0dcfca47a88c65f00224906ea7fbc",
-          "after": "df6946382e250439f3fe45abe60a681dd7fef8b3d7347761bdeac9202cbac033"
+          "before": "df6946382e250439f3fe45abe60a681dd7fef8b3d7347761bdeac9202cbac033",
+          "after": "ddc6ea6781b750468202f72bc9ee57ec4a9fba62001402947a900c9eb4a75ee6"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "a79b9064253170f3dec9a032c398d4565d1b2331b0a8b78491ec581ada3d99a0",
-      "after_sha256": "ae144aac1506dff3e0d9ac8b5ffb3aba1be80cf962ae331fc8fbcc71f09cd084",
+      "before_sha256": "ae144aac1506dff3e0d9ac8b5ffb3aba1be80cf962ae331fc8fbcc71f09cd084",
+      "after_sha256": "ddbf17b988f8606158cad911c19d2e7e8e7de2a0de70dded7e0f480d425657c6",
       "owners": {
         "@document": {
-          "before": "a79b9064253170f3dec9a032c398d4565d1b2331b0a8b78491ec581ada3d99a0",
-          "after": "ae144aac1506dff3e0d9ac8b5ffb3aba1be80cf962ae331fc8fbcc71f09cd084"
+          "before": "ae144aac1506dff3e0d9ac8b5ffb3aba1be80cf962ae331fc8fbcc71f09cd084",
+          "after": "ddbf17b988f8606158cad911c19d2e7e8e7de2a0de70dded7e0f480d425657c6"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "2a8cad67db2021a964a3bdc8dcb73a50db0ce12dc94c54602b305f115eb77e2c",
-      "after_sha256": "4f47a824a16e449dcaf148f56a1569b085ace984d7752aa39f88a1b5c8fdf61e",
+      "before_sha256": "4f47a824a16e449dcaf148f56a1569b085ace984d7752aa39f88a1b5c8fdf61e",
+      "after_sha256": "b2217b9ac8af82746d70971dce1c5102ecde50d6c559e6752e4e04c87babb9d1",
       "owners": {
         "@document": {
-          "before": "2a8cad67db2021a964a3bdc8dcb73a50db0ce12dc94c54602b305f115eb77e2c",
-          "after": "4f47a824a16e449dcaf148f56a1569b085ace984d7752aa39f88a1b5c8fdf61e"
+          "before": "4f47a824a16e449dcaf148f56a1569b085ace984d7752aa39f88a1b5c8fdf61e",
+          "after": "b2217b9ac8af82746d70971dce1c5102ecde50d6c559e6752e4e04c87babb9d1"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "c2f594c47c9171f9480c50530f2066c99ed1317c86a4ec94ca300b9fbccf2d95",
-      "after_sha256": "8377e303db97e1055c307f43eea7ee38ef6a6b0e5da5811dbd4acd484354fae4",
+      "before_sha256": "8377e303db97e1055c307f43eea7ee38ef6a6b0e5da5811dbd4acd484354fae4",
+      "after_sha256": "1b101f23fc6a8b017ba1df2a6f13ea60c62616071144460ca0e6bc8f5c2921b8",
       "owners": {
         "@document": {
-          "before": "c2f594c47c9171f9480c50530f2066c99ed1317c86a4ec94ca300b9fbccf2d95",
-          "after": "8377e303db97e1055c307f43eea7ee38ef6a6b0e5da5811dbd4acd484354fae4"
+          "before": "8377e303db97e1055c307f43eea7ee38ef6a6b0e5da5811dbd4acd484354fae4",
+          "after": "1b101f23fc6a8b017ba1df2a6f13ea60c62616071144460ca0e6bc8f5c2921b8"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "5c6ff444a8e63fcb14db2813d18de163b1d66dc2bf6aa32b7b802b7f043ba200",
-      "after_sha256": "1d842a47d374001766d1717d0b608fb478024119cbd7097245fb95c98e181f14",
+      "before_sha256": "1d842a47d374001766d1717d0b608fb478024119cbd7097245fb95c98e181f14",
+      "after_sha256": "6011f20d1be35c1b971a412d59060c855a91a675b9d414fbab82c8c90af12f30",
       "owners": {
         "@document": {
-          "before": "5c6ff444a8e63fcb14db2813d18de163b1d66dc2bf6aa32b7b802b7f043ba200",
-          "after": "1d842a47d374001766d1717d0b608fb478024119cbd7097245fb95c98e181f14"
+          "before": "1d842a47d374001766d1717d0b608fb478024119cbd7097245fb95c98e181f14",
+          "after": "6011f20d1be35c1b971a412d59060c855a91a675b9d414fbab82c8c90af12f30"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "68b577c3b1edf85962ce6d59b677b5afa46adba833af00e6cf4c00816c508878",
-      "after_sha256": "1b2bdd8613e8f88ca65e99dbf92589196985449ec9569bc06adb405e8f7c1633",
+      "before_sha256": "1b2bdd8613e8f88ca65e99dbf92589196985449ec9569bc06adb405e8f7c1633",
+      "after_sha256": "98bef450413c793cbe7d556fb161a175c541119fe313ec3d884dbfbfd6dd235e",
       "owners": {
         "@document": {
-          "before": "68b577c3b1edf85962ce6d59b677b5afa46adba833af00e6cf4c00816c508878",
-          "after": "1b2bdd8613e8f88ca65e99dbf92589196985449ec9569bc06adb405e8f7c1633"
+          "before": "1b2bdd8613e8f88ca65e99dbf92589196985449ec9569bc06adb405e8f7c1633",
+          "after": "98bef450413c793cbe7d556fb161a175c541119fe313ec3d884dbfbfd6dd235e"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "bcd20c1ba32266e79df1629145252f39c450c11782157fc69613e2c01d67a985",
-      "after_sha256": "0c864fb6eb2f34487f37c47a07970b30faaa6d24912c56152f8388ed46d8c418",
+      "before_sha256": "0c864fb6eb2f34487f37c47a07970b30faaa6d24912c56152f8388ed46d8c418",
+      "after_sha256": "0da5a90e44173aa949df87eddad66f7abb349456bda45b3f404a1a94c3313238",
       "owners": {
         "@document": {
-          "before": "bcd20c1ba32266e79df1629145252f39c450c11782157fc69613e2c01d67a985",
-          "after": "0c864fb6eb2f34487f37c47a07970b30faaa6d24912c56152f8388ed46d8c418"
+          "before": "0c864fb6eb2f34487f37c47a07970b30faaa6d24912c56152f8388ed46d8c418",
+          "after": "0da5a90e44173aa949df87eddad66f7abb349456bda45b3f404a1a94c3313238"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "553523fd9a11bf59b0d642a389c537d04acf739d6c9cf43b386e1a3c070f1bb3",
-      "after_sha256": "859b4465cd0321fa4bbd20e8df3110dc8a0ccf98bdb9c3f4f6607524132f1e79",
+      "before_sha256": "859b4465cd0321fa4bbd20e8df3110dc8a0ccf98bdb9c3f4f6607524132f1e79",
+      "after_sha256": "d34177dd6dfd6e721dfe2f49fb71f265013a2d10f64a441d3e3a0b00255b1328",
       "owners": {
         "@document": {
-          "before": "553523fd9a11bf59b0d642a389c537d04acf739d6c9cf43b386e1a3c070f1bb3",
-          "after": "859b4465cd0321fa4bbd20e8df3110dc8a0ccf98bdb9c3f4f6607524132f1e79"
-        }
-      }
-    },
-    "contracts/openapi.yaml": {
-      "before_sha256": "2f0836e40c2f2feb3ba75388795f30139411c54e45b41575d4eb0476c5933962",
-      "after_sha256": "d50f3c734fc465357a546c2c634a946506295e9c8ac644a44013581b53171ab6",
-      "owners": {
-        "@document": {
-          "before": "2f0836e40c2f2feb3ba75388795f30139411c54e45b41575d4eb0476c5933962",
-          "after": "d50f3c734fc465357a546c2c634a946506295e9c8ac644a44013581b53171ab6"
+          "before": "859b4465cd0321fa4bbd20e8df3110dc8a0ccf98bdb9c3f4f6607524132f1e79",
+          "after": "d34177dd6dfd6e721dfe2f49fb71f265013a2d10f64a441d3e3a0b00255b1328"
         }
       }
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "fb1840d621a4efcd621036f5684e59d53335c0346d1bb1350782f2031548adae",
-      "after_sha256": "dea5d82258ad97685225af964121bef78ef6014b7cccc09c0e06f3b4f476170e",
+      "before_sha256": "dea5d82258ad97685225af964121bef78ef6014b7cccc09c0e06f3b4f476170e",
+      "after_sha256": "fdf762106542f3a07137c5aa162430656bf5b38e52861e5e43120b6ae051cef7",
       "owners": {
         "@document": {
-          "before": "fb1840d621a4efcd621036f5684e59d53335c0346d1bb1350782f2031548adae",
-          "after": "dea5d82258ad97685225af964121bef78ef6014b7cccc09c0e06f3b4f476170e"
+          "before": "dea5d82258ad97685225af964121bef78ef6014b7cccc09c0e06f3b4f476170e",
+          "after": "fdf762106542f3a07137c5aa162430656bf5b38e52861e5e43120b6ae051cef7"
         }
       }
     },
-    "docs/ISSUE_533_FIRING_DECK_AUTHORITY.md": {
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "before_sha256": "2af9873d25c146519ecb7a86a65cb77607acc166dbfe94dc3ec12c531ec88b38",
+      "after_sha256": "c62234be7f9b0b629a92af4ca77e4433bedc4cabafc866f647d3d51c12cd9beb",
+      "owners": {
+        "@document": {
+          "before": "2af9873d25c146519ecb7a86a65cb77607acc166dbfe94dc3ec12c531ec88b38",
+          "after": "c62234be7f9b0b629a92af4ca77e4433bedc4cabafc866f647d3d51c12cd9beb"
+        }
+      }
+    },
+    "docs/ORDER_104_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "b37ecc852c7728c33049fce7a6cd563d8e358fc4a77441224014fa1a04338d64",
+      "after_sha256": "0840ba02cedda852bdf9d19d5072bb6785d335541e53f66a888944db99ecdc98",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b37ecc852c7728c33049fce7a6cd563d8e358fc4a77441224014fa1a04338d64"
+          "after": "0840ba02cedda852bdf9d19d5072bb6785d335541e53f66a888944db99ecdc98"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "8ad5ae02afceb3d8c6f0232f883d29a44bd2dd323672b92f94dd8a4f0e262e8c",
-      "after_sha256": "371eeecf6e00644167d4bbb3c13652fa651e5b48c5a8a0e716324fb5f79fd7b2",
+      "before_sha256": "371eeecf6e00644167d4bbb3c13652fa651e5b48c5a8a0e716324fb5f79fd7b2",
+      "after_sha256": "1fdb458305d261a6c590735b18c1ac431ae7b83beb93b094b2a235dd5306a9b0",
       "owners": {
         "@document": {
-          "before": "8ad5ae02afceb3d8c6f0232f883d29a44bd2dd323672b92f94dd8a4f0e262e8c",
-          "after": "371eeecf6e00644167d4bbb3c13652fa651e5b48c5a8a0e716324fb5f79fd7b2"
+          "before": "371eeecf6e00644167d4bbb3c13652fa651e5b48c5a8a0e716324fb5f79fd7b2",
+          "after": "1fdb458305d261a6c590735b18c1ac431ae7b83beb93b094b2a235dd5306a9b0"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "f23cf795c6885c6e851593f5c3045fb3249ca9aa92b43e49981b7213da32468f",
-      "after_sha256": "063d55288bf9909894518e79616a7277f2be8ff577826d031682db2687b97ea9",
+      "before_sha256": "063d55288bf9909894518e79616a7277f2be8ff577826d031682db2687b97ea9",
+      "after_sha256": "f2916a20ebefcb3815611a5edaa7892395859edd14552ffe62085e8001272018",
       "owners": {
         "@document": {
-          "before": "f23cf795c6885c6e851593f5c3045fb3249ca9aa92b43e49981b7213da32468f",
-          "after": "063d55288bf9909894518e79616a7277f2be8ff577826d031682db2687b97ea9"
+          "before": "063d55288bf9909894518e79616a7277f2be8ff577826d031682db2687b97ea9",
+          "after": "f2916a20ebefcb3815611a5edaa7892395859edd14552ffe62085e8001272018"
         }
       }
     },
-    "src/warhammer40k_core/adapters/external_contract.py": {
-      "before_sha256": "699d7f1a42fed724685c233fcae1bb8197ab1d5f90ea1345e3b0713bb5c87d5e",
-      "after_sha256": "65cb7f89387230e7709b4b01bfcaf46362ab423e61da103d8cc3bae4cceb524b",
+    "src/warhammer40k_core/engine/shooting_targets.py": {
+      "before_sha256": "a3307db53454734da9d71987e47f139362d3cda6628c25c092e2e66ea16de6ce",
+      "after_sha256": "1411582e5bbabd9a5dc44ec6647ec29b90f3779ec43f7b802c5064ac74e7fc75",
       "owners": {
-        "@module": {
-          "before": "2a4581877914f32170bd5e744420d96f7d39f06c8e1403477336ce2f349c1ed6",
-          "after": "6e5674af87c0ce8c7e02b55c15e765912427e57e92dda4c913ee6410900df380"
+        "_LineOfSightRangeEvidence": {
+          "before": "790c5b6ceb1fce48128450f85b54131cdd1854ab7c49a8afd4be74e68ccf4a57",
+          "after": "1fccecb8d8464286b49c75ddeca4ef17a49f808fbccaa422c25ae3de375c2ddb"
+        },
+        "_best_line_of_sight_range_evidence": {
+          "before": "b9a9a40de3c6fc2488018be0bc2933b7b34e9a2db5e1d3958adbb0ebe889d517",
+          "after": "1fa1554762f3efb3380772c98149e9b9d04e5b94d2b20f3400ce96a606eed599"
+        },
+        "_plunging_fire_applies": {
+          "before": "8194979e88bc6ee42c5cb3d304a58fdca6b7c87d1c100adb19ca4ce66b949914",
+          "after": "73fedf47d1520bd69c57daae6771fd3421db614c11f0fc7e30482b75b3b16fea"
+        },
+        "_target_candidate": {
+          "before": "55e62d0a0fc0dc16566d4d6fb7baedffa1b82df715529158a93cc60ff87e7cc1",
+          "after": "90bbe593b2c3dbe4fb7415feb252573c08ebec472b49efa2d4a603679a2c0775"
         }
       }
     },
-    "src/warhammer40k_core/engine/firing_deck_restore.py": {
-      "before_sha256": "e45964ee535285247196572967669964f644ef7042b6d4a781cdd941ac22bd34",
-      "after_sha256": "c161309bcd1cd0c0588f77f80f0b86ffb4851627d52a074f57510b8d6f615c0b",
-      "owners": {
-        "validate_firing_deck_restrictions": {
-          "before": "b1a4741d60de25073542c1298a2a9403555bab502811131ca09c74a166234c51",
-          "after": "50270bc4f8bfd7edfe3cbad3706fcfcc6fdb7bb3872195dcdafcf42fcd0cdedc"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/phases/shooting_firing_deck.py": {
-      "before_sha256": "53a9e0ee7c6decdeeecedb9f8d26085482a11aec0421b0b0903f9bedb2c57bdc",
-      "after_sha256": "2b11eb3682570dc4fdbb5189a23a77598590fc8412902bfdee17e7e5889e6724",
-      "owners": {
-        "firing_deck_shot_history_snapshot": {
-          "before": null,
-          "after": "2a73588d15f26c74993c4d085550e3a28e60a3c0c343dc90b893522f44e640b2"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/phases/shooting_model.py": {
-      "before_sha256": "a05af64d81630c111ecaba4401f4af860b275b974ba9003c69c26d99885d1f29",
-      "after_sha256": "a5c9e8d74aacd6df1088df91882f20499ef1a763f5581d72fd3d5b9cb49798b5",
-      "owners": {
-        "ShootingDeclarationProposalRequestPayload": {
-          "before": "d9f549c96fd08d82550918235ffd708b13141694783f39d495f8fd690476e114",
-          "after": "7c055333308595df456018e0f5fa330c561a059b5f515e03c0104604e362b166"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/phases/shooting_requests.py": {
-      "before_sha256": "8be12c90047096099d5e62c777a225b0be4b9c5b477c13262b6d758e78b59883",
-      "after_sha256": "944e9e28041c24ed9a0b2ab7a67842ed0b9257a9c14a0095922eac581fcf5116",
-      "owners": {
-        "_request_shooting_declaration": {
-          "before": "6c1af83723a644df2937a5b1069c60d2510eb685a0b0dbe2f881af53b78df9f0",
-          "after": "8d3397ab81478b7868295bd3aff821d929a3ef66df282834201d81cbdbeb37b2"
-        }
-      }
-    },
-    "tests/unit/test_phase18e_server_api.py": {
-      "before_sha256": "3f88c321db317ea3ec24193577c81b94e38765569e8839a11ea6e6124b9c381e",
-      "after_sha256": "334ce50fbb541155d2b40f51e8ede1276870065e55365b497d1a5a2990c1f766",
-      "owners": {
-        "test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads": {
-          "before": "afa3fec36e4b31b1a480b0e9e18802b8411f3710e55dc1e8fe53d0ffab21928f",
-          "after": "3add6db773450c848bcd0f662f5a8d7a0829adf58b2b8c52573864ca85924916"
-        }
-      }
-    },
-    "tests/unit/test_public_firing_deck_history.py": {
+    "tests/range_visibility_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "f963ed00df9f55415e8a77c5ef78e1efc3dcd347594e291eba133cffd1c2336f",
+      "after_sha256": "6cfca9539c2ade432fd83125ca1976ed708ec6ffba51c5cd6d50e7a725ad65d4",
       "owners": {
         "@module": {
           "before": null,
-          "after": "01dcc6aa892d55b7d7bf3fb85f5cbaaec788ecffe0e1fd0e273cb6096335b966"
+          "after": "a77da4817b29647c2be7ef909bf9e4c67b50b4e2e5bcf7cd659d78f7342e1ce6"
         },
-        "_object": {
+        "range_visibility_scene": {
           "before": null,
-          "after": "b04984b8bf1b04609d3667a5b05335fd76ca68f7e605eb863679866539750b0a"
+          "after": "1569623391bca253edd47882c7f4639fb1d5fa241eaeede45581d8b363315c98"
+        }
+      }
+    },
+    "tests/unit/test_order104_range_visibility.py": {
+      "before_sha256": null,
+      "after_sha256": "65825ef84e39edb7eca7b40042a2e22a715787d7a10763971041e699e1f8ff05",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "e9057cd7f9d02da64ccdb29c3a45bca1c59b340df4f124f62ef4af0bae86182b"
         },
-        "_pending": {
+        "test_detection_and_visibility_remain_required": {
           "before": null,
-          "after": "924fe75e7a3b31274e3facbd7ba8e2a3194028732fbe031a8a84bdb3fb99ccc5"
+          "after": "fa410f04385c2bf45378a939d5a5e494068ef0016bc07ecc8584b471ec523e60"
         },
-        "_public_proposal": {
+        "test_different_enemy_units_cannot_combine_range_and_visibility": {
           "before": null,
-          "after": "1bf33265727d94988578129b4d955c662e3c7d1ca219061c86da423feb4253c2"
+          "after": "210e676b6a25cbb8c01af7c4f502f90737766a03db0fe0a5fe85ffb0b8873fe2"
         },
-        "_select": {
+        "test_facade_accepts_separate_witnesses_with_restore_continuation_and_replay": {
           "before": null,
-          "after": "0a859094b73b4cc64f0fe520bbfd587a7d237c7032681932d4faba6d1691b7f9"
+          "after": "334eca76f2b6c73e9df6ef01b7c0e72e8eb9031fefc0811986ba46137e6a32e9"
         },
-        "_session": {
+        "test_hidden_near_model_still_supplies_rapid_fire_half_range": {
           "before": null,
-          "after": "63044d8a3f4a7fc988c821ec26187a04548ab0f8ad2da97fce3dc64ae79f6177"
+          "after": "59a46493104ff7f43992b0c25b2462357a5519c006c0ca0373a1ce510239537f"
         },
-        "test_invalid_public_firing_deck_is_atomic_and_retryable": {
+        "test_range_and_visibility_use_independent_models_with_complete_witnesses": {
           "before": null,
-          "after": "3bfa7238dd005f51ce223cf74a431203c9b61f9d6d8e903ee0f25c3af10743ac"
+          "after": "e949fd4aee00296017b618536f7ba8246380ed52b8c8d1700688b8e466a94c1a"
         },
-        "test_no_current_history_authority_outside_matching_phase": {
+        "test_visibility_does_not_replace_required_weapon_range": {
           "before": null,
-          "after": "71d05aa9405ec8879d311381096d3bc5b875257209d113b8fe35e8af65adc0d7"
-        },
-        "test_pending_history_restore_rejects_drift": {
-          "before": null,
-          "after": "b8726cb2fb1c8e0f367b9e377129384376f94241a80dab23b859fdb3b6513bd5"
-        },
-        "test_public_firing_deck_after_shot_history": {
-          "before": null,
-          "after": "f8ccf4bc1e7bdce2a4833f18143a4a78f65c51ae9dc53d4bcde47428c7a2a798"
-        },
-        "test_secret_request_and_event_redact_nested_history": {
-          "before": null,
-          "after": "e3f672e8ed473bf56426461423d3f86869d6f536369a40fa135afe3fbf3ec95b"
+          "after": "616083ca6b6718b7cd8649648e77b9a908ace28fce54019e9382318fd5fa63b4"
         }
       }
     }
@@ -420,191 +350,165 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
-        "issue533-client-regressions"
+        "issue533-client-regressions",
+        "order104-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
-        "issue533-client-regressions"
+        "issue533-client-regressions",
+        "order104-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
-        "issue533-client-regressions"
+        "issue533-client-regressions",
+        "order104-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
-        "issue533-client-regressions"
+        "issue533-client-regressions",
+        "order104-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
-        "issue533-client-regressions"
+        "issue533-client-regressions",
+        "order104-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
-        "issue533-client-regressions"
+        "issue533-client-regressions",
+        "order104-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
-        "issue533-client-regressions"
+        "issue533-client-regressions",
+        "order104-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
-        "issue533-client-regressions"
+        "issue533-client-regressions",
+        "order104-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
-        "issue533-client-regressions"
+        "issue533-client-regressions",
+        "order104-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
-        "issue533-client-regressions"
+        "issue533-client-regressions",
+        "order104-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
-        "issue533-client-regressions"
+        "issue533-client-regressions",
+        "order104-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
-        "issue533-client-regressions"
+        "issue533-client-regressions",
+        "order104-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
-        "issue533-client-regressions"
+        "issue533-client-regressions",
+        "order104-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "conformance/typescript/src/contract.ts": {
-      "category": "rule_semantics",
-      "operations": [
-        "contract-42-1-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/README.md": {
-      "category": "rule_semantics",
-      "operations": [
-        "contract-42-1-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/compatibility-policy.md": {
-      "category": "rule_semantics",
-      "operations": [
-        "contract-42-1-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -612,12 +516,13 @@
         "contract-42-1-publication",
         "issue532-contract44-publication",
         "issue533-contract-publication",
-        "order103-contract-publication"
+        "order103-contract-publication",
+        "order104-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -625,12 +530,13 @@
         "contract-42-1-publication",
         "issue532-contract44-publication",
         "issue533-contract-publication",
-        "order103-contract-publication"
+        "order103-contract-publication",
+        "order104-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -638,12 +544,13 @@
         "contract-42-1-publication",
         "issue532-contract44-publication",
         "issue533-contract-publication",
-        "order103-contract-publication"
+        "order103-contract-publication",
+        "order104-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -651,12 +558,13 @@
         "contract-42-1-publication",
         "issue532-contract44-publication",
         "issue533-contract-publication",
-        "order103-contract-publication"
+        "order103-contract-publication",
+        "order104-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -664,12 +572,13 @@
         "contract-42-1-publication",
         "issue532-contract44-publication",
         "issue533-contract-publication",
-        "order103-contract-publication"
+        "order103-contract-publication",
+        "order104-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -677,12 +586,13 @@
         "contract-42-1-publication",
         "issue532-contract44-publication",
         "issue533-contract-publication",
-        "order103-contract-publication"
+        "order103-contract-publication",
+        "order104-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -690,12 +600,13 @@
         "contract-42-1-publication",
         "issue532-contract44-publication",
         "issue533-contract-publication",
-        "order103-contract-publication"
+        "order103-contract-publication",
+        "order104-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -703,49 +614,45 @@
         "contract-42-1-publication",
         "issue532-contract44-publication",
         "issue533-contract-publication",
-        "order103-contract-publication"
+        "order103-contract-publication",
+        "order104-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/openapi.yaml": {
-      "category": "rule_semantics",
-      "operations": [
-        "contract-42-1-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
-    "docs/ISSUE_533_FIRING_DECK_AUTHORITY.md": {
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+    },
+    "docs/ORDER_104_SCOPE_PLAN.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -753,85 +660,39 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
-    "src/warhammer40k_core/adapters/external_contract.py": {
+    "src/warhammer40k_core/engine/shooting_targets.py": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order103-src-warhammer40k_core-adapters-external_contract"
+        "order104-range-visibility-authority"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
-    "src/warhammer40k_core/engine/firing_deck_restore.py": {
+    "tests/range_visibility_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "issue533-public-firing-deck-authority"
+        "order104-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
-    "src/warhammer40k_core/engine/phases/shooting_firing_deck.py": {
+    "tests/unit/test_order104_range_visibility.py": {
       "category": "rule_semantics",
       "operations": [
-        "issue533-public-firing-deck-authority"
+        "order104-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "src/warhammer40k_core/engine/phases/shooting_model.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue533-public-firing-deck-authority"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "src/warhammer40k_core/engine/phases/shooting_requests.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue533-public-firing-deck-authority"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "tests/unit/test_phase18e_server_api.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-client-regressions",
-        "issue533-client-regressions",
-        "order103-tests-unit-test_phase18e_server_api",
-        "shock-regression-controls"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "tests/unit/test_public_firing_deck_history.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue533-client-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
-      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
+      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     }
   },
   "milestone": "ordinary",

@@ -7409,3 +7409,15 @@ serializers. Charge uses `charge_proposal_flow.py` and
 budget, complete membership and start-pose checks remain unchanged. Scout
 (`prebattle.py`) and deployment (`deployment.py`) already publish explicit
 component/model inventories; those contracts remain unchanged.
+
+### Order 104: independent ranged-target witnesses (Contract 44.1 unchanged)
+
+Existing shooting candidates and attack pools publish separate
+`target_visible_model_ids` and `target_in_range_model_ids`. These sets can be
+disjoint: the same firing model may see one model and be in weapon range of
+another model of the same canonical target rules unit. Visibility IDs retain
+Hidden detection eligibility; range IDs retain all models within the selected
+observer's weapon range. The complete `line_of_sight_witness` still includes
+blocked and visible target models. Clients must not intersect the two sets to
+infer legality. Ordinary Shooting, reaction attacks, persistence and replay use
+the engine's existing validation authority and unchanged payload shapes.

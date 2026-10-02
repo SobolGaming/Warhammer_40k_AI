@@ -2,6 +2,11 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 104 / P04H permits a visible enemy model and a different in-range enemy
+model in the same target rules unit. Shared ordinary and reaction shooting keep
+complete visibility witnesses and bearer-specific range evidence. See
+[source, scope and validation](docs/ORDER_104_SCOPE_PLAN.md).
+
 Contract 44.1 makes Firing Deck declarations constructible from public requests
 after other units have shot. Exact engine validation and cargo restrictions remain
 unchanged; see [issue 533](docs/ISSUE_533_FIRING_DECK_AUTHORITY.md).
