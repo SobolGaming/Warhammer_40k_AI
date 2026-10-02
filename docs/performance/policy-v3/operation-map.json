@@ -329,7 +329,8 @@
     "development-dependency": {
       "paths": [
         "pyproject.toml",
-        "uv.lock"
+        "uv.lock",
+        "conformance/typescript/package-lock.json"
       ],
       "owners": [
         "*"
