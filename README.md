@@ -2,6 +2,10 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Contract 44.1 makes Firing Deck declarations constructible from public requests
+after other units have shot. Exact engine validation and cargo restrictions remain
+unchanged; see [issue 533](docs/ISSUE_533_FIRING_DECK_AUTHORITY.md).
+
 Order 103 / P04G groups otherwise identical PRECISION and plain attacks when
 the selected target has no CHARACTER. Physical weapons and selected sources
 remain intact; recorded group context survives casualties, restore and replay.

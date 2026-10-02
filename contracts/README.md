@@ -1,5 +1,11 @@
 # CORE V2 external contract
 
+Contract 44.1 publishes the complete current ordinary Shooting history required
+by Firing Deck declarations. Clients copy the advertised list; null means no
+ordinary history authority. Submissions, schemas and Contract 44 persistence
+envelopes remain unchanged with exact runtime identity. See
+[issue 533](../docs/ISSUE_533_FIRING_DECK_AUTHORITY.md).
+
 Contract 43 requires target CHARACTER context in gathered attack groups, binding
 target-aware PRECISION grouping and deterministic group identity. Physical weapons
 and source profiles remain unchanged. See [migration 42 to 43](migrations/42-to-43.md)
@@ -45,7 +51,7 @@ from HealingEffect and requires source-bound engagement evidence on battlefield
 revival events. See [35 to 36 migration](migrations/35-to-36.md).
 
 
-Contract version: `44.0.0`
+Contract version: `44.1.0`
 
 Order 81 / P03E restores the existing pending-proposal contract for all 13
 parameterized families. Interaction conformance examples now preserve the four
