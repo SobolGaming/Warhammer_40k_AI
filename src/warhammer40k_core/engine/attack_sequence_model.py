@@ -440,6 +440,7 @@ class GatheredAttackContributionPayload(TypedDict):
 class GatheredAttackGroupPayload(TypedDict):
     group_id: str
     target_unit_instance_id: str
+    target_has_character: bool
     signature: IdenticalAttackSignaturePayload
     pool_indices: list[int]
     total_attacks: int
@@ -1391,6 +1392,7 @@ class GatheredAttackContribution:
 class GatheredAttackGroup:
     group_id: str
     target_unit_instance_id: str
+    target_has_character: bool
     signature: IdenticalAttackSignature
     pool_indices: tuple[int, ...]
     total_attacks: int
@@ -1410,6 +1412,8 @@ class GatheredAttackGroup:
                 self.target_unit_instance_id,
             ),
         )
+        if type(self.target_has_character) is not bool:
+            raise GameLifecycleError("GatheredAttackGroup target_has_character must be a bool.")
         if type(self.signature) is not IdenticalAttackSignature:
             raise GameLifecycleError(
                 "GatheredAttackGroup signature must be an IdenticalAttackSignature."
@@ -1449,6 +1453,7 @@ class GatheredAttackGroup:
         return {
             "group_id": self.group_id,
             "target_unit_instance_id": self.target_unit_instance_id,
+            "target_has_character": self.target_has_character,
             "signature": self.signature.to_payload(),
             "pool_indices": list(self.pool_indices),
             "total_attacks": self.total_attacks,
@@ -1460,6 +1465,7 @@ class GatheredAttackGroup:
         return cls(
             group_id=payload["group_id"],
             target_unit_instance_id=payload["target_unit_instance_id"],
+            target_has_character=payload["target_has_character"],
             signature=IdenticalAttackSignature.from_payload(payload["signature"]),
             pool_indices=tuple(payload["pool_indices"]),
             total_attacks=payload["total_attacks"],

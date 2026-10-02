@@ -1,0 +1,117 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "dice_sustained",
+  "workload_id": "order96-sustained-d3-optional-wound-rerolls-v1",
+  "base_revision": "133956de896c0db222158a086e672cc04649c096",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:81b436feba3835847aef40a9d90e94ad5ced81c6a62cc445583b7ace2f10247e",
+  "head_input_digest": "03f49ddff44dbaa9f6025082829b520ba8174c912cf301634ce7cc33a2652306",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0291fd08bb730575da8e064d519fdc083a22f27b98ab5aa5e076055dc5a18a46",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 137327259648,
+      "logical_cpus": 64,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "fc4fe1423d4864d251bf8f5b2c1eaf305b4f21a358cc668c8b5a20c166f75daf",
+    "fixture_sha256": "224bbdf483c0c15a9dc3ebc3f372ca7846f5da1c3089a3eef94d7dbb2db744f6",
+    "samples": {
+      "shooting/false": [
+        2.4537207999965176,
+        2.408151400042698,
+        2.3529268000274897,
+        2.348887600004673,
+        2.5439475000603124
+      ],
+      "shooting/true": [
+        1.754706499981694,
+        1.7344071000115946,
+        1.8206082000397146,
+        1.8032658000010997,
+        1.7357583000557497
+      ],
+      "fight/false": [
+        1.5241943000582978,
+        1.5320559000829235,
+        1.5168947000056505,
+        1.541772500029765,
+        1.5432861000299454
+      ],
+      "fight/true": [
+        1.60300110001117,
+        1.6107873999280855,
+        1.6017361000413075,
+        1.6818615000229329,
+        1.6018554999027401
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:81b436feba3835847aef40a9d90e94ad5ced81c6a62cc445583b7ace2f10247e",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 137327259648,
+      "logical_cpus": 64,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "fc4fe1423d4864d251bf8f5b2c1eaf305b4f21a358cc668c8b5a20c166f75daf",
+    "fixture_sha256": "224bbdf483c0c15a9dc3ebc3f372ca7846f5da1c3089a3eef94d7dbb2db744f6",
+    "samples": {
+      "shooting/false": [
+        1.9239252000115812,
+        1.9098097999813035,
+        1.799307300010696,
+        1.800572199979797,
+        1.869511800003238
+      ],
+      "shooting/true": [
+        2.436907999916002,
+        2.488160900073126,
+        2.514026499935426,
+        2.5280395000008866,
+        2.4379396999720484
+      ],
+      "fight/false": [
+        1.7642851000418887,
+        1.7746275999816135,
+        1.7387831999221817,
+        1.7655853000469506,
+        1.7555440999567509
+      ],
+      "fight/true": [
+        1.7597031000768766,
+        1.6200367000419647,
+        1.6445512999780476,
+        1.6882424999494106,
+        1.6130694999592379
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": [
+    "Actual PR base133956de already implements Order96 optional wound rerolls. Same current driver/fixtures/lock execute against actual base and current runtimes; cross-version group payload/identity changes can alter deterministic dice history.",
+    "Four Shooting/Fight accept/decline cases retain five samples each. Setup and exact normal restore are separately reported; mandatory current-relative budgets apply to the unchanged pending-choice-through-first-attack-completion boundary.",
+    "Sustained-D3 is a separately registered existing hard-case companion, preserving12 original unique HIT contexts, one physical D3 per critical hit, submitted unique wound choices and accept/decline identity with no automatic weapon rerolls.",
+    "Original Order96 reports, workload hash pins and numeric checks remain historical and unchanged. Original Order10360-sample precision evidence and failed10236-case covered run remain retained, not relabeled after shared test-input repairs.",
+    "Host is actual declared provisional Windows hardware; no full-game, long-history or same-seed cross-version outcome equivalence claim. Every failed untimed preparation remains separate.",
+    "Preflight actual-base/current WOUND/choice counts are Shooting decline15/11, Shooting accept10/15, Fight decline13/14 and Fight accept12/12. The matched episode has12 original physical HIT attempts and the same phase/choice policy, not identical primitive work. Natural RNG-history differences remain visible; no per-wound timing normalization, forced RNG equivalence or faster-seed selection. All unchanged mean/max budgets apply to the raw complete episode timings."
+  ],
+  "owner_exception": {
+    "id": "order103-sustained-shooting-mean-20261002",
+    "case": "shooting/true",
+    "metric": "mean",
+    "status": "owner_approved_failure"
+  }
+}

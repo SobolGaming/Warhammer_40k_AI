@@ -3,10 +3,14 @@
 from __future__ import annotations
 
 from warhammer40k_core.core.random_profile_values import RandomProfileValue
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
 from typing import TYPE_CHECKING
 
-from warhammer40k_core.core.weapon_ability_sources import reidentify_weapon_profile
+from warhammer40k_core.core.weapon_ability_sources import (
+    reidentify_weapon_profile,
+    weapon_keyword_ability_id,
+)
 from warhammer40k_core.engine.attack_sequence_imports import *
 
 # fmt: off
@@ -52,9 +56,13 @@ __all__ = (
 )
 
 
-def identical_attack_signature(pool: RangedAttackPool) -> IdenticalAttackSignature:
+def identical_attack_signature(
+    pool: RangedAttackPool, *, target_has_character: bool
+) -> IdenticalAttackSignature:
     if type(pool) is not RangedAttackPool:
         raise GameLifecycleError("identical_attack_signature requires a RangedAttackPool.")
+    if type(target_has_character) is not bool:
+        raise GameLifecycleError("Attack grouping target_has_character must be a bool.")
     profile = pool.weapon_profile
     _validate_weapon_profile_signature_shape(profile)
     hit_basis = (
@@ -77,7 +85,7 @@ def identical_attack_signature(pool: RangedAttackPool) -> IdenticalAttackSignatu
         armor_penetration=canonical_json(profile.armor_penetration.to_payload()),
         damage=canonical_json(profile.damage_profile.to_payload()),
         weapon_rule_tokens=(
-            *_weapon_rule_tokens_for_signature(profile),
+            *_weapon_rule_tokens_for_signature(profile, target_has_character=target_has_character),
             *(
                 (f"random-profile-weapon:{pool.weapon_instance_id}",)
                 if any(
@@ -96,7 +104,9 @@ def identical_attack_signature(pool: RangedAttackPool) -> IdenticalAttackSignatu
             ),
             *(
                 f"selected-weapon-ability:{ability_id}"
-                for ability_id in pool.selected_weapon_ability_ids
+                for ability_id in _selected_weapon_ability_ids_for_signature(
+                    pool, target_has_character=target_has_character
+                )
             ),
         ),
         targeting_rule_ids=tuple(sorted(pool.targeting_rule_ids)),
@@ -104,6 +114,25 @@ def identical_attack_signature(pool: RangedAttackPool) -> IdenticalAttackSignatu
         firing_deck_source_unit_instance_id=pool.firing_deck_source_unit_instance_id,
         firing_deck_source_model_instance_id=pool.firing_deck_source_model_instance_id,
     )
+
+
+def _selected_weapon_ability_ids_for_signature(
+    pool: RangedAttackPool, *, target_has_character: bool
+) -> tuple[str, ...]:
+    if target_has_character or not pool.selected_weapon_ability_ids:
+        return pool.selected_weapon_ability_ids
+    context = pool.weapon_selection_context
+    if context is None:
+        raise GameLifecycleError("Selected weapon abilities require their source inventory.")
+    # The selected source remains authoritative in the physical pool. Only its
+    # inapplicable PRECISION grouping token follows the same FAQ as the keyword.
+    precision_ids = {
+        source.instance_id
+        for family, sources in context.instance_groups()
+        if family == weapon_keyword_ability_id(WeaponKeyword.PRECISION)
+        for source in sources
+    }
+    return tuple(value for value in pool.selected_weapon_ability_ids if value not in precision_ids)
 
 
 def unresolved_target_unit_ids(attack_sequence: AttackSequence) -> tuple[str, ...]:
@@ -122,6 +151,7 @@ def gathered_attack_groups_for_target(
     *,
     attack_sequence: AttackSequence,
     target_unit_instance_id: str,
+    target_has_character: bool,
 ) -> tuple[GatheredAttackGroup, ...]:
     if type(attack_sequence) is not AttackSequence:
         raise GameLifecycleError("Gathered attack grouping requires an AttackSequence.")
@@ -131,18 +161,29 @@ def gathered_attack_groups_for_target(
     for pool_index, pool in enumerate(attack_sequence.attack_pools):
         if pool_index in used or pool.target_unit_instance_id != target_id:
             continue
-        signature = identical_attack_signature(pool)
+        signature = identical_attack_signature(pool, target_has_character=target_has_character)
         grouped_indices.setdefault(signature, []).append(pool_index)
     groups = tuple(
         _gathered_attack_group_from_indices(
             attack_sequence=attack_sequence,
             target_unit_instance_id=target_id,
+            target_has_character=target_has_character,
             signature=signature,
             pool_indices=tuple(indices),
         )
         for signature, indices in grouped_indices.items()
     )
     return tuple(sorted(groups, key=lambda group: group.group_id))
+
+
+def target_has_character_for_attack_group(
+    *, state: GameState, target_unit_instance_id: str
+) -> bool:
+    """Snapshot canonical living/retained membership only when forming a fresh group."""
+    return (
+        "CHARACTER"
+        in rules_unit_view_by_id(state=state, unit_instance_id=target_unit_instance_id).keywords
+    )
 
 
 def build_select_resolve_target_unit_request(
@@ -198,6 +239,9 @@ def build_select_attack_weapon_group_request(
     groups = gathered_attack_groups_for_target(
         attack_sequence=attack_sequence,
         target_unit_instance_id=target_id,
+        target_has_character=target_has_character_for_attack_group(
+            state=state, target_unit_instance_id=target_id
+        ),
     )
     if not groups:
         raise GameLifecycleError("Attack weapon group selection requires unresolved groups.")
@@ -287,6 +331,7 @@ def _gathered_attack_group_from_indices(
     *,
     attack_sequence: AttackSequence,
     target_unit_instance_id: str,
+    target_has_character: bool,
     signature: IdenticalAttackSignature,
     pool_indices: tuple[int, ...],
 ) -> GatheredAttackGroup:
@@ -307,10 +352,12 @@ def _gathered_attack_group_from_indices(
     return GatheredAttackGroup(
         group_id=_gathered_attack_group_id(
             target_unit_instance_id=target_id,
+            target_has_character=target_has_character,
             signature=signature,
             pool_indices=pool_indices,
         ),
         target_unit_instance_id=target_id,
+        target_has_character=target_has_character,
         signature=signature,
         pool_indices=pool_indices,
         total_attacks=total_attacks,
@@ -339,6 +386,7 @@ def _gathered_attack_contribution(
 def _gathered_attack_group_id(
     *,
     target_unit_instance_id: str,
+    target_has_character: bool,
     signature: IdenticalAttackSignature,
     pool_indices: tuple[int, ...],
 ) -> str:
@@ -347,6 +395,7 @@ def _gathered_attack_group_id(
     encoded = canonical_json(
         {
             "target_unit_instance_id": target_id,
+            "target_has_character": target_has_character,
             "signature": signature.to_payload(),
             "pool_indices": list(indices),
         }
@@ -458,9 +507,16 @@ def _first_unresolved_pool_index_for_target_from(
     raise GameLifecycleError("Target unit has no unresolved attack pools.")
 
 
-def _weapon_rule_tokens_for_signature(profile: WeaponProfile) -> tuple[str, ...]:
+def _weapon_rule_tokens_for_signature(
+    profile: WeaponProfile, *, target_has_character: bool
+) -> tuple[str, ...]:
     _validate_weapon_profile_signature_shape(profile)
-    tokens: list[str] = [f"keyword:{keyword.value}" for keyword in profile.keywords]
+    # FAQ ee9a398d-3acb-4440-b63a-68bed3e6e217: only applicable rules separate attacks.
+    tokens: list[str] = [
+        f"keyword:{keyword.value}"
+        for keyword in profile.keywords
+        if target_has_character or keyword is not WeaponKeyword.PRECISION
+    ]
     tokens.extend(
         f"ability:{canonical_json(ability.to_payload())}" for ability in profile.abilities
     )

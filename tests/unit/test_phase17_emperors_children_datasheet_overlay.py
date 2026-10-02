@@ -4021,8 +4021,8 @@ def test_infractors_excessive_assault_grants_only_melee_wound_rerolls() -> None:
 @pytest.mark.parametrize(
     ("within_objective_range", "game_id", "expected_wound_value"),
     [
-        (True, "phase18j-excessive-inside-0001", 5),
-        (False, "order56-excessive-outside-1", 1),
+        (True, "order103-fixture-10-02", 5),
+        (False, "order103-fixture-13-00", 1),
     ],
 )
 def test_infractors_excessive_assault_uses_fight_lifecycle_decision_and_replays(
@@ -4220,8 +4220,8 @@ def test_icon_of_excess_requires_enemy_destruction_then_resolves_unit_leadership
     [
         # Order 43 hit-record evidence changes the later leadership RNG history.
         ("order43-icon-0", False, True, "applied"),
-        ("order43-icon-4-order64-1", False, False, None),
-        ("icon-order36-capped-0-order64-1", True, True, "capped"),
+        ("order103-fixture-15-00", False, False, None),
+        ("order103-fixture-04-00", True, True, "capped"),
     ],
 )
 def test_icon_of_excess_uses_shooting_lifecycle_destruction_and_replays(

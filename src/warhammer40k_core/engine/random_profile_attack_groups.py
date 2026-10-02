@@ -130,7 +130,10 @@ def validate_profile_attack_group(
                 for index, pool in enumerate(pools)
                 if index not in used
                 and pool.target_unit_instance_id == selected.target_unit_instance_id
-                and identical_attack_signature(pool) == selected.signature
+                and identical_attack_signature(
+                    pool, target_has_character=selected.target_has_character
+                )
+                == selected.signature
             )
             if (
                 selected.pool_indices != expected_indices
@@ -138,6 +141,7 @@ def validate_profile_attack_group(
                 or selected.group_id
                 != _gathered_attack_group_id(
                     target_unit_instance_id=selected.target_unit_instance_id,
+                    target_has_character=selected.target_has_character,
                     signature=selected.signature,
                     pool_indices=selected.pool_indices,
                 )

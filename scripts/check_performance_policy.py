@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import cast
 
 from scripts.performance_smoke import CASE_LIMIT_SECONDS, CASES, PROCESS_LIMIT_SECONDS, WORKLOAD
+from tools.performance_order103_exception import retained_comparison_inputs
 from tools.performance_policy import (
     ASSESSMENT,
     MAP,
@@ -185,6 +186,8 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
     )["build_id"]
     if not isinstance(base_identity, str):
         raise TypeError("Base runtime identity missing.")
+    approved_failures: list[dict[str, object]] = []
+    retained_applicability: dict[str, str] = {}
     for family in sorted(selected):
         path = comparisons[family]
         if (
@@ -197,26 +200,34 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
         driver = specification["driver"]
         if not isinstance(driver, str) or driver not in inputs:
             raise ValueError("Selected measurement driver is missing.")
-        validate_comparison(
-            read_object(root / path),
-            base=base,
-            runtime_id=runtime_id,
-            input_digest=input_digest,
-            family=family,
-            specification=specification,
-            base_runtime_id=base_identity,
-            expected_inputs={
-                "lock_sha256": inputs["uv.lock"],
-                "workload_sha256": inputs[driver],
-                "fixture_sha256": canonical_digest(
-                    {
-                        name: value
-                        for name, value in inputs.items()
-                        if name.startswith(("tests/", "scripts/"))
-                        and not name.startswith("tests/code_quality/")
-                    }
-                ),
-            },
+        comparison = read_object(root / path)
+        measured_inputs, applicability_sha = retained_comparison_inputs(
+            root, current=inputs, report=comparison, base=base, runtime_id=runtime_id
+        )
+        if applicability_sha is not None:
+            retained_applicability[family] = applicability_sha
+        approved_failures.extend(
+            validate_comparison(
+                comparison,
+                base=base,
+                runtime_id=runtime_id,
+                input_digest=canonical_digest(measured_inputs),
+                family=family,
+                specification=specification,
+                base_runtime_id=base_identity,
+                expected_inputs={
+                    "lock_sha256": measured_inputs["uv.lock"],
+                    "workload_sha256": measured_inputs[driver],
+                    "fixture_sha256": canonical_digest(
+                        {
+                            name: value
+                            for name, value in measured_inputs.items()
+                            if name.startswith(("tests/", "scripts/"))
+                            and not name.startswith("tests/code_quality/")
+                        }
+                    ),
+                },
+            )
         )
     if assessment["milestone"] == "rules_complete":
         path = assessment["full_game"]
@@ -244,6 +255,8 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
         "changed_input_digest": canonical_digest(changes),
         "assessment_sha256": digest((root / ASSESSMENT).read_bytes()),
         "selected_families": sorted(selected),
+        "approved_failures": approved_failures,
+        "retained_measurement_applicability": retained_applicability,
     }
 
 

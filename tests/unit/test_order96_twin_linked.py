@@ -500,7 +500,16 @@ def test_sustained_d3_is_stable_across_twin_linked_resume_restore_and_replay(
             session = LocalGameSession.from_persistence_payload(checkpoint)
             assert session.to_persistence_payload() == checkpoint
             restored = True
-        submit_next(session, request, reroll=reroll)
+        submit_next(
+            session,
+            request,
+            reroll=reroll,
+            result_id_suffix=(
+                "order103-fixture-16-00"
+                if phase is BattlePhase.FIGHT and reroll
+                else "fixture-choice"
+            ),
+        )
     assert attack_completed(session)
     assert restored
     hits = attack_steps(session, "hit")

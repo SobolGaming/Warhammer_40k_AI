@@ -1,0 +1,110 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "dice",
+  "workload_id": "order96-optional-wound-rerolls-v1",
+  "base_revision": "133956de896c0db222158a086e672cc04649c096",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:81b436feba3835847aef40a9d90e94ad5ced81c6a62cc445583b7ace2f10247e",
+  "head_input_digest": "03f49ddff44dbaa9f6025082829b520ba8174c912cf301634ce7cc33a2652306",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0291fd08bb730575da8e064d519fdc083a22f27b98ab5aa5e076055dc5a18a46",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 137327259648,
+      "logical_cpus": 64,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "fc4fe1423d4864d251bf8f5b2c1eaf305b4f21a358cc668c8b5a20c166f75daf",
+    "fixture_sha256": "224bbdf483c0c15a9dc3ebc3f372ca7846f5da1c3089a3eef94d7dbb2db744f6",
+    "samples": {
+      "shooting/false": [
+        1.556530800065957,
+        1.5361449000192806,
+        1.5173681000014767,
+        1.540396000025794,
+        1.5217340999515727
+      ],
+      "shooting/true": [
+        1.5672311000525951,
+        1.5234771000687033,
+        1.7144476000685245,
+        1.570698200026527,
+        1.5288451999658719
+      ],
+      "fight/false": [
+        1.1584024999756366,
+        1.1558105000294745,
+        1.149602000019513,
+        1.1876077000051737,
+        1.164030099986121
+      ],
+      "fight/true": [
+        1.1921923999907449,
+        1.193662800011225,
+        1.2920114999869838,
+        1.2177539999829605,
+        1.1924160999478772
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:81b436feba3835847aef40a9d90e94ad5ced81c6a62cc445583b7ace2f10247e",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 137327259648,
+      "logical_cpus": 64,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "fc4fe1423d4864d251bf8f5b2c1eaf305b4f21a358cc668c8b5a20c166f75daf",
+    "fixture_sha256": "224bbdf483c0c15a9dc3ebc3f372ca7846f5da1c3089a3eef94d7dbb2db744f6",
+    "samples": {
+      "shooting/false": [
+        1.5709795999573544,
+        1.5251431999495253,
+        1.4727495000697672,
+        1.5592022000346333,
+        1.5292834000429139
+      ],
+      "shooting/true": [
+        1.5225489999866113,
+        1.616351000033319,
+        1.6257381999166682,
+        1.533544100006111,
+        1.5568770000245422
+      ],
+      "fight/false": [
+        1.0820498999673873,
+        1.021335000055842,
+        1.0243947999551892,
+        1.027455799980089,
+        1.02873209991958
+      ],
+      "fight/true": [
+        1.0310882000485435,
+        1.0317597000394017,
+        1.0402731999056414,
+        1.111611899919808,
+        1.0410161000909284
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": [
+    "Actual PR base133956de already implements Order96 optional wound rerolls. Same current driver/fixtures/lock execute against actual base and current runtimes; cross-version group payload/identity changes can alter deterministic dice history.",
+    "Four Shooting/Fight accept/decline cases retain five samples each. Setup and exact normal restore are separately reported; mandatory current-relative budgets apply to the unchanged pending-choice-through-first-attack-completion boundary.",
+    "Sustained-D3 is a separately registered existing hard-case companion, preserving12 original unique HIT contexts, one physical D3 per critical hit, submitted unique wound choices and accept/decline identity with no automatic weapon rerolls.",
+    "Original Order96 reports, workload hash pins and numeric checks remain historical and unchanged. Original Order10360-sample precision evidence and failed10236-case covered run remain retained, not relabeled after shared test-input repairs.",
+    "Host is actual declared provisional Windows hardware; no full-game, long-history or same-seed cross-version outcome equivalence claim. Every failed untimed preparation remains separate."
+  ]
+}

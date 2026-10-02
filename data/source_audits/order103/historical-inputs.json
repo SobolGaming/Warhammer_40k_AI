@@ -1,0 +1,93 @@
+{
+  "reviewed_commit": "8007555ef23e85c11d39b294acec02bd83fc3271",
+  "evidence_commit": "19f1c507541321b7c1ed04f80e2c1110a1fa786d",
+  "also_present_at_base": "133956de896c0db222158a086e672cc04649c096",
+  "purpose": "Authenticate unchanged original Order97 assertion inventory, not current Order103 semantic compliance. Current tests still execute in normal suites. Per-file Git revisions distinguish reviewed tests from evidence helpers introduced by Order97 itself. Later fixture/version repairs retain the original pinned assertions; Order101 helper provenance is its actual introduction revision, not the earlier reviewed commit.",
+  "current_evidence": "docs/ORDER_103_SCOPE_PLAN.md",
+  "files": [
+    {
+      "path": "tests/unit/test_phase13b_shooting_declarations.py",
+      "historical_path": "data/source_audits/order103/baseline/tests/unit/test_phase13b_shooting_declarations.py.txt",
+      "git_revision": "8007555ef23e85c11d39b294acec02bd83fc3271",
+      "git_path": "tests/unit/test_phase13b_shooting_declarations.py",
+      "sha256": "fbe5dff1543e140d933880844a52a8d63e4b0eaad2e7fdd309438abc5c1e3d69",
+      "bytes": 815634,
+      "order97_file_pin": "fbe5dff1543e140d933880844a52a8d63e4b0eaad2e7fdd309438abc5c1e3d69"
+    },
+    {
+      "path": "tests/unit/test_target_replacement.py",
+      "historical_path": "data/source_audits/order103/baseline/tests/unit/test_target_replacement.py.txt",
+      "git_revision": "8007555ef23e85c11d39b294acec02bd83fc3271",
+      "git_path": "tests/unit/test_target_replacement.py",
+      "sha256": "85334dd19d82ec8f113eba0cd7c6999fe961cd530d2192ed268a78a34db363a8",
+      "bytes": 48608,
+      "order97_file_pin": "85334dd19d82ec8f113eba0cd7c6999fe961cd530d2192ed268a78a34db363a8"
+    },
+    {
+      "path": "tests/unit/test_order97_attack_evidence.py",
+      "historical_path": "data/source_audits/order103/baseline/tests/unit/test_order97_attack_evidence.py.txt",
+      "git_revision": "19f1c507541321b7c1ed04f80e2c1110a1fa786d",
+      "git_path": "tests/unit/test_order97_attack_evidence.py",
+      "sha256": "12a4057e5de809b5d048acf4df983333694e8f8df013cb3c356fb96d6ea95538",
+      "bytes": 13758,
+      "order97_file_pin": "12a4057e5de809b5d048acf4df983333694e8f8df013cb3c356fb96d6ea95538"
+    },
+    {
+      "path": "tests/order97_gap_probes_04_06.py",
+      "historical_path": "data/source_audits/order103/baseline/tests/order97_gap_probes_04_06.py.txt",
+      "git_revision": "19f1c507541321b7c1ed04f80e2c1110a1fa786d",
+      "git_path": "tests/order97_gap_probes_04_06.py",
+      "sha256": "86c4fa69223ac2bff187cbc4f8655f80ea2af1e81b0d17e50aa53445d861023c",
+      "bytes": 8734,
+      "order97_file_pin": "86c4fa69223ac2bff187cbc4f8655f80ea2af1e81b0d17e50aa53445d861023c"
+    },
+    {
+      "path": "tests/unit/test_lethal_hits.py",
+      "git_revision": "8007555ef23e85c11d39b294acec02bd83fc3271",
+      "git_path": "tests/unit/test_lethal_hits.py",
+      "sha256": "e1420132cd93943381e99b7f3ffd789ac834ba3a78e1ebbc61f4c1193b3b2ca5",
+      "bytes": 22456,
+      "historical_path": "data/source_audits/order103/baseline/tests/unit/test_lethal_hits.py.txt",
+      "order97_file_pin": "e1420132cd93943381e99b7f3ffd789ac834ba3a78e1ebbc61f4c1193b3b2ca5"
+    },
+    {
+      "path": "tests/unit/test_order96_twin_linked.py",
+      "git_revision": "8007555ef23e85c11d39b294acec02bd83fc3271",
+      "git_path": "tests/unit/test_order96_twin_linked.py",
+      "sha256": "4cd357c8cdc4f217cb17fe20c7015c1e65f7df89c49a4ef0b0ed9935463e2c16",
+      "bytes": 24575,
+      "historical_path": "data/source_audits/order103/baseline/tests/unit/test_order96_twin_linked.py.txt",
+      "order97_file_pin": "4cd357c8cdc4f217cb17fe20c7015c1e65f7df89c49a4ef0b0ed9935463e2c16"
+    },
+    {
+      "path": "tests/unit/test_phase11e_mission_scoring_cleanup.py",
+      "git_revision": "8007555ef23e85c11d39b294acec02bd83fc3271",
+      "git_path": "tests/unit/test_phase11e_mission_scoring_cleanup.py",
+      "sha256": "0bb56db81c16794d86833ec8fe5a1a976fcbbcd4895fb31e3ee14052a546aaa3",
+      "bytes": 511731,
+      "historical_path": "data/source_audits/order103/baseline/tests/unit/test_phase11e_mission_scoring_cleanup.py.txt",
+      "order97_file_pin": "0bb56db81c16794d86833ec8fe5a1a976fcbbcd4895fb31e3ee14052a546aaa3"
+    },
+    {
+      "path": "tests/order101_failed_setup_helpers.py",
+      "git_revision": "38ce2265b81f2c0b2c9c668dae7536c239095193",
+      "git_path": "tests/order101_failed_setup_helpers.py",
+      "sha256": "6c387f7d7c5975fbb9960c862b62b33fd75b6349e3fe5f39d3e0cdff39d36211",
+      "bytes": 43050,
+      "historical_path": "data/source_audits/order103/baseline/tests/order101_failed_setup_helpers.py.txt",
+      "order97_file_pin": "6c387f7d7c5975fbb9960c862b62b33fd75b6349e3fe5f39d3e0cdff39d36211"
+    },
+    {
+      "path": "tests/twin_linked_helpers.py",
+      "git_revision": "8007555ef23e85c11d39b294acec02bd83fc3271",
+      "git_path": "tests/twin_linked_helpers.py",
+      "sha256": "0333b151949c7761cde49283709e8edad5586725c75ee71611267b1bb600c8d5",
+      "bytes": 11947,
+      "historical_path": "data/source_audits/order103/baseline/tests/twin_linked_helpers.py.txt",
+      "order97_file_pin": "0333b151949c7761cde49283709e8edad5586725c75ee71611267b1bb600c8d5"
+    }
+  ],
+  "addressed_requirements": [
+    "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01"
+  ]
+}

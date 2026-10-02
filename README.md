@@ -2,6 +2,11 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 103 / P04G groups otherwise identical PRECISION and plain attacks when
+the selected target has no CHARACTER. Physical weapons and selected sources
+remain intact; recorded group context survives casualties, restore and replay.
+See [source, scope and evidence](docs/ORDER_103_SCOPE_PLAN.md).
+
 Order 102 / P04F separates completing a Fight selection from actually making melee
 attacks. Empty selections remain consumed, do not open after-fought windows, and
 retain Fight On Death models until phase-end cleanup. Armed retained cleanup,

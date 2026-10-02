@@ -1028,7 +1028,7 @@ def test_ecstatic_death_chain_uses_ordinary_fight_alternation_without_nesting() 
     status = session.submit_option(
         request_id=request.request_id,
         option_id=retained_option_id,
-        result_id="ecstatic-death-chain:retained-activation",
+        result_id="order103-fixture-03-00",
     )
     status = _advance_ecstatic_death_session(
         session=session,

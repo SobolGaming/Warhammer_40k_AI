@@ -7354,3 +7354,21 @@ replace Twin-linked's former unsubmitted `weapon_ability_reroll_resolved` event.
 Contract 42's existing dice decision, source-context and event envelopes already
 cover these payloads, so no schema version changes. Exact engine-build matching
 continues to reject incompatible old saves/replays without a migration shim.
+
+
+## Order 103: target-aware PRECISION grouping (Contract 43)
+
+Gathered attack-group payloads require `target_has_character: boolean`. It is the
+canonical target rules unit's membership at grouping and participates in the group
+ID. Otherwise identical physical attacks differing only by PRECISION group together
+when false; CHARACTER targets preserve the distinction. Physical contribution
+identities and source profiles are unchanged. Other effects, Firing Deck, observer,
+range and visibility remain part of the existing signature.
+
+Current pending selections compare the exact engine-generated context before
+mutation. A selected group's context remains historical through casualties and
+random defensive-profile reconstruction. Unresolved target replacement rebuilds
+pools and queries its new canonical target; already gathered attacks are not
+retargeted. Both facades, viewers, persistence and replay share these owners.
+Clients copy engine options and must discard old cached group IDs. See the
+[43 migration](../contracts/migrations/42-to-43.md) for family versions and support.

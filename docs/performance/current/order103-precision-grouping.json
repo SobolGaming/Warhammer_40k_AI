@@ -1,0 +1,138 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "precision_grouping",
+  "workload_id": "order103-target-aware-precision-v1",
+  "base_revision": "133956de896c0db222158a086e672cc04649c096",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:81b436feba3835847aef40a9d90e94ad5ced81c6a62cc445583b7ace2f10247e",
+  "head_input_digest": "03f49ddff44dbaa9f6025082829b520ba8174c912cf301634ce7cc33a2652306",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0291fd08bb730575da8e064d519fdc083a22f27b98ab5aa5e076055dc5a18a46",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 137327259648,
+      "logical_cpus": 64,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "0b0e63cba0ef8457f20ba2aa5bb4028018ef11b4a0e2cc932868534bbc76a5db",
+    "fixture_sha256": "224bbdf483c0c15a9dc3ebc3f372ca7846f5da1c3089a3eef94d7dbb2db744f6",
+    "samples": {
+      "plain_primary/group_request": [
+        0.00035310001112520695,
+        0.00032700004521757364,
+        0.0003073000116273761,
+        0.0003021000884473324,
+        0.000354300020262599
+      ],
+      "precision_primary/group_request": [
+        0.0003434000536799431,
+        0.00032240001019090414,
+        0.00032650004141032696,
+        0.00030780001543462276,
+        0.0003005999606102705
+      ],
+      "character_target/group_request": [
+        0.00035580003168433905,
+        0.0003139000618830323,
+        0.0003205999964848161,
+        0.00031779997516423464,
+        0.0003361999988555908
+      ],
+      "selected_precision_source/group_request": [
+        0.0003568000392988324,
+        0.00031779997516423464,
+        0.00033059995621442795,
+        0.00031210004817694426,
+        0.0003206999972462654
+      ],
+      "selected_random_source/restore": [
+        5.002039800048806,
+        4.821905000018887,
+        4.91893079993315,
+        5.025398300029337,
+        5.047554800054058
+      ],
+      "completed_random_source/replay": [
+        1.638636099989526,
+        1.727919099968858,
+        1.6303338999859989,
+        1.6212053999770433,
+        1.7083530999952927
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:81b436feba3835847aef40a9d90e94ad5ced81c6a62cc445583b7ace2f10247e",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 137327259648,
+      "logical_cpus": 64,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "0b0e63cba0ef8457f20ba2aa5bb4028018ef11b4a0e2cc932868534bbc76a5db",
+    "fixture_sha256": "224bbdf483c0c15a9dc3ebc3f372ca7846f5da1c3089a3eef94d7dbb2db744f6",
+    "samples": {
+      "plain_primary/group_request": [
+        0.0003035999834537506,
+        0.00027189997490495443,
+        0.00029340002220124006,
+        0.00026919995434582233,
+        0.0003613000735640526
+      ],
+      "precision_primary/group_request": [
+        0.0003038999857380986,
+        0.00026839994825422764,
+        0.000265000038780272,
+        0.0002761998912319541,
+        0.0002581999870017171
+      ],
+      "character_target/group_request": [
+        0.0006768000312149525,
+        0.0005484999855980277,
+        0.0005001999670639634,
+        0.00047940004151314497,
+        0.0005213000113144517
+      ],
+      "selected_precision_source/group_request": [
+        0.0003864000318571925,
+        0.00033109996002167463,
+        0.00032400002237409353,
+        0.00031759997364133596,
+        0.00032659992575645447
+      ],
+      "selected_random_source/restore": [
+        5.144628899986856,
+        4.904762399964966,
+        4.959868300007656,
+        5.027481000055559,
+        4.958525400026701
+      ],
+      "completed_random_source/replay": [
+        1.7981580999912694,
+        1.7150975000113249,
+        1.7906287999358028,
+        1.6694052000530064,
+        1.6749804000137374
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": [
+    "Actual base incorrectly separates PRECISION/plain attacks against a no-CHARACTER target, including accepted duplicate-Precision source identity. It is a cost reference, not a correctness oracle; each runtime creates its own history with identical current fixtures.",
+    "Six successful matched operations use five samples per runtime. Fresh grouping inputs are components reconstructed from accepted physical pools and initial canonical state, not live pending facade checkpoints. Selected random-profile restore uses the same physical Precision source but one versus two grouped contributions; complete replay resolves all four physical HIT attempts.",
+    "Two untimed base preparation traces show that the original result identity completes the Precision group before the next pause. The fixed already-demonstrated diagnostic choice reaches the intended pending source-group checkpoint. Both histories and the failed preflight remain preserved; no timing samples were discarded or measured before this adjustment.",
+    "Repeated independent operations use warm prepared inputs; setup, JSON transport, artifact capture and correctness assertions are excluded. Current whole-process serial smoke remains mandatory. No full-game certification, cold-start or long-history scalability claim is made.",
+    "Original historical measurements, numeric budgets and Order97 evidence remain unchanged. Failed illegal Torrent+Precision/model-ID/other fixture preparations are not gameplay passes; the two normal grouping reds and all subsequent corrections retain exact-input receipts."
+  ]
+}
