@@ -22,9 +22,14 @@ from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
+    BattlefieldTransitionBatch,
     ModelDisplacementKind,
     ModelPlacement,
     UnitPlacement,
+)
+from warhammer40k_core.engine.battlefield_transition_history import (
+    AUTHORITATIVE_BATTLEFIELD_TRANSITION_EVENT_TYPES,
+    authoritative_battlefield_transition_batch_or_none,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_record import DecisionRecord
@@ -40,7 +45,7 @@ from warhammer40k_core.engine.deployment import (
     create_empty_deployment_battlefield_state,
 )
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
@@ -2643,3 +2648,61 @@ def _unit_source_for_id(
             if unit.unit_instance_id == unit_instance_id:
                 return army, unit
     raise GameLifecycleError("Unit was not mustered.")
+
+
+@pytest.mark.parametrize("event_type", sorted(AUTHORITATIVE_BATTLEFIELD_TRANSITION_EVENT_TYPES))
+def test_physical_history_reads_each_registered_transition_shape(event_type: str) -> None:
+    batch = BattlefieldTransitionBatch()
+    payload: dict[str, JsonValue] = {"transition_batch": validate_json_value(batch.to_payload())}
+    if event_type == "prebattle_scout_move_completed":
+        payload = {"resolution": payload}
+    event = EventRecord(event_id="physical-history", event_type=event_type, payload=payload)
+    assert authoritative_battlefield_transition_batch_or_none(event=event) == batch
+
+
+@pytest.mark.parametrize(
+    ("payload", "message"),
+    [
+        (None, "event payload is invalid"),
+        ({}, "resolution is invalid"),
+        ({"resolution": []}, "resolution is invalid"),
+        ({"resolution": {}}, "batch is invalid"),
+        ({"resolution": {"transition_batch": None}}, "batch is invalid"),
+        ({"resolution": {"transition_batch": []}}, "batch is invalid"),
+        ({"resolution": {"transition_batch": {}}}, "batch is invalid"),
+    ],
+)
+def test_scout_physical_history_rejects_malformed_transition(
+    payload: JsonValue, message: str
+) -> None:
+    event = EventRecord(
+        event_id="physical-history", event_type="prebattle_scout_move_completed", payload=payload
+    )
+    with pytest.raises(GameLifecycleError, match=message):
+        authoritative_battlefield_transition_batch_or_none(event=event)
+
+
+def test_physical_history_keeps_nonphysical_and_optional_batch_controls() -> None:
+    controls: tuple[tuple[str, JsonValue], ...] = (
+        ("prebattle_action_recorded", {"resolution": {"transition_batch": []}}),
+        ("movement_activation_completed", {}),
+        ("movement_activation_completed", {"transition_batch": None}),
+    )
+    for event_type, payload in controls:
+        event = EventRecord(
+            event_id="physical-history", event_type=event_type, payload=validate_json_value(payload)
+        )
+        assert authoritative_battlefield_transition_batch_or_none(event=event) is None
+    malformed_payloads: tuple[JsonValue, ...] = (
+        None,
+        {"transition_batch": []},
+        {"transition_batch": {}},
+    )
+    for malformed_payload in malformed_payloads:
+        event = EventRecord(
+            event_id="physical-history",
+            event_type="movement_activation_completed",
+            payload=validate_json_value(malformed_payload),
+        )
+        with pytest.raises(GameLifecycleError, match="Battlefield transition"):
+            authoritative_battlefield_transition_batch_or_none(event=event)

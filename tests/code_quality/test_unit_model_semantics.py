@@ -1235,6 +1235,27 @@ def test_fight_movement_restore_authenticates_target_authority_at_the_right_boun
 
 
 def test_battlefield_transition_history_has_one_shared_event_registry() -> None:
+    registry = ast.parse((ENGINE / "battlefield_transition_history.py").read_text(encoding="utf-8"))
+    scout = _function_node(path=ENGINE / "scout_movement.py", function_name="apply_scout_move")
+    completed_events = {
+        node.args[0].value
+        for node in ast.walk(scout)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "append"
+        and node.args
+        and isinstance(node.args[0], ast.Constant)
+        and isinstance(node.args[0].value, str)
+    }
+    registered_events = {
+        element.value
+        for node in ast.walk(registry)
+        if isinstance(node, ast.Set)
+        for element in node.elts
+        if isinstance(element, ast.Constant)
+    }
+    assert completed_events == {"prebattle_scout_move_completed"}
+    assert completed_events <= registered_events
     consumer = _function_node(
         path=PRIMARY_MISSION_BOUNDARY_PHYSICAL_AUTHORITY,
         function_name="_physical_authority_by_model",

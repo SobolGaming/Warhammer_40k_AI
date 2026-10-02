@@ -1587,6 +1587,49 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "issue535-scout-transition-history": {
+      "paths": [
+        "src/warhammer40k_core/engine/battlefield_transition_history.py"
+      ],
+      "owners": [
+        "@module",
+        "authoritative_battlefield_transition_batch_or_none"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "issue535-scout-facade-regression": {
+      "paths": [
+        "tests/integration/test_setup_prebattle_ui_smoke.py"
+      ],
+      "owners": [
+        "@module",
+        "_assert_scout_checkpoint_round_trip",
+        "_event_companion_prebattle_pose",
+        "_scout_facade_config",
+        "_scout_facade_session",
+        "test_scout_facade_rejections_preserve_all_components_and_allow_retry",
+        "test_scout_history_restores_both_players_and_independent_fork"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "issue535-scout-history-regression": {
+      "paths": [
+        "tests/unit/test_phase16b_prebattle.py"
+      ],
+      "owners": [
+        "@module",
+        "test_physical_history_keeps_nonphysical_and_optional_batch_controls",
+        "test_physical_history_reads_each_registered_transition_shape",
+        "test_scout_physical_history_rejects_malformed_transition"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

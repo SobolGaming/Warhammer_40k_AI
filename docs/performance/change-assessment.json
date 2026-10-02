@@ -1,268 +1,196 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "d5185e4dcb28d67e45f513423378071e350f1f81",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bf8a1f6687e2b8983c3f161350dfef277d53169ea2fdf313bc03742df018a48b",
-  "operation_map_sha256": "1bc5581a916cd693e44fe4ccef84b6fec0fdd41f756cc1db3d795def2dd1e062",
+  "base": "ff0b2db17106e7e0493929d6ab9ddb15c44aa476",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:88213efa85870baf8a965f488f0b87ca4fbf2d604a5f49af32cf7f068a3c798f",
+  "operation_map_sha256": "0e2150bb8a9079779b52edc8235776263ad2a66a28ae3aeeb7b0efbd797360c4",
   "changes": {
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "b33dc2ba31aa8a74f8990e7c4498e9c62498d504e7688b626f722ea32d02e87e",
-      "after_sha256": "346df1d4c34a573329d672c3b62893f84fb752a0880484012103af06319f0209",
+      "before_sha256": "346df1d4c34a573329d672c3b62893f84fb752a0880484012103af06319f0209",
+      "after_sha256": "6b01ba1a7e8d0ef7f378a001e5dbe96413d22f03350a0e2de4c7e97dc9f916b6",
       "owners": {
         "@document": {
-          "before": "b33dc2ba31aa8a74f8990e7c4498e9c62498d504e7688b626f722ea32d02e87e",
-          "after": "346df1d4c34a573329d672c3b62893f84fb752a0880484012103af06319f0209"
+          "before": "346df1d4c34a573329d672c3b62893f84fb752a0880484012103af06319f0209",
+          "after": "6b01ba1a7e8d0ef7f378a001e5dbe96413d22f03350a0e2de4c7e97dc9f916b6"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "d4c4f06640e7d191aa575847c91a698f1283532f99192bd7db503e2b270e1d32",
-      "after_sha256": "b63a62d1a5f2de2e08ba0ecd8122e590cc4e4dc2d45f82d647fda23b3fe2fe54",
+      "before_sha256": "b63a62d1a5f2de2e08ba0ecd8122e590cc4e4dc2d45f82d647fda23b3fe2fe54",
+      "after_sha256": "da779dcb0cfe883bd040fd1c32f89b1fd84f3e5b6dee893d6f434f8fb4114b77",
       "owners": {
         "@document": {
-          "before": "d4c4f06640e7d191aa575847c91a698f1283532f99192bd7db503e2b270e1d32",
-          "after": "b63a62d1a5f2de2e08ba0ecd8122e590cc4e4dc2d45f82d647fda23b3fe2fe54"
+          "before": "b63a62d1a5f2de2e08ba0ecd8122e590cc4e4dc2d45f82d647fda23b3fe2fe54",
+          "after": "da779dcb0cfe883bd040fd1c32f89b1fd84f3e5b6dee893d6f434f8fb4114b77"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "0aea42872e45b0eecfa208e8e1097e62fc04da911e66dcb9709c7a152db27361",
-      "after_sha256": "cbfd27b2f30e9c5ef2c1973dd5d3f72b39ed360a7408c24071d0896f227818a2",
+      "before_sha256": "cbfd27b2f30e9c5ef2c1973dd5d3f72b39ed360a7408c24071d0896f227818a2",
+      "after_sha256": "c919f0c1283088b67800c6d35b78084adb43b160af0fb7338271b67634c5ad8c",
       "owners": {
         "@document": {
-          "before": "0aea42872e45b0eecfa208e8e1097e62fc04da911e66dcb9709c7a152db27361",
-          "after": "cbfd27b2f30e9c5ef2c1973dd5d3f72b39ed360a7408c24071d0896f227818a2"
+          "before": "cbfd27b2f30e9c5ef2c1973dd5d3f72b39ed360a7408c24071d0896f227818a2",
+          "after": "c919f0c1283088b67800c6d35b78084adb43b160af0fb7338271b67634c5ad8c"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "922ed56d1230c68685b507525baa7dba4f6740194198199781f0965aa76968ef",
-      "after_sha256": "f63f044fd02ab208c803223b83adbeed5e16734c20d88c615e03c4d2250b1dbc",
+      "before_sha256": "f63f044fd02ab208c803223b83adbeed5e16734c20d88c615e03c4d2250b1dbc",
+      "after_sha256": "2588fa7b36c29947a62cb1916ab219d0822c34535479791e35745f566f089c7b",
       "owners": {
         "@document": {
-          "before": "922ed56d1230c68685b507525baa7dba4f6740194198199781f0965aa76968ef",
-          "after": "f63f044fd02ab208c803223b83adbeed5e16734c20d88c615e03c4d2250b1dbc"
+          "before": "f63f044fd02ab208c803223b83adbeed5e16734c20d88c615e03c4d2250b1dbc",
+          "after": "2588fa7b36c29947a62cb1916ab219d0822c34535479791e35745f566f089c7b"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "b202303cf35f1724d5ada45bca54310c9aa244c40fe6b844034ab04e4576d941",
-      "after_sha256": "e9a60eed64bbee72d91190289be5902a448bbefd6a4102d409536e5ce4c72467",
+      "before_sha256": "e9a60eed64bbee72d91190289be5902a448bbefd6a4102d409536e5ce4c72467",
+      "after_sha256": "bc4dfd3072b63c54f13f17b21179b43755790d611890df8ff7113676f629d923",
       "owners": {
         "@document": {
-          "before": "b202303cf35f1724d5ada45bca54310c9aa244c40fe6b844034ab04e4576d941",
-          "after": "e9a60eed64bbee72d91190289be5902a448bbefd6a4102d409536e5ce4c72467"
+          "before": "e9a60eed64bbee72d91190289be5902a448bbefd6a4102d409536e5ce4c72467",
+          "after": "bc4dfd3072b63c54f13f17b21179b43755790d611890df8ff7113676f629d923"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "5ffab2debbbfa3c2c53c8334cf70952634c5e03c12d3ddf75174490d2e77ae80",
-      "after_sha256": "f49b506e4f68529bb71a9612ae2faba22eb91ab0bb2250c2571d285fe50c1d41",
+      "before_sha256": "f49b506e4f68529bb71a9612ae2faba22eb91ab0bb2250c2571d285fe50c1d41",
+      "after_sha256": "81d14779ba85a2d5435032e1aa7f17467385b9e41760ac5b7a203c6cf68ac36f",
       "owners": {
         "@document": {
-          "before": "5ffab2debbbfa3c2c53c8334cf70952634c5e03c12d3ddf75174490d2e77ae80",
-          "after": "f49b506e4f68529bb71a9612ae2faba22eb91ab0bb2250c2571d285fe50c1d41"
+          "before": "f49b506e4f68529bb71a9612ae2faba22eb91ab0bb2250c2571d285fe50c1d41",
+          "after": "81d14779ba85a2d5435032e1aa7f17467385b9e41760ac5b7a203c6cf68ac36f"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "87ff10ad08016c891c10af9141ffb1682d476945757f58ccc4de9937b83d1025",
-      "after_sha256": "03bbee8d41e596037be170c196043c240d4aa73166aa69abb685931620076a49",
+      "before_sha256": "03bbee8d41e596037be170c196043c240d4aa73166aa69abb685931620076a49",
+      "after_sha256": "092858832eab801115b4b7ad2000f51e46dfa77a17a717cebe98e0321e063777",
       "owners": {
         "@document": {
-          "before": "87ff10ad08016c891c10af9141ffb1682d476945757f58ccc4de9937b83d1025",
-          "after": "03bbee8d41e596037be170c196043c240d4aa73166aa69abb685931620076a49"
+          "before": "03bbee8d41e596037be170c196043c240d4aa73166aa69abb685931620076a49",
+          "after": "092858832eab801115b4b7ad2000f51e46dfa77a17a717cebe98e0321e063777"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "e74bbf63f98eb7f985eb06e1d5dbf3f189235c238056f3cc7eeee04a535f8e0e",
-      "after_sha256": "07d486f5672b563c8ec86d007b7111065ffaa68eabaf89306dea1f37e70f0034",
+      "before_sha256": "07d486f5672b563c8ec86d007b7111065ffaa68eabaf89306dea1f37e70f0034",
+      "after_sha256": "ae33473e49b3920af4805ebeda57b2cc0177617e9d589ce715ebc9f9d61c2e2b",
       "owners": {
         "@document": {
-          "before": "e74bbf63f98eb7f985eb06e1d5dbf3f189235c238056f3cc7eeee04a535f8e0e",
-          "after": "07d486f5672b563c8ec86d007b7111065ffaa68eabaf89306dea1f37e70f0034"
+          "before": "07d486f5672b563c8ec86d007b7111065ffaa68eabaf89306dea1f37e70f0034",
+          "after": "ae33473e49b3920af4805ebeda57b2cc0177617e9d589ce715ebc9f9d61c2e2b"
         }
       }
     },
-    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "9f862279ff4e17f46d146d7e39e4f2b8a8e8c913b6b346d4fd25b986e32c2708",
-      "after_sha256": "2af9873d25c146519ecb7a86a65cb77607acc166dbfe94dc3ec12c531ec88b38",
+    "docs/ISSUE_535_SCOUT_HISTORY.md": {
+      "before_sha256": null,
+      "after_sha256": "4e2591bb480947ae3c7afaaf18b59292e73efec66a6de4c56ded0e3a8efe2790",
       "owners": {
         "@document": {
-          "before": "9f862279ff4e17f46d146d7e39e4f2b8a8e8c913b6b346d4fd25b986e32c2708",
-          "after": "2af9873d25c146519ecb7a86a65cb77607acc166dbfe94dc3ec12c531ec88b38"
-        }
-      }
-    },
-    "docs/PR_BACKLOG_2026_09_30.md": {
-      "before_sha256": "cc90c5e4ca7528176ef5f6e8e14227496c6e97f06835374c7c890c9abbba63b4",
-      "after_sha256": "7f6b9cd98cd0ecc2fd9c770a3859760cb2dc57cbaec0103c98e2edf52b1e923b",
-      "owners": {
-        "@document": {
-          "before": "cc90c5e4ca7528176ef5f6e8e14227496c6e97f06835374c7c890c9abbba63b4",
-          "after": "7f6b9cd98cd0ecc2fd9c770a3859760cb2dc57cbaec0103c98e2edf52b1e923b"
-        }
-      }
-    },
-    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
-      "before_sha256": "cfc2c765eb3e9042aa748d19cc4e59ac68b10d99c83fce1190a94e8aaf5cda86",
-      "after_sha256": "7ab2e78e1d70b5df63cd4ccacd830fa098cfa735aa31358695bdc6675da844f8",
-      "owners": {
-        "@document": {
-          "before": "cfc2c765eb3e9042aa748d19cc4e59ac68b10d99c83fce1190a94e8aaf5cda86",
-          "after": "7ab2e78e1d70b5df63cd4ccacd830fa098cfa735aa31358695bdc6675da844f8"
+          "before": null,
+          "after": "4e2591bb480947ae3c7afaaf18b59292e73efec66a6de4c56ded0e3a8efe2790"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "7c2a894334441182d50d675170a27f4335984609a16e94f0e7c58fd02793e1e7",
-      "after_sha256": "d0cb2ab96a2bddc3aa68c03d36adee62c541e698c4798206a2c97a8353f51452",
+      "before_sha256": "d0cb2ab96a2bddc3aa68c03d36adee62c541e698c4798206a2c97a8353f51452",
+      "after_sha256": "47e3a337bc3b3ec48779a889a85f3e80f9d240468f89817fcf77651db431f3dd",
       "owners": {
         "@document": {
-          "before": "7c2a894334441182d50d675170a27f4335984609a16e94f0e7c58fd02793e1e7",
-          "after": "d0cb2ab96a2bddc3aa68c03d36adee62c541e698c4798206a2c97a8353f51452"
+          "before": "d0cb2ab96a2bddc3aa68c03d36adee62c541e698c4798206a2c97a8353f51452",
+          "after": "47e3a337bc3b3ec48779a889a85f3e80f9d240468f89817fcf77651db431f3dd"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "e955142b231d5bd28fba6fce313f3ccabdd7c71970c8bc1b22acfe9e496ee636",
-      "after_sha256": "2eff6610f2a563dc7d4ad32615d051c22ad45eb1049a15049ec4f6f3ed915751",
+      "before_sha256": "2eff6610f2a563dc7d4ad32615d051c22ad45eb1049a15049ec4f6f3ed915751",
+      "after_sha256": "934bb18175b73def0368471b735f3fe9cb4eb1ef5548d0c2d395c8633ffed004",
       "owners": {
         "@document": {
-          "before": "e955142b231d5bd28fba6fce313f3ccabdd7c71970c8bc1b22acfe9e496ee636",
-          "after": "2eff6610f2a563dc7d4ad32615d051c22ad45eb1049a15049ec4f6f3ed915751"
+          "before": "2eff6610f2a563dc7d4ad32615d051c22ad45eb1049a15049ec4f6f3ed915751",
+          "after": "934bb18175b73def0368471b735f3fe9cb4eb1ef5548d0c2d395c8633ffed004"
         }
       }
     },
-    "src/warhammer40k_core/engine/prebattle.py": {
-      "before_sha256": "1bdd67eae34fd90e09995c1e4528a04b5554b30d9172b956d9a5450eff2a0ba5",
-      "after_sha256": "9196429c672020be365eb1e2191033c29c5203501602bcecf0c5991e518d98bf",
+    "src/warhammer40k_core/engine/battlefield_transition_history.py": {
+      "before_sha256": "1e120d57e704b69ee1f5543c0ccdf3c6f3825c13af1fdab7e05ddfe2eb011fde",
+      "after_sha256": "e870351317260470589c1b2b7dd2e8847800f232b711e7be88664fd816d079e1",
       "owners": {
         "@module": {
-          "before": "c0ead39bd3e0a4f748e25bbf3493a5603893a03d78cffbcbf692fb504a412a8f",
-          "after": "09646b7402937f777113e31e0d9fcdba25444872a40e25f1dbec8bc2684f5954"
+          "before": "ed29b6706a333c7d4dc87ae4966ac4fd8759bc86d92452a844b2092e0e81e8cc",
+          "after": "3d27d81663d9ca5412c231084c3c2c1db13f42b88daa47a50b3f25ae7de97423"
         },
-        "_append_scout_enemy_distance_violations": {
-          "before": "244d30dd81840735c1e41463a154fdf3d37d478a904608ddea0b6bd3cc92f963",
-          "after": null
-        },
-        "_enemy_geometry_models_for_player": {
-          "before": "c5ec7225f857c9fd27f9629478a0b8f83733f194941a965de512d1089400c070",
-          "after": null
-        },
-        "_resolve_scout_move": {
-          "before": "6a4ad3be3a8c0e4120e3c79578ea1ec98d3da4cce4c325129f860cb77d65bbc2",
-          "after": null
-        },
-        "_start_is_eligible_for_scout_move": {
-          "before": "b71893183bc89f9ae93b8f4929616b80c4dbc762b680ee6e186f7d2594771109",
-          "after": null
-        },
-        "apply_scout_move": {
-          "before": "6015c3142c216bfa4e04df9a446c59a28cf6599a042b3743266612c08c13d202",
-          "after": null
-        },
-        "enemy_geometry_models_for_player": {
-          "before": null,
-          "after": "93bf9e42a78c1863c803311f6f27afb1806efc5ee33b1ec8c8d76ce28bb162db"
-        },
-        "start_is_eligible_for_scout_move": {
-          "before": null,
-          "after": "48fec8502a3af072d11d6bc9ca7f1fb398f8e2e2591ca83dc4b00a83a44cf561"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/scout_movement.py": {
-      "before_sha256": null,
-      "after_sha256": "0cf110b016418fed43deb9b78cfa7dc6ac540a711d469caae40bbe1c64d519ce",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "e8f2e42a676b07bf5b68f10c0452b9085c3c1628634f6d71e68c55dc637064ee"
-        },
-        "_append_scout_enemy_distance_violations": {
-          "before": null,
-          "after": "c5a3924862e1947a8a5b69511e2f2c502a2f4c551ab5b29b115f8975ed65b47c"
-        },
-        "_scout_endpoint_placement": {
-          "before": null,
-          "after": "da77008b612ec4686320ddcc8e2d027a773042dd04db047431b0c7c560745465"
-        },
-        "apply_scout_move": {
-          "before": null,
-          "after": "79efdb298a845b6f011ca03ff0048044224fbe40dc7ed633dce60c827c8d0f72"
-        },
-        "resolve_scout_move": {
-          "before": null,
-          "after": "0638051539da58bf8c356c94cb17d59efa495afd219b2d1e64776449f28e8a52"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/scout_movement_paths.py": {
-      "before_sha256": "441ab5b737e013674805fb7eac63ec8b64a62d4d08d464818d302307a0add6c5",
-      "after_sha256": "88b4cc4a69b0712f4836dbcf58decabbfecb10864bca3031f435e7b47864b0c9",
-      "owners": {
-        "@module": {
-          "before": "d423c39046766c0f0b1aa6d4ed089a241c016817a1b5902a192cf59464768ed4",
-          "after": "8b41201786fd21f018e6727845cda4b79d18257088fd24a051b72537f802e034"
-        },
-        "_friendly_geometry_models_for_path": {
-          "before": "5564f3b54613faaf01f1ebe57b37f5a9739767ca57565d56247277acc97e9891",
-          "after": "358a94856113c502ea9905e6524b46238862f44603babe8f2181fed6e9589b8c"
-        },
-        "append_scout_path_violations": {
-          "before": "f62ad41fb41bc70c63be52efe70dbf75add1659bed258d6a78ed30997ca20423",
-          "after": "800b6b6bd889ac2bd43349b659d7ecdb887b70c778665c5553f311f129e726c4"
-        }
-      }
-    },
-    "tests/code_quality/test_module_size_policy.py": {
-      "before_sha256": "757557113234da539424f6f3944af13bcceb0a587dd4a3fc404c1cee7879e385",
-      "after_sha256": "dab57828427036dbaad9efa026692ddd1e618bf4f7dc52ad916836a353a5e3e7",
-      "owners": {
-        "@module": {
-          "before": "c97ee3177abf79e9bd0f5c2fd4208d160b59b5aab5796edae30464cf435dad4f",
-          "after": "9ce1733b07da103932f3a842d9e1baaeb871747991c48480a5290862521a39a2"
+        "authoritative_battlefield_transition_batch_or_none": {
+          "before": "a0aeb1ade3a012fa5abd30789779dcf5cff6c038fdcb05581784d1cd916bf288",
+          "after": "c907827cc2199355613c3869281eb30b65d1901703a6a74b47c0f3a40970b296"
         }
       }
     },
     "tests/code_quality/test_unit_model_semantics.py": {
-      "before_sha256": "e9b3c6a60a9706f584a220a3700442042212548135e073eefb4785c0c5d20b7f",
-      "after_sha256": "b4cc21df551e75a72d8ea77260b628b540d0cc9dd8c1a16b0b06c195fd672630",
+      "before_sha256": "b4cc21df551e75a72d8ea77260b628b540d0cc9dd8c1a16b0b06c195fd672630",
+      "after_sha256": "33071929293071663d5efb9fa861da7506332323ffd9f582ab458c6e324ab7ed",
       "owners": {
-        "test_scout_validation_and_mutation_share_rules_unit_placement_authority": {
-          "before": null,
-          "after": "7d27b158c07983618ab66c7392b703c904c56fd9ed3919eda64ea30e9e6bc132"
+        "test_battlefield_transition_history_has_one_shared_event_registry": {
+          "before": "33e6d40a61a9ee73804bca321199b6ffc26416e014658d6ea0f8300b5137e13a",
+          "after": "386d9d2dfefd594cca312050049e5d95b3657847b9735b8a2502a51b2cb26950"
         }
       }
     },
     "tests/integration/test_setup_prebattle_ui_smoke.py": {
-      "before_sha256": "421452a2614da3d0e9ca6d125f772ff470ce32af4201c6ee2e7d90f30667fe7d",
-      "after_sha256": "1e9876fbad23bc7ed533e5bf99bb6de67dc216d3c6071c882fa7cd92ef565a0f",
+      "before_sha256": "1e9876fbad23bc7ed533e5bf99bb6de67dc216d3c6071c882fa7cd92ef565a0f",
+      "after_sha256": "52f98d973cb10b4d6608a079e4e790a50a8957f475f17ef1827e622a86ce30fe",
       "owners": {
         "@module": {
-          "before": "71279c3942ed6c03a60d503227ff3eba8ca0b47a2bc93e481c727f86ed91d8f6",
-          "after": "3348da3461a6cfd69c3d422e511f584d74894399dd7573d757c15b8b8cb5f086"
+          "before": "3348da3461a6cfd69c3d422e511f584d74894399dd7573d757c15b8b8cb5f086",
+          "after": "d97cd3f0c0e1479958d5c87b172da33ec24af17235cfbf5a3567c9508fb24e68"
+        },
+        "_assert_scout_checkpoint_round_trip": {
+          "before": null,
+          "after": "bcd2bb4240514b68069233936e7536e4645beedbcd2bb02bf942ff2f91cacb26"
+        },
+        "_event_companion_prebattle_pose": {
+          "before": "775e156af2d8479bb59fe407a7c217f0a7428a501f599c88ba575fcd4fc675ac",
+          "after": "89b93301a1f0e0fe0bd9cbbfe244a311953cf38ff41618a5885a4ddd9e0903a6"
         },
         "_scout_facade_config": {
-          "before": null,
-          "after": "c9d95be30130db67e62e14effef781b88d126cea128cdbbf8108af045f41529a"
+          "before": "c9d95be30130db67e62e14effef781b88d126cea128cdbbf8108af045f41529a",
+          "after": "7f5bf11c2182234d4771cfbe33a71f0bcefcd868a4fc1322add497eb7d91689c"
         },
         "_scout_facade_session": {
-          "before": null,
-          "after": "9a034a04bb47141c28a6c2defd2276b580773318d5cb2faa190ff1cd05797c20"
-        },
-        "_scout_witness": {
-          "before": "7cf981ca54cf5a0793754867bf4722f5389fd684577e9c29a4c91a94afe07064",
-          "after": "3b655d461a1aae6eda67c8153bdef0e802f44f15b776c05716d17202255caec2"
-        },
-        "test_scout_facade_moves_every_published_component": {
-          "before": null,
-          "after": "f75475e1a0fa8da79dd75445efafdc905b95930e05fe7f9b418e999ef9470a53"
+          "before": "9a034a04bb47141c28a6c2defd2276b580773318d5cb2faa190ff1cd05797c20",
+          "after": "d79422621865afd5759f519fecae25c741bd6c20ef16e33157279dd79e3365dc"
         },
         "test_scout_facade_rejections_preserve_all_components_and_allow_retry": {
+          "before": "9c22a1ca68197696030e3e695eea4e36338851939c175f9a780cecfe4a8f0dc8",
+          "after": "3de030bf94a36830e9ab58c2ef0cc8cc56bf4b1c33a4534fc6e0cd9fca7791ae"
+        },
+        "test_scout_history_restores_both_players_and_independent_fork": {
           "before": null,
-          "after": "9c22a1ca68197696030e3e695eea4e36338851939c175f9a780cecfe4a8f0dc8"
+          "after": "c1654154dadc8c66da180ddca5254d394cb4da9844471b84e1e362711eee71c5"
+        }
+      }
+    },
+    "tests/unit/test_phase16b_prebattle.py": {
+      "before_sha256": "c1fcf7728167c259abfd08e08565aa2c1f637837751afd8d40b29f6f258959fb",
+      "after_sha256": "6aaff2330b761a7c2b5272d0644d4bfaca5626d27a2c227daed77c3fddf6e607",
+      "owners": {
+        "@module": {
+          "before": "c74d494627974df8f5b2fecf2b88cc213f3be3bfc3a3f472ad8dc51f6df6723d",
+          "after": "11620a0c5daa00c06f45ef89cd384ff66e4ea03aee7f755badf8d6630a79f451"
+        },
+        "test_physical_history_keeps_nonphysical_and_optional_batch_controls": {
+          "before": null,
+          "after": "f0a41958a4c0519fa7b11e9b0972f92822c484240ba7a019078d4151c900f6dc"
+        },
+        "test_physical_history_reads_each_registered_transition_shape": {
+          "before": null,
+          "after": "b8d0839a760634094d6df8c923a03ce5ad94d4da81f0a9d8a1d134e99ba9966d"
+        },
+        "test_scout_physical_history_rejects_malformed_transition": {
+          "before": null,
+          "after": "4a1f278f5c941109895316746c89853ffe6e5ea2ba966ed41ab864e41b53a280"
         }
       }
     }
@@ -275,9 +203,9 @@
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
-      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
+      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -286,9 +214,9 @@
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
-      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
+      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -297,9 +225,9 @@
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
-      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
+      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -308,9 +236,9 @@
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
-      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
+      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -319,9 +247,9 @@
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
-      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
+      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -330,9 +258,9 @@
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
-      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
+      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -341,9 +269,9 @@
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
-      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
+      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -352,41 +280,25 @@
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
-      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
+      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
     },
-    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+    "docs/ISSUE_535_SCOUT_HISTORY.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
-      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
-    },
-    "docs/PR_BACKLOG_2026_09_30.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
-      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
-    },
-    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
-      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
+      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
-      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
+      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -394,65 +306,48 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
-      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
+      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
     },
-    "src/warhammer40k_core/engine/prebattle.py": {
+    "src/warhammer40k_core/engine/battlefield_transition_history.py": {
       "category": "rule_semantics",
       "operations": [
-        "issue537-prebattle-scout"
+        "issue535-scout-transition-history"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
-      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
-    },
-    "src/warhammer40k_core/engine/scout_movement.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "movement-rule-branch"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
-      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
-    },
-    "src/warhammer40k_core/engine/scout_movement_paths.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "movement-rule-branch"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
-      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
-    },
-    "tests/code_quality/test_module_size_policy.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
-      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
+      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
     },
     "tests/code_quality/test_unit_model_semantics.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
-      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
+      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
     },
     "tests/integration/test_setup_prebattle_ui_smoke.py": {
       "category": "rule_semantics",
       "operations": [
+        "issue535-scout-facade-regression",
         "issue537-scout-facade-regression"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
-      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
+      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+    },
+    "tests/unit/test_phase16b_prebattle.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue535-scout-history-regression"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
+      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
     }
   },
   "milestone": "ordinary",
