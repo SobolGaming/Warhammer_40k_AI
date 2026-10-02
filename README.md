@@ -2,6 +2,12 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 102 / P04F separates completing a Fight selection from actually making melee
+attacks. Empty selections remain consumed, do not open after-fought windows, and
+retain Fight On Death models until phase-end cleanup. Armed retained cleanup,
+restore and Engaging continuation share the same completion authority. See
+[source, scope and evidence](docs/ORDER_102_SCOPE_PLAN.md).
+
 V963-SHOCK adopts the timestamped current 18.07 observation: ordinary coherent,
 unengaged setup, no Shock forced Fight response, and charge ineligibility through
 turn-end rules. See [source, scope and evidence](docs/V963_SHOCK_SCOPE_PLAN.md).

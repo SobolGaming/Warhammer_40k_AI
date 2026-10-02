@@ -69,7 +69,11 @@ def validate_fight_phase_state_consistency(
     from warhammer40k_core.engine.consolidation_fight_history import (
         validate_consolidation_fight_history,
     )
+    from warhammer40k_core.engine.fight_selection_completion import (
+        validate_fight_selection_completion_history,
+    )
 
+    validate_fight_selection_completion_history(events=event_records, records=decision_records)
     validate_consolidation_fight_history(
         state=state,
         event_records=event_records,
