@@ -21,6 +21,10 @@ ISSUE535_MAPPING = "data/source_audits/issue535/historical-inputs.json"
 ISSUE535_MAPPING_SHA256 = "5c0f44902158da51de3279bc7d44c9e2a13a2f4c2d3ce1c67d02925e3e851c95"
 
 
+ISSUE534_MAPPING = "data/source_audits/issue534/historical-inputs.json"
+ISSUE534_MAPPING_SHA256 = "49d81bcbb38b6b29ad24a4ab24742854b987fca858070e82dcd7cc0f5e87a45f"
+
+
 def historical_evidence_path(reference: str, *, root: Path) -> Path | None:
     """Resolve only the reviewed mapping; missing or corrupt history never falls back."""
     for mapping_name, expected_sha256 in (
@@ -28,6 +32,7 @@ def historical_evidence_path(reference: str, *, root: Path) -> Path | None:
         (ORDER102_MAPPING, ORDER102_MAPPING_SHA256),
         (ORDER103_MAPPING, ORDER103_MAPPING_SHA256),
         (ISSUE535_MAPPING, ISSUE535_MAPPING_SHA256),
+        (ISSUE534_MAPPING, ISSUE534_MAPPING_SHA256),
     ):
         raw = (root / mapping_name).read_bytes()
         if hashlib.sha256(raw).hexdigest() != expected_sha256:

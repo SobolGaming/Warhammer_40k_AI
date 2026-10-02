@@ -1664,6 +1664,104 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "issue534-reserve-destruction-dispatch": {
+      "paths": [
+        "src/warhammer40k_core/engine/game_state.py"
+      ],
+      "owners": [
+        "@module",
+        "GameState._apply_unarrived_reserve_destruction"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "issue534-reserve-lifetime-mutation": {
+      "paths": [
+        "src/warhammer40k_core/engine/reserve_lifetime_boundary.py"
+      ],
+      "owners": [
+        "@module",
+        "apply_destruction"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "issue534-reserve-logical-history": {
+      "paths": [
+        "src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py"
+      ],
+      "owners": [
+        "_apply_primary_unit_destruction"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "issue534-reserve-fight-history": {
+      "paths": [
+        "src/warhammer40k_core/engine/fight_model_authority_history.py"
+      ],
+      "owners": [
+        "@module",
+        "_authority_mutations_by_event_index",
+        "_reserve_deadline_destruction_mutations"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "issue534-reserve-regressions": {
+      "paths": [
+        "tests/unit/test_order64_reserve_lifetimes.py"
+      ],
+      "owners": [
+        "@module",
+        "_pass_reserve_deadline_decision",
+        "_play_to_reserve_deadline_round",
+        "test_attached_reserve_deadline_public_continuation_restores_and_replays",
+        "test_reserve_deadline_destroys_attached_components_with_prior_casualty",
+        "test_reserve_deadline_logical_death_preserves_public_play_and_persistence"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "issue534-order97-history": {
+      "paths": [
+        "tools/core_rules_order97_history.py"
+      ],
+      "owners": [
+        "@module",
+        "historical_evidence_path"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "issue534-order97-map": {
+      "paths": [
+        "data/source_audits/issue534/historical-inputs.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "issue534-order97-archive": {
+      "paths": [
+        "data/source_audits/issue534/baseline/tests/unit/test_order64_reserve_lifetimes.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

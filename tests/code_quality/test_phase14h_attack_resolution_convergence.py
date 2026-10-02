@@ -105,7 +105,7 @@ ATTACK_DESTRUCTION_RESTORE_PATH = (
 )
 PRIMARY_UNIT_DESTRUCTION_TRACKING_CALLERS = {
     "src/warhammer40k_core/engine/attack_sequence_destroyed_transport.py",
-    "src/warhammer40k_core/engine/game_state.py",
+    "src/warhammer40k_core/engine/reserve_lifetime_boundary.py",
     "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py",
     "src/warhammer40k_core/engine/primary_unit_destruction_tracking.py",
 }
@@ -115,12 +115,12 @@ PRIMARY_EVENT_DESTRUCTION_SHARED_OWNERS = {
 }
 UNATTRIBUTED_PRIMARY_DESTRUCTION_CAUSES_BY_CALLER = {
     "src/warhammer40k_core/engine/attack_sequence_destroyed_transport.py": ("EMERGENCY_DISEMBARK"),
-    "src/warhammer40k_core/engine/game_state.py": "RESERVE_DEADLINE",
+    "src/warhammer40k_core/engine/reserve_lifetime_boundary.py": "RESERVE_DEADLINE",
     "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": ("DESPERATE_ESCAPE"),
     "src/warhammer40k_core/engine/primary_unit_destruction_tracking.py": ("UNIT_COHERENCY"),
 }
 PRIMARY_DESTRUCTION_LEFT_BATTLEFIELD_BY_CALLER = {
-    relative_path: relative_path != "src/warhammer40k_core/engine/game_state.py"
+    relative_path: relative_path != "src/warhammer40k_core/engine/reserve_lifetime_boundary.py"
     for relative_path in PRIMARY_UNIT_DESTRUCTION_TRACKING_CALLERS
 }
 PRIMARY_BATTLEFIELD_DEPARTURE_CALLS = {
@@ -590,7 +590,11 @@ def test_battlefield_removal_owners_converge_or_are_explicitly_non_authoritative
     assert "record_primary_unit_destructions_for_destroyed_models(" not in battle_round_source
     assert "PrimaryUnattributedDestructionCause.DESPERATE_ESCAPE" in fall_back_source
     assert "apply_reserve_destruction_to_battlefield(" in reserve_source
-    assert "PrimaryUnattributedDestructionCause.RESERVE_DEADLINE" in reserve_owner_source
+    reserve_boundary_source = source_for(SRC_ROOT / "engine" / "reserve_lifetime_boundary.py")
+    assert "apply_destruction(self, destruction=destruction)" in reserve_owner_source
+    assert "apply_reserve_destruction_to_battlefield(" in reserve_boundary_source
+    assert "destroy_unplaced_model_without_reactions(" in reserve_boundary_source
+    assert "PrimaryUnattributedDestructionCause.RESERVE_DEADLINE" in reserve_boundary_source
     assert "CoherencyCleanupRemoval(" in cleanup_source
     assert "state.resolve_end_turn_cleanup_boundary(completed_phase=completed_phase)" in source_for(
         SRC_ROOT / "engine" / "turn_end_boundary.py"

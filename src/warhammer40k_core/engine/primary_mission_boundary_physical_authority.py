@@ -1191,7 +1191,6 @@ def _apply_primary_unit_destruction(
         authority[model_id] = _authority_after_removal(
             prior=authority.get(model_id),
             removal_kind=BattlefieldRemovalKind.DESTROYED,
-            preserve_wounds_on_destroyed=True,
         )
 
 

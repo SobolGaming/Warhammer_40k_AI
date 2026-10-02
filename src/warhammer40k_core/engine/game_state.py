@@ -252,7 +252,6 @@ from warhammer40k_core.engine.reserves import (
     ReserveStatus,
     ReserveUnitPointValue,
     StrategicReserveDeclaration,
-    apply_reserve_destruction_to_battlefield,
     reserve_origin_from_token,
 )
 from warhammer40k_core.engine.return_on_death import (
@@ -5508,70 +5507,9 @@ class GameState:
         *,
         destruction: ReserveDestructionResult,
     ) -> None:
-        from warhammer40k_core.engine.primary_destruction_evidence import (
-            PrimaryUnattributedDestructionCause,
-        )
-        from warhammer40k_core.engine.primary_unit_destruction_tracking import (
-            record_primary_unit_destructions_for_destroyed_models,
-        )
+        from warhammer40k_core.engine.reserve_lifetime_boundary import apply_destruction
 
-        if self.battlefield_state is None:
-            raise GameLifecycleError("Reserve destruction requires battlefield_state.")
-        terminal_reserve_states = tuple(
-            prior_state
-            for prior_state, updated_state in zip(
-                self.reserve_states,
-                destruction.updated_reserve_states,
-                strict=True,
-            )
-            if prior_state.status is ReserveStatus.IN_RESERVES
-            and updated_state.status is ReserveStatus.DESTROYED
-        )
-        for reserve_state in terminal_reserve_states:
-            cargo_state = self.transport_cargo_state_for_transport(reserve_state.unit_instance_id)
-            if cargo_state is None:
-                if reserve_state.embarked_unit_instance_ids:
-                    raise GameLifecycleError(
-                        "transport_cargo_states unarrived reserve route cargo drift."
-                    )
-                continue
-            if cargo_state.embarked_unit_instance_ids != reserve_state.embarked_unit_instance_ids:
-                raise GameLifecycleError(
-                    "transport_cargo_states unarrived reserve route cargo drift."
-                )
-        terminal_transport_ids = {
-            reserve_state.unit_instance_id for reserve_state in terminal_reserve_states
-        }
-        updated_battlefield_state = apply_reserve_destruction_to_battlefield(
-            battlefield_state=self.battlefield_state,
-            destruction=destruction,
-        )
-        updated_transport_cargo_states = [
-            cargo_state
-            for cargo_state in self.transport_cargo_states
-            if cargo_state.transport_unit_instance_id not in terminal_transport_ids
-        ]
-        self.battlefield_state = updated_battlefield_state
-        self.reserve_states = list(destruction.updated_reserve_states)
-        self.transport_cargo_states = updated_transport_cargo_states
-        record_primary_unit_destructions_for_destroyed_models(
-            state=self,
-            destroyed_model_instance_ids=destruction.destroyed_model_instance_ids,
-            destruction_attribution=None,
-            source_model_destroyed_event_id=None,
-            source_rules_unit_objective_proximity_witness=None,
-            destroyed_rules_unit_objective_proximity_witness=None,
-            unattributed_cause=PrimaryUnattributedDestructionCause.RESERVE_DEADLINE,
-            source_mutation_id=(
-                f"{destruction.policy.source_id}:round-{destruction.battle_round:02d}:"
-                f"{'end-of-battle' if destruction.end_of_battle else 'round-boundary'}"
-            ),
-            left_battlefield=False,
-            source_id=(
-                f"{destruction.policy.source_id}:round-{destruction.battle_round:02d}:"
-                f"{'end-of-battle' if destruction.end_of_battle else 'round-boundary'}"
-            ),
-        )
+        apply_destruction(self, destruction=destruction)
 
     def ruleset_descriptor_for_runtime_policy(self) -> RulesetDescriptor:
         return runtime_ruleset_descriptor_for_mission_setup(

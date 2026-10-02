@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:88213efa85870baf8a965f488f0b87ca4fbf2d604a5f49af32cf7f068a3c798f",
-  "fingerprint": "88213efa85870baf8a965f488f0b87ca4fbf2d604a5f49af32cf7f068a3c798f",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:248fe30971fbb9cec16b6792bf50cdfd6607ccf07aba982b4a6bb0bac789a7f8",
+  "fingerprint": "248fe30971fbb9cec16b6792bf50cdfd6607ccf07aba982b4a6bb0bac789a7f8",
   "resource_count": 3043,
   "resources": [
     {
@@ -9965,9 +9965,9 @@
       "sha256": "88d1a2d73a6938a31b9193462cd2c8ec3cc75bc157074cafab93ee431267fe4c"
     },
     {
-      "byte_length": 51554,
+      "byte_length": 54232,
       "path": "warhammer40k_core/engine/fight_model_authority_history.py",
-      "sha256": "5551ace039358454624db3b5e303fdd18783984ed8e91bd5c4427a00193930fa"
+      "sha256": "072273e4fc4b0a63e45a71acf7931ab12f8ee58f5bff52ffc1c612308b32562b"
     },
     {
       "byte_length": 3726,
@@ -10150,9 +10150,9 @@
       "sha256": "546b87af37cf2ab8707ec2acdfc3e96f84b062fcc73ba046b28e44770c8d49df"
     },
     {
-      "byte_length": 306202,
+      "byte_length": 303129,
       "path": "warhammer40k_core/engine/game_state.py",
-      "sha256": "b4654fdf1da4636c736e1c9b39f7d1885ed5f203b7b2ae99ccd1a8b059f92cf3"
+      "sha256": "a07a6fbdf9faca5a28a8b289dfc0c0a447d94d796e7c6d297cb4ef02572413a4"
     },
     {
       "byte_length": 11532,
@@ -11495,9 +11495,9 @@
       "sha256": "60e608ea97a0d88889c39ffd959c5c9410ffabab3883c42ff437bc14743c34c9"
     },
     {
-      "byte_length": 64697,
+      "byte_length": 64650,
       "path": "warhammer40k_core/engine/primary_mission_boundary_physical_authority.py",
-      "sha256": "544ae3413a72204907765324596fb56c7e17f951b71c5f089b7b952e60e7e26e"
+      "sha256": "3a996c6b5282b3664eb3c17a0220482fb3a75438108b7c9d43f3cb0a64f45d42"
     },
     {
       "byte_length": 18511,
@@ -11970,9 +11970,9 @@
       "sha256": "589f5f14f798bce0d74699736a3ac7d3506745481b0061ffa2ceee2cc6db8cb3"
     },
     {
-      "byte_length": 4100,
+      "byte_length": 7894,
       "path": "warhammer40k_core/engine/reserve_lifetime_boundary.py",
-      "sha256": "828e65f26b42a4d4e13987ac9c6ab1488365a8d853413fc0e55a324efdab9363"
+      "sha256": "1f93ddf2dd40e37f61ce065c939e1aade8ebaac95dbd8c190900ad8132870dab"
     },
     {
       "byte_length": 2131,

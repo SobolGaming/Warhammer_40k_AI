@@ -1,244 +1,268 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "ff0b2db17106e7e0493929d6ab9ddb15c44aa476",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:88213efa85870baf8a965f488f0b87ca4fbf2d604a5f49af32cf7f068a3c798f",
-  "operation_map_sha256": "348361dedd27b8a80d8c6fb3a4b7e241989f397386139fa2487c0aedc5af7a00",
+  "base": "262baafa102972d2f0f6acbd2b0ebdea5a2c7512",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:248fe30971fbb9cec16b6792bf50cdfd6607ccf07aba982b4a6bb0bac789a7f8",
+  "operation_map_sha256": "74d75745826ba9990cf7fd53aed690e5d42ab2c2ef48fe1b919825668d45ad92",
   "changes": {
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "346df1d4c34a573329d672c3b62893f84fb752a0880484012103af06319f0209",
-      "after_sha256": "6b01ba1a7e8d0ef7f378a001e5dbe96413d22f03350a0e2de4c7e97dc9f916b6",
+      "before_sha256": "6b01ba1a7e8d0ef7f378a001e5dbe96413d22f03350a0e2de4c7e97dc9f916b6",
+      "after_sha256": "2887ef3c73361ef22d87104ab04315e0a604024fbdbc02cc49c461cc75c8cd70",
       "owners": {
         "@document": {
-          "before": "346df1d4c34a573329d672c3b62893f84fb752a0880484012103af06319f0209",
-          "after": "6b01ba1a7e8d0ef7f378a001e5dbe96413d22f03350a0e2de4c7e97dc9f916b6"
+          "before": "6b01ba1a7e8d0ef7f378a001e5dbe96413d22f03350a0e2de4c7e97dc9f916b6",
+          "after": "2887ef3c73361ef22d87104ab04315e0a604024fbdbc02cc49c461cc75c8cd70"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "b63a62d1a5f2de2e08ba0ecd8122e590cc4e4dc2d45f82d647fda23b3fe2fe54",
-      "after_sha256": "da779dcb0cfe883bd040fd1c32f89b1fd84f3e5b6dee893d6f434f8fb4114b77",
+      "before_sha256": "da779dcb0cfe883bd040fd1c32f89b1fd84f3e5b6dee893d6f434f8fb4114b77",
+      "after_sha256": "c3ad23fbce3390c97db7114ed1a70c826a616bbefc21c2ce2dd78f8101b47f47",
       "owners": {
         "@document": {
-          "before": "b63a62d1a5f2de2e08ba0ecd8122e590cc4e4dc2d45f82d647fda23b3fe2fe54",
-          "after": "da779dcb0cfe883bd040fd1c32f89b1fd84f3e5b6dee893d6f434f8fb4114b77"
+          "before": "da779dcb0cfe883bd040fd1c32f89b1fd84f3e5b6dee893d6f434f8fb4114b77",
+          "after": "c3ad23fbce3390c97db7114ed1a70c826a616bbefc21c2ce2dd78f8101b47f47"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "cbfd27b2f30e9c5ef2c1973dd5d3f72b39ed360a7408c24071d0896f227818a2",
-      "after_sha256": "c919f0c1283088b67800c6d35b78084adb43b160af0fb7338271b67634c5ad8c",
+      "before_sha256": "c919f0c1283088b67800c6d35b78084adb43b160af0fb7338271b67634c5ad8c",
+      "after_sha256": "9eac187f7893be346d9455debc7ed0a57a592e6ca900c553a36096e30b2bbfbd",
       "owners": {
         "@document": {
-          "before": "cbfd27b2f30e9c5ef2c1973dd5d3f72b39ed360a7408c24071d0896f227818a2",
-          "after": "c919f0c1283088b67800c6d35b78084adb43b160af0fb7338271b67634c5ad8c"
+          "before": "c919f0c1283088b67800c6d35b78084adb43b160af0fb7338271b67634c5ad8c",
+          "after": "9eac187f7893be346d9455debc7ed0a57a592e6ca900c553a36096e30b2bbfbd"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "f63f044fd02ab208c803223b83adbeed5e16734c20d88c615e03c4d2250b1dbc",
-      "after_sha256": "2588fa7b36c29947a62cb1916ab219d0822c34535479791e35745f566f089c7b",
+      "before_sha256": "2588fa7b36c29947a62cb1916ab219d0822c34535479791e35745f566f089c7b",
+      "after_sha256": "2ce10ef66b72fd368015bf053a8d15d2bb0087967b2ea38abc55f465e7c41530",
       "owners": {
         "@document": {
-          "before": "f63f044fd02ab208c803223b83adbeed5e16734c20d88c615e03c4d2250b1dbc",
-          "after": "2588fa7b36c29947a62cb1916ab219d0822c34535479791e35745f566f089c7b"
+          "before": "2588fa7b36c29947a62cb1916ab219d0822c34535479791e35745f566f089c7b",
+          "after": "2ce10ef66b72fd368015bf053a8d15d2bb0087967b2ea38abc55f465e7c41530"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "e9a60eed64bbee72d91190289be5902a448bbefd6a4102d409536e5ce4c72467",
-      "after_sha256": "bc4dfd3072b63c54f13f17b21179b43755790d611890df8ff7113676f629d923",
+      "before_sha256": "bc4dfd3072b63c54f13f17b21179b43755790d611890df8ff7113676f629d923",
+      "after_sha256": "5515ef501f2b7e3f8300877ec2f374c141d21bba08ea444bc2278a46d62b350c",
       "owners": {
         "@document": {
-          "before": "e9a60eed64bbee72d91190289be5902a448bbefd6a4102d409536e5ce4c72467",
-          "after": "bc4dfd3072b63c54f13f17b21179b43755790d611890df8ff7113676f629d923"
+          "before": "bc4dfd3072b63c54f13f17b21179b43755790d611890df8ff7113676f629d923",
+          "after": "5515ef501f2b7e3f8300877ec2f374c141d21bba08ea444bc2278a46d62b350c"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "f49b506e4f68529bb71a9612ae2faba22eb91ab0bb2250c2571d285fe50c1d41",
-      "after_sha256": "81d14779ba85a2d5435032e1aa7f17467385b9e41760ac5b7a203c6cf68ac36f",
+      "before_sha256": "81d14779ba85a2d5435032e1aa7f17467385b9e41760ac5b7a203c6cf68ac36f",
+      "after_sha256": "5b23d3a069a51af84f232c687264724716b8ca21a5766a27ff2c013e01d04538",
       "owners": {
         "@document": {
-          "before": "f49b506e4f68529bb71a9612ae2faba22eb91ab0bb2250c2571d285fe50c1d41",
-          "after": "81d14779ba85a2d5435032e1aa7f17467385b9e41760ac5b7a203c6cf68ac36f"
+          "before": "81d14779ba85a2d5435032e1aa7f17467385b9e41760ac5b7a203c6cf68ac36f",
+          "after": "5b23d3a069a51af84f232c687264724716b8ca21a5766a27ff2c013e01d04538"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "03bbee8d41e596037be170c196043c240d4aa73166aa69abb685931620076a49",
-      "after_sha256": "092858832eab801115b4b7ad2000f51e46dfa77a17a717cebe98e0321e063777",
+      "before_sha256": "092858832eab801115b4b7ad2000f51e46dfa77a17a717cebe98e0321e063777",
+      "after_sha256": "10e47b0424f241f6ab48fdafc066af6e1453f7e99545d94524e3af191720574c",
       "owners": {
         "@document": {
-          "before": "03bbee8d41e596037be170c196043c240d4aa73166aa69abb685931620076a49",
-          "after": "092858832eab801115b4b7ad2000f51e46dfa77a17a717cebe98e0321e063777"
+          "before": "092858832eab801115b4b7ad2000f51e46dfa77a17a717cebe98e0321e063777",
+          "after": "10e47b0424f241f6ab48fdafc066af6e1453f7e99545d94524e3af191720574c"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "07d486f5672b563c8ec86d007b7111065ffaa68eabaf89306dea1f37e70f0034",
-      "after_sha256": "ae33473e49b3920af4805ebeda57b2cc0177617e9d589ce715ebc9f9d61c2e2b",
+      "before_sha256": "ae33473e49b3920af4805ebeda57b2cc0177617e9d589ce715ebc9f9d61c2e2b",
+      "after_sha256": "280db3498732b2a048f02a012eb29d42250409acbf8a17e6a39b70fa321c4515",
       "owners": {
         "@document": {
-          "before": "07d486f5672b563c8ec86d007b7111065ffaa68eabaf89306dea1f37e70f0034",
-          "after": "ae33473e49b3920af4805ebeda57b2cc0177617e9d589ce715ebc9f9d61c2e2b"
+          "before": "ae33473e49b3920af4805ebeda57b2cc0177617e9d589ce715ebc9f9d61c2e2b",
+          "after": "280db3498732b2a048f02a012eb29d42250409acbf8a17e6a39b70fa321c4515"
         }
       }
     },
-    "data/source_audits/issue535/baseline/tests/unit/test_phase16b_prebattle.py.txt": {
+    "data/source_audits/issue534/baseline/tests/unit/test_order64_reserve_lifetimes.py.txt": {
       "before_sha256": null,
-      "after_sha256": "c1fcf7728167c259abfd08e08565aa2c1f637837751afd8d40b29f6f258959fb",
+      "after_sha256": "93853589f0f45bd115d87ca6ef07467af5442b7ad8822e08c8683c973b15ea2e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "c1fcf7728167c259abfd08e08565aa2c1f637837751afd8d40b29f6f258959fb"
+          "after": "93853589f0f45bd115d87ca6ef07467af5442b7ad8822e08c8683c973b15ea2e"
         }
       }
     },
-    "data/source_audits/issue535/historical-inputs.json": {
+    "data/source_audits/issue534/historical-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "5c0f44902158da51de3279bc7d44c9e2a13a2f4c2d3ce1c67d02925e3e851c95",
+      "after_sha256": "49d81bcbb38b6b29ad24a4ab24742854b987fca858070e82dcd7cc0f5e87a45f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "5c0f44902158da51de3279bc7d44c9e2a13a2f4c2d3ce1c67d02925e3e851c95"
+          "after": "49d81bcbb38b6b29ad24a4ab24742854b987fca858070e82dcd7cc0f5e87a45f"
         }
       }
     },
-    "docs/ISSUE_535_SCOUT_HISTORY.md": {
+    "docs/ISSUE_534_RESERVE_DESTRUCTION.md": {
       "before_sha256": null,
-      "after_sha256": "bf4cb51081cbbc00d85df0bf143bd9ff6c5956f5867101408931e65390d59863",
+      "after_sha256": "e39f2081bd527ba25ee71c9353e53dceea2e3c75dc054bbbc73ec27b7c1c9fbb",
       "owners": {
         "@document": {
           "before": null,
-          "after": "bf4cb51081cbbc00d85df0bf143bd9ff6c5956f5867101408931e65390d59863"
+          "after": "e39f2081bd527ba25ee71c9353e53dceea2e3c75dc054bbbc73ec27b7c1c9fbb"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "d0cb2ab96a2bddc3aa68c03d36adee62c541e698c4798206a2c97a8353f51452",
-      "after_sha256": "0d97eb42f242fc13c78797ba48a71b4597773ec5250336b31899d8aa0d5dc0da",
+      "before_sha256": "0d97eb42f242fc13c78797ba48a71b4597773ec5250336b31899d8aa0d5dc0da",
+      "after_sha256": "08168ebb48355f2223de90f9ed34ffc54b7fefc6fc0b78e72dae01440c3fafac",
       "owners": {
         "@document": {
-          "before": "d0cb2ab96a2bddc3aa68c03d36adee62c541e698c4798206a2c97a8353f51452",
-          "after": "0d97eb42f242fc13c78797ba48a71b4597773ec5250336b31899d8aa0d5dc0da"
+          "before": "0d97eb42f242fc13c78797ba48a71b4597773ec5250336b31899d8aa0d5dc0da",
+          "after": "08168ebb48355f2223de90f9ed34ffc54b7fefc6fc0b78e72dae01440c3fafac"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "2eff6610f2a563dc7d4ad32615d051c22ad45eb1049a15049ec4f6f3ed915751",
-      "after_sha256": "934bb18175b73def0368471b735f3fe9cb4eb1ef5548d0c2d395c8633ffed004",
+      "before_sha256": "934bb18175b73def0368471b735f3fe9cb4eb1ef5548d0c2d395c8633ffed004",
+      "after_sha256": "16c8f80d8d63b4b2f72fd4eaaa4c53c62800e0944753cef45b33e8368a68592c",
       "owners": {
         "@document": {
-          "before": "2eff6610f2a563dc7d4ad32615d051c22ad45eb1049a15049ec4f6f3ed915751",
-          "after": "934bb18175b73def0368471b735f3fe9cb4eb1ef5548d0c2d395c8633ffed004"
+          "before": "934bb18175b73def0368471b735f3fe9cb4eb1ef5548d0c2d395c8633ffed004",
+          "after": "16c8f80d8d63b4b2f72fd4eaaa4c53c62800e0944753cef45b33e8368a68592c"
         }
       }
     },
-    "src/warhammer40k_core/engine/battlefield_transition_history.py": {
-      "before_sha256": "1e120d57e704b69ee1f5543c0ccdf3c6f3825c13af1fdab7e05ddfe2eb011fde",
-      "after_sha256": "e870351317260470589c1b2b7dd2e8847800f232b711e7be88664fd816d079e1",
+    "src/warhammer40k_core/engine/fight_model_authority_history.py": {
+      "before_sha256": "5551ace039358454624db3b5e303fdd18783984ed8e91bd5c4427a00193930fa",
+      "after_sha256": "072273e4fc4b0a63e45a71acf7931ab12f8ee58f5bff52ffc1c612308b32562b",
       "owners": {
         "@module": {
-          "before": "ed29b6706a333c7d4dc87ae4966ac4fd8759bc86d92452a844b2092e0e81e8cc",
-          "after": "3d27d81663d9ca5412c231084c3c2c1db13f42b88daa47a50b3f25ae7de97423"
+          "before": "0f2327dc9feda298347787eff4e6fdab0d75485577d24854f0bfde6a6b2ce328",
+          "after": "a989d308779612ef31ef4c8ee657bbf61fb7c17722505002552dee453fff4aeb"
         },
-        "authoritative_battlefield_transition_batch_or_none": {
-          "before": "a0aeb1ade3a012fa5abd30789779dcf5cff6c038fdcb05581784d1cd916bf288",
-          "after": "c907827cc2199355613c3869281eb30b65d1901703a6a74b47c0f3a40970b296"
+        "_authority_mutations_by_event_index": {
+          "before": "40a3909113a624909c9067fa9c7616bd6fc4c950cf16827296140bfe48165260",
+          "after": "2ba3774568fbec9f8e9b9d2580c531b1374edfe004b48a981fd702778adaeb99"
+        },
+        "_reserve_deadline_destruction_mutations": {
+          "before": null,
+          "after": "65f1e3f7901d24b28a65e932d83da88ba61adfda8abf7afd312c069de5a5c866"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/game_state.py": {
+      "before_sha256": "b4654fdf1da4636c736e1c9b39f7d1885ed5f203b7b2ae99ccd1a8b059f92cf3",
+      "after_sha256": "a07a6fbdf9faca5a28a8b289dfc0c0a447d94d796e7c6d297cb4ef02572413a4",
+      "owners": {
+        "@module": {
+          "before": "32173a2750eda66052f1a7b8d00cfaa962009dd0aae6fac859d573f4e786d30a",
+          "after": "975e810d0d0cd5a1080c5c937a7085558ba49ad55beb6b77a40d4ea8e4f2bb8a"
+        },
+        "GameState._apply_unarrived_reserve_destruction": {
+          "before": "8c21eaed031a636dcd5056cf116492bc5511ea87987f189280d79e9d8408be05",
+          "after": "4dca6a55d05a93018bbd6d7ad4d12546e792d242ef8393f850d6fe75b66e565c"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py": {
+      "before_sha256": "544ae3413a72204907765324596fb56c7e17f951b71c5f089b7b952e60e7e26e",
+      "after_sha256": "3a996c6b5282b3664eb3c17a0220482fb3a75438108b7c9d43f3cb0a64f45d42",
+      "owners": {
+        "_apply_primary_unit_destruction": {
+          "before": "c428cbe78f3538843a416c1bbc5b39291012b11ed52d1e35023274252a907a36",
+          "after": "f17789ffcf31e8e43d7179a719d902ad93af09a5f3fb928fc9d1092c6ba753cf"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/reserve_lifetime_boundary.py": {
+      "before_sha256": "828e65f26b42a4d4e13987ac9c6ab1488365a8d853413fc0e55a324efdab9363",
+      "after_sha256": "1f93ddf2dd40e37f61ce065c939e1aade8ebaac95dbd8c190900ad8132870dab",
+      "owners": {
+        "@module": {
+          "before": "56eb711c7a0baba9e9eda91fc1feb87de381260da8edff5f9e318c32cd466573",
+          "after": "9370dc85b13a2b4e5452fc81d1a4c7bf8af3cfc68ea6ea5260e1093200bd9715"
+        },
+        "apply_destruction": {
+          "before": null,
+          "after": "2d20abf3ea1ee3f5d16d2546d02cce6c10707ff869dec64c7f56e64931c08ea4"
         }
       }
     },
     "tests/code_quality/test_order97_inventory.py": {
-      "before_sha256": "fa07f90bd411fbe97c5a16bdf23c638904a006fdbc85766f03b951735f43f352",
-      "after_sha256": "e214eb810a41cadfccde83a3ad92519b541d5dc745f338715cb4a733705dee2b",
+      "before_sha256": "e214eb810a41cadfccde83a3ad92519b541d5dc745f338715cb4a733705dee2b",
+      "after_sha256": "cd3e257be956f62d995210d6b137097156bb2849ae12fddb870384d1994db6d4",
       "owners": {
         "@module": {
-          "before": "a65a8772b4fba12333d29ddb9cc3008c06c6187e80bd749cdaac78cd2b6aeb0f",
-          "after": "3be63683830ddbdd83cbfac78a0dda90fa7c929c70b60a045146817058faed94"
+          "before": "3be63683830ddbdd83cbfac78a0dda90fa7c929c70b60a045146817058faed94",
+          "after": "aa05a8ad70e0bfee3925c989f8be4347c02fa924859b445adb4ef281f0af49ee"
         },
         "test_issue535_original_scout_assertions_remain_exact_and_fail_closed": {
+          "before": "ce5b94fb4a6ee26fbe3df8b3b2fc4f9831779b5df54d642b80bf0e12f5d073ab",
+          "after": null
+        },
+        "test_original_assertions_remain_exact_and_fail_closed": {
           "before": null,
-          "after": "ce5b94fb4a6ee26fbe3df8b3b2fc4f9831779b5df54d642b80bf0e12f5d073ab"
+          "after": "e9aa176168f08a9e839d853d0541a3e123950eac2b80d29537551c0f5ecd2df9"
         }
       }
     },
-    "tests/code_quality/test_unit_model_semantics.py": {
-      "before_sha256": "b4cc21df551e75a72d8ea77260b628b540d0cc9dd8c1a16b0b06c195fd672630",
-      "after_sha256": "33071929293071663d5efb9fa861da7506332323ffd9f582ab458c6e324ab7ed",
-      "owners": {
-        "test_battlefield_transition_history_has_one_shared_event_registry": {
-          "before": "33e6d40a61a9ee73804bca321199b6ffc26416e014658d6ea0f8300b5137e13a",
-          "after": "386d9d2dfefd594cca312050049e5d95b3657847b9735b8a2502a51b2cb26950"
-        }
-      }
-    },
-    "tests/integration/test_setup_prebattle_ui_smoke.py": {
-      "before_sha256": "1e9876fbad23bc7ed533e5bf99bb6de67dc216d3c6071c882fa7cd92ef565a0f",
-      "after_sha256": "52f98d973cb10b4d6608a079e4e790a50a8957f475f17ef1827e622a86ce30fe",
+    "tests/code_quality/test_phase14h_attack_resolution_convergence.py": {
+      "before_sha256": "1de85981719ad551a370279d26b660ad7fe2e325c411f2e1eedc335702302ae7",
+      "after_sha256": "67bdd7bf7f19b8e1c9fd3cebb60506702237b9e155ecd924326545db4bd4896f",
       "owners": {
         "@module": {
-          "before": "3348da3461a6cfd69c3d422e511f584d74894399dd7573d757c15b8b8cb5f086",
-          "after": "d97cd3f0c0e1479958d5c87b172da33ec24af17235cfbf5a3567c9508fb24e68"
+          "before": "b210f23fcbecf185dfef7d05cf54c62b1d1de7f59fc933b8172fafcc6d7017f7",
+          "after": "b94e9dfc8aee190c6a92864f5b3b0911ad2de629b5145b56e8af12694c1e08f6"
         },
-        "_assert_scout_checkpoint_round_trip": {
-          "before": null,
-          "after": "bcd2bb4240514b68069233936e7536e4645beedbcd2bb02bf942ff2f91cacb26"
-        },
-        "_event_companion_prebattle_pose": {
-          "before": "775e156af2d8479bb59fe407a7c217f0a7428a501f599c88ba575fcd4fc675ac",
-          "after": "89b93301a1f0e0fe0bd9cbbfe244a311953cf38ff41618a5885a4ddd9e0903a6"
-        },
-        "_scout_facade_config": {
-          "before": "c9d95be30130db67e62e14effef781b88d126cea128cdbbf8108af045f41529a",
-          "after": "7f5bf11c2182234d4771cfbe33a71f0bcefcd868a4fc1322add497eb7d91689c"
-        },
-        "_scout_facade_session": {
-          "before": "9a034a04bb47141c28a6c2defd2276b580773318d5cb2faa190ff1cd05797c20",
-          "after": "d79422621865afd5759f519fecae25c741bd6c20ef16e33157279dd79e3365dc"
-        },
-        "test_scout_facade_rejections_preserve_all_components_and_allow_retry": {
-          "before": "9c22a1ca68197696030e3e695eea4e36338851939c175f9a780cecfe4a8f0dc8",
-          "after": "3de030bf94a36830e9ab58c2ef0cc8cc56bf4b1c33a4534fc6e0cd9fca7791ae"
-        },
-        "test_scout_history_restores_both_players_and_independent_fork": {
-          "before": null,
-          "after": "c1654154dadc8c66da180ddca5254d394cb4da9844471b84e1e362711eee71c5"
+        "test_battlefield_removal_owners_converge_or_are_explicitly_non_authoritative": {
+          "before": "1011ebf641a6b61a488e059052aade4c10c10da033cc18c89fc712276f93b03a",
+          "after": "44a4c7437bccb7d76a0f998f0afb1288d966d69667a7aedcc8baab47b53ea144"
         }
       }
     },
-    "tests/unit/test_phase16b_prebattle.py": {
-      "before_sha256": "c1fcf7728167c259abfd08e08565aa2c1f637837751afd8d40b29f6f258959fb",
-      "after_sha256": "6aaff2330b761a7c2b5272d0644d4bfaca5626d27a2c227daed77c3fddf6e607",
+    "tests/unit/test_order64_reserve_lifetimes.py": {
+      "before_sha256": "93853589f0f45bd115d87ca6ef07467af5442b7ad8822e08c8683c973b15ea2e",
+      "after_sha256": "9c26db32c6edfc38fe97665482d41c6efe6a50634320ea80845b9de9fd919559",
       "owners": {
         "@module": {
-          "before": "c74d494627974df8f5b2fecf2b88cc213f3be3bfc3a3f472ad8dc51f6df6723d",
-          "after": "11620a0c5daa00c06f45ef89cd384ff66e4ea03aee7f755badf8d6630a79f451"
+          "before": "cd95703d68035d99f58793cd60a7bbcff47bf419525f5f0d9bf08b68fdd15924",
+          "after": "76b85cec66c53a93f3b9866950cf9255a6ee418e14283fd0c56c7872835a593a"
         },
-        "test_physical_history_keeps_nonphysical_and_optional_batch_controls": {
+        "_pass_reserve_deadline_decision": {
           "before": null,
-          "after": "f0a41958a4c0519fa7b11e9b0972f92822c484240ba7a019078d4151c900f6dc"
+          "after": "01234ff637f65396f8df7ada2979c16939e978d49b13518c57a03f3485d0f3e7"
         },
-        "test_physical_history_reads_each_registered_transition_shape": {
+        "_play_to_reserve_deadline_round": {
           "before": null,
-          "after": "b8d0839a760634094d6df8c923a03ce5ad94d4da81f0a9d8a1d134e99ba9966d"
+          "after": "ff45f0cd2790c436c57d4b5ca8e5f30fe1f743fcc262cf3775310b95d90a00e6"
         },
-        "test_scout_physical_history_rejects_malformed_transition": {
+        "test_attached_reserve_deadline_public_continuation_restores_and_replays": {
           "before": null,
-          "after": "4a1f278f5c941109895316746c89853ffe6e5ea2ba966ed41ab864e41b53a280"
+          "after": "71fed7a868a511128112b7c7e281abe0dfae6eaa517c4a10ff93fa83d13ab35d"
+        },
+        "test_reserve_deadline_destroys_attached_components_with_prior_casualty": {
+          "before": null,
+          "after": "ff857c5f087dc7b56e1ae29d77b779028f3e2a66b2ed356590eae6913fd23bb6"
+        },
+        "test_reserve_deadline_logical_death_preserves_public_play_and_persistence": {
+          "before": null,
+          "after": "1b270d621708569f1a5609405c2b69635e905062624dcf64a0bd793c4862aff0"
         }
       }
     },
     "tools/core_rules_order97_history.py": {
-      "before_sha256": "f7ad023ca9519c10f7bbdfc9b4005dfd327547fc1aff9826cec523efdd966a0a",
-      "after_sha256": "15b00ead54c398ce624d6cc7ec57684f35fcf266c5bcdc6a87a813aab833e9a3",
+      "before_sha256": "15b00ead54c398ce624d6cc7ec57684f35fcf266c5bcdc6a87a813aab833e9a3",
+      "after_sha256": "b7aaffafb2109364f65262bdb23d3e0470692e1a9cd58ce6945060836d16ef4c",
       "owners": {
         "@module": {
-          "before": "21dd66232d89da2eab3fcf48448357b1f32947426811abd5eea311949d9c786f",
-          "after": "9737cc00d0e820d90b8a5a447b00a7a6f03ab99d3f3a9e1baf540b13d5f8d04d"
+          "before": "9737cc00d0e820d90b8a5a447b00a7a6f03ab99d3f3a9e1baf540b13d5f8d04d",
+          "after": "51fd0365ac20032ff718fed47fd7f24e5fc621c1351febaa49b5da8ee4f7474d"
         },
         "historical_evidence_path": {
-          "before": "7e347324eab963be1a123fcf6eadc13ccde380340b7e26a4e5c82ededb1a7902",
-          "after": "0241fe97a7fdcf67cfb0df650c5b6c671c955f8a37206ebe52924ded3ce71aed"
+          "before": "0241fe97a7fdcf67cfb0df650c5b6c671c955f8a37206ebe52924ded3ce71aed",
+          "after": "3215bddafa5fac07041c91ad2fb1eb4f990124fdcc0463737917f8de495b4c34"
         }
       }
     }
@@ -251,9 +275,9 @@
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
-      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -262,9 +286,9 @@
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
-      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -273,9 +297,9 @@
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
-      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -284,9 +308,9 @@
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
-      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -295,9 +319,9 @@
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
-      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -306,9 +330,9 @@
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
-      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -317,9 +341,9 @@
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
-      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -328,45 +352,45 @@
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
-      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
     },
-    "data/source_audits/issue535/baseline/tests/unit/test_phase16b_prebattle.py.txt": {
+    "data/source_audits/issue534/baseline/tests/unit/test_order64_reserve_lifetimes.py.txt": {
       "category": "rule_semantics",
       "operations": [
-        "issue535-order97-archive"
+        "issue534-order97-archive"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
-      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
     },
-    "data/source_audits/issue535/historical-inputs.json": {
+    "data/source_audits/issue534/historical-inputs.json": {
       "category": "rule_semantics",
       "operations": [
-        "issue535-order97-map"
+        "issue534-order97-map"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
-      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
     },
-    "docs/ISSUE_535_SCOUT_HISTORY.md": {
+    "docs/ISSUE_534_RESERVE_DESTRUCTION.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
-      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
-      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -374,67 +398,89 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
-      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
     },
-    "src/warhammer40k_core/engine/battlefield_transition_history.py": {
+    "src/warhammer40k_core/engine/fight_model_authority_history.py": {
       "category": "rule_semantics",
       "operations": [
-        "issue535-scout-transition-history"
+        "fight-rule-branch",
+        "issue534-reserve-fight-history"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
-      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "The existing event-history pass now maps reserve-deadline primary destruction events and scans prior typed mutations to preserve earlier casualties. This adds required semantic event support, with no serializer format, traversal architecture, cache or search redesign and no deliberate performance change. The approved bounded-repair default retains serial current-runtime smoke and live semantic/work/cache checks."
+    },
+    "src/warhammer40k_core/engine/game_state.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue534-reserve-destruction-dispatch",
+        "phase-rule-branch"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
+    },
+    "src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue534-reserve-logical-history"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "The existing reserve-death reconstruction branch now uses its established zero-wound removal semantics instead of preserving old wounds. Event order, membership lookup, traversal, serialization and caches are unchanged. This is a one-argument rules consistency correction with no deliberate performance change; retain serial current-runtime smoke and live semantic/work/cache checks."
+    },
+    "src/warhammer40k_core/engine/reserve_lifetime_boundary.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue534-reserve-lifetime-mutation"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
     },
     "tests/code_quality/test_order97_inventory.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
-      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
     },
-    "tests/code_quality/test_unit_model_semantics.py": {
+    "tests/code_quality/test_phase14h_attack_resolution_convergence.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
-      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
     },
-    "tests/integration/test_setup_prebattle_ui_smoke.py": {
+    "tests/unit/test_order64_reserve_lifetimes.py": {
       "category": "rule_semantics",
       "operations": [
-        "issue535-scout-facade-regression",
-        "issue537-scout-facade-regression"
+        "issue534-reserve-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
-      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
-    },
-    "tests/unit/test_phase16b_prebattle.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue535-scout-history-regression"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
-      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
     },
     "tools/core_rules_order97_history.py": {
       "category": "rule_semantics",
       "operations": [
+        "issue534-order97-history",
         "issue535-order97-history",
         "shock-source-generation-and-audit"
       ],
       "selected_families": [],
-      "rationale": "Bounded Scout transition recognition correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
-      "source_obligation": "Issue535 preserves accepted ordinary and attached Scout physical displacements in shared ordered history so engine-generated legal same-runtime checkpoints restore, fork and replay exactly.",
-      "unchanged_work": "No deliberate performance change: recognize one existing event family and read its existing nested transition through the shared parser. No reconstruction algorithm, traversal complexity, serialization shape, cache or workload changes; retain live smoke and semantic/work/cache gates."
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
     }
   },
   "milestone": "ordinary",

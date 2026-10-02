@@ -12,6 +12,7 @@ import pytest
 from tools import core_rules_order97_inventory as audit
 from tools.core_rules_order84_capture import fingerprint
 from tools.core_rules_order97_history import (
+    ISSUE534_MAPPING,
     ISSUE535_MAPPING,
     MAPPING,
     ORDER102_MAPPING,
@@ -175,30 +176,54 @@ def test_order97_rejects_duplicated_nonoperative_disposition(
         audit.load_inventory(payload=payload)
 
 
-def test_issue535_original_scout_assertions_remain_exact_and_fail_closed(tmp_path: Path) -> None:
-    reference = "tests/unit/test_phase16b_prebattle.py"
-    for name in (MAPPING, ORDER102_MAPPING, ORDER103_MAPPING):
+@pytest.mark.parametrize(
+    ("reference", "mapping_name", "base", "sha256", "byte_count", "prior_mappings"),
+    [
+        (
+            "tests/unit/test_phase16b_prebattle.py",
+            ISSUE535_MAPPING,
+            "ff0b2db17106e7e0493929d6ab9ddb15c44aa476",
+            "c1fcf7728167c259abfd08e08565aa2c1f637837751afd8d40b29f6f258959fb",
+            104510,
+            (MAPPING, ORDER102_MAPPING, ORDER103_MAPPING),
+        ),
+        (
+            "tests/unit/test_order64_reserve_lifetimes.py",
+            ISSUE534_MAPPING,
+            "262baafa102972d2f0f6acbd2b0ebdea5a2c7512",
+            "93853589f0f45bd115d87ca6ef07467af5442b7ad8822e08c8683c973b15ea2e",
+            14378,
+            (MAPPING, ORDER102_MAPPING, ORDER103_MAPPING, ISSUE535_MAPPING),
+        ),
+    ],
+)
+def test_original_assertions_remain_exact_and_fail_closed(
+    tmp_path: Path,
+    reference: str,
+    mapping_name: str,
+    base: str,
+    sha256: str,
+    byte_count: int,
+    prior_mappings: tuple[str, ...],
+) -> None:
+    for name in prior_mappings:
         path = tmp_path / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes((audit.ROOT / name).read_bytes())
     with pytest.raises(FileNotFoundError):
         historical_evidence_path(reference, root=tmp_path)
-    map_path = tmp_path / ISSUE535_MAPPING
+    map_path = tmp_path / mapping_name
     map_path.parent.mkdir(parents=True, exist_ok=True)
-    map_path.write_bytes((audit.ROOT / ISSUE535_MAPPING).read_bytes())
+    map_path.write_bytes((audit.ROOT / mapping_name).read_bytes())
     mapping = json.loads(map_path.read_bytes())
     assert mapping["reviewed_commit"] == "8007555ef23e85c11d39b294acec02bd83fc3271"
-    assert mapping["also_present_at_base"] == "ff0b2db17106e7e0493929d6ab9ddb15c44aa476"
+    assert mapping["also_present_at_base"] == base
     assert len(mapping["files"]) == 1
     row = mapping["files"][0]
     assert row["path"] == row["git_path"] == reference
     assert row["git_revision"] == mapping["reviewed_commit"]
-    assert (
-        row["sha256"]
-        == row["order97_file_pin"]
-        == ("c1fcf7728167c259abfd08e08565aa2c1f637837751afd8d40b29f6f258959fb")
-    )
-    assert row["bytes"] == 104510
+    assert row["sha256"] == row["order97_file_pin"] == sha256
+    assert row["bytes"] == byte_count
     with pytest.raises(FileNotFoundError):
         historical_evidence_path(reference, root=tmp_path)
     archive = tmp_path / row["historical_path"]
