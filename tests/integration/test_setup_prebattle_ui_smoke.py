@@ -41,6 +41,7 @@ from warhammer40k_core.engine.prebattle import (
     PreBattleViolationCode,
     ScoutMoveProposal,
 )
+from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.reserve_declarations import (
     SELECT_RESERVE_DECLARATION_DECISION_TYPE,
 )
@@ -443,6 +444,9 @@ def _event_companion_deployment_pose(
 
 
 def _event_companion_prebattle_pose(index: int, player_id: str) -> Pose:
+    if player_id == "player-b" and index == 5:
+        # The sixth grid slot intersects the layout's short solid terrain arm.
+        index = 6
     row = index // 3
     column = index % 3
     if player_id == "player-b":
@@ -675,12 +679,80 @@ def test_scout_facade_rejections_preserve_all_components_and_allow_retry(attache
         assert tuple(session.lifecycle.decision_controller.records) == before_records
         assert tuple(session.lifecycle.decision_controller.event_log.records) == before_events
         assert session.lifecycle.decision_controller.queue.peek_next() == request
+    _assert_scout_checkpoint_round_trip(session)
     status = session.submit_parameterized_payload(
         request_id=request.request_id,
         payload=_scout_move_payload(state=state, request=request, dx=0.5),
         result_id="scout-after-invalid",
     )
     assert status.status_kind is not LifecycleStatusKind.INVALID
+    _assert_scout_checkpoint_round_trip(session)
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize("attached", [False, True], ids=["ordinary", "attached"])
+@pytest.mark.parametrize("dx", [0.5, 0.0], ids=["nonzero", "zero"])
+def test_scout_history_restores_both_players_and_independent_fork(
+    attached: bool, dx: float
+) -> None:
+    session, request = _scout_facade_session(attached=attached)
+    _assert_scout_checkpoint_round_trip(session)
+    for player_id in ("player-a", "player-b"):
+        context = PreBattleProposalRequest.from_decision_request_payload(request.payload)
+        assert context.player_id == player_id
+        assert len(context.component_unit_instance_ids) == (2 if attached else 1)
+        status = session.submit_parameterized_payload(
+            request_id=request.request_id,
+            payload=_scout_move_payload(state=_state(session), request=request, dx=dx),
+            result_id=f"history-scout-{player_id}",
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID
+        _assert_scout_checkpoint_round_trip(session)
+        if player_id == "player-a":
+            # Advancing a recovered branch must not consume the source's next choice.
+            before = session.lifecycle.to_payload()
+            fork = session.fork()
+            selection = _decision_request(status)
+            assert selection.actor_id == "player-b"
+            fork_status = fork.submit_option(
+                request_id=selection.request_id,
+                option_id="complete_prebattle_actions",
+                result_id="history-fork-skip-b",
+            )
+            assert fork_status.status_kind is not LifecycleStatusKind.INVALID
+            assert _state(fork).stage is GameLifecycleStage.BATTLE
+            _assert_scout_checkpoint_round_trip(fork)
+            assert session.lifecycle.to_payload() == before
+            option = next(
+                option for option in selection.options if option.option_id.startswith("scout_move:")
+            )
+            status = session.submit_option(
+                request_id=selection.request_id,
+                option_id=option.option_id,
+                result_id="history-select-scout-b",
+            )
+            request = _decision_request(status)
+            assert request.decision_type == SUBMIT_SCOUT_MOVE_DECISION_TYPE
+    assert _state(session).stage is GameLifecycleStage.BATTLE
+    events = session.lifecycle.decision_controller.event_log.records
+    assert sum(event.event_type == "prebattle_scout_move_completed" for event in events) == 2
+
+
+def _assert_scout_checkpoint_round_trip(session: LocalGameSession) -> None:
+    checkpoint = session.to_persistence_payload()
+    encoded = json.dumps(checkpoint, sort_keys=True)
+    assert "object at 0x" not in encoded
+    restored = LocalGameSession.from_persistence_payload(json.loads(encoded))
+    fork = session.fork()
+    for recovered in (restored, fork):
+        assert recovered.lifecycle.to_payload() == session.lifecycle.to_payload()
+        assert recovered.to_persistence_payload() == checkpoint
+        for player_id in ("player-a", "player-b"):
+            assert recovered.view(viewer_player_id=player_id) == session.view(
+                viewer_player_id=player_id
+            )
+    replay = ReplayRunner.from_payload(session.replay_artifact(artifact_id="scout-history")).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED
 
 
 def _scout_facade_session(*, attached: bool) -> tuple[LocalGameSession, DecisionRequest]:
@@ -724,7 +796,7 @@ def _scout_facade_session(*, attached: bool) -> tuple[LocalGameSession, Decision
             status = session.submit_option(
                 request_id=request.request_id, option_id=option_id, result_id=f"scout-facade-{step}"
             )
-        assert status.status_kind is not LifecycleStatusKind.INVALID
+        assert status.status_kind is not LifecycleStatusKind.INVALID, json.dumps(status.payload)
 
 
 def _scout_facade_config(*, attached: bool) -> GameConfig:
@@ -756,7 +828,7 @@ def _scout_facade_config(*, attached: bool) -> GameConfig:
         replace(
             req,
             unit_selections=(req.unit_selections[0], leader)
-            if attached and req.player_id == "player-a"
+            if attached
             else (req.unit_selections[0],),
             attachment_declarations=(
                 AttachmentDeclaration(
@@ -764,7 +836,7 @@ def _scout_facade_config(*, attached: bool) -> GameConfig:
                     bodyguard_unit_selection_id="scout-redeploy-unit",
                 ),
             )
-            if attached and req.player_id == "player-a"
+            if attached
             else (),
         )
         for req in config.army_muster_requests

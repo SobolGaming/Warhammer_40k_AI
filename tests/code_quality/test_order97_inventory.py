@@ -2,12 +2,22 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from copy import deepcopy
+from pathlib import Path
 from typing import Any
 
 import pytest
 from tools import core_rules_order97_inventory as audit
 from tools.core_rules_order84_capture import fingerprint
+from tools.core_rules_order97_history import (
+    ISSUE535_MAPPING,
+    MAPPING,
+    ORDER102_MAPPING,
+    ORDER103_MAPPING,
+    historical_evidence_path,
+)
 
 
 def repin(monkeypatch: pytest.MonkeyPatch, payload: dict[str, Any]) -> None:
@@ -163,3 +173,45 @@ def test_order97_rejects_duplicated_nonoperative_disposition(
     repin(monkeypatch, payload)
     with pytest.raises(audit.InventoryError, match="Duplicated nonoperative disposition"):
         audit.load_inventory(payload=payload)
+
+
+def test_issue535_original_scout_assertions_remain_exact_and_fail_closed(tmp_path: Path) -> None:
+    reference = "tests/unit/test_phase16b_prebattle.py"
+    for name in (MAPPING, ORDER102_MAPPING, ORDER103_MAPPING):
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes((audit.ROOT / name).read_bytes())
+    with pytest.raises(FileNotFoundError):
+        historical_evidence_path(reference, root=tmp_path)
+    map_path = tmp_path / ISSUE535_MAPPING
+    map_path.parent.mkdir(parents=True, exist_ok=True)
+    map_path.write_bytes((audit.ROOT / ISSUE535_MAPPING).read_bytes())
+    mapping = json.loads(map_path.read_bytes())
+    assert mapping["reviewed_commit"] == "8007555ef23e85c11d39b294acec02bd83fc3271"
+    assert mapping["also_present_at_base"] == "ff0b2db17106e7e0493929d6ab9ddb15c44aa476"
+    assert len(mapping["files"]) == 1
+    row = mapping["files"][0]
+    assert row["path"] == row["git_path"] == reference
+    assert row["git_revision"] == mapping["reviewed_commit"]
+    assert (
+        row["sha256"]
+        == row["order97_file_pin"]
+        == ("c1fcf7728167c259abfd08e08565aa2c1f637837751afd8d40b29f6f258959fb")
+    )
+    assert row["bytes"] == 104510
+    with pytest.raises(FileNotFoundError):
+        historical_evidence_path(reference, root=tmp_path)
+    archive = tmp_path / row["historical_path"]
+    archive.parent.mkdir(parents=True, exist_ok=True)
+    retained = (audit.ROOT / row["historical_path"]).read_bytes()
+    assert len(retained) == row["bytes"]
+    assert hashlib.sha256(retained).hexdigest() == row["sha256"]
+    archive.write_bytes(retained)
+    assert historical_evidence_path(reference, root=tmp_path) == archive
+    archive.write_bytes(retained + b"\n")
+    with pytest.raises(ValueError, match="immutable historical input drifted"):
+        historical_evidence_path(reference, root=tmp_path)
+    archive.write_bytes(retained)
+    map_path.write_bytes(map_path.read_bytes() + b"\n")
+    with pytest.raises(ValueError, match="historical-input mapping drifted"):
+        historical_evidence_path(reference, root=tmp_path)

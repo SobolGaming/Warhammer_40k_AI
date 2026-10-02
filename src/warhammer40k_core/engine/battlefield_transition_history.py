@@ -23,6 +23,7 @@ AUTHORITATIVE_BATTLEFIELD_TRANSITION_EVENT_TYPES = frozenset(
         "charge_move_completed",
         "fight_movement_completed",
         "movement_activation_completed",
+        "prebattle_scout_move_completed",
         "reinforcement_unit_arrived",
         "triggered_movement_resolved",
         "unit_disembarked",
@@ -40,9 +41,15 @@ def authoritative_battlefield_transition_batch_or_none(
         return None
     if not isinstance(event.payload, dict):
         raise GameLifecycleError("Battlefield transition event payload is invalid.")
-    raw_transition = event.payload.get("transition_batch")
-    if raw_transition is None:
-        return None
+    if event.event_type == "prebattle_scout_move_completed":
+        resolution = event.payload.get("resolution")
+        if not isinstance(resolution, dict):
+            raise GameLifecycleError("Battlefield transition resolution is invalid.")
+        raw_transition = resolution.get("transition_batch")
+    else:
+        raw_transition = event.payload.get("transition_batch")
+        if raw_transition is None:
+            return None
     if not isinstance(raw_transition, dict):
         raise GameLifecycleError("Battlefield transition batch is invalid.")
     try:
