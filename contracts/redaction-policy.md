@@ -144,3 +144,10 @@ bindings and epoch.
 event/status examples are conformance fixtures. Adding a visibility-sensitive
 payload requires valid owner and opponent examples plus a regression proving
 that counts and metadata do not leak.
+
+Contract 44 battlefield model `rules_unit_instance_id` is null for non-owning
+viewers while simultaneous battle-formation declarations are unresolved. This
+applies to ordinary and attached units alike. It reuses the same declaration
+visibility boundary as model state/pose, never adds a hidden model row, and is
+recomputed from current rules-unit membership after split or reveal. Physical
+`unit_instance_id` retains the existing visible roster ownership policy.

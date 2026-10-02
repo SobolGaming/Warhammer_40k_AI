@@ -3056,6 +3056,7 @@
               "z_inches": 0.0
             }
           },
+          "rules_unit_instance_id": "army-alpha:intercessor-unit-1",
           "state": "placed",
           "state_context": {
             "reserve_kind": null,
@@ -3109,6 +3110,7 @@
               "z_inches": 0.0
             }
           },
+          "rules_unit_instance_id": "army-alpha:intercessor-unit-1",
           "state": "placed",
           "state_context": {
             "reserve_kind": null,
@@ -3162,6 +3164,7 @@
               "z_inches": 0.0
             }
           },
+          "rules_unit_instance_id": "army-alpha:intercessor-unit-1",
           "state": "placed",
           "state_context": {
             "reserve_kind": null,
@@ -3215,6 +3218,7 @@
               "z_inches": 0.0
             }
           },
+          "rules_unit_instance_id": "army-alpha:intercessor-unit-1",
           "state": "placed",
           "state_context": {
             "reserve_kind": null,
@@ -3268,6 +3272,7 @@
               "z_inches": 0.0
             }
           },
+          "rules_unit_instance_id": "army-alpha:intercessor-unit-1",
           "state": "placed",
           "state_context": {
             "reserve_kind": null,
@@ -3314,6 +3319,7 @@
           "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:001",
           "owner_player_id": "player-b",
           "pose": null,
+          "rules_unit_instance_id": "army-beta:intercessor-unit-2",
           "state": "reserves",
           "state_context": {
             "reserve_kind": "strategic_reserves",
@@ -3360,6 +3366,7 @@
           "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:002",
           "owner_player_id": "player-b",
           "pose": null,
+          "rules_unit_instance_id": "army-beta:intercessor-unit-2",
           "state": "reserves",
           "state_context": {
             "reserve_kind": "strategic_reserves",
@@ -3406,6 +3413,7 @@
           "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:003",
           "owner_player_id": "player-b",
           "pose": null,
+          "rules_unit_instance_id": "army-beta:intercessor-unit-2",
           "state": "reserves",
           "state_context": {
             "reserve_kind": "strategic_reserves",
@@ -3452,6 +3460,7 @@
           "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:004",
           "owner_player_id": "player-b",
           "pose": null,
+          "rules_unit_instance_id": "army-beta:intercessor-unit-2",
           "state": "reserves",
           "state_context": {
             "reserve_kind": "strategic_reserves",
@@ -3498,6 +3507,7 @@
           "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:005",
           "owner_player_id": "player-b",
           "pose": null,
+          "rules_unit_instance_id": "army-beta:intercessor-unit-2",
           "state": "reserves",
           "state_context": {
             "reserve_kind": "strategic_reserves",
@@ -6963,7 +6973,7 @@
         }
       }
     },
-    "authoritative_geometry_hash": "644cb16f3c627468c736ffb73323148bcc8ee08ead80e513debe6a74a4275855",
+    "authoritative_geometry_hash": "ead59bdfb5d0e31dd88dc992cfc139bb7a88d6e66fafdfaa2c1346d8d42dcf3b",
     "battlefield_id": "ui-contract-terrain-snapshot-hidden-reserve:take-and-hold-vs-purge-the-foe-layout-3-deployment:battlefield",
     "bounds": {
       "max_x_inches": 44.0,
@@ -8046,7 +8056,7 @@
         }
       }
     },
-    "schema_version": "battlefield-view-v4-phase17n-step3"
+    "schema_version": "battlefield-view-v5-rules-unit-membership"
   },
   "current_battle_phase": "movement",
   "current_setup_step": null,
@@ -14985,7 +14995,7 @@
     }
   ],
   "projection_schema": "game-view-v13-random-profiles",
-  "projection_state_hash": "48104422d9884be12c5ab132c93bfc85dd0d7abc650670e014671796e22f8f8d",
+  "projection_state_hash": "c2687880367e84080870f285256bb91062546ef10b1a90b6a0b56b4639b49dcb",
   "public_command_point_ledgers": [
     {
       "command_points": 1,

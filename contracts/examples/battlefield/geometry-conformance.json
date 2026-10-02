@@ -183,6 +183,7 @@
             "z_inches": 0.0
           }
         },
+        "rules_unit_instance_id": "geometry-conformance-circle-unit",
         "state": "placed",
         "state_context": {
           "reserve_kind": null,
@@ -236,6 +237,7 @@
             "z_inches": 0.5
           }
         },
+        "rules_unit_instance_id": "geometry-conformance-hull-unit",
         "state": "placed",
         "state_context": {
           "reserve_kind": null,
@@ -289,6 +291,7 @@
             "z_inches": 0.0
           }
         },
+        "rules_unit_instance_id": "geometry-conformance-oval-unit",
         "state": "placed",
         "state_context": {
           "reserve_kind": null,
@@ -397,7 +400,7 @@
       }
     }
   },
-  "authoritative_geometry_hash": "ea06cd82008b2f2d2d349f34966924f40eda02594b6a8352510019ed81e704c2",
+  "authoritative_geometry_hash": "0942e024170b5375393f7f1aaa239072e704adb959483ce92a987c44a85205df",
   "battlefield_id": "geometry-conformance-battlefield",
   "bounds": {
     "max_x_inches": 60.0,
@@ -521,5 +524,5 @@
       }
     }
   },
-  "schema_version": "battlefield-view-v4-phase17n-step3"
+  "schema_version": "battlefield-view-v5-rules-unit-membership"
 }

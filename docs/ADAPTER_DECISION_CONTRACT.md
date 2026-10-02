@@ -658,7 +658,7 @@ reference server currently requires:
   mission state contains both directed Primary Mission assignments, complete
   group-aware turn-start position rows, and persistent Step 4 Primary Mission
   progress;
-- `battlefield-view-v4-phase17n-step3` for authoritative battlefield geometry
+- `battlefield-view-v5-rules-unit-membership` for authoritative battlefield geometry
   with explicit terrain-area logical identity and terrain area and feature
   classifications, plus viewer-scoped model formation state before reveal;
 - `session-projection-v8-model-keywords` for full role-scoped reconnect projections;
@@ -4166,7 +4166,7 @@ The submission contract is shared. The information available to a producer is no
 Phase 18J publishes `GameViewPayload.battlefield_view` as the canonical visual
 play-surface contract. The member remains optional because projections can
 exist before battlefield and mission state; current engine projections emit
-`battlefield-view-v4-phase17n-step3` when
+`battlefield-view-v5-rules-unit-membership` when
 both battlefield and mission state exist and emit `null` before that boundary.
 Its normative world frame is defined in `contracts/coordinate-system.md`:
 inches, lower-left origin, positive X/Y on the board plane, positive Z above
@@ -7372,3 +7372,24 @@ pools and queries its new canonical target; already gathered attacks are not
 retargeted. Both facades, viewers, persistence and replay share these owners.
 Clients copy engine options and must discard old cached group IDs. See the
 [43 migration](../contracts/migrations/42-to-43.md) for family versions and support.
+
+### Contract 44: canonical movement actor membership
+
+Every battlefield model publishes required nullable `rules_unit_instance_id`
+alongside physical `unit_instance_id`. Group current `placed` model rows by the
+proposal actor to construct complete ordinary or attached movement witnesses.
+Use the published poses, original request context, committed Charge targets and
+budget; membership grants no legal-movement authority. Hidden simultaneous
+formation membership is null for opponents until reveal. Split, casualty and
+physical-removal updates appear on the next projection. See
+[`43-to-44.md`](../contracts/migrations/43-to-44.md).
+
+Issue 532 audit: ordinary Movement requests (`movement_action_decisions.py`) and
+Pile In/Consolidate requests (`fight_movement_lifecycle.py`) also name canonical
+rules-unit actors and consume complete physical model witnesses. The shared
+projection field supplies their missing join without changing these phase
+serializers. Charge uses `charge_proposal_flow.py` and
+`charge_movement_source.validate_charge_witness_for_proposal`; its commitment,
+budget, complete membership and start-pose checks remain unchanged. Scout
+(`prebattle.py`) and deployment (`deployment.py`) already publish explicit
+component/model inventories; those contracts remain unchanged.

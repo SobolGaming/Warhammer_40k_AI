@@ -45,7 +45,7 @@ from HealingEffect and requires source-bound engagement evidence on battlefield
 revival events. See [35 to 36 migration](migrations/35-to-36.md).
 
 
-Contract version: `43.0.0`
+Contract version: `44.0.0`
 
 Order 81 / P03E restores the existing pending-proposal contract for all 13
 parameterized families. Interaction conformance examples now preserve the four
@@ -290,7 +290,7 @@ hash. The battlefield family separates viewer-scoped authoritative
 geometry and its hash from interaction overlays and non-authoritative render
 hints under the normative `coordinate-system.md` world frame.
 `examples/battlefield/geometry-conformance.json` is the canonical standalone
-`battlefield-view-v4-phase17n-step3` fixture for every declared geometry union surface and is
+`battlefield-view-v5-rules-unit-membership` fixture for every declared geometry union surface and is
 validated by both Python and the generated TypeScript client. Movement and
 shared placement proposal requests use a separate opaque engine-owned
 `spatial_context_hash`; the viewer-scoped authoritative hash is informational.
@@ -563,3 +563,10 @@ Order 84 / Contract 38 separates physical dice from source-assigned results,
 including values above six and whole-roll assignments. Tied highest/lowest
 references expose physical component options to the effective active player.
 See [migration 37 to 38](migrations/37-to-38.md).
+
+Contract 44 publishes current canonical rules-unit identity beside each visible
+model's physical owner. Charge clients join the canonical proposal actor to all
+placed model rows and preserve their physical ownership. See
+[migration 43 to 44](migrations/43-to-44.md) for visibility, freshness and witness
+requirements, and `examples/projections/attached_charge_view.json` for an actual
+attached Charge request and its complete viewer-scoped model membership.

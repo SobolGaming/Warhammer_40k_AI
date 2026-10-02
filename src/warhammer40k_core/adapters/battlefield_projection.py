@@ -17,6 +17,7 @@ from warhammer40k_core.engine.event_log import JsonValue, canonical_json, valida
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.reserves import ReserveStatus
+from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
 from warhammer40k_core.engine.unit_factory import ModelInstance
 from warhammer40k_core.engine.unit_ownership import SplitUnitOriginPayload
 from warhammer40k_core.geometry.measurement import millimeters_to_inches
@@ -24,7 +25,7 @@ from warhammer40k_core.geometry.model_geometry import BaseFootprintKind
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
-BATTLEFIELD_VIEW_SCHEMA_VERSION = "battlefield-view-v4-phase17n-step3"
+BATTLEFIELD_VIEW_SCHEMA_VERSION = "battlefield-view-v5-rules-unit-membership"
 BATTLEFIELD_COORDINATE_SPEC_VERSION = "battlefield-coordinate-v1"
 BATTLEFIELD_COORDINATE_SPACE = "battlefield_inches_right_handed_z_up"
 
@@ -81,6 +82,7 @@ class BattlefieldModelEntityPayload(TypedDict):
     entity_kind: Literal["model"]
     model_instance_id: str
     unit_instance_id: str
+    rules_unit_instance_id: str | None
     owner_player_id: str
     state: Literal["placed", "destroyed", "embarked", "reserves", "removed", "undeployed"]
     pose: BattlefieldPosePayload | None
@@ -373,6 +375,11 @@ def _model_entities(
     removed_model_ids = frozenset(battlefield.removed_model_ids)
     projected: dict[str, BattlefieldModelEntityPayload] = {}
     formation_declarations_unresolved = battle_formation_declarations_are_unresolved(state)
+    rules_unit_by_model_id = {
+        model.model_instance_id: view.unit_instance_id
+        for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
+        for model in view.own_models
+    }
     for army in state.army_definitions:
         for unit in visible_army_units(
             state=state,
@@ -406,6 +413,11 @@ def _model_entities(
                     "entity_kind": "model",
                     "model_instance_id": model.model_instance_id,
                     "unit_instance_id": unit.unit_instance_id,
+                    "rules_unit_instance_id": (
+                        None
+                        if formation_hidden
+                        else rules_unit_by_model_id[model.model_instance_id]
+                    ),
                     "owner_player_id": army.player_id,
                     "state": state_token,
                     "pose": (
