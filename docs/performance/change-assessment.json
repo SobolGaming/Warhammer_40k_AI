@@ -1,86 +1,86 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "262baafa102972d2f0f6acbd2b0ebdea5a2c7512",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:248fe30971fbb9cec16b6792bf50cdfd6607ccf07aba982b4a6bb0bac789a7f8",
-  "operation_map_sha256": "74d75745826ba9990cf7fd53aed690e5d42ab2c2ef48fe1b919825668d45ad92",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:46532413fcc67215c90ffb287308def0301b72559576fe3103a1880b9463d19b",
+  "operation_map_sha256": "caf782d578289d0037ac9a1d244af9d8d246edcf2e7544d82b2e8ac37973b3a6",
   "changes": {
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "6b01ba1a7e8d0ef7f378a001e5dbe96413d22f03350a0e2de4c7e97dc9f916b6",
-      "after_sha256": "2887ef3c73361ef22d87104ab04315e0a604024fbdbc02cc49c461cc75c8cd70",
+      "after_sha256": "6f68afff678f41fcc9c2d9cdc018ac63f3991da39e4ff35b3d73094573684bc6",
       "owners": {
         "@document": {
           "before": "6b01ba1a7e8d0ef7f378a001e5dbe96413d22f03350a0e2de4c7e97dc9f916b6",
-          "after": "2887ef3c73361ef22d87104ab04315e0a604024fbdbc02cc49c461cc75c8cd70"
+          "after": "6f68afff678f41fcc9c2d9cdc018ac63f3991da39e4ff35b3d73094573684bc6"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "da779dcb0cfe883bd040fd1c32f89b1fd84f3e5b6dee893d6f434f8fb4114b77",
-      "after_sha256": "c3ad23fbce3390c97db7114ed1a70c826a616bbefc21c2ce2dd78f8101b47f47",
+      "after_sha256": "d6bc5b578dc173c7bee8e1fe6d026fb50c45b3eb6f30bda404ccef50baa3cc87",
       "owners": {
         "@document": {
           "before": "da779dcb0cfe883bd040fd1c32f89b1fd84f3e5b6dee893d6f434f8fb4114b77",
-          "after": "c3ad23fbce3390c97db7114ed1a70c826a616bbefc21c2ce2dd78f8101b47f47"
+          "after": "d6bc5b578dc173c7bee8e1fe6d026fb50c45b3eb6f30bda404ccef50baa3cc87"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "c919f0c1283088b67800c6d35b78084adb43b160af0fb7338271b67634c5ad8c",
-      "after_sha256": "9eac187f7893be346d9455debc7ed0a57a592e6ca900c553a36096e30b2bbfbd",
+      "after_sha256": "eb982bba7eaa8c3d312f37c8f93dc2a00852e7b20ee8e29c64dc4f633610179d",
       "owners": {
         "@document": {
           "before": "c919f0c1283088b67800c6d35b78084adb43b160af0fb7338271b67634c5ad8c",
-          "after": "9eac187f7893be346d9455debc7ed0a57a592e6ca900c553a36096e30b2bbfbd"
+          "after": "eb982bba7eaa8c3d312f37c8f93dc2a00852e7b20ee8e29c64dc4f633610179d"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "2588fa7b36c29947a62cb1916ab219d0822c34535479791e35745f566f089c7b",
-      "after_sha256": "2ce10ef66b72fd368015bf053a8d15d2bb0087967b2ea38abc55f465e7c41530",
+      "after_sha256": "53846b795fde23814fa0e8f1429a5db0dae2965956228ef012c43946abe6ae56",
       "owners": {
         "@document": {
           "before": "2588fa7b36c29947a62cb1916ab219d0822c34535479791e35745f566f089c7b",
-          "after": "2ce10ef66b72fd368015bf053a8d15d2bb0087967b2ea38abc55f465e7c41530"
+          "after": "53846b795fde23814fa0e8f1429a5db0dae2965956228ef012c43946abe6ae56"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "bc4dfd3072b63c54f13f17b21179b43755790d611890df8ff7113676f629d923",
-      "after_sha256": "5515ef501f2b7e3f8300877ec2f374c141d21bba08ea444bc2278a46d62b350c",
+      "after_sha256": "3d3d21277bae829fb3996dade076be1ab205a6c3c6b9c1d72418dbc777032a0b",
       "owners": {
         "@document": {
           "before": "bc4dfd3072b63c54f13f17b21179b43755790d611890df8ff7113676f629d923",
-          "after": "5515ef501f2b7e3f8300877ec2f374c141d21bba08ea444bc2278a46d62b350c"
+          "after": "3d3d21277bae829fb3996dade076be1ab205a6c3c6b9c1d72418dbc777032a0b"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "81d14779ba85a2d5435032e1aa7f17467385b9e41760ac5b7a203c6cf68ac36f",
-      "after_sha256": "5b23d3a069a51af84f232c687264724716b8ca21a5766a27ff2c013e01d04538",
+      "after_sha256": "45f4fcc7c557cd4ae8eaddbd94b3b9bbb21e00880687ea1476dcc17a934a7e5e",
       "owners": {
         "@document": {
           "before": "81d14779ba85a2d5435032e1aa7f17467385b9e41760ac5b7a203c6cf68ac36f",
-          "after": "5b23d3a069a51af84f232c687264724716b8ca21a5766a27ff2c013e01d04538"
+          "after": "45f4fcc7c557cd4ae8eaddbd94b3b9bbb21e00880687ea1476dcc17a934a7e5e"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "092858832eab801115b4b7ad2000f51e46dfa77a17a717cebe98e0321e063777",
-      "after_sha256": "10e47b0424f241f6ab48fdafc066af6e1453f7e99545d94524e3af191720574c",
+      "after_sha256": "677098c88ec489e9d6f67d4aae360064c3300b0cfeda49fe406499c9b8a8b2c9",
       "owners": {
         "@document": {
           "before": "092858832eab801115b4b7ad2000f51e46dfa77a17a717cebe98e0321e063777",
-          "after": "10e47b0424f241f6ab48fdafc066af6e1453f7e99545d94524e3af191720574c"
+          "after": "677098c88ec489e9d6f67d4aae360064c3300b0cfeda49fe406499c9b8a8b2c9"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "ae33473e49b3920af4805ebeda57b2cc0177617e9d589ce715ebc9f9d61c2e2b",
-      "after_sha256": "280db3498732b2a048f02a012eb29d42250409acbf8a17e6a39b70fa321c4515",
+      "after_sha256": "7abb0d188c6bde207caec2c7d9a1bce572dfb849ce4c2365f40dee71274bc0a4",
       "owners": {
         "@document": {
           "before": "ae33473e49b3920af4805ebeda57b2cc0177617e9d589ce715ebc9f9d61c2e2b",
-          "after": "280db3498732b2a048f02a012eb29d42250409acbf8a17e6a39b70fa321c4515"
+          "after": "7abb0d188c6bde207caec2c7d9a1bce572dfb849ce4c2365f40dee71274bc0a4"
         }
       }
     },
@@ -106,41 +106,41 @@
     },
     "docs/ISSUE_534_RESERVE_DESTRUCTION.md": {
       "before_sha256": null,
-      "after_sha256": "e39f2081bd527ba25ee71c9353e53dceea2e3c75dc054bbbc73ec27b7c1c9fbb",
+      "after_sha256": "cd0e6b0531c321bb7a3e2ec80c12a7a7dfe7fa51e605c2aa74c132ff828fb1aa",
       "owners": {
         "@document": {
           "before": null,
-          "after": "e39f2081bd527ba25ee71c9353e53dceea2e3c75dc054bbbc73ec27b7c1c9fbb"
+          "after": "cd0e6b0531c321bb7a3e2ec80c12a7a7dfe7fa51e605c2aa74c132ff828fb1aa"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "0d97eb42f242fc13c78797ba48a71b4597773ec5250336b31899d8aa0d5dc0da",
-      "after_sha256": "08168ebb48355f2223de90f9ed34ffc54b7fefc6fc0b78e72dae01440c3fafac",
+      "after_sha256": "cf4277353d09efb4d7f5983e10c68530051a264fab93d8da7b47bce309998c5e",
       "owners": {
         "@document": {
           "before": "0d97eb42f242fc13c78797ba48a71b4597773ec5250336b31899d8aa0d5dc0da",
-          "after": "08168ebb48355f2223de90f9ed34ffc54b7fefc6fc0b78e72dae01440c3fafac"
+          "after": "cf4277353d09efb4d7f5983e10c68530051a264fab93d8da7b47bce309998c5e"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "934bb18175b73def0368471b735f3fe9cb4eb1ef5548d0c2d395c8633ffed004",
-      "after_sha256": "16c8f80d8d63b4b2f72fd4eaaa4c53c62800e0944753cef45b33e8368a68592c",
+      "after_sha256": "8ce93c5222fbcc5d167f497ce94581f91ac33bf09c9370f2cf26c0bb61ef17c0",
       "owners": {
         "@document": {
           "before": "934bb18175b73def0368471b735f3fe9cb4eb1ef5548d0c2d395c8633ffed004",
-          "after": "16c8f80d8d63b4b2f72fd4eaaa4c53c62800e0944753cef45b33e8368a68592c"
+          "after": "8ce93c5222fbcc5d167f497ce94581f91ac33bf09c9370f2cf26c0bb61ef17c0"
         }
       }
     },
     "src/warhammer40k_core/engine/fight_model_authority_history.py": {
       "before_sha256": "5551ace039358454624db3b5e303fdd18783984ed8e91bd5c4427a00193930fa",
-      "after_sha256": "072273e4fc4b0a63e45a71acf7931ab12f8ee58f5bff52ffc1c612308b32562b",
+      "after_sha256": "a1b449c2928df40055b0a419ed8ec7b5fa0ed281e7dcf6430ab7a0d24faf5777",
       "owners": {
         "@module": {
           "before": "0f2327dc9feda298347787eff4e6fdab0d75485577d24854f0bfde6a6b2ce328",
-          "after": "a989d308779612ef31ef4c8ee657bbf61fb7c17722505002552dee453fff4aeb"
+          "after": "1dda77b7ed2d57113132995a4ea5c57a17261da4ffa0bfc7af2ffaf1b0cb5c75"
         },
         "_authority_mutations_by_event_index": {
           "before": "40a3909113a624909c9067fa9c7616bd6fc4c950cf16827296140bfe48165260",
@@ -148,7 +148,7 @@
         },
         "_reserve_deadline_destruction_mutations": {
           "before": null,
-          "after": "65f1e3f7901d24b28a65e932d83da88ba61adfda8abf7afd312c069de5a5c866"
+          "after": "e84a1c8beea8f691c1bbc55c8297d35c5958a0f1cf142d0894bb3f239da4eefe"
         }
       }
     },
@@ -166,6 +166,34 @@
         }
       }
     },
+    "src/warhammer40k_core/engine/primary_historical_event_integrity.py": {
+      "before_sha256": "1268b570e845062a194d05049a1118d3e72be2c2a8f8f09bdb0dcf751e31bc7f",
+      "after_sha256": "97f57bff652e831491bca5182f8fed6879119657dd0a8ca57b853e3b5b357150",
+      "owners": {
+        "@module": {
+          "before": "69a63529c9b33d1fb19d8320b4d6aa1b517c6ad03b9e49b7213f35ecb1a8bd55",
+          "after": "abe49bc28ef0bec446e93e578ef9782b6cf4d5e8c1864c957df0ede794748ca5"
+        },
+        "_validate_no_missing_model_destroyed_departures": {
+          "before": "b74d65c2fcb533bbbcf906935ee3d007ccf98c444392879055d92c5919608eec",
+          "after": "5c957cbe842c0276a94fd2181d39722d757dfb41df0fde84a5c42be9f06b6e8c"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/primary_historical_events.py": {
+      "before_sha256": "0530256e6d431cd3f0a97dbf0a7bdba57ee1cd14186691f335cc677ccd11668a",
+      "after_sha256": "837575045d18ca1a5eb3d2c6d5f7ddffc2afc9ea0f5e1187131e33e8a95b9871",
+      "owners": {
+        "@module": {
+          "before": "cf66b52c98b4a2aca4815602997fe138c0437deadcaa8c466b2ef1e1503d7934",
+          "after": "4ad6e3f562132db1370ce89fb03b092da0dd737d927d57a57b2606297686a86e"
+        },
+        "primary_destruction_recorded_state_payload": {
+          "before": null,
+          "after": "363a96b2780f349a444f1f98b7499d9b2573f7d08f8405483faa1b477539c800"
+        }
+      }
+    },
     "src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py": {
       "before_sha256": "544ae3413a72204907765324596fb56c7e17f951b71c5f089b7b952e60e7e26e",
       "after_sha256": "3a996c6b5282b3664eb3c17a0220482fb3a75438108b7c9d43f3cb0a64f45d42",
@@ -178,7 +206,7 @@
     },
     "src/warhammer40k_core/engine/reserve_lifetime_boundary.py": {
       "before_sha256": "828e65f26b42a4d4e13987ac9c6ab1488365a8d853413fc0e55a324efdab9363",
-      "after_sha256": "1f93ddf2dd40e37f61ce065c939e1aade8ebaac95dbd8c190900ad8132870dab",
+      "after_sha256": "f306e51eb8ea8407f2e971c4266f9c16d5ee103130594b28f973640a9c8c508f",
       "owners": {
         "@module": {
           "before": "56eb711c7a0baba9e9eda91fc1feb87de381260da8edff5f9e318c32cd466573",
@@ -186,7 +214,17 @@
         },
         "apply_destruction": {
           "before": null,
-          "after": "2d20abf3ea1ee3f5d16d2546d02cce6c10707ff869dec64c7f56e64931c08ea4"
+          "after": "22b9429f2d6ecd7b766911b248c96a22102161b069981101f578a781901986ab"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/secondary_scoring_state_evidence_authority.py": {
+      "before_sha256": "a5a0a1c70e3bff6262cf0f93217c805379ead12701de33ab22c7ad228bfc11c2",
+      "after_sha256": "308b256642d395bdc34eb0176f0c6cf826f74582da0ad2b6f2e194dbdffd335b",
+      "owners": {
+        "_validate_same_boundary_reserve_destructions": {
+          "before": "1f6b5c54680cd3afa93d3bc95f4e20464c6a59adafdb9f0c5558f520ef446ea2",
+          "after": "990b73255275190a463ec6bfefff4837b6a6702b3ccc183c3095857115e5b07e"
         }
       }
     },
@@ -224,7 +262,7 @@
     },
     "tests/unit/test_order64_reserve_lifetimes.py": {
       "before_sha256": "93853589f0f45bd115d87ca6ef07467af5442b7ad8822e08c8683c973b15ea2e",
-      "after_sha256": "9c26db32c6edfc38fe97665482d41c6efe6a50634320ea80845b9de9fd919559",
+      "after_sha256": "d6d490c27aca063642923310ba0daecae7da745341016bf72eebbfafbd32f510",
       "owners": {
         "@module": {
           "before": "cd95703d68035d99f58793cd60a7bbcff47bf419525f5f0d9bf08b68fdd15924",
@@ -249,6 +287,10 @@
         "test_reserve_deadline_logical_death_preserves_public_play_and_persistence": {
           "before": null,
           "after": "1b270d621708569f1a5609405c2b69635e905062624dcf64a0bd793c4862aff0"
+        },
+        "test_reserve_deadline_secondary_boundary_preserves_attached_casualty_presence": {
+          "before": null,
+          "after": "d81dd1aeb10957d33730b3a866fce462d2957cea183a80e90788ff3ffc3c2d09"
         }
       }
     },
@@ -424,6 +466,26 @@
       "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
       "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
     },
+    "src/warhammer40k_core/engine/primary_historical_event_integrity.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue534-primary-event-integrity"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "Call the shared extraction of the same existing envelope and identity guards. Validation semantics and diagnostics are unchanged; no additional traversal, cache, search or serialization work. Retain serial current-runtime smoke."
+    },
+    "src/warhammer40k_core/engine/primary_historical_events.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue534-primary-event-envelope"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "Extract the existing recorded-primary-destruction envelope and identity guards into a shared pure parser so both existing integrity validation and the new reserve Fight consumer retain established diagnostics. No additional historical traversal or serialization changes; retain serial current-runtime smoke."
+    },
     "src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py": {
       "category": "rule_semantics",
       "operations": [
@@ -443,6 +505,16 @@
       "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
       "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
       "unchanged_work": "No deliberate performance change: the boundary uses the existing no-reaction model death primitive and preserves deadline resolution and state ownership. No search, cache, serializer, hot-query algorithm or measured workload changes; retain serial current-runtime smoke and live semantic/work/cache checks."
+    },
+    "src/warhammer40k_core/engine/secondary_scoring_state_evidence_authority.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue534-reserve-secondary-authority"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded authoritative reserve destruction repair, regression controls, retained historical evidence and generated publication artifacts. Small serial live smoke is the owner-approved default; no deliberate optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue534 requires unarrived reserve deadline destruction to update live army/model state together with reserve, cargo, battlefield removal and destruction evidence, without destroyed-model reactions, so surviving units continue through public movement and valid restore/replay.",
+      "unchanged_work": "The existing reserve-deadline secondary-scoring validator now checks the corrected destroyed model presence while preserving prior casualty state. This is required semantic consistency for existing destruction evidence, with no serialization, cache, search or traversal architecture redesign. Retain the approved serial current-runtime smoke and live semantic/work/cache checks."
     },
     "tests/code_quality/test_order97_inventory.py": {
       "category": "governance",

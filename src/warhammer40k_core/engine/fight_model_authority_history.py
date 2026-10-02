@@ -45,6 +45,7 @@ from warhammer40k_core.engine.primary_historical_events import (
     PRIMARY_BATTLEFIELD_DEPARTURE_RECORDED_EVENT,
     PRIMARY_RESERVE_ENTRY_MUTATION_EVENT,
     PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT,
+    primary_destruction_recorded_state_payload,
 )
 from warhammer40k_core.engine.primary_reserve_entry_provider import (
     PrimaryReserveEntryProvider,
@@ -498,17 +499,11 @@ def _reserve_deadline_destruction_mutations(
     from warhammer40k_core.engine.primary_destruction_evidence import (
         PrimaryUnattributedDestructionCause,
     )
-    from warhammer40k_core.engine.scoring import (
-        PrimaryUnitDestructionState,
-        PrimaryUnitDestructionStatePayload,
-    )
+    from warhammer40k_core.engine.scoring import PrimaryUnitDestructionState
 
     payload = _event_payload(event, field_name="Primary unit destruction")
-    raw = payload.get("primary_unit_destruction_state")
-    if not isinstance(raw, dict):
-        raise GameLifecycleError("Fight reserve destruction authority is invalid.")
     destruction = PrimaryUnitDestructionState.from_payload(
-        cast(PrimaryUnitDestructionStatePayload, raw)
+        primary_destruction_recorded_state_payload(payload.get("primary_unit_destruction_state"))
     )
     if destruction.unattributed_cause is not PrimaryUnattributedDestructionCause.RESERVE_DEADLINE:
         return ()

@@ -35,6 +35,20 @@ dead members when reversing the deadline. The canonical pre-deadline attached
 fixture already passes restore; the added regression follows public play to the
 deadline and checks subsequent restore and exact replay.
 
+The extracted boundary installs battlefield, reserve and cargo changes through
+the existing narrow `GameState` mutators. Secondary scoring also consumes the
+corrected life state: post-destruction checkpoints contain destroyed models,
+while checkpoints before cleanup retain their reserve/cargo presence and earlier
+casualties. Its same-boundary validator reads checkpoint life rather than current
+life and counts an attached cargo unit once despite its physical component IDs.
+The existing Bring It Down certification and new real attached-unit checkpoints
+exercise these paths without changing scoring awards or checkpoint formats.
+
+Fight and primary history share the existing recorded-destruction envelope and
+identity guards so the new consumer preserves established malformed-input
+diagnostics. The checks and messages are extracted unchanged; full typed decoding
+still follows them.
+
 The bug-class search checked the shared unplaced-destruction primitive, empty
 Dedicated Transport cleanup, reserve removal and primary reconstruction consumers.
 Empty Dedicated Transport cleanup already uses the shared primitive. End-turn

@@ -533,3 +533,60 @@ def test_attached_reserve_deadline_public_continuation_restores_and_replays() ->
         session.replay_artifact(artifact_id="issue534-attached")
     ).run()
     assert replay.reproduced_exactly, replay
+
+
+@pytest.mark.parametrize("cargo", [False, True])
+@pytest.mark.parametrize("after_destruction", [False, True])
+def test_reserve_deadline_secondary_boundary_preserves_attached_casualty_presence(
+    cargo: bool, after_destruction: bool
+) -> None:
+    from tests.order90_revival_helpers import offboard_scene
+    from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
+
+    from warhammer40k_core.engine.primary_destruction_evidence import (
+        PrimaryUnattributedDestructionCause,
+    )
+    from warhammer40k_core.engine.primary_mission_boundary_checkpoint import (
+        capture_primary_mission_boundary_checkpoint,
+        primary_unit_destruction_states_from_checkpoint,
+    )
+    from warhammer40k_core.engine.reserve_lifetime_boundary import resolve_boundary
+    from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+    from warhammer40k_core.engine.secondary_scoring_state_evidence_authority import (
+        _validate_same_boundary_reserve_destructions,  # pyright: ignore[reportPrivateUsage]
+    )
+
+    lifecycle, _effect, casualty_id = offboard_scene(
+        reserves=not cargo, attached=True, cargo_in_reserves=cargo, battle_round=2
+    )
+    state = lifecycle.state
+    assert state is not None
+    state.battle_round = 3
+    record_primary_turn_start_evidence_for_fixture(state, decisions=lifecycle.decision_controller)
+    record = state.determine_current_phase_end_objective_control()
+    if after_destruction:
+        resolve_boundary(state, end_of_battle=False)
+    checkpoint = capture_primary_mission_boundary_checkpoint(
+        state=state,
+        boundary_kind="objective_control",
+        player_id="player-a",
+        runtime_modifier_registry=RuntimeModifierRegistry(),
+    )
+    casualty = next(row for row in checkpoint.model_states if row.model_instance_id == casualty_id)
+    assert casualty.presence == "destroyed"
+    if not after_destruction:
+        resolve_boundary(state, end_of_battle=False)
+    _validate_same_boundary_reserve_destructions(
+        state=state,
+        record=record,
+        checkpoint=checkpoint,
+        checkpoint_destruction_ids=tuple(
+            row.destruction_id
+            for row in primary_unit_destruction_states_from_checkpoint(checkpoint)
+        ),
+        destructions=tuple(
+            row
+            for row in state.primary_unit_destruction_states
+            if row.unattributed_cause is PrimaryUnattributedDestructionCause.RESERVE_DEADLINE
+        ),
+    )

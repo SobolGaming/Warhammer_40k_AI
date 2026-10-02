@@ -35,6 +35,7 @@ from warhammer40k_core.engine.primary_destruction_timeline_integrity import (
 from warhammer40k_core.engine.primary_historical_events import (
     PRIMARY_BATTLEFIELD_DEPARTURE_RECORDED_EVENT,
     PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT,
+    primary_destruction_recorded_state_payload,
 )
 from warhammer40k_core.engine.primary_turn_start_event_integrity import (
     validate_turn_start_recorded_events,
@@ -388,13 +389,10 @@ def _validate_no_missing_model_destroyed_departures(
         if record.event_type != PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT:
             continue
         payload = _event_payload(record, event_name="primary_unit_destruction_recorded")
-        raw_state = payload.get("primary_unit_destruction_state")
-        if not isinstance(raw_state, dict):
-            raise GameLifecycleError("Primary destruction recorded state is malformed.")
-        destruction_id = raw_state.get("destruction_id")
-        if type(destruction_id) is not str:
-            raise GameLifecycleError("Primary destruction recorded identity is malformed.")
-        destruction_record_order_by_id[destruction_id] = index
+        raw_state = primary_destruction_recorded_state_payload(
+            payload.get("primary_unit_destruction_state")
+        )
+        destruction_record_order_by_id[raw_state["destruction_id"]] = index
     destruction_orders_by_identity = {
         identity_id: tuple(
             _required_destruction_record_order(

@@ -1723,7 +1723,8 @@
         "_play_to_reserve_deadline_round",
         "test_attached_reserve_deadline_public_continuation_restores_and_replays",
         "test_reserve_deadline_destroys_attached_components_with_prior_casualty",
-        "test_reserve_deadline_logical_death_preserves_public_play_and_persistence"
+        "test_reserve_deadline_logical_death_preserves_public_play_and_persistence",
+        "test_reserve_deadline_secondary_boundary_preserves_attached_casualty_presence"
       ],
       "families": [],
       "sensitive": false,
@@ -1758,6 +1759,41 @@
       ],
       "owners": [
         "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "issue534-primary-event-envelope": {
+      "paths": [
+        "src/warhammer40k_core/engine/primary_historical_events.py"
+      ],
+      "owners": [
+        "@module",
+        "primary_destruction_recorded_state_payload"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "issue534-primary-event-integrity": {
+      "paths": [
+        "src/warhammer40k_core/engine/primary_historical_event_integrity.py"
+      ],
+      "owners": [
+        "@module",
+        "_validate_no_missing_model_destroyed_departures"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "issue534-reserve-secondary-authority": {
+      "paths": [
+        "src/warhammer40k_core/engine/secondary_scoring_state_evidence_authority.py"
+      ],
+      "owners": [
+        "_validate_same_boundary_reserve_destructions"
       ],
       "families": [],
       "sensitive": false,

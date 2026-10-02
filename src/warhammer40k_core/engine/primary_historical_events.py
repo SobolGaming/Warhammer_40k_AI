@@ -25,6 +25,7 @@ from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.scoring import (
     PrimaryObjectiveTurnStartState,
     PrimaryUnitDestructionState,
+    PrimaryUnitDestructionStatePayload,
 )
 
 if TYPE_CHECKING:
@@ -37,6 +38,17 @@ PRIMARY_RESERVE_ENTRY_SOURCE_BINDINGS_KEY = "primary_reserve_entry_bindings"
 PRIMARY_TURN_START_EVIDENCE_RECORDED_EVENT = "primary_turn_start_evidence_recorded"
 PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT = "primary_unit_destruction_recorded"
 PRIMARY_CONSECRATION_UNIT_DESIGNATED_EVENT = "primary_consecration_unit_designated"
+
+
+def primary_destruction_recorded_state_payload(
+    raw_state: JsonValue,
+) -> PrimaryUnitDestructionStatePayload:
+    """Validate the recorded-state envelope and identity before typed decoding."""
+    if not isinstance(raw_state, dict):
+        raise GameLifecycleError("Primary destruction recorded state is malformed.")
+    if type(raw_state.get("destruction_id")) is not str:
+        raise GameLifecycleError("Primary destruction recorded identity is malformed.")
+    return cast(PrimaryUnitDestructionStatePayload, raw_state)
 
 
 def record_primary_battlefield_departure_event(
@@ -471,6 +483,7 @@ __all__ = (
     "PRIMARY_RESERVE_ENTRY_SOURCE_BINDINGS_KEY",
     "PRIMARY_TURN_START_EVIDENCE_RECORDED_EVENT",
     "PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT",
+    "primary_destruction_recorded_state_payload",
     "primary_reserve_entry_source_terminal_bindings_payload",
     "record_new_primary_battlefield_departure_events",
     "record_new_primary_turn_start_evidence_events",

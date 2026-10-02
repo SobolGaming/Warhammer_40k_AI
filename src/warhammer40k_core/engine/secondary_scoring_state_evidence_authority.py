@@ -416,9 +416,7 @@ def _validate_same_boundary_reserve_destructions(
     checkpoint_destruction_ids: tuple[str, ...],
     destructions: tuple[PrimaryUnitDestructionState, ...],
 ) -> None:
-    presence_by_model_id = {
-        model.model_instance_id: model.presence for model in checkpoint.model_states
-    }
+    checkpoint_models = {model.model_instance_id: model for model in checkpoint.model_states}
     checkpoint_destruction_id_set = set(checkpoint_destruction_ids)
     checkpoint_destroyed_unit_ids = {
         destruction.destroyed_unit_instance_id
@@ -454,21 +452,32 @@ def _validate_same_boundary_reserve_destructions(
                 for unit_id in reserve.embarked_unit_instance_ids
             ),
         )
-        for index, view in enumerate(route_views):
-            # Reserve-deadline destruction retires the route without rewriting model wounds,
-            # so a checkpoint captured afterward records living models as off-battlefield.
-            expected_presence = (
-                "off_battlefield"
-                if view.unit_instance_id in checkpoint_destroyed_unit_ids
-                else ("reserves" if index == 0 else "embarked")
-            )
-            if view.owner_player_id != reserve.player_id or any(
-                presence_by_model_id.get(model.model_instance_id) != expected_presence
-                for model in view.own_models
-            ):
+        # Cargo stores physical components; an attached unit has one route authority.
+        unique_route_views = {view.unit_instance_id: view for view in route_views}
+        for index, view in enumerate(unique_route_views.values()):
+            if view.owner_player_id != reserve.player_id:
                 raise GameLifecycleError(
                     "Secondary scoring state evidence drifted from authoritative boundary state."
                 )
+            for model in view.own_models:
+                checkpoint_model = checkpoint_models.get(model.model_instance_id)
+                if checkpoint_model is None:
+                    raise GameLifecycleError(
+                        "Secondary scoring reserve boundary model inventory drifted."
+                    )
+                # Read life at the checkpoint: current models may have died later.
+                # Earlier casualties remain destroyed even before this deadline.
+                expected_presence = (
+                    "destroyed"
+                    if view.unit_instance_id in checkpoint_destroyed_unit_ids
+                    or not checkpoint_model.alive
+                    else ("reserves" if index == 0 else "embarked")
+                )
+                if checkpoint_model.presence != expected_presence:
+                    raise GameLifecycleError(
+                        "Secondary scoring state evidence drifted "
+                        "from authoritative boundary state."
+                    )
             route_authorities_by_unit_id.setdefault(view.unit_instance_id, []).append(
                 (reserve.player_id, mutation_id)
             )

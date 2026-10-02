@@ -141,19 +141,21 @@ def apply_destruction(state: GameState, *, destruction: ReserveDestructionResult
         battlefield_state=state.battlefield_state,
         destruction=destruction,
     )
-    updated_transport_cargo_states = [
-        cargo_state
+    terminal_cargo_transport_ids = tuple(
+        cargo_state.transport_unit_instance_id
         for cargo_state in state.transport_cargo_states
-        if cargo_state.transport_unit_instance_id not in terminal_transport_ids
-    ]
+        if cargo_state.transport_unit_instance_id in terminal_transport_ids
+    )
     # Reserve deadlines remove models without invoking destroyed-model rules.
     # Previously destroyed members remain part of the removal/lineage record.
     for model_id in destruction.destroyed_model_instance_ids:
         if model_by_id(state=state, model_instance_id=model_id).is_alive:
             destroy_unplaced_model_without_reactions(state=state, model_instance_id=model_id)
-    state.battlefield_state = updated_battlefield_state
-    state.reserve_states = list(destruction.updated_reserve_states)
-    state.transport_cargo_states = updated_transport_cargo_states
+    state.replace_battlefield_state(updated_battlefield_state)
+    for reserve_state in destruction.updated_reserve_states:
+        state.replace_reserve_state(reserve_state)
+    for transport_id in terminal_cargo_transport_ids:
+        state.remove_transport_cargo_state(transport_id)
     record_primary_unit_destructions_for_destroyed_models(
         state=state,
         destroyed_model_instance_ids=destruction.destroyed_model_instance_ids,
