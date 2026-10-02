@@ -1912,7 +1912,9 @@
     },
     "issue533-contract-publication": {
       "paths": [
+        "conformance/typescript/src/contract.ts",
         "contracts/README.md",
+        "contracts/compatibility-policy.md",
         "contracts/examples/persistence/session-persistence.json",
         "contracts/examples/sessions/session-command-outcome.json",
         "contracts/examples/sessions/session-command-started.json",
@@ -1947,6 +1949,7 @@
         "ci/test_shards/shard-7.txt",
         "ci/test_shards/shard-8.txt",
         "ci/test_shards/shard-9.txt",
+        "tests/unit/test_phase18e_server_api.py",
         "tests/unit/test_public_firing_deck_history.py"
       ],
       "owners": [
@@ -1960,6 +1963,7 @@
         "test_invalid_public_firing_deck_is_atomic_and_retryable",
         "test_no_current_history_authority_outside_matching_phase",
         "test_pending_history_restore_rejects_drift",
+        "test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads",
         "test_public_firing_deck_after_shot_history",
         "test_secret_request_and_event_redact_nested_history"
       ],

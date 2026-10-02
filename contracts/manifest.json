@@ -97,7 +97,7 @@
   },
   "file_sha256": {
     "README.md": "f0a8fb250e5f1d76822a55cf97f99083afb4e0b95f8b952f98353ae09b04e6b6",
-    "compatibility-policy.md": "2ef3317b6fb953ac5d9bc0d735acb91447a88d425032f949881ef151257289f2",
+    "compatibility-policy.md": "51430907620b9fbd8b42c511d114f45f53fdb8a669ca2e5b1be3e82fa6d3b4f0",
     "compatibility/1.0.0-shape.json": "a2fb7d57f0677dbc1583f4ec5c3bc0b32b3c9db80594cefb55bb90fe3c949d96",
     "compatibility/10.0.0-shape.json": "c61f72db9c0a5f0635a2c4cf0b14f6fa13e663449c6813e37b49bea6f4ea4b8a",
     "compatibility/11.0.0-shape.json": "f2ead8bd9a4e070b7af933e0d7f9dae9582648a5c9e18306947e342375f5ce98",
