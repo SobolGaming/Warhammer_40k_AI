@@ -8,7 +8,6 @@ from warhammer40k_core.engine.aircraft import aircraft_model_ids_for_scenario
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     ModelDisplacementKind,
-    UnitPlacement,
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.endpoint_placement import (
@@ -17,6 +16,7 @@ from warhammer40k_core.engine.endpoint_placement import (
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.volume import Model
 
@@ -32,16 +32,16 @@ def append_scout_path_violations(
     state: GameState,
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
-    current: UnitPlacement,
-    attempted: UnitPlacement,
+    current: RulesUnitPlacement,
+    attempted: RulesUnitPlacement,
     witness: PathWitness,
     scout_distance_inches: float,
 ) -> None:
     from warhammer40k_core.engine.prebattle import (
         PreBattleViolation,
         PreBattleViolationCode,
-        _enemy_geometry_models_for_player,  # pyright: ignore[reportPrivateUsage]
         _require_mission_setup,
+        enemy_geometry_models_for_player,
     )
 
     mission_setup = _require_mission_setup(state)
@@ -59,7 +59,9 @@ def append_scout_path_violations(
             ((placement.model_instance_id, witness.poses_for_model(placement.model_instance_id)),)
         )
         legality_context = MovementLegalityContext.from_keywords(
-            keywords=scenario.unit_instance_for_placement(current).keywords,
+            keywords=scenario.unit_instance_for_placement(
+                scenario.battlefield_state.unit_placement_by_id(placement.unit_instance_id)
+            ).keywords,
             ruleset_descriptor=ruleset_descriptor,
             movement_mode=MovementMode.NORMAL,
             movement_phase_action=None,
@@ -76,7 +78,7 @@ def append_scout_path_violations(
                 attempted_placement=attempted,
                 moving_model_instance_id=placement.model_instance_id,
             ),
-            enemy_models=_enemy_geometry_models_for_player(
+            enemy_models=enemy_geometry_models_for_player(
                 scenario=scenario,
                 player_id=current.player_id,
             ),
@@ -152,21 +154,23 @@ def append_scout_path_violations(
 def _friendly_geometry_models_for_path(
     *,
     scenario: BattlefieldScenario,
-    unit_placement: UnitPlacement,
-    attempted_placement: UnitPlacement,
+    unit_placement: RulesUnitPlacement,
+    attempted_placement: RulesUnitPlacement,
     moving_model_instance_id: str,
 ) -> tuple[Model, ...]:
     moving_model_id = _validate_identifier("moving_model_instance_id", moving_model_instance_id)
+    attempted_by_component = {
+        component.unit_instance_id: component
+        for component in attempted_placement.component_unit_placements
+    }
     friendly_models: list[Model] = []
     for placed_army in scenario.battlefield_state.placed_armies:
         if placed_army.player_id != unit_placement.player_id:
             continue
         for current_unit_placement in placed_army.unit_placements:
-            placements = (
-                attempted_placement.model_placements
-                if current_unit_placement.unit_instance_id == unit_placement.unit_instance_id
-                else current_unit_placement.model_placements
-            )
+            placements = attempted_by_component.get(
+                current_unit_placement.unit_instance_id, current_unit_placement
+            ).model_placements
             for placement in placements:
                 if placement.model_instance_id == moving_model_id:
                     continue

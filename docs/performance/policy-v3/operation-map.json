@@ -1553,6 +1553,40 @@
       ],
       "sensitive": true,
       "mandatory": true
+    },
+    "issue537-prebattle-scout": {
+      "paths": [
+        "src/warhammer40k_core/engine/prebattle.py"
+      ],
+      "owners": [
+        "@module",
+        "_append_scout_enemy_distance_violations",
+        "_enemy_geometry_models_for_player",
+        "_resolve_scout_move",
+        "_start_is_eligible_for_scout_move",
+        "apply_scout_move",
+        "enemy_geometry_models_for_player",
+        "start_is_eligible_for_scout_move"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "issue537-scout-facade-regression": {
+      "paths": [
+        "tests/integration/test_setup_prebattle_ui_smoke.py"
+      ],
+      "owners": [
+        "@module",
+        "_scout_facade_config",
+        "_scout_facade_session",
+        "_scout_witness",
+        "test_scout_facade_moves_every_published_component",
+        "test_scout_facade_rejections_preserve_all_components_and_allow_retry"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

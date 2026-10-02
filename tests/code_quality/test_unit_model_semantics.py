@@ -1498,3 +1498,24 @@ def _function_node(*, path: Path, function_name: str) -> ast.FunctionDef:
     )
     assert len(matches) == 1, f"Expected exactly one {function_name} in {path}."
     return matches[0]
+
+
+def test_scout_validation_and_mutation_share_rules_unit_placement_authority() -> None:
+    tree = ast.parse((ENGINE / "scout_movement.py").read_text(encoding="utf-8"))
+    for name in ("resolve_scout_move", "apply_scout_move"):
+        owner = next(
+            node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == name
+        )
+        calls = [node for node in ast.walk(owner) if isinstance(node, ast.Call)]
+        assert any(
+            isinstance(call.func, ast.Attribute)
+            and isinstance(call.func.value, ast.Name)
+            and call.func.value.id == "RulesUnitPlacement"
+            and call.func.attr == "from_battlefield"
+            for call in calls
+        ), name
+        assert not any(
+            isinstance(call.func, ast.Attribute)
+            and call.func.attr in {"unit_placement_by_id", "unit_placement_or_none"}
+            for call in calls
+        ), f"{name} must not treat a rules-unit ID as a physical component ID"

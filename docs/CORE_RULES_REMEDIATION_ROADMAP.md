@@ -59,6 +59,12 @@ uses protected main `133956de896c0db222158a086e672cc04649c096`. Other v963
 intake families remain separately scheduled; all source/implementation gaps
 must close before PFINAL.
 
+Order 103 subsequently merged in PR #538 at
+`d5185e4dcb28d67e45f513423378071e350f1f81`. The owner's 2 October sequence is
+#537, #535, #534, #532, #533, then the remaining Orders, each in a fresh session
+and separate PR. See the [bounded repair backlog](PR_BACKLOG_2026_09_30.md#approved-post-order-103-repairs---2-october-2026)
+and [streamlined review policy](SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md).
+
 The owner approved a separate throughput PR immediately after Order 101 and
 before Order 102 on 2026-09-30. It preserves both local and hosted full-suite
 gates and all independent review requirements. The additional version 963

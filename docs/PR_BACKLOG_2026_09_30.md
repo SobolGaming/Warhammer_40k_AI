@@ -26,6 +26,28 @@ or implemented by this backlog entry.
 4. Resolve all source-intake entries and required repairs before the fresh-main
    25-category `PFINAL` audit. This entry does not authorize certification with gaps.
 
+## Approved post-Order-103 repairs - 2 October 2026
+
+Order 103 merged in [PR #538](https://github.com/SobolGaming/Warhammer_40k_AI/pull/538),
+verified main `d5185e4dcb28d67e45f513423378071e350f1f81`. The owner approved
+the following bounded repairs at 11:38:47 UTC on 2 October, in this order, before
+returning to the remaining Orders without renumbering them. Each has its own
+fresh implementation session and PR; stop after each verified merge and hand off
+the next issue. Reproduce each failure through normal legal engine/public paths
+before fixing its authoritative owner.
+
+| Issue | Bounded repair and required controls |
+|---|---|
+| [#537](https://github.com/SobolGaming/Warhammer_40k_AI/issues/537) | Resolve attached Scout validation and mutation through rules-unit physical placement authority. Preserve full published membership, witnessed movement, ordinary and attached positive/rejection controls. |
+| [#535](https://github.com/SobolGaming/Warhammer_40k_AI/issues/535) | Restore physical history from engine-generated nested Scout transitions, with exact ordering and once-only application; cover normal save/load, fork and replay. Separate from #537. |
+| [#534](https://github.com/SobolGaming/Warhammer_40k_AI/issues/534) | Keep live-model, placement and destruction history consistent after reserve-deadline cleanup; cover subsequent movement and timely-arrival controls. |
+| [#532](https://github.com/SobolGaming/Warhammer_40k_AI/issues/532) | Publish authoritative attached Charge membership through the shared viewer-scoped public decision path; retain ordinary Charge controls and update contract artifacts when required. |
+| [#533](https://github.com/SobolGaming/Warhammer_40k_AI/issues/533) | Publish the required Firing Deck shot-history snapshot at its owning boundary; preserve physical/source identity, ordinary shooting, viewer visibility and legal continuation. |
+
+The streamlined High implementation/review and smoke-default policy is recorded
+in [the sequential review policy](SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md).
+These entries record authorization and acceptance scope, not completed repairs.
+
 ## Approved review policy for subsequent work
 
 The owner approved this policy on 30 September 2026. Apply it to orders after

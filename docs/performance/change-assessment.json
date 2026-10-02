@@ -1,1826 +1,392 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "133956de896c0db222158a086e672cc04649c096",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:81b436feba3835847aef40a9d90e94ad5ced81c6a62cc445583b7ace2f10247e",
-  "operation_map_sha256": "446e5e9f5bd6b6080d624cd7455699a30a9801468ec339f02b73551bf067c168",
+  "base": "d5185e4dcb28d67e45f513423378071e350f1f81",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bf8a1f6687e2b8983c3f161350dfef277d53169ea2fdf313bc03742df018a48b",
+  "operation_map_sha256": "1bc5581a916cd693e44fe4ccef84b6fec0fdd41f756cc1db3d795def2dd1e062",
   "changes": {
-    "README.md": {
-      "before_sha256": "e178de8abefe259403a2a0c60a6c7a4fffc197b766b846eaba72144be19a66c7",
-      "after_sha256": "a3eacecefca1a2b9fa8d86ec6d2134960d4df2b81ca8f8967875edf89c4031ce",
-      "owners": {
-        "@document": {
-          "before": "e178de8abefe259403a2a0c60a6c7a4fffc197b766b846eaba72144be19a66c7",
-          "after": "a3eacecefca1a2b9fa8d86ec6d2134960d4df2b81ca8f8967875edf89c4031ce"
-        }
-      }
-    },
-    "ci/test_shards/durations.json": {
-      "before_sha256": "44c76a23ffed87e0cc07c018afa065dc79d8947577a8a258c17ac4ca51bbe424",
-      "after_sha256": "a35aa0fc472cbb4b785960337f7b0198fe133b97f2a3218d100a2fd5ff491ce8",
-      "owners": {
-        "@document": {
-          "before": "44c76a23ffed87e0cc07c018afa065dc79d8947577a8a258c17ac4ca51bbe424",
-          "after": "a35aa0fc472cbb4b785960337f7b0198fe133b97f2a3218d100a2fd5ff491ce8"
-        }
-      }
-    },
-    "ci/test_shards/shard-1.txt": {
-      "before_sha256": "2a181a038e268be85b176ca2c074f17fb21b01160596fb6632c095f8ff8ba92b",
-      "after_sha256": "2b6bd771b92ec23f75f89b75ad34e0ddedc23e691ee4fc720828b30ef19d0ca3",
-      "owners": {
-        "@document": {
-          "before": "2a181a038e268be85b176ca2c074f17fb21b01160596fb6632c095f8ff8ba92b",
-          "after": "2b6bd771b92ec23f75f89b75ad34e0ddedc23e691ee4fc720828b30ef19d0ca3"
-        }
-      }
-    },
-    "ci/test_shards/shard-10.txt": {
-      "before_sha256": "abef9643df6e5a0d8074885b8ade3cb377bd8ed25c0a416f348cf6f08c7d9259",
-      "after_sha256": "ba54cea3da6fa68db94ba94a468fa589e0ccbc9576b99ac0e5edd7c49b53112c",
-      "owners": {
-        "@document": {
-          "before": "abef9643df6e5a0d8074885b8ade3cb377bd8ed25c0a416f348cf6f08c7d9259",
-          "after": "ba54cea3da6fa68db94ba94a468fa589e0ccbc9576b99ac0e5edd7c49b53112c"
-        }
-      }
-    },
-    "ci/test_shards/shard-11.txt": {
-      "before_sha256": "b41d7d819613f4a917bd9139440e80be1c132cc0d4492beb848e7321fdcddefa",
-      "after_sha256": "e651676a784bea375bb0df7bd124987b46630152642e4a186550cbc31b55816f",
-      "owners": {
-        "@document": {
-          "before": "b41d7d819613f4a917bd9139440e80be1c132cc0d4492beb848e7321fdcddefa",
-          "after": "e651676a784bea375bb0df7bd124987b46630152642e4a186550cbc31b55816f"
-        }
-      }
-    },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "c17b550f3ab5b9a6c3cdeb1b1d1fb9e7c341ca6f91ae000a2fda44a7c44d643b",
-      "after_sha256": "52c83eaac7e7144c587d1851fccd263cd54f19c966b870c6d3691a7b5217c398",
-      "owners": {
-        "@document": {
-          "before": "c17b550f3ab5b9a6c3cdeb1b1d1fb9e7c341ca6f91ae000a2fda44a7c44d643b",
-          "after": "52c83eaac7e7144c587d1851fccd263cd54f19c966b870c6d3691a7b5217c398"
-        }
-      }
-    },
-    "ci/test_shards/shard-2.txt": {
-      "before_sha256": "5d438e875205040b35626d1308550c8ff3e68f9927ecea66852abf6d0fff5613",
-      "after_sha256": "d15936a457b28de3c639ac9c5ac9495ff92af3362d63fad7e55e84f14b0e3aaf",
-      "owners": {
-        "@document": {
-          "before": "5d438e875205040b35626d1308550c8ff3e68f9927ecea66852abf6d0fff5613",
-          "after": "d15936a457b28de3c639ac9c5ac9495ff92af3362d63fad7e55e84f14b0e3aaf"
-        }
-      }
-    },
-    "ci/test_shards/shard-3.txt": {
-      "before_sha256": "e0136ced145e563a015c29deb7020deea4be88854fded0e8234f697e67e78c1d",
-      "after_sha256": "0f00521a25021d61f8b0ace4d18e026ded60e8ec971f8adefbf75576ceddbc70",
-      "owners": {
-        "@document": {
-          "before": "e0136ced145e563a015c29deb7020deea4be88854fded0e8234f697e67e78c1d",
-          "after": "0f00521a25021d61f8b0ace4d18e026ded60e8ec971f8adefbf75576ceddbc70"
-        }
-      }
-    },
-    "ci/test_shards/shard-4.txt": {
-      "before_sha256": "70530de2791d44a65d944fe38e7c5ec987239e4553717f7c48c8fdd2b55e2528",
-      "after_sha256": "63b82838480408f89edcc1dc43866c73683f9db1b9d47b9fc2103cefc33c7f19",
-      "owners": {
-        "@document": {
-          "before": "70530de2791d44a65d944fe38e7c5ec987239e4553717f7c48c8fdd2b55e2528",
-          "after": "63b82838480408f89edcc1dc43866c73683f9db1b9d47b9fc2103cefc33c7f19"
-        }
-      }
-    },
-    "ci/test_shards/shard-5.txt": {
-      "before_sha256": "f60ca3fdb2d22ec9c1fd2552a65af70d6f3eb3489317c99e55ccf5414497fd86",
-      "after_sha256": "2f6989d2a15c605cda7da5bb2ba4f482920ff0f9a5b99952c04c1051e5e317a5",
-      "owners": {
-        "@document": {
-          "before": "f60ca3fdb2d22ec9c1fd2552a65af70d6f3eb3489317c99e55ccf5414497fd86",
-          "after": "2f6989d2a15c605cda7da5bb2ba4f482920ff0f9a5b99952c04c1051e5e317a5"
-        }
-      }
-    },
-    "ci/test_shards/shard-6.txt": {
-      "before_sha256": "ea6f44939be5c767afc5462177cb2230b77a2f52e597756eef2adf13c2b1f684",
-      "after_sha256": "74024b6e6d57f076a4f2e93f5c6b2291419f0367a92f63f08caff9e3ab000015",
-      "owners": {
-        "@document": {
-          "before": "ea6f44939be5c767afc5462177cb2230b77a2f52e597756eef2adf13c2b1f684",
-          "after": "74024b6e6d57f076a4f2e93f5c6b2291419f0367a92f63f08caff9e3ab000015"
-        }
-      }
-    },
-    "ci/test_shards/shard-7.txt": {
-      "before_sha256": "660d6ae1a6db4285181f093b190519f69b4fbfc1cbcf8146b7e2f457441bd1d6",
-      "after_sha256": "6604628941119cd337a1fa78c0fd50ffa4e49e07aa8812a1c5188871d5facd1b",
-      "owners": {
-        "@document": {
-          "before": "660d6ae1a6db4285181f093b190519f69b4fbfc1cbcf8146b7e2f457441bd1d6",
-          "after": "6604628941119cd337a1fa78c0fd50ffa4e49e07aa8812a1c5188871d5facd1b"
-        }
-      }
-    },
-    "ci/test_shards/shard-8.txt": {
-      "before_sha256": "5dcd776866d8d0b99e3709a228b9ee44a1ff69068cc81cdd93ec67303badf08e",
-      "after_sha256": "676b585722682adbd9cad054a4bd22880805461705322653b1d550ada5e177d6",
-      "owners": {
-        "@document": {
-          "before": "5dcd776866d8d0b99e3709a228b9ee44a1ff69068cc81cdd93ec67303badf08e",
-          "after": "676b585722682adbd9cad054a4bd22880805461705322653b1d550ada5e177d6"
-        }
-      }
-    },
-    "ci/test_shards/shard-9.txt": {
-      "before_sha256": "a81c9af109d1ac33c3a689bf3a243bb9f5b43f23da3440f4edb0cac48df0ea19",
-      "after_sha256": "b866b979fe6eddc0d4b2b7a15c0a6e4e35fdcb613e380ef6730654a5bd10797c",
-      "owners": {
-        "@document": {
-          "before": "a81c9af109d1ac33c3a689bf3a243bb9f5b43f23da3440f4edb0cac48df0ea19",
-          "after": "b866b979fe6eddc0d4b2b7a15c0a6e4e35fdcb613e380ef6730654a5bd10797c"
-        }
-      }
-    },
-    "conformance/typescript/src/contract.ts": {
-      "before_sha256": "c165c2c52f968da47d12c0f2115cf85bf699852ef87ed921d445b7c04fc41a49",
-      "after_sha256": "bc3604374a595a4fb8598b042e1df0f4dcd0475ea1a5220083d14466e4389987",
-      "owners": {
-        "@document": {
-          "before": "c165c2c52f968da47d12c0f2115cf85bf699852ef87ed921d445b7c04fc41a49",
-          "after": "bc3604374a595a4fb8598b042e1df0f4dcd0475ea1a5220083d14466e4389987"
-        }
-      }
-    },
-    "conformance/typescript/src/generated/openapi.ts": {
-      "before_sha256": "d6af6781a11f0ce4ff183aa28ea0fd4aa07b6c1ca0ecbfd86ec0efc88794d8ba",
-      "after_sha256": "5ca71708e54485d7e40c729e73dd38ae0b66787d85845b9ac47098d790720a82",
-      "owners": {
-        "@document": {
-          "before": "d6af6781a11f0ce4ff183aa28ea0fd4aa07b6c1ca0ecbfd86ec0efc88794d8ba",
-          "after": "5ca71708e54485d7e40c729e73dd38ae0b66787d85845b9ac47098d790720a82"
-        }
-      }
-    },
-    "contracts/README.md": {
-      "before_sha256": "1706adcc3a07dc3da43b73e55f4157391a3545396d1597ac152cfa41d5797377",
-      "after_sha256": "41d5120e530bad073968309086e9a780742212f48f9464f2fef9ba87d2ef0544",
-      "owners": {
-        "@document": {
-          "before": "1706adcc3a07dc3da43b73e55f4157391a3545396d1597ac152cfa41d5797377",
-          "after": "41d5120e530bad073968309086e9a780742212f48f9464f2fef9ba87d2ef0544"
-        }
-      }
-    },
-    "contracts/compatibility-policy.md": {
-      "before_sha256": "788b1233184aa87943916ea67710211ddf2a5b4e98d624ce4b6d118131b4bc2f",
-      "after_sha256": "22f031e38c160944ecf227ec77528db39068214d5d8da1eaeec2ec218912796e",
-      "owners": {
-        "@document": {
-          "before": "788b1233184aa87943916ea67710211ddf2a5b4e98d624ce4b6d118131b4bc2f",
-          "after": "22f031e38c160944ecf227ec77528db39068214d5d8da1eaeec2ec218912796e"
-        }
-      }
-    },
-    "contracts/compatibility/43.0.0-shape.json": {
-      "before_sha256": null,
-      "after_sha256": "a344b2a6f1106912b18d38726a0b8f5766c6059a30298ad3c3312f9b384b0076",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "a344b2a6f1106912b18d38726a0b8f5766c6059a30298ad3c3312f9b384b0076"
-        }
-      }
-    },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "f02a07068f7eb19a6e778e256eb702400bcd458842f9cc323d366a5f6cde560a",
-      "after_sha256": "b33dc2ba31aa8a74f8990e7c4498e9c62498d504e7688b626f722ea32d02e87e",
+      "before_sha256": "b33dc2ba31aa8a74f8990e7c4498e9c62498d504e7688b626f722ea32d02e87e",
+      "after_sha256": "346df1d4c34a573329d672c3b62893f84fb752a0880484012103af06319f0209",
       "owners": {
         "@document": {
-          "before": "f02a07068f7eb19a6e778e256eb702400bcd458842f9cc323d366a5f6cde560a",
-          "after": "b33dc2ba31aa8a74f8990e7c4498e9c62498d504e7688b626f722ea32d02e87e"
-        }
-      }
-    },
-    "contracts/examples/replay-metadata.json": {
-      "before_sha256": "cf2e10b2c442d657b1fec75978c437f22434bb658843987c6cd93eb3840a3bd8",
-      "after_sha256": "8fc035607fb9ac619ee138b4e5315962afdb3e7c8bd25deed350ab4b3bcd442e",
-      "owners": {
-        "@document": {
-          "before": "cf2e10b2c442d657b1fec75978c437f22434bb658843987c6cd93eb3840a3bd8",
-          "after": "8fc035607fb9ac619ee138b4e5315962afdb3e7c8bd25deed350ab4b3bcd442e"
+          "before": "b33dc2ba31aa8a74f8990e7c4498e9c62498d504e7688b626f722ea32d02e87e",
+          "after": "346df1d4c34a573329d672c3b62893f84fb752a0880484012103af06319f0209"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "4f6f8ea2cd75a8ae48f42be00afc0749788b520b43967854737f4a81d4b7f6c0",
-      "after_sha256": "d4c4f06640e7d191aa575847c91a698f1283532f99192bd7db503e2b270e1d32",
+      "before_sha256": "d4c4f06640e7d191aa575847c91a698f1283532f99192bd7db503e2b270e1d32",
+      "after_sha256": "b63a62d1a5f2de2e08ba0ecd8122e590cc4e4dc2d45f82d647fda23b3fe2fe54",
       "owners": {
         "@document": {
-          "before": "4f6f8ea2cd75a8ae48f42be00afc0749788b520b43967854737f4a81d4b7f6c0",
-          "after": "d4c4f06640e7d191aa575847c91a698f1283532f99192bd7db503e2b270e1d32"
+          "before": "d4c4f06640e7d191aa575847c91a698f1283532f99192bd7db503e2b270e1d32",
+          "after": "b63a62d1a5f2de2e08ba0ecd8122e590cc4e4dc2d45f82d647fda23b3fe2fe54"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "a811bd2f8b1af832b28169c62ec98068ff55cbdcac0d8e1184871d274c029e46",
-      "after_sha256": "0aea42872e45b0eecfa208e8e1097e62fc04da911e66dcb9709c7a152db27361",
+      "before_sha256": "0aea42872e45b0eecfa208e8e1097e62fc04da911e66dcb9709c7a152db27361",
+      "after_sha256": "cbfd27b2f30e9c5ef2c1973dd5d3f72b39ed360a7408c24071d0896f227818a2",
       "owners": {
         "@document": {
-          "before": "a811bd2f8b1af832b28169c62ec98068ff55cbdcac0d8e1184871d274c029e46",
-          "after": "0aea42872e45b0eecfa208e8e1097e62fc04da911e66dcb9709c7a152db27361"
+          "before": "0aea42872e45b0eecfa208e8e1097e62fc04da911e66dcb9709c7a152db27361",
+          "after": "cbfd27b2f30e9c5ef2c1973dd5d3f72b39ed360a7408c24071d0896f227818a2"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "ec5b71fc0611e5721abc7aa65857a92288d33c6419c4a5f9407210b0eeaf9fa5",
-      "after_sha256": "922ed56d1230c68685b507525baa7dba4f6740194198199781f0965aa76968ef",
+      "before_sha256": "922ed56d1230c68685b507525baa7dba4f6740194198199781f0965aa76968ef",
+      "after_sha256": "f63f044fd02ab208c803223b83adbeed5e16734c20d88c615e03c4d2250b1dbc",
       "owners": {
         "@document": {
-          "before": "ec5b71fc0611e5721abc7aa65857a92288d33c6419c4a5f9407210b0eeaf9fa5",
-          "after": "922ed56d1230c68685b507525baa7dba4f6740194198199781f0965aa76968ef"
+          "before": "922ed56d1230c68685b507525baa7dba4f6740194198199781f0965aa76968ef",
+          "after": "f63f044fd02ab208c803223b83adbeed5e16734c20d88c615e03c4d2250b1dbc"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "ab29b43788b1327e76b97cbfeed7f0c6ab1639468f643bd02f548e5c5e0566f5",
-      "after_sha256": "b202303cf35f1724d5ada45bca54310c9aa244c40fe6b844034ab04e4576d941",
+      "before_sha256": "b202303cf35f1724d5ada45bca54310c9aa244c40fe6b844034ab04e4576d941",
+      "after_sha256": "e9a60eed64bbee72d91190289be5902a448bbefd6a4102d409536e5ce4c72467",
       "owners": {
         "@document": {
-          "before": "ab29b43788b1327e76b97cbfeed7f0c6ab1639468f643bd02f548e5c5e0566f5",
-          "after": "b202303cf35f1724d5ada45bca54310c9aa244c40fe6b844034ab04e4576d941"
+          "before": "b202303cf35f1724d5ada45bca54310c9aa244c40fe6b844034ab04e4576d941",
+          "after": "e9a60eed64bbee72d91190289be5902a448bbefd6a4102d409536e5ce4c72467"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "457320b220a3d0ea29d4bfa8656aaf59b39797be585c706a091a773b45422174",
-      "after_sha256": "5ffab2debbbfa3c2c53c8334cf70952634c5e03c12d3ddf75174490d2e77ae80",
+      "before_sha256": "5ffab2debbbfa3c2c53c8334cf70952634c5e03c12d3ddf75174490d2e77ae80",
+      "after_sha256": "f49b506e4f68529bb71a9612ae2faba22eb91ab0bb2250c2571d285fe50c1d41",
       "owners": {
         "@document": {
-          "before": "457320b220a3d0ea29d4bfa8656aaf59b39797be585c706a091a773b45422174",
-          "after": "5ffab2debbbfa3c2c53c8334cf70952634c5e03c12d3ddf75174490d2e77ae80"
+          "before": "5ffab2debbbfa3c2c53c8334cf70952634c5e03c12d3ddf75174490d2e77ae80",
+          "after": "f49b506e4f68529bb71a9612ae2faba22eb91ab0bb2250c2571d285fe50c1d41"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "931990e40031114e3b885b0db9eed4330d2d02a7d6d16e060ad06ead4c279398",
-      "after_sha256": "87ff10ad08016c891c10af9141ffb1682d476945757f58ccc4de9937b83d1025",
+      "before_sha256": "87ff10ad08016c891c10af9141ffb1682d476945757f58ccc4de9937b83d1025",
+      "after_sha256": "03bbee8d41e596037be170c196043c240d4aa73166aa69abb685931620076a49",
       "owners": {
         "@document": {
-          "before": "931990e40031114e3b885b0db9eed4330d2d02a7d6d16e060ad06ead4c279398",
-          "after": "87ff10ad08016c891c10af9141ffb1682d476945757f58ccc4de9937b83d1025"
+          "before": "87ff10ad08016c891c10af9141ffb1682d476945757f58ccc4de9937b83d1025",
+          "after": "03bbee8d41e596037be170c196043c240d4aa73166aa69abb685931620076a49"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "66383ff7a957ae1af29bf0d5df6b7601fd5bb9afc7525266b0e64766063e9b8f",
-      "after_sha256": "e74bbf63f98eb7f985eb06e1d5dbf3f189235c238056f3cc7eeee04a535f8e0e",
+      "before_sha256": "e74bbf63f98eb7f985eb06e1d5dbf3f189235c238056f3cc7eeee04a535f8e0e",
+      "after_sha256": "07d486f5672b563c8ec86d007b7111065ffaa68eabaf89306dea1f37e70f0034",
       "owners": {
         "@document": {
-          "before": "66383ff7a957ae1af29bf0d5df6b7601fd5bb9afc7525266b0e64766063e9b8f",
-          "after": "e74bbf63f98eb7f985eb06e1d5dbf3f189235c238056f3cc7eeee04a535f8e0e"
-        }
-      }
-    },
-    "contracts/migrations/42-to-43.md": {
-      "before_sha256": null,
-      "after_sha256": "4879e9b67de23be23392827cbd7dbc052f11c6f88934006e3076074283fac179",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "4879e9b67de23be23392827cbd7dbc052f11c6f88934006e3076074283fac179"
-        }
-      }
-    },
-    "contracts/openapi.yaml": {
-      "before_sha256": "5f9b047efd97961e4e847e5e2af4414fb5a05f8510dae18411aa6a9e54c7d948",
-      "after_sha256": "f41ec334a2a902159059b8f88f856cba5335307d723c1d9d80eec3dcbdc6b474",
-      "owners": {
-        "@document": {
-          "before": "5f9b047efd97961e4e847e5e2af4414fb5a05f8510dae18411aa6a9e54c7d948",
-          "after": "f41ec334a2a902159059b8f88f856cba5335307d723c1d9d80eec3dcbdc6b474"
-        }
-      }
-    },
-    "contracts/schemas/replay-metadata.schema.json": {
-      "before_sha256": "7a853a8794bacae3ecb19a2bd1becd61840fa96fe29136e315b6c9219f56ea81",
-      "after_sha256": "ddbd5d74d0990c3c3af19a56dd59d00f11c17fc99da0db7e0df51afa11465622",
-      "owners": {
-        "@document": {
-          "before": "7a853a8794bacae3ecb19a2bd1becd61840fa96fe29136e315b6c9219f56ea81",
-          "after": "ddbd5d74d0990c3c3af19a56dd59d00f11c17fc99da0db7e0df51afa11465622"
-        }
-      }
-    },
-    "contracts/schemas/session-command-outcome.schema.json": {
-      "before_sha256": "769bae627c34994b3c4559ac54d6bb878fb5f5d2f0f86f8861d3569c0447baf9",
-      "after_sha256": "8200ec1ea5a54e7d9cb3bac93556d83f0e89e23f0acb9ec50e1c2678458b0413",
-      "owners": {
-        "@document": {
-          "before": "769bae627c34994b3c4559ac54d6bb878fb5f5d2f0f86f8861d3569c0447baf9",
-          "after": "8200ec1ea5a54e7d9cb3bac93556d83f0e89e23f0acb9ec50e1c2678458b0413"
-        }
-      }
-    },
-    "contracts/schemas/session-command-result.schema.json": {
-      "before_sha256": "c7aab12c35a9bf2950a3f64f2ba5c286dd425a7d9f601bcc70ddd0eae89fc589",
-      "after_sha256": "9fdd3b4b881de50fe4eba36a98e9a0e6a26b99022706ac662e13b68835afcca5",
-      "owners": {
-        "@document": {
-          "before": "c7aab12c35a9bf2950a3f64f2ba5c286dd425a7d9f601bcc70ddd0eae89fc589",
-          "after": "9fdd3b4b881de50fe4eba36a98e9a0e6a26b99022706ac662e13b68835afcca5"
-        }
-      }
-    },
-    "contracts/schemas/session-metadata.schema.json": {
-      "before_sha256": "59388080bff640ae7fb029853ddd4a98d74f0e1048e7369510a5221aa8265464",
-      "after_sha256": "d8d1c3817f7b2e0cdb3b196f056f4793a99ed91f34a02747c99f97ec2e2d2a35",
-      "owners": {
-        "@document": {
-          "before": "59388080bff640ae7fb029853ddd4a98d74f0e1048e7369510a5221aa8265464",
-          "after": "d8d1c3817f7b2e0cdb3b196f056f4793a99ed91f34a02747c99f97ec2e2d2a35"
-        }
-      }
-    },
-    "contracts/schemas/session-persistence.schema.json": {
-      "before_sha256": "68e906e12d8ec67122f6b38136511e6d9ef4991519c0c6fcd5aec62523aec26c",
-      "after_sha256": "81dfeb1365af80bee01f3951150c976ec442dd8d681530fc65a5eb6ad8ecf645",
-      "owners": {
-        "@document": {
-          "before": "68e906e12d8ec67122f6b38136511e6d9ef4991519c0c6fcd5aec62523aec26c",
-          "after": "81dfeb1365af80bee01f3951150c976ec442dd8d681530fc65a5eb6ad8ecf645"
-        }
-      }
-    },
-    "data/source_audits/order103/baseline/tests/order101_failed_setup_helpers.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "6c387f7d7c5975fbb9960c862b62b33fd75b6349e3fe5f39d3e0cdff39d36211",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "6c387f7d7c5975fbb9960c862b62b33fd75b6349e3fe5f39d3e0cdff39d36211"
-        }
-      }
-    },
-    "data/source_audits/order103/baseline/tests/order97_gap_probes_04_06.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "86c4fa69223ac2bff187cbc4f8655f80ea2af1e81b0d17e50aa53445d861023c",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "86c4fa69223ac2bff187cbc4f8655f80ea2af1e81b0d17e50aa53445d861023c"
-        }
-      }
-    },
-    "data/source_audits/order103/baseline/tests/twin_linked_helpers.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "0333b151949c7761cde49283709e8edad5586725c75ee71611267b1bb600c8d5",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "0333b151949c7761cde49283709e8edad5586725c75ee71611267b1bb600c8d5"
-        }
-      }
-    },
-    "data/source_audits/order103/baseline/tests/unit/test_lethal_hits.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "e1420132cd93943381e99b7f3ffd789ac834ba3a78e1ebbc61f4c1193b3b2ca5",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "e1420132cd93943381e99b7f3ffd789ac834ba3a78e1ebbc61f4c1193b3b2ca5"
-        }
-      }
-    },
-    "data/source_audits/order103/baseline/tests/unit/test_order96_twin_linked.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "4cd357c8cdc4f217cb17fe20c7015c1e65f7df89c49a4ef0b0ed9935463e2c16",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "4cd357c8cdc4f217cb17fe20c7015c1e65f7df89c49a4ef0b0ed9935463e2c16"
-        }
-      }
-    },
-    "data/source_audits/order103/baseline/tests/unit/test_order97_attack_evidence.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "12a4057e5de809b5d048acf4df983333694e8f8df013cb3c356fb96d6ea95538",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "12a4057e5de809b5d048acf4df983333694e8f8df013cb3c356fb96d6ea95538"
-        }
-      }
-    },
-    "data/source_audits/order103/baseline/tests/unit/test_phase11e_mission_scoring_cleanup.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "0bb56db81c16794d86833ec8fe5a1a976fcbbcd4895fb31e3ee14052a546aaa3",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "0bb56db81c16794d86833ec8fe5a1a976fcbbcd4895fb31e3ee14052a546aaa3"
-        }
-      }
-    },
-    "data/source_audits/order103/baseline/tests/unit/test_phase13b_shooting_declarations.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "fbe5dff1543e140d933880844a52a8d63e4b0eaad2e7fdd309438abc5c1e3d69",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "fbe5dff1543e140d933880844a52a8d63e4b0eaad2e7fdd309438abc5c1e3d69"
-        }
-      }
-    },
-    "data/source_audits/order103/baseline/tests/unit/test_target_replacement.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "85334dd19d82ec8f113eba0cd7c6999fe961cd530d2192ed268a78a34db363a8",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "85334dd19d82ec8f113eba0cd7c6999fe961cd530d2192ed268a78a34db363a8"
-        }
-      }
-    },
-    "data/source_audits/order103/historical-inputs.json": {
-      "before_sha256": null,
-      "after_sha256": "af890dd01ff20bfafd61db06b3e6f5a546a97fc55dd06985be79b3c8a794b6df",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "af890dd01ff20bfafd61db06b3e6f5a546a97fc55dd06985be79b3c8a794b6df"
-        }
-      }
-    },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "45f6fb2ec8492548968b24696333893e9b4df20456d3a49f775342fa4c1f0d0b",
-      "after_sha256": "5ba7c4c2f387bfdaa8e1531bebb08d9c6f0504dacc342aaa1e9237ee71f4948e",
-      "owners": {
-        "@document": {
-          "before": "45f6fb2ec8492548968b24696333893e9b4df20456d3a49f775342fa4c1f0d0b",
-          "after": "5ba7c4c2f387bfdaa8e1531bebb08d9c6f0504dacc342aaa1e9237ee71f4948e"
+          "before": "e74bbf63f98eb7f985eb06e1d5dbf3f189235c238056f3cc7eeee04a535f8e0e",
+          "after": "07d486f5672b563c8ec86d007b7111065ffaa68eabaf89306dea1f37e70f0034"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "5de758933cc5f48560c3a3b52877989f9a003bedebcd55f303fb5f24674615c9",
-      "after_sha256": "9f862279ff4e17f46d146d7e39e4f2b8a8e8c913b6b346d4fd25b986e32c2708",
+      "before_sha256": "9f862279ff4e17f46d146d7e39e4f2b8a8e8c913b6b346d4fd25b986e32c2708",
+      "after_sha256": "2af9873d25c146519ecb7a86a65cb77607acc166dbfe94dc3ec12c531ec88b38",
       "owners": {
         "@document": {
-          "before": "5de758933cc5f48560c3a3b52877989f9a003bedebcd55f303fb5f24674615c9",
-          "after": "9f862279ff4e17f46d146d7e39e4f2b8a8e8c913b6b346d4fd25b986e32c2708"
-        }
-      }
-    },
-    "docs/ORDER_103_SCOPE_PLAN.md": {
-      "before_sha256": null,
-      "after_sha256": "d8fc26a50a527846c69706c347f4cadfeaee8f2ca48a11d0d63ba5e50dabc8d5",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "d8fc26a50a527846c69706c347f4cadfeaee8f2ca48a11d0d63ba5e50dabc8d5"
+          "before": "9f862279ff4e17f46d146d7e39e4f2b8a8e8c913b6b346d4fd25b986e32c2708",
+          "after": "2af9873d25c146519ecb7a86a65cb77607acc166dbfe94dc3ec12c531ec88b38"
         }
       }
     },
     "docs/PR_BACKLOG_2026_09_30.md": {
-      "before_sha256": "abfd21c5f4f99fb8bafeca9ba70ce5e8f8b58ed4a24ef65aa023cfe343e0fd7b",
-      "after_sha256": "cc90c5e4ca7528176ef5f6e8e14227496c6e97f06835374c7c890c9abbba63b4",
+      "before_sha256": "cc90c5e4ca7528176ef5f6e8e14227496c6e97f06835374c7c890c9abbba63b4",
+      "after_sha256": "7f6b9cd98cd0ecc2fd9c770a3859760cb2dc57cbaec0103c98e2edf52b1e923b",
       "owners": {
         "@document": {
-          "before": "abfd21c5f4f99fb8bafeca9ba70ce5e8f8b58ed4a24ef65aa023cfe343e0fd7b",
-          "after": "cc90c5e4ca7528176ef5f6e8e14227496c6e97f06835374c7c890c9abbba63b4"
+          "before": "cc90c5e4ca7528176ef5f6e8e14227496c6e97f06835374c7c890c9abbba63b4",
+          "after": "7f6b9cd98cd0ecc2fd9c770a3859760cb2dc57cbaec0103c98e2edf52b1e923b"
         }
       }
     },
-    "docs/performance/PERFORMANCE_POLICY.md": {
-      "before_sha256": "070dea4dd68497a6f8df643d26672884ae7c982fcd0b3bf60f5ca09259ef7b50",
-      "after_sha256": "f33f3e065f4f1adae416069090eb3674c145ccc32a8376a2dc5b9d30374dbcd9",
+    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
+      "before_sha256": "cfc2c765eb3e9042aa748d19cc4e59ac68b10d99c83fce1190a94e8aaf5cda86",
+      "after_sha256": "7ab2e78e1d70b5df63cd4ccacd830fa098cfa735aa31358695bdc6675da844f8",
       "owners": {
         "@document": {
-          "before": "070dea4dd68497a6f8df643d26672884ae7c982fcd0b3bf60f5ca09259ef7b50",
-          "after": "f33f3e065f4f1adae416069090eb3674c145ccc32a8376a2dc5b9d30374dbcd9"
-        }
-      }
-    },
-    "docs/performance/current/order103-dice-sustained.json": {
-      "before_sha256": null,
-      "after_sha256": "01fce4e11b5dbda5ffe1a2b7e37358831ad5bc102ddd2764389b1286168a68d3",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "01fce4e11b5dbda5ffe1a2b7e37358831ad5bc102ddd2764389b1286168a68d3"
-        }
-      }
-    },
-    "docs/performance/current/order103-dice.json": {
-      "before_sha256": null,
-      "after_sha256": "e38f0bb9444c8b815c0c111822fba654f23ad2af4283f0d507fa50b3b49d0241",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "e38f0bb9444c8b815c0c111822fba654f23ad2af4283f0d507fa50b3b49d0241"
-        }
-      }
-    },
-    "docs/performance/current/order103-precision-grouping.json": {
-      "before_sha256": null,
-      "after_sha256": "43da8a2ee294eb9028facdfdbb2c717d60b26a12fd62e7e6babcb21a805d8518",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "43da8a2ee294eb9028facdfdbb2c717d60b26a12fd62e7e6babcb21a805d8518"
+          "before": "cfc2c765eb3e9042aa748d19cc4e59ac68b10d99c83fce1190a94e8aaf5cda86",
+          "after": "7ab2e78e1d70b5df63cd4ccacd830fa098cfa735aa31358695bdc6675da844f8"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "d0789f70ed65e904fb4f74b126cf0912ba3d208c988691efacd17430dda544e0",
-      "after_sha256": "7c2a894334441182d50d675170a27f4335984609a16e94f0e7c58fd02793e1e7",
+      "before_sha256": "7c2a894334441182d50d675170a27f4335984609a16e94f0e7c58fd02793e1e7",
+      "after_sha256": "d0cb2ab96a2bddc3aa68c03d36adee62c541e698c4798206a2c97a8353f51452",
       "owners": {
         "@document": {
-          "before": "d0789f70ed65e904fb4f74b126cf0912ba3d208c988691efacd17430dda544e0",
-          "after": "7c2a894334441182d50d675170a27f4335984609a16e94f0e7c58fd02793e1e7"
-        }
-      }
-    },
-    "docs/performance/policy-v3/order103-exception-applicability.json": {
-      "before_sha256": null,
-      "after_sha256": "da1e46e5cb76e044ce6e74ad17847fc526e3ea27d524ab395e35c3c01905a100",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "da1e46e5cb76e044ce6e74ad17847fc526e3ea27d524ab395e35c3c01905a100"
-        }
-      }
-    },
-    "docs/performance/policy-v3/order103-owner-exception.json": {
-      "before_sha256": null,
-      "after_sha256": "9e617d3a728aaaea6998c26ab0e09ed21e6af6ceafd86444332a06b168e3e9cd",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "9e617d3a728aaaea6998c26ab0e09ed21e6af6ceafd86444332a06b168e3e9cd"
-        }
-      }
-    },
-    "scripts/benchmark_order96_rerolls.py": {
-      "before_sha256": "e061748ef66b399741d1b579317d1212156498cbfc4b214ec00a4e8a51abfb10",
-      "after_sha256": "fc4fe1423d4864d251bf8f5b2c1eaf305b4f21a358cc668c8b5a20c166f75daf",
-      "owners": {
-        "@module": {
-          "before": "db39c5d24651b9b66399ce6eec314a7ac03ff447e40d5e481b5a8070bcc247f3",
-          "after": "bfe32a910d9b6f954fb8afd3f12011ffdbb1374bc9db3026669e45652e6a32f0"
-        },
-        "measure": {
-          "before": "ee70e3c8884842a514aca3bd55f9c358b9f4856a9b4d743ce0a5664f9bbf7886",
-          "after": "426c89d3b10fddeb67d5c821b29fc44b5e6c6a4c50137f0cabafda439c2d70d3"
-        }
-      }
-    },
-    "scripts/check_performance_policy.py": {
-      "before_sha256": "89538f31d57cfc0c582cdb6ce0bd6a8008fdabb8b9d73f688b997bedd36f3561",
-      "after_sha256": "7de13ee1e0650f12bd711f104a831b6921244489a367a87fa1e11ea95b2c1b24",
-      "owners": {
-        "@module": {
-          "before": "35f97953619e8f7167db4bf0ac36deb44b48a1765dbcc9beccb14aacf47abe30",
-          "after": "6ed659b42171dfaf6154cf4261abda6f2addda6836c2376cd2cb58c2c2ee782d"
-        },
-        "validate_current": {
-          "before": "e606c78c29ec700d9fd84faf36bde79790d915088c6d6c8a3b032277cdd54859",
-          "after": "9ba4d301d593b9d85a3d32177e9a06084ec9defa5b917f9c43a9368538fd28ef"
-        }
-      }
-    },
-    "scripts/measure_precision_grouping.py": {
-      "before_sha256": null,
-      "after_sha256": "0b0e63cba0ef8457f20ba2aa5bb4028018ef11b4a0e2cc932868534bbc76a5db",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "468cc113a8203d5ac8dd4057785ba689fec185afc09be7fe00c26b19873e963d"
-        },
-        "checkpoint_inventory": {
-          "before": null,
-          "after": "cb7f9be015f9e47e02a338ee723c7a51ee960b0bc855e8b2aa32300b4d46b26a"
-        },
-        "group_sample": {
-          "before": null,
-          "after": "52e462c151cc92bff77cd691f7e8d2198fb73339557b5c39dd977afb1b0244a3"
-        },
-        "main": {
-          "before": null,
-          "after": "5659007e6ee05a55eba6c856db228025586bcb68901dff65eb0c3b780b76792f"
-        },
-        "reconstruct_sample": {
-          "before": null,
-          "after": "25ed844fea0d4b0ad634d111d2aeb93ac73e4a21b1081f1b8c799c3defb9200d"
-        },
-        "report_row": {
-          "before": null,
-          "after": "bfaba4087eef82e7bf0d95867a152019ea06bab0b4ada3a4a1aa6c03a0e2f3ca"
-        },
-        "unresolved_inputs": {
-          "before": null,
-          "after": "cb4737f66e8d4e9d21855af4f11c0c50bd1c5d3a2d2d232831e167def0caf66e"
+          "before": "7c2a894334441182d50d675170a27f4335984609a16e94f0e7c58fd02793e1e7",
+          "after": "d0cb2ab96a2bddc3aa68c03d36adee62c541e698c4798206a2c97a8353f51452"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "56fd0a6ec6e2b1bab17c6cd7eac26d1aa297cb01509409fdaac5cb3afb6a90bd",
-      "after_sha256": "e955142b231d5bd28fba6fce313f3ccabdd7c71970c8bc1b22acfe9e496ee636",
+      "before_sha256": "e955142b231d5bd28fba6fce313f3ccabdd7c71970c8bc1b22acfe9e496ee636",
+      "after_sha256": "2eff6610f2a563dc7d4ad32615d051c22ad45eb1049a15049ec4f6f3ed915751",
       "owners": {
         "@document": {
-          "before": "56fd0a6ec6e2b1bab17c6cd7eac26d1aa297cb01509409fdaac5cb3afb6a90bd",
-          "after": "e955142b231d5bd28fba6fce313f3ccabdd7c71970c8bc1b22acfe9e496ee636"
+          "before": "e955142b231d5bd28fba6fce313f3ccabdd7c71970c8bc1b22acfe9e496ee636",
+          "after": "2eff6610f2a563dc7d4ad32615d051c22ad45eb1049a15049ec4f6f3ed915751"
         }
       }
     },
-    "src/warhammer40k_core/adapters/external_contract.py": {
-      "before_sha256": "d4fc814d7da5297cef42f58554570fbac74c53258692fe912ea2e712f3f3d921",
-      "after_sha256": "1211b30ebe48548fe651aef4f71c2fde8dd279ff6b7ab1b53fc4f24e5e357af3",
+    "src/warhammer40k_core/engine/prebattle.py": {
+      "before_sha256": "1bdd67eae34fd90e09995c1e4528a04b5554b30d9172b956d9a5450eff2a0ba5",
+      "after_sha256": "9196429c672020be365eb1e2191033c29c5203501602bcecf0c5991e518d98bf",
       "owners": {
         "@module": {
-          "before": "5532c5a7e04cdf72432ead274ae3b4b656145fffc1eff85d1b2118657e2ea99b",
-          "after": "22fa8a38a03d58382ce0b5852e26f15f995e326711f88bfc0574707973941d03"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
-      "before_sha256": "ea781f89fbe43c75d96f198a157ecad33061dfa44c64a3cc45f38a51034ab97f",
-      "after_sha256": "6963791b7e83b62c6f57193b6b9f79e76b728267910a1717b91f11a1364ba82e",
-      "owners": {
-        "@module": {
-          "before": "8184340e3c7e1482080c1bb67c2d0b4e457da3d5a552cd97f0f94e2aa8179304",
-          "after": "0b45056cdaad9fc7f66cccb963fc3d8d47508abc6ca8106f995551fef1e8b72c"
+          "before": "c0ead39bd3e0a4f748e25bbf3493a5603893a03d78cffbcbf692fb504a412a8f",
+          "after": "09646b7402937f777113e31e0d9fcdba25444872a40e25f1dbec8bc2684f5954"
         },
-        "_select_or_request_next_gathered_group": {
-          "before": "d64b3e835b69475f3c93ecd49a6ffa2ca4ce1ee9bb6152231b2727c0914a254e",
-          "after": "6844f014c40134be48f1bc34615c65e1296ac4b2d768dc72320452e856d289f0"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/attack_sequence_model.py": {
-      "before_sha256": "7066231df48747c419969e5f1ae877d007bff7ebbb97a2761d24d6711ece8779",
-      "after_sha256": "735a8adcc917f529452febda383c9b8808c6c76a0cec8c685adb64d3aa9bc21a",
-      "owners": {
-        "GatheredAttackGroup": {
-          "before": "5387ef2de86494eb6b81259f0b0b2d604a48a200b5a66bd28a14e23158170916",
-          "after": "e5808a6785598c4cc32a09cfb95930232fed3988a90a3dc29560ad7b310d8d55"
+        "_append_scout_enemy_distance_violations": {
+          "before": "244d30dd81840735c1e41463a154fdf3d37d478a904608ddea0b6bd3cc92f963",
+          "after": null
         },
-        "GatheredAttackGroup.__post_init__": {
-          "before": "bc44df23182f117adbca0376be870795ca4e4cee772be502c537b6d9f5bc9b6c",
-          "after": "5496b9dd2edd3e78c8bd37ee2cd3a32303860c9d1a9242c163fcef69bcf66f05"
+        "_enemy_geometry_models_for_player": {
+          "before": "c5ec7225f857c9fd27f9629478a0b8f83733f194941a965de512d1089400c070",
+          "after": null
         },
-        "GatheredAttackGroup.from_payload": {
-          "before": "1f7c36e92859de1c1e6c4e3892dd5e3cc5967149e5ee68cf75a3f485e9fae3aa",
-          "after": "e4544c712e588dc4fd2b31cfe7cfa4619153b68291a577c795f943a21daf7174"
+        "_resolve_scout_move": {
+          "before": "6a4ad3be3a8c0e4120e3c79578ea1ec98d3da4cce4c325129f860cb77d65bbc2",
+          "after": null
         },
-        "GatheredAttackGroup.to_payload": {
-          "before": "f19d89e947b88768707089b7475eaaa47907f850ea0c212d5c93420c51613d46",
-          "after": "6bca1ace915f9c594376f69b4340ef5ee1185ac3dba37e863dd92518ce1503b7"
+        "_start_is_eligible_for_scout_move": {
+          "before": "b71893183bc89f9ae93b8f4929616b80c4dbc762b680ee6e186f7d2594771109",
+          "after": null
         },
-        "GatheredAttackGroupPayload": {
-          "before": "dd5bbc60e0e4124d4b7a145cbffa58f5bf14c7a3652e29a4df1a7a1577ab7e1d",
-          "after": "aa1b7081a2c12cbf9d50c81c23402b03b902a3f771f863b231f18558c21e9c56"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/attack_sequence_selection.py": {
-      "before_sha256": "c87d38d6c14213f3bfc4bebc2ec96cf18fbe26c0cc2d02aca8d46c46047b206b",
-      "after_sha256": "eb875248728e55bff73be89cf50dc6f95f722cba0862cfc45d796ca461aa970e",
-      "owners": {
-        "@module": {
-          "before": "1146ea2a607d0e858442de229488089adfb367e3c4019ddd9a99d6592663a28a",
-          "after": "6d448fa4ccf47885a01817574f1c2333f99972efef27774652b2a9d8fe4812a2"
+        "apply_scout_move": {
+          "before": "6015c3142c216bfa4e04df9a446c59a28cf6599a042b3743266612c08c13d202",
+          "after": null
         },
-        "_gathered_attack_group_from_indices": {
-          "before": "388ab39d76a2caacd147e561bec1b837092988a16072b9751e8b785ac9dea6e0",
-          "after": "e8baf815d660198c719e015d5677e1e4481569321324442a10518d11208e7b46"
-        },
-        "_gathered_attack_group_id": {
-          "before": "bd4e3671ba43d4872f462202c83e1b19e6bdffb7ac92cefd899ed4b728261d55",
-          "after": "84dcbe81e79678e58ef90f875c2a4b99c4a2f7d4c5856eacc0fab68d0cc79069"
-        },
-        "_selected_weapon_ability_ids_for_signature": {
+        "enemy_geometry_models_for_player": {
           "before": null,
-          "after": "ec4ca42284f5553ee4186a7a1650a57a33aadd1f026a21e336e306fc6e0f32a2"
+          "after": "93bf9e42a78c1863c803311f6f27afb1806efc5ee33b1ec8c8d76ce28bb162db"
         },
-        "_weapon_rule_tokens_for_signature": {
-          "before": "73241b799525193611373c9f15582aa99d352c1e96db2dbb4ee04ebffc794b5b",
-          "after": "5115d3b9011a14e5c8d5f53a3fc953c7b6c72ee1805414eec2846cd11cc2ecf9"
-        },
-        "build_select_attack_weapon_group_request": {
-          "before": "3d81515d68f92d129bd7da1653c2dd4f0950358bda106ba634b07eac2561d4d6",
-          "after": "3e4b25eec6b63a58030e0aa2c7d46d913cee79fc5aef4861cf931d3aab1f7a56"
-        },
-        "gathered_attack_groups_for_target": {
-          "before": "0e57564598fee485af31c874a66c9a158459d46e0a17c8fdd3fd616bde68571f",
-          "after": "319f5b41e4744701379bab69bf53b4c0a86e3134887cfb04efc1b15a17cabb7d"
-        },
-        "identical_attack_signature": {
-          "before": "1ec28baa360d876bf0abae1ef3741e4ed0a54de7fbcc9e6c9449d5f2cf3b7e0c",
-          "after": "edf0f07212562e5046a06302b1494d47c24a2e46cbfbe4df1802a3bf593ac06a"
-        },
-        "target_has_character_for_attack_group": {
+        "start_is_eligible_for_scout_move": {
           "before": null,
-          "after": "c3b587e2d6dad1cf0b056171fb45bd39aad90e932c3fc0b2effda9f29759b405"
+          "after": "48fec8502a3af072d11d6bc9ca7f1fb398f8e2e2591ca83dc4b00a83a44cf561"
         }
       }
     },
-    "src/warhammer40k_core/engine/attack_sequence_validation.py": {
-      "before_sha256": "df0540251eed83489d581e3e6ad6f92f1089416773c430f9078336c483fb3f02",
-      "after_sha256": "3d428f29de45db9c0ed5e2362402a92ad8aa3cd2c76c12f3fed918f06cc3d164",
-      "owners": {
-        "_validate_gathered_group_matches_attack_pools": {
-          "before": "5526ae5f912c9108b49a9b576467996a50095be19705f9d14cd22b93445f62c1",
-          "after": "40e64fac8d7f2fd066aca63b9f95248955c1eab1893aafc150484527e95bf735"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/phases/fight.py": {
-      "before_sha256": "ed69356bd141e18fa928b4d9ae0c8666120e835c9187d6729654f8c3b5f5745b",
-      "after_sha256": "35d1bd32c380ac4832b1898f405164b1121dd147da1ae4ba8e5b9351a7741fc2",
-      "owners": {
-        "@module": {
-          "before": "c740f51715a3a55244386fc960655f9df447324c3cda4187d42b5e5de611eeef",
-          "after": "715a2b52088cf86994de2cb715838d2f2373d3101e5ef1dd6867f64ad6479844"
-        },
-        "invalid_fight_attack_sequence_selection_status": {
-          "before": "4e8f4f0387c3ae90d033317a2194aca9429b9aff35bfb950ec92b3b787dfd51c",
-          "after": "f33dba76c6114f7c630254f3076837e18447d2b549ae0f66af8a89fb79c2e184"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/phases/shooting_handler.py": {
-      "before_sha256": "81a652d3fc404e3fdaa635ca7b5147c3e070d6d763158cf6b7ed1a4bb4c712f9",
-      "after_sha256": "7eb62dc82222d2ebe0f6c1dccee3ef2b6ccaf9ae766b13ccb12ab1ed87a22c75",
-      "owners": {
-        "@module": {
-          "before": "54bd3e4307fce53b0a864fdcbf12862972f460c2a4760d9f1b9aab5499d5c892",
-          "after": "89c6f48b13aa3ff0bcf7fe2e7038ef37b2cd56d3edadaffd880d4704bca2fd9c"
-        },
-        "ShootingPhaseHandler.invalid_attack_sequence_selection_status": {
-          "before": "663ded45742fd0ac719a60b4cc8e331b129998c368a027074bb13ed6e2bdecac",
-          "after": "f819b44d268376a89c174b4d75d759e33d9e7f64efb3a8552be5fd191deb6943"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/random_profile_attack_groups.py": {
-      "before_sha256": "ddcd1312477bb078071d8dd20f7c0c9839f0821061e6abc36074c48384afa7b4",
-      "after_sha256": "abbae5d1acf8c2cfbac7450f2545c790cd5fecbb15195b6dc3692b6961ca4aa4",
-      "owners": {
-        "validate_profile_attack_group": {
-          "before": "3465eea7c8e1a7882015e774c74233a4ce45a64c84b28755e4c55e3eb082904c",
-          "after": "e74ce6aa83e9b29bbfa4c9a36d4561ed7522b11a05dd2e6cd77e42aa3d3af6ac"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/replay.py": {
-      "before_sha256": "ccf5578c1dc765232576ca54481b8d3a446e53fc6e724785606405523f46048d",
-      "after_sha256": "c07892038ef9173ef05e514267e28f898a2620a89eea60b0334cbe8c493f7886",
-      "owners": {
-        "@module": {
-          "before": "9ebc5c5ec8e75dbdeb5db029151957ccde5afcde021909e8497758d7965ab67d",
-          "after": "bf87d5295fa5ff7e353aef550d0c98b8dd8d13a333b49109a306526f4a2a3cdc"
-        }
-      }
-    },
-    "tests/code_quality/test_order103_historical_evidence.py": {
+    "src/warhammer40k_core/engine/scout_movement.py": {
       "before_sha256": null,
-      "after_sha256": "5b3655b1946f9c9578fa8933977dd0f9cfe2d5b155cf3507aa598978a919cdf5",
+      "after_sha256": "0cf110b016418fed43deb9b78cfa7dc6ac540a711d469caae40bbe1c64d519ce",
       "owners": {
         "@module": {
           "before": null,
-          "after": "d99d752e9c790c47f2bafdf9db68fbc34ff38f8b281613d2d8eadc40373c1454"
+          "after": "e8f2e42a676b07bf5b68f10c0452b9085c3c1628634f6d71e68c55dc637064ee"
         },
-        "test_order103_original_assertions_remain_exact_and_fail_closed": {
+        "_append_scout_enemy_distance_violations": {
           "before": null,
-          "after": "7b988828e395212f4d56bcf0671093d4cd9dd47d2c7dba47273dacb76cf99151"
+          "after": "c5a3924862e1947a8a5b69511e2f2c502a2f4c551ab5b29b115f8975ed65b47c"
+        },
+        "_scout_endpoint_placement": {
+          "before": null,
+          "after": "da77008b612ec4686320ddcc8e2d027a773042dd04db047431b0c7c560745465"
+        },
+        "apply_scout_move": {
+          "before": null,
+          "after": "79efdb298a845b6f011ca03ff0048044224fbe40dc7ed633dce60c827c8d0f72"
+        },
+        "resolve_scout_move": {
+          "before": null,
+          "after": "0638051539da58bf8c356c94cb17d59efa495afd219b2d1e64776449f28e8a52"
         }
       }
     },
-    "tests/code_quality/test_performance_order103_exception.py": {
-      "before_sha256": null,
-      "after_sha256": "abcd574d240fcf98eacc1876885901afb2291babd16db0f100f1b9152a718d09",
+    "src/warhammer40k_core/engine/scout_movement_paths.py": {
+      "before_sha256": "441ab5b737e013674805fb7eac63ec8b64a62d4d08d464818d302307a0add6c5",
+      "after_sha256": "88b4cc4a69b0712f4836dbcf58decabbfecb10864bca3031f435e7b47864b0c9",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "637fa8e595a7354dd9918dfca79c2104feee3a66f421d2c2b70a108a30e20617"
+          "before": "d423c39046766c0f0b1aa6d4ed089a241c016817a1b5902a192cf59464768ed4",
+          "after": "8b41201786fd21f018e6727845cda4b79d18257088fd24a051b72537f802e034"
         },
-        "_retained_current": {
-          "before": null,
-          "after": "03e55781a307ae4976dc3ee541f7750496e75919ec2dfb82f04d08210bef022a"
+        "_friendly_geometry_models_for_path": {
+          "before": "5564f3b54613faaf01f1ebe57b37f5a9739767ca57565d56247277acc97e9891",
+          "after": "358a94856113c502ea9905e6524b46238862f44603babe8f2181fed6e9589b8c"
         },
-        "_validate": {
-          "before": null,
-          "after": "f8329ea7c596570ae767934d68d1e29d304432aed0c91932a22ac7579a9c32db"
-        },
-        "test_exact_approved_failure_keeps_original_samples_and_failed_numerical_status": {
-          "before": null,
-          "after": "0ffc0aa097090023bc739c48d2b11d59164e0b20bf5f498a7709a770527d8980"
-        },
-        "test_missing_or_corrupt_authority_and_applicability_fail_closed": {
-          "before": null,
-          "after": "af42806113322f6a07bce5016e6d614c0c75b8d9b52c910baa7390b916df2643"
-        },
-        "test_recognition_cannot_cover_changed_evidence_or_any_other_failure": {
-          "before": null,
-          "after": "d028c883d6c858cca057e91bc0fc56e5283f85612b74c1167933c1d5ac1500c6"
-        },
-        "test_recognition_is_not_accepted_on_a_different_passing_family": {
-          "before": null,
-          "after": "34938ce3b79d4e3e08d155e2611ba6752e9e660d046b045b11c021137f8d0823"
-        },
-        "test_retained_bridge_authenticates_governance_delta_without_relabeling_digest": {
-          "before": null,
-          "after": "4f19d6448198880d0f606aec32b17ad16fdb56cd282d92e797701282f966d080"
-        },
-        "test_retained_bridge_rejects_unapproved_or_stale_actual_inputs": {
-          "before": null,
-          "after": "8a15b627122e40a39d724294ca010f35692a1b52e1eb3bb815bf89ad02604268"
-        },
-        "test_unrelated_matching_inputs_need_no_exception_or_applicability_file": {
-          "before": null,
-          "after": "55c626cea3a2ae89f37d44167c00d6a8fdd07ec05731f3bec5d3ce5a803d26a3"
+        "append_scout_path_violations": {
+          "before": "f62ad41fb41bc70c63be52efe70dbf75add1659bed258d6a78ed30997ca20423",
+          "after": "800b6b6bd889ac2bd43349b659d7ecdb887b70c778665c5553f311f129e726c4"
         }
       }
     },
-    "tests/integration/test_retained_shooting.py": {
-      "before_sha256": "1cb06e185d3c21a7d0856e309440e315abb2b867532c15c16d726d0a3b9733e9",
-      "after_sha256": "bd7df29729ad3b7357cab2ed49eba427bfa838492e5916f92411b057297228cf",
-      "owners": {
-        "test_order_30_for_the_chapter_shoots_after_own_hazardous_death": {
-          "before": "d8500a1ff35e0ed55dae3f767adbbcac00a35b1f0fa6b23c2322bc52da3c0e9b",
-          "after": "809da172101e0b96b9f19315454cb32b588530d541142d4b5b88435b9c6ac993"
-        },
-        "test_order_30_multiple_hazardous_casualties_keep_each_pending_authority": {
-          "before": "e739c0763bc17c486f2b1d269eaac10edba9ddd227a8cf3aba15758d74d63caa",
-          "after": "0aa4dc3be1a542081d92130b87a2ddb371c9463319c8941477b726beb8919cf1"
-        },
-        "test_order_30_nested_retained_shooting_restores_each_parent_and_redacts_authority": {
-          "before": "7ebf26f7b6b56a62dcf22ecc07574c0878001d99572d106302f075ddeb08ca1a",
-          "after": "7a576c91da913d2b5d0d2c3c439e004482a444188d53bc77887df320936dcd89"
-        },
-        "test_r34_001_action_blocks_nested_retained_shooting_before_acceptance": {
-          "before": "e4015a1ef42ed3fd0434aa935b72d693e4ef78ffbdb914b1f9a7f5d54d498c15",
-          "after": "2519a3a8cf4f770df13862823043b520031028f94ec74924c744132f07d14e16"
-        }
-      }
-    },
-    "tests/order101_failed_setup_helpers.py": {
-      "before_sha256": "6c387f7d7c5975fbb9960c862b62b33fd75b6349e3fe5f39d3e0cdff39d36211",
-      "after_sha256": "b2cd265675f44c8aa6ec5f02c400089b676f1cb2cd7a4cae700190aa208b5660",
-      "owners": {
-        "failed_setup_automatic_record_session": {
-          "before": "233793696088849355f0d5f71105934dc14a78b36d9df1e465891178bbe568e5",
-          "after": "004b382b35927837bf16b40a6aeb68acfcb5cfd585be6ede7c39a94addd287d5"
-        }
-      }
-    },
-    "tests/order97_gap_probes_04_06.py": {
-      "before_sha256": "86c4fa69223ac2bff187cbc4f8655f80ea2af1e81b0d17e50aa53445d861023c",
-      "after_sha256": "f4457ebe88590b5dd57ff9f0cdaa1aaedc4ce81c53f364110d1dc693c105bfdb",
+    "tests/code_quality/test_module_size_policy.py": {
+      "before_sha256": "757557113234da539424f6f3944af13bcceb0a587dd4a3fc404c1cee7879e385",
+      "after_sha256": "dab57828427036dbaad9efa026692ddd1e618bf4f7dc52ad916836a353a5e3e7",
       "owners": {
         "@module": {
-          "before": "04e3b80102408e9d0540e554ed2e0b182ef520af8217214e9094e1c8d901ca3e",
-          "after": "fc719f3744ccfeaf91b044a7f3484d81efc9b4ec02c930e7b0447169ced42252"
-        },
-        "precision_grouping": {
-          "before": "b2e9fec9d62d51ff11f5bae91bb76747cb18daf3cfbed83b551f6ea25e4d0aa7",
-          "after": "63cbd348b402d36aa91861718bbbf9f9cf6c3913369a04311d398889e782c1db"
+          "before": "c97ee3177abf79e9bd0f5c2fd4208d160b59b5aab5796edae30464cf435dad4f",
+          "after": "9ce1733b07da103932f3a842d9e1baaeb871747991c48480a5290862521a39a2"
         }
       }
     },
-    "tests/precision_grouping_helpers.py": {
-      "before_sha256": null,
-      "after_sha256": "8c04d395059117a6e5ae6206e6b6a719ed08364c729bdfd998eef2a675eb6b65",
+    "tests/code_quality/test_unit_model_semantics.py": {
+      "before_sha256": "e9b3c6a60a9706f584a220a3700442042212548135e073eefb4785c0c5d20b7f",
+      "after_sha256": "b4cc21df551e75a72d8ea77260b628b540d0cc9dd8c1a16b0b06c195fd672630",
+      "owners": {
+        "test_scout_validation_and_mutation_share_rules_unit_placement_authority": {
+          "before": null,
+          "after": "7d27b158c07983618ab66c7392b703c904c56fd9ed3919eda64ea30e9e6bc132"
+        }
+      }
+    },
+    "tests/integration/test_setup_prebattle_ui_smoke.py": {
+      "before_sha256": "421452a2614da3d0e9ca6d125f772ff470ce32af4201c6ee2e7d90f30667fe7d",
+      "after_sha256": "1e9876fbad23bc7ed533e5bf99bb6de67dc216d3c6071c882fa7cd92ef565a0f",
       "owners": {
         "@module": {
+          "before": "71279c3942ed6c03a60d503227ff3eba8ca0b47a2bc93e481c727f86ed91d8f6",
+          "after": "3348da3461a6cfd69c3d422e511f584d74894399dd7573d757c15b8b8cb5f086"
+        },
+        "_scout_facade_config": {
           "before": null,
-          "after": "43a72e093e842019f9592fc888b2a5546077be7f3965d0b82f7012f68eb32b35"
+          "after": "c9d95be30130db67e62e14effef781b88d126cea128cdbbf8108af045f41529a"
         },
-        "PrecisionGroupingScene": {
+        "_scout_facade_session": {
           "before": null,
-          "after": "bcf4f52c79104fed1e453bc1d330b2904630d8eb08a9f9a55c41cd67b1381329"
+          "after": "9a034a04bb47141c28a6c2defd2276b580773318d5cb2faa190ff1cd05797c20"
         },
-        "assert_precision_scene_persistence_and_completion": {
+        "_scout_witness": {
+          "before": "7cf981ca54cf5a0793754867bf4722f5389fd684577e9c29a4c91a94afe07064",
+          "after": "3b655d461a1aae6eda67c8153bdef0e802f44f15b776c05716d17202255caec2"
+        },
+        "test_scout_facade_moves_every_published_component": {
           "before": null,
-          "after": "1090883116ac4df5fb5225088024cd6b75d2c5a081f857e131fdd6a10f0eb5ec"
+          "after": "f75475e1a0fa8da79dd75445efafdc905b95930e05fe7f9b418e999ef9470a53"
         },
-        "offered_group_request": {
+        "test_scout_facade_rejections_preserve_all_components_and_allow_retry": {
           "before": null,
-          "after": "8bb43b78bc305fa7da8d656ad99f28f13844325c330852ba4dbc08e0c060c1e0"
-        },
-        "precision_melee_scene": {
-          "before": null,
-          "after": "9b7252913a347ff56d094fbf81eba486da0f66b50eb79b30815a952bbb8f7802"
-        },
-        "precision_shooting_scene": {
-          "before": null,
-          "after": "f7f7d07f310b650d0c9d8add386d9f9d2b5bf6868c79f9f7ab3534757a948188"
-        }
-      }
-    },
-    "tests/precision_replacement_helpers.py": {
-      "before_sha256": null,
-      "after_sha256": "b025220c3dc28495eb1babc56c62b51f35a8d504bce3a089587a91b51675935f",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "8b9645c6b126bdf2692945bf3eae11f1d8ca73bce2143f51acc9e972b3de9e6b"
-        },
-        "precision_replacement_scene": {
-          "before": null,
-          "after": "fcda1e0ab63a2a42bfc2bf7ed0f15793643ea6822a072df5fc61efb7dcec44c2"
-        }
-      }
-    },
-    "tests/replay/test_phase18b_replay_runner.py": {
-      "before_sha256": "ebe50e58f93fbcc6d36259f91ab9077a75365e500c0d4865e7421eae7b9ada5a",
-      "after_sha256": "7d7cd6f5bc8b858b0506d39f15257868c85e2375652540dc72431bdf900a5d66",
-      "owners": {
-        "test_setup_to_battle_replay_reproduces_exactly": {
-          "before": "6dd17b69a5f5a54a51ff342090ff9b2c0ded359f5407ae8accae59ec6a72fef4",
-          "after": "1745400fc707fab566c8971369b64395272c2471db4b966b07d6f1ac0631c4d3"
-        }
-      }
-    },
-    "tests/twin_linked_helpers.py": {
-      "before_sha256": "0333b151949c7761cde49283709e8edad5586725c75ee71611267b1bb600c8d5",
-      "after_sha256": "3f761df299afb719dc376a1d6a0366d8e1f17bc48dcffbdbb1c4950a598cbb04",
-      "owners": {
-        "complete_optional_attack": {
-          "before": "241a29c83581eb33526b5434334695b8089280c7e7e4b1f62671edf2bc1c043c",
-          "after": "6a488d402acd475c0bcb6ddb0325f1e6394aac1419b53f5d1820a674d9d11611"
-        },
-        "submit_next": {
-          "before": "8a60479c3c784ae536e8a5185e86873bf852e6480e71b3f1d36c2f3f38090120",
-          "after": "1f494c62e2ffaf0390100bd72efcf88c96fa76d30dc32f096be6c581927b0c2d"
-        }
-      }
-    },
-    "tests/unit/test_generic_rule_effect_identity.py": {
-      "before_sha256": "1d4a78723a6610c0e2b02b14d69cafb38da8b388603127abf392d42e6bdee88e",
-      "after_sha256": "e0b408f708d99f301c00a0a7fbc2cb1e776ff7e5ea490254a443ac850a89f909",
-      "owners": {
-        "test_both_players_accept_fidelity_in_fight_and_replay_through_completion": {
-          "before": "96849b923a14d4ed88eadadb58e53592c906e7345f2b287ee5b76b1ac939a3f3",
-          "after": "76ab6a4366286ee96d5bd993c71a3330e4d58e17c5854d41b30a66875a239045"
-        }
-      }
-    },
-    "tests/unit/test_lethal_hits.py": {
-      "before_sha256": "e1420132cd93943381e99b7f3ffd789ac834ba3a78e1ebbc61f4c1193b3b2ca5",
-      "after_sha256": "eb7bf4e7bee38f38aac63b70c4dd5ffd92d3435ce4bdea40ee9c59ae3d06e334",
-      "owners": {
-        "test_choices_devastating_sustained_restore_and_replay": {
-          "before": "34d046d1808b437a8a4779deda4dcdea9b9660409ad4940361532ba38afe7d61",
-          "after": "369c80474abba2b828d6055a7531bdb4de71e15d9e240045d2e594caa6736937"
-        }
-      }
-    },
-    "tests/unit/test_order96_twin_linked.py": {
-      "before_sha256": "4cd357c8cdc4f217cb17fe20c7015c1e65f7df89c49a4ef0b0ed9935463e2c16",
-      "after_sha256": "6457ff943506b21912a679386c7614a800a972545ab7ead751c32439f400dd41",
-      "owners": {
-        "test_sustained_d3_is_stable_across_twin_linked_resume_restore_and_replay": {
-          "before": "8973c8d98ff6cbfe2456047fe573cc43618e6e532e8d9602af8fffca712fa261",
-          "after": "d5615446a4fa1c913640da4fead22c7985cc0d83362ddbe6e718473bdf922bf8"
-        }
-      }
-    },
-    "tests/unit/test_order97_attack_evidence.py": {
-      "before_sha256": "12a4057e5de809b5d048acf4df983333694e8f8df013cb3c356fb96d6ea95538",
-      "after_sha256": "40182aa32ca5ae3a0946667baadfb60e78963b7e34d1f06e4a34c788e0b01120",
-      "owners": {
-        "@module": {
-          "before": "1807e336f70f38e5f93a90bb8d31c323c5b75ededf19c9a7f50f7d21fc10f1f5",
-          "after": "d167e85ecc44603cdbfd81bb04c7c7f5893d73672ac470a8cf8423eae00529c1"
-        },
-        "test_identical_attack_grouping_separates_each_characteristic": {
-          "before": "3d371ef0eaebad2a5056510f7151efefba7f10c0adffa9d99f297a949decc782",
-          "after": "b5ed0bfcdf66273f61222259ace3fe033dfc34021bccd0627abe6cede825ee8f"
-        }
-      }
-    },
-    "tests/unit/test_phase11e_mission_scoring_cleanup.py": {
-      "before_sha256": "0bb56db81c16794d86833ec8fe5a1a976fcbbcd4895fb31e3ee14052a546aaa3",
-      "after_sha256": "88a20298641cceaa0ce417a39925da17c9142b17a3b8e9de383e5f639536086a",
-      "owners": {
-        "test_attached_action_history_retains_identity_through_round_trip_and_terminal_replay": {
-          "before": "63053de6c2d833b03ed4e88da5752b907b00b2737f172a5ec1c0d0ae3d69345b",
-          "after": "3d848f8dcaf82e7600ac6d08adf03f5967a10f93445498a211ffe785587860c1"
-        }
-      }
-    },
-    "tests/unit/test_phase13b_shooting_declarations.py": {
-      "before_sha256": "fbe5dff1543e140d933880844a52a8d63e4b0eaad2e7fdd309438abc5c1e3d69",
-      "after_sha256": "7058214ec9f8540a5ca78a9b2a3150954c2d676838ba6d464e04cd50e997b238",
-      "owners": {
-        "@module": {
-          "before": "830341b6d4e7d2a7762016a113c741a70fe83df2073d8460fe76442cb40a884f",
-          "after": "6247939531bab3ecb3ce3eb593dabffce416b037659502a0c4eea7258eb519bd"
-        },
-        "test_phase14h_pending_grouped_damage_payload_validates_fail_fast": {
-          "before": "7290f163fc71b05c930f5207f9214b47c6024fd9969d0fff7eba283893486c09",
-          "after": "e8caf4492eadb11bd0ae3af328602c7ef2fcd13f586c26f3df69de25caf06e73"
-        },
-        "test_phase14l_attack_sequence_round_trips_current_gathered_group_json_safe": {
-          "before": "25ce938c45db37214da2f4785a6ae4316be27549c88a06d61208f1566f564d8e",
-          "after": "70e986d1db38afcacd64bec4d698212a25f74b4d6da8ae7dfd38480d7dd5bcee"
-        },
-        "test_phase14l_attacker_observer_provenance_prevents_unsafe_cover_gathering": {
-          "before": "9fa42cc69fc9225045f55384264f28b14a70ab8f2293e5830a2e020f73d3df36",
-          "after": "2e93fd60b2024676df30e5011cd15977ea65c6244a52fce3c3b4be0b0c929665"
-        },
-        "test_phase14l_gathered_attack_state_fails_fast_on_malformed_shapes": {
-          "before": "08c75d8163b741e7c9051eb5eb3e951866276b8235fe315e27f2ac0a998826ef",
-          "after": "680adf8937180e439cd35d647cabfa4454fd774a21ada68ef389617bb44f3d78"
-        },
-        "test_phase14l_identical_attack_signature_and_gathered_group_payloads": {
-          "before": "54f6183e02522ee31e1bbba6768e4b7c20ef351806ef57f229f10dd648825e73",
-          "after": "8cde1d30a2af34dcc769c203c9f3be48d99cd677fec8428ecd84a4a9c54a4558"
-        },
-        "test_phase14l_precision_visibility_provenance_prevents_unsafe_gathering": {
-          "before": "d8713365360e2805475726303b456bf07c154c47813d77fdbce5a652704d1c7b",
-          "after": "b39da441d1f229b06299112602bd8e108afe6c6660610b0b0f8e171806a3554d"
-        },
-        "test_phase14l_range_and_firing_deck_provenance_prevent_unsafe_gathering": {
-          "before": "45b9a1a4613e4e0c73918ee335dad1d0670f929d97c256fc81eb7f39785686f5",
-          "after": "3d68c9847888bc711dec68e2cea08a2c7bc52c92093d077954d08bbed155502f"
-        },
-        "test_phase14l_shooting_test1_gathered_save_order_regression": {
-          "before": "8f438ceb136d4b0fb6a1c6b3be69558fec4d1bb5c387a63ca4d344d3d9ec3247",
-          "after": "74cf0e5b3978b887db64a39d528e9c5c9b1de1d76291b0eb08ae43cb5159db88"
-        }
-      }
-    },
-    "tests/unit/test_phase15c_fight_order.py": {
-      "before_sha256": "fb020dd91f658a8d96b3116a0cd657e1d46a943362f722dceb7e4a44311c0fd0",
-      "after_sha256": "2f54e9dc1a8a8c17fcd6b65bb1091e5aefd372f78fa04647bd09e45427bd1e01",
-      "owners": {
-        "_resolve_phase15d_activation": {
-          "before": "167bee6dd4b4229461d3a53c1831d6fddbba9ece3dbab5734e78b2f1995682d9",
-          "after": "27bc2b485cc6d5f28789276feb0125f53d083c73e2f57de87cb4ff000235b066"
-        }
-      }
-    },
-    "tests/unit/test_phase17_emperors_children_daemon_prince.py": {
-      "before_sha256": "5652264421a7914031515f82fb4bf640831bcc33c889167af7aedbf72c84a5ec",
-      "after_sha256": "63159a2401faae5c686afab04a321fa346623054354153e55ad52d8ab65dfd59",
-      "owners": {
-        "test_ecstatic_death_chain_uses_ordinary_fight_alternation_without_nesting": {
-          "before": "e029b382f00ee37e8a6d21cc20498224d4a1256a6ccab04afb12d56771d2f586",
-          "after": "b9e9d69901e20209458016c8aae9b4c75a512a0be583deb5d91aecee64332e3c"
-        }
-      }
-    },
-    "tests/unit/test_phase17_emperors_children_datasheet_overlay.py": {
-      "before_sha256": "e2686e48a4cde755e102ba6248377c9a41b565891cc69e8cab1992e29d097e44",
-      "after_sha256": "ce761236492de7f67a7bf991c348cc75095f5ee268032ee9a444ea2e7369b904",
-      "owners": {
-        "test_icon_of_excess_uses_shooting_lifecycle_destruction_and_replays": {
-          "before": "8d54d4ee8cfb84076fcab99b287f3d3903bd3fba7543a28aef4e223fb6f99d42",
-          "after": "6aeb805f8ed000f584a75dc39ae46d858718de799df124fd1fb4fa6bcee651fa"
-        },
-        "test_infractors_excessive_assault_uses_fight_lifecycle_decision_and_replays": {
-          "before": "811eeaf300da2668abda6e7e74f8c7e5c2e582eba2c13ba3797cbb4f20654742",
-          "after": "89e75970aa69ac98ca92f57688579bb8cefe58ce527b231edd0f04bc7ff04788"
-        }
-      }
-    },
-    "tests/unit/test_phase17g_drukhari_army_rule.py": {
-      "before_sha256": "7eb9b06c26664aa486d52abdc71d691305b2c001c9cce024d34b06bb8488b866",
-      "after_sha256": "48c254599f2bfa395eb3c1ab9836c1c3dcf61690d25abcc8454a614c1413513a",
-      "owners": {
-        "test_hatred_eternal_accepted_fight_hit_reroll_resumes_attack_sequence": {
-          "before": "0b6440215607365f016ef1cfd980914006440e36c8b4c6a966279dc1aa9e8457",
-          "after": "2c6ef4631e8ae4d4deb62186754d72340f8f718cef15c7d5db2546eea2921477"
-        }
-      }
-    },
-    "tests/unit/test_phase18d_ui_contract_artifacts.py": {
-      "before_sha256": "dc480731ce6f6ea4703adbd33ccdba1a5f71f45df3a2f89f63be837fa063665d",
-      "after_sha256": "61c14403f344aff83d3e7a27484d337dc6894b27e7961e6a9c146485143b993d",
-      "owners": {
-        "test_current_contract_preserves_model_projections_and_advances_visibility_wrappers": {
-          "before": "935ec880a935037dbe2ea60bf229974b31d23d1678e5a15fd483b14007c06986",
-          "after": "eb9e9e8a046b474cc59751b6f4b726ce8611649b021b925fc1107a4160e2eda7"
-        },
-        "test_session_metadata_contract_version_accepts_current_major_releases": {
-          "before": "43a74981257afce3c6e1bf4c6be019bb564a6dcccedf1ed953fd7c116681e380",
-          "after": "08b4abc9bcdefd66f9baa8fe6f15dc3c8230f4c7d195d5acc67396922d09570a"
-        }
-      }
-    },
-    "tests/unit/test_phase18e_server_api.py": {
-      "before_sha256": "0b3a500bfe428f65137ab3153c82152036d616d0a22de4a8caef4449788eb816",
-      "after_sha256": "d5cf5480ab616075e2200b2cc09909634bc6d958d20976072a6daef842575faf",
-      "owners": {
-        "test_phase18e_command_result_schema_requires_accepted_commands_to_be_committed": {
-          "before": "1569fb613b64ae5a3129f1e6947a15b7ef41c5d22e969c15460d53bd9b82cf03",
-          "after": "419a8bcf6e4c6236beda62c08f649a78c86a054d518ef34875fa0ec1b051cfa9"
-        },
-        "test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads": {
-          "before": "32dd4af9512b9999128b8ba15d3b66878d75f23b734311f3b84f10a49697ae06",
-          "after": "2c1d61e658e3591d175941b62defb8c2d43a5c68467b7f889ef6e649eef8ab75"
-        }
-      }
-    },
-    "tests/unit/test_precision_target_grouping.py": {
-      "before_sha256": null,
-      "after_sha256": "daf0a06dc79aac963b86ac8eceb670841c2e1e285b3020224d6b18b39f5f9842",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "2589faa9946a4aeda42b8d1e65a740d0f4be096b089e45bab3d0cab41498ae16"
-        },
-        "test_actual_casualties_retarget_unresolved_precision_groups": {
-          "before": null,
-          "after": "b4abb2f8c7a2ceb1723f8756105a3a699b89ca20ae96cedc075d2dd722693ca4"
-        },
-        "test_attached_character_allocation_and_casualty_preserve_recorded_group_context": {
-          "before": null,
-          "after": "4c9e4a843f28d146b3fba2dbd87b99956cbb478d2c89d7e99c2a8dd9a93817ca"
-        },
-        "test_character_target_preserves_distinct_precision_groups": {
-          "before": null,
-          "after": "11d58b0da4bba7aa1072f67303c74c367b6e9e46be043e179e4f2e5bb067e7f1"
-        },
-        "test_group_context_is_required_strict_and_pending_mutation_fails_atomically": {
-          "before": null,
-          "after": "770360ccafcd229a80ce7dad09744f60281b78b24a0bf88c08ec3cbf97f01756"
-        },
-        "test_legal_extra_attacks_share_target_aware_grouping": {
-          "before": null,
-          "after": "deacdbaf9e386f65a0d04138b6b25ad85b7f106fc7628ebce4a240704af7ab08"
-        },
-        "test_mixed_precision_random_defence_history_restores_and_replays": {
-          "before": null,
-          "after": "d2eb1a321c4368849f821a11fb7f20817e07f290c269c31fca36908cae57299f"
-        },
-        "test_non_character_target_gathers_both_physical_precision_orders": {
-          "before": null,
-          "after": "8a1bfda10a4577c388eb5de7ce888ba3b157aefe5470e20a397a10854fb035f5"
-        },
-        "test_non_precision_selected_source_identity_remains_distinct": {
-          "before": null,
-          "after": "ffdbe1e62ac5d0f6ebeb6cc3ece502cecfbed59c4fe242ac309475cc8c8f0266"
-        },
-        "test_selected_duplicate_precision_source_follows_target_applicability": {
-          "before": null,
-          "after": "0f1a3d5402513b3776f099df576866f17f2aaf6f9823e77d73653441a7123436"
-        }
-      }
-    },
-    "tests/unit/test_target_replacement.py": {
-      "before_sha256": "85334dd19d82ec8f113eba0cd7c6999fe961cd530d2192ed268a78a34db363a8",
-      "after_sha256": "ec693bfe208f6c3d41960827dec93c7de9c7083100bb9be07b094b301a22d04a",
-      "owners": {
-        "@module": {
-          "before": "5b94f7a5e938f792132cd2920bbb60333cd7d86fc95b2f06c9ffc5b336426e9c",
-          "after": "844cb695a6d5f7df395c7445fd1203915c41ff52900250c51febb66df07291d9"
-        },
-        "test_already_gathered_attacks_are_not_retargeted": {
-          "before": "1b3934f34d0fb7581837fa091bed37f122ccb0da6b2d8ce1bd4d66246d4152f3",
-          "after": "600ed8aa18a6bca62160b3660387c859f9b69bae3d670f77c6ad9a8c4a84b52b"
-        }
-      }
-    },
-    "tools/core_rules_order97_history.py": {
-      "before_sha256": "afdb248495b679df6491eeff3616eeb51422ea83db5bed599017ad1770adec7d",
-      "after_sha256": "f7ad023ca9519c10f7bbdfc9b4005dfd327547fc1aff9826cec523efdd966a0a",
-      "owners": {
-        "@module": {
-          "before": "d07a9268a479538e7f044540faae03afb6815109944453780ed91c3bbafa7af1",
-          "after": "21dd66232d89da2eab3fcf48448357b1f32947426811abd5eea311949d9c786f"
-        },
-        "historical_evidence_path": {
-          "before": "f82e541815f618add6d1b5f20a09325daabf760b58e3a112a44538c6fc35a720",
-          "after": "7e347324eab963be1a123fcf6eadc13ccde380340b7e26a4e5c82ededb1a7902"
-        }
-      }
-    },
-    "tools/performance_order103_exception.py": {
-      "before_sha256": null,
-      "after_sha256": "63b3736a27e83d5e063eab38a7db242651a4d45c9add27b6fb76be77b4b07e85",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "96937034118637c428fe6def2417ee9969d99a7c5d6bedfbcbb21af57c7512b3"
-        },
-        "_approval": {
-          "before": null,
-          "after": "ceb058eef4bf8c60869941d5ce8e18f709257977ad8ee6b5648b200953e45df3"
-        },
-        "_digest": {
-          "before": null,
-          "after": "428cc9073474d9ac2317cdb03fea38e1277e956b0d4ce561fb4880b38c6fa3a2"
-        },
-        "_object": {
-          "before": null,
-          "after": "8d138d89bd5758bf0af66c5acb221b62ec6f0998c467f0382ab0c0ba322d198d"
-        },
-        "_original_report": {
-          "before": null,
-          "after": "71219a058c46cea0fe36d04f1c3bf8696b67ed9964a88ce1a65c2677e50b0f21"
-        },
-        "retained_comparison_inputs": {
-          "before": null,
-          "after": "cdce7b581ac529b8c0ea39dd6235182660bdef78eb73d97d389a9d3500129924"
-        },
-        "validate_owner_recognition": {
-          "before": null,
-          "after": "8a4fe2ab5dd10e99cb8c3f01b9ccda767e137a3540ab3910b38f3363901a34be"
-        }
-      }
-    },
-    "tools/performance_policy.py": {
-      "before_sha256": "1a4a91d6398258ac4efb09f243092f5858da8eb230876cdb508d99ee015561bd",
-      "after_sha256": "cb0eaa37e89350cc8e0e7a69e732ea7ca01ae42e954f1b746d9c9e9d243a6712",
-      "owners": {
-        "@module": {
-          "before": "2fb29398ce32ece914427cb853a8d662eebc33ac308a6f6efc6ccff2262c1f85",
-          "after": "1f92445e497285daa4b460bafab130333478375869b0aec5151f331bbecd2587"
-        },
-        "validate_comparison": {
-          "before": "8e88be54939b6e7c20982f47238293701710e669678829e02bdfb90a060ac210",
-          "after": "72bcfb9cd7a3ba9d41ef1829354c9f002601b486a00e2bbf9f85a9b295b4c964"
+          "after": "9c22a1ca68197696030e3e695eea4e36338851939c175f9a780cecfe4a8f0dc8"
         }
       }
     }
   },
   "rows": {
-    "README.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Publish bounded source/architecture/contract/performance evidence, current roadmap status or fail-closed historical archive controls. These documentation and quality-control owners do not alter engine execution; prior failed attempts and historical measurements remain qualified.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/durations.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate twelve complete behavioral shards from the successful current full covered Windows JUnit. Scheduling-only metadata is explicitly qualified to its measured host/runtime and every current behavioral file remains represented once; final Git applicability separately binds frozen tested source.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "ci/test_shards/shard-1.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate twelve complete behavioral shards from the successful current full covered Windows JUnit. Scheduling-only metadata is explicitly qualified to its measured host/runtime and every current behavioral file remains represented once; final Git applicability separately binds frozen tested source.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "ci/test_shards/shard-10.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate twelve complete behavioral shards from the successful current full covered Windows JUnit. Scheduling-only metadata is explicitly qualified to its measured host/runtime and every current behavioral file remains represented once; final Git applicability separately binds frozen tested source.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "ci/test_shards/shard-11.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate twelve complete behavioral shards from the successful current full covered Windows JUnit. Scheduling-only metadata is explicitly qualified to its measured host/runtime and every current behavioral file remains represented once; final Git applicability separately binds frozen tested source.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "ci/test_shards/shard-12.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate twelve complete behavioral shards from the successful current full covered Windows JUnit. Scheduling-only metadata is explicitly qualified to its measured host/runtime and every current behavioral file remains represented once; final Git applicability separately binds frozen tested source.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "ci/test_shards/shard-2.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate twelve complete behavioral shards from the successful current full covered Windows JUnit. Scheduling-only metadata is explicitly qualified to its measured host/runtime and every current behavioral file remains represented once; final Git applicability separately binds frozen tested source.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "ci/test_shards/shard-3.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate twelve complete behavioral shards from the successful current full covered Windows JUnit. Scheduling-only metadata is explicitly qualified to its measured host/runtime and every current behavioral file remains represented once; final Git applicability separately binds frozen tested source.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "ci/test_shards/shard-4.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate twelve complete behavioral shards from the successful current full covered Windows JUnit. Scheduling-only metadata is explicitly qualified to its measured host/runtime and every current behavioral file remains represented once; final Git applicability separately binds frozen tested source.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "ci/test_shards/shard-5.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate twelve complete behavioral shards from the successful current full covered Windows JUnit. Scheduling-only metadata is explicitly qualified to its measured host/runtime and every current behavioral file remains represented once; final Git applicability separately binds frozen tested source.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "ci/test_shards/shard-6.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate twelve complete behavioral shards from the successful current full covered Windows JUnit. Scheduling-only metadata is explicitly qualified to its measured host/runtime and every current behavioral file remains represented once; final Git applicability separately binds frozen tested source.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "ci/test_shards/shard-7.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate twelve complete behavioral shards from the successful current full covered Windows JUnit. Scheduling-only metadata is explicitly qualified to its measured host/runtime and every current behavioral file remains represented once; final Git applicability separately binds frozen tested source.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "ci/test_shards/shard-8.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate twelve complete behavioral shards from the successful current full covered Windows JUnit. Scheduling-only metadata is explicitly qualified to its measured host/runtime and every current behavioral file remains represented once; final Git applicability separately binds frozen tested source.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "ci/test_shards/shard-9.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate twelve complete behavioral shards from the successful current full covered Windows JUnit. Scheduling-only metadata is explicitly qualified to its measured host/runtime and every current behavioral file remains represented once; final Git applicability separately binds frozen tested source.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "conformance/typescript/src/contract.ts": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "conformance/typescript/src/generated/openapi.ts": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "contracts/README.md": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "contracts/compatibility-policy.md": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "contracts/compatibility/43.0.0-shape.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "contracts/examples/replay-metadata.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
+      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
+      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
+      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
+      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
+      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
+      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
+      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
+      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
+      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
+      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
+      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
+      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
+      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
+      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
+        "contract-42-1-publication",
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "contracts/migrations/42-to-43.md": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "contracts/openapi.yaml": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "contracts/schemas/replay-metadata.schema.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "contracts/schemas/session-command-outcome.schema.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "contracts/schemas/session-command-result.schema.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "contracts/schemas/session-metadata.schema.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "contracts/schemas/session-persistence.schema.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "data/source_audits/order103/baseline/tests/order101_failed_setup_helpers.py.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-historical-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Retain nine exact original Git evidence files under an additive authenticated archive map. Preserve original Order97 manifest/AST pins and prior maps; missing or corrupt mapped evidence fails closed without fallback. This historical evidence resolver makes no current gameplay or performance claim.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "data/source_audits/order103/baseline/tests/order97_gap_probes_04_06.py.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-historical-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Retain nine exact original Git evidence files under an additive authenticated archive map. Preserve original Order97 manifest/AST pins and prior maps; missing or corrupt mapped evidence fails closed without fallback. This historical evidence resolver makes no current gameplay or performance claim.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "data/source_audits/order103/baseline/tests/twin_linked_helpers.py.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-historical-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Retain nine exact original Git evidence files under an additive authenticated archive map. Preserve original Order97 manifest/AST pins and prior maps; missing or corrupt mapped evidence fails closed without fallback. This historical evidence resolver makes no current gameplay or performance claim.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "data/source_audits/order103/baseline/tests/unit/test_lethal_hits.py.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-historical-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Retain nine exact original Git evidence files under an additive authenticated archive map. Preserve original Order97 manifest/AST pins and prior maps; missing or corrupt mapped evidence fails closed without fallback. This historical evidence resolver makes no current gameplay or performance claim.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "data/source_audits/order103/baseline/tests/unit/test_order96_twin_linked.py.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-historical-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Retain nine exact original Git evidence files under an additive authenticated archive map. Preserve original Order97 manifest/AST pins and prior maps; missing or corrupt mapped evidence fails closed without fallback. This historical evidence resolver makes no current gameplay or performance claim.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "data/source_audits/order103/baseline/tests/unit/test_order97_attack_evidence.py.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-historical-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Retain nine exact original Git evidence files under an additive authenticated archive map. Preserve original Order97 manifest/AST pins and prior maps; missing or corrupt mapped evidence fails closed without fallback. This historical evidence resolver makes no current gameplay or performance claim.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "data/source_audits/order103/baseline/tests/unit/test_phase11e_mission_scoring_cleanup.py.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-historical-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Retain nine exact original Git evidence files under an additive authenticated archive map. Preserve original Order97 manifest/AST pins and prior maps; missing or corrupt mapped evidence fails closed without fallback. This historical evidence resolver makes no current gameplay or performance claim.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "data/source_audits/order103/baseline/tests/unit/test_phase13b_shooting_declarations.py.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-historical-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Retain nine exact original Git evidence files under an additive authenticated archive map. Preserve original Order97 manifest/AST pins and prior maps; missing or corrupt mapped evidence fails closed without fallback. This historical evidence resolver makes no current gameplay or performance claim.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "data/source_audits/order103/baseline/tests/unit/test_target_replacement.py.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-historical-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Retain nine exact original Git evidence files under an additive authenticated archive map. Preserve original Order97 manifest/AST pins and prior maps; missing or corrupt mapped evidence fails closed without fallback. This historical evidence resolver makes no current gameplay or performance claim.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "data/source_audits/order103/historical-inputs.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-historical-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Retain nine exact original Git evidence files under an additive authenticated archive map. Preserve original Order97 manifest/AST pins and prior maps; missing or corrupt mapped evidence fails closed without fallback. This historical evidence resolver makes no current gameplay or performance claim.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Publish bounded source/architecture/contract/performance evidence, current roadmap status or fail-closed historical archive controls. These documentation and quality-control owners do not alter engine execution; prior failed attempts and historical measurements remain qualified.",
-      "source_obligation": null,
-      "unchanged_work": null
+      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
+      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Publish bounded source/architecture/contract/performance evidence, current roadmap status or fail-closed historical archive controls. These documentation and quality-control owners do not alter engine execution; prior failed attempts and historical measurements remain qualified.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/ORDER_103_SCOPE_PLAN.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Publish bounded source/architecture/contract/performance evidence, current roadmap status or fail-closed historical archive controls. These documentation and quality-control owners do not alter engine execution; prior failed attempts and historical measurements remain qualified.",
-      "source_obligation": null,
-      "unchanged_work": null
+      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
+      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
     },
     "docs/PR_BACKLOG_2026_09_30.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Publish bounded source/architecture/contract/performance evidence, current roadmap status or fail-closed historical archive controls. These documentation and quality-control owners do not alter engine execution; prior failed attempts and historical measurements remain qualified.",
-      "source_obligation": null,
-      "unchanged_work": null
+      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
+      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
     },
-    "docs/performance/PERFORMANCE_POLICY.md": {
+    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Publish bounded source/architecture/contract/performance evidence, current roadmap status or fail-closed historical archive controls. These documentation and quality-control owners do not alter engine execution; prior failed attempts and historical measurements remain qualified.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/current/order103-dice-sustained.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Publish bounded source/architecture/contract/performance evidence, current roadmap status or fail-closed historical archive controls. These documentation and quality-control owners do not alter engine execution; prior failed attempts and historical measurements remain qualified.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/current/order103-dice.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Publish bounded source/architecture/contract/performance evidence, current roadmap status or fail-closed historical archive controls. These documentation and quality-control owners do not alter engine execution; prior failed attempts and historical measurements remain qualified.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/current/order103-precision-grouping.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Publish bounded source/architecture/contract/performance evidence, current roadmap status or fail-closed historical archive controls. These documentation and quality-control owners do not alter engine execution; prior failed attempts and historical measurements remain qualified.",
-      "source_obligation": null,
-      "unchanged_work": null
+      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
+      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Publish bounded source/architecture/contract/performance evidence, current roadmap status or fail-closed historical archive controls. These documentation and quality-control owners do not alter engine execution; prior failed attempts and historical measurements remain qualified.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/policy-v3/order103-exception-applicability.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Publish bounded source/architecture/contract/performance evidence, current roadmap status or fail-closed historical archive controls. These documentation and quality-control owners do not alter engine execution; prior failed attempts and historical measurements remain qualified.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/policy-v3/order103-owner-exception.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Publish bounded source/architecture/contract/performance evidence, current roadmap status or fail-closed historical archive controls. These documentation and quality-control owners do not alter engine execution; prior failed attempts and historical measurements remain qualified.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "scripts/benchmark_order96_rerolls.py": {
-      "category": "measured_workload",
-      "operations": [
-        "order103-optional-reroll-measured-driver",
-        "workload-dice"
-      ],
-      "selected_families": [
-        "dice",
-        "dice_sustained"
-      ],
-      "rationale": "The changed submit_next fixture owner executes inside the registered optional-reroll benchmark timing. Preserve its original default decision IDs and all existing assertions; actual base/current use identical current helper/driver/lock with four Shooting/Fight accept/decline cases and five samples for each ordinary and Sustained-D3 workload. A portable host query and outside-timer semantic/raw event capture preserve original timing boundaries. Existing reports/pins and numeric budgets stay unchanged; both current families require matched evidence.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": null
-    },
-    "scripts/check_performance_policy.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Publish bounded source/architecture/contract/performance evidence, current roadmap status or fail-closed historical archive controls. These documentation and quality-control owners do not alter engine execution; prior failed attempts and historical measurements remain qualified.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "scripts/measure_precision_grouping.py": {
-      "category": "measured_workload",
-      "operations": [
-        "order103-scripts-measure_precision_grouping"
-      ],
-      "selected_families": [
-        "precision_grouping"
-      ],
-      "rationale": "Change target-dependent signature/group identity and its strict selected context in shared live and reconstruction consumers. One reviewed six-operation family uses five samples per actual base/current case: both physical primary orders, CHARACTER context, accepted duplicate Precision source, selected random-profile restore and exact complete four-attack replay. Preserve original physical sources and unchanged budgets; the incorrect base is a qualified cost reference, not a correctness oracle.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": null
+      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
+      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -1828,377 +394,68 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the exact runtime build identity for the scoped shared grouping and Contract43 correction. This digest publication changes no execution algorithm; each underlying changed owner has a separate exact applicability row.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
+      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
+      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
     },
-    "src/warhammer40k_core/adapters/external_contract.py": {
+    "src/warhammer40k_core/engine/prebattle.py": {
       "category": "rule_semantics",
       "operations": [
-        "order103-src-warhammer40k_core-adapters-external_contract"
+        "issue537-prebattle-scout"
       ],
       "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
+      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
+      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
     },
-    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
-      "category": "serialization_or_replay_work",
-      "operations": [
-        "order103-src-warhammer40k_core-engine-attack_sequence_group_selection"
-      ],
-      "selected_families": [
-        "precision_grouping"
-      ],
-      "rationale": "Change target-dependent signature/group identity and its strict selected context in shared live and reconstruction consumers. One reviewed six-operation family uses five samples per actual base/current case: both physical primary orders, CHARACTER context, accepted duplicate Precision source, selected random-profile restore and exact complete four-attack replay. Preserve original physical sources and unchanged budgets; the incorrect base is a qualified cost reference, not a correctness oracle.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": null
-    },
-    "src/warhammer40k_core/engine/attack_sequence_model.py": {
-      "category": "serialization_or_replay_work",
-      "operations": [
-        "order103-src-warhammer40k_core-engine-attack_sequence_model"
-      ],
-      "selected_families": [
-        "precision_grouping"
-      ],
-      "rationale": "Change target-dependent signature/group identity and its strict selected context in shared live and reconstruction consumers. One reviewed six-operation family uses five samples per actual base/current case: both physical primary orders, CHARACTER context, accepted duplicate Precision source, selected random-profile restore and exact complete four-attack replay. Preserve original physical sources and unchanged budgets; the incorrect base is a qualified cost reference, not a correctness oracle.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": null
-    },
-    "src/warhammer40k_core/engine/attack_sequence_selection.py": {
-      "category": "algorithm_or_search",
-      "operations": [
-        "order103-src-warhammer40k_core-engine-attack_sequence_selection"
-      ],
-      "selected_families": [
-        "precision_grouping"
-      ],
-      "rationale": "Change target-dependent signature/group identity and its strict selected context in shared live and reconstruction consumers. One reviewed six-operation family uses five samples per actual base/current case: both physical primary orders, CHARACTER context, accepted duplicate Precision source, selected random-profile restore and exact complete four-attack replay. Preserve original physical sources and unchanged budgets; the incorrect base is a qualified cost reference, not a correctness oracle.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": null
-    },
-    "src/warhammer40k_core/engine/attack_sequence_validation.py": {
-      "category": "serialization_or_replay_work",
-      "operations": [
-        "order103-src-warhammer40k_core-engine-attack_sequence_validation"
-      ],
-      "selected_families": [
-        "precision_grouping"
-      ],
-      "rationale": "Change target-dependent signature/group identity and its strict selected context in shared live and reconstruction consumers. One reviewed six-operation family uses five samples per actual base/current case: both physical primary orders, CHARACTER context, accepted duplicate Precision source, selected random-profile restore and exact complete four-attack replay. Preserve original physical sources and unchanged budgets; the incorrect base is a qualified cost reference, not a correctness oracle.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": null
-    },
-    "src/warhammer40k_core/engine/phases/fight.py": {
-      "category": "serialization_or_replay_work",
-      "operations": [
-        "order103-src-warhammer40k_core-engine-phases-fight"
-      ],
-      "selected_families": [
-        "precision_grouping"
-      ],
-      "rationale": "Change target-dependent signature/group identity and its strict selected context in shared live and reconstruction consumers. One reviewed six-operation family uses five samples per actual base/current case: both physical primary orders, CHARACTER context, accepted duplicate Precision source, selected random-profile restore and exact complete four-attack replay. Preserve original physical sources and unchanged budgets; the incorrect base is a qualified cost reference, not a correctness oracle.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": null
-    },
-    "src/warhammer40k_core/engine/phases/shooting_handler.py": {
-      "category": "serialization_or_replay_work",
-      "operations": [
-        "order103-src-warhammer40k_core-engine-phases-shooting_handler"
-      ],
-      "selected_families": [
-        "precision_grouping"
-      ],
-      "rationale": "Change target-dependent signature/group identity and its strict selected context in shared live and reconstruction consumers. One reviewed six-operation family uses five samples per actual base/current case: both physical primary orders, CHARACTER context, accepted duplicate Precision source, selected random-profile restore and exact complete four-attack replay. Preserve original physical sources and unchanged budgets; the incorrect base is a qualified cost reference, not a correctness oracle.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": null
-    },
-    "src/warhammer40k_core/engine/random_profile_attack_groups.py": {
-      "category": "serialization_or_replay_work",
-      "operations": [
-        "order103-src-warhammer40k_core-engine-random_profile_attack_groups"
-      ],
-      "selected_families": [
-        "precision_grouping"
-      ],
-      "rationale": "Change target-dependent signature/group identity and its strict selected context in shared live and reconstruction consumers. One reviewed six-operation family uses five samples per actual base/current case: both physical primary orders, CHARACTER context, accepted duplicate Precision source, selected random-profile restore and exact complete four-attack replay. Preserve original physical sources and unchanged budgets; the incorrect base is a qualified cost reference, not a correctness oracle.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": null
-    },
-    "src/warhammer40k_core/engine/replay.py": {
+    "src/warhammer40k_core/engine/scout_movement.py": {
       "category": "rule_semantics",
       "operations": [
-        "order103-src-warhammer40k_core-engine-replay"
+        "movement-rule-branch"
       ],
       "selected_families": [],
-      "rationale": "Publish Contract43 and affected session/persistence/replay family identities for a newly required typed nested group-context boolean and changed group IDs. Generic JSON envelopes remain open; unrelated family versions and all released historical baselines stay immutable. Exact-base/oldest-major compatibility, clients, conformance and package checks remain required.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
+      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
+      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
     },
-    "tests/code_quality/test_order103_historical_evidence.py": {
+    "src/warhammer40k_core/engine/scout_movement_paths.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "movement-rule-branch"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
+      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
+    },
+    "tests/code_quality/test_module_size_policy.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Publish bounded source/architecture/contract/performance evidence, current roadmap status or fail-closed historical archive controls. These documentation and quality-control owners do not alter engine execution; prior failed attempts and historical measurements remain qualified.",
-      "source_obligation": null,
-      "unchanged_work": null
+      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
+      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
     },
-    "tests/code_quality/test_performance_order103_exception.py": {
+    "tests/code_quality/test_unit_model_semantics.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Publish bounded source/architecture/contract/performance evidence, current roadmap status or fail-closed historical archive controls. These documentation and quality-control owners do not alter engine execution; prior failed attempts and historical measurements remain qualified.",
-      "source_obligation": null,
-      "unchanged_work": null
+      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
+      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
     },
-    "tests/integration/test_retained_shooting.py": {
+    "tests/integration/test_setup_prebattle_ui_smoke.py": {
       "category": "rule_semantics",
       "operations": [
-        "order103-tests-integration-test_retained_shooting"
+        "issue537-scout-facade-regression"
       ],
       "selected_families": [],
-      "rationale": "Add or adapt bounded regression controls for physical grouping, attached Character allocation/casualty, selected-source distinctions, legal Extra Attacks, normal replacement, immutable archives and actual restore/view/replay. Existing positive and no-retarget assertions remain; these regression owners do not change a measured algorithm. The executed optional-reroll helper has its own mandatory detailed row; the complete shared input inventory remains bound. The failed full cohort and legal ID-search evidence stay historical.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tests/order101_failed_setup_helpers.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-tests-order101_failed_setup_helpers"
-      ],
-      "selected_families": [],
-      "rationale": "Add or adapt bounded regression controls for physical grouping, attached Character allocation/casualty, selected-source distinctions, legal Extra Attacks, normal replacement, immutable archives and actual restore/view/replay. Existing positive and no-retarget assertions remain; these regression owners do not change a measured algorithm. The executed optional-reroll helper has its own mandatory detailed row; the complete shared input inventory remains bound. The failed full cohort and legal ID-search evidence stay historical.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tests/order97_gap_probes_04_06.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-tests-order97_gap_probes_04_06"
-      ],
-      "selected_families": [],
-      "rationale": "Add or adapt bounded regression controls for physical grouping, attached Character allocation/casualty, selected-source distinctions, legal Extra Attacks, normal replacement, immutable archives and actual restore/view/replay. Existing positive and no-retarget assertions remain; these regression owners do not change a measured algorithm. The executed optional-reroll helper has its own mandatory detailed row; the complete shared input inventory remains bound. The failed full cohort and legal ID-search evidence stay historical.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tests/precision_grouping_helpers.py": {
-      "category": "measured_workload",
-      "operations": [
-        "order103-tests-precision_grouping_helpers"
-      ],
-      "selected_families": [
-        "precision_grouping"
-      ],
-      "rationale": "Change target-dependent signature/group identity and its strict selected context in shared live and reconstruction consumers. One reviewed six-operation family uses five samples per actual base/current case: both physical primary orders, CHARACTER context, accepted duplicate Precision source, selected random-profile restore and exact complete four-attack replay. Preserve original physical sources and unchanged budgets; the incorrect base is a qualified cost reference, not a correctness oracle.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": null
-    },
-    "tests/precision_replacement_helpers.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-tests-precision_replacement_helpers"
-      ],
-      "selected_families": [],
-      "rationale": "Add or adapt bounded regression controls for physical grouping, attached Character allocation/casualty, selected-source distinctions, legal Extra Attacks, normal replacement, immutable archives and actual restore/view/replay. Existing positive and no-retarget assertions remain; these regression owners do not change a measured algorithm. The executed optional-reroll helper has its own mandatory detailed row; the complete shared input inventory remains bound. The failed full cohort and legal ID-search evidence stay historical.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tests/replay/test_phase18b_replay_runner.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-tests-replay-test_phase18b_replay_runner"
-      ],
-      "selected_families": [],
-      "rationale": "Add or adapt bounded regression controls for physical grouping, attached Character allocation/casualty, selected-source distinctions, legal Extra Attacks, normal replacement, immutable archives and actual restore/view/replay. Existing positive and no-retarget assertions remain; these regression owners do not change a measured algorithm. The executed optional-reroll helper has its own mandatory detailed row; the complete shared input inventory remains bound. The failed full cohort and legal ID-search evidence stay historical.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tests/twin_linked_helpers.py": {
-      "category": "measured_workload",
-      "operations": [
-        "order103-optional-reroll-measured-helper"
-      ],
-      "selected_families": [
-        "dice",
-        "dice_sustained"
-      ],
-      "rationale": "The changed submit_next fixture owner executes inside the registered optional-reroll benchmark timing. Preserve its original default decision IDs and all existing assertions; actual base/current use identical current helper/driver/lock with four Shooting/Fight accept/decline cases and five samples for each ordinary and Sustained-D3 workload. A portable host query and outside-timer semantic/raw event capture preserve original timing boundaries. Existing reports/pins and numeric budgets stay unchanged; both current families require matched evidence.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": null
-    },
-    "tests/unit/test_generic_rule_effect_identity.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-tests-unit-test_generic_rule_effect_identity"
-      ],
-      "selected_families": [],
-      "rationale": "Add or adapt bounded regression controls for physical grouping, attached Character allocation/casualty, selected-source distinctions, legal Extra Attacks, normal replacement, immutable archives and actual restore/view/replay. Existing positive and no-retarget assertions remain; these regression owners do not change a measured algorithm. The executed optional-reroll helper has its own mandatory detailed row; the complete shared input inventory remains bound. The failed full cohort and legal ID-search evidence stay historical.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tests/unit/test_lethal_hits.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-tests-unit-test_lethal_hits"
-      ],
-      "selected_families": [],
-      "rationale": "Add or adapt bounded regression controls for physical grouping, attached Character allocation/casualty, selected-source distinctions, legal Extra Attacks, normal replacement, immutable archives and actual restore/view/replay. Existing positive and no-retarget assertions remain; these regression owners do not change a measured algorithm. The executed optional-reroll helper has its own mandatory detailed row; the complete shared input inventory remains bound. The failed full cohort and legal ID-search evidence stay historical.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tests/unit/test_order96_twin_linked.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-tests-unit-test_order96_twin_linked"
-      ],
-      "selected_families": [],
-      "rationale": "Add or adapt bounded regression controls for physical grouping, attached Character allocation/casualty, selected-source distinctions, legal Extra Attacks, normal replacement, immutable archives and actual restore/view/replay. Existing positive and no-retarget assertions remain; these regression owners do not change a measured algorithm. The executed optional-reroll helper has its own mandatory detailed row; the complete shared input inventory remains bound. The failed full cohort and legal ID-search evidence stay historical.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tests/unit/test_order97_attack_evidence.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-tests-unit-test_order97_attack_evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Add or adapt bounded regression controls for physical grouping, attached Character allocation/casualty, selected-source distinctions, legal Extra Attacks, normal replacement, immutable archives and actual restore/view/replay. Existing positive and no-retarget assertions remain; these regression owners do not change a measured algorithm. The executed optional-reroll helper has its own mandatory detailed row; the complete shared input inventory remains bound. The failed full cohort and legal ID-search evidence stay historical.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tests/unit/test_phase11e_mission_scoring_cleanup.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-tests-unit-test_phase11e_mission_scoring_cleanup"
-      ],
-      "selected_families": [],
-      "rationale": "Add or adapt bounded regression controls for physical grouping, attached Character allocation/casualty, selected-source distinctions, legal Extra Attacks, normal replacement, immutable archives and actual restore/view/replay. Existing positive and no-retarget assertions remain; these regression owners do not change a measured algorithm. The executed optional-reroll helper has its own mandatory detailed row; the complete shared input inventory remains bound. The failed full cohort and legal ID-search evidence stay historical.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tests/unit/test_phase13b_shooting_declarations.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-tests-unit-test_phase13b_shooting_declarations"
-      ],
-      "selected_families": [],
-      "rationale": "Add or adapt bounded regression controls for physical grouping, attached Character allocation/casualty, selected-source distinctions, legal Extra Attacks, normal replacement, immutable archives and actual restore/view/replay. Existing positive and no-retarget assertions remain; these regression owners do not change a measured algorithm. The executed optional-reroll helper has its own mandatory detailed row; the complete shared input inventory remains bound. The failed full cohort and legal ID-search evidence stay historical.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tests/unit/test_phase15c_fight_order.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-tests-unit-test_phase15c_fight_order"
-      ],
-      "selected_families": [],
-      "rationale": "Add or adapt bounded regression controls for physical grouping, attached Character allocation/casualty, selected-source distinctions, legal Extra Attacks, normal replacement, immutable archives and actual restore/view/replay. Existing positive and no-retarget assertions remain; these regression owners do not change a measured algorithm. The executed optional-reroll helper has its own mandatory detailed row; the complete shared input inventory remains bound. The failed full cohort and legal ID-search evidence stay historical.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tests/unit/test_phase17_emperors_children_daemon_prince.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-tests-unit-test_phase17_emperors_children_daemon_prince"
-      ],
-      "selected_families": [],
-      "rationale": "Add or adapt bounded regression controls for physical grouping, attached Character allocation/casualty, selected-source distinctions, legal Extra Attacks, normal replacement, immutable archives and actual restore/view/replay. Existing positive and no-retarget assertions remain; these regression owners do not change a measured algorithm. The executed optional-reroll helper has its own mandatory detailed row; the complete shared input inventory remains bound. The failed full cohort and legal ID-search evidence stay historical.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tests/unit/test_phase17_emperors_children_datasheet_overlay.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-tests-unit-test_phase17_emperors_children_datasheet_overlay"
-      ],
-      "selected_families": [],
-      "rationale": "Add or adapt bounded regression controls for physical grouping, attached Character allocation/casualty, selected-source distinctions, legal Extra Attacks, normal replacement, immutable archives and actual restore/view/replay. Existing positive and no-retarget assertions remain; these regression owners do not change a measured algorithm. The executed optional-reroll helper has its own mandatory detailed row; the complete shared input inventory remains bound. The failed full cohort and legal ID-search evidence stay historical.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tests/unit/test_phase17g_drukhari_army_rule.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-tests-unit-test_phase17g_drukhari_army_rule"
-      ],
-      "selected_families": [],
-      "rationale": "Add or adapt bounded regression controls for physical grouping, attached Character allocation/casualty, selected-source distinctions, legal Extra Attacks, normal replacement, immutable archives and actual restore/view/replay. Existing positive and no-retarget assertions remain; these regression owners do not change a measured algorithm. The executed optional-reroll helper has its own mandatory detailed row; the complete shared input inventory remains bound. The failed full cohort and legal ID-search evidence stay historical.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tests/unit/test_phase18d_ui_contract_artifacts.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-tests-unit-test_phase18d_ui_contract_artifacts"
-      ],
-      "selected_families": [],
-      "rationale": "Add or adapt bounded regression controls for physical grouping, attached Character allocation/casualty, selected-source distinctions, legal Extra Attacks, normal replacement, immutable archives and actual restore/view/replay. Existing positive and no-retarget assertions remain; these regression owners do not change a measured algorithm. The executed optional-reroll helper has its own mandatory detailed row; the complete shared input inventory remains bound. The failed full cohort and legal ID-search evidence stay historical.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tests/unit/test_phase18e_server_api.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-tests-unit-test_phase18e_server_api"
-      ],
-      "selected_families": [],
-      "rationale": "Add or adapt bounded regression controls for physical grouping, attached Character allocation/casualty, selected-source distinctions, legal Extra Attacks, normal replacement, immutable archives and actual restore/view/replay. Existing positive and no-retarget assertions remain; these regression owners do not change a measured algorithm. The executed optional-reroll helper has its own mandatory detailed row; the complete shared input inventory remains bound. The failed full cohort and legal ID-search evidence stay historical.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tests/unit/test_precision_target_grouping.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-tests-unit-test_precision_target_grouping"
-      ],
-      "selected_families": [],
-      "rationale": "Add or adapt bounded regression controls for physical grouping, attached Character allocation/casualty, selected-source distinctions, legal Extra Attacks, normal replacement, immutable archives and actual restore/view/replay. Existing positive and no-retarget assertions remain; these regression owners do not change a measured algorithm. The executed optional-reroll helper has its own mandatory detailed row; the complete shared input inventory remains bound. The failed full cohort and legal ID-search evidence stay historical.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tests/unit/test_target_replacement.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order103-tests-unit-test_target_replacement"
-      ],
-      "selected_families": [],
-      "rationale": "Add or adapt bounded regression controls for physical grouping, attached Character allocation/casualty, selected-source distinctions, legal Extra Attacks, normal replacement, immutable archives and actual restore/view/replay. Existing positive and no-retarget assertions remain; these regression owners do not change a measured algorithm. The executed optional-reroll helper has its own mandatory detailed row; the complete shared input inventory remains bound. The failed full cohort and legal ID-search evidence stay historical.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tools/core_rules_order97_history.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "shock-source-generation-and-audit"
-      ],
-      "selected_families": [],
-      "rationale": "Retain nine exact original Git evidence files under an additive authenticated archive map. Preserve original Order97 manifest/AST pins and prior maps; missing or corrupt mapped evidence fails closed without fallback. This historical evidence resolver makes no current gameplay or performance claim.",
-      "source_obligation": "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01: inapplicable PRECISION must not split otherwise identical attacks; preserve physical sources, CHARACTER allocation, selected context across casualties, current target replacement, normal restore/viewers/replay.",
-      "unchanged_work": "Only source-qualified regression, archive integrity, version identity or generated publication changes here. No additional grouping/search/cache/reconstruction algorithm is introduced in this owner; the shared changed grouping/reconstruction owners are separately selected and measured."
-    },
-    "tools/performance_order103_exception.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Publish bounded source/architecture/contract/performance evidence, current roadmap status or fail-closed historical archive controls. These documentation and quality-control owners do not alter engine execution; prior failed attempts and historical measurements remain qualified.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tools/performance_policy.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Publish bounded source/architecture/contract/performance evidence, current roadmap status or fail-closed historical archive controls. These documentation and quality-control owners do not alter engine execution; prior failed attempts and historical measurements remain qualified.",
-      "source_obligation": null,
-      "unchanged_work": null
+      "rationale": "Bounded Scout ownership correction and its regression/publication artifacts. Small serial live smoke is the owner-approved default; no optimization or demonstrated serious regression requires a detailed comparison.",
+      "source_obligation": "Issue537 enforces first-class attached rules-unit physical membership for every accepted witnessed Scout move, as already required by Phase16B and CORE V2.",
+      "unchanged_work": "No deliberate performance change: reuse existing RulesUnitPlacement and per-model path/coherency validators, unchanged witness/schema/replay algorithms and caches; retain live smoke and semantic/work/cache gates."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {
-    "precision_grouping": "docs/performance/current/order103-precision-grouping.json",
-    "dice": "docs/performance/current/order103-dice.json",
-    "dice_sustained": "docs/performance/current/order103-dice-sustained.json"
-  },
+  "comparisons": {},
   "full_game": null
 }

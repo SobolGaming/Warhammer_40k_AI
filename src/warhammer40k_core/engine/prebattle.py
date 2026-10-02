@@ -19,8 +19,6 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     BattlefieldScenario,
     BattlefieldTransitionBatch,
-    ModelDisplacementKind,
-    ModelDisplacementRecord,
     ModelPlacement,
     ModelPlacementPayload,
     ModelPlacementRecord,
@@ -102,20 +100,21 @@ from warhammer40k_core.engine.scout_abilities import (
 from warhammer40k_core.engine.scout_abilities import (
     scout_ability_instances_for_rules_unit as scout_ability_instances_for_rules_unit,
 )
-from warhammer40k_core.engine.scout_movement_paths import (
-    append_scout_path_violations as _append_scout_path_violations,
+from warhammer40k_core.engine.scout_movement import (
+    apply_scout_move as apply_scout_move,
+)
+from warhammer40k_core.engine.scout_movement import (
+    resolve_scout_move as _resolve_scout_move,
 )
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyContext,
     UnitCoherencyResult,
-    unit_placement_coherency_result,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.pathing import (
     PathWitness,
     PathWitnessPayload,
-    is_degenerate_endpoint_only_real_movement_path,
 )
 from warhammer40k_core.geometry.physical_model import models_overlap_physically
 from warhammer40k_core.geometry.pose import GeometryError
@@ -1275,61 +1274,6 @@ def apply_scout_reserve_setup(
     return resolution
 
 
-def apply_scout_move(
-    *,
-    state: GameState,
-    request: DecisionRequest,
-    result: DecisionResult,
-    decisions: DecisionController,
-    ruleset_descriptor: RulesetDescriptor,
-    army_catalog: ArmyCatalog,
-) -> PreBattleResolution:
-    request_context = PreBattleProposalRequest.from_decision_request_payload(request.payload)
-    proposal = ScoutMoveProposal.from_payload(cast(ScoutMoveProposalPayload, result.payload))
-    resolution = resolve_prebattle_proposal(
-        state=state,
-        ruleset_descriptor=ruleset_descriptor,
-        army_catalog=army_catalog,
-        request=request_context,
-        proposal=proposal,
-        source_event_id=result.result_id,
-    )
-    if not resolution.is_valid:
-        raise GameLifecycleError("Invalid Scout Move cannot mutate state.")
-    if resolution.transition_batch is None:
-        raise GameLifecycleError("Scout Move requires a transition batch.")
-    battlefield = _require_battlefield_state(state)
-    current = battlefield.unit_placement_by_id(request_context.unit_instance_id)
-    moved_placements = tuple(
-        placement.with_pose(proposal.witness.final_pose_for_model(placement.model_instance_id))
-        for placement in current.model_placements
-    )
-    state.replace_battlefield_state(
-        battlefield.with_unit_placement(current.with_model_placements(moved_placements))
-    )
-    record_prebattle_action(
-        state=state,
-        result=result,
-        request=request,
-        action_kind=proposal.action_kind,
-        unit_instance_id=request_context.unit_instance_id,
-        source_rule_id=request_context.source_rule_id,
-        payload=validate_json_value(resolution.to_payload()),
-    )
-    decisions.event_log.append(
-        "prebattle_scout_move_completed",
-        {
-            "game_id": state.game_id,
-            "setup_step": SetupStep.RESOLVE_PREBATTLE_ACTIONS.value,
-            "player_id": request_context.player_id,
-            "unit_instance_id": request_context.unit_instance_id,
-            "action_kind": proposal.action_kind.value,
-            "resolution": resolution.to_payload(),
-        },
-    )
-    return resolution
-
-
 def resolve_prebattle_proposal(
     *,
     state: GameState,
@@ -1787,162 +1731,6 @@ def _resolve_prebattle_placement(
     )
 
 
-def _resolve_scout_move(
-    *,
-    state: GameState,
-    ruleset_descriptor: RulesetDescriptor,
-    army_catalog: ArmyCatalog,
-    request: PreBattleProposalRequest,
-    proposal: ScoutMoveProposal,
-    source_event_id: str | None,
-) -> PreBattleResolution:
-    _validate_prebattle_state(state, SetupStep.RESOLVE_PREBATTLE_ACTIONS)
-    scenario = BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=_require_battlefield_state(state),
-    )
-    view = rules_unit_view_from_armies(
-        armies=tuple(state.army_definitions),
-        unit_instance_id=request.unit_instance_id,
-    )
-    current = _require_battlefield_state(state).unit_placement_by_id(request.unit_instance_id)
-    violations: list[PreBattleViolation] = []
-    _append_action_eligibility_violations(
-        violations=violations,
-        state=state,
-        army_catalog=army_catalog,
-        request=request,
-        view=view,
-    )
-    if not _start_is_eligible_for_scout_move(state=state, view=view):
-        violations.append(
-            PreBattleViolation(
-                violation_code=PreBattleViolationCode.DEPLOYMENT_ZONE_VIOLATION,
-                message=(
-                    "Scout Move requires the selected unit to start wholly in its deployment zone."
-                ),
-                field="unit_instance_id",
-            )
-        )
-    expected_model_ids = tuple(
-        sorted(placement.model_instance_id for placement in current.model_placements)
-    )
-    if tuple(sorted(proposal.witness.model_ids())) != expected_model_ids:
-        violations.append(
-            PreBattleViolation(
-                violation_code=PreBattleViolationCode.WITNESS_MODEL_SET_DRIFT,
-                message="Scout Move witness must include every alive placed model in the unit.",
-                field="witness",
-            )
-        )
-    for placement in current.model_placements:
-        if placement.model_instance_id not in proposal.witness.model_ids():
-            continue
-        poses = proposal.witness.poses_for_model(placement.model_instance_id)
-        if poses[0] != placement.pose:
-            violations.append(
-                PreBattleViolation(
-                    violation_code=PreBattleViolationCode.WITNESS_START_DRIFT,
-                    message="Scout Move witness must start at the current model pose.",
-                    field="witness",
-                    model_instance_id=placement.model_instance_id,
-                )
-            )
-        if is_degenerate_endpoint_only_real_movement_path(poses):
-            violations.append(
-                PreBattleViolation(
-                    violation_code=PreBattleViolationCode.ENDPOINT_ONLY_PATH,
-                    message="Scout Move witness must not repeat only endpoint poses.",
-                    field="witness",
-                    model_instance_id=placement.model_instance_id,
-                )
-            )
-    if violations:
-        return PreBattleResolution(
-            proposal=proposal,
-            violations=tuple(violations),
-        )
-    moved_placements = tuple(
-        placement.with_pose(proposal.witness.final_pose_for_model(placement.model_instance_id))
-        for placement in current.model_placements
-        if placement.model_instance_id in proposal.witness.model_ids()
-    )
-    attempted_placement = current.with_model_placements(moved_placements)
-    if not violations:
-        _append_scout_path_violations(
-            violations=violations,
-            state=state,
-            scenario=scenario,
-            ruleset_descriptor=ruleset_descriptor,
-            current=current,
-            attempted=attempted_placement,
-            witness=proposal.witness,
-            scout_distance_inches=proposal.scout_distance_inches,
-        )
-    coherency_result = unit_placement_coherency_result(
-        scenario=scenario,
-        ruleset_descriptor=ruleset_descriptor,
-        unit_placement=attempted_placement,
-    )
-    if not coherency_result.is_coherent:
-        for model_id in coherency_result.offending_model_instance_ids:
-            violations.append(
-                PreBattleViolation(
-                    violation_code=PreBattleViolationCode.UNIT_COHERENCY_BROKEN,
-                    message="Scout Move endpoint breaks unit coherency.",
-                    field="witness",
-                    model_instance_id=model_id,
-                )
-            )
-    _append_scout_enemy_distance_violations(
-        violations=violations,
-        state=state,
-        scenario=scenario,
-        attempted=attempted_placement,
-    )
-    if violations:
-        return PreBattleResolution(
-            proposal=proposal,
-            violations=tuple(violations),
-            coherency_result=coherency_result,
-        )
-    event_id = (
-        request.source_decision_result_id
-        if source_event_id is None
-        else _validate_identifier("source_event_id", source_event_id)
-    )
-    transition_batch = BattlefieldTransitionBatch(
-        displacements=tuple(
-            ModelDisplacementRecord(
-                model_instance_id=placement.model_instance_id,
-                displacement_kind=ModelDisplacementKind.SCOUT_MOVE,
-                start_pose=placement.pose,
-                end_pose=proposal.witness.final_pose_for_model(placement.model_instance_id),
-                path_witness=PathWitness.for_paths(
-                    (
-                        (
-                            placement.model_instance_id,
-                            proposal.witness.poses_for_model(placement.model_instance_id),
-                        ),
-                    )
-                ),
-                source_phase=None,
-                source_step=SetupStep.RESOLVE_PREBATTLE_ACTIONS.value,
-                source_rule_id=request.source_rule_id,
-                source_event_id=event_id,
-            )
-            for placement in current.model_placements
-            if placement.pose != proposal.witness.final_pose_for_model(placement.model_instance_id)
-        )
-    )
-    return PreBattleResolution(
-        proposal=proposal,
-        violations=(),
-        coherency_result=coherency_result,
-        transition_batch=transition_batch,
-    )
-
-
 def _append_action_eligibility_violations(
     *,
     violations: list[PreBattleViolation],
@@ -2144,35 +1932,6 @@ def _validate_placement_models(
                 )
             )
     return coherency_result, tuple(models)
-
-
-def _append_scout_enemy_distance_violations(
-    *,
-    violations: list[PreBattleViolation],
-    state: GameState,
-    scenario: BattlefieldScenario,
-    attempted: UnitPlacement,
-) -> None:
-    enemy_models = _enemy_geometry_models_for_player(
-        scenario=scenario,
-        player_id=attempted.player_id,
-    )
-    for placement in attempted.model_placements:
-        model = geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(placement),
-            placement=placement,
-        )
-        for enemy_model in enemy_models:
-            if model.base_distance_to(enemy_model) <= SCOUT_ENEMY_DISTANCE_INCHES + _EPSILON:
-                violations.append(
-                    PreBattleViolation(
-                        violation_code=PreBattleViolationCode.SCOUT_ENEMY_DISTANCE,
-                        message="Scout Move must end more than 8 inches from all enemy units.",
-                        field="witness",
-                        model_instance_id=model.model_id,
-                        blocker_id=enemy_model.model_id,
-                    )
-                )
 
 
 def _common_request_drift_violations(
@@ -2383,7 +2142,7 @@ def _rules_unit_wholly_within_zones(
     return True
 
 
-def _start_is_eligible_for_scout_move(*, state: GameState, view: RulesUnitView) -> bool:
+def start_is_eligible_for_scout_move(*, state: GameState, view: RulesUnitView) -> bool:
     mission_setup = _require_mission_setup(state)
     battlefield = _require_battlefield_state(state)
     return _rules_unit_wholly_within_zones(
@@ -2451,7 +2210,7 @@ def _dedicated_transport_cargo_scout_instances(
     return tuple(instances)
 
 
-def _enemy_geometry_models_for_player(
+def enemy_geometry_models_for_player(
     *,
     scenario: BattlefieldScenario,
     player_id: str,
