@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import json
 from collections.abc import Callable
+from dataclasses import replace
 from typing import cast
 
 import pytest
 from tests.deployment_submission_helpers import (
+    deployment_placement_payload_for_request,
     submit_deployment_placement,
     submit_deployment_unit_selection,
 )
@@ -20,8 +22,14 @@ from warhammer40k_core.engine.deployment import (
     SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.game_state import GameState
-from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage, LifecycleStatus
+from warhammer40k_core.engine.game_state import GameConfig, GameState
+from warhammer40k_core.engine.list_validation import AttachmentDeclaration, UnitMusterSelection
+from warhammer40k_core.engine.phase import (
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.prebattle import (
     SCOUT_MOVE_PROPOSAL_KIND,
     SELECT_PREBATTLE_ACTION_DECISION_TYPE,
@@ -30,6 +38,7 @@ from warhammer40k_core.engine.prebattle import (
     SUBMIT_SCOUT_MOVE_DECISION_TYPE,
     PreBattlePlacementProposal,
     PreBattleProposalRequest,
+    PreBattleViolationCode,
     ScoutMoveProposal,
 )
 from warhammer40k_core.engine.reserve_declarations import (
@@ -37,6 +46,7 @@ from warhammer40k_core.engine.reserve_declarations import (
 )
 from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
+from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 
@@ -488,9 +498,18 @@ def _scout_witness(
 ) -> PathWitness:
     if state.battlefield_state is None:
         raise GameLifecycleError("Scout smoke witness requires battlefield_state.")
-    unit_placement = state.battlefield_state.unit_placement_by_id(request_context.unit_instance_id)
+    placements = tuple(
+        placement
+        for army in state.battlefield_state.placed_armies
+        for unit in army.unit_placements
+        for placement in unit.model_placements
+        if placement.model_instance_id in request_context.model_instance_ids
+    )
+    assert {placement.model_instance_id for placement in placements} == set(
+        request_context.model_instance_ids
+    )
     paths: list[tuple[str, tuple[Pose, ...]]] = []
-    for placement in unit_placement.model_placements:
+    for placement in placements:
         start = placement.pose
         end = Pose.at(
             start.position.x + dx,
@@ -542,3 +561,214 @@ def _decision_request(status: LifecycleStatus) -> DecisionRequest:
 
 def _option_ids(request: DecisionRequest) -> tuple[str, ...]:
     return tuple(option.option_id for option in request.options)
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize("attached", [False, True], ids=["ordinary", "attached"])
+def test_scout_facade_moves_every_published_component(attached: bool) -> None:
+    session, request = _scout_facade_session(attached=attached)
+    context = PreBattleProposalRequest.from_decision_request_payload(request.payload)
+    before = _state(session).battlefield_state
+    assert before is not None
+    before_models = {
+        placement.model_instance_id: placement
+        for army in before.placed_armies
+        for unit in army.unit_placements
+        for placement in unit.model_placements
+    }
+    assert len(context.component_unit_instance_ids) == (2 if attached else 1)
+    assert len(context.model_instance_ids) == (6 if attached else 5)
+    if attached:
+        assert context.unit_instance_id.startswith("attached-unit:")
+        assert before.unit_placement_or_none(context.unit_instance_id) is None
+    projected = session.view(viewer_player_id=context.player_id)["pending_proposal"]
+    assert isinstance(projected, dict)
+    assert projected["model_instance_ids"] == list(context.model_instance_ids)
+    assert projected["component_unit_instance_ids"] == list(context.component_unit_instance_ids)
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        payload=_scout_move_payload(state=_state(session), request=request, dx=0.5),
+        result_id="scout-facade-move",
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    after = _state(session).battlefield_state
+    assert after is not None
+    for army in after.placed_armies:
+        for unit in army.unit_placements:
+            for placement in unit.model_placements:
+                prior = before_models[placement.model_instance_id]
+                if placement.model_instance_id in context.model_instance_ids:
+                    assert placement.pose.position.x == prior.pose.position.x + 0.5
+                    assert placement.unit_instance_id == prior.unit_instance_id
+                else:
+                    assert placement == prior
+    actions = _state(session).prebattle_action_records
+    moved = [record for record in actions if record.unit_instance_id == context.unit_instance_id]
+    assert len(moved) == 1
+    resolution = moved[0].payload
+    assert isinstance(resolution, dict)
+    batch = resolution["transition_batch"]
+    assert isinstance(batch, dict)
+    displacements = batch["displacements"]
+    assert isinstance(displacements, list)
+    assert {
+        cast(str, record["model_instance_id"])
+        for record in displacements
+        if isinstance(record, dict)
+    } == set(context.model_instance_ids)
+    assert "object at 0x" not in json.dumps(session.lifecycle.to_payload(), sort_keys=True)
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize("attached", [False, True], ids=["ordinary", "attached"])
+def test_scout_facade_rejections_preserve_all_components_and_allow_retry(attached: bool) -> None:
+    session, request = _scout_facade_session(attached=attached)
+    state = _state(session)
+    context = PreBattleProposalRequest.from_decision_request_payload(request.payload)
+    witness = _scout_witness(state=state, request_context=context, dx=0.5)
+    model_id, poses = witness.model_paths[0]
+    invalid_paths = (
+        ("missing-model", witness.model_paths[1:], PreBattleViolationCode.WITNESS_MODEL_SET_DRIFT),
+        (
+            "start-drift",
+            ((model_id, poses[1:]), *witness.model_paths[1:]),
+            PreBattleViolationCode.WITNESS_START_DRIFT,
+        ),
+        (
+            "endpoint-only",
+            ((model_id, (poses[0], poses[0], poses[-1])), *witness.model_paths[1:]),
+            PreBattleViolationCode.ENDPOINT_ONLY_PATH,
+        ),
+        (
+            "over-distance",
+            _scout_witness(state=state, request_context=context, dx=7.0).model_paths,
+            PreBattleViolationCode.PATH_VALIDATION_FAILED,
+        ),
+        (
+            "coherency",
+            (
+                (
+                    model_id,
+                    (
+                        poses[0],
+                        Pose.at(poses[0].position.x + 3.0, poses[0].position.y),
+                        Pose.at(poses[0].position.x + 6.0, poses[0].position.y),
+                    ),
+                ),
+                *witness.model_paths[1:],
+            ),
+            PreBattleViolationCode.UNIT_COHERENCY_BROKEN,
+        ),
+    )
+    for case, paths, expected in invalid_paths:
+        before = state.to_payload()
+        before_records = tuple(session.lifecycle.decision_controller.records)
+        before_events = tuple(session.lifecycle.decision_controller.event_log.records)
+        payload = _scout_move_payload(state=state, request=request, dx=0.5)
+        payload["witness"] = validate_json_value(PathWitness.for_paths(paths).to_payload())
+        status = session.submit_parameterized_payload(
+            request_id=request.request_id, payload=payload, result_id=f"scout-invalid-{case}"
+        )
+        assert status.status_kind is LifecycleStatusKind.INVALID
+        assert expected.value in json.dumps(status.payload)
+        assert state.to_payload() == before
+        assert tuple(session.lifecycle.decision_controller.records) == before_records
+        assert tuple(session.lifecycle.decision_controller.event_log.records) == before_events
+        assert session.lifecycle.decision_controller.queue.peek_next() == request
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        payload=_scout_move_payload(state=state, request=request, dx=0.5),
+        result_id="scout-after-invalid",
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+
+
+def _scout_facade_session(*, attached: bool) -> tuple[LocalGameSession, DecisionRequest]:
+    session = LocalGameSession()
+    session.start(_scout_facade_config(attached=attached))
+    status = session.advance_until_decision_or_terminal()
+    step = 0
+    while True:
+        request = _decision_request(status)
+        step += 1
+        if request.decision_type == SELECT_PREBATTLE_ACTION_DECISION_TYPE:
+            option = next(
+                option for option in request.options if option.option_id.startswith("scout_move:")
+            )
+            status = session.submit_option(
+                request_id=request.request_id,
+                option_id=option.option_id,
+                result_id=f"scout-facade-{step}",
+            )
+            request = _decision_request(status)
+            assert request.decision_type == SUBMIT_SCOUT_MOVE_DECISION_TYPE
+            return session, request
+        if request.decision_type == SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE:
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                payload=deployment_placement_payload_for_request(
+                    session.lifecycle,
+                    request=request,
+                    pose_factory=_event_companion_deployment_pose,
+                ),
+                result_id=f"scout-facade-{step}",
+            )
+        else:
+            if request.decision_type == SECONDARY_MISSION_DECISION_TYPE:
+                option_id = "fixed:assassination:bring_it_down"
+            elif request.decision_type == SELECT_REDEPLOY_UNIT_DECISION_TYPE:
+                option_id = "complete_redeploys"
+            else:
+                assert request.decision_type == SELECT_DEPLOYMENT_UNIT_DECISION_TYPE
+                option_id = request.options[0].option_id
+            status = session.submit_option(
+                request_id=request.request_id, option_id=option_id, result_id=f"scout-facade-{step}"
+            )
+        assert status.status_kind is not LifecycleStatusKind.INVALID
+
+
+def _scout_facade_config(*, attached: bool) -> GameConfig:
+    config = canonical_setup_prebattle_smoke_config(game_id=f"scout-facade-{attached}")
+    catalog = config.army_catalog
+    assert catalog is not None
+    scout = next(
+        sheet
+        for sheet in catalog.datasheets
+        if sheet.datasheet_id == "core-intercessor-like-infantry"
+    )
+    catalog = replace(
+        catalog,
+        datasheets=tuple(
+            replace(sheet, abilities=(*sheet.abilities, *scout.abilities))
+            if sheet.datasheet_id == "core-character-leader"
+            else sheet
+            for sheet in catalog.datasheets
+        ),
+    )
+    leader = UnitMusterSelection(
+        unit_selection_id="leader",
+        datasheet_id="core-character-leader",
+        model_profile_selections=(
+            ModelProfileSelection(model_profile_id="core-character-leader", model_count=1),
+        ),
+    )
+    requests = tuple(
+        replace(
+            req,
+            unit_selections=(req.unit_selections[0], leader)
+            if attached and req.player_id == "player-a"
+            else (req.unit_selections[0],),
+            attachment_declarations=(
+                AttachmentDeclaration(
+                    source_unit_selection_id="leader",
+                    bodyguard_unit_selection_id="scout-redeploy-unit",
+                ),
+            )
+            if attached and req.player_id == "player-a"
+            else (),
+        )
+        for req in config.army_muster_requests
+    )
+    return replace(
+        config, army_catalog=catalog, army_muster_requests=requests, reserve_unit_points=()
+    )
