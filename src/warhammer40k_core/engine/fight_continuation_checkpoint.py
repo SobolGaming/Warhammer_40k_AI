@@ -161,7 +161,7 @@ def reconstruct_fight_continuation_checkpoint(
             canonical = canonical.with_resolved_interrupt(
                 interrupt_id=interrupt.interrupt_id, source_effect_id=interrupt.source_effect_id
             )
-        elif event.event_type == "unit_has_fought":
+        elif event.event_type == "fight_selection_completed":
             if active is None or payload.get("activation_selection") != active.to_payload():
                 raise GameLifecycleError("Ordinary Fight activation completion drift.")
             active = None

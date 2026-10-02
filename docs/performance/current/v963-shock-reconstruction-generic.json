@@ -1,0 +1,159 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "reconstruction",
+  "workload_id": "loaded-ingress-reconstruction-v1",
+  "base_revision": "ae5005f4eb13378190018718c287abd94fb9320d",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:de19a3758fe8f3cf8272f0fd0bc6cfa83179f39824b9104c25dd046090cdc851",
+  "head_input_digest": "bd08806023c7005d7fa4d8976b5c04d84ecaec0b7d0ad1d22030ae204173f405",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 137327259648,
+      "logical_cpus": 64,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "workload_sha256": "5e0787cba828b3717ddd07bb16b0c68926d77b9416eaac062e1199408f1beebf",
+    "fixture_sha256": "e8e6cc09b25af50073ab9c6069f0d3bbcc58733b9a694681b28fac2eb4837b14",
+    "samples": {
+      "ingress/restore": [
+        3.781840999959968,
+        3.6885386999929324,
+        3.785756599972956,
+        3.7886597000760958,
+        3.7309129000641406,
+        3.7651716999243945,
+        3.692599199945107
+      ],
+      "ingress/fork": [
+        3.7152612999780104,
+        3.735539900022559,
+        3.706177300075069,
+        3.708203899906948,
+        3.8082859000423923,
+        3.7147325000260025,
+        3.8074651000788435
+      ],
+      "rapid_disembark/restore": [
+        3.821611399995163,
+        3.748258800012991,
+        3.832127600093372,
+        3.721801600069739,
+        3.907562999986112,
+        3.8242596000200137,
+        3.732793500064872
+      ],
+      "rapid_disembark/fork": [
+        3.783175199991092,
+        3.86802599998191,
+        3.7965898000402376,
+        3.837381900055334,
+        3.87742429994978,
+        3.7615961999399588,
+        3.877948999986984
+      ],
+      "later_decision/restore": [
+        3.7650205000536516,
+        3.753760499996133,
+        3.7128596999682486,
+        3.8872590000974014,
+        3.8142750000115484,
+        3.724768199957907,
+        3.842528000008315
+      ],
+      "later_decision/fork": [
+        3.9025822000112385,
+        3.7810148999560624,
+        3.766456300043501,
+        3.933462699991651,
+        3.761342199984938,
+        3.8876139000058174,
+        3.8672381999203935
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:de19a3758fe8f3cf8272f0fd0bc6cfa83179f39824b9104c25dd046090cdc851",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 137327259648,
+      "logical_cpus": 64,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "workload_sha256": "5e0787cba828b3717ddd07bb16b0c68926d77b9416eaac062e1199408f1beebf",
+    "fixture_sha256": "e8e6cc09b25af50073ab9c6069f0d3bbcc58733b9a694681b28fac2eb4837b14",
+    "samples": {
+      "ingress/restore": [
+        3.866590499994345,
+        3.6553056000266224,
+        3.718378599965945,
+        3.702835299889557,
+        3.6725432000821456,
+        3.6424944999162108,
+        3.6780631000874564
+      ],
+      "ingress/fork": [
+        3.72389290004503,
+        3.695213900064118,
+        3.812776800012216,
+        3.8292956999503076,
+        3.7576958999270573,
+        3.7156280000926927,
+        3.791085800039582
+      ],
+      "rapid_disembark/restore": [
+        3.799509299919009,
+        3.8298313999548554,
+        3.7830285999225453,
+        3.697469300008379,
+        3.7077146000228822,
+        3.7771556000225246,
+        3.840545100043528
+      ],
+      "rapid_disembark/fork": [
+        3.796145600033924,
+        3.8248182999668643,
+        3.7328429999761283,
+        3.847669400041923,
+        3.731798299937509,
+        3.740439399960451,
+        3.766757700010203
+      ],
+      "later_decision/restore": [
+        3.7208675999427214,
+        3.815003199968487,
+        3.8170892000198364,
+        3.7148266000440344,
+        3.931097000022419,
+        3.8200096000218764,
+        3.8722632999997586
+      ],
+      "later_decision/fork": [
+        3.957131000002846,
+        3.8875792999751866,
+        3.8650225999299437,
+        3.9013745000120252,
+        3.8239825000055134,
+        3.8884436999214813,
+        3.8155975999543443
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": [
+    "Prior 62 Windows V963 refresh reports retained 14 failed inequalities in Order78/83/101, also reproduced on unchanged main7f45. Those failures remain historical failures; no passing status is inferred from these new bounded comparisons.",
+    "Preserved evidence: Library libfile_cb02a09ce87881918dbe447a67a3e779 SHA2564f194b6edee3e31de9caa277ae1c292be278e79b93d4c5d4e79e46ca8ebf7344; original 492df01c559aef3df8f4848428a1cfa4506f477d checkpoint and exact bytes retained externally. Policy-pinned historical report files remain unchanged."
+  ]
+}

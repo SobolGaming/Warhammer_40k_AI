@@ -1,4 +1,4 @@
-"""Keep Shock engagement ownership and measured regression evidence explicit."""
+"""Current Shock uses shared setup; retain historical Order 62 measurement evidence."""
 
 import ast
 import json
@@ -28,25 +28,22 @@ def test_shock_candidates_do_not_snapshot_transport_engagements() -> None:
     assert all(isinstance(value, ast.Tuple) and not value.elts for value in snapshots)
 
 
-def test_shock_queue_and_restore_use_post_placement_authority() -> None:
+def test_shock_has_no_queue_producer_or_mandatory_restore_disposition() -> None:
     source = (ENGINE / "phases/movement_placement_proposals.py").read_text(encoding="utf-8")
     tree = ast.parse(source)
-    queue = next(
-        node
-        for node in tree.body
-        if isinstance(node, ast.FunctionDef)
-        and node.name == "_start_shock_disembark_forced_fight_activations"
-    )
-    assert not any(
-        isinstance(node, ast.Attribute) and node.attr == "start_engaged_enemy_unit_instance_ids"
-        for node in ast.walk(queue)
-    )
+    names = {node for node in tree.body if isinstance(node, ast.FunctionDef)}
+    assert not any(node.name == "_start_shock_disembark_forced_fight_activations" for node in names)
+    assert "install_forced_fight_queue" not in source
     assert "current_physically_engaged_enemy_rules_unit_ids(" in source
     history = (ENGINE / "shock_disembark_history.py").read_text(encoding="utf-8")
     assert "historical_engaged_enemy_rules_unit_ids(" in history
     assert "event_index=index + 1" in history
+    assert "Shock Disembark setup must be unengaged" in history
     lifecycle = (ENGINE / "lifecycle_state_validation.py").read_text(encoding="utf-8")
     assert "validate_shock_disembark_engagement_history(" in lifecycle
+    assert "_validate_shock_disembark_fight_history" not in lifecycle
+    shared = (ENGINE / "consolidation_fight_queue.py").read_text(encoding="utf-8")
+    assert "install_forced_fight_queue(" in shared
 
 
 def test_order62_matched_measurement_gate() -> None:

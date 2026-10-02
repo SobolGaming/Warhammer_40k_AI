@@ -1,0 +1,46 @@
+{
+  "base_commit": "7f45d87d3094c76beb1be58e0cabb721dec21053",
+  "purpose": "Authenticate the original Order97 source/assertion inventory at the pre-V963 baseline, not current semantic compliance.",
+  "superseded_requirements": [
+    "18.07-preserve-passenger-engagement",
+    "18.07-post-placement-forced-fights"
+  ],
+  "current_evidence": "docs/V963_SHOCK_SCOPE_PLAN.md",
+  "files": [
+    {
+      "path": "tests/unit/test_phase10q_transports.py",
+      "historical_path": "data/source_audits/v963_shock/baseline/tests/unit/test_phase10q_transports.py.txt",
+      "sha256": "31039152b2cd9c1be4e39ff7d93904fe7994104658aab19c9626d69b804412e1",
+      "bytes": 436740,
+      "order97_file_pin": "31039152b2cd9c1be4e39ff7d93904fe7994104658aab19c9626d69b804412e1"
+    },
+    {
+      "path": "tests/unit/test_phase14a_source_identity.py",
+      "historical_path": "data/source_audits/v963_shock/baseline/tests/unit/test_phase14a_source_identity.py.txt",
+      "sha256": "0e8e042f24d08950ed93931359d1670747e6bf8f66710b82813149dcf016ffb9",
+      "bytes": 150209,
+      "order97_file_pin": null
+    },
+    {
+      "path": "src/warhammer40k_core/_engine_build_manifest.json",
+      "historical_path": "data/source_audits/v963_shock/baseline/src/warhammer40k_core/_engine_build_manifest.json.txt",
+      "sha256": "2f831dd3b558e9ccf8ce0227e1eafdf4ff675a622e3301fb81cf6e1e402483bb",
+      "bytes": 696454,
+      "order97_file_pin": "2f831dd3b558e9ccf8ce0227e1eafdf4ff675a622e3301fb81cf6e1e402483bb"
+    },
+    {
+      "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_transports_2026_09/artifacts/package.json",
+      "historical_path": "data/source_audits/v963_shock/baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_transports_2026_09/artifacts/package.json.txt",
+      "sha256": "1b0f790f63da545c4cd0d509bba52aa3deacaa18dda9f1402491b00beded2e76",
+      "bytes": 18047,
+      "order97_file_pin": null
+    },
+    {
+      "path": "src/warhammer40k_core/engine/phases/movement_placement_proposals.py",
+      "historical_path": "data/source_audits/v963_shock/baseline/src/warhammer40k_core/engine/phases/movement_placement_proposals.py.txt",
+      "sha256": "2e07b9495d1344d23284a89a4c1b4bd4ca21c096e02857f8aeb612e6855bfdd3",
+      "bytes": 36483,
+      "order97_file_pin": null
+    }
+  ]
+}

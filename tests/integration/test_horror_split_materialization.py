@@ -1915,45 +1915,12 @@ def test_fight_interrupt_split_resumes_completed_activation_and_resolves_reactio
         blue_datasheet_id="000002583",
         destruction_kind=DestructionSourceKind.ATTACK.value,
         source_phase=BattlePhase.FIGHT,
+        fight_interrupt_activation=True,
     )
     _record_successful_materialization_rolls(scenario)
-    config = _game_config(scenario)
-    policy = config.ruleset_descriptor.fight_policy
-    active_player_id = scenario.state.active_player_id
-    assert active_player_id is not None
-    fight_state = FightPhaseState.start(
-        battle_round=scenario.state.battle_round,
-        active_player_id=active_player_id,
-        policy=policy,
-        engaged_at_fight_step_start_unit_ids=(
-            scenario.attack_sequence.attacking_unit_instance_id,
-            scenario.attached_unit_instance_id,
-        ),
-        fights_first_registry=FightsFirstRegistry(),
-    ).with_current_step(
-        current_step=FightPhaseStepKind.FIGHT,
-        policy=policy,
-    )
-    activation = FightActivationSelection(
-        player_id=scenario.enemy_army.player_id,
-        battle_round=scenario.state.battle_round,
-        unit_instance_id=scenario.attack_sequence.attacking_unit_instance_id,
-        ordering_band=fight_state.current_ordering_band,
-        fight_type=policy.fight_types[0],
-        eligibility_reasons=(FightEligibilityKind.ENGAGED_AT_FIGHT_STEP_START,),
-        request_id="request:fight-interrupt:horror-split",
-        result_id="result:fight-interrupt:horror-split",
-        interrupt_id="interrupt:fight:horror-split",
-    )
-    fight_state = (
-        fight_state.with_activation(activation)
-        .with_active_activation(activation)
-        .with_attack_sequence_update(
-            attack_sequence=scenario.attack_sequence,
-            allocated_model_ids_this_phase=(),
-        )
-    )
-    scenario.state.replace_fight_phase_state(fight_state)
+    fight_state = scenario.state.fight_phase_state
+    assert fight_state is not None
+    assert fight_state.active_activation is not None
     lifecycle = GameLifecycle(
         state=scenario.state,
         decision_controller=scenario.decisions,
@@ -2033,13 +2000,12 @@ def test_fight_interrupt_split_resumes_completed_activation_and_resolves_reactio
     assert _unit_by_id(restored_state, scenario.bodyguard.unit_instance_id).datasheet_id == (
         "000002583"
     )
-    assert (
-        sum(
-            record.event_type == "unit_has_fought"
-            for record in restored.decision_controller.event_log.records
-        )
-        == 1
-    )
+    # This post-executor materialization fixture supplies no executed HIT.
+    # Selection/final completion occurs once without inventing actual fighting.
+    events = restored.decision_controller.event_log.records
+    assert sum(event.event_type == "unit_has_fought" for event in events) == 0
+    assert sum(event.event_type == "fight_selection_completed" for event in events) == 1
+    assert sum(event.event_type == "fight_activation_completed" for event in events) == 1
     assert (
         sum(
             record.event_type == CATALOG_UNIT_DATASHEET_REPLACED_EVENT
@@ -2441,6 +2407,56 @@ def test_horror_catalog_keeps_materialized_profiles_out_of_mustering() -> None:
             assert ModelInstance.from_payload(model.to_payload()) == model
 
 
+def _record_split_interrupt_activation(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    target_unit_instance_id: str,
+) -> FightActivationSelection:
+    """Bind the synthetic post-executor fixture to its accepted selection first."""
+    from tests.completed_attack_fixture_helpers import record_fight_selection_for_executor_fixture
+
+    policy = state.runtime_ruleset_descriptor().fight_policy
+    active_player_id = state.active_player_id
+    assert active_player_id is not None
+    fight_state = FightPhaseState.start(
+        battle_round=state.battle_round,
+        active_player_id=active_player_id,
+        policy=policy,
+        engaged_at_fight_step_start_unit_ids=(
+            attack_sequence.attacking_unit_instance_id,
+            target_unit_instance_id,
+        ),
+        fights_first_registry=FightsFirstRegistry(),
+    ).with_current_step(
+        current_step=FightPhaseStepKind.FIGHT,
+        policy=policy,
+    )
+    activation = FightActivationSelection(
+        player_id=attack_sequence.attacker_player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=attack_sequence.attacking_unit_instance_id,
+        ordering_band=fight_state.current_ordering_band,
+        fight_type=policy.fight_types[0],
+        eligibility_reasons=(FightEligibilityKind.ENGAGED_AT_FIGHT_STEP_START,),
+        request_id="request:fight-interrupt:horror-split",
+        result_id="result:fight-interrupt:horror-split",
+        interrupt_id="interrupt:fight:horror-split",
+    )
+    fight_state = (
+        fight_state.with_activation(activation)
+        .with_active_activation(activation)
+        .with_attack_sequence_update(
+            attack_sequence=attack_sequence,
+            allocated_model_ids_this_phase=(),
+        )
+    )
+    state.replace_fight_phase_state(fight_state)
+    record_fight_selection_for_executor_fixture(decisions=decisions, selection=activation)
+    return activation
+
+
 def _split_scenario(
     *,
     pink_datasheet_id: str,
@@ -2459,6 +2475,7 @@ def _split_scenario(
     emit_destruction_events: bool = True,
     game_id: str | None = None,
     random_materialized_wounds: bool = False,
+    fight_interrupt_activation: bool = False,
 ) -> _SplitScenario:
     package = horrors_package()
     if random_materialized_wounds:
@@ -2698,8 +2715,24 @@ def _split_scenario(
                 f"{attack_sequence.attacking_unit_instance_id}:{result_id}"
             ),
         )
+        activation = (
+            _record_split_interrupt_activation(
+                state=state,
+                decisions=decisions,
+                attack_sequence=attack_sequence,
+                target_unit_instance_id=(
+                    attached_unit_id if attached else bodyguard.unit_instance_id
+                ),
+            )
+            if fight_interrupt_activation
+            else None
+        )
         record_melee_declaration_for_executor_fixture(
-            state=state, decisions=decisions, sequence=attack_sequence, result_id=result_id
+            state=state,
+            decisions=decisions,
+            sequence=attack_sequence,
+            result_id=result_id,
+            activation=activation,
         )
     if emit_destruction_events and destruction_kind != "hazardous":
         assert models_start_destroyed

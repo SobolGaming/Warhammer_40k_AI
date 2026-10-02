@@ -1,0 +1,134 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "fight_selection_reconstruction",
+  "workload_id": "order102-fight-selection-reconstruction-v1",
+  "base_revision": "ba3e3898e53bce6d8c23570e1ddaa224af59d55c",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0291fd08bb730575da8e064d519fdc083a22f27b98ab5aa5e076055dc5a18a46",
+  "head_input_digest": "5c667153a20ed531f057e0e95e080df95f29d63550a92c3a08c60cf83eca4dd9",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:de19a3758fe8f3cf8272f0fd0bc6cfa83179f39824b9104c25dd046090cdc851",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 137327259648,
+      "logical_cpus": 64,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "workload_sha256": "5a4a12bf2ad847791a6c97e36748239760efb50bd7468f5c5efef5a5060abf62",
+    "fixture_sha256": "851454bde4ab98e59a4fff6d20604fed21ca904d68b31ed2c655690f50808ac0",
+    "samples": {
+      "ordinary_empty/restore": [
+        4.435209899907932,
+        4.417707800050266,
+        4.63847020000685
+      ],
+      "ordinary_empty/replay": [
+        0.8926424999954179,
+        0.967784299980849,
+        0.8907401999458671
+      ],
+      "retained_empty_completed/restore": [
+        5.613314899965189,
+        5.621011200011708,
+        5.539419699925929
+      ],
+      "retained_empty_completed/replay": [
+        1.7743046999676153,
+        1.8741417999844998,
+        1.7902751000365242
+      ],
+      "engaging_resumed/restore": [
+        4.773173599969596,
+        4.725802500033751,
+        4.7558011000510305
+      ],
+      "engaging_resumed/replay": [
+        0.9956253999844193,
+        0.9862532999832183,
+        0.9795959999319166
+      ],
+      "retained_armed_pending/replay": [
+        1.6544405999593437,
+        1.6832173999864608,
+        1.6450292998924851
+      ],
+      "retained_armed_completed/restore": [
+        5.93739049998112,
+        5.843954100040719,
+        5.901649400009774
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0291fd08bb730575da8e064d519fdc083a22f27b98ab5aa5e076055dc5a18a46",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 137327259648,
+      "logical_cpus": 64,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "workload_sha256": "5a4a12bf2ad847791a6c97e36748239760efb50bd7468f5c5efef5a5060abf62",
+    "fixture_sha256": "851454bde4ab98e59a4fff6d20604fed21ca904d68b31ed2c655690f50808ac0",
+    "samples": {
+      "ordinary_empty/restore": [
+        4.429332600091584,
+        4.449888400034979,
+        4.570698900031857
+      ],
+      "ordinary_empty/replay": [
+        0.9152113000163808,
+        0.9827049999730662,
+        0.8897349999751896
+      ],
+      "retained_empty_completed/restore": [
+        5.0347489000996575,
+        4.951862300047651,
+        5.01202430005651
+      ],
+      "retained_empty_completed/replay": [
+        1.3077645000303164,
+        1.2898050000658259,
+        1.31244610005524
+      ],
+      "engaging_resumed/restore": [
+        4.740208399947733,
+        4.697705200058408,
+        4.823369799996726
+      ],
+      "engaging_resumed/replay": [
+        0.9807365000015125,
+        1.0756533000385389,
+        0.9930921000195667
+      ],
+      "retained_armed_pending/replay": [
+        1.6619505999842659,
+        1.6643812999827787,
+        1.66536740004085
+      ],
+      "retained_armed_completed/restore": [
+        5.920085499994457,
+        5.895385600044392,
+        5.936383899999782
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": [
+    "The earlier detailed-serial1 comparison remains preserved with its exact frozen inputs and passed samples. Subsequent regression-only fixture repairs changed the declared whole fixture inventory, so this record contains a fresh actual-base/current serial run, not relabeled old timing evidence. The earlier full covered run failed five fixture expectations and is not a passed gate.",
+    "Actual protected base ba3e3898 rejects its own normally generated armed-retained pending-cleanup restore with Active-player scope stack differs from authoritative action order. Baseline failure receipt base-armed-cleanup-compatibility.json and original checkpoint remain preserved externally; no rejection duration is called a successful restore or matched budget pass.",
+    "Eight successful matched operations use three samples per runtime. The ninth operation, armed-retained pending-cleanup restore, has only three current successful samples and no relative-budget claim. Raw current-only evidence is retained beside all 48 paired samples and exact imports/input/process receipts in the Order102 evidence archive.",
+    "These are repeated independent warm component reconstructions with preparation, JSON transport, artifact capture and assertions excluded. Full untrimmed bounded normal histories are used; no cold-start, full-game, long-history scalability or meaningful speedup claim is made. Mandatory whole-process smoke remains separate.",
+    "Prior failed, incomplete and superseded Order102 diagnostic expectations and original immutable Order97/V963 evidence remain preserved. Existing historical performance records and budgets are unchanged; no old failure is relabeled by this bounded current comparison."
+  ]
+}

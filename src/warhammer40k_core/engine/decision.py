@@ -64,6 +64,7 @@ _RNG_HISTORY_NEUTRAL_EVENT_TYPES = frozenset(
     {
         "out_of_phase_shooting_started",
         "fight_activation_completed",
+        "fight_selection_completed",
         "secondary_missions_revealed",
         "setup_completion_gate_passed",
         "battle_started",

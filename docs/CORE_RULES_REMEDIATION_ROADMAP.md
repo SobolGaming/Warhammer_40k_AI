@@ -44,11 +44,17 @@ For merged Orders 1–100, the fourth column describes the closed defect or deli
 
 ## Resolved exceptions `PFINAL` still rechecks
 
-Shock Disembark engagement: C18-07's source exception was resolved by the repository owner on 2026-09-19. Passengers may set up engaged with any enemy, and that engagement feeds the opponent Fight queue. Embarked passengers do not inherit the Transport's prior engagements. Evidence: [Order 62 scope](ORDER_62_SCOPE_PLAN.md).
+Shock Disembark: the source exception was resolved by the repository owner on 2026-09-19. That historical C18-07 / Order 62 engaged-setup and enemy-Fight exception is superseded for the timestamped current 18.07 observation by [V963-SHOCK](V963_SHOCK_SCOPE_PLAN.md), explicitly sequenced after PR #525 and before Order 102. Ordinary coherent, unengaged setup and charge ineligibility through turn end now apply; Engaging Consolidation remains separate. The [Order 62 scope](ORDER_62_SCOPE_PLAN.md) and original Order 97 assertions retain historical meaning.
 
 Consolidation responses: owner-confirmed official App v946 (2026-09-21) gives forced enemy selection to Engaging only. Ongoing preserves prior engagements. Objective stays unengaged and in range. Evidence: [scope, source resolution and validation](ORDER_72_SCOPE_PLAN.md).
 
 ## Canonical one-PR-at-a-time sequence
+
+PR #525 completed `THROUGHPUT-AFTER-101` at base `7f45d87d3094c76beb1be58e0cabb721dec21053`.
+The owner selected the narrow `V963-SHOCK` prerequisite next, before unchanged
+Order 102. Its full source comparison confirms the Fought rule and weaponless
+FAQ are unchanged. Other v963 intake families remain separately scheduled;
+all source/implementation gaps must close before PFINAL.
 
 The owner approved a separate throughput PR immediately after Order 101 and
 before Order 102 on 2026-09-30. It preserves both local and hosted full-suite

@@ -486,7 +486,7 @@ def test_p18d_assault_disembark_is_source_bound_grouped_and_adapter_authoritativ
         assert forbidden_display_name not in candidate_source
 
 
-def test_p18e_shock_disembark_is_source_bound_and_reuses_canonical_fight_activation() -> None:
+def test_p18e_shock_disembark_is_source_bound_without_forced_fight_production() -> None:
     transport_source = source_for(TRANSPORTS_PATH)
     disembark_state_source = source_for(TRANSPORT_DISEMBARK_STATE_PATH)
     shock_permission_source = source_for(SHOCK_DISEMBARK_PATH)
@@ -497,12 +497,6 @@ def test_p18e_shock_disembark_is_source_bound_and_reuses_canonical_fight_activat
     )
     proposal_source = source_for(MOVEMENT_PROPOSALS_PATH)
     placement_source = source_for(MOVEMENT_PLACEMENT_PROPOSALS_PATH)
-    fight_order_source = source_for(FIGHT_ORDER_PATH)
-    fight_request_source = source_for(FIGHT_ACTIVATION_REQUESTS_PATH)
-    historical_eligibility_source = source_for(FIGHT_HISTORICAL_ELIGIBILITY_PATH)
-    fight_phase_source = source_for(FIGHT_PHASE_PATH)
-    fight_hook_source = source_for(FIGHT_UNIT_SELECTED_HOOKS_PATH)
-    lifecycle_source = source_for(LIFECYCLE_PATH)
     restore_source = source_for(LIFECYCLE_STATE_VALIDATION_PATH)
     adapter_contract = source_for(ADAPTER_CONTRACT_PATH)
 
@@ -520,7 +514,29 @@ def test_p18e_shock_disembark_is_source_bound_and_reuses_canonical_fight_activat
     assert "current_physically_engaged_enemy_rules_unit_ids(" in placement_source
     assert "RulesetDescriptor.warhammer_40000_eleventh()" not in candidate_source
     assert "proposal_start_engagement_drift" in proposal_source
-    assert "_start_shock_disembark_forced_fight_activations" in placement_source
+    # Current 18.07 supersedes only the former Shock producer and mandatory queue.
+    assert "_start_shock_disembark_forced_fight_activations" not in placement_source
+    assert "_validate_shock_disembark_fight_history" not in restore_source
+    assert "omitted mandatory forced-Fight activations" not in restore_source
+    assert "shock_disembark" in adapter_contract
+    for forbidden_display_name in (
+        "Assault Ramp",
+        "Full-throttle Assault",
+        "Full-Throttle Assault",
+    ):
+        assert forbidden_display_name not in shock_permission_source
+        assert forbidden_display_name not in candidate_source
+
+
+def test_shared_engaging_forced_fight_authority_remains_canonical() -> None:
+    fight_order_source = source_for(FIGHT_ORDER_PATH)
+    fight_request_source = source_for(FIGHT_ACTIVATION_REQUESTS_PATH)
+    historical_eligibility_source = source_for(FIGHT_HISTORICAL_ELIGIBILITY_PATH)
+    fight_phase_source = source_for(FIGHT_PHASE_PATH)
+    fight_hook_source = source_for(FIGHT_UNIT_SELECTED_HOOKS_PATH)
+    lifecycle_source = source_for(LIFECYCLE_PATH)
+    restore_source = source_for(LIFECYCLE_STATE_VALIDATION_PATH)
+
     assert "ForcedFightActivationContext" in fight_order_source
     assert "for_forced_activations" in fight_order_source
     assert "build_fight_activation_request" in fight_request_source
@@ -535,7 +551,6 @@ def test_p18e_shock_disembark_is_source_bound_and_reuses_canonical_fight_activat
     assert "advance_forced_fight_activations_if_needed" in source_for(
         LIFECYCLE_PATH.parent / "lifecycle_advancement.py"
     )
-    assert "_validate_shock_disembark_fight_history" in restore_source
     assert "authenticated_forced_fight_selections" in restore_source
     assert "build_fight_activation_request" in restore_source
     assert "fight_activation_selection_requested_payload" in restore_source
@@ -545,15 +560,9 @@ def test_p18e_shock_disembark_is_source_bound_and_reuses_canonical_fight_activat
     assert "geometry_models_are_physically_engaged" in historical_eligibility_source
     assert "historical_rules_unit_model_ids" in historical_eligibility_source
     assert "CURRENTLY_ENGAGED in eligible_context.eligibility_reasons" not in restore_source
-    assert "omitted mandatory forced-Fight activations" in restore_source
-    assert "shock_disembark" in adapter_contract
-    for forbidden_display_name in (
-        "Assault Ramp",
-        "Full-throttle Assault",
-        "Full-Throttle Assault",
-    ):
-        assert forbidden_display_name not in shock_permission_source
-        assert forbidden_display_name not in candidate_source
+    assert "Consolidation response omitted mandatory forced-Fight activations." in source_for(
+        LIFECYCLE_PATH.parent / "consolidation_fight_history.py"
+    )
 
 
 def test_phase14h_shooting_selector_and_range_helpers_are_rules_unit_aware() -> None:

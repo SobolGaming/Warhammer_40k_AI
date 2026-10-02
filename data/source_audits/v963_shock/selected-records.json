@@ -1,0 +1,124 @@
+{
+  "03.02": {
+    "accordions": [
+      {
+        "ref": "03.02.01",
+        "text": [
+          "While having to set up a unit as the result of a \u0005move type\u0006, if you have to return a unit’s models to their previous positions because it is not possible to set them all up, that unit has not been \u0005selected to move\u0006. This means it can be \u0005selected to move\u0006 later, so could either attempt another set up or \u0005remain stationary\u0006 (09.04)."
+        ],
+        "title": "If You Cannot Set Up a Unit"
+      },
+      {
+        "ref": "03.02.02",
+        "text": [
+          "If a model cannot meet all of its set up restrictions because it is too large, consult the relevant section below:",
+          "\u0005During Deployment:\u0006 If a model is so large that its base cannot physically be set up wholly within your deployment zone, it must be set up so that it is touching your battlefield edge. During a turn in which such a large model is set up on the battlefield, that model’s unit cannot do any of the following:",
+          "• Make a \u0005normal/advance/fall-back/charge move\u0006.",
+          "• Make any attacks with ranged weapons.",
+          "Some large models, typically \u0003Aircraft\u0004, have wings and other parts that extend significantly beyond their base. Such models can overhang a deployment zone if it is not possible to set them up otherwise, but when setting them up, their base must still be wholly within that deployment zone.",
+          "\u0005From Strategic Reserves:\u0006 If a model is so large that its base cannot physically be set up wholly within the distance required of the battlefield edge, it must be set up so that it is touching a battlefield edge. During a turn in which such a large model is set up on the battlefield (excluding \u0003AIRCRAFT\u0004 models), that model’s unit cannot do any of the following:",
+          "normal/advance/fall-back/charge move.",
+          "Make any attacks with ranged weapons.",
+          "Some large models, typically \u0003Aircraft\u0004, have wings and other parts that extend significantly beyond their base. Such models can overhang a battlefield edge if it is not possible to set them up otherwise, but when setting them up, they must still be more than 8\" away from all enemy units.",
+          "\u0005Disembarking from a Transport:\u0006 When a unit disembarks from a \u0003Transport\u0004, it must be set up wholly within 3\" of that model. If a disembarking model is so large that it is not possible to set it up wholly within 3\" (typically because it is itself larger than 3\" in all directions), set that model up with its base within 1\" of that \u0003Transport\u0004’s base (or hull), and not \u0005engaged\u0006 with any enemy units."
+        ],
+        "title": "Setting Up Large Models"
+      },
+      {
+        "ref": "03.02.03",
+        "text": [
+          "When a player uses a rule that lets them redeploy their unit, they remove that unit from the battlefield, then deploy it again using all the normal rules (e.g. if all the models in the redeploying unit have the Infiltrators ability, that unit can be set up using that ability)."
+        ],
+        "title": "Redeployments"
+      }
+    ],
+    "ref": "03.02",
+    "text": [
+      "Before your units can move and make attacks, they will first need to be set up on the battlefield. This most commonly happens when deploying your army for battle, but can happen for other reasons as well.",
+      "Whenever a rule instructs you to set up a unit, place its models on the battlefield so that:",
+      "• That unit is in \u0005coherency\u0006 (03.03).",
+      "• That unit is \u0005unengaged\u0006 (03.04).",
+      "• All other requirements and restrictions are met.",
+      "If you cannot set up all of the models in a unit, remove that unit from the battlefield and return it to its original position (e.g. in \u0005strategic reserves\u0006 or embarked within a \u0003TRANSPORT\u0004)"
+    ],
+    "title": "Set Up"
+  },
+  "04.03.05": {
+    "ref": "04.03.05",
+    "text": [
+      "When all of the attacks made with a melee weapon have been resolved, that weapon has fought.",
+      "When all of a model’s selected melee weapons have fought, that model has fought.",
+      "When all models in a unit that are making melee attacks have resolved all of those attacks, that unit has fought.",
+      "If a unit was selected to fight and none of the models in it make any attacks, it has not fought."
+    ],
+    "title": "Fought"
+  },
+  "12.08": {
+    "ref": "12.08",
+    "text": [
+      "\u000eEligible If",
+      "It is the Fight phase and your unit was \u0005eligible to fight\u0006 this phase.",
+      "\u000eBefore Moving",
+      "Select \u0005consolidation mode\u0006:",
+      "• \u0005Ongoing Consolidation:\u0006 If your unit is \u0005engaged\u0006, you must select this mode and select \u0001every\u0002 enemy unit it is \u0005engaged\u0006 with.",
+      "• \u0005Engaging Consolidation:\u0006 Otherwise, if your unit is within 3\" of one or more enemy units, you must select this mode and select one or more of those enemy units.",
+      "• \u0005Objective Consolidation:\u0006 Otherwise, if your unit is within 3\" of one or more \u0005objectives\u0006, you must select this mode and select one of those \u0005objectives\u0006.",
+      "\u000eWhile Moving",
+      "• \u0005Ongoing Consolidation:\u0006 Models in base‑contact with one or more enemy models cannot be moved. Each model that is moved must end its move closer to the closest selected enemy unit, and \u0005engaged\u0006 with it if possible.",
+      "• \u0005Engaging Consolidation:\u0006 Each model that is moved must end its move closer to the closest selected enemy unit, and \u0005engaged\u0006 with it if possible.",
+      "• \u0005Objective Consolidation:\u0006 Each model that is moved must end its move within range of the selected \u0005objective\u0006 if possible, or closer to it if not.",
+      "\u000eEffect",
+      "Your unit moves as described in Moving (03).",
+      "\u000eAfter Moving",
+      "• \u0005Ongoing Consolidation:\u0006 Each model that started this move \u0005engaged\u0006 with an enemy unit must still be \u0005engaged\u0006 with that enemy unit.",
+      "• \u0005Engaging Consolidation:\u0006 Your unit must be \u0005engaged\u0006 with \u0001all\u0002 of the selected enemy units. If one or more enemy units \u0005engaged\u0006 with your unit have not been \u0005selected to fight\u0006 this phase, your opponent must select each of those units, one at a time; when each is selected, it becomes \u0005eligible to fight\u0006 and is \u0005selected to fight\u0006 (12.04).",
+      "• \u0005Objective Consolidation:\u0006 Your unit must be \u0005unengaged\u0006 and within range of the selected \u0005objective\u0006.",
+      "\u000eMaximum Distance",
+      "3\""
+    ],
+    "title": "Consolidation Move"
+  },
+  "18.07": {
+    "ref": "18.07",
+    "text": [
+      "\u000eEligible If",
+      "As stated in the rule allowing this \u0005move type\u0006, if all of the following apply to your unit:",
+      "• Embarked within a \u0003TRANSPORT\u0004 model that is on the battlefield.",
+      "• Did not embark within that \u0003TRANSPORT\u0004 this phase.",
+      "\u000eSet-up Distance",
+      "3\"",
+      "\u000eWhile Moving",
+      "Set up each model in your unit wholly within the \u0005set‑up distance\u0006 of that \u0003TRANSPORT\u0004.",
+      "\u000eEffect",
+      "Your unit is set up as described in Set Up (Core Rules, 03.02).",
+      "\u000eAfter Moving",
+      "Your unit is \u0001not\u0002 \u0005eligible to declare a charge\u0006 until the end of the turn."
+    ],
+    "title": "Shock Disembark Move"
+  },
+  "weaponless-faq": {
+    "answer": "Yes, it just makes no attacks and then the fight type or shoot type is resolved.",
+    "id": "9bfa47ed-be8d-4e11-80de-f3832d507ca1",
+    "question": "Can I select a unit to shoot or fight if it doesn't have melee or ranged weapons?"
+  },
+  "duration-faq": {
+    "answer": "Yes. For example, if an ability gave a unit +1 OC until the end of the turn, at the end of the turn, that unit would still have +1 OC. That unit would not have +1 OC at the start of the next turn.",
+    "id": "f1507145-5606-474c-ba71-f5c92f2d6faf",
+    "question": "If a rule's effect lasts until the end of a specific part of the battle (e.g. until the end of the phase, until the end of the turn), is that rule still in effect at the end of that part of the battle?"
+  },
+  "18.07-v931-added-record": {
+    "body": "Your unit is set up as described in Set Up (Core Rules, 03.02). As stated in the rule allowing this move type, if all of the following apply to your unit: Embarked within a TRANSPORT model that is on the battlefield. Did not embark within that TRANSPORT this phase. Set up each model in your unit wholly within the set‑up distance of that TRANSPORT. Each model that started this move engaged with an enemy unit must still be engaged with that enemy unit. If one or more enemy units engaged with your unit have not been selected to fight this phase, your opponent must select each of those units, one at a time; when each is selected, it becomes eligible to fight and is selected to fight 3\" 18.07",
+    "kind": "added",
+    "ref": "18.07",
+    "title": "Shock Disembark Move"
+  },
+  "18.07-v963-change-record": {
+    "excerpt": {
+      "after": "… distance of that TRANSPORT. Your unit is not eligible to declare a charge until the end of the turn. 3\" 18.07",
+      "before": "… distance of that TRANSPORT. Each model that started this move engaged with an enemy unit must still be engaged with that enemy unit. If one or more enemy units engaged with your unit have not been selected to fight this phase, your opponent must select each of those units, one at a time; when each is selected, it becomes eligible to fight and is selected to fight 3\" 18.07"
+    },
+    "kind": "changed",
+    "ref": "18.07",
+    "title": "Shock Disembark Move"
+  }
+}
