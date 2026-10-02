@@ -7,6 +7,7 @@ from functools import cache
 from typing import Any, cast
 
 import pytest
+from tests.fight_completion_positive_helpers import assert_completed_melee
 from tests.phase15c_fight_order_helpers import fight_lifecycle
 from tools import generate_emperors_children_daemon_prince_rule_ir as generator
 from tools.generate_ability_support_matrix import (
@@ -101,7 +102,7 @@ from warhammer40k_core.rules.wahapedia_schema import (
 DAEMON_PRINCE_ID = "000004086"
 TORMENTORS_ID = "000004079"
 ECSTATIC_DEATH_GAME_ID = "order56-ecstatic_death_game_id-01-order64-0"
-ECSTATIC_CHAIN_GAME_ID = "order93-ecstatic-chain-retention-1"
+ECSTATIC_CHAIN_GAME_ID = "order102-ecstatic-chain-07"
 EXPECTED_PACKAGE_HASH = "86cf74bc36db389c92c05dba0752832eed98272a0a0fa2d16923c1e2b5f16d84"
 
 
@@ -1063,6 +1064,9 @@ def test_ecstatic_death_chain_uses_ordinary_fight_alternation_without_nesting() 
         for event in session.lifecycle.decision_controller.event_log.records
     )
 
+    assert_completed_melee(session.lifecycle, unit_instance_id=attacker.unit_instance_id)
+    assert_completed_melee(session.lifecycle, unit_instance_id=retained.unit_instance_id)
+
     request = status.decision_request
     assert request is not None
     assert request.actor_id == "player-a"
@@ -1131,10 +1135,11 @@ def _ecstatic_death_chain_session() -> tuple[
         enemy_unit_ids=("retained",),
         origins={
             "attacker": Pose.at(x=10.0, y=20.0),
-            "retained": Pose.at(x=11.0, y=20.0),
-            "child": Pose.at(x=12.0, y=20.0),
+            "retained": Pose.at(x=13.0, y=20.0),
+            "child": Pose.at(x=16.0, y=20.0),
         },
-        # Preserve both casualty branches with Order 93 save evidence in retention hashes.
+        # Disjoint 60 mm bases remain engaged across each 3-inch centre gap.
+        # Real deterministic rolls exercise both casualty/retention branches.
         game_id=ECSTATIC_CHAIN_GAME_ID,
         datasheet_id=DAEMON_PRINCE_ID,
         model_profile_id=f"{DAEMON_PRINCE_ID}:daemon-prince-of-slaanesh",

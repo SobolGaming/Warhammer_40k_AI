@@ -248,6 +248,7 @@ def record_melee_declaration_for_executor_fixture(
     decisions: DecisionController,
     sequence: AttackSequence,
     result_id: str,
+    activation: FightActivationSelection | None = None,
 ) -> None:
     from warhammer40k_core.engine.fight_resolution import (
         MELEE_DECLARATION_PROPOSAL_KIND,
@@ -264,6 +265,10 @@ def record_melee_declaration_for_executor_fixture(
     )
     if sequence.source_phase is not BattlePhase.FIGHT or sequence.sequence_id != expected_id:
         raise AssertionError("Melee executor fixture requires its exact declaration sequence ID")
+    if activation is not None:
+        assert activation.player_id == sequence.attacker_player_id
+        assert activation.unit_instance_id == sequence.attacking_unit_instance_id
+        assert activation.battle_round == state.battle_round
     assert state.active_player_id is not None
     request = build_melee_declaration_request(
         request_id=f"melee-fixture-request:{result_id}",
@@ -272,8 +277,16 @@ def record_melee_declaration_for_executor_fixture(
         active_player_id=state.active_player_id,
         actor_id=sequence.attacker_player_id,
         unit_instance_id=sequence.attacking_unit_instance_id,
-        source_decision_request_id=f"melee-fixture-activation-request:{result_id}",
-        source_decision_result_id=f"melee-fixture-activation-result:{result_id}",
+        source_decision_request_id=(
+            activation.request_id
+            if activation is not None
+            else f"melee-fixture-activation-request:{result_id}"
+        ),
+        source_decision_result_id=(
+            activation.result_id
+            if activation is not None
+            else f"melee-fixture-activation-result:{result_id}"
+        ),
         ruleset_descriptor=state.runtime_ruleset_descriptor(),
         available_weapons=tuple(
             validate_json_value(pool.to_payload()) for pool in sequence.attack_pools

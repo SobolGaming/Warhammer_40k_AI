@@ -11,7 +11,10 @@ from pathlib import Path
 
 import pytest
 
-from warhammer40k_core.build_identity import verified_engine_build_identity
+from tests.performance_evidence_helpers import (
+    assert_historical_report,
+    historical_input_bytes,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_gone_to_ground_2026_09 as source,
 )
@@ -93,7 +96,7 @@ def test_order78_matched_query_evidence(baseline: str) -> None:
     base = json.loads((folder / baseline).read_bytes())
     head = json.loads((folder / "head.json").read_bytes())
     budget = json.loads((folder / "budgets.json").read_bytes())
-    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    assert_historical_report(head)
     for key in (
         "workload",
         "platform",
@@ -110,7 +113,7 @@ def test_order78_matched_query_evidence(baseline: str) -> None:
     assert base["rows"][-1]["legal"]
     assert base["rows"][-1]["shared_los"]
     for path, digest in head["hashes"].items():
-        assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest
+        assert hashlib.sha256(historical_input_bytes(path)).hexdigest() == digest
     assert [row["case"] for row in head["rows"]] == [
         "dense-outside",
         "dense-inside",

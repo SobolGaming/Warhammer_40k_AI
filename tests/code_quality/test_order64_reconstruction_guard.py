@@ -13,7 +13,10 @@ from typing import Literal, cast
 import pytest
 from scripts.measure_ingress_reconstruction import CHECKPOINTS
 
-from warhammer40k_core.build_identity import verified_engine_build_identity
+from tests.performance_evidence_helpers import (
+    assert_historical_report,
+    historical_input_bytes,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 EVIDENCE = ROOT / "docs/performance/order64"
@@ -72,10 +75,7 @@ def test_matched_reconstruction_timing_evidence() -> None:
     base = json.loads((EVIDENCE / "base-reconstruction.json").read_text(encoding="utf-8"))
     head = json.loads((EVIDENCE / "head-reconstruction.json").read_text(encoding="utf-8"))
     budgets = json.loads((EVIDENCE / "budgets.json").read_text(encoding="utf-8"))
-    assert head["runtime_build_id"] == verified_engine_build_identity().build_id, (
-        "Order 64 head timing evidence is stale for the current engine build. "
-        "Refresh qualified measurements as required by docs/performance/order64/README.md."
-    )
+    assert_historical_report(head)
     for field in (
         "workload_id",
         "platform",
@@ -93,7 +93,7 @@ def test_matched_reconstruction_timing_evidence() -> None:
     assert base["workload_id"] == budgets["workload_id"]
     assert head["input_hash_algorithm"] == "sha256-normalized-text-lf"
     for name, digest in head["hashes"].items():
-        content = (ROOT / name).read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+        content = historical_input_bytes(name).replace(b"\r\n", b"\n").replace(b"\r", b"\n")
         assert hashlib.sha256(content).hexdigest() == digest, name
     expected = {
         (checkpoint, operation) for checkpoint in CHECKPOINTS for operation in ("restore", "fork")

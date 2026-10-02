@@ -2,6 +2,18 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 102 / P04F separates completing a Fight selection from actually making melee
+attacks. Empty selections remain consumed, do not open after-fought windows, and
+retain Fight On Death models until phase-end cleanup. Armed retained cleanup,
+restore and Engaging continuation share the same completion authority. See
+[source, scope and evidence](docs/ORDER_102_SCOPE_PLAN.md).
+
+V963-SHOCK adopts the timestamped current 18.07 observation: ordinary coherent,
+unengaged setup, no Shock forced Fight response, and charge ineligibility through
+turn-end rules. See [source, scope and evidence](docs/V963_SHOCK_SCOPE_PLAN.md).
+The original Order 97 inventory remains historical; its superseded Shock
+assertions validate against five authenticated baseline copies.
+
 Order 101 / P03F restores ordinary Movement selection rights when complete
 disembark or reserve Ingress setup fails. Prior cargo/reserve location remains
 unchanged, and a fresh unit selection permits retry or legal Remain Stationary.
@@ -340,13 +352,14 @@ uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 ```
 
 Download the `behavior-report-*` artifacts from each chosen successful run into a
-separate directory, then regenerate (repeat both options for additional runs):
+separate directory outside the checkout, then regenerate (repeat both options for
+additional runs). Downloaded profiles are supplied inputs, not generated source:
 
 ```bash
 uv run --no-sync python scripts/build_test_shards.py \
-  --junit reports/run-one \
+  --junit ../behavior-reports/run-one \
   --profile-source "RUN_URL; commit SHA; ubuntu-latest; 4 workers per shard" \
-  --junit reports/run-two \
+  --junit ../behavior-reports/run-two \
   --profile-source "RUN_URL; commit SHA; ubuntu-latest; 4 workers per shard" \
   --shard-count 12
 ```
@@ -663,6 +676,15 @@ Build in this order:
 
 Current status:
 
+Performance validation uses the owner-approved
+[v3 tiered policy](docs/performance/PERFORMANCE_POLICY.md): immutable historical
+evidence, an exact-base change assessment and real current-runtime smoke on every
+PR, then matched detailed comparisons for relevant sensitive operations and
+complete-game profiling at rules-complete milestones. Before full quality tests,
+run `uv run --no-sync python -m scripts.check_performance_policy --base-ref <exact-PR-base-SHA>`
+serially. A changed global runtime identity alone does not refresh all history;
+missing applicable evidence still fails closed.
+
 - Core rules infrastructure through movement, shooting, charge, fight, setup,
   reserves, transports, missions, replay, source ingestion, catalog generation,
   rule IR, generic rule execution, and adapter decision submission is in place.
@@ -863,8 +885,8 @@ Current status:
   and verify it offline with
   `uv run python tools/build_core_emergency_disembark_placement_source.py` and
   the same command plus `--check`.
-- P18C/P18D/P18E's reviewed 18.05 Emergency Disembark and App-data v931 18.06
-  Assault Disembark and 18.07 Shock Disembark wording are pinned in
+- P18C/P18D/P18E's reviewed 18.05 Emergency, v931 18.06 Assault and the
+  October 1 timestamped current 18.07 Shock Disembark wording are pinned in
   `core_transports_2026_09/artifacts/package.json`; refresh and verify it
   offline with `uv run python tools/build_core_transports_source.py` and the
   same command plus `--check`.
@@ -1056,10 +1078,10 @@ See [scope and proof](docs/ORDER_61_SCOPE_PLAN.md),
 [contract 27 migration](contracts/migrations/26-to-27.md), and verify the reviewed
 source with `uv run python tools/build_core_embark_setup_turn_source.py --check`.
 
-Order 62 derives Shock Disembark forced Fights from enemies engaged with the
-passengers after setup, including newly engaged enemies. Starting Transport
-engagements confer no passenger obligation. See [scope and owner resolution](docs/ORDER_62_SCOPE_PLAN.md)
-and [contract 28 migration](contracts/migrations/27-to-28.md).
+Historical Order 62 permitted engaged Shock setup and forced enemy Fights.
+V963-SHOCK supersedes those consequences with ordinary unengaged setup and the
+current charge restriction. The [Order 62 source record](docs/ORDER_62_SCOPE_PLAN.md)
+and [contract 28 migration](contracts/migrations/27-to-28.md) remain historical.
 
 
 Order 63 allows loaded reserve Transports to ingress while their cargo remains

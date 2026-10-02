@@ -31,6 +31,16 @@ RETIRED_REFERENCE_SUCCESSORS = {
         "src/warhammer40k_core/engine/attack_sequence_dice_rerolls.py:"
         "build_source_backed_wound_reroll_request",
     ),
+    # V963-SHOCK supersedes 18.07's former forced-Fight producer. The original
+    # test remains in the exact-base V963 historical snapshot, while these live
+    # successors check current legal setup and reject passenger engagement.
+    "tests/unit/test_phase10q_transports.py::"
+    "test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_replay": (
+        "tests/unit/test_v963_shock_disembark.py::"
+        "test_v963_shock_unengaged_setup_has_no_queue_and_restores_exactly",
+        "tests/unit/test_v963_shock_disembark.py::"
+        "test_v963_shock_rejects_passenger_engagement_without_mutation",
+    ),
 }
 
 

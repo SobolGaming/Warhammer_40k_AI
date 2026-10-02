@@ -12,7 +12,10 @@ or implemented by this backlog entry.
    independent coding/Astra reviews and full validation; verify merged remote main.
    Completed in [PR #524](https://github.com/SobolGaming/Warhammer_40k_AI/pull/524);
    remote main verified at `38ce2265b81f2c0b2c9c668dae7536c239095193` on 1 October 2026.
-2. Implement `THROUGHPUT-AFTER-101` as a separate PR before Order 102.
+2. Complete `THROUGHPUT-AFTER-101` as a separate PR before Order 102. Merged in
+   PR #525 at `7f45d87d3094c76beb1be58e0cabb721dec21053`.
+   The owner then explicitly selected narrow `V963-SHOCK` before Order 102;
+   see [the source and scope record](V963_SHOCK_SCOPE_PLAN.md).
 3. Resume Order 102 onward. Reconcile version 963 full source observations and
    consumer mappings before each affected order; schedule any additional repair
    explicitly without silently renumbering the existing roadmap.
@@ -111,6 +114,13 @@ The source researcher owns acquisition and complete-text comparison; this
 implementation checkout owns backlog sequencing and later consumer reconciliation.
 Avoid concurrent edits to source packages or the selected observation inventory.
 No interpretation is adopted solely from the changelog excerpts.
+
+V963-SHOCK now selects the full October 1 timestamped current 18.07 observation,
+with v963 change metadata retained separately. The current body is not labeled
+v963 solely from that selector. Full 03.02, 12.08, 04.03.05 and weaponless FAQ
+comparisons preserve their existing authority. Historical Order 62 consequences
+and two Order 97 source expectations are explicitly superseded; original
+receipts remain immutable. Other intake rows remain open.
 
 ## Subsequent-order review policy and separate integrity queue
 

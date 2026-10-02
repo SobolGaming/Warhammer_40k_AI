@@ -171,9 +171,18 @@ Changes to hot paths, algorithms, data structures, caches, or gameplay
 orchestration require an appropriate performance assessment. Profiling,
 benchmarking, and optimization of the current rules-engine slice are authorized
 now; this does not authorize premature AI/training or unrelated optimization.
-Follow `docs/performance/PERFORMANCE_POLICY.md`: measure base and head on the
-same environment and workload, retain machine-readable evidence, and enforce
-versioned budgets without silently raising thresholds or dropping hard cases.
+Follow `docs/performance/PERFORMANCE_POLICY.md` (`rules-engine-performance-v3`):
+every PR has an exact-base, diff-bound reviewed assessment and a required serial
+current-runtime smoke. Preserve historical measurements and their integrity
+checks; a changed global runtime ID does not require refreshing all history.
+Detailed matched comparisons apply to changed algorithms/search, caches,
+serialization/replay work, hot queries/data structures, measured workloads and
+relevant runtime dependencies. Ordinary rule branches and development-only
+dependency changes still require explicit assessment, the smoke, and all live
+semantic/work/cache checks. Unknown owners or missing evidence fail closed.
+For applicable detailed comparisons, measure the actual PR base and head on the
+same environment and workload; keep those records separate from the original
+historical baselines. Do not silently raise budgets or drop hard cases.
 Report incomplete component, gameplay-slice, and full-game evidence separately.
 An unresolved computation or timeout must never become a visibility/rules answer.
 

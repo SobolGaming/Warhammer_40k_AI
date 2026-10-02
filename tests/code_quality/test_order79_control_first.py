@@ -7,7 +7,10 @@ import hashlib
 import json
 from pathlib import Path
 
-from warhammer40k_core.build_identity import verified_engine_build_identity
+from tests.performance_evidence_helpers import (
+    assert_historical_report,
+    historical_input_bytes,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import july_rules_updates_2026_07
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -61,7 +64,7 @@ def test_order79_matched_boundary_performance() -> None:
     base = json.loads((folder / "base.json").read_bytes())
     head = json.loads((folder / "head.json").read_bytes())
     budget = json.loads((folder / "budgets.json").read_bytes())
-    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    assert_historical_report(head)
     for key in (
         "workload",
         "platform",
@@ -76,7 +79,7 @@ def test_order79_matched_boundary_performance() -> None:
         assert base[key] == head[key], key
     assert head["workload"] == budget["workload"]
     for path, digest in head["hashes"].items():
-        assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest
+        assert hashlib.sha256(historical_input_bytes(path)).hexdigest() == digest
     assert [row["case"] for row in head["rows"]] == ["player-b", "player-a"]
     for before, after in zip(base["rows"], head["rows"], strict=True):
         assert before["complete"]

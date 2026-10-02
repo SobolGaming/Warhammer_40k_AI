@@ -140,7 +140,7 @@
       "evidence_id": "core-v2-transports-source-review:shock-disembark-move",
       "evidence_kind": "project_reviewed_app_transcription",
       "load_support_status": "loaded",
-      "observation_sha256": "3c866ae008d4085ac1c09d21b794221bb72eb18d62a9dd7415668733bfb722cc",
+      "observation_sha256": "66c10a476ebcb2e85bf0bf13989f1391448aae26ff534a9f95424f564005f80c",
       "observed_at": null,
       "official_corroborating_source_ids": [],
       "project_authority_policy_id": null,
@@ -152,59 +152,61 @@
       "rule_source_id": "gw-11e-core-rules:transports:shock-disembark-move",
       "runtime_consumer_ids": [
         "warhammer40k_core.engine.transport_disembark_geometry:append_disembark_endpoint_violations",
-        "warhammer40k_core.engine.phases.movement_placement_proposals:_start_shock_disembark_forced_fight_activations",
         "warhammer40k_core.engine.shock_disembark_history:validate_shock_disembark_engagement_history",
         "warhammer40k_core.engine.shock_disembark:shock_disembark_restriction_overrides",
         "warhammer40k_core.engine.phases.movement_transports:_disembark_candidates_for_movement_unit",
         "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",
-        "warhammer40k_core.engine.transports:resolve_disembark",
-        "warhammer40k_core.engine.phases.fight:FightPhaseHandler.advance_forced_fight_activations_if_needed"
+        "warhammer40k_core.engine.charge_eligibility:charge_unit_ineligibility_reason",
+        "warhammer40k_core.engine.game_state:GameState.expire_shock_disembark_after_turn_end",
+        "warhammer40k_core.engine.game_state:GameState.clear_turn_action_states",
+        "warhammer40k_core.engine.transports:resolve_disembark"
       ],
       "semantic_execution_status": "executable_engine_runtime",
       "source_platform": "Repository",
       "source_title": "Reviewed transcription of 18.07 Shock Disembark Move",
       "source_url": null,
-      "transcription_sha256": "d8dae354aabcc30c582b66e70939dd67c010055637f86923292c0c76ffe7252c",
+      "transcription_sha256": "3ac2c07c75fc4285319aa4b34bb1a724b28f50dc54a932345271d6a63d518019",
       "verification_status": "unverified"
     },
     {
       "app_build": null,
-      "app_version": "931",
+      "app_version": null,
       "authority": "project_authoritative_app_mirror",
       "capture_artifact_path": null,
       "capture_sha256": null,
-      "evidence_id": "game-datamissions-core-rules-data-931:shock-disembark-move",
+      "evidence_id": "game-datamissions-live-2026-10-01:shock-disembark-move",
       "evidence_kind": "third_party_mirror",
       "load_support_status": "loaded",
-      "observation_sha256": "cc8a85d4bcd88e7eb0ec3d9228721e5c1e4d1e4287b57d02a18ae3e8b3523efe",
-      "observed_at": null,
+      "observation_sha256": "0dc676c4c35f89c6c68e0376743883edc526869beeb642b6b0c8ce09b75ccd5b",
+      "observed_at": "2026-10-01T12:04:31.127429+00:00",
       "official_corroborating_source_ids": [],
       "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
       "provider_name": "Game Datamissions",
       "provider_non_affiliation_recorded": true,
-      "review_audit_id": "core-rules-maintained-app-mirrors-2026-09-02",
-      "review_audit_row_id": "game-datamissions-core-rules-data-931",
-      "review_audit_source_observation_sha256": "1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668",
+      "review_audit_id": "core-shock-disembark-maintained-app-mirror-2026-10-01",
+      "review_audit_row_id": "rule:18.07:current-observation",
+      "review_audit_source_observation_sha256": "3738e2ba5c83388b3924f2f159484c806bf59dedb679043fa0b2eac826699058",
       "rule_source_id": "gw-11e-core-rules:transports:shock-disembark-move",
       "runtime_consumer_ids": [
         "warhammer40k_core.engine.transport_disembark_geometry:append_disembark_endpoint_violations",
-        "warhammer40k_core.engine.phases.movement_placement_proposals:_start_shock_disembark_forced_fight_activations",
         "warhammer40k_core.engine.shock_disembark_history:validate_shock_disembark_engagement_history",
         "warhammer40k_core.engine.shock_disembark:shock_disembark_restriction_overrides",
         "warhammer40k_core.engine.phases.movement_transports:_disembark_candidates_for_movement_unit",
         "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",
-        "warhammer40k_core.engine.transports:resolve_disembark",
-        "warhammer40k_core.engine.phases.fight:FightPhaseHandler.advance_forced_fight_activations_if_needed"
+        "warhammer40k_core.engine.charge_eligibility:charge_unit_ineligibility_reason",
+        "warhammer40k_core.engine.game_state:GameState.expire_shock_disembark_after_turn_end",
+        "warhammer40k_core.engine.game_state:GameState.clear_turn_action_states",
+        "warhammer40k_core.engine.transports:resolve_disembark"
       ],
       "semantic_execution_status": "executable_engine_runtime",
       "source_platform": "Web",
       "source_title": "Game Datamissions Core Rules 18.07 Shock Disembark Move",
-      "source_url": "https://game-datamissions.com/11th/rules/changelog",
-      "transcription_sha256": "d8dae354aabcc30c582b66e70939dd67c010055637f86923292c0c76ffe7252c",
+      "source_url": "https://game-datamissions.com/11th/rules/core-rules",
+      "transcription_sha256": "3ac2c07c75fc4285319aa4b34bb1a724b28f50dc54a932345271d6a63d518019",
       "verification_status": "authoritative_app_mirror"
     }
   ],
-  "package_hash": "a44f8932a0a6e1e557a00e71876691858627c6c3008f519de0b00f5918375b71",
+  "package_hash": "ea6696318e007be4b5ef14436bde91b7eada7dc43712790ec8b2f458481476e0",
   "rules": [
     {
       "load_support_status": "loaded",
@@ -244,20 +246,21 @@
       "rule_id": "shock-disembark-move",
       "runtime_consumer_ids": [
         "warhammer40k_core.engine.transport_disembark_geometry:append_disembark_endpoint_violations",
-        "warhammer40k_core.engine.phases.movement_placement_proposals:_start_shock_disembark_forced_fight_activations",
         "warhammer40k_core.engine.shock_disembark_history:validate_shock_disembark_engagement_history",
         "warhammer40k_core.engine.shock_disembark:shock_disembark_restriction_overrides",
         "warhammer40k_core.engine.phases.movement_transports:_disembark_candidates_for_movement_unit",
         "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",
-        "warhammer40k_core.engine.transports:resolve_disembark",
-        "warhammer40k_core.engine.phases.fight:FightPhaseHandler.advance_forced_fight_activations_if_needed"
+        "warhammer40k_core.engine.charge_eligibility:charge_unit_ineligibility_reason",
+        "warhammer40k_core.engine.game_state:GameState.expire_shock_disembark_after_turn_end",
+        "warhammer40k_core.engine.game_state:GameState.clear_turn_action_states",
+        "warhammer40k_core.engine.transports:resolve_disembark"
       ],
       "section_heading": "SHOCK DISEMBARK MOVE",
       "section_id": "18.07",
       "semantic_execution_status": "executable_engine_runtime",
       "source_id": "gw-11e-core-rules:transports:shock-disembark-move",
-      "source_text": "SHOCK DISEMBARK MOVE\nYour unit is set up as described in Set Up (Core Rules, 03.02). As stated in the rule allowing this move type, if all of the following apply to your unit: Embarked within a TRANSPORT model that is on the battlefield. Did not embark within that TRANSPORT this phase. Set up each model in your unit wholly within the set-up distance of that TRANSPORT. Each model that started this move engaged with an enemy unit must still be engaged with that enemy unit. If one or more enemy units engaged with your unit have not been selected to fight this phase, your opponent must select each of those units, one at a time; when each is selected, it becomes eligible to fight and is selected to fight. 3\" 18.07",
-      "transcription_sha256": "d8dae354aabcc30c582b66e70939dd67c010055637f86923292c0c76ffe7252c"
+      "source_text": "SHOCK DISEMBARK MOVE\nEligible If\nAs stated in the rule allowing this move type, if all of the following apply to your unit:\n\u2022 Embarked within a TRANSPORT model that is on the battlefield.\n\u2022 Did not embark within that TRANSPORT this phase.\nSet-up Distance\n3\"\nWhile Moving\nSet up each model in your unit wholly within the set\u2011up distance of that TRANSPORT.\nEffect\nYour unit is set up as described in Set Up (Core Rules, 03.02).\nAfter Moving\nYour unit is not eligible to declare a charge until the end of the turn.",
+      "transcription_sha256": "3ac2c07c75fc4285319aa4b34bb1a724b28f50dc54a932345271d6a63d518019"
     }
   ],
   "source_documents": [
@@ -278,13 +281,23 @@
       "observed_at": "2026-09-02T12:30:09-04:00",
       "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
       "rule_source_ids": [
-        "gw-11e-core-rules:transports:assault-disembark-move",
-        "gw-11e-core-rules:transports:shock-disembark-move"
+        "gw-11e-core-rules:transports:assault-disembark-move"
       ],
       "source_title": "Game Datamissions Core Rules Data Changelog v931",
       "source_url": "https://game-datamissions.com/11th/rules/changelog"
+    },
+    {
+      "app_version": null,
+      "document_id": "game-datamissions-shock-live-observation-2026-10-01",
+      "observed_at": "2026-10-01T12:04:31.127429+00:00",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_ids": [
+        "gw-11e-core-rules:transports:shock-disembark-move"
+      ],
+      "source_title": "Game Datamissions current Core Rules Shock Disembark observation",
+      "source_url": "https://game-datamissions.com/11th/rules/core-rules"
     }
   ],
   "source_package_id": "gw-11e-core-transports",
-  "source_version": "reviewed-transports-observed-2026-09-03"
+  "source_version": "reviewed-transports-shock-observed-2026-10-01"
 }

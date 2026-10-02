@@ -1,4 +1,4 @@
-"""Authenticate Shock's passenger engagements independently of saved queue copies."""
+"""Authenticate current Shock setup as unengaged ordinary 03.02 placement."""
 
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.event_log import EventRecord
@@ -34,5 +34,7 @@ def validate_shock_disembark_engagement_history(
             event_index=index + 1,
             unit_instance_id=unit_id,
         )
+        if expected:
+            raise GameLifecycleError("Shock Disembark setup must be unengaged.")
         if payload.get("post_engaged_enemy_unit_instance_ids") != list(expected):
             raise GameLifecycleError("Shock Disembark post-placement engagement history drift.")

@@ -1625,6 +1625,7 @@ def _resolve_malevolent_attack(
             )
         )
     decisions = DecisionController()
+    attacker_activation = None
     if select_attacker:
         from tests.completed_attack_fixture_helpers import (
             record_fight_selection_for_executor_fixture,
@@ -1660,6 +1661,7 @@ def _resolve_malevolent_attack(
             decisions=decisions,
             sequence=sequence,
             result_id="malevolent-melee",
+            activation=attacker_activation,
         )
     manager = DiceRollManager(
         fixture.state.game_id,

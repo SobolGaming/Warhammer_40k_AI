@@ -1,0 +1,51 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "base": "86f810ae3a6052b4def631125dc89beec83b1ae8",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0291fd08bb730575da8e064d519fdc083a22f27b98ab5aa5e076055dc5a18a46",
+  "operation_map_sha256": "9bf682ac68f968e96151ae13250c2e213bc60152d69d4f8a4147ac8d87a6112c",
+  "changes": {
+    "conformance/typescript/package-lock.json": {
+      "before_sha256": "4c259de5160bc4380cdee446b5ea3ef06173bb567a4950ca4a932460df80ea18",
+      "after_sha256": "9d456e4ad7822f83ffdaf17c3b9b1e899af92b93263ece516224613796302692",
+      "owners": {
+        "@document": {
+          "before": "4c259de5160bc4380cdee446b5ea3ef06173bb567a4950ca4a932460df80ea18",
+          "after": "9d456e4ad7822f83ffdaf17c3b9b1e899af92b93263ece516224613796302692"
+        }
+      }
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "before_sha256": "80960c3d0a12ff966a74d10672c434c0db666df7607839eef083cbd6838acd97",
+      "after_sha256": "d0789f70ed65e904fb4f74b126cf0912ba3d208c988691efacd17430dda544e0",
+      "owners": {
+        "@document": {
+          "before": "80960c3d0a12ff966a74d10672c434c0db666df7607839eef083cbd6838acd97",
+          "after": "d0789f70ed65e904fb4f74b126cf0912ba3d208c988691efacd17430dda544e0"
+        }
+      }
+    }
+  },
+  "rows": {
+    "conformance/typescript/package-lock.json": {
+      "category": "dependency_environment",
+      "operations": [
+        "development-dependency"
+      ],
+      "selected_families": [],
+      "rationale": "Update fast-uri from 3.1.7 to 3.1.8 in the private TypeScript conformance package, preserving the original Dependabot version, resolved URL and integrity changes. This transitive Ajv dependency supports the conformance validation tool and is not a Python rules-engine runtime dependency.",
+      "source_obligation": null,
+      "unchanged_work": "No Python runtime, gameplay algorithm, search, cache, persistence or replay implementation changes. The private conformance tool's dependency changes remain covered by required hosted conformance and policy checks; no engine detailed comparison is selected for this development-tool update."
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add only the exact private TypeScript conformance package-lock path to the existing nonsensitive development-dependency operation. Preserve all operation flags, owner selectors, detailed-family mappings, budgets and enforcement behavior.",
+      "source_obligation": null,
+      "unchanged_work": null
+    }
+  },
+  "milestone": "ordinary",
+  "comparisons": {},
+  "full_game": null
+}

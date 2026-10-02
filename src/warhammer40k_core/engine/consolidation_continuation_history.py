@@ -101,7 +101,7 @@ def consolidation_continuation_before_event(
                     "Consolidation response selection differs from its decision."
                 )
             response.append(canonical)
-        elif event.event_type == "unit_has_fought" and response is not None:
+        elif event.event_type == "fight_selection_completed" and response is not None:
             selected = FightActivationSelection.from_payload(
                 cast(FightActivationSelectionPayload, _object(payload.get("activation_selection")))
             )

@@ -16,6 +16,7 @@ from typing import Any, cast
 
 from tools.core_rules_40k_app_audit import roadmap_rows
 from tools.core_rules_order84_capture import fingerprint, source_inventory
+from tools.core_rules_order97_history import historical_evidence_path
 from tools.core_rules_order97_models import Inventory
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,6 +35,12 @@ def _path(reference: str, root: Path) -> Path:
         raise InventoryError(f"Evidence path escapes the repository: {reference}.")
     if not path.is_file():
         raise InventoryError(f"Evidence file is absent: {reference}.")
+    try:
+        historical = historical_evidence_path(reference, root=root)
+    except (OSError, ValueError) as exc:
+        raise InventoryError(f"Historical evidence is invalid: {reference}.") from exc
+    if historical is not None:
+        return historical
     return path
 
 

@@ -9,7 +9,10 @@ import subprocess
 import sys
 from pathlib import Path
 
-from warhammer40k_core.build_identity import verified_engine_build_identity
+from tests.performance_evidence_helpers import (
+    assert_historical_report,
+    historical_input_bytes,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import core_revival_2026_09
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -80,8 +83,8 @@ def test_revival_uses_one_shared_physical_predicate_and_no_producer_model_allowl
 def test_revival_matched_slice_performance() -> None:
     folder = ROOT / "docs/performance/order83"
     base, head = (json.loads((folder / name).read_bytes()) for name in ("base.json", "head.json"))
-    budget = json.loads((ROOT / "docs/performance/order82/budgets.json").read_bytes())
-    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    budget = json.loads(historical_input_bytes("docs/performance/order82/budgets.json"))
+    assert_historical_report(head)
     for key in (
         "workload",
         "cpu",
@@ -95,7 +98,7 @@ def test_revival_matched_slice_performance() -> None:
     ):
         assert base[key] == head[key], key
     for name, digest in head["hashes"].items():
-        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
+        assert hashlib.sha256(historical_input_bytes(name)).hexdigest() == digest
     assert head["workload"] == budget["workload"]
     assert [row["case"] for row in head["rows"]] == [
         "unengaged-control",

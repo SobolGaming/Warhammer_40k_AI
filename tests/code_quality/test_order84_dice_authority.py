@@ -7,6 +7,10 @@ from pathlib import Path
 
 from tools.build_core_dice_results_source import ARTIFACT_PATH, AUDIT_PATH, build_payloads
 
+from tests.performance_evidence_helpers import (
+    assert_historical_report,
+    historical_input_bytes,
+)
 from warhammer40k_core.engine.dice_extremum import SELECT_DICE_EXTREMUM_DECISION_TYPE
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_dice_results_2026_09 import (
@@ -48,16 +52,14 @@ def test_dice_consumers_share_interpreted_face_validation_and_roll_history() -> 
     assert "roll_state.current_total == 6" not in overrides
 
 
-def test_dice_result_component_performance_uses_matched_inputs_and_current_runtime() -> None:
+def test_dice_result_component_performance_uses_matched_inputs_and_historical_runtime() -> None:
     import json
     import statistics
-
-    from warhammer40k_core.build_identity import verified_engine_build_identity
 
     folder = ROOT / "docs/performance/order84"
     base, head = (json.loads((folder / name).read_bytes()) for name in ("base.json", "head.json"))
     budget = json.loads((folder / "budget.json").read_bytes())
-    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    assert_historical_report(head)
     for key in (
         "workload",
         "cpu",
@@ -73,7 +75,7 @@ def test_dice_result_component_performance_uses_matched_inputs_and_current_runti
     assert head["workload"] == budget["workload"]
     assert head["concurrency"] == 1
     for name, digest in head["hashes"].items():
-        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
+        assert hashlib.sha256(historical_input_bytes(name)).hexdigest() == digest
     assert [row["case"] for row in head["rows"]] == ["1d6-physical", "2d6-physical", "1d6-assigned"]
     for before, after in zip(base["rows"], head["rows"], strict=True):
         assert before["case"] == after["case"]
