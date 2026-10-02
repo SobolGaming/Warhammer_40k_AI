@@ -22,10 +22,6 @@ from warhammer40k_core.engine.fight_historical_eligibility import (
     forced_fight_registry_before_event,
     forced_fight_suspended_state_before_event,
 )
-from warhammer40k_core.engine.fight_model_authority_history import (
-    build_model_authority_timeline,
-    historical_rules_unit_model_ids,
-)
 from warhammer40k_core.engine.fight_order import (
     FIGHT_ACTIVATION_DECISION_TYPE,
     FightActivationSelection,
@@ -50,7 +46,6 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, Game
 from warhammer40k_core.engine.rules_units import (
     current_rules_unit_views_for_canonical_identity,
     rules_unit_identity_history_contains,
-    rules_unit_view_by_id,
     rules_unit_views_from_armies,
 )
 from warhammer40k_core.engine.tactical_disembark_setup_boundary import (
@@ -74,7 +69,11 @@ def validate_fight_phase_state_consistency(
     from warhammer40k_core.engine.consolidation_fight_history import (
         validate_consolidation_fight_history,
     )
+    from warhammer40k_core.engine.fight_selection_completion import (
+        validate_fight_selection_completion_history,
+    )
 
+    validate_fight_selection_completion_history(events=event_records, records=decision_records)
     validate_consolidation_fight_history(
         state=state,
         event_records=event_records,
@@ -382,21 +381,6 @@ def validate_disembarked_unit_state_consistency(
         event_records=event_records,
         decision_records=decision_records,
     )
-    for event in event_records:
-        if (
-            event.event_type == "unit_disembarked"
-            and isinstance(event.payload, dict)
-            and event.payload.get("disembark_mode") == DisembarkModeKind.SHOCK_DISEMBARK.value
-        ):
-            historical_state = disembarked_unit_state_from_event_payload(event.payload)
-            if historical_state not in state.disembarked_unit_states:
-                _validate_shock_disembark_fight_history(
-                    state=state,
-                    disembarked_state=historical_state,
-                    disembark_event=event,
-                    event_records=event_records,
-                    decision_records=decision_records,
-                )
     if not state.disembarked_unit_states:
         return
     if state.stage is not GameLifecycleStage.BATTLE:
@@ -575,273 +559,8 @@ def _validate_disembarked_unit_state_history(
     if disembarked_state.disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK:
         if shock_permission_sources != (disembarked_state.permission_source_rule_id,):
             raise GameLifecycleError("Shock Disembark permission source history drift.")
-        _validate_shock_disembark_fight_history(
-            state=state,
-            disembarked_state=disembarked_state,
-            disembark_event=disembark_event_record,
-            event_records=event_records,
-            decision_records=decision_records,
-        )
     elif shock_permission_sources:
         raise GameLifecycleError("Non-Shock disembark carries Shock permission history.")
-
-
-def _validate_shock_disembark_fight_history(
-    *,
-    state: GameState,
-    disembarked_state: DisembarkedUnitState,
-    disembark_event: EventRecord,
-    event_records: tuple[EventRecord, ...],
-    decision_records: tuple[DecisionRecord, ...],
-) -> None:
-    disembark_event_index = event_records.index(disembark_event)
-    authenticated_selections = authenticated_forced_fight_selections(
-        state=state,
-        event_records=event_records,
-        decision_records=decision_records,
-        battle_round=disembarked_state.battle_round,
-        active_player_id=disembarked_state.turn_player_id,
-    )
-    prior_selected_unit_ids = tuple(
-        selection.unit_instance_id
-        for selection, selection_event_index, context in authenticated_selections
-        if selection_event_index < disembark_event_index
-        and selection.battle_round == disembarked_state.battle_round
-        and context.source_phase.value == BattlePhase.MOVEMENT.value
-    )
-    if not isinstance(disembark_event.payload, dict):
-        raise GameLifecycleError("Shock Disembark event payload is invalid.")
-    post_ids = disembark_event.payload.get("post_engaged_enemy_unit_instance_ids")
-    if not isinstance(post_ids, list) or any(type(value) is not str for value in post_ids):
-        raise GameLifecycleError("Shock Disembark post-placement engagements are invalid.")
-    post_engaged_ids = tuple(cast(list[str], post_ids))
-    expected_eligible_ids = tuple(
-        unit_id
-        for unit_id in post_engaged_ids
-        if not rules_unit_identity_history_contains(
-            state=state,
-            identity_ids=prior_selected_unit_ids,
-            unit_instance_id=unit_id,
-        )
-    )
-    started_events = tuple(
-        event
-        for event in event_records
-        if event.event_type == "forced_fight_activation_queue_started"
-        and isinstance(event.payload, dict)
-        and isinstance(event.payload.get("forced_activation_context"), dict)
-        and cast(
-            dict[str, JsonValue],
-            event.payload["forced_activation_context"],
-        ).get("trigger_event_id")
-        == disembark_event.event_id
-    )
-    skipped_events = tuple(
-        event
-        for event in event_records
-        if event.event_type == "forced_fight_activation_queue_skipped"
-        and isinstance(event.payload, dict)
-        and event.payload.get("trigger_event_id") == disembark_event.event_id
-    )
-    if len(started_events) + len(skipped_events) != 1:
-        raise GameLifecycleError("Shock Disembark requires one forced-Fight queue disposition.")
-    if skipped_events:
-        skipped_event = skipped_events[0]
-        if event_records.index(skipped_event) <= disembark_event_index:
-            raise GameLifecycleError("Shock Disembark skipped queue event ordering drift.")
-        if expected_eligible_ids:
-            raise GameLifecycleError(
-                "Shock Disembark cannot skip outstanding forced-Fight activations."
-            )
-        expected_skipped_payload = validate_json_value(
-            {
-                "game_id": state.game_id,
-                "battle_round": disembarked_state.battle_round,
-                "phase": BattlePhase.MOVEMENT.value,
-                "active_player_id": disembarked_state.turn_player_id,
-                "phase_body_status": "forced_fight_activation_queue_skipped",
-                "source_rule_id": disembarked_state.source_rule_id,
-                "trigger_event_id": disembark_event.event_id,
-                "source_unit_instance_id": disembarked_state.unit_instance_id,
-                "transport_unit_instance_id": disembarked_state.transport_unit_instance_id,
-                "start_engaged_enemy_unit_instance_ids": [],
-                "post_engaged_enemy_unit_instance_ids": list(post_engaged_ids),
-                "already_selected_unit_instance_ids": sorted(set(prior_selected_unit_ids)),
-            }
-        )
-        if skipped_event.payload != expected_skipped_payload:
-            raise GameLifecycleError("Shock Disembark skipped queue payload drift.")
-        return
-    if not expected_eligible_ids:
-        raise GameLifecycleError("Shock Disembark started an empty forced-Fight queue.")
-    started_event = started_events[0]
-    started_event_index = event_records.index(started_event)
-    if started_event_index <= disembark_event_index:
-        raise GameLifecycleError("Shock Disembark queue-start event ordering drift.")
-    started_payload = started_event.payload
-    if not isinstance(started_payload, dict):
-        raise GameLifecycleError("Shock Disembark queue-start payload is malformed.")
-    context_payload = started_payload.get("forced_activation_context")
-    if not isinstance(context_payload, dict):
-        raise GameLifecycleError("Shock Disembark queue-start context is malformed.")
-    try:
-        context = ForcedFightActivationContext.from_payload(
-            cast(ForcedFightActivationContextPayload, context_payload)
-        )
-    except (KeyError, TypeError) as exc:
-        raise GameLifecycleError("Shock Disembark queue-start context is malformed.") from exc
-    expected_owners = {
-        rules_unit_view_by_id(state=state, unit_instance_id=unit_id).owner_player_id
-        for unit_id in expected_eligible_ids
-    }
-    if len(expected_owners) != 1:
-        raise GameLifecycleError("Shock Disembark forced-Fight owner history drift.")
-    expected_context = ForcedFightActivationContext(
-        context_id=f"forced-fight:{disembark_event.event_id}",
-        source_rule_id=disembarked_state.source_rule_id,
-        trigger_event_id=disembark_event.event_id,
-        source_phase=BattlePhase.MOVEMENT,
-        source_unit_instance_id=disembarked_state.unit_instance_id,
-        transport_unit_instance_id=disembarked_state.transport_unit_instance_id,
-        selecting_player_id=next(iter(expected_owners)),
-        eligible_unit_instance_ids=expected_eligible_ids,
-    )
-    if context != expected_context:
-        raise GameLifecycleError("Shock Disembark queue-start eligibility context drift.")
-    registry = forced_fight_registry_before_event(
-        event_records=event_records,
-        event_index=started_event_index + 1,
-        context=context,
-        battle_round=disembarked_state.battle_round,
-    )
-    expected_started_payload = validate_json_value(
-        {
-            "game_id": state.game_id,
-            "battle_round": disembarked_state.battle_round,
-            "phase": BattlePhase.MOVEMENT.value,
-            "active_player_id": disembarked_state.turn_player_id,
-            "phase_body_status": "forced_fight_activation_queue_started",
-            "forced_activation_context": expected_context.to_payload(),
-            "fights_first_registry": registry.to_payload(),
-        }
-    )
-    if started_payload != expected_started_payload:
-        raise GameLifecycleError("Shock Disembark queue-start payload drift.")
-    if (
-        context_payload.get("source_rule_id") != disembarked_state.source_rule_id
-        or context_payload.get("source_phase") != BattlePhase.MOVEMENT.value
-        or context_payload.get("source_unit_instance_id") != disembarked_state.unit_instance_id
-        or context_payload.get("transport_unit_instance_id")
-        != disembarked_state.transport_unit_instance_id
-    ):
-        raise GameLifecycleError("Shock Disembark queue-start context drift.")
-    completion_events = tuple(
-        event
-        for event in event_records
-        if event.event_type == "forced_fight_activation_queue_completed"
-        and isinstance(event.payload, dict)
-        and event.payload.get("forced_activation_context") == context_payload
-    )
-    active_context = (
-        None
-        if state.fight_phase_state is None
-        else state.fight_phase_state.forced_activation_context
-    )
-    context_selections = tuple(
-        (selection, event_index)
-        for selection, event_index, selection_context in authenticated_selections
-        if selection_context == context
-    )
-    if active_context is not None and active_context.to_payload() == context_payload:
-        if completion_events:
-            raise GameLifecycleError("Active Shock Disembark queue cannot already be completed.")
-        if any(
-            event_index <= started_event_index for _selection, event_index in context_selections
-        ):
-            raise GameLifecycleError("Shock Disembark activation selection ordering drift.")
-        _validate_unique_forced_fight_selection_lineages(
-            state=state,
-            context=context,
-            selections=tuple(selection for selection, _event_index in context_selections),
-        )
-        fight_state = state.fight_phase_state
-        if fight_state is None:
-            raise GameLifecycleError("Active Shock Disembark queue lost its Fight state.")
-        if fight_state.fight_order_state.fights_first_registry != registry:
-            raise GameLifecycleError("Active Shock Disembark registry differs from its start.")
-        if fight_state.fight_order_state.activation_selections != tuple(
-            selection for selection, _event_index in context_selections
-        ):
-            raise GameLifecycleError("Active Shock Disembark activation history drift.")
-        return
-    if len(completion_events) != 1:
-        raise GameLifecycleError("Resolved Shock Disembark queue requires one completion event.")
-    completion_event = completion_events[0]
-    completion_event_index = event_records.index(completion_event)
-    if completion_event_index <= started_event_index:
-        raise GameLifecycleError("Shock Disembark queue completion ordering drift.")
-    if any(
-        event_index <= started_event_index or event_index >= completion_event_index
-        for _selection, event_index in context_selections
-    ):
-        raise GameLifecycleError("Shock Disembark activation follows queue completion.")
-    _validate_unique_forced_fight_selection_lineages(
-        state=state,
-        context=context,
-        selections=tuple(selection for selection, _event_index in context_selections),
-    )
-    expected_completion_payload = validate_json_value(
-        {
-            "game_id": state.game_id,
-            "battle_round": disembarked_state.battle_round,
-            "phase": BattlePhase.MOVEMENT.value,
-            "active_player_id": disembarked_state.turn_player_id,
-            "phase_body_status": "forced_fight_activation_queue_completed",
-            "forced_activation_context": context.to_payload(),
-            "activation_selections": [
-                selection.to_payload() for selection, _event_index in context_selections
-            ],
-        }
-    )
-    if completion_event.payload != expected_completion_payload:
-        raise GameLifecycleError("Shock Disembark queue completion payload drift.")
-    selected_unit_ids = tuple(
-        selection.unit_instance_id for selection, _event_index in context_selections
-    )
-    outstanding_ids = tuple(
-        unit_id
-        for unit_id in context.eligible_unit_instance_ids
-        if not rules_unit_identity_history_contains(
-            state=state,
-            identity_ids=selected_unit_ids,
-            unit_instance_id=unit_id,
-        )
-    )
-    if outstanding_ids:
-        authority_timeline = build_model_authority_timeline(
-            state=state,
-            event_records=event_records,
-            decision_records=decision_records,
-        )
-        outstanding_ids = tuple(
-            unit_id
-            for unit_id in outstanding_ids
-            if any(
-                authority_timeline.has_placed_living_model_before_event(
-                    model_instance_id=model_id,
-                    event_index=completion_event_index,
-                )
-                for model_id in historical_rules_unit_model_ids(
-                    state=state,
-                    event_records=event_records,
-                    unit_instance_id=unit_id,
-                )
-            )
-        )
-    if outstanding_ids:
-        raise GameLifecycleError(
-            "Shock Disembark queue completion omitted mandatory forced-Fight activations."
-        )
 
 
 def authenticated_forced_fight_selections(
@@ -1099,27 +818,3 @@ def _forced_fight_eligibility_contexts_from_request(
     ):
         raise GameLifecycleError("Forced Fight activation eligibility history drift.")
     return authoritative_contexts
-
-
-def _validate_unique_forced_fight_selection_lineages(
-    *,
-    state: GameState,
-    context: ForcedFightActivationContext,
-    selections: tuple[FightActivationSelection, ...],
-) -> None:
-    for index, selection in enumerate(selections):
-        if any(
-            rules_unit_identity_history_contains(
-                state=state,
-                identity_ids=(prior.unit_instance_id,),
-                unit_instance_id=selection.unit_instance_id,
-            )
-            for prior in selections[:index]
-        ):
-            raise GameLifecycleError("Forced Fight activation repeats a rules-unit lineage.")
-        if not rules_unit_identity_history_contains(
-            state=state,
-            identity_ids=context.eligible_unit_instance_ids,
-            unit_instance_id=selection.unit_instance_id,
-        ):
-            raise GameLifecycleError("Forced Fight activation selected an ineligible unit.")

@@ -15,6 +15,7 @@ from warhammer40k_core.engine.active_player_scopes import (
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.fight_activation_completion import completed_activation_event
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
 
@@ -87,10 +88,24 @@ def validate_active_player_history(*, state: GameState, decisions: DecisionContr
         expected_attack_scopes.append(charge)
     fight = state.fight_phase_state
     fight_scope = fight_scope_for_state(fight)
+    completion = (
+        None
+        if fight is None or fight.active_activation is None
+        else completed_activation_event(decisions=decisions, activation=fight.active_activation)
+    )
+    # The authenticated completed executor has already closed its attack scope.
+    # Retained cleanup keeps the selection active without reopening that scope;
+    # a no-declaration selection still owns its scope until final completion.
+    executor_closed = (
+        completion is not None
+        and isinstance(completion.payload, dict)
+        and completion.payload.get("attack_sequence_id") is not None
+    )
     if (
         fight_scope is not None
         and fight is not None
         and fight.pending_completed_attack_sequence is None
+        and not executor_closed
     ):
         expected_attack_scopes.append(fight_scope)
     shooting = state.out_of_phase_shooting_state

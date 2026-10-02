@@ -4,6 +4,10 @@ import ast
 import json
 from pathlib import Path
 
+from tests.performance_evidence_helpers import (
+    assert_historical_report,
+    historical_input_bytes,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_charge_2026_09 import (
     CHARGE_ENDPOINT_SOURCE_ID,
     source_evidence_records,
@@ -99,8 +103,6 @@ def test_order74_terrain_exclusion_has_one_shared_proof_owner() -> None:
 def test_order74_matched_facade_performance_retains_the_base_rejection() -> None:
     import hashlib
 
-    from warhammer40k_core.build_identity import verified_engine_build_identity
-
     directory = ROOT / "docs/performance/order74"
     base = json.loads((directory / "base.json").read_text())
     head = json.loads((directory / "head.json").read_text())
@@ -116,7 +118,7 @@ def test_order74_matched_facade_performance_retains_the_base_rejection() -> None
         "budget",
     ):
         assert base[key] == head[key], key
-    assert head["revision"] == verified_engine_build_identity().build_id
+    assert_historical_report(head)
     assert len(base["samples"]) == len(head["samples"]) == 3
     assert all(not sample["valid"] for sample in base["samples"])
     assert all(sample["valid"] for sample in head["samples"])
@@ -124,7 +126,8 @@ def test_order74_matched_facade_performance_retains_the_base_rejection() -> None
     assert not head["full_game_certified"]
     for path, digest in head["hashes"].items():
         assert (
-            hashlib.sha256((ROOT / path).read_bytes().replace(b"\r\n", b"\n")).hexdigest() == digest
+            hashlib.sha256(historical_input_bytes(path).replace(b"\r\n", b"\n")).hexdigest()
+            == digest
         )
 
 

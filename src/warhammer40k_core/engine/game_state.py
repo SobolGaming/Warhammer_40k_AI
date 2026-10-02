@@ -325,6 +325,7 @@ from warhammer40k_core.engine.tracked_targets import (
 )
 from warhammer40k_core.engine.transports import (
     DisembarkedUnitState,
+    DisembarkModeKind,
     TransportCapacityProfile,
     TransportCargoState,
 )
@@ -2083,7 +2084,9 @@ class GameState:
             decisions=decisions,
             runtime_modifier_registry=runtime_modifier_registry,
         )
-        from warhammer40k_core.engine.turn_end_boundary import expire_completed_phase_effects
+        from warhammer40k_core.engine.turn_end_boundary import (
+            expire_completed_phase_effects,
+        )
 
         expire_completed_phase_effects(
             state=self, completed_phase=completed_phase, player_id=completed_player_id
@@ -2110,6 +2113,7 @@ class GameState:
             runtime_modifier_registry=runtime_modifier_registry,
         )
         self._score_objective_control_boundary(turn_end_record, event_log=event_log)
+        self.expire_shock_disembark_after_turn_end()
         if completed_phase is BattlePhase.COMMAND:
             self.command_step_state = None
         if completed_phase is BattlePhase.MOVEMENT:
@@ -5669,6 +5673,18 @@ class GameState:
                             "Battlefield placement cannot end on an objective marker."
                         )
 
+    def expire_shock_disembark_after_turn_end(self) -> None:
+        """Keep 18.07 active throughout turn-end rules, then expire before the next part."""
+        self.disembarked_unit_states = [
+            record
+            for record in self.disembarked_unit_states
+            if not (
+                record.disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK
+                and record.turn_player_id == self.active_player_id
+                and record.battle_round == self.battle_round
+            )
+        ]
+
     def clear_turn_action_states(self, *, player_id: str, battle_round: int) -> None:
         requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
         requested_round = _validate_positive_int("battle_round", battle_round)
@@ -5692,6 +5708,7 @@ class GameState:
             if not (
                 state.turn_player_id == requested_player_id
                 and state.battle_round == requested_round
+                and state.disembark_mode is not DisembarkModeKind.SHOCK_DISEMBARK
             )
         ]
         self.reserve_states = [

@@ -1,0 +1,91 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "shock_reconstruction",
+  "workload_id": "v963-shock-reconstruction-v1",
+  "base_revision": "ae5005f4eb13378190018718c287abd94fb9320d",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:de19a3758fe8f3cf8272f0fd0bc6cfa83179f39824b9104c25dd046090cdc851",
+  "head_input_digest": "bd08806023c7005d7fa4d8976b5c04d84ecaec0b7d0ad1d22030ae204173f405",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5d60c93b8a8141235a5a936ed1086a18faf112df6146fab4ea6cdd766d3ca51e",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 137327259648,
+      "logical_cpus": 64,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "workload_sha256": "f9a750bddeacecac6dca0a3d3e4c5c03a3ac6347596fa4d8ae827d0b5f5638d5",
+    "fixture_sha256": "e8e6cc09b25af50073ab9c6069f0d3bbcc58733b9a694681b28fac2eb4837b14",
+    "samples": {
+      "active_shock/restore": [
+        5.08340440003667,
+        5.0644091999856755,
+        4.9417236999142915
+      ],
+      "active_shock/replay": [
+        0.9539164999732748,
+        0.9500204001087695,
+        0.9501565999817103
+      ],
+      "expired_shock/restore": [
+        5.908014000044204,
+        5.683682000031695,
+        5.79786759999115
+      ],
+      "expired_shock/replay": [
+        1.4671779000200331,
+        1.4659824999980628,
+        1.4900417999597266
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:de19a3758fe8f3cf8272f0fd0bc6cfa83179f39824b9104c25dd046090cdc851",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 137327259648,
+      "logical_cpus": 64,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "workload_sha256": "f9a750bddeacecac6dca0a3d3e4c5c03a3ac6347596fa4d8ae827d0b5f5638d5",
+    "fixture_sha256": "e8e6cc09b25af50073ab9c6069f0d3bbcc58733b9a694681b28fac2eb4837b14",
+    "samples": {
+      "active_shock/restore": [
+        4.938966499990784,
+        4.988800099934451,
+        4.99310439999681
+      ],
+      "active_shock/replay": [
+        0.9464058000594378,
+        0.9468443999066949,
+        0.9473826000466943
+      ],
+      "expired_shock/restore": [
+        5.577648899983615,
+        5.670093200053088,
+        5.694235800066963
+      ],
+      "expired_shock/replay": [
+        1.4787531000329182,
+        1.4960519999731332,
+        1.4679987999843433
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": [
+    "Prior 62 Windows V963 refresh reports retained 14 failed inequalities in Order78/83/101, also reproduced on unchanged main7f45. Those failures remain historical failures; no passing status is inferred from these new bounded comparisons.",
+    "Preserved evidence: Library libfile_cb02a09ce87881918dbe447a67a3e779 SHA2564f194b6edee3e31de9caa277ae1c292be278e79b93d4c5d4e79e46ca8ebf7344; original 492df01c559aef3df8f4848428a1cfa4506f477d checkpoint and exact bytes retained externally. Policy-pinned historical report files remain unchanged."
+  ]
+}

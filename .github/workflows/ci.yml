@@ -158,6 +158,18 @@ jobs:
       - name: Sync test dependencies
         run: uv sync --locked --no-default-groups --group test
 
+      - name: Current performance assessment and serial smoke
+        timeout-minutes: 3
+        env:
+          PERFORMANCE_BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before }}
+          PERFORMANCE_PR_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          args=(--base-ref "$PERFORMANCE_BASE" --output reports/performance-smoke.json)
+          if [ -n "$PERFORMANCE_PR_HEAD" ]; then
+            args+=(--pr-head "$PERFORMANCE_PR_HEAD")
+          fi
+          uv run --no-sync python -m scripts.check_performance_policy "${args[@]}"
+
       - name: Code-quality tests
         env:
           TEST_TIMING_DIR: reports/quality-timing

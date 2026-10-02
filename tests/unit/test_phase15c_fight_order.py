@@ -5,6 +5,10 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.fight_completion_positive_helpers import (
+    armed_fight_control_catalog,
+    assert_completed_melee,
+)
 from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.phase13b_shooting_declaration_helpers import (
     _apply_shooting_declaration_without_advancing as _shooting_declaration_without_advancing,
@@ -91,6 +95,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.damage_allocation import (
     DamageKind,
+    FeelNoPainSource,
     apply_damage_to_model,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -425,7 +430,7 @@ def test_restore_rejects_destroyed_model_revived_without_restoration_or_fight_mo
     _record_fight_on_death_cleanup(
         lifecycle=lifecycle,
         unit=destroyed_unit,
-        reason="unit_fight_completed",
+        reason="phase_end",
     )
     assert all(
         record.request.decision_type != MOVEMENT_PROPOSAL_DECISION_TYPE
@@ -1473,7 +1478,7 @@ def test_phase15d_restore_rejects_pending_fight_movement_after_retained_target_i
     _record_fight_on_death_cleanup(
         lifecycle=lifecycle,
         unit=units["enemy"],
-        reason="unit_fight_completed",
+        reason="phase_end",
     )
     checkpoint = cast(
         GameLifecyclePayload,
@@ -1810,7 +1815,7 @@ def test_phase15d_restore_authenticates_target_living_at_fight_movement_terminal
     _record_fight_on_death_cleanup(
         lifecycle=lifecycle,
         unit=units["enemy"],
-        reason="unit_fight_completed",
+        reason="phase_end",
     )
     checkpoint = cast(
         GameLifecyclePayload,
@@ -2762,11 +2767,12 @@ def test_fight_interrupt_uses_reaction_queue_once_and_resumes_parent_sequence() 
     from tests.dice_result_semantics_helpers import assert_active_player_history, open_phase
 
     lifecycle, units = _fight_lifecycle(
+        catalog=armed_fight_control_catalog(),
         alpha_unit_ids=("intercessor-1",),
         enemy_unit_ids=("enemy",),
         origins={
             "intercessor-1": Pose.at(10.0, 20.0),
-            "enemy": Pose.at(13.0, 20.0),
+            "enemy": Pose.at(10.0, 22.0),
         },
         game_id="phase15c-interrupt",
         fight_interrupt_unit_keys=("enemy",),
@@ -2779,6 +2785,7 @@ def test_fight_interrupt_uses_reaction_queue_once_and_resumes_parent_sequence() 
         unit=units["intercessor-1"],
         result_id="phase15c-trigger-interrupt",
     )
+    assert_completed_melee(lifecycle, unit_instance_id=units["intercessor-1"].unit_instance_id)
     interrupt_request = _decision_request(interrupt_status)
     interrupt_option_id = fight_activation_option_id(
         unit_instance_id=units["enemy"].unit_instance_id,
@@ -2808,11 +2815,12 @@ def test_fight_interrupt_uses_reaction_queue_once_and_resumes_parent_sequence() 
 
 def test_counteroffensive_acceptance_continues_reaction_to_melee_subflow() -> None:
     lifecycle, units = _fight_lifecycle(
+        catalog=armed_fight_control_catalog(),
         alpha_unit_ids=("parent",),
         enemy_unit_ids=("counteroffensive-unit",),
         origins={
             "parent": Pose.at(10.0, 20.0),
-            "counteroffensive-unit": Pose.at(12.0, 20.0),
+            "counteroffensive-unit": Pose.at(10.0, 22.0),
         },
         game_id="phase15e-counteroffensive-reaction-continuation",
         enemy_unit_specs={
@@ -2838,6 +2846,7 @@ def test_counteroffensive_acceptance_continues_reaction_to_melee_subflow() -> No
         unit=units["parent"],
         result_id="phase15e-trigger-counteroffensive-reaction",
     )
+    assert_completed_melee(lifecycle, unit_instance_id=units["parent"].unit_instance_id)
     counteroffensive_request = _decision_request(counteroffensive_status)
     counteroffensive_proposal = _stratagem_target_proposal_from_request(
         counteroffensive_request
@@ -2885,11 +2894,12 @@ def test_counteroffensive_acceptance_continues_reaction_to_melee_subflow() -> No
 
 def test_counteroffensive_epic_challenge_decline_continues_reaction_to_melee() -> None:
     lifecycle, units = _fight_lifecycle(
+        catalog=armed_fight_control_catalog(),
         alpha_unit_ids=("parent",),
         enemy_unit_ids=("counteroffensive-character",),
         origins={
             "parent": Pose.at(10.0, 20.0),
-            "counteroffensive-character": Pose.at(12.0, 20.0),
+            "counteroffensive-character": Pose.at(10.0, 22.0),
         },
         game_id="phase15e-counteroffensive-epic-decline-continuation-order64-0",
         enemy_unit_specs={
@@ -2915,6 +2925,7 @@ def test_counteroffensive_epic_challenge_decline_continues_reaction_to_melee() -
         unit=units["parent"],
         result_id="phase15e-trigger-counteroffensive-before-epic-decline",
     )
+    assert_completed_melee(lifecycle, unit_instance_id=units["parent"].unit_instance_id)
     counteroffensive_request = _decision_request(counteroffensive_status)
     counteroffensive_proposal = _stratagem_target_proposal_from_request(
         counteroffensive_request
@@ -2981,13 +2992,14 @@ def test_phase15d_interrupt_melee_declaration_continues_reaction_to_attack_seque
     from tests.dice_result_semantics_helpers import assert_active_player_history, open_phase
 
     lifecycle, units = _fight_lifecycle(
+        catalog=armed_fight_control_catalog(),
         alpha_unit_ids=("parent", "interrupt-target"),
         enemy_unit_ids=("parent-target", "interrupter"),
         origins={
             "parent": Pose.at(50.0, 20.0),
-            "parent-target": Pose.at(52.0, 20.0),
+            "parent-target": Pose.at(50.0, 22.0),
             "interrupter": Pose.at(10.0, 20.0),
-            "interrupt-target": Pose.at(12.0, 20.0),
+            "interrupt-target": Pose.at(10.0, 22.0),
         },
         game_id="phase15d-interrupt-melee-continuation-order64-0",
         fight_interrupt_unit_keys=("interrupter",),
@@ -2999,6 +3011,14 @@ def test_phase15d_interrupt_melee_declaration_continues_reaction_to_attack_seque
             ),
         },
     )
+    for model in units["interrupt-target"].own_models:
+        _state(lifecycle).record_model_feel_no_pain_sources(
+            model_instance_id=model.model_instance_id,
+            decline_allowed=True,
+            sources=(
+                FeelNoPainSource(source_id="phase15d-interrupt-continuation-fnp", threshold=6),
+            ),
+        )
     open_phase(lifecycle)
     first_request = _advance_to_fight_order_request(lifecycle)
     interrupt_status = _submit_normal_fight(
@@ -3007,6 +3027,7 @@ def test_phase15d_interrupt_melee_declaration_continues_reaction_to_attack_seque
         unit=units["parent"],
         result_id="phase15d-trigger-interrupt-melee-continuation",
     )
+    assert_completed_melee(lifecycle, unit_instance_id=units["parent"].unit_instance_id)
     interrupt_request = _decision_request(interrupt_status)
     melee_status = _submit_option(
         lifecycle,
@@ -3045,7 +3066,14 @@ def test_phase15d_interrupt_melee_declaration_continues_reaction_to_attack_seque
     )
     next_attack_request = _decision_request(next_attack_status)
 
-    assert next_attack_request.decision_type in _ATTACK_SEQUENCE_DECISION_TYPES
+    assert next_attack_request.decision_type in _ATTACK_SEQUENCE_DECISION_TYPES, (
+        attack_request,
+        tuple(
+            event
+            for event in lifecycle.decision_controller.event_log.records
+            if event.event_type == "attack_sequence_step"
+        )[-4:],
+    )
     assert _active_reaction_frame_request_id(lifecycle) == next_attack_request.request_id
     assert len(_event_payloads(lifecycle, "reaction_parent_resumed")) == (
         parent_resume_count_before_attack
@@ -3217,14 +3245,15 @@ def test_phase15d_normal_subdecisions_do_not_mutate_reaction_frames() -> None:
 
 def test_fight_interrupt_source_is_not_offered_again_after_accepted_interrupt() -> None:
     lifecycle, units = _fight_lifecycle(
+        catalog=armed_fight_control_catalog(),
         alpha_unit_ids=("alpha-1", "alpha-2"),
         enemy_unit_ids=("enemy-1", "enemy-2", "enemy-3"),
         origins={
             "alpha-1": Pose.at(10.0, 20.0),
-            "enemy-1": Pose.at(13.0, 20.0),
+            "enemy-1": Pose.at(10.0, 22.0),
             "alpha-2": Pose.at(10.0, 40.0),
-            "enemy-2": Pose.at(13.0, 40.0),
-            "enemy-3": Pose.at(14.5, 40.0),
+            "enemy-2": Pose.at(10.0, 42.0),
+            "enemy-3": Pose.at(10.0, 38.0),
         },
         game_id="phase15c-interrupt-source-accepted",
         fight_interrupt_unit_keys=("enemy-1",),
@@ -3236,6 +3265,7 @@ def test_fight_interrupt_source_is_not_offered_again_after_accepted_interrupt() 
         unit=units["alpha-1"],
         result_id="phase15c-trigger-accepted-source-interrupt",
     )
+    assert_completed_melee(lifecycle, unit_instance_id=units["alpha-1"].unit_instance_id)
     interrupt_request = _decision_request(interrupt_status)
     interrupt_source_effect_id = _interrupt_source_effect_id(interrupt_request)
     after_interrupt_status = _submit_normal_fight(
@@ -3296,11 +3326,12 @@ def test_fight_interrupt_source_is_not_offered_again_after_accepted_interrupt() 
 
 def test_fight_interrupt_decline_records_once_and_resumes_parent_sequence() -> None:
     lifecycle, units = _fight_lifecycle(
+        catalog=armed_fight_control_catalog(),
         alpha_unit_ids=("intercessor-1",),
         enemy_unit_ids=("enemy",),
         origins={
             "intercessor-1": Pose.at(10.0, 20.0),
-            "enemy": Pose.at(13.0, 20.0),
+            "enemy": Pose.at(10.0, 22.0),
         },
         game_id="phase15c-interrupt-decline",
         fight_interrupt_unit_keys=("enemy",),
@@ -3312,6 +3343,7 @@ def test_fight_interrupt_decline_records_once_and_resumes_parent_sequence() -> N
         unit=units["intercessor-1"],
         result_id="phase15c-trigger-declined-interrupt",
     )
+    assert_completed_melee(lifecycle, unit_instance_id=units["intercessor-1"].unit_instance_id)
     interrupt_request = _decision_request(interrupt_status)
     resumed_status = _submit_option(
         lifecycle,
@@ -3334,13 +3366,14 @@ def test_fight_interrupt_decline_records_once_and_resumes_parent_sequence() -> N
 
 def test_fight_interrupt_source_is_not_offered_again_after_decline() -> None:
     lifecycle, units = _fight_lifecycle(
+        catalog=armed_fight_control_catalog(),
         alpha_unit_ids=("alpha-1", "alpha-2"),
         enemy_unit_ids=("enemy-1", "enemy-2"),
         origins={
             "alpha-1": Pose.at(10.0, 20.0),
-            "enemy-1": Pose.at(13.0, 20.0),
+            "enemy-1": Pose.at(10.0, 22.0),
             "alpha-2": Pose.at(10.0, 40.0),
-            "enemy-2": Pose.at(13.0, 40.0),
+            "enemy-2": Pose.at(10.0, 42.0),
         },
         game_id="phase15c-interrupt-source-declined",
         fight_interrupt_unit_keys=("enemy-1",),
@@ -3352,6 +3385,7 @@ def test_fight_interrupt_source_is_not_offered_again_after_decline() -> None:
         unit=units["alpha-1"],
         result_id="phase15c-trigger-declined-source-interrupt",
     )
+    assert_completed_melee(lifecycle, unit_instance_id=units["alpha-1"].unit_instance_id)
     interrupt_request = _decision_request(interrupt_status)
     interrupt_source_effect_id = _interrupt_source_effect_id(interrupt_request)
     after_decline_status = _submit_option(
@@ -3542,11 +3576,12 @@ def test_fight_on_death_models_and_survivors_share_one_normal_activation(
     living_model_count: int,
 ) -> None:
     lifecycle, units = _fight_lifecycle(
+        catalog=armed_fight_control_catalog(),
         alpha_unit_ids=("opponent",),
         enemy_unit_ids=("retained",),
         origins={
             "opponent": Pose.at(10.0, 20.0),
-            "retained": Pose.at(12.0, 20.0),
+            "retained": Pose.at(10.0, 22.0),
         },
         game_id=f"phase15c-fight-on-death-normal-activation-{living_model_count}",
     )
@@ -3632,7 +3667,8 @@ def test_fight_on_death_models_and_survivors_share_one_normal_activation(
         option_id=option_id,
         result_id="phase15c-fight-on-death-normal-activation",
     )
-    status = _drain_fight_movement_requests(lifecycle, status)
+    status = _resolve_phase15d_activation(lifecycle, status)
+    assert_completed_melee(lifecycle, unit_instance_id=retained.unit_instance_id)
     next_request = _decision_request(status)
     assert next_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
     assert next_request.actor_id == "player-a"
@@ -5548,7 +5584,7 @@ def test_p12_full_fight_phase_reconstructs_ordinary_continuation_and_forced_over
         "fight_step_completed",
         "fight_activation_selection_requested",
         "fight_activation_selected",
-        "unit_has_fought",
+        "fight_selection_completed",
     ):
         forged_history = cast(GameLifecyclePayload, json.loads(json.dumps(checkpoint)))
         event = next(
@@ -5794,7 +5830,7 @@ def test_order70_fight_order_rechecks_casualties_and_retained_cleanup(retained: 
         _record_fight_on_death_cleanup(
             lifecycle=lifecycle,
             unit=leader,
-            reason="unit_fight_completed",
+            reason="phase_end",
         )
     else:
         apply_damage_to_model(
@@ -6122,7 +6158,7 @@ def test_order70_conditional_leader_grant_uses_retained_presence(
     assert not conditional_not_leading_source_applies(
         state=state, source_unit_instance_id=leader.unit_instance_id
     )
-    _record_fight_on_death_cleanup(lifecycle=lifecycle, unit=unit, reason="unit_fight_completed")
+    _record_fight_on_death_cleanup(lifecycle=lifecycle, unit=unit, reason="phase_end")
     assert FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id) is (
         bodyguard_native and destroyed_component == "leader"
     )
@@ -6330,11 +6366,12 @@ def _overrun_interrupt_lifecycle(
     game_id: str,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     return _fight_lifecycle(
+        catalog=armed_fight_control_catalog(),
         alpha_unit_ids=("parent", "overrun-target"),
         enemy_unit_ids=("parent-target", "interrupter"),
         origins={
             "parent": Pose.at(50.0, 20.0),
-            "parent-target": Pose.at(52.0, 20.0),
+            "parent-target": Pose.at(50.0, 22.0),
             "interrupter": Pose.at(10.0, 20.0),
             "overrun-target": Pose.at(14.0, 20.0),
         },
@@ -6364,6 +6401,7 @@ def _trigger_overrun_interrupt_request(
         unit=units["parent"],
         result_id=result_id,
     )
+    assert_completed_melee(lifecycle, unit_instance_id=units["parent"].unit_instance_id)
     return _decision_request(interrupt_status)
 
 
@@ -6958,21 +6996,24 @@ def _record_fight_on_death_cleanup(
     reason: str,
 ) -> None:
     state = _state(lifecycle)
-    assert reason == "unit_fight_completed"
-    lifecycle.decision_controller.event_log.append(
-        "unit_has_fought",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "phase": "fight",
-            "activation_selection": {"unit_instance_id": unit.unit_instance_id},
-        },
+    # Synthetic presence-history fixture: use the existing authenticated phase-end
+    # boundary, without inventing actual melee attacks for the removed unit.
+    from warhammer40k_core.engine.boundary_rule_flow import prepare_phase_end_boundary
+
+    assert reason == "phase_end"
+    assert unit.own_models
+    assert (
+        prepare_phase_end_boundary(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+        is None
     )
     assert (
         begin_retained_destruction_cleanup(
             state=state,
             decisions=lifecycle.decision_controller,
-            unit_instance_id=unit.unit_instance_id,
             reason=reason,
         )
         is None
@@ -7206,11 +7247,17 @@ def _drain_fight_movement_requests(
     status: LifecycleStatus,
 ) -> LifecycleStatus:
     current = status
+    submission_count = 0
     while (
         current.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
         and current.decision_request is not None
         and current.decision_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
     ):
+        submission_count += 1
+        assert submission_count <= 8, (
+            current,
+            lifecycle.decision_controller.event_log.records[-3:],
+        )
         request = current.decision_request
         proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
         assert proposal_request.proposal_kind in {
@@ -7263,11 +7310,17 @@ def _resolve_phase15d_activation(
     drain_movement: bool = True,
 ) -> LifecycleStatus:
     current = status
+    submission_count = 0
     decision_index = 0
     while (
         current.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
         and current.decision_request is not None
     ):
+        submission_count += 1
+        assert submission_count <= 64, (
+            current,
+            lifecycle.decision_controller.event_log.records[-3:],
+        )
         request = current.decision_request
         if request.decision_type in {
             FIGHT_ACTIVATION_DECISION_TYPE,
@@ -7282,6 +7335,10 @@ def _resolve_phase15d_activation(
                 request=request,
                 result_id=f"{request.request_id}:phase15c-melee",
             )
+            assert current.status_kind is not LifecycleStatusKind.INVALID, current
+            assert current.decision_request is None or (
+                current.decision_request.decision_type != SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+            ), (current, lifecycle.decision_controller.event_log.records[-3:])
             continue
         if request.is_parameterized_submission_request():
             return current

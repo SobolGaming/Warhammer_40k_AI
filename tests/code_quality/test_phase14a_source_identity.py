@@ -254,11 +254,38 @@ def test_edition_audit_does_not_exempt_malformed_uuid() -> None:
     assert "10e" in _without_hex_identities(text)
 
 
+def test_edition_audit_recognizes_the_exact_quoted_phase_test_filename() -> None:
+    reference = "tests/unit/test_phase10e_model_geometry.py"
+    assert (ROOT / reference).is_file()
+    tokens = _retired_identity_tokens()
+    text = json.dumps(reference) + " " + " ".join(tokens)
+
+    sanitized = _without_non_edition_references(text)
+
+    assert json.dumps(reference) not in sanitized
+    assert all(token in sanitized for token in tokens)
+
+
+@pytest.mark.parametrize(
+    "reference",
+    [
+        '"prefix/tests/unit/test_phase10e_model_geometry.py"',
+        '"tests/unit/test_phase10e_model_geometry.py.extra"',
+        '"tests/unit/test_phase10e_other_geometry.py"',
+        '"src/unit/test_phase10e_model_geometry.py"',
+        "tests/unit/test_phase10e_model_geometry.py",
+    ],
+)
+def test_edition_audit_does_not_exempt_near_miss_phase_references(reference: str) -> None:
+    assert _without_non_edition_references(reference) == reference
+    assert "10e" in _without_non_edition_references(reference)
+
+
 def test_active_code_tests_and_docs_do_not_reference_retired_edition_ids() -> None:
     violations: list[str] = []
 
     for path in _scanned_paths():
-        text = _without_hex_identities(path.read_text(encoding="utf-8"))
+        text = _without_non_edition_references(path.read_text(encoding="utf-8"))
         relative_path = path.relative_to(ROOT).as_posix()
         for token in _retired_identity_tokens():
             if token in text:
@@ -423,6 +450,13 @@ def _retired_identity_tokens() -> tuple[str, ...]:
 
 def _without_hex_identities(text: str) -> str:
     return HEX_DIGEST_PATTERN.sub("", UUID_PATTERN.sub("", text))
+
+
+def _without_non_edition_references(text: str) -> str:
+    # This existing Phase10E test path is provenance, not an edition identifier.
+    # Only its complete quoted spelling is recognized; adjacent tokens stay visible.
+    phase_reference = '"tests/unit/test_phase10e_model_geometry.py"'
+    return _without_hex_identities(text).replace(phase_reference, '""')
 
 
 def _python_constant_strings(source: str) -> tuple[str, ...]:
