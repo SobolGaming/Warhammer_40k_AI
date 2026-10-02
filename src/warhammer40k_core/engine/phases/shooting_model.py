@@ -141,6 +141,7 @@ class ShootingDeclarationProposalRequestPayload(TypedDict):
     visibility_cache_key: str
     firing_deck_value: int | None
     firing_deck_embarked_unit_instance_ids: NotRequired[list[str]]
+    firing_deck_already_shot_unit_instance_ids: NotRequired[list[str] | None]
     available_weapons: list[AvailableWeaponPayload]
     shooting_weapon_selection_limits: list[ShootingWeaponSelectionLimitPayload]
     target_candidates: list[JsonValue]

@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:189895f28d6817d8ff5e77feefe40c0c351fd8a05b064bd78de81182cf164674",
-  "fingerprint": "189895f28d6817d8ff5e77feefe40c0c351fd8a05b064bd78de81182cf164674",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7e6f1a71a4ae347f98fa512cbcee8f8c9c03b409cf65c8464b55831daa6c6d54",
+  "fingerprint": "7e6f1a71a4ae347f98fa512cbcee8f8c9c03b409cf65c8464b55831daa6c6d54",
   "resource_count": 3043,
   "resources": [
     {
@@ -62,7 +62,7 @@
     {
       "byte_length": 6284,
       "path": "warhammer40k_core/adapters/external_contract.py",
-      "sha256": "699d7f1a42fed724685c233fcae1bb8197ab1d5f90ea1345e3b0713bb5c87d5e"
+      "sha256": "65cb7f89387230e7709b4b01bfcaf46362ab423e61da103d8cc3bae4cceb524b"
     },
     {
       "byte_length": 2445,
@@ -10105,9 +10105,9 @@
       "sha256": "3b394beb6a94c04fe2396ebc5d915766012edf3a72d6c4f05bbe655084d77f34"
     },
     {
-      "byte_length": 8076,
+      "byte_length": 8616,
       "path": "warhammer40k_core/engine/firing_deck_restore.py",
-      "sha256": "e45964ee535285247196572967669964f644ef7042b6d4a781cdd941ac22bd34"
+      "sha256": "c161309bcd1cd0c0588f77f80f0b86ffb4851627d52a074f57510b8d6f615c0b"
     },
     {
       "byte_length": 5185,
@@ -11270,9 +11270,9 @@
       "sha256": "562ffa869c43d0e60bee9c056e72bd089485db8239c7a5e86928bffc833aac76"
     },
     {
-      "byte_length": 32293,
+      "byte_length": 32847,
       "path": "warhammer40k_core/engine/phases/shooting_firing_deck.py",
-      "sha256": "53a9e0ee7c6decdeeecedb9f8d26085482a11aec0421b0b0903f9bedb2c57bdc"
+      "sha256": "2b11eb3682570dc4fdbb5189a23a77598590fc8412902bfdee17e7e5889e6724"
     },
     {
       "byte_length": 60772,
@@ -11285,9 +11285,9 @@
       "sha256": "b17dc2ba0eb61c654ebe8408cb2e8365f5ba5c4430ce231aa7fdb021bc7891fa"
     },
     {
-      "byte_length": 48898,
+      "byte_length": 48976,
       "path": "warhammer40k_core/engine/phases/shooting_model.py",
-      "sha256": "a05af64d81630c111ecaba4401f4af860b275b974ba9003c69c26d99885d1f29"
+      "sha256": "a5c9e8d74aacd6df1088df91882f20499ef1a763f5581d72fd3d5b9cb49798b5"
     },
     {
       "byte_length": 42363,
@@ -11295,9 +11295,9 @@
       "sha256": "357bbedeff5a3e1cd7eec10ed90fd4427d9e36f3121e02f301eb31c04c4c98d5"
     },
     {
-      "byte_length": 40080,
+      "byte_length": 40351,
       "path": "warhammer40k_core/engine/phases/shooting_requests.py",
-      "sha256": "8be12c90047096099d5e62c777a225b0be4b9c5b477c13262b6d758e78b59883"
+      "sha256": "944e9e28041c24ed9a0b2ab7a67842ed0b9257a9c14a0095922eac581fcf5116"
     },
     {
       "byte_length": 8126,

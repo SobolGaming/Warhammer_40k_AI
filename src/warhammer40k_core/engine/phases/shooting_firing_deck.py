@@ -82,6 +82,20 @@ def firing_deck_cargo_snapshot(
     return cargo.embarked_unit_instance_ids
 
 
+def firing_deck_shot_history_snapshot(state: GameState) -> list[str] | None:
+    """Publish current ordinary Shooting evidence without inventing reaction authority."""
+    shooting = state.shooting_phase_state
+    if (
+        state.out_of_phase_shooting_state is not None
+        or shooting is None
+        or state.current_battle_phase is not BattlePhase.SHOOTING
+        or shooting.battle_round != state.battle_round
+        or shooting.active_player_id != state.active_player_id
+    ):
+        return None
+    return list(shooting.shot_unit_ids)
+
+
 def _validate_firing_deck_selection(
     *,
     state: GameState,

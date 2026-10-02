@@ -356,6 +356,13 @@ def _request_shooting_declaration(
         "target_candidates": target_candidates,
     }
     if proposal_request["firing_deck_value"] is not None:
+        from warhammer40k_core.engine.phases.shooting_firing_deck import (
+            firing_deck_shot_history_snapshot,
+        )
+
+        proposal_request["firing_deck_already_shot_unit_instance_ids"] = (
+            firing_deck_shot_history_snapshot(state)
+        )
         proposal_request["firing_deck_embarked_unit_instance_ids"] = list(
             firing_deck_cargo_snapshot(
                 state=state, unit_instance_id=rules_unit.unit_instance_id, army_catalog=army_catalog

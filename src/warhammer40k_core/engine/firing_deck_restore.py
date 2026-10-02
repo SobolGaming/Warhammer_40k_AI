@@ -29,7 +29,10 @@ def validate_firing_deck_restrictions(
     pending_decision_requests: tuple[DecisionRequest, ...],
     army_catalog: ArmyCatalog | None,
 ) -> None:
-    from warhammer40k_core.engine.phases.shooting_firing_deck import firing_deck_cargo_snapshot
+    from warhammer40k_core.engine.phases.shooting_firing_deck import (
+        firing_deck_cargo_snapshot,
+        firing_deck_shot_history_snapshot,
+    )
 
     for pending in pending_decision_requests:
         if pending.decision_type not in {"submit_shooting_declaration", "select_shooting_type"}:
@@ -62,6 +65,16 @@ def validate_firing_deck_restrictions(
         )
         if request.get("firing_deck_embarked_unit_instance_ids") != expected_snapshot:
             raise GameLifecycleError("Firing Deck pending cargo snapshot drifted.")
+        if (
+            pending.decision_type == "submit_shooting_declaration"
+            and request["firing_deck_value"] is not None
+            and (
+                "firing_deck_already_shot_unit_instance_ids" not in request
+                or request["firing_deck_already_shot_unit_instance_ids"]
+                != firing_deck_shot_history_snapshot(state)
+            )
+        ):
+            raise GameLifecycleError("Firing Deck pending shot-history snapshot drifted.")
     decisions = {record.result.result_id: record for record in decision_records}
     expected: dict[str, PersistingEffect] = {}
     completed_declarations: set[str] = set()

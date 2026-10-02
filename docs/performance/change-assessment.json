@@ -1,1189 +1,695 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "5c07fb65010627249b344fa61c65c3b7a36b2a3c",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:189895f28d6817d8ff5e77feefe40c0c351fd8a05b064bd78de81182cf164674",
-  "operation_map_sha256": "1210f7b33175825aaae6941ef773bbe4aec10c9b8911515b03543f595b8b6594",
+  "base": "e3be9908ee9f8778ed7f6390ff1ea032e795d105",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7e6f1a71a4ae347f98fa512cbcee8f8c9c03b409cf65c8464b55831daa6c6d54",
+  "operation_map_sha256": "f0b1dddbac7b0ebd605ff5d5955ff18cd168dfda872aa220f725cf738e21e71c",
   "changes": {
-    "ci/test_shards/durations.json": {
-      "before_sha256": "a35aa0fc472cbb4b785960337f7b0198fe133b97f2a3218d100a2fd5ff491ce8",
-      "after_sha256": "a5cd3768c49c0098fe7a84fb0aa3662c5fbac81e307d26c3e50ee3c7b0413769",
+    "README.md": {
+      "before_sha256": "a3eacecefca1a2b9fa8d86ec6d2134960d4df2b81ca8f8967875edf89c4031ce",
+      "after_sha256": "73e3615d6600911967331475d01d439b6e25286ed942e09f493d13dcb0a5457c",
       "owners": {
         "@document": {
-          "before": "a35aa0fc472cbb4b785960337f7b0198fe133b97f2a3218d100a2fd5ff491ce8",
-          "after": "a5cd3768c49c0098fe7a84fb0aa3662c5fbac81e307d26c3e50ee3c7b0413769"
+          "before": "a3eacecefca1a2b9fa8d86ec6d2134960d4df2b81ca8f8967875edf89c4031ce",
+          "after": "73e3615d6600911967331475d01d439b6e25286ed942e09f493d13dcb0a5457c"
+        }
+      }
+    },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "a5cd3768c49c0098fe7a84fb0aa3662c5fbac81e307d26c3e50ee3c7b0413769",
+      "after_sha256": "169a3151e265b8a7043cbf02e2308addbe71302d2fd0f14e4b2714c0f9aa7771",
+      "owners": {
+        "@document": {
+          "before": "a5cd3768c49c0098fe7a84fb0aa3662c5fbac81e307d26c3e50ee3c7b0413769",
+          "after": "169a3151e265b8a7043cbf02e2308addbe71302d2fd0f14e4b2714c0f9aa7771"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "2b6bd771b92ec23f75f89b75ad34e0ddedc23e691ee4fc720828b30ef19d0ca3",
-      "after_sha256": "014dea0939c76173367c46444db7dc83774b61dc7d6d64349d73fef64b69f90f",
+      "before_sha256": "014dea0939c76173367c46444db7dc83774b61dc7d6d64349d73fef64b69f90f",
+      "after_sha256": "6a11b05c53a6de4215bf0eacf7c3d8ff48dc410cd38d009d5bd3cc39f1cf26c0",
       "owners": {
         "@document": {
-          "before": "2b6bd771b92ec23f75f89b75ad34e0ddedc23e691ee4fc720828b30ef19d0ca3",
-          "after": "014dea0939c76173367c46444db7dc83774b61dc7d6d64349d73fef64b69f90f"
+          "before": "014dea0939c76173367c46444db7dc83774b61dc7d6d64349d73fef64b69f90f",
+          "after": "6a11b05c53a6de4215bf0eacf7c3d8ff48dc410cd38d009d5bd3cc39f1cf26c0"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "ba54cea3da6fa68db94ba94a468fa589e0ccbc9576b99ac0e5edd7c49b53112c",
-      "after_sha256": "844e154e5636915f494a87e028e0169194a4e403eecf28b477a4503568176e7d",
+      "before_sha256": "844e154e5636915f494a87e028e0169194a4e403eecf28b477a4503568176e7d",
+      "after_sha256": "07fff556ee04b57d9dbda52749da5253cfec088e2b0756543fd25137f57404e7",
       "owners": {
         "@document": {
-          "before": "ba54cea3da6fa68db94ba94a468fa589e0ccbc9576b99ac0e5edd7c49b53112c",
-          "after": "844e154e5636915f494a87e028e0169194a4e403eecf28b477a4503568176e7d"
+          "before": "844e154e5636915f494a87e028e0169194a4e403eecf28b477a4503568176e7d",
+          "after": "07fff556ee04b57d9dbda52749da5253cfec088e2b0756543fd25137f57404e7"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "e651676a784bea375bb0df7bd124987b46630152642e4a186550cbc31b55816f",
-      "after_sha256": "a5cefea2bb4bf456dcafdfc8e454d1ddca762d1bd099d1dcb8105e5479db5578",
+      "before_sha256": "a5cefea2bb4bf456dcafdfc8e454d1ddca762d1bd099d1dcb8105e5479db5578",
+      "after_sha256": "1bf79462b579f6d625206390a3a092a9d089a51140242d41077d154fed37c803",
       "owners": {
         "@document": {
-          "before": "e651676a784bea375bb0df7bd124987b46630152642e4a186550cbc31b55816f",
-          "after": "a5cefea2bb4bf456dcafdfc8e454d1ddca762d1bd099d1dcb8105e5479db5578"
+          "before": "a5cefea2bb4bf456dcafdfc8e454d1ddca762d1bd099d1dcb8105e5479db5578",
+          "after": "1bf79462b579f6d625206390a3a092a9d089a51140242d41077d154fed37c803"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "52c83eaac7e7144c587d1851fccd263cd54f19c966b870c6d3691a7b5217c398",
-      "after_sha256": "d84df0bffeea7766bfcd7a4e7713078a122becd16ad05ddf99220c58b20600ea",
+      "before_sha256": "d84df0bffeea7766bfcd7a4e7713078a122becd16ad05ddf99220c58b20600ea",
+      "after_sha256": "712d9e66875e8ecea4c97d66e8a3ef0fb4800c0f8edaeabd62e6d3c1e39600e0",
       "owners": {
         "@document": {
-          "before": "52c83eaac7e7144c587d1851fccd263cd54f19c966b870c6d3691a7b5217c398",
-          "after": "d84df0bffeea7766bfcd7a4e7713078a122becd16ad05ddf99220c58b20600ea"
+          "before": "d84df0bffeea7766bfcd7a4e7713078a122becd16ad05ddf99220c58b20600ea",
+          "after": "712d9e66875e8ecea4c97d66e8a3ef0fb4800c0f8edaeabd62e6d3c1e39600e0"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "d15936a457b28de3c639ac9c5ac9495ff92af3362d63fad7e55e84f14b0e3aaf",
-      "after_sha256": "2356f0047504a300744a2584854120a418e6c486db5c0fdebeccdd93801ad7cf",
+      "before_sha256": "2356f0047504a300744a2584854120a418e6c486db5c0fdebeccdd93801ad7cf",
+      "after_sha256": "6c661aa205d1f7e0c033a78a4cfef66dc44b82066dc43969fabce88d6af6d247",
       "owners": {
         "@document": {
-          "before": "d15936a457b28de3c639ac9c5ac9495ff92af3362d63fad7e55e84f14b0e3aaf",
-          "after": "2356f0047504a300744a2584854120a418e6c486db5c0fdebeccdd93801ad7cf"
+          "before": "2356f0047504a300744a2584854120a418e6c486db5c0fdebeccdd93801ad7cf",
+          "after": "6c661aa205d1f7e0c033a78a4cfef66dc44b82066dc43969fabce88d6af6d247"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "0f00521a25021d61f8b0ace4d18e026ded60e8ec971f8adefbf75576ceddbc70",
-      "after_sha256": "a96fc0700dc1e8c9f0f7dcc38fcdec96346deda068e2f91f048284bb74dc5520",
+      "before_sha256": "a96fc0700dc1e8c9f0f7dcc38fcdec96346deda068e2f91f048284bb74dc5520",
+      "after_sha256": "55f06cfb1d1bc1fff73b354e22acfb7c762b2d72636166884ca21b9d3c648b5a",
       "owners": {
         "@document": {
-          "before": "0f00521a25021d61f8b0ace4d18e026ded60e8ec971f8adefbf75576ceddbc70",
-          "after": "a96fc0700dc1e8c9f0f7dcc38fcdec96346deda068e2f91f048284bb74dc5520"
+          "before": "a96fc0700dc1e8c9f0f7dcc38fcdec96346deda068e2f91f048284bb74dc5520",
+          "after": "55f06cfb1d1bc1fff73b354e22acfb7c762b2d72636166884ca21b9d3c648b5a"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "63b82838480408f89edcc1dc43866c73683f9db1b9d47b9fc2103cefc33c7f19",
-      "after_sha256": "639e5985ea19d78a5d1ffb19aeea35004c0442ad184494da0d1aef9441f8e55f",
+      "before_sha256": "639e5985ea19d78a5d1ffb19aeea35004c0442ad184494da0d1aef9441f8e55f",
+      "after_sha256": "ed8e81759a17332ffec21999ea2f57a8380225af60cdfafbdee99feae9be4f88",
       "owners": {
         "@document": {
-          "before": "63b82838480408f89edcc1dc43866c73683f9db1b9d47b9fc2103cefc33c7f19",
-          "after": "639e5985ea19d78a5d1ffb19aeea35004c0442ad184494da0d1aef9441f8e55f"
+          "before": "639e5985ea19d78a5d1ffb19aeea35004c0442ad184494da0d1aef9441f8e55f",
+          "after": "ed8e81759a17332ffec21999ea2f57a8380225af60cdfafbdee99feae9be4f88"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "2f6989d2a15c605cda7da5bb2ba4f482920ff0f9a5b99952c04c1051e5e317a5",
-      "after_sha256": "182cf3c9d73ec185a503b4a25652e2d245333440ade90f93078c476768338c50",
+      "before_sha256": "182cf3c9d73ec185a503b4a25652e2d245333440ade90f93078c476768338c50",
+      "after_sha256": "6e2005500359bf31b5e5b867b52f81230de4e91563ebe94d57ef608881a981cc",
       "owners": {
         "@document": {
-          "before": "2f6989d2a15c605cda7da5bb2ba4f482920ff0f9a5b99952c04c1051e5e317a5",
-          "after": "182cf3c9d73ec185a503b4a25652e2d245333440ade90f93078c476768338c50"
+          "before": "182cf3c9d73ec185a503b4a25652e2d245333440ade90f93078c476768338c50",
+          "after": "6e2005500359bf31b5e5b867b52f81230de4e91563ebe94d57ef608881a981cc"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "74024b6e6d57f076a4f2e93f5c6b2291419f0367a92f63f08caff9e3ab000015",
-      "after_sha256": "92c27adaa51bb42631d6dd3ae987d1d75132eddb027a554320e0e1c1b69e00c4",
+      "before_sha256": "92c27adaa51bb42631d6dd3ae987d1d75132eddb027a554320e0e1c1b69e00c4",
+      "after_sha256": "e2c38cf6ec2a6f1d46840101451f90181471ff0cfdf0a0a9766caa859f9dae5c",
       "owners": {
         "@document": {
-          "before": "74024b6e6d57f076a4f2e93f5c6b2291419f0367a92f63f08caff9e3ab000015",
-          "after": "92c27adaa51bb42631d6dd3ae987d1d75132eddb027a554320e0e1c1b69e00c4"
+          "before": "92c27adaa51bb42631d6dd3ae987d1d75132eddb027a554320e0e1c1b69e00c4",
+          "after": "e2c38cf6ec2a6f1d46840101451f90181471ff0cfdf0a0a9766caa859f9dae5c"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "6604628941119cd337a1fa78c0fd50ffa4e49e07aa8812a1c5188871d5facd1b",
-      "after_sha256": "92d246bf2408c64d4f2a65740bff637d1c51a7934481fb75eb0e17f6b5256f46",
+      "before_sha256": "92d246bf2408c64d4f2a65740bff637d1c51a7934481fb75eb0e17f6b5256f46",
+      "after_sha256": "f25fb7bba968dee79aea3d9db2302a9f25e124a78df5252663214894e27196b6",
       "owners": {
         "@document": {
-          "before": "6604628941119cd337a1fa78c0fd50ffa4e49e07aa8812a1c5188871d5facd1b",
-          "after": "92d246bf2408c64d4f2a65740bff637d1c51a7934481fb75eb0e17f6b5256f46"
+          "before": "92d246bf2408c64d4f2a65740bff637d1c51a7934481fb75eb0e17f6b5256f46",
+          "after": "f25fb7bba968dee79aea3d9db2302a9f25e124a78df5252663214894e27196b6"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "676b585722682adbd9cad054a4bd22880805461705322653b1d550ada5e177d6",
-      "after_sha256": "39957b4080ab8ca87507843a8eead113287ce1f941d3c680e77626df603a9ee9",
+      "before_sha256": "39957b4080ab8ca87507843a8eead113287ce1f941d3c680e77626df603a9ee9",
+      "after_sha256": "eb2bcc03517f2e3de7616885693ebfa3042b73f54082c9db948d39682bc065f5",
       "owners": {
         "@document": {
-          "before": "676b585722682adbd9cad054a4bd22880805461705322653b1d550ada5e177d6",
-          "after": "39957b4080ab8ca87507843a8eead113287ce1f941d3c680e77626df603a9ee9"
+          "before": "39957b4080ab8ca87507843a8eead113287ce1f941d3c680e77626df603a9ee9",
+          "after": "eb2bcc03517f2e3de7616885693ebfa3042b73f54082c9db948d39682bc065f5"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "b866b979fe6eddc0d4b2b7a15c0a6e4e35fdcb613e380ef6730654a5bd10797c",
-      "after_sha256": "3ed7aa621906abbcda3ce81144ed48f5017830b7935393405506ec908e259ec3",
+      "before_sha256": "3ed7aa621906abbcda3ce81144ed48f5017830b7935393405506ec908e259ec3",
+      "after_sha256": "3f5733620eeb64623d626db7a3a9da25385d6c5ef381e25d175679280d300928",
       "owners": {
         "@document": {
-          "before": "b866b979fe6eddc0d4b2b7a15c0a6e4e35fdcb613e380ef6730654a5bd10797c",
-          "after": "3ed7aa621906abbcda3ce81144ed48f5017830b7935393405506ec908e259ec3"
-        }
-      }
-    },
-    "conformance/typescript/src/battlefield-conformance.test.ts": {
-      "before_sha256": "8e83e6952265151b1d61e105e0c66c03a83983292067eb3ee124d06b9aeb87a3",
-      "after_sha256": "16258554e24b286bbedfc0028f920e5ea50ab048968342987958ed20763fd3b3",
-      "owners": {
-        "@document": {
-          "before": "8e83e6952265151b1d61e105e0c66c03a83983292067eb3ee124d06b9aeb87a3",
-          "after": "16258554e24b286bbedfc0028f920e5ea50ab048968342987958ed20763fd3b3"
-        }
-      }
-    },
-    "conformance/typescript/src/contract.ts": {
-      "before_sha256": "bc3604374a595a4fb8598b042e1df0f4dcd0475ea1a5220083d14466e4389987",
-      "after_sha256": "87580a383d56d30636cf47bf23e2be6e4fa84780d2f97b060430c2a081eb895e",
-      "owners": {
-        "@document": {
-          "before": "bc3604374a595a4fb8598b042e1df0f4dcd0475ea1a5220083d14466e4389987",
-          "after": "87580a383d56d30636cf47bf23e2be6e4fa84780d2f97b060430c2a081eb895e"
-        }
-      }
-    },
-    "conformance/typescript/src/generated/openapi.ts": {
-      "before_sha256": "5ca71708e54485d7e40c729e73dd38ae0b66787d85845b9ac47098d790720a82",
-      "after_sha256": "e38b1c17b1bd254489eb0f76045c54ec910ac38bf86969507b1e10f06fb4322a",
-      "owners": {
-        "@document": {
-          "before": "5ca71708e54485d7e40c729e73dd38ae0b66787d85845b9ac47098d790720a82",
-          "after": "e38b1c17b1bd254489eb0f76045c54ec910ac38bf86969507b1e10f06fb4322a"
+          "before": "3ed7aa621906abbcda3ce81144ed48f5017830b7935393405506ec908e259ec3",
+          "after": "3f5733620eeb64623d626db7a3a9da25385d6c5ef381e25d175679280d300928"
         }
       }
     },
     "contracts/README.md": {
-      "before_sha256": "41d5120e530bad073968309086e9a780742212f48f9464f2fef9ba87d2ef0544",
-      "after_sha256": "35cf25af4bc389d0408e79e45c8b2fcd055a71e4ab3230659da55f19a7cd782e",
+      "before_sha256": "35cf25af4bc389d0408e79e45c8b2fcd055a71e4ab3230659da55f19a7cd782e",
+      "after_sha256": "f0a8fb250e5f1d76822a55cf97f99083afb4e0b95f8b952f98353ae09b04e6b6",
       "owners": {
         "@document": {
-          "before": "41d5120e530bad073968309086e9a780742212f48f9464f2fef9ba87d2ef0544",
-          "after": "35cf25af4bc389d0408e79e45c8b2fcd055a71e4ab3230659da55f19a7cd782e"
-        }
-      }
-    },
-    "contracts/compatibility-policy.md": {
-      "before_sha256": "22f031e38c160944ecf227ec77528db39068214d5d8da1eaeec2ec218912796e",
-      "after_sha256": "2ef3317b6fb953ac5d9bc0d735acb91447a88d425032f949881ef151257289f2",
-      "owners": {
-        "@document": {
-          "before": "22f031e38c160944ecf227ec77528db39068214d5d8da1eaeec2ec218912796e",
-          "after": "2ef3317b6fb953ac5d9bc0d735acb91447a88d425032f949881ef151257289f2"
-        }
-      }
-    },
-    "contracts/compatibility/44.0.0-shape.json": {
-      "before_sha256": null,
-      "after_sha256": "3998bf5f4401fa44de35d596b54abea45e15537eb78145ddb8e2e895c590ad2e",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "3998bf5f4401fa44de35d596b54abea45e15537eb78145ddb8e2e895c590ad2e"
-        }
-      }
-    },
-    "contracts/examples/battlefield/geometry-conformance.json": {
-      "before_sha256": "06dbd7a97772a155c1ab6fe859188c307b5a95a4f0d862f209486c7bd3cd6c10",
-      "after_sha256": "74de0022ff4a3bd6fcf1bce6c8e74a207eaf785622cbc7d17f840eaffd658ce5",
-      "owners": {
-        "@document": {
-          "before": "06dbd7a97772a155c1ab6fe859188c307b5a95a4f0d862f209486c7bd3cd6c10",
-          "after": "74de0022ff4a3bd6fcf1bce6c8e74a207eaf785622cbc7d17f840eaffd658ce5"
-        }
-      }
-    },
-    "contracts/examples/events/initial-player-a.json": {
-      "before_sha256": "7cf4d30fe4aabfbfaf883a47e5282c33975a893823d241df59b4fe6e5da37550",
-      "after_sha256": "115c81587d2b62820e5505f89a443412f112ac7632381e656f92319b5a06b5a8",
-      "owners": {
-        "@document": {
-          "before": "7cf4d30fe4aabfbfaf883a47e5282c33975a893823d241df59b4fe6e5da37550",
-          "after": "115c81587d2b62820e5505f89a443412f112ac7632381e656f92319b5a06b5a8"
-        }
-      }
-    },
-    "contracts/examples/events/initial-player-b.json": {
-      "before_sha256": "6080eb86fadb6e22160ee768b5b47ee46170d51ec96d7f2d625f714ad2be9b6f",
-      "after_sha256": "3b50b6b8a84910f23cd8112edd21594f0f5a79b9640a4a4040ecb22f282119d7",
-      "owners": {
-        "@document": {
-          "before": "6080eb86fadb6e22160ee768b5b47ee46170d51ec96d7f2d625f714ad2be9b6f",
-          "after": "3b50b6b8a84910f23cd8112edd21594f0f5a79b9640a4a4040ecb22f282119d7"
+          "before": "35cf25af4bc389d0408e79e45c8b2fcd055a71e4ab3230659da55f19a7cd782e",
+          "after": "f0a8fb250e5f1d76822a55cf97f99083afb4e0b95f8b952f98353ae09b04e6b6"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "6f68afff678f41fcc9c2d9cdc018ac63f3991da39e4ff35b3d73094573684bc6",
-      "after_sha256": "5c74e80664f6418ce1686f92287378c78cd0dcfca47a88c65f00224906ea7fbc",
+      "before_sha256": "5c74e80664f6418ce1686f92287378c78cd0dcfca47a88c65f00224906ea7fbc",
+      "after_sha256": "df6946382e250439f3fe45abe60a681dd7fef8b3d7347761bdeac9202cbac033",
       "owners": {
         "@document": {
-          "before": "6f68afff678f41fcc9c2d9cdc018ac63f3991da39e4ff35b3d73094573684bc6",
-          "after": "5c74e80664f6418ce1686f92287378c78cd0dcfca47a88c65f00224906ea7fbc"
-        }
-      }
-    },
-    "contracts/examples/projections/attached_charge_view.json": {
-      "before_sha256": null,
-      "after_sha256": "16563c5abdaaac198b1403f8957364348b6cdaaffbf277f2cda0645240f6cbd6",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "16563c5abdaaac198b1403f8957364348b6cdaaffbf277f2cda0645240f6cbd6"
-        }
-      }
-    },
-    "contracts/examples/projections/hidden_secondary_redaction_view.json": {
-      "before_sha256": "4670e9f3c2a671f02cfe86c1fbcfe11f79a7be985e18bf01268a3b48d6f0d496",
-      "after_sha256": "ce4c219b64b3a65a828f8ba35e139097951c88181944bb2e307beccb30c8dea7",
-      "owners": {
-        "@document": {
-          "before": "4670e9f3c2a671f02cfe86c1fbcfe11f79a7be985e18bf01268a3b48d6f0d496",
-          "after": "ce4c219b64b3a65a828f8ba35e139097951c88181944bb2e307beccb30c8dea7"
-        }
-      }
-    },
-    "contracts/examples/projections/initial_setup_view_player1.json": {
-      "before_sha256": "8c8053508be785f4d2694546b77c168f678301eca31ddd2669672c3513cfc495",
-      "after_sha256": "28fba889229333b82b1ac8900b9af34b22b380e48e22f939c13cb51e6d832617",
-      "owners": {
-        "@document": {
-          "before": "8c8053508be785f4d2694546b77c168f678301eca31ddd2669672c3513cfc495",
-          "after": "28fba889229333b82b1ac8900b9af34b22b380e48e22f939c13cb51e6d832617"
-        }
-      }
-    },
-    "contracts/examples/projections/initial_setup_view_player2.json": {
-      "before_sha256": "9a96ab6e05d0cc791fa25630763772055b97aabdadf9520f00343d9c72ad2f2b",
-      "after_sha256": "a74d90c29b603bb8bb021c6ef86e10b4977ca67c1f8042a77fcc1c4ddc3463f2",
-      "owners": {
-        "@document": {
-          "before": "9a96ab6e05d0cc791fa25630763772055b97aabdadf9520f00343d9c72ad2f2b",
-          "after": "a74d90c29b603bb8bb021c6ef86e10b4977ca67c1f8042a77fcc1c4ddc3463f2"
-        }
-      }
-    },
-    "contracts/examples/projections/post_deployment_view.json": {
-      "before_sha256": "ab34e26aba88eb9f8c5295a8b65e5231afba05058d55df9d9b728d1906c0f4af",
-      "after_sha256": "7c31d11cbca15060388d31814609b5c86ba4e52db9107e9dad293a3e065b0144",
-      "owners": {
-        "@document": {
-          "before": "ab34e26aba88eb9f8c5295a8b65e5231afba05058d55df9d9b728d1906c0f4af",
-          "after": "7c31d11cbca15060388d31814609b5c86ba4e52db9107e9dad293a3e065b0144"
-        }
-      }
-    },
-    "contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_a.json": {
-      "before_sha256": "fb73437ec3e532765c9cea6e62bf8d599d186022362772765c57716e64f319b5",
-      "after_sha256": "839549168284e96bcbc8185e9355fe42cbcb0171eb3d077755d4f1b4638441d4",
-      "owners": {
-        "@document": {
-          "before": "fb73437ec3e532765c9cea6e62bf8d599d186022362772765c57716e64f319b5",
-          "after": "839549168284e96bcbc8185e9355fe42cbcb0171eb3d077755d4f1b4638441d4"
-        }
-      }
-    },
-    "contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_b.json": {
-      "before_sha256": "a5d477941f6f51a510aaf9654fb9639782e8b93ab0f8cb6bb30c327fa3614ee0",
-      "after_sha256": "a7e6c34fa0f241d88a94c584a4444fd6125b0eb4d6c042440a29186d855c4b31",
-      "owners": {
-        "@document": {
-          "before": "a5d477941f6f51a510aaf9654fb9639782e8b93ab0f8cb6bb30c327fa3614ee0",
-          "after": "a7e6c34fa0f241d88a94c584a4444fd6125b0eb4d6c042440a29186d855c4b31"
-        }
-      }
-    },
-    "contracts/examples/projections/visible_modifier_datacard_view.json": {
-      "before_sha256": "903ce44df82155d6b4fd0b9fe80b3bfdf99acfb1b20b241dc882366c740819a7",
-      "after_sha256": "fd54bc0e5bb08d56500edec9ffc93fdb5e40202d0c429bfda5fe5b84c3197576",
-      "owners": {
-        "@document": {
-          "before": "903ce44df82155d6b4fd0b9fe80b3bfdf99acfb1b20b241dc882366c740819a7",
-          "after": "fd54bc0e5bb08d56500edec9ffc93fdb5e40202d0c429bfda5fe5b84c3197576"
+          "before": "5c74e80664f6418ce1686f92287378c78cd0dcfca47a88c65f00224906ea7fbc",
+          "after": "df6946382e250439f3fe45abe60a681dd7fef8b3d7347761bdeac9202cbac033"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "d6bc5b578dc173c7bee8e1fe6d026fb50c45b3eb6f30bda404ccef50baa3cc87",
-      "after_sha256": "a79b9064253170f3dec9a032c398d4565d1b2331b0a8b78491ec581ada3d99a0",
+      "before_sha256": "a79b9064253170f3dec9a032c398d4565d1b2331b0a8b78491ec581ada3d99a0",
+      "after_sha256": "ae144aac1506dff3e0d9ac8b5ffb3aba1be80cf962ae331fc8fbcc71f09cd084",
       "owners": {
         "@document": {
-          "before": "d6bc5b578dc173c7bee8e1fe6d026fb50c45b3eb6f30bda404ccef50baa3cc87",
-          "after": "a79b9064253170f3dec9a032c398d4565d1b2331b0a8b78491ec581ada3d99a0"
+          "before": "a79b9064253170f3dec9a032c398d4565d1b2331b0a8b78491ec581ada3d99a0",
+          "after": "ae144aac1506dff3e0d9ac8b5ffb3aba1be80cf962ae331fc8fbcc71f09cd084"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "eb982bba7eaa8c3d312f37c8f93dc2a00852e7b20ee8e29c64dc4f633610179d",
-      "after_sha256": "2a8cad67db2021a964a3bdc8dcb73a50db0ce12dc94c54602b305f115eb77e2c",
+      "before_sha256": "2a8cad67db2021a964a3bdc8dcb73a50db0ce12dc94c54602b305f115eb77e2c",
+      "after_sha256": "4f47a824a16e449dcaf148f56a1569b085ace984d7752aa39f88a1b5c8fdf61e",
       "owners": {
         "@document": {
-          "before": "eb982bba7eaa8c3d312f37c8f93dc2a00852e7b20ee8e29c64dc4f633610179d",
-          "after": "2a8cad67db2021a964a3bdc8dcb73a50db0ce12dc94c54602b305f115eb77e2c"
+          "before": "2a8cad67db2021a964a3bdc8dcb73a50db0ce12dc94c54602b305f115eb77e2c",
+          "after": "4f47a824a16e449dcaf148f56a1569b085ace984d7752aa39f88a1b5c8fdf61e"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "53846b795fde23814fa0e8f1429a5db0dae2965956228ef012c43946abe6ae56",
-      "after_sha256": "c2f594c47c9171f9480c50530f2066c99ed1317c86a4ec94ca300b9fbccf2d95",
+      "before_sha256": "c2f594c47c9171f9480c50530f2066c99ed1317c86a4ec94ca300b9fbccf2d95",
+      "after_sha256": "8377e303db97e1055c307f43eea7ee38ef6a6b0e5da5811dbd4acd484354fae4",
       "owners": {
         "@document": {
-          "before": "53846b795fde23814fa0e8f1429a5db0dae2965956228ef012c43946abe6ae56",
-          "after": "c2f594c47c9171f9480c50530f2066c99ed1317c86a4ec94ca300b9fbccf2d95"
+          "before": "c2f594c47c9171f9480c50530f2066c99ed1317c86a4ec94ca300b9fbccf2d95",
+          "after": "8377e303db97e1055c307f43eea7ee38ef6a6b0e5da5811dbd4acd484354fae4"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "3d3d21277bae829fb3996dade076be1ab205a6c3c6b9c1d72418dbc777032a0b",
-      "after_sha256": "5c6ff444a8e63fcb14db2813d18de163b1d66dc2bf6aa32b7b802b7f043ba200",
+      "before_sha256": "5c6ff444a8e63fcb14db2813d18de163b1d66dc2bf6aa32b7b802b7f043ba200",
+      "after_sha256": "1d842a47d374001766d1717d0b608fb478024119cbd7097245fb95c98e181f14",
       "owners": {
         "@document": {
-          "before": "3d3d21277bae829fb3996dade076be1ab205a6c3c6b9c1d72418dbc777032a0b",
-          "after": "5c6ff444a8e63fcb14db2813d18de163b1d66dc2bf6aa32b7b802b7f043ba200"
+          "before": "5c6ff444a8e63fcb14db2813d18de163b1d66dc2bf6aa32b7b802b7f043ba200",
+          "after": "1d842a47d374001766d1717d0b608fb478024119cbd7097245fb95c98e181f14"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "45f4fcc7c557cd4ae8eaddbd94b3b9bbb21e00880687ea1476dcc17a934a7e5e",
-      "after_sha256": "68b577c3b1edf85962ce6d59b677b5afa46adba833af00e6cf4c00816c508878",
+      "before_sha256": "68b577c3b1edf85962ce6d59b677b5afa46adba833af00e6cf4c00816c508878",
+      "after_sha256": "1b2bdd8613e8f88ca65e99dbf92589196985449ec9569bc06adb405e8f7c1633",
       "owners": {
         "@document": {
-          "before": "45f4fcc7c557cd4ae8eaddbd94b3b9bbb21e00880687ea1476dcc17a934a7e5e",
-          "after": "68b577c3b1edf85962ce6d59b677b5afa46adba833af00e6cf4c00816c508878"
+          "before": "68b577c3b1edf85962ce6d59b677b5afa46adba833af00e6cf4c00816c508878",
+          "after": "1b2bdd8613e8f88ca65e99dbf92589196985449ec9569bc06adb405e8f7c1633"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "677098c88ec489e9d6f67d4aae360064c3300b0cfeda49fe406499c9b8a8b2c9",
-      "after_sha256": "bcd20c1ba32266e79df1629145252f39c450c11782157fc69613e2c01d67a985",
+      "before_sha256": "bcd20c1ba32266e79df1629145252f39c450c11782157fc69613e2c01d67a985",
+      "after_sha256": "0c864fb6eb2f34487f37c47a07970b30faaa6d24912c56152f8388ed46d8c418",
       "owners": {
         "@document": {
-          "before": "677098c88ec489e9d6f67d4aae360064c3300b0cfeda49fe406499c9b8a8b2c9",
-          "after": "bcd20c1ba32266e79df1629145252f39c450c11782157fc69613e2c01d67a985"
+          "before": "bcd20c1ba32266e79df1629145252f39c450c11782157fc69613e2c01d67a985",
+          "after": "0c864fb6eb2f34487f37c47a07970b30faaa6d24912c56152f8388ed46d8c418"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "7abb0d188c6bde207caec2c7d9a1bce572dfb849ce4c2365f40dee71274bc0a4",
-      "after_sha256": "553523fd9a11bf59b0d642a389c537d04acf739d6c9cf43b386e1a3c070f1bb3",
+      "before_sha256": "553523fd9a11bf59b0d642a389c537d04acf739d6c9cf43b386e1a3c070f1bb3",
+      "after_sha256": "a2d4e821c09f26b4254202e46985b08e959967d6de00d32963eb10debfb1824f",
       "owners": {
         "@document": {
-          "before": "7abb0d188c6bde207caec2c7d9a1bce572dfb849ce4c2365f40dee71274bc0a4",
-          "after": "553523fd9a11bf59b0d642a389c537d04acf739d6c9cf43b386e1a3c070f1bb3"
-        }
-      }
-    },
-    "contracts/migrations/43-to-44.md": {
-      "before_sha256": null,
-      "after_sha256": "e5d9a2d6bfff035de6bab4a24b57bc09a9e947748dd2102a0288fa92c76342bd",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "e5d9a2d6bfff035de6bab4a24b57bc09a9e947748dd2102a0288fa92c76342bd"
+          "before": "553523fd9a11bf59b0d642a389c537d04acf739d6c9cf43b386e1a3c070f1bb3",
+          "after": "a2d4e821c09f26b4254202e46985b08e959967d6de00d32963eb10debfb1824f"
         }
       }
     },
     "contracts/openapi.yaml": {
-      "before_sha256": "f41ec334a2a902159059b8f88f856cba5335307d723c1d9d80eec3dcbdc6b474",
-      "after_sha256": "2f0836e40c2f2feb3ba75388795f30139411c54e45b41575d4eb0476c5933962",
+      "before_sha256": "2f0836e40c2f2feb3ba75388795f30139411c54e45b41575d4eb0476c5933962",
+      "after_sha256": "d50f3c734fc465357a546c2c634a946506295e9c8ac644a44013581b53171ab6",
       "owners": {
         "@document": {
-          "before": "f41ec334a2a902159059b8f88f856cba5335307d723c1d9d80eec3dcbdc6b474",
-          "after": "2f0836e40c2f2feb3ba75388795f30139411c54e45b41575d4eb0476c5933962"
-        }
-      }
-    },
-    "contracts/redaction-policy.md": {
-      "before_sha256": "d07607874fec6ed70b9ce6db681fad1d958a2b5b0f9aeb44d1118bfeb992dee8",
-      "after_sha256": "fbc8848c7c4467cdb3d27bb6a2abff7bb888946ba103a4c792b789383064bbfd",
-      "owners": {
-        "@document": {
-          "before": "d07607874fec6ed70b9ce6db681fad1d958a2b5b0f9aeb44d1118bfeb992dee8",
-          "after": "fbc8848c7c4467cdb3d27bb6a2abff7bb888946ba103a4c792b789383064bbfd"
-        }
-      }
-    },
-    "contracts/schemas/battlefield-view.schema.json": {
-      "before_sha256": "21b70ca531c10705108aa5be8389e5ea3562873680602ef39a754e1c29357322",
-      "after_sha256": "faecd553474a6396838c35541a3913247e1073e3c3e0938a9931e7ddb9243164",
-      "owners": {
-        "@document": {
-          "before": "21b70ca531c10705108aa5be8389e5ea3562873680602ef39a754e1c29357322",
-          "after": "faecd553474a6396838c35541a3913247e1073e3c3e0938a9931e7ddb9243164"
-        }
-      }
-    },
-    "contracts/schemas/session-command-outcome.schema.json": {
-      "before_sha256": "8200ec1ea5a54e7d9cb3bac93556d83f0e89e23f0acb9ec50e1c2678458b0413",
-      "after_sha256": "677b46c2d6cd147152d71a5563fab939c68523449584e7b3b72dcce6859ea1cc",
-      "owners": {
-        "@document": {
-          "before": "8200ec1ea5a54e7d9cb3bac93556d83f0e89e23f0acb9ec50e1c2678458b0413",
-          "after": "677b46c2d6cd147152d71a5563fab939c68523449584e7b3b72dcce6859ea1cc"
-        }
-      }
-    },
-    "contracts/schemas/session-command-result.schema.json": {
-      "before_sha256": "9fdd3b4b881de50fe4eba36a98e9a0e6a26b99022706ac662e13b68835afcca5",
-      "after_sha256": "0b24e9e11fa3ad8303c3271de60b9b271c232875b776507fd143d23aa22422c5",
-      "owners": {
-        "@document": {
-          "before": "9fdd3b4b881de50fe4eba36a98e9a0e6a26b99022706ac662e13b68835afcca5",
-          "after": "0b24e9e11fa3ad8303c3271de60b9b271c232875b776507fd143d23aa22422c5"
-        }
-      }
-    },
-    "contracts/schemas/session-metadata.schema.json": {
-      "before_sha256": "d8d1c3817f7b2e0cdb3b196f056f4793a99ed91f34a02747c99f97ec2e2d2a35",
-      "after_sha256": "fea4d3caa1a23483c730ba6b4c85eeabcdd5a04e16c8c6bb5c7009b920ea05f3",
-      "owners": {
-        "@document": {
-          "before": "d8d1c3817f7b2e0cdb3b196f056f4793a99ed91f34a02747c99f97ec2e2d2a35",
-          "after": "fea4d3caa1a23483c730ba6b4c85eeabcdd5a04e16c8c6bb5c7009b920ea05f3"
-        }
-      }
-    },
-    "contracts/schemas/session-persistence.schema.json": {
-      "before_sha256": "81dfeb1365af80bee01f3951150c976ec442dd8d681530fc65a5eb6ad8ecf645",
-      "after_sha256": "ba13007280a6a629a0cb4f29a5560e1e707523d5ea85d8b9f207820bd79de79e",
-      "owners": {
-        "@document": {
-          "before": "81dfeb1365af80bee01f3951150c976ec442dd8d681530fc65a5eb6ad8ecf645",
-          "after": "ba13007280a6a629a0cb4f29a5560e1e707523d5ea85d8b9f207820bd79de79e"
+          "before": "2f0836e40c2f2feb3ba75388795f30139411c54e45b41575d4eb0476c5933962",
+          "after": "d50f3c734fc465357a546c2c634a946506295e9c8ac644a44013581b53171ab6"
         }
       }
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "5ba7c4c2f387bfdaa8e1531bebb08d9c6f0504dacc342aaa1e9237ee71f4948e",
-      "after_sha256": "fb1840d621a4efcd621036f5684e59d53335c0346d1bb1350782f2031548adae",
+      "before_sha256": "fb1840d621a4efcd621036f5684e59d53335c0346d1bb1350782f2031548adae",
+      "after_sha256": "dea5d82258ad97685225af964121bef78ef6014b7cccc09c0e06f3b4f476170e",
       "owners": {
         "@document": {
-          "before": "5ba7c4c2f387bfdaa8e1531bebb08d9c6f0504dacc342aaa1e9237ee71f4948e",
-          "after": "fb1840d621a4efcd621036f5684e59d53335c0346d1bb1350782f2031548adae"
+          "before": "fb1840d621a4efcd621036f5684e59d53335c0346d1bb1350782f2031548adae",
+          "after": "dea5d82258ad97685225af964121bef78ef6014b7cccc09c0e06f3b4f476170e"
+        }
+      }
+    },
+    "docs/ISSUE_533_FIRING_DECK_AUTHORITY.md": {
+      "before_sha256": null,
+      "after_sha256": "b37ecc852c7728c33049fce7a6cd563d8e358fc4a77441224014fa1a04338d64",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b37ecc852c7728c33049fce7a6cd563d8e358fc4a77441224014fa1a04338d64"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "cf4277353d09efb4d7f5983e10c68530051a264fab93d8da7b47bce309998c5e",
-      "after_sha256": "8ad5ae02afceb3d8c6f0232f883d29a44bd2dd323672b92f94dd8a4f0e262e8c",
+      "before_sha256": "8ad5ae02afceb3d8c6f0232f883d29a44bd2dd323672b92f94dd8a4f0e262e8c",
+      "after_sha256": "1b005dbd8884472908780a47354c0581b7464f3ddbfebeb99aa1287ef45fd325",
       "owners": {
         "@document": {
-          "before": "cf4277353d09efb4d7f5983e10c68530051a264fab93d8da7b47bce309998c5e",
-          "after": "8ad5ae02afceb3d8c6f0232f883d29a44bd2dd323672b92f94dd8a4f0e262e8c"
-        }
-      }
-    },
-    "scripts/export_ui_contract_fixtures.py": {
-      "before_sha256": "ccc8cb1ecc4aa4eba6a8bd7bfddbca358fe6689003528f0d4de986835370515f",
-      "after_sha256": "2aa3bb712fbffb673b385ddfcc014700d342e980c8aed4495cc7f4530d6229be",
-      "owners": {
-        "@module": {
-          "before": "4437ce69278e661afb855d18880cdb63ba8d0d6f68a51a3d7ef97729d7cf12cf",
-          "after": "b6decc249cd551f0c14575ce5249ad56fec755973f6a33159442af665d5deed3"
-        },
-        "_attached_charge_view": {
-          "before": null,
-          "after": "489cea7a8aaf7eba49027a53aef093366cc6997e7252896fbe0114e729d4b2e0"
-        },
-        "_conformance_model": {
-          "before": "ad366dcd450ba9959eecde68e00f0c0bafdf9247c67c2edfbdeae51346b7fc8f",
-          "after": "007f5ccc0c60e2dee53ff812c9aef0e03b65ca348a35f4d4e7572ca4037c2013"
-        },
-        "build_ui_contract_bundle": {
-          "before": "d732b39fc838bb25ff49099116f705083210c36b54899cfa404aff94f7c59990",
-          "after": "4beed1d5fdb97a86e6921caef1d6023e8b6498810dd352952f4bc22ef9bbd5bc"
-        }
-      }
-    },
-    "scripts/mock_event_layout_ui_assets/viewer.js": {
-      "before_sha256": "dba9f24294041257189fd34b07470eaf4fc30e999ac60321edb233606517faf8",
-      "after_sha256": "ea66a289b44277ac116411330a781593ec1bd2c7def72f79b9f4c73c081cbaf0",
-      "owners": {
-        "@document": {
-          "before": "dba9f24294041257189fd34b07470eaf4fc30e999ac60321edb233606517faf8",
-          "after": "ea66a289b44277ac116411330a781593ec1bd2c7def72f79b9f4c73c081cbaf0"
+          "before": "8ad5ae02afceb3d8c6f0232f883d29a44bd2dd323672b92f94dd8a4f0e262e8c",
+          "after": "1b005dbd8884472908780a47354c0581b7464f3ddbfebeb99aa1287ef45fd325"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "8ce93c5222fbcc5d167f497ce94581f91ac33bf09c9370f2cf26c0bb61ef17c0",
-      "after_sha256": "f23cf795c6885c6e851593f5c3045fb3249ca9aa92b43e49981b7213da32468f",
+      "before_sha256": "f23cf795c6885c6e851593f5c3045fb3249ca9aa92b43e49981b7213da32468f",
+      "after_sha256": "063d55288bf9909894518e79616a7277f2be8ff577826d031682db2687b97ea9",
       "owners": {
         "@document": {
-          "before": "8ce93c5222fbcc5d167f497ce94581f91ac33bf09c9370f2cf26c0bb61ef17c0",
-          "after": "f23cf795c6885c6e851593f5c3045fb3249ca9aa92b43e49981b7213da32468f"
-        }
-      }
-    },
-    "src/warhammer40k_core/adapters/battlefield_projection.py": {
-      "before_sha256": "0e0370b1a01d80a756c87cc89f06647363efe6a0ce22d5da925c995cfceaa8f2",
-      "after_sha256": "6ec0ae728d9929245d3c529bfe494d91ad069c6255bd04b3186dd59f645f76f6",
-      "owners": {
-        "@module": {
-          "before": "f58c72775f7d643d858d1e96587d7cb0229b7713bd0f590ff7319933cdc02edc",
-          "after": "c3a19a709f591a61d07155b272ddb76fbe4195d2e0edeb20f6a05b6f3262a5d9"
-        },
-        "BattlefieldModelEntityPayload": {
-          "before": "e46ae4ee4ebc33ac5f9ade8e15462dcbe3c703df3a901db01f80f09f33b306eb",
-          "after": "400ae9fcc09989cecf48232c51771fb34fd20a21c2672e078a6b094d69789cd4"
-        },
-        "_model_entities": {
-          "before": "c8d01af26068c6b2152332ae369bd0e9f96656695034d86af7edbbc1abb7e321",
-          "after": "f8df17f37a8a824f2bf8f8b922ec0ecbed971d9b5dfecef31e244208ddaacad8"
+          "before": "f23cf795c6885c6e851593f5c3045fb3249ca9aa92b43e49981b7213da32468f",
+          "after": "063d55288bf9909894518e79616a7277f2be8ff577826d031682db2687b97ea9"
         }
       }
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
-      "before_sha256": "1211b30ebe48548fe651aef4f71c2fde8dd279ff6b7ab1b53fc4f24e5e357af3",
-      "after_sha256": "699d7f1a42fed724685c233fcae1bb8197ab1d5f90ea1345e3b0713bb5c87d5e",
+      "before_sha256": "699d7f1a42fed724685c233fcae1bb8197ab1d5f90ea1345e3b0713bb5c87d5e",
+      "after_sha256": "65cb7f89387230e7709b4b01bfcaf46362ab423e61da103d8cc3bae4cceb524b",
       "owners": {
         "@module": {
-          "before": "22fa8a38a03d58382ce0b5852e26f15f995e326711f88bfc0574707973941d03",
-          "after": "2a4581877914f32170bd5e744420d96f7d39f06c8e1403477336ce2f349c1ed6"
+          "before": "2a4581877914f32170bd5e744420d96f7d39f06c8e1403477336ce2f349c1ed6",
+          "after": "6e5674af87c0ce8c7e02b55c15e765912427e57e92dda4c913ee6410900df380"
         }
       }
     },
-    "tests/fixtures/phase18a_projection_join_sample.json": {
-      "before_sha256": "72bb86b896bd6be2431960b4f4b3110b43ddf8f3c4f56b28d49e415347d4cbfa",
-      "after_sha256": "ae19ae56273b5f5c6c09e44e84dea683171c428ed7e26692e02b0c2334de7058",
+    "src/warhammer40k_core/engine/firing_deck_restore.py": {
+      "before_sha256": "e45964ee535285247196572967669964f644ef7042b6d4a781cdd941ac22bd34",
+      "after_sha256": "c161309bcd1cd0c0588f77f80f0b86ffb4851627d52a074f57510b8d6f615c0b",
       "owners": {
-        "@document": {
-          "before": "72bb86b896bd6be2431960b4f4b3110b43ddf8f3c4f56b28d49e415347d4cbfa",
-          "after": "ae19ae56273b5f5c6c09e44e84dea683171c428ed7e26692e02b0c2334de7058"
+        "validate_firing_deck_restrictions": {
+          "before": "b1a4741d60de25073542c1298a2a9403555bab502811131ca09c74a166234c51",
+          "after": "50270bc4f8bfd7edfe3cbad3706fcfcc6fdb7bb3872195dcdafcf42fcd0cdedc"
         }
       }
     },
-    "tests/public_membership_helpers.py": {
+    "src/warhammer40k_core/engine/phases/shooting_firing_deck.py": {
+      "before_sha256": "53a9e0ee7c6decdeeecedb9f8d26085482a11aec0421b0b0903f9bedb2c57bdc",
+      "after_sha256": "2b11eb3682570dc4fdbb5189a23a77598590fc8412902bfdee17e7e5889e6724",
+      "owners": {
+        "firing_deck_shot_history_snapshot": {
+          "before": null,
+          "after": "2a73588d15f26c74993c4d085550e3a28e60a3c0c343dc90b893522f44e640b2"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/shooting_model.py": {
+      "before_sha256": "a05af64d81630c111ecaba4401f4af860b275b974ba9003c69c26d99885d1f29",
+      "after_sha256": "a5c9e8d74aacd6df1088df91882f20499ef1a763f5581d72fd3d5b9cb49798b5",
+      "owners": {
+        "ShootingDeclarationProposalRequestPayload": {
+          "before": "d9f549c96fd08d82550918235ffd708b13141694783f39d495f8fd690476e114",
+          "after": "7c055333308595df456018e0f5fa330c561a059b5f515e03c0104604e362b166"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/shooting_requests.py": {
+      "before_sha256": "8be12c90047096099d5e62c777a225b0be4b9c5b477c13262b6d758e78b59883",
+      "after_sha256": "944e9e28041c24ed9a0b2ab7a67842ed0b9257a9c14a0095922eac581fcf5116",
+      "owners": {
+        "_request_shooting_declaration": {
+          "before": "6c1af83723a644df2937a5b1069c60d2510eb685a0b0dbe2f881af53b78df9f0",
+          "after": "8d3397ab81478b7868295bd3aff821d929a3ef66df282834201d81cbdbeb37b2"
+        }
+      }
+    },
+    "tests/unit/test_public_firing_deck_history.py": {
       "before_sha256": null,
-      "after_sha256": "8e4731d7d66e21d68a68e5b33b830fae6903704437055a203b924d10f7bd8509",
+      "after_sha256": "f963ed00df9f55415e8a77c5ef78e1efc3dcd347594e291eba133cffd1c2336f",
       "owners": {
         "@module": {
           "before": null,
-          "after": "b5a3d72dd3daf52ee7c7f54e9c8ca4a81bcf973f788ddf0aeb44480bed2bb370"
+          "after": "01dcc6aa892d55b7d7bf3fb85f5cbaaec788ecffe0e1fd0e273cb6096335b966"
         },
-        "attached_split_config": {
+        "_object": {
           "before": null,
-          "after": "b6169304d272270c79bb2d6e09c0dc890da996b685c48fa55016f2a989d2a8af"
-        }
-      }
-    },
-    "tests/unit/test_mock_event_layout_ui.py": {
-      "before_sha256": "8d319b1c38d06b53d07760090a197bbad16adbe0de69b225f13e1ddf75c51260",
-      "after_sha256": "f5f4fe3f4619a0d1267e7b4380d62fa8239e45d4f3afcb3615dcf0126251fcb7",
-      "owners": {
-        "test_mock_event_layout_ui_consumes_exact_battlefield_projections": {
-          "before": "ef140754cea98d8327c8384c8bd60ba1771a20a8ffdf2fc9d4333d79d785a796",
-          "after": "2b7c67fce9bd671ef8acee7a60673a1984f7b5a9e41dcd86017d9bacd4a0a79a"
+          "after": "b04984b8bf1b04609d3667a5b05335fd76ca68f7e605eb863679866539750b0a"
         },
-        "test_mock_event_layout_ui_embeds_projection_and_interactive_3d_controls": {
-          "before": "8470ac14a4aafb4912d1c460b06d0eca6b5fbd9161bc3a59b89f33b2fafc967a",
-          "after": "5820571eee33f2e50f757892ee461f6f66c4c844d5db053f988a03c36d086331"
-        }
-      }
-    },
-    "tests/unit/test_phase18d_ui_contract_artifacts.py": {
-      "before_sha256": "61c14403f344aff83d3e7a27484d337dc6894b27e7961e6a9c146485143b993d",
-      "after_sha256": "ec1985649bdb509b9317486be810f09676da39c66907d82749b49a5d05dec56d",
-      "owners": {
-        "test_current_contract_preserves_model_projections_and_advances_visibility_wrappers": {
-          "before": "eb9e9e8a046b474cc59751b6f4b726ce8611649b021b925fc1107a4160e2eda7",
-          "after": "322f8a4d08ca718043c5ebc5a8119bde73ec8a17f5d59259fd44be5c926e8d89"
-        },
-        "test_phase17n_projection_family_versions_cover_the_new_closed_shapes": {
-          "before": "41b61aff6a90f192294b3cd85c9151df77bbd5da33d89a39190a511ccac08689",
-          "after": "1d43974bb7faa2f57753cf4df11f6acf03d76bf159c23fecf0343015d6956ce8"
-        },
-        "test_session_metadata_contract_version_accepts_current_major_releases": {
-          "before": "08b4abc9bcdefd66f9baa8fe6f15dc3c8230f4c7d195d5acc67396922d09570a",
-          "after": "efb197157578a40dd248e09e355eb29679e2d10dc74dbda38cd9ecd18e1c4c06"
-        }
-      }
-    },
-    "tests/unit/test_phase18e_server_api.py": {
-      "before_sha256": "d5cf5480ab616075e2200b2cc09909634bc6d958d20976072a6daef842575faf",
-      "after_sha256": "3f88c321db317ea3ec24193577c81b94e38765569e8839a11ea6e6124b9c381e",
-      "owners": {
-        "test_phase18e_command_result_schema_requires_accepted_commands_to_be_committed": {
-          "before": "419a8bcf6e4c6236beda62c08f649a78c86a054d518ef34875fa0ec1b051cfa9",
-          "after": "21f2d6ee14a82f666d9db5059d80ea0e652bbb3db2376b3e8be0d76773217e97"
-        },
-        "test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads": {
-          "before": "2c1d61e658e3591d175941b62defb8c2d43a5c68467b7f889ef6e649eef8ab75",
-          "after": "afa3fec36e4b31b1a480b0e9e18802b8411f3710e55dc1e8fe53d0ffab21928f"
-        }
-      }
-    },
-    "tests/unit/test_public_rules_unit_membership.py": {
-      "before_sha256": null,
-      "after_sha256": "18ebff9726ae4d866f06d9159b10b815ed2d6ad3a138a682853556886593e4b6",
-      "owners": {
-        "@module": {
+        "_pending": {
           "before": null,
-          "after": "587479b2fdbab9cf556c27942d26e69b77eb075402162ac3d18b8006613ba412"
+          "after": "924fe75e7a3b31274e3facbd7ba8e2a3194028732fbe031a8a84bdb3fb99ccc5"
         },
-        "_models": {
+        "_public_proposal": {
           "before": null,
-          "after": "f763ae2d107c8ab73cf86ab9112f7ad8cad2c0f229827334e549c0928d37404e"
+          "after": "1bf33265727d94988578129b4d955c662e3c7d1ca219061c86da423feb4253c2"
         },
-        "_public_charge": {
+        "_select": {
           "before": null,
-          "after": "870fa9a4ccbe17f0a279d374f18843f2e590a9260a74572978b61fb7839bc58f"
+          "after": "0a859094b73b4cc64f0fe520bbfd587a7d237c7032681932d4faba6d1691b7f9"
         },
-        "test_casualty_and_physical_removal_keep_lineage_but_refresh_witness_membership": {
+        "_session": {
           "before": null,
-          "after": "2add15432a2b2631dabdd65d18e2e5476ba0209a319d519daddca1a5558bea5d"
+          "after": "63044d8a3f4a7fc988c821ec26187a04548ab0f8ad2da97fce3dc64ae79f6177"
         },
-        "test_membership_tracks_private_split_reveal_and_checkpoint": {
+        "test_invalid_public_firing_deck_is_atomic_and_retryable": {
           "before": null,
-          "after": "779c110519fb69cdda3908d5b1e917343ff0bdc628a61333ec731d5a90027800"
+          "after": "3bfa7238dd005f51ce223cf74a431203c9b61f9d6d8e903ee0f25c3af10743ac"
         },
-        "test_public_charge_invalid_witness_is_atomic_and_can_retry": {
+        "test_no_current_history_authority_outside_matching_phase": {
           "before": null,
-          "after": "b4c0f61a50072e42cd14a4092d337133d2fe2cccf23eea44ae5731923ca617b6"
+          "after": "71d05aa9405ec8879d311381096d3bc5b875257209d113b8fe35e8af65adc0d7"
         },
-        "test_public_client_completes_charge_and_restores_current_membership": {
+        "test_pending_history_restore_rejects_drift": {
           "before": null,
-          "after": "287a235878b428aa2d0edaba53dac5cf79b9d3cb18ed46638649d675c8c931ae"
+          "after": "b8726cb2fb1c8e0f367b9e377129384376f94241a80dab23b859fdb3b6513bd5"
+        },
+        "test_public_firing_deck_after_shot_history": {
+          "before": null,
+          "after": "f8ccf4bc1e7bdce2a4833f18143a4a78f65c51ae9dc53d4bcde47428c7a2a798"
+        },
+        "test_secret_request_and_event_redact_nested_history": {
+          "before": null,
+          "after": "e3f672e8ed473bf56426461423d3f86869d6f536369a40fa135afe3fbf3ec95b"
         }
       }
     }
   },
   "rows": {
+    "README.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+    },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "conformance/typescript/src/battlefield-conformance.test.ts": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "conformance/typescript/src/contract.ts": {
-      "category": "rule_semantics",
-      "operations": [
-        "contract-42-1-publication",
-        "issue532-contract44-publication",
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "conformance/typescript/src/generated/openapi.ts": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication",
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "contracts/README.md": {
       "category": "rule_semantics",
       "operations": [
         "contract-42-1-publication",
         "issue532-contract44-publication",
+        "issue533-contract-publication",
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/compatibility-policy.md": {
-      "category": "rule_semantics",
-      "operations": [
-        "contract-42-1-publication",
-        "issue532-contract44-publication",
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/compatibility/44.0.0-shape.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/examples/battlefield/geometry-conformance.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/examples/events/initial-player-a.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/examples/events/initial-player-b.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
         "contract-42-1-publication",
         "issue532-contract44-publication",
+        "issue533-contract-publication",
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/examples/projections/attached_charge_view.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/examples/projections/hidden_secondary_redaction_view.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/examples/projections/initial_setup_view_player1.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/examples/projections/initial_setup_view_player2.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/examples/projections/post_deployment_view.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_a.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_b.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/examples/projections/visible_modifier_datacard_view.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
         "contract-42-1-publication",
         "issue532-contract44-publication",
+        "issue533-contract-publication",
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
         "contract-42-1-publication",
         "issue532-contract44-publication",
+        "issue533-contract-publication",
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
         "contract-42-1-publication",
         "issue532-contract44-publication",
+        "issue533-contract-publication",
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
         "contract-42-1-publication",
         "issue532-contract44-publication",
+        "issue533-contract-publication",
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
         "contract-42-1-publication",
         "issue532-contract44-publication",
+        "issue533-contract-publication",
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
         "contract-42-1-publication",
         "issue532-contract44-publication",
+        "issue533-contract-publication",
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
         "contract-42-1-publication",
         "issue532-contract44-publication",
+        "issue533-contract-publication",
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/migrations/43-to-44.md": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "contracts/openapi.yaml": {
       "category": "rule_semantics",
       "operations": [
         "contract-42-1-publication",
         "issue532-contract44-publication",
+        "issue533-contract-publication",
         "order103-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/redaction-policy.md": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/schemas/battlefield-view.schema.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/schemas/session-command-outcome.schema.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication",
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/schemas/session-command-result.schema.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication",
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/schemas/session-metadata.schema.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication",
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "contracts/schemas/session-persistence.schema.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication",
-        "order103-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
+    },
+    "docs/ISSUE_533_FIRING_DECK_AUTHORITY.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "scripts/export_ui_contract_fixtures.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "scripts/mock_event_layout_ui_assets/viewer.js": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-contract44-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -1191,94 +697,72 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "src/warhammer40k_core/adapters/battlefield_projection.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-public-membership-projection"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
       "operations": [
         "contract-42-1-publication",
         "issue532-contract44-publication",
+        "issue533-contract-publication",
         "order103-src-warhammer40k_core-adapters-external_contract"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
-    "tests/fixtures/phase18a_projection_join_sample.json": {
+    "src/warhammer40k_core/engine/firing_deck_restore.py": {
       "category": "rule_semantics",
       "operations": [
-        "issue532-client-regressions"
+        "issue533-public-firing-deck-authority"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
-    "tests/public_membership_helpers.py": {
+    "src/warhammer40k_core/engine/phases/shooting_firing_deck.py": {
       "category": "rule_semantics",
       "operations": [
-        "issue532-client-regressions"
+        "issue533-public-firing-deck-authority"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
-    "tests/unit/test_mock_event_layout_ui.py": {
+    "src/warhammer40k_core/engine/phases/shooting_model.py": {
       "category": "rule_semantics",
       "operations": [
-        "issue532-client-regressions"
+        "issue533-public-firing-deck-authority"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
-    "tests/unit/test_phase18d_ui_contract_artifacts.py": {
+    "src/warhammer40k_core/engine/phases/shooting_requests.py": {
       "category": "rule_semantics",
       "operations": [
-        "issue532-client-regressions",
-        "order103-tests-unit-test_phase18d_ui_contract_artifacts"
+        "issue533-public-firing-deck-authority"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     },
-    "tests/unit/test_phase18e_server_api.py": {
+    "tests/unit/test_public_firing_deck_history.py": {
       "category": "rule_semantics",
       "operations": [
-        "issue532-client-regressions",
-        "order103-tests-unit-test_phase18e_server_api",
-        "shock-regression-controls"
+        "issue533-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
-    },
-    "tests/unit/test_public_rules_unit_membership.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue532-client-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded issue532 public canonical membership repair and required contract/client publication. The owner-approved sequential policy selects serial smoke for this semantic change; there is no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Issue532 requires a public client to join the canonical Charge actor to every current physical component/model and pose using viewer-scoped information, without weakening physical ownership, hidden formation redaction or complete PathWitness validation.",
-      "unchanged_work": "The projection adds one current rules-unit/model inventory traversal and one canonical identity field per already-visible model. Existing rules-unit authority, viewer filtering, physical ownership, movement validation, persistence/replay algorithms and caches remain unchanged. Contract version artifacts and client controls describe that field. The assessment acknowledges this bounded added projection work; serial live smoke and full semantic/work/cache controls remain mandatory."
+      "rationale": "Bounded issue533 public authority repair and required contract/client publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Issue533 requires ordinary public Firing Deck declarations after nonempty prior shooting to obtain the exact current shot-history tuple through the public request, preserving physical weapon/source/cargo checks, viewer safety, restore and replay.",
+      "unchanged_work": "The current Firing Deck request exposes the engine-owned current shot-history snapshot. Existing selection legality, physical weapon/source/cargo validation, geometry algorithms and caches retain their authority. Contract artifacts and client regressions describe and exercise that field. Bounded request snapshot work is acknowledged; serial live smoke and full semantic/work/cache controls remain mandatory."
     }
   },
   "milestone": "ordinary",

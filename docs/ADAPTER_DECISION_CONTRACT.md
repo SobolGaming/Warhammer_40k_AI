@@ -2138,7 +2138,7 @@ Phase 13B shooting declaration submissions must use `selected_option_id: "submit
 
 - `proposal_request_id`, `proposal_kind: "shooting_declaration"`, player ID, battle round, acting unit ID, source request/result IDs, and visibility cache key;
 - one or more `WeaponDeclaration` entries with attacker model ID, the exact engine-emitted `weapon_instance_id`, wargear ID, weapon profile ID, target unit ID, engine-enumerated `shooting_type`, selected duplicate weapon ability descriptor IDs in `selected_weapon_ability_ids`, and optional Firing Deck source unit/model IDs. Distinct physical copies may select the same or different otherwise-legal targets. The same physical-copy/profile/Firing-Deck-source declaration key may appear only once. Catalog-defined independently selectable multi-profile groups such as Tesseract Vault C'tan Powers may expose distinct legal profiles that share one `weapon_instance_id`; those distinct rows remain independently declarable subject to `shooting_weapon_selection_limits`;
-- optional `FiringDeckSelection` evidence with the Transport ID, descriptor-sourced Firing Deck value, and selected embarked unit/model/`weapon_instance_id`/wargear/profile bindings plus already-shot embarked unit IDs. At most the descriptor value's number of distinct embarked models may be selected, and each selected embarked model may contribute at most one non-One-Shot ranged weapon.
+- optional `FiringDeckSelection` evidence with the Transport ID, descriptor-sourced Firing Deck value, and selected embarked unit/model/`weapon_instance_id`/wargear/profile bindings plus the complete current-phase shot-unit IDs copied unchanged from `firing_deck_already_shot_unit_instance_ids`. At most the descriptor value's number of distinct embarked models may be selected, and each selected embarked model may contribute at most one non-One-Shot ranged weapon.
 
 Order 33 preserves the existing finite and proposal schemas. In `indirect` mode,
 `available_weapons` may contain ordinary ranged weapons as well as
@@ -6520,6 +6520,22 @@ See [migration 29 to 30](../contracts/migrations/29-to-30.md) and the dedicated
 
 
 ## Order 65 / P24B: turn-long Firing Deck passenger restrictions
+
+Contract 44.1 / issue 533 adds `firing_deck_already_shot_unit_instance_ids`
+to each declaration proposal request with a non-null `firing_deck_value`.
+For current ordinary Shooting this is the entire sorted phase shot-history list,
+including prior non-Transport shooters, not merely contributing or embarked units.
+Clients copy it unchanged into `firing_deck_selection.already_shot_unit_instance_ids`;
+they must not reconstruct it from cargo, events or guessed empty history.
+An empty list means no unit has shot. Null means no ordinary Firing Deck history
+authority in this context (including out-of-phase, absent or stale phase state),
+and grants no Firing Deck permission. Other units omit the field.
+Existing current-state, source, actor, round, cargo, weapon-copy and profile
+validation remains authoritative. Pending restore verifies this snapshot beside
+the cargo snapshot. Public ordinary Shooting identities retain the existing
+nonsecret request/event visibility; shared secret-request redaction hides the
+entire nested snapshot from unauthorized viewers. No new reaction window is added.
+See [scope and regression coverage](ISSUE_533_FIRING_DECK_AUTHORITY.md).
 
 Every Firing Deck Shooting declaration request includes
 `firing_deck_embarked_unit_instance_ids`, the complete sorted cargo snapshot for
