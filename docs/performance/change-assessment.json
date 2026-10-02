@@ -1,30 +1,30 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "0e11d3b9c924448167fa50b228c0a68a27118e17",
+  "base": "f9c44bb80a3776a83f8a8e23befca11e0c64db04",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0291fd08bb730575da8e064d519fdc083a22f27b98ab5aa5e076055dc5a18a46",
   "operation_map_sha256": "9bf682ac68f968e96151ae13250c2e213bc60152d69d4f8a4147ac8d87a6112c",
   "changes": {
-    "conformance/typescript/package-lock.json": {
-      "before_sha256": "9d456e4ad7822f83ffdaf17c3b9b1e899af92b93263ece516224613796302692",
-      "after_sha256": "96a6a1493e0be69c2e0bea5dc3e2646d5c9d441a3c770d7c49a5e503fa2dc385",
+    "uv.lock": {
+      "before_sha256": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+      "after_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
       "owners": {
         "@document": {
-          "before": "9d456e4ad7822f83ffdaf17c3b9b1e899af92b93263ece516224613796302692",
-          "after": "96a6a1493e0be69c2e0bea5dc3e2646d5c9d441a3c770d7c49a5e503fa2dc385"
+          "before": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+          "after": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa"
         }
       }
     }
   },
   "rows": {
-    "conformance/typescript/package-lock.json": {
+    "uv.lock": {
       "category": "dependency_environment",
       "operations": [
         "development-dependency"
       ],
       "selected_families": [],
-      "rationale": "Update brace-expansion from 2.1.2 to 2.1.7 in the private TypeScript conformance toolchain, retaining the original Dependabot version, resolved URL and integrity changes. Preserve the previously merged fast-uri 3.1.8 dependency and all other lockfile entries.",
+      "rationale": "Retain Dependabot's virtualenv 21.3.3 to 21.7.13 update and its python-discovery 1.3.1 to 1.6.1 resolution, including python-discovery's removed direct platformdirs dependency. These packages support the pre-commit development environment; all other locked packages and merged npm updates remain unchanged.",
       "source_obligation": null,
-      "unchanged_work": "This dependency supports the private TypeScript conformance toolchain rather than the Python rules-engine runtime. No gameplay algorithm, search, cache, persistence or replay implementation changes. Required hosted conformance and policy checks remain active; no engine detailed comparison is selected."
+      "unchanged_work": "The pre-commit -> virtualenv -> python-discovery chain is development tooling, not a Python rules-engine runtime dependency. No gameplay algorithm, search, cache, persistence or replay implementation changes. Required hosted dependency, policy and quality checks remain active; no engine detailed comparison is selected."
     }
   },
   "milestone": "ordinary",
