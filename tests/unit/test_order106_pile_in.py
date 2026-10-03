@@ -91,7 +91,7 @@ def _submit(
     state = session.lifecycle.state
     assert state is not None
     assert state.battlefield_state is not None
-    paths = []
+    paths: list[tuple[str, tuple[Pose, ...]]] = []
     for unit_id in ("army-alpha:source", "army-alpha:leader"):
         if unit_id not in {u.unit_instance_id for a in state.army_definitions for u in a.units}:
             continue
