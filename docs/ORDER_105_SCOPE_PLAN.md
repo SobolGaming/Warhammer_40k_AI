@@ -42,7 +42,13 @@ The shared owner serves:
    roll carries the same count calculated from the entire group, rather than
    an independent component count.
 
-Existing simultaneous-roll records freeze the count before allocation. The
+Existing simultaneous-roll records freeze the count before allocation.
+The shared Hazardous context validator authenticates continuation against the
+existing registered `mortal_wound_application_started` source context. Before
+registration it validates the live all-model count. After registration it must
+not recalculate the count from survivors: the last ordinary-model casualty or
+complete destruction of an all-large unit does not change that roll's count.
+The
 shared mortal-wound decisions, casualties, Feel No Pain, transport placement,
 viewer projections, persistence and replay retain their current owners.
 There are no new choices, fields, handlers or contract versions. Contract 44.1
@@ -83,6 +89,14 @@ The attached Infantry/Vehicle Emergency case reaches the former component-count
 disagreement exception. The other failures reach the incorrect three-wound
 consequence. Current focused tests retain the actual failed-roll, applied damage,
 restoration and replay assertions.
+
+Independent review reproduced a normal-play continuation failure on initial
+candidate `63cacec1`: two legal mortal-wound recipient choices destroy both
+W1 MOUNTED models in an attached unit, leaving VEHICLE survivors. Recomputing
+the live count then rejected the frozen one-wound value after mutation. The
+registered-application repair above addresses this same simultaneous-roll
+invariant. Regressions cover that transition and complete all-large-unit
+destruction, restoring and continuing after each casualty and replaying exactly.
 
 Full covered exact behavioral inventory at 85%, all quality/type/lint/import,
 generated/contract/client/package checks, hosted CI and both independent clean

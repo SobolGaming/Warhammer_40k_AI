@@ -126,6 +126,7 @@ def hazardous_sequence_for_progress(
         raise GameLifecycleError("Hazardous completion selected-rule authority drift.")
     validate_hazardous_mortal_wound_source_context(
         state=state,
+        event_records=event_records,
         attack_sequence=sequence,
         source_context_payload=source,
         mortal_wounds=progress.mortal_wounds,

@@ -82,7 +82,7 @@
     "tests/unit/test_order100_frame_measurement.py": 60.001,
     "tests/unit/test_order101_setup_failure.py": 1025.872,
     "tests/unit/test_order104_range_visibility.py": 211.876,
-    "tests/unit/test_order105_hazard.py": 59.178,
+    "tests/unit/test_order105_hazard.py": 130.332,
     "tests/unit/test_order36_sequencing.py": 251.04,
     "tests/unit/test_order36_timing_authority.py": 174.62,
     "tests/unit/test_order51_flight.py": 165.05,
@@ -299,77 +299,77 @@
     {
       "junit_sha256": [
         "1f4269a19fd029a2f503fe0d72148070592294fb75cd43053a400a85d7c5c27d",
-        "3933d36c314e3cd1b8d727805a7f68ca6cdf8438c66f78af9b613f54b0c4fea7",
-        "9467308249280a996f3e85ad5aba74433dc822c259c0a9c87de74e0b10eb8907"
+        "9467308249280a996f3e85ad5aba74433dc822c259c0a9c87de74e0b10eb8907",
+        "a1441ac86292ae083a46e7c92158bd7fb616f609cdd3304b4052a9e224874041"
       ],
-      "source": "Order104 exact-base complete10321 cases plus Order105 focused17 new cases on Windows Python3.14.5, green7.xml",
-      "test_cases": 10338,
+      "source": "Verified Order104 base complete10321 cases plus Order105 current19 cases, WindowsPython3.14.5, review-fix.xml",
+      "test_cases": 10340,
       "test_files": 294
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 4076.161,
+      "duration_seconds": 4082.081,
       "shard_id": 1,
       "test_file_count": 23
     },
     {
-      "duration_seconds": 4076.143,
+      "duration_seconds": 4082.072,
       "shard_id": 2,
       "test_file_count": 24
     },
     {
-      "duration_seconds": 4076.163,
+      "duration_seconds": 4082.074,
       "shard_id": 3,
-      "test_file_count": 23
+      "test_file_count": 24
     },
     {
-      "duration_seconds": 4076.142,
+      "duration_seconds": 4082.116,
       "shard_id": 4,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4076.143,
+      "duration_seconds": 4082.101,
       "shard_id": 5,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4076.152,
+      "duration_seconds": 4082.067,
       "shard_id": 6,
-      "test_file_count": 24
+      "test_file_count": 25
     },
     {
-      "duration_seconds": 4076.159,
+      "duration_seconds": 4082.094,
       "shard_id": 7,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4076.158,
+      "duration_seconds": 4082.077,
       "shard_id": 8,
-      "test_file_count": 24
-    },
-    {
-      "duration_seconds": 4076.145,
-      "shard_id": 9,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4076.162,
+      "duration_seconds": 4082.067,
+      "shard_id": 9,
+      "test_file_count": 24
+    },
+    {
+      "duration_seconds": 4082.096,
       "shard_id": 10,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4076.175,
+      "duration_seconds": 4082.08,
       "shard_id": 11,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4076.139,
+      "duration_seconds": 4082.071,
       "shard_id": 12,
-      "test_file_count": 26
+      "test_file_count": 24
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 48913.842
+  "total_test_duration_seconds": 48984.996
 }

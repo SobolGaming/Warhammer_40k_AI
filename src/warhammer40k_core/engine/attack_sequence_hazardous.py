@@ -381,6 +381,7 @@ def _hazardous_source_context_from_payload(
 def validate_hazardous_mortal_wound_source_context(
     *,
     state: GameState,
+    event_records: tuple[EventRecord, ...],
     attack_sequence: AttackSequence,
     source_context_payload: JsonValue,
     mortal_wounds: int,
@@ -411,12 +412,39 @@ def validate_hazardous_mortal_wound_source_context(
     )
     if roll_state.original_result.spec != expected_roll_spec:
         raise GameLifecycleError("Hazardous mortal wound roll specification drift.")
-    expected_mortal_wounds_per_failed_roll = _hazardous_mortal_wounds_for_attacker(
-        state=state,
-        attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+    from warhammer40k_core.engine.mortal_wound_application_authority import (
+        MORTAL_WOUND_APPLICATION_STARTED_EVENT,
+        mortal_wound_application_authority_from_event,
     )
-    if source_context["mortal_wounds_per_failed_roll"] != (expected_mortal_wounds_per_failed_roll):
-        raise GameLifecycleError("Hazardous mortal wound value per failure drift.")
+
+    starts = tuple(
+        event
+        for event in event_records
+        if event.event_type == MORTAL_WOUND_APPLICATION_STARTED_EVENT
+        and isinstance(event.payload, dict)
+        and event.payload.get("application_id")
+        == f"{attack_sequence.sequence_id}:hazardous:mortal-wounds"
+    )
+    if starts:
+        # Registration precedes allocation. Casualties must not change a simultaneous roll's count.
+        if len(starts) != 1:
+            raise GameLifecycleError("Hazardous mortal wound application start drift.")
+        authority = mortal_wound_application_authority_from_event(starts[0])
+        if source_context != _hazardous_source_context_from_payload(authority.source_context):
+            raise GameLifecycleError("Hazardous mortal wound application source context drift.")
+    else:
+        # The initial retained-damage binding is validated before registering its application.
+        expected_mortal_wounds_per_failed_roll = _hazardous_mortal_wounds_for_attacker(
+            state=state,
+            attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+        )
+        if (
+            source_context["mortal_wounds_per_failed_roll"]
+            != expected_mortal_wounds_per_failed_roll
+        ):
+            raise GameLifecycleError("Hazardous mortal wound value per failure drift.")
+    if source_context["mortal_wounds_per_failed_roll"] not in {1, 3}:
+        raise GameLifecycleError("Hazardous mortal wound value per failure is invalid.")
     if source_context["mortal_wounds"] != mortal_wounds:
         raise GameLifecycleError("Hazardous mortal wound source context wound drift.")
     return source_context

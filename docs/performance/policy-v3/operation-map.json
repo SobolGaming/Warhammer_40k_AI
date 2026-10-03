@@ -2061,19 +2061,28 @@
     },
     "order105-hazard-all-models-authority": {
       "paths": [
+        "src/warhammer40k_core/engine/attack_sequence_group_selection.py",
         "src/warhammer40k_core/engine/attack_sequence_hazardous.py",
         "src/warhammer40k_core/engine/emergency_disembark.py",
         "src/warhammer40k_core/engine/hazard.py",
+        "src/warhammer40k_core/engine/hazardous_completion.py",
+        "src/warhammer40k_core/engine/hazardous_retention.py",
+        "src/warhammer40k_core/engine/hazardous_retention_history.py",
         "src/warhammer40k_core/engine/phases/movement_rules_unit_disembark.py"
       ],
       "owners": [
         "@module",
         "_canonical_keyword",
+        "_continue_hazardous_after_mortal_wound_feel_no_pain",
         "_hazardous_mortal_wounds_for_attacker",
         "_resolve_rules_unit_combat_components",
         "_rules_unit_hazard_mortal_wounds_per_failed_roll",
         "hazard_mortal_wounds_per_failed_roll",
-        "resolve_destroyed_transport_rules_unit_hazard_rolls_service"
+        "hazardous_sequence_for_progress",
+        "pending_hazardous_logical_deaths",
+        "resolve_destroyed_transport_rules_unit_hazard_rolls_service",
+        "validate_hazardous_mortal_wound_source_context",
+        "validate_retained_hazardous_progress"
       ],
       "families": [],
       "sensitive": false,

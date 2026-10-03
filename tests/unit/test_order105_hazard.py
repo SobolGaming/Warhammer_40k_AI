@@ -235,11 +235,22 @@ def test_mixed_emergency_hazard_resolves_complete_cargo(
     )
 
 
-@pytest.mark.parametrize("attached", [False, True])
-def test_mixed_hazardous_facade_restore_and_replay(attached: bool) -> None:
+@pytest.mark.parametrize(
+    ("attached", "fragile", "keyword"),
+    [
+        (False, False, "MOUNTED"),
+        (True, False, "MOUNTED"),
+        (True, True, "MOUNTED"),
+        (False, True, "MONSTER"),
+    ],
+)
+def test_mixed_hazardous_facade_restore_and_replay(
+    attached: bool, fragile: bool, keyword: str
+) -> None:
     session, units = hazard_scene(
-        "MOUNTED",
+        keyword,
         attached=attached,
+        fragile=fragile,
         game_id="order105-hazard-1" if attached else "order105-hazard",
     )
     initial = json.loads(json.dumps(session.lifecycle.to_payload()))
@@ -247,6 +258,8 @@ def test_mixed_hazardous_facade_restore_and_replay(attached: bool) -> None:
     state = session.lifecycle.state
     assert state is not None
     shooter = rules_unit_view_by_id(state=state, unit_instance_id=units["shooter"].unit_instance_id)
+    initial_wounds = sum(model.current_wounds for model in shooter.alive_models())
+    expected_per_failure = 3 if keyword == "MONSTER" else 1
     session.submit_option(
         request_id=request.request_id,
         result_id="order105:select",
@@ -295,10 +308,11 @@ def test_mixed_hazardous_facade_restore_and_replay(attached: bool) -> None:
     payload = cast(dict[str, object], event.payload)
     failed = cast(list[str], payload["failed_hazardous_weapon_instance_ids"])
     assert failed, payload
-    assert payload["mortal_wounds"] == len(failed)
+    assert payload["mortal_wounds"] == len(failed) * expected_per_failure
     restored = LocalGameSession.from_persistence_payload(
         json.loads(json.dumps(session.to_persistence_payload()))
     )
+    completed_sessions: list[LocalGameSession] = []
     for current in (session, restored):
         for _ in range(30):
             if any(
@@ -306,9 +320,35 @@ def test_mixed_hazardous_facade_restore_and_replay(attached: bool) -> None:
                 for event in current.lifecycle.decision_controller.event_log.records
             ):
                 break
-            submit_fixture_request(current, pending_request(current))
+            request = pending_request(current)
+            if fragile and request.decision_type == "select_mortal_wound_model":
+                chosen = next(
+                    (
+                        option
+                        for option in request.options
+                        if keyword in shooter.model_by_id(option.option_id).keywords
+                    ),
+                    request.options[0],
+                )
+                status = current.submit_option(
+                    request_id=request.request_id,
+                    result_id=request.request_id + ":fragile",
+                    option_id=chosen.option_id,
+                )
+                assert status.status_kind is not LifecycleStatusKind.INVALID, status
+                # Resume from engine-generated state after every casualty, not just before damage.
+                checkpoint = current.to_persistence_payload()
+                resumed = LocalGameSession.from_persistence_payload(
+                    json.loads(json.dumps(checkpoint))
+                )
+                assert resumed.to_persistence_payload() == checkpoint
+                current = resumed
+            else:
+                submit_fixture_request(current, request)
         else:
             raise AssertionError("Hazardous damage did not complete.")
+        completed_sessions.append(current)
+    session, restored = completed_sessions
     assert restored.to_persistence_payload() == session.to_persistence_payload()
     applied = next(
         event
@@ -318,8 +358,21 @@ def test_mixed_hazardous_facade_restore_and_replay(attached: bool) -> None:
     applied_payload = cast(dict[str, object], applied.payload)
     application = cast(dict[str, object], applied_payload["mortal_wound_application"])
     applications = cast(list[dict[str, object]], application["applications"])
-    assert application["mortal_wounds"] == len(failed)
-    assert sum(cast(int, row["wounds_lost"]) for row in applications) == len(failed)
+    assert application["mortal_wounds"] == len(failed) * expected_per_failure
+    assert sum(cast(int, row["wounds_lost"]) for row in applications) == min(
+        initial_wounds, len(failed) * expected_per_failure
+    )
+    if fragile:
+        final_state = session.lifecycle.state
+        assert final_state is not None
+        survivors = rules_unit_view_by_id(
+            state=final_state, unit_instance_id=units["shooter"].unit_instance_id
+        ).alive_models()
+        if keyword == "MOUNTED":
+            assert survivors
+            assert all("VEHICLE" in model.keywords for model in survivors)
+        else:
+            assert not survivors
     for viewer in ("player-a", "player-b"):
         assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
         assert restored.events_since(

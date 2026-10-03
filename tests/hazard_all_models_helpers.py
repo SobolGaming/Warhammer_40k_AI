@@ -4,12 +4,13 @@ from dataclasses import replace
 
 from tests.model_keyword_helpers import mixed_keyword_catalog
 from tests.phase13b_shooting_declaration_helpers import (
-    _build_shooting_lifecycle,
+    _build_shooting_lifecycle,  # pyright: ignore[reportPrivateUsage]
     _config,
     _unit_placement_at,
 )
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.weapon_profiles import AttackProfile, WeaponKeyword
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import AttachmentDeclaration
@@ -19,13 +20,34 @@ from warhammer40k_core.geometry.pose import Pose
 
 
 def hazard_scene(
-    ordinary_keyword: str, *, attached: bool = False, game_id: str = "order105-hazard-1"
+    ordinary_keyword: str,
+    *,
+    attached: bool = False,
+    game_id: str = "order105-hazard-1",
+    fragile: bool = False,
 ) -> tuple[LocalGameSession, dict[str, UnitInstance]]:
     catalog = mixed_keyword_catalog()
     sheet = catalog.datasheet_by_id("core-intercessor-like-infantry")
     sheet = replace(
         sheet,
         keywords=replace(sheet.keywords, keywords=(ordinary_keyword, "VEHICLE", "BATTLELINE")),
+        model_profiles=tuple(
+            replace(
+                profile,
+                characteristics=tuple(
+                    CharacteristicValue.from_raw(Characteristic.WOUNDS, 1)
+                    if fragile
+                    and value.characteristic is Characteristic.WOUNDS
+                    and (
+                        ordinary_keyword == "MONSTER"
+                        or profile.model_profile_id == "core-intercessor-like"
+                    )
+                    else value
+                    for value in profile.characteristics
+                ),
+            )
+            for profile in sheet.model_profiles
+        ),
         wargear_options=tuple(
             replace(
                 option,
