@@ -2525,7 +2525,8 @@
         "test_outside_range_member_gets_recorded_random_oc_preparation",
         "test_positive_member_follows_existing_rules_presence",
         "test_positive_oc_uses_runtime_modifiers_and_battle_shock",
-        "test_shared_stratagem_control_separates_range_and_positive_oc"
+        "test_shared_stratagem_control_separates_range_and_positive_oc",
+        "test_stratagem_selection_only_resolves_oc_for_in_range_candidates"
       ],
       "families": [],
       "sensitive": false,

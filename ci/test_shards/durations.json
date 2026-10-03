@@ -86,7 +86,7 @@
     "tests/unit/test_order106_pile_in.py": 287.081,
     "tests/unit/test_order107_fight_distance_window.py": 178.813,
     "tests/unit/test_order108_terrain_semantics.py": 194.051,
-    "tests/unit/test_order109_unit_control.py": 151.064,
+    "tests/unit/test_order109_unit_control.py": 202.37,
     "tests/unit/test_order36_sequencing.py": 249.236,
     "tests/unit/test_order36_timing_authority.py": 291.973,
     "tests/unit/test_order51_flight.py": 175.215,
@@ -302,76 +302,76 @@
   "profiles": [
     {
       "junit_sha256": [
-        "77f0d2c6d4004fbd11ff4199d34124d78ccfe4b5ea92afd1cd23ecec66553f29"
+        "5246c976f34e4798afdede6db0081727dca6f2d08b6ca179637a185ed9a1b43c"
       ],
-      "source": "Order108 exact-head 70ebb2936871d8c596d652b27d072467980fdd15 complete10466-case timing inventory, replacing rerun cases and adding Order109 cases from focused-final.xml:0baa69f1833e; Windows same host; composite scheduling evidence only, final complete Order109 gates remain separate",
-      "test_cases": 10483,
+      "source": "Order108 exact-head 70ebb2936871d8c596d652b27d072467980fdd15 complete10466-case timing inventory, replacing rerun cases and adding Order109 cases from focused-final-b1.xml:a540ba507529; Windows same host; composite scheduling evidence only, final complete Order109 gates remain separate",
+      "test_cases": 10485,
       "test_files": 298
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 4321.851,
+      "duration_seconds": 4326.151,
       "shard_id": 1,
-      "test_file_count": 24
+      "test_file_count": 23
     },
     {
-      "duration_seconds": 4321.85,
+      "duration_seconds": 4326.119,
       "shard_id": 2,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4321.849,
+      "duration_seconds": 4326.126,
       "shard_id": 3,
-      "test_file_count": 24
-    },
-    {
-      "duration_seconds": 4321.861,
-      "shard_id": 4,
-      "test_file_count": 24
-    },
-    {
-      "duration_seconds": 4321.849,
-      "shard_id": 5,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4321.856,
-      "shard_id": 6,
-      "test_file_count": 24
-    },
-    {
-      "duration_seconds": 4321.871,
-      "shard_id": 7,
+      "duration_seconds": 4326.132,
+      "shard_id": 4,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4321.849,
+      "duration_seconds": 4326.151,
+      "shard_id": 5,
+      "test_file_count": 24
+    },
+    {
+      "duration_seconds": 4326.145,
+      "shard_id": 6,
+      "test_file_count": 25
+    },
+    {
+      "duration_seconds": 4326.124,
+      "shard_id": 7,
+      "test_file_count": 27
+    },
+    {
+      "duration_seconds": 4326.126,
       "shard_id": 8,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4321.873,
+      "duration_seconds": 4326.15,
       "shard_id": 9,
-      "test_file_count": 25
+      "test_file_count": 23
     },
     {
-      "duration_seconds": 4321.878,
+      "duration_seconds": 4326.151,
       "shard_id": 10,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4321.876,
+      "duration_seconds": 4326.15,
       "shard_id": 11,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4321.883,
+      "duration_seconds": 4326.127,
       "shard_id": 12,
-      "test_file_count": 25
+      "test_file_count": 24
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 51862.346
+  "total_test_duration_seconds": 51913.652
 }

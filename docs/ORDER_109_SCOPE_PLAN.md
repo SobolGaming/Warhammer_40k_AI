@@ -40,6 +40,9 @@ removed models cannot supply OC. Objective scores and contributor inventories
 are unchanged.
 
 Generic Stratagem objective-selection enumeration and validation use this query.
+They first require player control and unit range before resolving the unit's OC,
+so an out-of-range unit's legitimately unprepared random OC does not prevent
+empty enumeration or typed selection rejection.
 Their existing range helper remains available for rules requiring only a unit
 within range of an objective its player controls. In particular, Corsair Coterie's
 Cloak and Shadow target text says "within range of an objective marker you control";

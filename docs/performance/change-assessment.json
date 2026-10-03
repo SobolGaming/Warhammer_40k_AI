@@ -1,8 +1,8 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "be9bda2bf56ffde3147727fb9dc869c4163ddabc",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:01535b63e5850a7d3da31fff0a7ae657b3144bc0ee984b18799f8f7aea658481",
-  "operation_map_sha256": "b185baa3d8cfea536ff3a99b6fe62ab72c4f959fd5ba0db3923fa146ffb85c3c",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8087b5a6b574f7f15439e7d9fc0a3f75e7a979b8d1b2b2d0a56f36d264a75471",
+  "operation_map_sha256": "8f4bd108e2187c1789774dde8766938e67df737321826931f3a9d9653e4fc6c4",
   "changes": {
     "README.md": {
       "before_sha256": "2cfae629440baae25b8afcbb865e527005674f2e0c1dcb959ecc40cc2fb409ef",
@@ -16,211 +16,211 @@
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "bf14de096129ef08146d48ff25e276a416238697e5e6850e2681cff6139a684e",
-      "after_sha256": "bfeec4b328646908a05a1480c9d8fa47037bbe60c2bbb5d0f97f2f1cfc4863f0",
+      "after_sha256": "755ecbfaf3275c7962950bd8300754c45afc5fbdb62125e7b5d87356e9c5f2b9",
       "owners": {
         "@document": {
           "before": "bf14de096129ef08146d48ff25e276a416238697e5e6850e2681cff6139a684e",
-          "after": "bfeec4b328646908a05a1480c9d8fa47037bbe60c2bbb5d0f97f2f1cfc4863f0"
+          "after": "755ecbfaf3275c7962950bd8300754c45afc5fbdb62125e7b5d87356e9c5f2b9"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "34de73356bf39dca893e1502a926e17986ee381cb5160df8388090665d528573",
-      "after_sha256": "320fcae554a3b5cac8dc309b875cc4741d3e6393b236843d2a09d97280ab4d2d",
+      "after_sha256": "ba07e69399b6fe551daf416970016ac14189e24f09a80abfeee20ff7f0c4faaa",
       "owners": {
         "@document": {
           "before": "34de73356bf39dca893e1502a926e17986ee381cb5160df8388090665d528573",
-          "after": "320fcae554a3b5cac8dc309b875cc4741d3e6393b236843d2a09d97280ab4d2d"
+          "after": "ba07e69399b6fe551daf416970016ac14189e24f09a80abfeee20ff7f0c4faaa"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "54f6437e9ca5924246d4eec25893c0f11cd2c2c7bdf3b5bbc95363d65e5ebf2a",
-      "after_sha256": "f04b9745160bddf9c1b5b94290afca04356ccd1a27842f2cf1d2b7e931d456b4",
+      "after_sha256": "7b5eeee7957d439d316df702a06419544b5d68e410b2a00d92a99c865fa97123",
       "owners": {
         "@document": {
           "before": "54f6437e9ca5924246d4eec25893c0f11cd2c2c7bdf3b5bbc95363d65e5ebf2a",
-          "after": "f04b9745160bddf9c1b5b94290afca04356ccd1a27842f2cf1d2b7e931d456b4"
+          "after": "7b5eeee7957d439d316df702a06419544b5d68e410b2a00d92a99c865fa97123"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "cec52bfbd17f283c8e13f68ad2b46c32bef175c508948dce29891b99e412984e",
-      "after_sha256": "f3a2b6d06d33d7da2337d8eaf1bb51560ef337a40f482b47046e6470dccc952f",
+      "after_sha256": "f6e3dd7be365ce53dd9e9daea2b35c30b02939d27c2c1ec21e63788ceeb91932",
       "owners": {
         "@document": {
           "before": "cec52bfbd17f283c8e13f68ad2b46c32bef175c508948dce29891b99e412984e",
-          "after": "f3a2b6d06d33d7da2337d8eaf1bb51560ef337a40f482b47046e6470dccc952f"
+          "after": "f6e3dd7be365ce53dd9e9daea2b35c30b02939d27c2c1ec21e63788ceeb91932"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "8bd42b5d6bf561117d71e3975533e3103a94a7e86ea24ccfee21085fea8b3570",
-      "after_sha256": "301e6855bc6cf399a27a08488b1f977dc9f93c08bad5a38bb14e662b67e8a82e",
+      "after_sha256": "729416670ffe3c824f6bc4a36bc9169fff0d3a04c77449e1f5fd252add22ce7e",
       "owners": {
         "@document": {
           "before": "8bd42b5d6bf561117d71e3975533e3103a94a7e86ea24ccfee21085fea8b3570",
-          "after": "301e6855bc6cf399a27a08488b1f977dc9f93c08bad5a38bb14e662b67e8a82e"
+          "after": "729416670ffe3c824f6bc4a36bc9169fff0d3a04c77449e1f5fd252add22ce7e"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "0d2c64a59fcac81400d14e8db54da81d97c641ef8347177fe67f004963daaee9",
-      "after_sha256": "8a3f525cf3766f8d42081bc98bb98a1cff3db2f9ebcdcaa34a3231ae5ba6ac18",
+      "after_sha256": "024a30ef56ec43b7875cd27c1a34b1e7576055eac8ff34ca5c9874ead4bcf2a0",
       "owners": {
         "@document": {
           "before": "0d2c64a59fcac81400d14e8db54da81d97c641ef8347177fe67f004963daaee9",
-          "after": "8a3f525cf3766f8d42081bc98bb98a1cff3db2f9ebcdcaa34a3231ae5ba6ac18"
+          "after": "024a30ef56ec43b7875cd27c1a34b1e7576055eac8ff34ca5c9874ead4bcf2a0"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "2bfd70df359643f0b198b293ccf407724672ae9e0f1fc28c0b77d972920ab82c",
-      "after_sha256": "c87669b224bf40c09564cb2cfa660d4beca31d801a0a388e609299029ee71474",
+      "after_sha256": "2109021a894cede4bbc6366ef1397d7757303fa085c8db5d82b8ad2e55ba61c5",
       "owners": {
         "@document": {
           "before": "2bfd70df359643f0b198b293ccf407724672ae9e0f1fc28c0b77d972920ab82c",
-          "after": "c87669b224bf40c09564cb2cfa660d4beca31d801a0a388e609299029ee71474"
+          "after": "2109021a894cede4bbc6366ef1397d7757303fa085c8db5d82b8ad2e55ba61c5"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "5926d6daf2c07561d799483b1ffded728cd6913dd358f0cf95136615ded5af7a",
-      "after_sha256": "4943c230e280af6a5550ebc16e7bf699365cc849c95df8affcd67fc5014bdaa7",
+      "after_sha256": "e91b529d733fe7289c875a3c97df11264e96681c95e73ac4afe1a4fa2cc11498",
       "owners": {
         "@document": {
           "before": "5926d6daf2c07561d799483b1ffded728cd6913dd358f0cf95136615ded5af7a",
-          "after": "4943c230e280af6a5550ebc16e7bf699365cc849c95df8affcd67fc5014bdaa7"
+          "after": "e91b529d733fe7289c875a3c97df11264e96681c95e73ac4afe1a4fa2cc11498"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "03691817f85563faa0315ea6e62666ec5b31bbea1dd09311195ffbb26aa1231d",
-      "after_sha256": "36c47aaffee01c4c7ab31b389785694c94d0bdb629c00997b6173bcbe609ebfb",
+      "after_sha256": "cababaa7ff77d9c9d60a5b4d58158919dda110b01170a3cfdb9679ba4aa8e1c1",
       "owners": {
         "@document": {
           "before": "03691817f85563faa0315ea6e62666ec5b31bbea1dd09311195ffbb26aa1231d",
-          "after": "36c47aaffee01c4c7ab31b389785694c94d0bdb629c00997b6173bcbe609ebfb"
+          "after": "cababaa7ff77d9c9d60a5b4d58158919dda110b01170a3cfdb9679ba4aa8e1c1"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "de4c7c306709b00531c752427a4b039f4aa86c42f94b0b74ee5656fb673d72ea",
-      "after_sha256": "dc5c4e155d35b1c19ab039a03dc3c7546f0edba50fa0a800c8a90872e5c07f1b",
+      "after_sha256": "9387d4926e5d9b4070e025630aeed3a0a93ddead8f01b53bc6c4542d05f5e724",
       "owners": {
         "@document": {
           "before": "de4c7c306709b00531c752427a4b039f4aa86c42f94b0b74ee5656fb673d72ea",
-          "after": "dc5c4e155d35b1c19ab039a03dc3c7546f0edba50fa0a800c8a90872e5c07f1b"
+          "after": "9387d4926e5d9b4070e025630aeed3a0a93ddead8f01b53bc6c4542d05f5e724"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "75603c523fcf19959563275d0b16a5372f099cd274be6c24e182fa45d04ccfd2",
-      "after_sha256": "d7926406f9aef29ad496a2cff8b4ff09ebf27b301e2f15e27d8d9345cb057b59",
+      "after_sha256": "aaef678264274c4f835472273ff930217e9c65639c83f1e1e6cfbd263660b54f",
       "owners": {
         "@document": {
           "before": "75603c523fcf19959563275d0b16a5372f099cd274be6c24e182fa45d04ccfd2",
-          "after": "d7926406f9aef29ad496a2cff8b4ff09ebf27b301e2f15e27d8d9345cb057b59"
+          "after": "aaef678264274c4f835472273ff930217e9c65639c83f1e1e6cfbd263660b54f"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "01c10b381f4c1c746803473ba3b4ca68b2ee3dee09c6dd551fafd653c97adc6b",
-      "after_sha256": "369233aded5080344b688b7aea87956da7d321f80db9a078377e2f1cc10b3dd6",
+      "after_sha256": "b428de966ee49edf2fd243af1a5f286b708fef5d7939ef4214e354002b3fe213",
       "owners": {
         "@document": {
           "before": "01c10b381f4c1c746803473ba3b4ca68b2ee3dee09c6dd551fafd653c97adc6b",
-          "after": "369233aded5080344b688b7aea87956da7d321f80db9a078377e2f1cc10b3dd6"
+          "after": "b428de966ee49edf2fd243af1a5f286b708fef5d7939ef4214e354002b3fe213"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "2afc7850c92e8ed49d68bdbee41b516865950edbe97579953bd3ffe4b8c6f72a",
-      "after_sha256": "59a054b46c57d68e5a80dfce4c9760435e34ff1ac399f4a0ac58b5ec7a8a1056",
+      "after_sha256": "6d084da75fa1b57d0892e94afaa414d4efce8907dab05f75c205fedb7f004a38",
       "owners": {
         "@document": {
           "before": "2afc7850c92e8ed49d68bdbee41b516865950edbe97579953bd3ffe4b8c6f72a",
-          "after": "59a054b46c57d68e5a80dfce4c9760435e34ff1ac399f4a0ac58b5ec7a8a1056"
+          "after": "6d084da75fa1b57d0892e94afaa414d4efce8907dab05f75c205fedb7f004a38"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "3da323c92bd7a22fbaa3a09e89ac6e5d1261ac2bdac62d4bdf9c65c8dce65ec5",
-      "after_sha256": "612d8bc77bfe994267b4f330ca99342f6d4a052ba33ecdd9c0395e0e91155ebf",
+      "after_sha256": "4b1b4876b105afd3165302dca25bf19a15ecff0c0662757ebc40d274da1f1ef0",
       "owners": {
         "@document": {
           "before": "3da323c92bd7a22fbaa3a09e89ac6e5d1261ac2bdac62d4bdf9c65c8dce65ec5",
-          "after": "612d8bc77bfe994267b4f330ca99342f6d4a052ba33ecdd9c0395e0e91155ebf"
+          "after": "4b1b4876b105afd3165302dca25bf19a15ecff0c0662757ebc40d274da1f1ef0"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "e9c062fdb7db441780f61ac1258b48c7a4ed365ec6a854c2f6a41aef96517eea",
-      "after_sha256": "b4ddbb862c557dc01ae8e5e763207a72eb4a87103a2814ba277da3745decd396",
+      "after_sha256": "34aa2e7b54bc8b0de2c05aa9908a98c0949dacfc1edac03031c02b4258e75736",
       "owners": {
         "@document": {
           "before": "e9c062fdb7db441780f61ac1258b48c7a4ed365ec6a854c2f6a41aef96517eea",
-          "after": "b4ddbb862c557dc01ae8e5e763207a72eb4a87103a2814ba277da3745decd396"
+          "after": "34aa2e7b54bc8b0de2c05aa9908a98c0949dacfc1edac03031c02b4258e75736"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "4b4398ef177b81629d159932268ee74050dab53e37dd5908ed2f99fda580b10a",
-      "after_sha256": "258e1673781988d20510d2c6d090fa65dbaab080cace56ce48b302c38cd7daeb",
+      "after_sha256": "07ad0c18d71254f5f3c3d97fdc2c4c66bfbaafd477611ce677d5a9c269602cf3",
       "owners": {
         "@document": {
           "before": "4b4398ef177b81629d159932268ee74050dab53e37dd5908ed2f99fda580b10a",
-          "after": "258e1673781988d20510d2c6d090fa65dbaab080cace56ce48b302c38cd7daeb"
+          "after": "07ad0c18d71254f5f3c3d97fdc2c4c66bfbaafd477611ce677d5a9c269602cf3"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "ac695743a13152211ffdde8c7fe396a0b78a9e31618e6109dcbd72313060e8ce",
-      "after_sha256": "b64bd7830e46b1dc447c7c1ab528d63bac80453f07d82c5329fcb4a3a1bd9857",
+      "after_sha256": "422cbc400af57d4ac1baacdcb8af51e8d3d863bd6f1d27dd51334ec103ef6f0f",
       "owners": {
         "@document": {
           "before": "ac695743a13152211ffdde8c7fe396a0b78a9e31618e6109dcbd72313060e8ce",
-          "after": "b64bd7830e46b1dc447c7c1ab528d63bac80453f07d82c5329fcb4a3a1bd9857"
+          "after": "422cbc400af57d4ac1baacdcb8af51e8d3d863bd6f1d27dd51334ec103ef6f0f"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "ed034d526f5199276fb4c6a4c209c651f1bf816277a84a3c044d5e87777b872d",
-      "after_sha256": "822acbe4e15a5b5320313c55b62a9d03b84c07badeba16f0a8750e90d91be923",
+      "after_sha256": "e84f4a3540ab340f3f09c5d2758a92a3b87efb8b0aa46187f0bdde45417f5762",
       "owners": {
         "@document": {
           "before": "ed034d526f5199276fb4c6a4c209c651f1bf816277a84a3c044d5e87777b872d",
-          "after": "822acbe4e15a5b5320313c55b62a9d03b84c07badeba16f0a8750e90d91be923"
+          "after": "e84f4a3540ab340f3f09c5d2758a92a3b87efb8b0aa46187f0bdde45417f5762"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "17d7781f19a2a962c94ccddb3d5a72fb778843ba389d69eea6c2a4466cc76624",
-      "after_sha256": "0fa35a7caf345719d44f56b9df6f58ce6c12f0abd6978d3692431933fe1d4f75",
+      "after_sha256": "119b2337065acf758802851124ee0ba902555bb881dab4db80bac35cbdf058bc",
       "owners": {
         "@document": {
           "before": "17d7781f19a2a962c94ccddb3d5a72fb778843ba389d69eea6c2a4466cc76624",
-          "after": "0fa35a7caf345719d44f56b9df6f58ce6c12f0abd6978d3692431933fe1d4f75"
+          "after": "119b2337065acf758802851124ee0ba902555bb881dab4db80bac35cbdf058bc"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "ab9f4c72dcad950fadfb0fda8863b1e35065afdca59e9ec29fd8ed8316148b4e",
-      "after_sha256": "1e360fb73dd60b8c3f7b2d0d70744178b41e8e3a7ee0a99da2ec216cf91300c2",
+      "after_sha256": "fe7a28ac44b028456e4b854111d6288a45b9586537a299c1c60ba2ee799a81b9",
       "owners": {
         "@document": {
           "before": "ab9f4c72dcad950fadfb0fda8863b1e35065afdca59e9ec29fd8ed8316148b4e",
-          "after": "1e360fb73dd60b8c3f7b2d0d70744178b41e8e3a7ee0a99da2ec216cf91300c2"
+          "after": "fe7a28ac44b028456e4b854111d6288a45b9586537a299c1c60ba2ee799a81b9"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "02c9a35970848312b28a0b42b182a8cd63b5964c628190945a44bac66dd0a6b1",
-      "after_sha256": "b1d18da0d2fc7c35f87c9cc09015f179eb3ab0c91d4748407b052e1f71e00b98",
+      "after_sha256": "fccb87e63d8ef236e61b32aa695757cb6cc58c8c84159042784b4d2fc9a3571b",
       "owners": {
         "@document": {
           "before": "02c9a35970848312b28a0b42b182a8cd63b5964c628190945a44bac66dd0a6b1",
-          "after": "b1d18da0d2fc7c35f87c9cc09015f179eb3ab0c91d4748407b052e1f71e00b98"
+          "after": "fccb87e63d8ef236e61b32aa695757cb6cc58c8c84159042784b4d2fc9a3571b"
         }
       }
     },
@@ -236,31 +236,31 @@
     },
     "docs/ORDER_109_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "32f2195836eaf77f1ab6cd8aa205572813783bbf03ae164f9ec49c2aa36280bb",
+      "after_sha256": "4bc638389c04bb978d41d4131b988baf2744870922e0a60a6b71c9b298a3ba0d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "32f2195836eaf77f1ab6cd8aa205572813783bbf03ae164f9ec49c2aa36280bb"
+          "after": "4bc638389c04bb978d41d4131b988baf2744870922e0a60a6b71c9b298a3ba0d"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "09ebf454a3228b57de98012d12c6e5fd27bd34458863ef8c5b172d142ed3eb0e",
-      "after_sha256": "640cf20cbc13424812bcd31e110ff779ddc36ddd4171b11ac838502de4e234ff",
+      "after_sha256": "045a2defccc63ca22bdaafb450c232a4ffce2817ff23c8a9d40f8813b6940af6",
       "owners": {
         "@document": {
           "before": "09ebf454a3228b57de98012d12c6e5fd27bd34458863ef8c5b172d142ed3eb0e",
-          "after": "640cf20cbc13424812bcd31e110ff779ddc36ddd4171b11ac838502de4e234ff"
+          "after": "045a2defccc63ca22bdaafb450c232a4ffce2817ff23c8a9d40f8813b6940af6"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "9fe993028b81072793a2a70603728bbbcbf1643950027fc8145e0a16c0f4c942",
-      "after_sha256": "899a87b7eabdb85913f8ece955eecd94e626fc6e8451b5661b0bc3f9330194eb",
+      "after_sha256": "3f12d5e19e17e671f4b70e341b032c645ed0462a42825bbe4f4b9ed47b7dd8d6",
       "owners": {
         "@document": {
           "before": "9fe993028b81072793a2a70603728bbbcbf1643950027fc8145e0a16c0f4c942",
-          "after": "899a87b7eabdb85913f8ece955eecd94e626fc6e8451b5661b0bc3f9330194eb"
+          "after": "3f12d5e19e17e671f4b70e341b032c645ed0462a42825bbe4f4b9ed47b7dd8d6"
         }
       }
     },
@@ -312,7 +312,7 @@
     },
     "src/warhammer40k_core/engine/stratagems_targeting.py": {
       "before_sha256": "68e462fd4f1f0689d1f6391e3da86d9adae1584f99c08869ceda751e92b2bf31",
-      "after_sha256": "63cb308a40d8a80762c0dcd77ee601f6111c5d0b449c43d1fa966a8bb799c169",
+      "after_sha256": "fff99336214af9f1a0fdaf237afca942f27c0cb5513e50864619b41304f7a783",
       "owners": {
         "@module": {
           "before": "5f2c97342b791efbbffe19721a8b9a6e4470429f58c446faf6b16da642cb9a42",
@@ -320,7 +320,7 @@
         },
         "_controlled_objective_marker_ids_for_target": {
           "before": "7313a2acc9328f8fb6767e71bf14328934c37345acf14b4fc498945eb894b20c",
-          "after": "b5f9828168dd6085ccfed59f99c0a110d44ddf8cda874519a143288f094a7aad"
+          "after": "b78f8ca452198862f4e52873f96936b448fb7309344c247096f10453a9eb6347"
         },
         "_target_unit_within_controlled_objective_range": {
           "before": "fa894c1ca9f13b6d9a64c358bfa96c55eb7c1be31bcbe027363ef713d4cd9370",
@@ -374,7 +374,7 @@
     },
     "tests/unit/test_order109_unit_control.py": {
       "before_sha256": null,
-      "after_sha256": "57f2e7f3b69a2ca5433bc689d688c814c74c5e9e27ebe30bd9bf50a396ebcef9",
+      "after_sha256": "42f0e96b74bba1f44c400810b91276bd47d505cfc142b3006bcf61bf5beab789",
       "owners": {
         "@module": {
           "before": null,
@@ -415,6 +415,10 @@
         "test_shared_stratagem_control_separates_range_and_positive_oc": {
           "before": null,
           "after": "ba9b7c20d62f98c189da3cf15d8076c77e3113a274563d45c305925d19664560"
+        },
+        "test_stratagem_selection_only_resolves_oc_for_in_range_candidates": {
+          "before": null,
+          "after": "4f50f8fa8242b669ae55d6f310143355b95cbb435e5b975878c0f07c38ba47eb"
         }
       }
     }

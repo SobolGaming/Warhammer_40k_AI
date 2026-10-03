@@ -391,6 +391,79 @@ def test_shared_stratagem_control_separates_range_and_positive_oc(
     )
 
 
+@pytest.mark.parametrize("within_range", [False, True])
+def test_stratagem_selection_only_resolves_oc_for_in_range_candidates(within_range: bool) -> None:
+    from warhammer40k_core.core.attributes import Characteristic
+    from warhammer40k_core.engine.random_objective_control import prepare_objective_control
+    from warhammer40k_core.geometry.pose import Pose
+
+    session = control_session(attached=True, random_oc=True)
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    if not within_range:
+        battlefield = state.battlefield_state
+        for component_id in (SOURCE, LEADER):
+            placement = battlefield.unit_placement_by_id(component_id)
+            battlefield = battlefield.with_unit_placement(
+                placement.with_model_placements(
+                    tuple(
+                        model.with_pose(Pose.at(model.pose.position.x, model.pose.position.y - 12))
+                        for model in placement.model_placements
+                    )
+                )
+            )
+        state.battlefield_state = battlefield
+    session = LocalGameSession.from_persistence_payload(
+        json.loads(json.dumps(session.to_persistence_payload()))
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.mission_setup is not None
+    prepared = prepare_objective_control(
+        ObjectiveControlContext.from_game_state(
+            state, timing=ObjectiveControlTiming.PHASE_END, phase=BattlePhase.FIGHT
+        ),
+        decisions=session.lifecycle.decision_controller,
+        scope_id="order109:candidate-preparation",
+    )
+    result = resolve_objective_control(prepared).results[0]
+    assert result.controlled_by_player_id == "player-a"
+    assert all(row.unit_instance_id != LEADER for row in result.contributors)
+    assert any(row.unit_instance_id == SOURCE for row in result.contributors) is within_range
+    unit = rules_unit_view_by_id(state=state, unit_instance_id=SOURCE)
+    leader = next(
+        component.unit for component in unit.components if component.unit.unit_instance_id == LEADER
+    )
+    assert (
+        leader.own_models[0].characteristic(Characteristic.OBJECTIVE_CONTROL).is_numeric
+        is within_range
+    )
+    context = StratagemEligibilityContext(
+        game_id=state.game_id,
+        player_id="player-a",
+        battle_round=state.battle_round,
+        phase=BattlePhase.FIGHT,
+        active_player_id="player-a",
+        trigger_kind=TimingTriggerKind.END_PHASE,
+    )
+    binding = StratagemTargetBinding(
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id="player-a",
+        target_unit_instance_id=SOURCE,
+    )
+    marker_id = state.mission_setup.objective_markers[0].objective_marker_id
+    assert controlled_objective_effect_selection_ids_for_binding(
+        state=state, context=context, target_binding=binding
+    ) == ((marker_id,) if within_range else ())
+    assert objective_selection_error(
+        state=state,
+        context=context,
+        target_binding=binding,
+        effect_selection=objective_marker_effect_selection(marker_id),
+    ) == (None if within_range else "no_controlled_objective_marker")
+
+
 @pytest.mark.parametrize(
     ("source_oc", "attached", "expected"), [(0, False, False), (1, False, True), (0, True, True)]
 )

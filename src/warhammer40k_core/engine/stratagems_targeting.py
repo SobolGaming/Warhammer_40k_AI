@@ -525,6 +525,17 @@ def _controlled_objective_marker_ids_for_target(
         record=record,
         states=tuple(state.sticky_objective_control_states),
     )
+    candidates = tuple(
+        result
+        for result in record.results
+        if result.controlled_by_player_id == player_id
+        and any(
+            _objective_control_result_has_unit(result=result, unit_instance_id=component_id)
+            for component_id in unit.component_unit_instance_ids
+        )
+    )
+    if not candidates:
+        return ()
     control = (
         current_unit_objective_control(state=state, unit_instance_id=target_unit_id)
         if require_unit_control
@@ -533,16 +544,8 @@ def _controlled_objective_marker_ids_for_target(
     return tuple(
         sorted(
             result.objective_id
-            for result in record.results
-            if result.controlled_by_player_id == player_id
-            and (
-                control.controls(result)
-                if control is not None
-                else any(
-                    _objective_control_result_has_unit(result=result, unit_instance_id=component_id)
-                    for component_id in unit.component_unit_instance_ids
-                )
-            )
+            for result in candidates
+            if control is None or control.controls(result)
         )
     )
 
