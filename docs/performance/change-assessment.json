@@ -4,6 +4,136 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:14644cb7799aa3db990d75b63bcbb23722b848d6008d37c43b34944d1faeda1c",
   "operation_map_sha256": "373f39b7dd4257a8b5a39005ba79ed4c9342a8832985f7305d34de722e35c1d9",
   "changes": {
+    "ci/test_shards/durations.json": {
+      "before_sha256": "33bbc6b6a1f7d2b61b70a0f20a2c8880709582e0abaa50991e27e205f6778b09",
+      "after_sha256": "e54501609ebbc77988bc1f0c0e92eb93b7037174b1213904c4324caadca871ad",
+      "owners": {
+        "@document": {
+          "before": "33bbc6b6a1f7d2b61b70a0f20a2c8880709582e0abaa50991e27e205f6778b09",
+          "after": "e54501609ebbc77988bc1f0c0e92eb93b7037174b1213904c4324caadca871ad"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "2f20363e4e1cea0b9e13fa175e526c9ab389ba449a47eff7a2107cb6425b8ee2",
+      "after_sha256": "fb3fc5be7774a3cb5af80bc2f499e9beed382063614cf05793b5795db8ed0eee",
+      "owners": {
+        "@document": {
+          "before": "2f20363e4e1cea0b9e13fa175e526c9ab389ba449a47eff7a2107cb6425b8ee2",
+          "after": "fb3fc5be7774a3cb5af80bc2f499e9beed382063614cf05793b5795db8ed0eee"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "3d3d5423e11544c3869a86f80b43f0e96a98279966740687b754dc8b5afa2f41",
+      "after_sha256": "d5a75d47e5fc5d59624f04385104f39422f3f0bc3d095ed9c0f0b63d91d85721",
+      "owners": {
+        "@document": {
+          "before": "3d3d5423e11544c3869a86f80b43f0e96a98279966740687b754dc8b5afa2f41",
+          "after": "d5a75d47e5fc5d59624f04385104f39422f3f0bc3d095ed9c0f0b63d91d85721"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "85703aab67a5d2811db3c1611ef8fc8e7e1a791e49f34fa8dc279dcae571a493",
+      "after_sha256": "e27749225b4580fce393adf454beea63c4304cbc4e4af3e0c9d8828c657d5215",
+      "owners": {
+        "@document": {
+          "before": "85703aab67a5d2811db3c1611ef8fc8e7e1a791e49f34fa8dc279dcae571a493",
+          "after": "e27749225b4580fce393adf454beea63c4304cbc4e4af3e0c9d8828c657d5215"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "101d6686587507328a195da07a5103b2f329e89ba134dc9ab699852a0e589f95",
+      "after_sha256": "83d545d3df43bd401148af497bb43a8ae84110bad8b1be4de297546de3cfee3d",
+      "owners": {
+        "@document": {
+          "before": "101d6686587507328a195da07a5103b2f329e89ba134dc9ab699852a0e589f95",
+          "after": "83d545d3df43bd401148af497bb43a8ae84110bad8b1be4de297546de3cfee3d"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "98ffc70c53b529a85486bd077099c1601acf8cbc8a6c4be5c2f0650d46114e3c",
+      "after_sha256": "2a74f1cb0fb42b35dc0def3f7e53b7569dae65769b3398998a5b677605c2fed1",
+      "owners": {
+        "@document": {
+          "before": "98ffc70c53b529a85486bd077099c1601acf8cbc8a6c4be5c2f0650d46114e3c",
+          "after": "2a74f1cb0fb42b35dc0def3f7e53b7569dae65769b3398998a5b677605c2fed1"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "07bdfda5bb7938536b2f874bc2f041e37e7692775199c36f3505cfd0195f212d",
+      "after_sha256": "94ddf205acca90abd035394f110589360a61f80931a59562af4dcb6723059361",
+      "owners": {
+        "@document": {
+          "before": "07bdfda5bb7938536b2f874bc2f041e37e7692775199c36f3505cfd0195f212d",
+          "after": "94ddf205acca90abd035394f110589360a61f80931a59562af4dcb6723059361"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "0959560d57bbc2ba022ece587930573593715d9a70222d3a4ff5d54d7016c1de",
+      "after_sha256": "d1ad9f6a5e6bcadbe4d2c48bc36ae33fa158bd4aa22bc642e85beafbff367da2",
+      "owners": {
+        "@document": {
+          "before": "0959560d57bbc2ba022ece587930573593715d9a70222d3a4ff5d54d7016c1de",
+          "after": "d1ad9f6a5e6bcadbe4d2c48bc36ae33fa158bd4aa22bc642e85beafbff367da2"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "313761191090f49a0c817731590d1ec5cf7663d6f075d7fa0cbd6e76032aeacf",
+      "after_sha256": "05764b563e14c127f9e189b41d56f725b1fe19d2051c8c2ae8b8b5f64e2d1065",
+      "owners": {
+        "@document": {
+          "before": "313761191090f49a0c817731590d1ec5cf7663d6f075d7fa0cbd6e76032aeacf",
+          "after": "05764b563e14c127f9e189b41d56f725b1fe19d2051c8c2ae8b8b5f64e2d1065"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "0e3707a803877e35dec2492dff722147ab3f98a15665ff0cfc83357f698d4c4f",
+      "after_sha256": "b3903f60e947b85a7cdf5a2fefd6819cb4682707b38cc8dd0cbb07165af5a93e",
+      "owners": {
+        "@document": {
+          "before": "0e3707a803877e35dec2492dff722147ab3f98a15665ff0cfc83357f698d4c4f",
+          "after": "b3903f60e947b85a7cdf5a2fefd6819cb4682707b38cc8dd0cbb07165af5a93e"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "72ced4cee2656f53f2bf7be45750930311e75ab56db9a1bce05e62561f5ce5d1",
+      "after_sha256": "d1db7904e198ab4890d48e45e10b3f531deb01867e516531d3d5acb4c341c3d3",
+      "owners": {
+        "@document": {
+          "before": "72ced4cee2656f53f2bf7be45750930311e75ab56db9a1bce05e62561f5ce5d1",
+          "after": "d1db7904e198ab4890d48e45e10b3f531deb01867e516531d3d5acb4c341c3d3"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "9d6f33442924bc927f901caa55815581a2aebb053855160238103c3e8c3bf3f6",
+      "after_sha256": "2abb268f4310efd335717061f4f2aa5529a49f443a30f9de6ad24e1cafec736d",
+      "owners": {
+        "@document": {
+          "before": "9d6f33442924bc927f901caa55815581a2aebb053855160238103c3e8c3bf3f6",
+          "after": "2abb268f4310efd335717061f4f2aa5529a49f443a30f9de6ad24e1cafec736d"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "563dfe542280f4e0b3964ffb33f6c73e323e717695225b2be68837652b1c2f7c",
+      "after_sha256": "563eb9cf86d12a89d3ad70c8eb2aab3ce2dd58625ba8edc8143195556bb70325",
+      "owners": {
+        "@document": {
+          "before": "563dfe542280f4e0b3964ffb33f6c73e323e717695225b2be68837652b1c2f7c",
+          "after": "563eb9cf86d12a89d3ad70c8eb2aab3ce2dd58625ba8edc8143195556bb70325"
+        }
+      }
+    },
     "conformance/typescript/src/contract.ts": {
       "before_sha256": "41ad8dd41c3be6544cfe7fd88afe7cc306fff703e003c6549b491220c175861e",
       "after_sha256": "cdedfc659cd0107211da63559121e9381e329285cfea6a8dac94a8518ec3beaa",
@@ -630,6 +760,136 @@
     }
   },
   "rows": {
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
     "conformance/typescript/src/contract.ts": {
       "category": "rule_semantics",
       "operations": [
