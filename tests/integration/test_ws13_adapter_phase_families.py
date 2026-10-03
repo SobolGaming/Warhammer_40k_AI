@@ -649,7 +649,7 @@ def test_local_session_moves_attached_rules_unit_once_and_replays_canonical_even
         enemy_unit_ids=("enemy",),
         origins={
             "bodyguard": Pose.at(10.0, 20.0),
-            "leader": Pose.at(10.0, 21.7),
+            "leader": Pose.at(8.4, 20.0),
             "enemy": Pose.at(10.0, 18.0),
         },
         game_id="ws13-attached-fight-movement",
