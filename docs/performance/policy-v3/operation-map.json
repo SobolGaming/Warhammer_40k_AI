@@ -2700,6 +2700,75 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order112-extra-attacks-selection": {
+      "paths": [
+        "src/warhammer40k_core/engine/fight_rules_unit_melee.py",
+        "src/warhammer40k_core/engine/fight_weapon_selection.py",
+        "src/warhammer40k_core/engine/melee_weapon_commitment.py"
+      ],
+      "owners": [
+        "_committed_weapon_rows",
+        "chosen_rows",
+        "selection_request",
+        "selection_stages",
+        "validate_melee_declaration_rules",
+        "validate_rules_unit_melee_declaration"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order112-extra-attacks-regressions": {
+      "paths": [
+        "tests/unit/test_order92_random_melee.py",
+        "tests/unit/test_phase17_emperors_children_datasheet_overlay.py"
+      ],
+      "owners": [
+        "@module",
+        "test_each_physical_extra_weapon_is_required",
+        "test_extra_weapons_cannot_be_skipped_and_retry_restores_and_replays",
+        "test_ineligible_extra_bearer_does_not_require_a_declaration",
+        "test_mandatory_extra_selection_obeys_physical_one_shot_availability",
+        "_lethal_extra_session",
+        "_assert_deferred_allocation_boundary",
+        "test_lethal_primary_and_mandatory_extra_finish_before_deferred_destruction",
+        "test_living_attached_recipient_remains_allocatable_after_component_death",
+        "_advance_fight_session_to_poison_request"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order112-source-evidence": {
+      "paths": [
+        "data/source_audits/order112/baseline/tests/unit/test_order92_random_melee.py.txt",
+        "data/source_audits/order112/historical-inputs.json",
+        "tools/core_rules_order97_history.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "historical_evidence_path"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order112-deferred-allocation": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_sequence_group_selection.py",
+        "src/warhammer40k_core/engine/damage_allocation_targets.py"
+      ],
+      "owners": [
+        "@module",
+        "_has_placed_pending_destruction",
+        "_resolve_grouped_current_pool",
+        "damage_allocation_target_state"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

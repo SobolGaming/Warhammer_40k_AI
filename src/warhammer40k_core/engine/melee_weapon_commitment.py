@@ -203,18 +203,18 @@ def selection_records(
 
 def selection_stages(
     rows: tuple[JsonValue, ...],
-) -> tuple[tuple[str, tuple[dict[str, JsonValue], ...], bool], ...]:
+) -> tuple[tuple[str, tuple[dict[str, JsonValue], ...]], ...]:
     eligible = [
         object_payload(row)
         for row in rows
         if object_payload(row)["engaged_target_unit_instance_ids"]
     ]
-    stages: list[tuple[str, tuple[dict[str, JsonValue], ...], bool]] = []
+    stages: list[tuple[str, tuple[dict[str, JsonValue], ...]]] = []
     for model_id in sorted({identifier(row, "model_instance_id") for row in eligible}):
         model_rows = [row for row in eligible if row["model_instance_id"] == model_id]
         primary = tuple(row for row in model_rows if row["is_extra_attacks"] is False)
         if primary:
-            stages.append((f"{model_id}:primary", primary, False))
+            stages.append((f"{model_id}:primary", primary))
         extra_ids = sorted(
             {
                 identifier(row, "weapon_instance_id")
@@ -228,7 +228,7 @@ def selection_stages(
                 for row in model_rows
                 if row["is_extra_attacks"] is True and row["weapon_instance_id"] == weapon_id
             )
-            stages.append((f"{model_id}:extra:{weapon_id}", extra, True))
+            stages.append((f"{model_id}:extra:{weapon_id}", extra))
     return tuple(stages)
 
 
@@ -240,7 +240,7 @@ def selection_request(
     index: int,
     previous: tuple[DecisionRecord, ...] = (),
 ) -> DecisionRequest:
-    stage_id, candidates, optional = selection_stages(rows)[index]
+    stage_id, candidates = selection_stages(rows)[index]
     used = {identifier(row, "weapon_instance_id") for row in chosen_rows(rows, previous)}
     options = tuple(
         DecisionOption(
@@ -262,12 +262,6 @@ def selection_request(
         for row in candidates
         if row["weapon_instance_id"] not in used
     )
-    if optional:
-        options += (
-            DecisionOption(
-                option_id="skip_extra", label="Do not use this Extra Attacks weapon", payload=None
-            ),
-        )
     return DecisionRequest(
         request_id=request_id,
         decision_type=SELECT_MELEE_WEAPON_DECISION_TYPE,
@@ -292,8 +286,6 @@ def chosen_rows(
     seen: set[str] = set()
     for record in records:
         selection = record.result.payload
-        if selection is None:
-            continue
         body = object_payload(selection)
         matches = [
             object_payload(row)

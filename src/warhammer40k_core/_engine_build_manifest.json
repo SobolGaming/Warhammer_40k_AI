@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:dae0a4a5ce5d01626bb9e44181289993dadc8143554714174e5ea4fce5725fcb",
-  "fingerprint": "dae0a4a5ce5d01626bb9e44181289993dadc8143554714174e5ea4fce5725fcb",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:dd58803f47745215e32902db7f7d7a4b219c72d1cd4984e9a9483c6807c212aa",
+  "fingerprint": "dd58803f47745215e32902db7f7d7a4b219c72d1cd4984e9a9483c6807c212aa",
   "resource_count": 3048,
   "resources": [
     {
@@ -915,9 +915,9 @@
       "sha256": "550554909ee838d02a50a99ef05c4b5e55090589942a873c38438da75d5996ee"
     },
     {
-      "byte_length": 72788,
+      "byte_length": 72829,
       "path": "warhammer40k_core/engine/attack_sequence_group_selection.py",
-      "sha256": "8b918335da0384e0d4fb35aea95ecc90e3f4dffc7b8a802e3d95519fa8213c0d"
+      "sha256": "2368de5eb9823e8e877ee6022fc2ad661fd8addaa91b7d7c0f60314858c6b0d9"
     },
     {
       "byte_length": 63341,
@@ -2035,9 +2035,9 @@
       "sha256": "0b9caf74072f6d44b3b7137059f2a28dd9d317df96b6bc806a32b50d1304be83"
     },
     {
-      "byte_length": 3365,
+      "byte_length": 4893,
       "path": "warhammer40k_core/engine/damage_allocation_targets.py",
-      "sha256": "b37c5b3a1c96223133e9f509beaf02fbbcfda35e0cff809f46dbc823aa00a437"
+      "sha256": "10b7a292e110344698396ae37667fea58c0565b20b6e011303232c74a442e0b4"
     },
     {
       "byte_length": 5556,
@@ -10045,9 +10045,9 @@
       "sha256": "8806f9f1451a7c14ba178ed1d30db6c7e9812f67042d46a230c7a76c27197a88"
     },
     {
-      "byte_length": 28227,
+      "byte_length": 28486,
       "path": "warhammer40k_core/engine/fight_rules_unit_melee.py",
-      "sha256": "1d69d278a11ea5648c75e46c219b4561744ff02f4e27688f995dc3a8b4907ea0"
+      "sha256": "24611fcca8e160d011eadb53863a34b2d13e84400e244a260b86ccc6201b1689"
     },
     {
       "byte_length": 53869,
@@ -10080,9 +10080,9 @@
       "sha256": "2e32a27fb176fa5f0bdd177c0c18fd653b2f26bda4f3ed75400bd3eddd5542e1"
     },
     {
-      "byte_length": 30315,
+      "byte_length": 31440,
       "path": "warhammer40k_core/engine/fight_weapon_selection.py",
-      "sha256": "46279b57bfaa84ba487d333aba6db38edf18a013908b91e05e7f0a3b8fe50f2a"
+      "sha256": "a114eef1c3ddbdac8b05ad8c07575c280631e1b5164ad22ffd7a051186f67abf"
     },
     {
       "byte_length": 10360,
@@ -10595,9 +10595,9 @@
       "sha256": "d13e69e38b433b9f07975e3c87676c0d341e813fa5e14319c0c9658f1e03e827"
     },
     {
-      "byte_length": 15694,
+      "byte_length": 15418,
       "path": "warhammer40k_core/engine/melee_weapon_commitment.py",
-      "sha256": "74380001d5f43490b9c6884fc7bf8a413f3054b7924b30b3941a7b8199b5b8fe"
+      "sha256": "68fe6c4e769405892d0f21bf420993cf92ef0f5884f3961c82f163f68f2b946a"
     },
     {
       "byte_length": 797,

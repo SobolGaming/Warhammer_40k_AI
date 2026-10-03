@@ -5941,7 +5941,11 @@ def _advance_fight_session_to_poison_request(
                 if melee_request.actor_id == "player-a"
                 else cast(dict[str, Any], melee_request.available_weapons[0])
             )
-            target_ids = cast(list[str], weapon["engaged_target_unit_instance_ids"])
+            selected_weapons = {weapon["weapon_instance_id"]: weapon}
+            for value in melee_request.available_weapons:
+                extra = cast(dict[str, Any], value)
+                if extra["is_extra_attacks"] and extra["engaged_target_unit_instance_ids"]:
+                    selected_weapons.setdefault(extra["weapon_instance_id"], extra)
             status = session.submit_parameterized_payload(
                 request_id=request.request_id,
                 result_id=result_id,
@@ -5957,11 +5961,19 @@ def _advance_fight_session_to_poison_request(
                         "source_decision_result_id": melee_request.source_decision_result_id,
                         "declarations": [
                             {
-                                "attacker_model_instance_id": weapon["model_instance_id"],
-                                "wargear_id": weapon["wargear_id"],
-                                "weapon_profile_id": weapon["weapon_profile_id"],
-                                "target_allocations": [{"target_unit_instance_id": target_ids[0]}],
+                                "attacker_model_instance_id": selected["model_instance_id"],
+                                "weapon_instance_id": selected["weapon_instance_id"],
+                                "wargear_id": selected["wargear_id"],
+                                "weapon_profile_id": selected["weapon_profile_id"],
+                                "target_allocations": [
+                                    {
+                                        "target_unit_instance_id": selected[
+                                            "engaged_target_unit_instance_ids"
+                                        ][0]
+                                    }
+                                ],
                             }
+                            for selected in selected_weapons.values()
                         ],
                     },
                 ),

@@ -1309,6 +1309,7 @@ def _resolve_grouped_current_pool(
     allocation_target_state = damage_allocation_target_state(
         state=state,
         target_unit_instance_id=pool.target_unit_instance_id,
+        attack_sequence=attack_sequence,
     )
     if allocation_target_state in (
         DamageAllocationTargetState.PRESENT_WITHOUT_LIVING_MODELS,

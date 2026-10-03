@@ -494,6 +494,35 @@ def validate_melee_declaration_rules(
             message="Each fighting model must select one non-extra melee weapon.",
             field="declarations",
         )
+    extra_weapons = tuple(
+        weapon
+        for weapon in available.values()
+        if _is_extra_attacks_weapon(weapon["weapon_profile"])
+    )
+    eligible_extra_model_ids = {
+        model_id
+        for model_id in {weapon["model_instance_id"] for weapon in extra_weapons}
+        if _melee_target_unit_ids_for_model(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_instance_id=unit.unit_instance_id,
+            model_instance_id=model_id,
+            state=state,
+            source_decision_result_id=request.source_decision_result_id,
+        )
+    }
+    required_extra_weapon_ids = {
+        weapon["weapon_instance_id"]
+        for weapon in extra_weapons
+        if weapon["model_instance_id"] in eligible_extra_model_ids
+    }
+    if required_extra_weapon_ids - declared_weapon_keys:
+        return _invalid_melee_validation(
+            request=request,
+            violation_code="melee_extra_attacks_weapon_required",
+            message="Each fighting model must select all eligible Extra Attacks weapons.",
+            field="declarations",
+        )
     return ProposalValidationResult.valid(
         proposal_request_id=request.request_id,
         proposal_kind=ProposalKind.MELEE_DECLARATION,
