@@ -4,6 +4,136 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:dd58803f47745215e32902db7f7d7a4b219c72d1cd4984e9a9483c6807c212aa",
   "operation_map_sha256": "39b9d37ea60be0a6d42faaedbe42f878820db8110e28f1f165ae16592d571b29",
   "changes": {
+    "ci/test_shards/durations.json": {
+      "before_sha256": "baa787bcbff261292e0aa38a5737cce7c0a9d51a0ed95d9ad4569223af81c854",
+      "after_sha256": "0684e28d7eb2bde841e91efa1d39e9a86ad5f88e297ecd6e6b33fc0bdc575be3",
+      "owners": {
+        "@document": {
+          "before": "baa787bcbff261292e0aa38a5737cce7c0a9d51a0ed95d9ad4569223af81c854",
+          "after": "0684e28d7eb2bde841e91efa1d39e9a86ad5f88e297ecd6e6b33fc0bdc575be3"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "63722cb3b5ba0b0571a7f8fcae1bd3be400c80bb7bb4e132f57c7db7f0f1e171",
+      "after_sha256": "0685be77d51d7433d2107a2b8ebee4a44b0099a0664b4d654780a42f525d9438",
+      "owners": {
+        "@document": {
+          "before": "63722cb3b5ba0b0571a7f8fcae1bd3be400c80bb7bb4e132f57c7db7f0f1e171",
+          "after": "0685be77d51d7433d2107a2b8ebee4a44b0099a0664b4d654780a42f525d9438"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "a36890f13b2980cb3abfd0cbac12357385385f72283186ecac04eb0aa2061f82",
+      "after_sha256": "7e7bf0a5ba501a2b21987a85f39fdcac1cc1ee0318ba968ae0ad96d35b82f5d9",
+      "owners": {
+        "@document": {
+          "before": "a36890f13b2980cb3abfd0cbac12357385385f72283186ecac04eb0aa2061f82",
+          "after": "7e7bf0a5ba501a2b21987a85f39fdcac1cc1ee0318ba968ae0ad96d35b82f5d9"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "ca3c6622ea67e2c7f619a46753ac27d61ef32edebc2cecb53ac04c4cde638a6c",
+      "after_sha256": "967dda8d127b47840653c5a0d2b315239584f928a8902e097423cdd1a3f225ca",
+      "owners": {
+        "@document": {
+          "before": "ca3c6622ea67e2c7f619a46753ac27d61ef32edebc2cecb53ac04c4cde638a6c",
+          "after": "967dda8d127b47840653c5a0d2b315239584f928a8902e097423cdd1a3f225ca"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "5214f6c85c0ecff4551b6587c8265b93b15f2cec14c6bd1bb45375fa31cc51a9",
+      "after_sha256": "21f00b3165fe73eb9546583a270edaee61a028d2c5f6d8afa991a9216610f67c",
+      "owners": {
+        "@document": {
+          "before": "5214f6c85c0ecff4551b6587c8265b93b15f2cec14c6bd1bb45375fa31cc51a9",
+          "after": "21f00b3165fe73eb9546583a270edaee61a028d2c5f6d8afa991a9216610f67c"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "3d231b5b77f43335552091d6f04cd2acbf0e6575d0742a066537e0d40e1e76ea",
+      "after_sha256": "ab0896e75257d854e709c745c736c3f8609382daf77549a1b5c56ee9ddb8f412",
+      "owners": {
+        "@document": {
+          "before": "3d231b5b77f43335552091d6f04cd2acbf0e6575d0742a066537e0d40e1e76ea",
+          "after": "ab0896e75257d854e709c745c736c3f8609382daf77549a1b5c56ee9ddb8f412"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "84a8b1fd1ec8f8cca7fc28e15fb8d3bfff3562670ba9ff9502146806b13600a2",
+      "after_sha256": "96f16b1e24858e922b2c9130738afc1c70373e5169edabecfadf3de0343e33bd",
+      "owners": {
+        "@document": {
+          "before": "84a8b1fd1ec8f8cca7fc28e15fb8d3bfff3562670ba9ff9502146806b13600a2",
+          "after": "96f16b1e24858e922b2c9130738afc1c70373e5169edabecfadf3de0343e33bd"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "8f39d51fd617f12094d941202efd02d9d2c1b7e352dc4823f55901205c5e72a5",
+      "after_sha256": "8574982f06815307040c8ae3f029e8c66e12907b0d7c6ec1b524b2503be90270",
+      "owners": {
+        "@document": {
+          "before": "8f39d51fd617f12094d941202efd02d9d2c1b7e352dc4823f55901205c5e72a5",
+          "after": "8574982f06815307040c8ae3f029e8c66e12907b0d7c6ec1b524b2503be90270"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "169051d25f954ccddfeb63e92ddd2879e4ec71feee39b661de88b9989365d490",
+      "after_sha256": "46526353d4e6e23392ec5008f8e59e860e517033e1e18d9ce2280d946c80c589",
+      "owners": {
+        "@document": {
+          "before": "169051d25f954ccddfeb63e92ddd2879e4ec71feee39b661de88b9989365d490",
+          "after": "46526353d4e6e23392ec5008f8e59e860e517033e1e18d9ce2280d946c80c589"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "75d1e79ce4abd263804393e64acd4d33f7b9aafbfcddef877725d03a4ab3c5e2",
+      "after_sha256": "1880431d81900a6c747e3be369eb8b11746d9efa10299bf89fc72670b82dd623",
+      "owners": {
+        "@document": {
+          "before": "75d1e79ce4abd263804393e64acd4d33f7b9aafbfcddef877725d03a4ab3c5e2",
+          "after": "1880431d81900a6c747e3be369eb8b11746d9efa10299bf89fc72670b82dd623"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "b3d54a8462a7f9c8cf2e5343ff1dfafaaa7d04a5c3d5e20d90262053cf96ed78",
+      "after_sha256": "3e7eea485adaec178cc6cc81b5fe7c099d8e9e2e72518aff357170afea96123a",
+      "owners": {
+        "@document": {
+          "before": "b3d54a8462a7f9c8cf2e5343ff1dfafaaa7d04a5c3d5e20d90262053cf96ed78",
+          "after": "3e7eea485adaec178cc6cc81b5fe7c099d8e9e2e72518aff357170afea96123a"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "f3b3f7a3ee9ffe5cfff89a1e5833039672675b8cf5c48eb701c0a61e69db8fd3",
+      "after_sha256": "9a8b628016ad6aa0bb06a5128e6ac9c2e155be196212a2f77a35503e489f5a8f",
+      "owners": {
+        "@document": {
+          "before": "f3b3f7a3ee9ffe5cfff89a1e5833039672675b8cf5c48eb701c0a61e69db8fd3",
+          "after": "9a8b628016ad6aa0bb06a5128e6ac9c2e155be196212a2f77a35503e489f5a8f"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "435bd8d4920fa06f20cee5c3495b43c9c77f0480e1b9c5e8e3beacd7ee9412a9",
+      "after_sha256": "7a42902f65c31ba2cb595cdf6dc59e595358a01f04cc88f878cd7ee99e10828e",
+      "owners": {
+        "@document": {
+          "before": "435bd8d4920fa06f20cee5c3495b43c9c77f0480e1b9c5e8e3beacd7ee9412a9",
+          "after": "7a42902f65c31ba2cb595cdf6dc59e595358a01f04cc88f878cd7ee99e10828e"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "ab9e526084433ed24f9977c9f00f84848255dba2577a5c2bc7c7edc4c671e158",
       "after_sha256": "c76dc8ef36a894af77d4ea3c3e084a9ee8a5cb6455b940d48b932348206e1932",
@@ -320,6 +450,136 @@
     }
   },
   "rows": {
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
