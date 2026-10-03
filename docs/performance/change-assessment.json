@@ -4,6 +4,136 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9a3cdf5ed915146346eeef746bb921e851d9ab05f8089c1a498d8eb3aeac22d8",
   "operation_map_sha256": "b792d99fb65eed2408aea9be770d796551aeaf246698a4b605296bf2b692e881",
   "changes": {
+    "ci/test_shards/durations.json": {
+      "before_sha256": "0684e28d7eb2bde841e91efa1d39e9a86ad5f88e297ecd6e6b33fc0bdc575be3",
+      "after_sha256": "33bbc6b6a1f7d2b61b70a0f20a2c8880709582e0abaa50991e27e205f6778b09",
+      "owners": {
+        "@document": {
+          "before": "0684e28d7eb2bde841e91efa1d39e9a86ad5f88e297ecd6e6b33fc0bdc575be3",
+          "after": "33bbc6b6a1f7d2b61b70a0f20a2c8880709582e0abaa50991e27e205f6778b09"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "0685be77d51d7433d2107a2b8ebee4a44b0099a0664b4d654780a42f525d9438",
+      "after_sha256": "2f20363e4e1cea0b9e13fa175e526c9ab389ba449a47eff7a2107cb6425b8ee2",
+      "owners": {
+        "@document": {
+          "before": "0685be77d51d7433d2107a2b8ebee4a44b0099a0664b4d654780a42f525d9438",
+          "after": "2f20363e4e1cea0b9e13fa175e526c9ab389ba449a47eff7a2107cb6425b8ee2"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "7e7bf0a5ba501a2b21987a85f39fdcac1cc1ee0318ba968ae0ad96d35b82f5d9",
+      "after_sha256": "3d3d5423e11544c3869a86f80b43f0e96a98279966740687b754dc8b5afa2f41",
+      "owners": {
+        "@document": {
+          "before": "7e7bf0a5ba501a2b21987a85f39fdcac1cc1ee0318ba968ae0ad96d35b82f5d9",
+          "after": "3d3d5423e11544c3869a86f80b43f0e96a98279966740687b754dc8b5afa2f41"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "967dda8d127b47840653c5a0d2b315239584f928a8902e097423cdd1a3f225ca",
+      "after_sha256": "85703aab67a5d2811db3c1611ef8fc8e7e1a791e49f34fa8dc279dcae571a493",
+      "owners": {
+        "@document": {
+          "before": "967dda8d127b47840653c5a0d2b315239584f928a8902e097423cdd1a3f225ca",
+          "after": "85703aab67a5d2811db3c1611ef8fc8e7e1a791e49f34fa8dc279dcae571a493"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "21f00b3165fe73eb9546583a270edaee61a028d2c5f6d8afa991a9216610f67c",
+      "after_sha256": "101d6686587507328a195da07a5103b2f329e89ba134dc9ab699852a0e589f95",
+      "owners": {
+        "@document": {
+          "before": "21f00b3165fe73eb9546583a270edaee61a028d2c5f6d8afa991a9216610f67c",
+          "after": "101d6686587507328a195da07a5103b2f329e89ba134dc9ab699852a0e589f95"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "ab0896e75257d854e709c745c736c3f8609382daf77549a1b5c56ee9ddb8f412",
+      "after_sha256": "98ffc70c53b529a85486bd077099c1601acf8cbc8a6c4be5c2f0650d46114e3c",
+      "owners": {
+        "@document": {
+          "before": "ab0896e75257d854e709c745c736c3f8609382daf77549a1b5c56ee9ddb8f412",
+          "after": "98ffc70c53b529a85486bd077099c1601acf8cbc8a6c4be5c2f0650d46114e3c"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "96f16b1e24858e922b2c9130738afc1c70373e5169edabecfadf3de0343e33bd",
+      "after_sha256": "07bdfda5bb7938536b2f874bc2f041e37e7692775199c36f3505cfd0195f212d",
+      "owners": {
+        "@document": {
+          "before": "96f16b1e24858e922b2c9130738afc1c70373e5169edabecfadf3de0343e33bd",
+          "after": "07bdfda5bb7938536b2f874bc2f041e37e7692775199c36f3505cfd0195f212d"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "8574982f06815307040c8ae3f029e8c66e12907b0d7c6ec1b524b2503be90270",
+      "after_sha256": "0959560d57bbc2ba022ece587930573593715d9a70222d3a4ff5d54d7016c1de",
+      "owners": {
+        "@document": {
+          "before": "8574982f06815307040c8ae3f029e8c66e12907b0d7c6ec1b524b2503be90270",
+          "after": "0959560d57bbc2ba022ece587930573593715d9a70222d3a4ff5d54d7016c1de"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "46526353d4e6e23392ec5008f8e59e860e517033e1e18d9ce2280d946c80c589",
+      "after_sha256": "313761191090f49a0c817731590d1ec5cf7663d6f075d7fa0cbd6e76032aeacf",
+      "owners": {
+        "@document": {
+          "before": "46526353d4e6e23392ec5008f8e59e860e517033e1e18d9ce2280d946c80c589",
+          "after": "313761191090f49a0c817731590d1ec5cf7663d6f075d7fa0cbd6e76032aeacf"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "1880431d81900a6c747e3be369eb8b11746d9efa10299bf89fc72670b82dd623",
+      "after_sha256": "0e3707a803877e35dec2492dff722147ab3f98a15665ff0cfc83357f698d4c4f",
+      "owners": {
+        "@document": {
+          "before": "1880431d81900a6c747e3be369eb8b11746d9efa10299bf89fc72670b82dd623",
+          "after": "0e3707a803877e35dec2492dff722147ab3f98a15665ff0cfc83357f698d4c4f"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "3e7eea485adaec178cc6cc81b5fe7c099d8e9e2e72518aff357170afea96123a",
+      "after_sha256": "72ced4cee2656f53f2bf7be45750930311e75ab56db9a1bce05e62561f5ce5d1",
+      "owners": {
+        "@document": {
+          "before": "3e7eea485adaec178cc6cc81b5fe7c099d8e9e2e72518aff357170afea96123a",
+          "after": "72ced4cee2656f53f2bf7be45750930311e75ab56db9a1bce05e62561f5ce5d1"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "9a8b628016ad6aa0bb06a5128e6ac9c2e155be196212a2f77a35503e489f5a8f",
+      "after_sha256": "9d6f33442924bc927f901caa55815581a2aebb053855160238103c3e8c3bf3f6",
+      "owners": {
+        "@document": {
+          "before": "9a8b628016ad6aa0bb06a5128e6ac9c2e155be196212a2f77a35503e489f5a8f",
+          "after": "9d6f33442924bc927f901caa55815581a2aebb053855160238103c3e8c3bf3f6"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "7a42902f65c31ba2cb595cdf6dc59e595358a01f04cc88f878cd7ee99e10828e",
+      "after_sha256": "563dfe542280f4e0b3964ffb33f6c73e323e717695225b2be68837652b1c2f7c",
+      "owners": {
+        "@document": {
+          "before": "7a42902f65c31ba2cb595cdf6dc59e595358a01f04cc88f878cd7ee99e10828e",
+          "after": "563dfe542280f4e0b3964ffb33f6c73e323e717695225b2be68837652b1c2f7c"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "c76dc8ef36a894af77d4ea3c3e084a9ee8a5cb6455b940d48b932348206e1932",
       "after_sha256": "84dc4f0c94526177e222bb9128bd05e7ba7858a8d8580e0a659425a967511146",
@@ -524,6 +654,136 @@
     }
   },
   "rows": {
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
