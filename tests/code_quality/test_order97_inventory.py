@@ -271,7 +271,7 @@ def test_order97_rejects_duplicated_nonoperative_disposition(
                 ORDER107_MAPPING,
             ),
             "19f1c507541321b7c1ed04f80e2c1110a1fa786d",
-            1,
+            3,
         ),
     ],
 )

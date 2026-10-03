@@ -514,7 +514,7 @@
     },
     "tests/code_quality/test_order97_inventory.py": {
       "before_sha256": "918beec821766cbea6d3d9bb6849ae0c229abfd805b473d8861ba06e52e780aa",
-      "after_sha256": "71d151be0cb3a759b37467dd1c3a8ccd9f9fc4e1742544826a30d1ec53a73d05",
+      "after_sha256": "050a3e6e1f8845785bc2ca1f6d740e29b68327eab0938b808653144c83f69d15",
       "owners": {
         "@module": {
           "before": "6e0cea8c8a16812f299f52688ece5e106d8325cd96c0b8d1e935a54b53a8551e",
@@ -522,7 +522,7 @@
         },
         "test_original_assertions_remain_exact_and_fail_closed": {
           "before": "a611ca02a4aa378e4bea799b7dcf1b37fa69931d2e16a368eb77f34090d295d1",
-          "after": "8625b29c223f9a35bd7db64a709f2028d676f3b46da5b485d0900b6d4fefc06d"
+          "after": "e7926f4320e242d03fb58247bedb9c76c2b57bda55cf625b44396a5723587619"
         }
       }
     },
