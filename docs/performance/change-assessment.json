@@ -1,452 +1,392 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "5c3de70b20089c9adbede4326a74155f892de1ff",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:01d408373e29dd80bf45c3fdf1908a67605ed4e2412356a71d407cf30215263a",
-  "operation_map_sha256": "f229fe95a2466d07177c2587905416bff42144b8688992820123cf0d4aa7f86d",
+  "base": "3a3d4cdf1342715d3de49e986d741f7466a7b915",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b0339d24d145ee6258ed5ca2b60887f707bbf66abb8e111123539e439200544a",
+  "operation_map_sha256": "315b2c5fc9790895eaf2ffb7fe228b2a29a53448d390211284291df2bd1c5108",
   "changes": {
     "README.md": {
-      "before_sha256": "a4fd5f093ac4be76fe54e4246a699c38d333025efe94ad993e527ce753a3769c",
-      "after_sha256": "10e90d9d65cbc514a1481f733d69c9d3eba99736c15236254f3a6684ad40081b",
+      "before_sha256": "10e90d9d65cbc514a1481f733d69c9d3eba99736c15236254f3a6684ad40081b",
+      "after_sha256": "e466e226251083a83768ad60b62c05542e4778277b7f0af71c046a14fd96bb8c",
       "owners": {
         "@document": {
-          "before": "a4fd5f093ac4be76fe54e4246a699c38d333025efe94ad993e527ce753a3769c",
-          "after": "10e90d9d65cbc514a1481f733d69c9d3eba99736c15236254f3a6684ad40081b"
+          "before": "10e90d9d65cbc514a1481f733d69c9d3eba99736c15236254f3a6684ad40081b",
+          "after": "e466e226251083a83768ad60b62c05542e4778277b7f0af71c046a14fd96bb8c"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "311b06ac470b395c4280c5ebbc806bb9fa872138aac0bcc9f07cb5be720f6f80",
-      "after_sha256": "12cfe5a69d57eaa7b82943adfdfda3c61e1445bd56ca2c2524b9da2b150c3879",
+      "before_sha256": "12cfe5a69d57eaa7b82943adfdfda3c61e1445bd56ca2c2524b9da2b150c3879",
+      "after_sha256": "f75294a9ec05e2f410e363ad8b7a6950ef30c2e531d3f6af2d9131033dbdc74f",
       "owners": {
         "@document": {
-          "before": "311b06ac470b395c4280c5ebbc806bb9fa872138aac0bcc9f07cb5be720f6f80",
-          "after": "12cfe5a69d57eaa7b82943adfdfda3c61e1445bd56ca2c2524b9da2b150c3879"
+          "before": "12cfe5a69d57eaa7b82943adfdfda3c61e1445bd56ca2c2524b9da2b150c3879",
+          "after": "f75294a9ec05e2f410e363ad8b7a6950ef30c2e531d3f6af2d9131033dbdc74f"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "6518dd02bb7d141df4561ef1000fc7b3b2dd18d33a51b9ac8eb534c4c7103c33",
-      "after_sha256": "e85be5ef6743dcd78bb45f4f982110c44b2c5668628d9f1e315f8765f2c943d1",
+      "before_sha256": "e85be5ef6743dcd78bb45f4f982110c44b2c5668628d9f1e315f8765f2c943d1",
+      "after_sha256": "706b36f6f47abb46e53c4707f7badb13e5c1be246508b37c31aad7a24a7eedde",
       "owners": {
         "@document": {
-          "before": "6518dd02bb7d141df4561ef1000fc7b3b2dd18d33a51b9ac8eb534c4c7103c33",
-          "after": "e85be5ef6743dcd78bb45f4f982110c44b2c5668628d9f1e315f8765f2c943d1"
+          "before": "e85be5ef6743dcd78bb45f4f982110c44b2c5668628d9f1e315f8765f2c943d1",
+          "after": "706b36f6f47abb46e53c4707f7badb13e5c1be246508b37c31aad7a24a7eedde"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "7ee901049464be1622daa95a619ef46c33e2af57342af008a4a0d858947dee8b",
-      "after_sha256": "28155790704ef19b6c1d8bd273e769c663bb303246771e713bf74f335f0a4cab",
+      "before_sha256": "28155790704ef19b6c1d8bd273e769c663bb303246771e713bf74f335f0a4cab",
+      "after_sha256": "cc0ab654c881bfb4cce4c65ac2a5c9c293809b50a188eebaae12c1f234ff4021",
       "owners": {
         "@document": {
-          "before": "7ee901049464be1622daa95a619ef46c33e2af57342af008a4a0d858947dee8b",
-          "after": "28155790704ef19b6c1d8bd273e769c663bb303246771e713bf74f335f0a4cab"
+          "before": "28155790704ef19b6c1d8bd273e769c663bb303246771e713bf74f335f0a4cab",
+          "after": "cc0ab654c881bfb4cce4c65ac2a5c9c293809b50a188eebaae12c1f234ff4021"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "c52171e4db3672d3a3d9691fdfc1aa3b61f4e02353ad4a7caebb6db0d9ba271d",
-      "after_sha256": "ac5f3f200595652a9b2b63d6849cd2a81278312df047d8fa88054c4e75729241",
+      "before_sha256": "ac5f3f200595652a9b2b63d6849cd2a81278312df047d8fa88054c4e75729241",
+      "after_sha256": "441e08f06e5a75056116d88a3c2b8da86b44b53370488592128a808ba91c06eb",
       "owners": {
         "@document": {
-          "before": "c52171e4db3672d3a3d9691fdfc1aa3b61f4e02353ad4a7caebb6db0d9ba271d",
-          "after": "ac5f3f200595652a9b2b63d6849cd2a81278312df047d8fa88054c4e75729241"
+          "before": "ac5f3f200595652a9b2b63d6849cd2a81278312df047d8fa88054c4e75729241",
+          "after": "441e08f06e5a75056116d88a3c2b8da86b44b53370488592128a808ba91c06eb"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "778819ee79788fac682792ecfbb75049baa10fca7c3edc3bd73fe064d2ee0408",
-      "after_sha256": "b08267baff63b30016562170b49197b3430153010906331391a19d1879c4f278",
+      "before_sha256": "b08267baff63b30016562170b49197b3430153010906331391a19d1879c4f278",
+      "after_sha256": "6025967b7cf4e852ce62dd9e7b27f5d10999b83b68d651f5ff7d0abd04aa155c",
       "owners": {
         "@document": {
-          "before": "778819ee79788fac682792ecfbb75049baa10fca7c3edc3bd73fe064d2ee0408",
-          "after": "b08267baff63b30016562170b49197b3430153010906331391a19d1879c4f278"
+          "before": "b08267baff63b30016562170b49197b3430153010906331391a19d1879c4f278",
+          "after": "6025967b7cf4e852ce62dd9e7b27f5d10999b83b68d651f5ff7d0abd04aa155c"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "c3f696f76d140af0c4473617fde26bcbe3a22b01b46e77af32409fad5543f01a",
-      "after_sha256": "61db5b3a48c6c6c332792db04daf3d22e6747d8dd3d3bff9e2ae13c4429e3498",
+      "before_sha256": "61db5b3a48c6c6c332792db04daf3d22e6747d8dd3d3bff9e2ae13c4429e3498",
+      "after_sha256": "0747394a161781921db8eede966156728789ba38bc0d0b7bbc2decacc812119d",
       "owners": {
         "@document": {
-          "before": "c3f696f76d140af0c4473617fde26bcbe3a22b01b46e77af32409fad5543f01a",
-          "after": "61db5b3a48c6c6c332792db04daf3d22e6747d8dd3d3bff9e2ae13c4429e3498"
+          "before": "61db5b3a48c6c6c332792db04daf3d22e6747d8dd3d3bff9e2ae13c4429e3498",
+          "after": "0747394a161781921db8eede966156728789ba38bc0d0b7bbc2decacc812119d"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "d96f93795d967f5f97dbf38c5ca0be421af985c4565a0288ecaf35d9af70d69b",
-      "after_sha256": "6e2542d2ec8ca2c0e945084e871b88c211a0bdd3b315622921f82a43277a1fc1",
+      "before_sha256": "6e2542d2ec8ca2c0e945084e871b88c211a0bdd3b315622921f82a43277a1fc1",
+      "after_sha256": "04e451c0adf55b2f8b736f3877830be38b4dc7508b72c702338e44ad20852895",
       "owners": {
         "@document": {
-          "before": "d96f93795d967f5f97dbf38c5ca0be421af985c4565a0288ecaf35d9af70d69b",
-          "after": "6e2542d2ec8ca2c0e945084e871b88c211a0bdd3b315622921f82a43277a1fc1"
+          "before": "6e2542d2ec8ca2c0e945084e871b88c211a0bdd3b315622921f82a43277a1fc1",
+          "after": "04e451c0adf55b2f8b736f3877830be38b4dc7508b72c702338e44ad20852895"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "c5a5cc2fd5c7ba77683d9998c65e34a19c25bd3a5b59b268a591d96b22985dbb",
-      "after_sha256": "bf4062ef1118e3e87d5675bc181f020edbfaa5a1bd05fe481bc24c83c067b518",
+      "before_sha256": "bf4062ef1118e3e87d5675bc181f020edbfaa5a1bd05fe481bc24c83c067b518",
+      "after_sha256": "ab292034b5866d67fe6d317fe16938f3ca4e976400e9260b472c7744e8ffadf5",
       "owners": {
         "@document": {
-          "before": "c5a5cc2fd5c7ba77683d9998c65e34a19c25bd3a5b59b268a591d96b22985dbb",
-          "after": "bf4062ef1118e3e87d5675bc181f020edbfaa5a1bd05fe481bc24c83c067b518"
+          "before": "bf4062ef1118e3e87d5675bc181f020edbfaa5a1bd05fe481bc24c83c067b518",
+          "after": "ab292034b5866d67fe6d317fe16938f3ca4e976400e9260b472c7744e8ffadf5"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "28c2f296aae86df51ce39a0853f9271ef4aa49c18248b08ce1f4799bbdea3306",
-      "after_sha256": "5f245ff7685c49e526f0c80df54805614bc5ece8240564a649a67594c4453182",
+      "before_sha256": "5f245ff7685c49e526f0c80df54805614bc5ece8240564a649a67594c4453182",
+      "after_sha256": "116ebf7feba8b030b8c77232bf1d39c19068d685cd2b59e8d7e19a67f9612f03",
       "owners": {
         "@document": {
-          "before": "28c2f296aae86df51ce39a0853f9271ef4aa49c18248b08ce1f4799bbdea3306",
-          "after": "5f245ff7685c49e526f0c80df54805614bc5ece8240564a649a67594c4453182"
+          "before": "5f245ff7685c49e526f0c80df54805614bc5ece8240564a649a67594c4453182",
+          "after": "116ebf7feba8b030b8c77232bf1d39c19068d685cd2b59e8d7e19a67f9612f03"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "e6bdbec918f950cea30b7bf28754ff5fb3b651cc683bfa73706de5fa7e531ded",
-      "after_sha256": "927e18d28bceb7ca7f7bf6e7a196b68267298a65a4ad6fcf4e8455b74f903f94",
+      "before_sha256": "927e18d28bceb7ca7f7bf6e7a196b68267298a65a4ad6fcf4e8455b74f903f94",
+      "after_sha256": "cfaa09e3eed8ace731587a04ad15bc6957c4e3e6ae7e1a5786c379090b3202b8",
       "owners": {
         "@document": {
-          "before": "e6bdbec918f950cea30b7bf28754ff5fb3b651cc683bfa73706de5fa7e531ded",
-          "after": "927e18d28bceb7ca7f7bf6e7a196b68267298a65a4ad6fcf4e8455b74f903f94"
+          "before": "927e18d28bceb7ca7f7bf6e7a196b68267298a65a4ad6fcf4e8455b74f903f94",
+          "after": "cfaa09e3eed8ace731587a04ad15bc6957c4e3e6ae7e1a5786c379090b3202b8"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "ea1bb92b350fcd0a5cea7fc4f836b3a3718eed6d0390a08548d9db1e00996cad",
-      "after_sha256": "b7e1fe3015b852b0cebe3dffe53616200ae001160b66083983f00c9b1ea2f62d",
+      "before_sha256": "b7e1fe3015b852b0cebe3dffe53616200ae001160b66083983f00c9b1ea2f62d",
+      "after_sha256": "5bee2980055261e009b5113c5a6ee425526dd8796062337886f50f653b5a0d5e",
       "owners": {
         "@document": {
-          "before": "ea1bb92b350fcd0a5cea7fc4f836b3a3718eed6d0390a08548d9db1e00996cad",
-          "after": "b7e1fe3015b852b0cebe3dffe53616200ae001160b66083983f00c9b1ea2f62d"
+          "before": "b7e1fe3015b852b0cebe3dffe53616200ae001160b66083983f00c9b1ea2f62d",
+          "after": "5bee2980055261e009b5113c5a6ee425526dd8796062337886f50f653b5a0d5e"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "84ce770da3894a14648f3fdcee97bf6285a8f7fd564ede5df9ac0e527cd3697d",
-      "after_sha256": "0d639bd067ba7ea098fae34cdf742f93143bf739548d0516b497f49f43c32d1a",
+      "before_sha256": "0d639bd067ba7ea098fae34cdf742f93143bf739548d0516b497f49f43c32d1a",
+      "after_sha256": "4c4d7148e8cf871035da3afaaac458351fba9622465d0cf7e083c371c037a15c",
       "owners": {
         "@document": {
-          "before": "84ce770da3894a14648f3fdcee97bf6285a8f7fd564ede5df9ac0e527cd3697d",
-          "after": "0d639bd067ba7ea098fae34cdf742f93143bf739548d0516b497f49f43c32d1a"
+          "before": "0d639bd067ba7ea098fae34cdf742f93143bf739548d0516b497f49f43c32d1a",
+          "after": "4c4d7148e8cf871035da3afaaac458351fba9622465d0cf7e083c371c037a15c"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "767a2d66b861889198c62b8fca92add6c6927c4bd1f091409f68ad9e6af0a47b",
-      "after_sha256": "3cca02e74c66956f62f7591d436f51357eee059a814e581f227abe7b3b7df153",
+      "before_sha256": "3cca02e74c66956f62f7591d436f51357eee059a814e581f227abe7b3b7df153",
+      "after_sha256": "75e0a7c0328538f982a95365388b267f4001d0801617eb3e952ca0d231a8ebd9",
       "owners": {
         "@document": {
-          "before": "767a2d66b861889198c62b8fca92add6c6927c4bd1f091409f68ad9e6af0a47b",
-          "after": "3cca02e74c66956f62f7591d436f51357eee059a814e581f227abe7b3b7df153"
+          "before": "3cca02e74c66956f62f7591d436f51357eee059a814e581f227abe7b3b7df153",
+          "after": "75e0a7c0328538f982a95365388b267f4001d0801617eb3e952ca0d231a8ebd9"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "ddc6ea6781b750468202f72bc9ee57ec4a9fba62001402947a900c9eb4a75ee6",
-      "after_sha256": "94d41d37c6919db920a39a39c29dab18be664886097314de7cc7e7f093fe7474",
+      "before_sha256": "94d41d37c6919db920a39a39c29dab18be664886097314de7cc7e7f093fe7474",
+      "after_sha256": "0e48ccb1dbf4e65565a2fb92969eb47b0ee75881e9740bef1e57efb6c663ba4b",
       "owners": {
         "@document": {
-          "before": "ddc6ea6781b750468202f72bc9ee57ec4a9fba62001402947a900c9eb4a75ee6",
-          "after": "94d41d37c6919db920a39a39c29dab18be664886097314de7cc7e7f093fe7474"
+          "before": "94d41d37c6919db920a39a39c29dab18be664886097314de7cc7e7f093fe7474",
+          "after": "0e48ccb1dbf4e65565a2fb92969eb47b0ee75881e9740bef1e57efb6c663ba4b"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "ddbf17b988f8606158cad911c19d2e7e8e7de2a0de70dded7e0f480d425657c6",
-      "after_sha256": "19487cf2da057da7cc99349768f6318c34b2768b1e04317ef3bbc819d99d4b51",
+      "before_sha256": "19487cf2da057da7cc99349768f6318c34b2768b1e04317ef3bbc819d99d4b51",
+      "after_sha256": "f629ab2705dd12e42453415e0096be9bfab393aabd50a76ac64cbd0db85a1846",
       "owners": {
         "@document": {
-          "before": "ddbf17b988f8606158cad911c19d2e7e8e7de2a0de70dded7e0f480d425657c6",
-          "after": "19487cf2da057da7cc99349768f6318c34b2768b1e04317ef3bbc819d99d4b51"
+          "before": "19487cf2da057da7cc99349768f6318c34b2768b1e04317ef3bbc819d99d4b51",
+          "after": "f629ab2705dd12e42453415e0096be9bfab393aabd50a76ac64cbd0db85a1846"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "b2217b9ac8af82746d70971dce1c5102ecde50d6c559e6752e4e04c87babb9d1",
-      "after_sha256": "bd97268d5debf72f5f5356c85c1ad7ea5c0db93fbdf12beead3b26b5d8db95d9",
+      "before_sha256": "bd97268d5debf72f5f5356c85c1ad7ea5c0db93fbdf12beead3b26b5d8db95d9",
+      "after_sha256": "c20d3fc4e0b08344c5a657ec700b71a7e0abe90a03cfd9e41c839f8d8441ff3f",
       "owners": {
         "@document": {
-          "before": "b2217b9ac8af82746d70971dce1c5102ecde50d6c559e6752e4e04c87babb9d1",
-          "after": "bd97268d5debf72f5f5356c85c1ad7ea5c0db93fbdf12beead3b26b5d8db95d9"
+          "before": "bd97268d5debf72f5f5356c85c1ad7ea5c0db93fbdf12beead3b26b5d8db95d9",
+          "after": "c20d3fc4e0b08344c5a657ec700b71a7e0abe90a03cfd9e41c839f8d8441ff3f"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "1b101f23fc6a8b017ba1df2a6f13ea60c62616071144460ca0e6bc8f5c2921b8",
-      "after_sha256": "e897a26a15ec777e67b82e8d9db5325b28b399e3d2851a018e0ccae0cb8c4469",
+      "before_sha256": "e897a26a15ec777e67b82e8d9db5325b28b399e3d2851a018e0ccae0cb8c4469",
+      "after_sha256": "99fb4496d16914b9ec5f5a03db3b14bccff966a450210f1502cae1f8703f8d08",
       "owners": {
         "@document": {
-          "before": "1b101f23fc6a8b017ba1df2a6f13ea60c62616071144460ca0e6bc8f5c2921b8",
-          "after": "e897a26a15ec777e67b82e8d9db5325b28b399e3d2851a018e0ccae0cb8c4469"
+          "before": "e897a26a15ec777e67b82e8d9db5325b28b399e3d2851a018e0ccae0cb8c4469",
+          "after": "99fb4496d16914b9ec5f5a03db3b14bccff966a450210f1502cae1f8703f8d08"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "6011f20d1be35c1b971a412d59060c855a91a675b9d414fbab82c8c90af12f30",
-      "after_sha256": "e15b34f541eb51e11e908a24cd4386d08a878a5d713ee3f1930ca8f434ec7bd9",
+      "before_sha256": "e15b34f541eb51e11e908a24cd4386d08a878a5d713ee3f1930ca8f434ec7bd9",
+      "after_sha256": "13a94062d9cd04be35c68cee698011cde4c362d997e46d91c8399a2382853f93",
       "owners": {
         "@document": {
-          "before": "6011f20d1be35c1b971a412d59060c855a91a675b9d414fbab82c8c90af12f30",
-          "after": "e15b34f541eb51e11e908a24cd4386d08a878a5d713ee3f1930ca8f434ec7bd9"
+          "before": "e15b34f541eb51e11e908a24cd4386d08a878a5d713ee3f1930ca8f434ec7bd9",
+          "after": "13a94062d9cd04be35c68cee698011cde4c362d997e46d91c8399a2382853f93"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "98bef450413c793cbe7d556fb161a175c541119fe313ec3d884dbfbfd6dd235e",
-      "after_sha256": "f8bcf5d58dbf71b0bdac5150ad58e5ebe64e2dbf712a7f5dcc29fca5bbb8ba77",
+      "before_sha256": "f8bcf5d58dbf71b0bdac5150ad58e5ebe64e2dbf712a7f5dcc29fca5bbb8ba77",
+      "after_sha256": "861a086b87c2999b027463705ef8a9576a25a79702c081dc8ef90766e01d3126",
       "owners": {
         "@document": {
-          "before": "98bef450413c793cbe7d556fb161a175c541119fe313ec3d884dbfbfd6dd235e",
-          "after": "f8bcf5d58dbf71b0bdac5150ad58e5ebe64e2dbf712a7f5dcc29fca5bbb8ba77"
+          "before": "f8bcf5d58dbf71b0bdac5150ad58e5ebe64e2dbf712a7f5dcc29fca5bbb8ba77",
+          "after": "861a086b87c2999b027463705ef8a9576a25a79702c081dc8ef90766e01d3126"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "0da5a90e44173aa949df87eddad66f7abb349456bda45b3f404a1a94c3313238",
-      "after_sha256": "8dcc312d98a691262180df60704f89ce254eaec22872b56275adfd85dac761a9",
+      "before_sha256": "8dcc312d98a691262180df60704f89ce254eaec22872b56275adfd85dac761a9",
+      "after_sha256": "99d954eba1ee0c9d5dbddfadddf9584ac9dab2874ad1f844d6d0727c12930535",
       "owners": {
         "@document": {
-          "before": "0da5a90e44173aa949df87eddad66f7abb349456bda45b3f404a1a94c3313238",
-          "after": "8dcc312d98a691262180df60704f89ce254eaec22872b56275adfd85dac761a9"
+          "before": "8dcc312d98a691262180df60704f89ce254eaec22872b56275adfd85dac761a9",
+          "after": "99d954eba1ee0c9d5dbddfadddf9584ac9dab2874ad1f844d6d0727c12930535"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "d34177dd6dfd6e721dfe2f49fb71f265013a2d10f64a441d3e3a0b00255b1328",
-      "after_sha256": "4183d9a28c313658dba59254c26d7533538e63d348244d059e10977143692c0c",
+      "before_sha256": "4183d9a28c313658dba59254c26d7533538e63d348244d059e10977143692c0c",
+      "after_sha256": "1f70baa7b54739f03bff083fa54f2b00f1dfab47b82e16518d74b5c8cc1989fb",
       "owners": {
         "@document": {
-          "before": "d34177dd6dfd6e721dfe2f49fb71f265013a2d10f64a441d3e3a0b00255b1328",
-          "after": "4183d9a28c313658dba59254c26d7533538e63d348244d059e10977143692c0c"
+          "before": "4183d9a28c313658dba59254c26d7533538e63d348244d059e10977143692c0c",
+          "after": "1f70baa7b54739f03bff083fa54f2b00f1dfab47b82e16518d74b5c8cc1989fb"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "c62234be7f9b0b629a92af4ca77e4433bedc4cabafc866f647d3d51c12cd9beb",
-      "after_sha256": "48cbd652eecc5fc0008aa97cecdebb19c0488c8b107bb754869112746c820e84",
+      "before_sha256": "48cbd652eecc5fc0008aa97cecdebb19c0488c8b107bb754869112746c820e84",
+      "after_sha256": "7bce5c55072ae1de37179b14869b6febde6bf96476707f0be8f382a0d6eee5dd",
       "owners": {
         "@document": {
-          "before": "c62234be7f9b0b629a92af4ca77e4433bedc4cabafc866f647d3d51c12cd9beb",
-          "after": "48cbd652eecc5fc0008aa97cecdebb19c0488c8b107bb754869112746c820e84"
+          "before": "48cbd652eecc5fc0008aa97cecdebb19c0488c8b107bb754869112746c820e84",
+          "after": "7bce5c55072ae1de37179b14869b6febde6bf96476707f0be8f382a0d6eee5dd"
         }
       }
     },
-    "docs/ORDER_105_SCOPE_PLAN.md": {
+    "docs/ORDER_106_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "a2a573d72be1b0672dcdfa714ee25145d659314d78bd577043345ff67b53ee6d",
+      "after_sha256": "7740f53c9a21fb37306b9d7d58fef566c71d2565c7779dc5da1fea98071c5b29",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a2a573d72be1b0672dcdfa714ee25145d659314d78bd577043345ff67b53ee6d"
-        }
-      }
-    },
-    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
-      "before_sha256": "7ab2e78e1d70b5df63cd4ccacd830fa098cfa735aa31358695bdc6675da844f8",
-      "after_sha256": "130c91bcc173640eae41ae3ea0e6b63ac70a49a059071f6ecbc930c0a7ea2297",
-      "owners": {
-        "@document": {
-          "before": "7ab2e78e1d70b5df63cd4ccacd830fa098cfa735aa31358695bdc6675da844f8",
-          "after": "130c91bcc173640eae41ae3ea0e6b63ac70a49a059071f6ecbc930c0a7ea2297"
+          "after": "7740f53c9a21fb37306b9d7d58fef566c71d2565c7779dc5da1fea98071c5b29"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "eb240368dbd9158fa59565da15b6d1cc6602bdc40f9d1de705c085a66fc9d889",
-      "after_sha256": "ded7b36f211e83346c92c17129178fe900fc61e69cdcb53621b06143b7b44fa4",
+      "before_sha256": "ded7b36f211e83346c92c17129178fe900fc61e69cdcb53621b06143b7b44fa4",
+      "after_sha256": "cbf1d7d887c525c66c0f78378512adcfc8d05918879a353272fb26029a7a9eb1",
       "owners": {
         "@document": {
-          "before": "eb240368dbd9158fa59565da15b6d1cc6602bdc40f9d1de705c085a66fc9d889",
-          "after": "ded7b36f211e83346c92c17129178fe900fc61e69cdcb53621b06143b7b44fa4"
+          "before": "ded7b36f211e83346c92c17129178fe900fc61e69cdcb53621b06143b7b44fa4",
+          "after": "cbf1d7d887c525c66c0f78378512adcfc8d05918879a353272fb26029a7a9eb1"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "f2916a20ebefcb3815611a5edaa7892395859edd14552ffe62085e8001272018",
-      "after_sha256": "8dacf7a7b59e28edcc0085c4289e4512d0978f52f0e9c00252a991630d685101",
+      "before_sha256": "8dacf7a7b59e28edcc0085c4289e4512d0978f52f0e9c00252a991630d685101",
+      "after_sha256": "b325a0a761b38417c6295480e03f48009b0dfb9a1fb29de2b7e637de18cd46e4",
       "owners": {
         "@document": {
-          "before": "f2916a20ebefcb3815611a5edaa7892395859edd14552ffe62085e8001272018",
-          "after": "8dacf7a7b59e28edcc0085c4289e4512d0978f52f0e9c00252a991630d685101"
+          "before": "8dacf7a7b59e28edcc0085c4289e4512d0978f52f0e9c00252a991630d685101",
+          "after": "b325a0a761b38417c6295480e03f48009b0dfb9a1fb29de2b7e637de18cd46e4"
         }
       }
     },
-    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
-      "before_sha256": "6963791b7e83b62c6f57193b6b9f79e76b728267910a1717b91f11a1364ba82e",
-      "after_sha256": "8b918335da0384e0d4fb35aea95ecc90e3f4dffc7b8a802e3d95519fa8213c0d",
-      "owners": {
-        "_continue_hazardous_after_mortal_wound_feel_no_pain": {
-          "before": "019d003766819a1ddfa3101dad8a1e613841cf9217c10824d17af3353bc13b5e",
-          "after": "35655e650e634b4c92668d2857aaf28277497f351d564997d51e5e435e822adf"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/attack_sequence_hazardous.py": {
-      "before_sha256": "25f64be8aaa39b0846136be0749744d2777becee10f33be15beedf25299fd693",
-      "after_sha256": "183dce3a3a0bf31af18f28fd7472829b7e71e207d46692bc65b60f623419c7ab",
-      "owners": {
-        "_hazardous_mortal_wounds_for_attacker": {
-          "before": "58c8f740b577c2096b7f3cae0c3a209a084c66adbfabb9dbd913af879f53ebb0",
-          "after": "0a097f6a040a18dca15423f3cd9d2d39706c751ff1c24a24acfb91be58c4d852"
-        },
-        "validate_hazardous_mortal_wound_source_context": {
-          "before": "3341a3f690fc64bc41c16701f76b3b8ca7bf8f92b71767967a39a71bd5d42679",
-          "after": "7915c3b1b5505ade7f5459d8f37d069fe2557665ee20bd2c8c053a28d357d57a"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/emergency_disembark.py": {
-      "before_sha256": "2614600a4f7ebbec8f310e749d35ed40b4c0ad56a46b28cb08f419758ca6c642",
-      "after_sha256": "2657ee3c4c3aa0f06d706c7203b53e0225031ff3a57fb586f124f6f058f808ad",
-      "owners": {
-        "_rules_unit_hazard_mortal_wounds_per_failed_roll": {
-          "before": "d90c8dfac074a87fda77b976c9a58711447c765909ab8686ecc093fd654ecccf",
-          "after": null
-        },
-        "resolve_destroyed_transport_rules_unit_hazard_rolls_service": {
-          "before": "8dc85934886e8546a40e8872ff0011eadc3c2b917b5a63174f28ba924e8c2fcd",
-          "after": "05d5e6a274b082fcad0bbf73de282e33e326c6549e10ea777ad1f8ac189cbd37"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/hazard.py": {
-      "before_sha256": "4edeae38b8df7473d34245d25ee263ac1f367a7d1db8611bffc7500a8a7d9bdc",
-      "after_sha256": "b25a78e39bd761540141589e634c7ef63ba9f8ad7f50cb64ca81fb04e8b5a4ef",
+    "src/warhammer40k_core/engine/consolidation_model_constraints.py": {
+      "before_sha256": "b8989d4b4d8172fb02836b3645ff02601f543a71b2dcba715eaf64e8d841074d",
+      "after_sha256": "745dee697613138750cd2df2013ba08178f977759de64061267e06a7e73e37e8",
       "owners": {
         "@module": {
-          "before": "37196d3ccd4e934c9859d9436fec08cc47e7985ca6337f23206406dfff28ecef",
-          "after": "262eda8b29b0f53e55adc4e7b53b6458c4d04f01a009f268c03666f3b4ad7c57"
+          "before": "1b4c0d4bc2fa4cb3da33756658227d384fa48f90ecf04294cd3e6d5847ae25dc",
+          "after": "45196a6d5765c7b6444f8c3f22168c58dbeed567b48545913c08d50385ad45f0"
         },
-        "_canonical_keyword": {
-          "before": "214e49807492cc19d87dbabcb90c21408b222549431b6f3087d785fc61e17cba",
-          "after": null
+        "_query": {
+          "before": "ce6d596d61555882c7cbf625ad8597bc160a9d470fca3c1291adde80382ed73e",
+          "after": "e9dafd9744958a5b540f43be401bb34047c2a217821e449ee494d159d5d37a3e"
         },
-        "hazard_mortal_wounds_per_failed_roll": {
-          "before": "707bc16c9da49eafe108baabbbc1309b63478f2c225d5ef652d69ff56d1b68f9",
-          "after": "98398e37863f73f8d13594c0f3369b94c0655c8aab18a9ecc260357ab4854e29"
+        "consolidation_model_violation": {
+          "before": "3864947eaf96a1b98058cdb10b66dcc8825dee879a1f032e6f0a9941ffbb0b0d",
+          "after": "0152dd8afbf5d6e58be7832238d21b52b22bc47b55ca7ad870dcfb9c428909c1"
         }
       }
     },
-    "src/warhammer40k_core/engine/hazardous_completion.py": {
-      "before_sha256": "9b7b879952fb9e3ce7ba70850902930fa0f0fd66009e1902303102347c9182d5",
-      "after_sha256": "c5be54cdc3c47c3e59497a3a8d7ae604037519dbb7f1091b5b0a151ef341bdaf",
-      "owners": {
-        "hazardous_sequence_for_progress": {
-          "before": "d24d65a4cd11fae1167ae5680d80a439abe5559e5f4682f95f38e1e0650e762a",
-          "after": "5a22b54381bb2029d7bebf5fce4b5442063704736192545fec6412ff36687829"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/hazardous_retention.py": {
-      "before_sha256": "931ae9476603bdd11c080e31547294e99d86c29b293c939deadfa0a11248ac1c",
-      "after_sha256": "3505da974973f8b119178704b6ac243c51550b7e56f0056536dfc859577e338b",
-      "owners": {
-        "validate_retained_hazardous_progress": {
-          "before": "f847438ea399d119c5e8b987bdde4dc9bb6a584a0c710ed3f9a6be9eced8da22",
-          "after": "bf4509b6a89557b7777f8ece37d83a87b3360304f3f8763bbb34fe9930e1f3a1"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/hazardous_retention_history.py": {
-      "before_sha256": "9c4c7f1124fcc2978e5c261ece241d0d839c5fe8dd9da5cd19470b4e07f8edda",
-      "after_sha256": "6b05ce8a9f7a445dae85aa865fd07a67f6ba222a2b5ead2444e19ef70d760e26",
-      "owners": {
-        "pending_hazardous_logical_deaths": {
-          "before": "272ebb1586b9613863e5bb57caf3ebbf41aefc41fb6ea6a92dbe06df9d971c64",
-          "after": "45ba4e7196a37470194d5d709e2fd389970e2b940a8dc43af5d4fe0d7e15faf2"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/phases/movement_rules_unit_disembark.py": {
-      "before_sha256": "0edf1974b5e7f7c4fc5b33f01da9e119974fcad135d135c2f84cafaf27653c48",
-      "after_sha256": "e99226ebe0ddd7012a9adfc0cbc130c13b2954383cd1fd6011d69f5a78ce06d7",
-      "owners": {
-        "@module": {
-          "before": "4e9f9661d5643ea1737ae9d5a63e21e8d893a83d259b439e84e8f162255ce8f1",
-          "after": "3c078e6ac9a65d6be4a97d1a58bb90732ed9d987624fa4e0e358c87130539175"
-        },
-        "_resolve_rules_unit_combat_components": {
-          "before": "3efd25d57ae9ea11f6de8110bc65ff6fded629efdc2794770b0883d1dfb67d4c",
-          "after": "5829555b3f0adb4cd47441d509755468a04efaccf2509dc6053c505d5d1cbba5"
-        }
-      }
-    },
-    "tests/code_quality/test_order105_hazard_authority.py": {
+    "src/warhammer40k_core/engine/fight_pile_in_validation.py": {
       "before_sha256": null,
-      "after_sha256": "3b27864bdeb429160b8528edaac1c6d397459cecffe325151fda10b8a417cd38",
+      "after_sha256": "adf4137fa7c8edb185165db296429feb86920bab8df116a3d1782d2e2bf6b3be",
       "owners": {
         "@module": {
           "before": null,
-          "after": "e81d795bd22259c8207046241c44abe01fbcca74545b665321e4854c71ed7efe"
+          "after": "9f3109e8005a5206242b46c0b8c5dde4d88ab9c8da59b255c17eae65a6408f29"
         },
-        "test_hazard_consumers_share_model_count_authority": {
+        "validate_pile_in_endpoint": {
           "before": null,
-          "after": "c5a2b24cb39cb535f6e915f7bb6509681310af5ccca6e310c112a3a939d5e44d"
+          "after": "e41eface67316517def103de7682aaca7d5b8f8aacacf176800b4463ccb15067"
         }
       }
     },
-    "tests/hazard_all_models_helpers.py": {
+    "src/warhammer40k_core/engine/fight_resolution.py": {
+      "before_sha256": "d027b9c6f9a6391e718e5543819af6c525aee09a2d4fd1c484b8db3f1a28acf0",
+      "after_sha256": "720cc1824545636bdc2a2961abe83aa012aa275b53ae8618be793734a7a41774",
+      "owners": {
+        "_pile_in_endpoint_validation": {
+          "before": "b4b16dae20f010b737fd133cca6fccde648b306c75265243195c34c1c3b9af56",
+          "after": "6e4c0d70c5164604ec8c98b5e27e5cab3b0b7a69bd0508cbf2473dc44f2b3bd4"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/fight_rules_unit_movement.py": {
+      "before_sha256": "29a5864078484eb1d076811f9cf444b3e5d0f46b53c1b539478fd1bf7a48e0cf",
+      "after_sha256": "2f6c0e5817c3b7d2b039045cbbbdba4b2cc8c4bd0fafd957e9f85f5b1513637e",
+      "owners": {
+        "_endpoint_validation": {
+          "before": "d0f639a003bd9b8396f40615138cc066373e1e0c16446235fd91e63593b1628f",
+          "after": "49ed436de01c36f4062c0dece45dba5c239b8e8522d35904aa7d6e8af338a85b"
+        }
+      }
+    },
+    "tests/code_quality/test_phase14i_14h_closeout.py": {
+      "before_sha256": "5edd42bf0225c4a02b0d633f4d3022b36e8a13d45beabdab760cab831f428ea5",
+      "after_sha256": "5b4eb873f50ba994a66b73d4bfabda60d54494f9a9657e5c0228d2811aacc79b",
+      "owners": {
+        "test_p12_consolidation_shares_objective_model_and_forced_fight_owners": {
+          "before": "dbf04a0c70bf3f531f61c325c5a5930cc2d309e6fc639db506f9470fcf9c67b7",
+          "after": "406af8eba678589957801f674fef85e20f70dd54bf023ba52f4a49fce8e71daf"
+        }
+      }
+    },
+    "tests/unit/test_order106_pile_in.py": {
       "before_sha256": null,
-      "after_sha256": "c327d3312663c028b3210af828bb3384a068b9df50c93e52d60f2926271f4561",
+      "after_sha256": "e1ef185d328145c2da06b9309084d16cbad1d08b4de427d18cd612734d2f3da6",
       "owners": {
         "@module": {
           "before": null,
-          "after": "50a3bbe84e643ef6e2a707d11a057b65a072021282eb01eaf0b11d68eba8bfc0"
+          "after": "c64525f72336fa7910bdc9dcaa750fadb7c8a726157ebe1ec9bab1c832bf2829"
         },
-        "hazard_scene": {
+        "_session": {
           "before": null,
-          "after": "bcedb583aa393f3df59787b4d612b2eb44e27ad9ba458121a694312f66d5b985"
+          "after": "ec089a402c6e9a60e96f86642d12d37cd1c3c5e50baadab13e199ce4211cf6a7"
+        },
+        "_submit": {
+          "before": null,
+          "after": "94888701f2389a4e1472e0d3aecce1b59a3efa94189ca6439610c919f41b44ec"
+        },
+        "test_pile_in_closest_identity_is_attached_target_unit_not_one_component": {
+          "before": null,
+          "after": "b28aa1e9837e56a4052ad446dd5ddca263e48b61ea0637d87ee4b47662e32465"
+        },
+        "test_pile_in_coherency_unresolved_does_not_invent_unattainability": {
+          "before": null,
+          "after": "651c92321ef3a91c40e7c0e0547814927fefeb1181157df8ed9a5221500d1559"
+        },
+        "test_pile_in_legal_closest_engagement_restores_and_replays": {
+          "before": null,
+          "after": "8672c8437fe28e4aca10124edd3a13232e94b1a71b0127371013955c9df170bc"
+        },
+        "test_pile_in_proven_unattainable_model_may_move_closer_without_engaging": {
+          "before": null,
+          "after": "7070ad74d6d96551bfab05f32f7f4e9d074fac2bd5ddead0e99fee3396e0df16"
+        },
+        "test_pile_in_rejects_switching_target_or_avoidable_nonengagement": {
+          "before": null,
+          "after": "c6452f013aa0bb77eb27c1d03045cd7c737065e7fb16c96387e7198c647ba2e5"
+        },
+        "test_pile_in_stationary_and_closed_loop_paths": {
+          "before": null,
+          "after": "52704c69f88cb2891d2a62e92d51bf50a9e969ccca2e49b46b8bf5d02cf0486e"
+        },
+        "test_pile_in_tied_closest_targets_allow_either_target": {
+          "before": null,
+          "after": "56294cd7b7baef1c53f089c52ae4ade3d66670156d35e87411d8450c5b81cff3"
         }
       }
     },
-    "tests/unit/test_order105_hazard.py": {
-      "before_sha256": null,
-      "after_sha256": "1860d3d874d7bcce2dd6af6473519e0ed9d378a2e36629aa51d1c88a90b50e42",
+    "tests/unit/test_phase15c_fight_order.py": {
+      "before_sha256": "2f54e9dc1a8a8c17fcd6b65bb1091e5aefd372f78fa04647bd09e45427bd1e01",
+      "after_sha256": "632e37f25205a8f096cce373880ef4c17dbd655c9d4656cdd0216ada5f9c2814",
       "owners": {
-        "@module": {
-          "before": null,
-          "after": "671683126fa15e189246f13268106fd3fefb48a1c9dad3c747bbaa62e54cac73"
+        "test_fight_on_death_survivor_move_checkpoint_uses_living_only_global_coherency": {
+          "before": "2190ccdc76f7c41629a888fd1588248ceb312a1110a6d0e7feb221bcc368396c",
+          "after": "910084da7b3a62bec988311b3aa607afbe9f88b3a0502ae9860dd9c22cf327c5"
         },
-        "test_attached_combat_hazard_counts_the_whole_unit": {
-          "before": null,
-          "after": "e63d6f192d1737e55dc51a7e3fadafb5c5e9f8cce177923c30e0614849891ce5"
+        "test_phase15d_restore_accepts_pile_in_completed_before_fight_on_death_retention": {
+          "before": "e5e6991924b749ac8b3141c5cfbbedac0307c49ea078dbd0c05baf33b39543ba",
+          "after": "2f0d1ebbed396f679da37d877d28bf6af8c931b062794e0ebca28be4d15fffbd"
         },
-        "test_each_large_model_qualifies_even_with_additional_infantry_keyword": {
-          "before": null,
-          "after": "02b8304429e3808ca9fab49dcd02dc540cc7bd6457feafe1066a9fabcd1f8062"
-        },
-        "test_mixed_emergency_hazard_resolves_complete_cargo": {
-          "before": null,
-          "after": "da4ca28b4e329f8086e022a332950a45d92036203f8c2a916bfb95cc801a0b40"
-        },
-        "test_mixed_hazardous_facade_restore_and_replay": {
-          "before": null,
-          "after": "1440f430da5c0c33ef5bebbb12b530b14e618b94feee08e0c4b0063372d146f2"
-        },
-        "test_mixed_model_hazard_uses_every_model": {
-          "before": null,
-          "after": "d27222b54cabbfeac5d5be4d55abdca3034fd84f9f45a96eba4fb872528ec186"
-        },
-        "test_removed_ordinary_models_do_not_supply_current_hazard_keywords": {
-          "before": null,
-          "after": "5524ea6da233323c07ffa57191bb6033abd55b0dd7673252a55f8014439b5401"
-        },
-        "test_rules_present_retained_model_keeps_its_own_hazard_keywords": {
-          "before": null,
-          "after": "995affb4628fde4694d5d4b8437ed78930c3589bebf1bf9c2afe34880e2cdf00"
-        }
-      }
-    },
-    "tests/unit/test_phase13b_shooting_declarations.py": {
-      "before_sha256": "7f3db2643ba583f649f989b05054f928731fe456c9e08d6b958706cb48b700ab",
-      "after_sha256": "cf6ef7d483e90543ce905adf1e53a80d3417f7d26844286b348230c2447d1563",
-      "owners": {
-        "test_phase13d_hazardous_tests_resolve_after_all_attacks": {
-          "before": "d5f16ae07bb0e966d1860cfb574172f0dc1e22f132d0a1d03ae783820b370c48",
-          "after": "49037f99268102277e31751962416ff40f42990af108edcba81320966016ff59"
+        "test_phase15d_restore_rejects_omitted_living_target_authority_model": {
+          "before": "e444fe8fd2af6187ef4b69d308af0e683fe0a6135f6050522f1ac7cad059f4ec",
+          "after": "ca782864f10c63115d42ed780c00ff3f11d54903ee4597e212206dafd9d31722"
         }
       }
     }
@@ -456,9 +396,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
@@ -466,12 +406,13 @@
         "behavior-shard-inventory",
         "issue533-client-regressions",
         "order104-client-regressions",
-        "order105-client-regressions"
+        "order105-client-regressions",
+        "order106-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -479,12 +420,13 @@
         "behavior-shard-inventory",
         "issue533-client-regressions",
         "order104-client-regressions",
-        "order105-client-regressions"
+        "order105-client-regressions",
+        "order106-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -492,12 +434,13 @@
         "behavior-shard-inventory",
         "issue533-client-regressions",
         "order104-client-regressions",
-        "order105-client-regressions"
+        "order105-client-regressions",
+        "order106-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -505,12 +448,13 @@
         "behavior-shard-inventory",
         "issue533-client-regressions",
         "order104-client-regressions",
-        "order105-client-regressions"
+        "order105-client-regressions",
+        "order106-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -518,12 +462,13 @@
         "behavior-shard-inventory",
         "issue533-client-regressions",
         "order104-client-regressions",
-        "order105-client-regressions"
+        "order105-client-regressions",
+        "order106-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -531,12 +476,13 @@
         "behavior-shard-inventory",
         "issue533-client-regressions",
         "order104-client-regressions",
-        "order105-client-regressions"
+        "order105-client-regressions",
+        "order106-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -544,12 +490,13 @@
         "behavior-shard-inventory",
         "issue533-client-regressions",
         "order104-client-regressions",
-        "order105-client-regressions"
+        "order105-client-regressions",
+        "order106-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -557,12 +504,13 @@
         "behavior-shard-inventory",
         "issue533-client-regressions",
         "order104-client-regressions",
-        "order105-client-regressions"
+        "order105-client-regressions",
+        "order106-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -570,12 +518,13 @@
         "behavior-shard-inventory",
         "issue533-client-regressions",
         "order104-client-regressions",
-        "order105-client-regressions"
+        "order105-client-regressions",
+        "order106-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -583,12 +532,13 @@
         "behavior-shard-inventory",
         "issue533-client-regressions",
         "order104-client-regressions",
-        "order105-client-regressions"
+        "order105-client-regressions",
+        "order106-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -596,12 +546,13 @@
         "behavior-shard-inventory",
         "issue533-client-regressions",
         "order104-client-regressions",
-        "order105-client-regressions"
+        "order105-client-regressions",
+        "order106-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -609,12 +560,13 @@
         "behavior-shard-inventory",
         "issue533-client-regressions",
         "order104-client-regressions",
-        "order105-client-regressions"
+        "order105-client-regressions",
+        "order106-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -622,12 +574,13 @@
         "behavior-shard-inventory",
         "issue533-client-regressions",
         "order104-client-regressions",
-        "order105-client-regressions"
+        "order105-client-regressions",
+        "order106-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -637,12 +590,13 @@
         "issue533-contract-publication",
         "order103-contract-publication",
         "order104-contract-publication",
-        "order105-contract-publication"
+        "order105-contract-publication",
+        "order106-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -652,12 +606,13 @@
         "issue533-contract-publication",
         "order103-contract-publication",
         "order104-contract-publication",
-        "order105-contract-publication"
+        "order105-contract-publication",
+        "order106-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -667,12 +622,13 @@
         "issue533-contract-publication",
         "order103-contract-publication",
         "order104-contract-publication",
-        "order105-contract-publication"
+        "order105-contract-publication",
+        "order106-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -682,12 +638,13 @@
         "issue533-contract-publication",
         "order103-contract-publication",
         "order104-contract-publication",
-        "order105-contract-publication"
+        "order105-contract-publication",
+        "order106-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -697,12 +654,13 @@
         "issue533-contract-publication",
         "order103-contract-publication",
         "order104-contract-publication",
-        "order105-contract-publication"
+        "order105-contract-publication",
+        "order106-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -712,12 +670,13 @@
         "issue533-contract-publication",
         "order103-contract-publication",
         "order104-contract-publication",
-        "order105-contract-publication"
+        "order105-contract-publication",
+        "order106-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -727,12 +686,13 @@
         "issue533-contract-publication",
         "order103-contract-publication",
         "order104-contract-publication",
-        "order105-contract-publication"
+        "order105-contract-publication",
+        "order106-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -742,44 +702,37 @@
         "issue533-contract-publication",
         "order103-contract-publication",
         "order104-contract-publication",
-        "order105-contract-publication"
+        "order105-contract-publication",
+        "order106-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
-    "docs/ORDER_105_SCOPE_PLAN.md": {
+    "docs/ORDER_106_SCOPE_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
-    },
-    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -787,130 +740,82 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
-    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
+    "src/warhammer40k_core/engine/consolidation_model_constraints.py": {
       "category": "rule_semantics",
       "operations": [
-        "order105-hazard-all-models-authority"
+        "fight-rule-branch",
+        "order106-pile-in-authority"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
-    "src/warhammer40k_core/engine/attack_sequence_hazardous.py": {
+    "src/warhammer40k_core/engine/fight_pile_in_validation.py": {
       "category": "rule_semantics",
       "operations": [
-        "order105-hazard-all-models-authority"
+        "fight-rule-branch",
+        "order106-pile-in-authority"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
-    "src/warhammer40k_core/engine/emergency_disembark.py": {
+    "src/warhammer40k_core/engine/fight_resolution.py": {
       "category": "rule_semantics",
       "operations": [
-        "order105-hazard-all-models-authority",
-        "transport-rule-branch"
+        "fight-rule-branch",
+        "order106-pile-in-authority"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
-    "src/warhammer40k_core/engine/hazard.py": {
+    "src/warhammer40k_core/engine/fight_rules_unit_movement.py": {
       "category": "rule_semantics",
       "operations": [
-        "order105-hazard-all-models-authority"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
-    },
-    "src/warhammer40k_core/engine/hazardous_completion.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order105-hazard-all-models-authority"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
-    },
-    "src/warhammer40k_core/engine/hazardous_retention.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order105-hazard-all-models-authority"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
-    },
-    "src/warhammer40k_core/engine/hazardous_retention_history.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order105-hazard-all-models-authority"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
-    },
-    "src/warhammer40k_core/engine/phases/movement_rules_unit_disembark.py": {
-      "category": "rule_semantics",
-      "operations": [
+        "fight-rule-branch",
         "movement-rule-branch",
-        "order105-hazard-all-models-authority",
-        "transport-rule-branch"
+        "order106-pile-in-authority"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
-    "tests/code_quality/test_order105_hazard_authority.py": {
+    "tests/code_quality/test_phase14i_14h_closeout.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
-    "tests/hazard_all_models_helpers.py": {
+    "tests/unit/test_order106_pile_in.py": {
       "category": "rule_semantics",
       "operations": [
-        "order105-client-regressions"
+        "order106-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
-    "tests/unit/test_order105_hazard.py": {
+    "tests/unit/test_phase15c_fight_order.py": {
       "category": "rule_semantics",
       "operations": [
-        "order105-client-regressions"
+        "order106-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
-    },
-    "tests/unit/test_phase13b_shooting_declarations.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order105-client-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
-      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. Continuation now looks up the existing registered application in event history to preserve the pre-damage count; existing reconstruction, source-context parsing and allocation remain the owners. No geometry or cache algorithm changes, and this is not a deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     }
   },
   "milestone": "ordinary",

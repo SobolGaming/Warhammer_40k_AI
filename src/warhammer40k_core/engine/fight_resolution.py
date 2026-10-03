@@ -1431,45 +1431,16 @@ def _pile_in_endpoint_validation(
     after: UnitPlacement,
     state: GameState | None,
 ) -> ProposalValidationResult | None:
-    before = scenario.battlefield_state.unit_placement_by_id(proposal.unit_instance_id)
-    base_contact_violation = fight_base_contact_movement_violation(
+    from warhammer40k_core.engine.fight_pile_in_validation import validate_pile_in_endpoint
+
+    return validate_pile_in_endpoint(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
-        before=before,
+        proposal_request=proposal_request,
+        proposal=proposal,
         after=after,
         state=state,
     )
-    if base_contact_violation is not None:
-        return fight_movement_endpoint_invalid(proposal_request, base_contact_violation, "witness")
-    closer_violation = fight_moved_models_closer_to_targets_violation(
-        scenario=scenario,
-        before=before,
-        after=after,
-        target_unit_instance_ids=proposal.pile_in_target_unit_instance_ids,
-        state=state,
-    )
-    if closer_violation is not None:
-        return fight_movement_endpoint_invalid(proposal_request, closer_violation, "witness")
-    if not fight_unit_is_engaged_with_any(
-        scenario=scenario,
-        ruleset_descriptor=ruleset_descriptor,
-        unit_placement=after,
-        target_unit_instance_ids=proposal.pile_in_target_unit_instance_ids,
-        state=state,
-    ):
-        return fight_movement_endpoint_invalid(
-            proposal_request, "pile_in_unit_not_engaged_after", "witness"
-        )
-    continuing_violation = fight_continuing_engagement_violation(
-        scenario=scenario,
-        ruleset_descriptor=ruleset_descriptor,
-        before=before,
-        after=after,
-        state=state,
-    )
-    if continuing_violation is not None:
-        return fight_movement_endpoint_invalid(proposal_request, continuing_violation, "witness")
-    return None
 
 
 def _consolidate_endpoint_validation(

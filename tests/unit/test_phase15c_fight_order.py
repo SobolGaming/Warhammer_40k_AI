@@ -1490,12 +1490,13 @@ def test_phase15d_restore_rejects_pending_fight_movement_after_retained_target_i
 
 
 def test_phase15d_restore_accepts_pile_in_completed_before_fight_on_death_retention() -> None:
+    # Parallel ranks keep each moved living model engaged with the selected target.
     lifecycle, units = _fight_lifecycle(
         alpha_unit_ids=("attacker",),
         enemy_unit_ids=("enemy",),
         origins={
             "attacker": Pose.at(10.0, 20.0),
-            "enemy": Pose.at(18.5, 20.0),
+            "enemy": Pose.at(10.5, 22.0),
         },
         game_id="phase15d-restore-historical-pile-in-before-fight-on-death",
     )
@@ -1602,12 +1603,13 @@ def test_phase15d_restore_accepts_pile_in_completed_before_fight_on_death_retent
 
 
 def test_phase15d_restore_rejects_omitted_living_target_authority_model() -> None:
+    # Parallel ranks keep each moved living model engaged with the selected target.
     lifecycle, units = _fight_lifecycle(
         alpha_unit_ids=("attacker",),
         enemy_unit_ids=("enemy",),
         origins={
             "attacker": Pose.at(10.0, 20.0),
-            "enemy": Pose.at(18.5, 20.0),
+            "enemy": Pose.at(10.5, 22.0),
         },
         game_id="phase15d-restore-target-authority-omission",
         model_count=5,
@@ -4300,12 +4302,13 @@ def test_pending_destroyed_transport_retains_physical_model_but_restores_living_
 
 
 def test_fight_on_death_survivor_move_checkpoint_uses_living_only_global_coherency() -> None:
+    # Parallel ranks keep each moved living model engaged with the selected target.
     lifecycle, units = _fight_lifecycle(
         alpha_unit_ids=("retained",),
         enemy_unit_ids=("enemy",),
         origins={
             "retained": Pose.at(10.0, 20.0),
-            "enemy": Pose.at(18.5, 20.0),
+            "enemy": Pose.at(11.0, 22.0),
         },
         game_id="phase15c-fight-on-death-living-only-restore-coherency",
     )

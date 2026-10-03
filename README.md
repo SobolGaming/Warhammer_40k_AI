@@ -2,6 +2,12 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 106 / P12C requires each moved Pile In model to approach its initially
+closest selected target and engage it when a legal witnessed move can do so.
+Ordinary and attached units share the existing movement reachability constraints,
+including coherency and continuing engagement. See
+[source, scope and validation](docs/ORDER_106_SCOPE_PLAN.md).
+
 Order 105 / P06D applies the all-model MONSTER/VEHICLE requirement to Hazard
 and Hazardous wound counts. Mixed and attached units share the same count across
 attacks and transport disembarkation; the Infantry/Vehicle FAQ retains one wound.

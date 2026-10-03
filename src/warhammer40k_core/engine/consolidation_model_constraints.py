@@ -1,4 +1,4 @@
-"""Shared per-model Consolidation obligations over physical rules-unit geometry."""
+"""Shared per-model Pile In and Consolidation obligations over physical rules-unit geometry."""
 
 from __future__ import annotations
 
@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.core.ruleset_descriptor import (
     CoherencyPolicyKind,
     ConsolidationModeKind,
-    MovementMode,
     RulesetDescriptor,
 )
 from warhammer40k_core.engine.aircraft import aircraft_model_ids_for_scenario
@@ -56,7 +55,7 @@ def consolidation_model_violation(
     from warhammer40k_core.engine.fight_resolution import fight_objective_markers_from_context
 
     targets: dict[str, tuple[Model, ...]] = {}
-    for target_id in proposal.consolidate_target_unit_instance_ids:
+    for target_id in proposal.target_unit_instance_ids:
         target = rules_unit_view_from_armies(armies=scenario.armies, unit_instance_id=target_id)
         targets[target.unit_instance_id] = tuple(
             model
@@ -100,7 +99,7 @@ def consolidation_model_violation(
                 for unit_id, models in targets.items()
             }
             if not distances:
-                raise GameLifecycleError("Consolidation requires selected target geometry.")
+                raise GameLifecycleError("Fight movement requires selected target geometry.")
             closest = min(distances.values())
             closest_models = tuple(
                 model
@@ -129,9 +128,17 @@ def consolidation_model_violation(
         )
         result = movement_reachability(query)
         if result.status is MovementReachabilityStatus.REACHABLE:
-            return "consolidation_model_must_reach_required_endpoint"
+            return (
+                "pile_in_model_must_reach_required_endpoint"
+                if proposal.proposal_kind is ProposalKind.PILE_IN
+                else "consolidation_model_must_reach_required_endpoint"
+            )
         if result.status is MovementReachabilityStatus.UNRESOLVED:
-            return "consolidation_reachability_unresolved"
+            return (
+                "pile_in_reachability_unresolved"
+                if proposal.proposal_kind is ProposalKind.PILE_IN
+                else "consolidation_reachability_unresolved"
+            )
     return None
 
 
@@ -172,9 +179,13 @@ def _query(
     legality = MovementLegalityContext.from_keywords(
         keywords=owner.keywords,
         ruleset_descriptor=ruleset,
-        movement_mode=MovementMode.CONSOLIDATE,
+        movement_mode=proposal.movement_mode,
         movement_phase_action=None,
-        displacement_kind=ModelDisplacementKind.CONSOLIDATE,
+        displacement_kind=(
+            ModelDisplacementKind.PILE_IN
+            if proposal.proposal_kind is ProposalKind.PILE_IN
+            else ModelDisplacementKind.CONSOLIDATE
+        ),
     )
     witness = PathWitness.for_paths(((start.model_id, (start.pose, start.pose)),))
     after_by_id = {item.model_instance_id: item for item in after}
@@ -224,7 +235,7 @@ def _query(
         or coherency.max_horizontal_inches is None
         or coherency.max_vertical_inches is None
     ):
-        raise GameLifecycleError("Consolidation requires complete neighbor coherency policy.")
+        raise GameLifecycleError("Fight movement requires complete neighbor coherency policy.")
     return MovementReachabilityQuery(
         path_context=legality.to_path_validation_context(
             moving_model=start,
@@ -243,7 +254,7 @@ def _query(
                 else rules_unit_fight_movement_maximum_distance_inches(
                     state=state,
                     unit_instance_id=proposal.unit_instance_id,
-                    proposal_kind=ProposalKind.CONSOLIDATE,
+                    proposal_kind=proposal.proposal_kind,
                 )
             ),
         ),
@@ -258,7 +269,10 @@ def _query(
             min(start.range_to(model) for model in goal.models) - 1e-9 if goal.models else None
         ),
         required_goals=tuple(item for item in enemy_goals if item.contains(start))
-        if proposal.consolidation_mode is ConsolidationModeKind.ONGOING
+        if (
+            proposal.proposal_kind is ProposalKind.PILE_IN
+            or proposal.consolidation_mode is ConsolidationModeKind.ONGOING
+        )
         else (),
         forbidden_goals=enemy_goals
         if proposal.consolidation_mode is ConsolidationModeKind.OBJECTIVE

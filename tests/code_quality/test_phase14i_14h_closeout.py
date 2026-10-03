@@ -653,6 +653,7 @@ def test_p12_consolidation_shares_objective_model_and_forced_fight_owners() -> N
     for source in (endpoint, grouped):
         assert "consolidation_model_violation" in source
         assert "consolidation_objective_distances" in source
+    assert "consolidation_model_violation" in source_for(engine / "fight_pile_in_validation.py")
     assert "mission_objective_geometries" in geometry
     assert "measure_model_to_objective" in geometry
     assert "install_forced_fight_queue" in response

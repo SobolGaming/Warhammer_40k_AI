@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:01d408373e29dd80bf45c3fdf1908a67605ed4e2412356a71d407cf30215263a",
-  "fingerprint": "01d408373e29dd80bf45c3fdf1908a67605ed4e2412356a71d407cf30215263a",
-  "resource_count": 3043,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b0339d24d145ee6258ed5ca2b60887f707bbf66abb8e111123539e439200544a",
+  "fingerprint": "b0339d24d145ee6258ed5ca2b60887f707bbf66abb8e111123539e439200544a",
+  "resource_count": 3044,
   "resources": [
     {
       "byte_length": 113,
@@ -1920,9 +1920,9 @@
       "sha256": "1f2e0375a481c9d5c9270827dbf2b7857ab3674b14e311d0a000a9a49be88292"
     },
     {
-      "byte_length": 11644,
+      "byte_length": 12160,
       "path": "warhammer40k_core/engine/consolidation_model_constraints.py",
-      "sha256": "b8989d4b4d8172fb02836b3645ff02601f543a71b2dcba715eaf64e8d841074d"
+      "sha256": "745dee697613138750cd2df2013ba08178f977759de64061267e06a7e73e37e8"
     },
     {
       "byte_length": 2624,
@@ -10035,9 +10035,14 @@
       "sha256": "0a8ae67390286c434bd0e601439632ac98b62215ac9fb97455a6e372dcb6510c"
     },
     {
-      "byte_length": 95546,
+      "byte_length": 3282,
+      "path": "warhammer40k_core/engine/fight_pile_in_validation.py",
+      "sha256": "adf4137fa7c8edb185165db296429feb86920bab8df116a3d1782d2e2bf6b3be"
+    },
+    {
+      "byte_length": 94300,
       "path": "warhammer40k_core/engine/fight_resolution.py",
-      "sha256": "d027b9c6f9a6391e718e5543819af6c525aee09a2d4fd1c484b8db3f1a28acf0"
+      "sha256": "720cc1824545636bdc2a2961abe83aa012aa275b53ae8618be793734a7a41774"
     },
     {
       "byte_length": 28227,
@@ -10045,9 +10050,9 @@
       "sha256": "1d69d278a11ea5648c75e46c219b4561744ff02f4e27688f995dc3a8b4907ea0"
     },
     {
-      "byte_length": 53435,
+      "byte_length": 53869,
       "path": "warhammer40k_core/engine/fight_rules_unit_movement.py",
-      "sha256": "29a5864078484eb1d076811f9cf444b3e5d0f46b53c1b539478fd1bf7a48e0cf"
+      "sha256": "2f6c0e5817c3b7d2b039045cbbbdba4b2cc8c4bd0fafd957e9f85f5b1513637e"
     },
     {
       "byte_length": 40402,

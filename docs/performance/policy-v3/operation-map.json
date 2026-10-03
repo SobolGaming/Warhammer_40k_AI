@@ -2143,6 +2143,83 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order106-pile-in-authority": {
+      "paths": [
+        "src/warhammer40k_core/engine/consolidation_model_constraints.py",
+        "src/warhammer40k_core/engine/fight_pile_in_validation.py",
+        "src/warhammer40k_core/engine/fight_resolution.py",
+        "src/warhammer40k_core/engine/fight_rules_unit_movement.py"
+      ],
+      "owners": [
+        "@module",
+        "_endpoint_validation",
+        "_pile_in_endpoint_validation",
+        "_query",
+        "consolidation_model_violation",
+        "validate_pile_in_endpoint"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order106-contract-publication": {
+      "paths": [
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order106-client-regressions": {
+      "paths": [
+        "ci/test_shards/durations.json",
+        "ci/test_shards/shard-1.txt",
+        "ci/test_shards/shard-10.txt",
+        "ci/test_shards/shard-11.txt",
+        "ci/test_shards/shard-12.txt",
+        "ci/test_shards/shard-2.txt",
+        "ci/test_shards/shard-3.txt",
+        "ci/test_shards/shard-4.txt",
+        "ci/test_shards/shard-5.txt",
+        "ci/test_shards/shard-6.txt",
+        "ci/test_shards/shard-7.txt",
+        "ci/test_shards/shard-8.txt",
+        "ci/test_shards/shard-9.txt",
+        "tests/code_quality/test_phase14i_14h_closeout.py",
+        "tests/unit/test_order106_pile_in.py",
+        "tests/unit/test_phase15c_fight_order.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_session",
+        "_submit",
+        "test_fight_on_death_survivor_move_checkpoint_uses_living_only_global_coherency",
+        "test_p12_consolidation_shares_objective_model_and_forced_fight_owners",
+        "test_phase15d_restore_accepts_pile_in_completed_before_fight_on_death_retention",
+        "test_phase15d_restore_rejects_omitted_living_target_authority_model",
+        "test_pile_in_closest_identity_is_attached_target_unit_not_one_component",
+        "test_pile_in_coherency_unresolved_does_not_invent_unattainability",
+        "test_pile_in_legal_closest_engagement_restores_and_replays",
+        "test_pile_in_proven_unattainable_model_may_move_closer_without_engaging",
+        "test_pile_in_rejects_switching_target_or_avoidable_nonengagement",
+        "test_pile_in_stationary_and_closed_loop_paths",
+        "test_pile_in_tied_closest_targets_allow_either_target"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

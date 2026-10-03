@@ -840,6 +840,17 @@ def _endpoint_validation(
         if closer_violation is not None:
             return _endpoint_invalid(request=request, code=closer_violation)
     if proposal.proposal_kind is ProposalKind.PILE_IN:
+        violation = consolidation_model_violation(
+            scenario=before_scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            proposal_request=request,
+            proposal=proposal,
+            before=before.model_placements,
+            after=after.model_placements,
+            state=state,
+        )
+        if violation is not None:
+            return _endpoint_invalid(request=request, code=violation)
         if not _rules_unit_engaged_with_targets(
             scenario=after_scenario,
             ruleset_descriptor=ruleset_descriptor,
