@@ -847,6 +847,8 @@ class MovementLegalityContext:
             self.capabilities.can_move_through_friendly_models
             or self.capabilities.can_move_over_friendly_vehicle_monster_models
             or not self.capabilities.blocks_friendly_vehicle_monster_pass_through
+            # FAQ 9b1c81f5: other move types retain ordinary friendly transit.
+            or self.movement_mode not in (MovementMode.NORMAL, MovementMode.ADVANCE)
             or (fly_transit_applies and self.capabilities.can_move_through_friendly_models)
         ):
             friendly_vehicle_monster_blockers = ()
