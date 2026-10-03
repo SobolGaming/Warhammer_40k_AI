@@ -1157,7 +1157,7 @@ def test_order113_ingested_mixed_blast_requires_player_choice(
         alpha_unit_ids=("intercessor-1",), catalog=_catalog_with_extra_bolt_profile(profile)
     )
     record_current_battlefield_placements_for_fixture(
-        lifecycle.state, decisions=lifecycle.decision_controller
+        _state(lifecycle), decisions=lifecycle.decision_controller
     )
     session = LocalGameSession(GameLifecycle.from_payload(lifecycle.to_payload()))
     request = _decision_request(session.advance_until_decision_or_terminal())

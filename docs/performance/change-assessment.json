@@ -470,7 +470,7 @@
     },
     "tests/unit/test_phase13b_shooting_declarations.py": {
       "before_sha256": "cf6ef7d483e90543ce905adf1e53a80d3417f7d26844286b348230c2447d1563",
-      "after_sha256": "cbceb02cd83006d9bc3c197f3bede266e316a929ddc966027de4ad15b090559d",
+      "after_sha256": "2e42180c0ef129b19fd0fd95a995e5cce04ab45ab601e882d397375031bde8dc",
       "owners": {
         "test_order113_blast_x_shared_declaration_count": {
           "before": null,
@@ -478,7 +478,7 @@
         },
         "test_order113_ingested_mixed_blast_requires_player_choice": {
           "before": null,
-          "after": "e159795c054aa14d269763a42089421931a62d9820b42211f3fb39b6fd0586a8"
+          "after": "08ca6bc02090f6b67d17eb9fb8f433c2204c5bd29fcc9a54b9920fe37e1ec49d"
         }
       }
     },
