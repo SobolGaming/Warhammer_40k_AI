@@ -2,6 +2,7 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 from warhammer40k_core.engine.random_weapon_range import weapon_with_committed_range
+from warhammer40k_core.engine.weapon_abilities import blast_attack_bonus_for_profile
 
 from warhammer40k_core.engine.targetless_weapons import TargetlessWeapon
 from typing import TYPE_CHECKING
@@ -1027,11 +1028,14 @@ def _apply_phase13d_weapon_modifiers(
         attacks += rapid_bonus
         targeting_rule_ids.append(rapid_fire_rule_id(rapid_bonus))
 
-    if has_weapon_keyword(weapon_profile, WeaponKeyword.BLAST):
-        blast_bonus = blast_attack_bonus(target_model_count=len(target_rules_unit.alive_models()))
-        if blast_bonus > 0:
-            attacks += blast_bonus
-            targeting_rule_ids.append(blast_rule_id(blast_bonus))
+    blast_bonus = blast_attack_bonus_for_profile(
+        weapon_profile,
+        target_model_count=len(target_rules_unit.alive_models()),
+        target_keywords=target_rules_unit.keywords,
+    )
+    if blast_bonus > 0:
+        attacks += blast_bonus
+        targeting_rule_ids.append(blast_rule_id(blast_bonus))
 
     melta_bonus = melta_damage_bonus(
         weapon_profile,

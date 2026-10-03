@@ -57,6 +57,7 @@ def weapon_keyword_for_ability_kind(kind: AbilityKind) -> WeaponKeyword | None:
         AbilityKind.SUSTAINED_HITS: WeaponKeyword.SUSTAINED_HITS,
         AbilityKind.LETHAL_HITS: WeaponKeyword.LETHAL_HITS,
         AbilityKind.CLEAVE: WeaponKeyword.CLEAVE,
+        AbilityKind.BLAST: WeaponKeyword.BLAST,
         AbilityKind.MELTA: WeaponKeyword.MELTA,
         AbilityKind.RAPID_FIRE: WeaponKeyword.RAPID_FIRE,
         AbilityKind.HEAVY: WeaponKeyword.HEAVY,

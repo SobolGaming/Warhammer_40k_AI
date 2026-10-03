@@ -186,23 +186,9 @@ def _weapon_ability_descriptor(
     *,
     keyword: WeaponKeyword,
 ) -> AbilityDescriptor | None:
-    if keyword is WeaponKeyword.LETHAL_HITS:
-        return AbilityDescriptor.lethal_hits()
-    if keyword is WeaponKeyword.DEVASTATING_WOUNDS:
-        return AbilityDescriptor.devastating_wounds()
-    if keyword is WeaponKeyword.HEAVY:
-        return AbilityDescriptor.heavy()
-    if keyword is WeaponKeyword.SUSTAINED_HITS:
-        return AbilityDescriptor.sustained_hits(_required_weapon_ability_value(parameters))
-    if keyword is WeaponKeyword.RAPID_FIRE:
-        return AbilityDescriptor.rapid_fire(_required_positive_weapon_ability_value(parameters))
-    if keyword is WeaponKeyword.MELTA:
-        return AbilityDescriptor.melta(_required_positive_weapon_ability_value(parameters))
-    if keyword is WeaponKeyword.CLEAVE:
-        return AbilityDescriptor.cleave(_required_positive_weapon_ability_value(parameters))
-    if keyword is WeaponKeyword.HUNTER:
-        raise GameLifecycleError("RuleIR weapon ability grant cannot infer Hunter targets.")
-    return None
+    from warhammer40k_core.engine.weapon_ability_grants import weapon_ability_descriptor_for_grant
+
+    return weapon_ability_descriptor_for_grant(parameters=parameters, keyword=keyword)
 
 
 def _int_parameter(parameters: Mapping[str, object], key: str) -> int:
@@ -216,24 +202,6 @@ def _required_string_parameter(parameters: Mapping[str, object], key: str) -> st
     value = parameters.get(key)
     if type(value) is not str or not value.strip():
         raise GameLifecycleError(f"RuleIR weapon modifier {key} must be a string.")
-    return value
-
-
-def _required_weapon_ability_value(parameters: Mapping[str, object]) -> int | str:
-    value = parameters.get("weapon_ability_value")
-    if type(value) in {int, str}:
-        if type(value) is int and value < 1:
-            raise GameLifecycleError("RuleIR weapon_ability_value must be positive.")
-        if type(value) is str and not value.strip():
-            raise GameLifecycleError("RuleIR weapon_ability_value must not be empty.")
-        return cast(int | str, value)
-    raise GameLifecycleError("RuleIR weapon_ability_value is required.")
-
-
-def _required_positive_weapon_ability_value(parameters: Mapping[str, object]) -> int:
-    value = parameters.get("weapon_ability_value")
-    if type(value) is not int or value < 1:
-        raise GameLifecycleError("RuleIR weapon_ability_value must be a positive int.")
     return value
 
 

@@ -2067,37 +2067,10 @@ def _valued_weapon_ability_entry(
     *,
     target_keywords: tuple[str, ...],
 ) -> _WeaponKeywordEntry | None:
-    match = re.fullmatch(
-        r"(?P<name>rapid[\s-]+fire|sustained[\s-]+hits|melta|cleave)\s+"
-        r"(?P<value>\d+)\+?",
-        ability_text.strip(),
-        re.IGNORECASE,
-    )
-    if match is None:
-        return None
-    value = _int_from_text(match.group("value"))
-    key = _name_key(match.group("name"))
-    if key == "rapid-fire":
-        return _WeaponKeywordEntry(
-            keyword=WeaponKeyword.RAPID_FIRE,
-            ability=AbilityDescriptor.rapid_fire(value, target_keywords=target_keywords),
-        )
-    if key == "sustained-hits":
-        return _WeaponKeywordEntry(
-            keyword=WeaponKeyword.SUSTAINED_HITS,
-            ability=AbilityDescriptor.sustained_hits(value, target_keywords=target_keywords),
-        )
-    if key == "melta":
-        return _WeaponKeywordEntry(
-            keyword=WeaponKeyword.MELTA,
-            ability=AbilityDescriptor.melta(value, target_keywords=target_keywords),
-        )
-    if key == "cleave":
-        return _WeaponKeywordEntry(
-            keyword=WeaponKeyword.CLEAVE,
-            ability=AbilityDescriptor.cleave(value, target_keywords=target_keywords),
-        )
-    raise WahapediaBridgeError("Unsupported valued Wahapedia weapon keyword.")
+    from warhammer40k_core.rules.weapon_keyword_values import valued_weapon_keyword
+
+    valued = valued_weapon_keyword(ability_text, target_keywords=target_keywords)
+    return None if valued is None else _WeaponKeywordEntry(keyword=valued[0], ability=valued[1])
 
 
 def _anti_weapon_ability_entry(ability_text: str) -> _WeaponKeywordEntry | None:

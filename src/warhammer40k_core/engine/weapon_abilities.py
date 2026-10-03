@@ -52,6 +52,7 @@ WEAPON_ABILITY_SELECTION_DECISION_TYPE = "select_weapon_ability_instance"
 SUSTAINED_HITS_D3_VALUE = "D3"
 
 _PARAMETERIZED_KEYWORDS_BY_KIND = {
+    AbilityKind.BLAST: WeaponKeyword.BLAST,
     AbilityKind.CLEAVE: WeaponKeyword.CLEAVE,
     AbilityKind.MELTA: WeaponKeyword.MELTA,
     AbilityKind.RAPID_FIRE: WeaponKeyword.RAPID_FIRE,
@@ -134,6 +135,9 @@ def weapon_ability_value(
         raise GameLifecycleError("Weapon ability value parameter must be an integer or string.")
     if descriptors:
         return None
+    if ability_kind is AbilityKind.BLAST and WeaponKeyword.BLAST in profile.keywords:
+        # Core 24.05 explicitly defines bare Blast as one die per five models.
+        return 1
     if expected_keyword is not None and expected_keyword in profile.keywords:
         raise GameLifecycleError(
             f"{expected_keyword.value} requires a structured ability descriptor."
@@ -165,6 +169,8 @@ def weapon_ability_applies(
             for descriptor in descriptors
         )
     if expected_keyword is not None and expected_keyword in profile.keywords:
+        if ability_kind is AbilityKind.BLAST:
+            return True
         raise GameLifecycleError(
             f"{expected_keyword.value} requires a structured ability descriptor."
         )
@@ -296,12 +302,22 @@ def rapid_fire_attack_bonus(
     return value
 
 
-def blast_attack_bonus(*, target_model_count: int) -> int:
-    if type(target_model_count) is not int:
-        raise GameLifecycleError("Blast target_model_count must be an integer.")
-    if target_model_count < 0:
-        raise GameLifecycleError("Blast target_model_count must not be negative.")
-    return target_model_count // 5
+def blast_attack_bonus(*, target_model_count: int, blast_value: int = 1) -> int:
+    return _attack_bonus_per_five(
+        value=blast_value, target_model_count=target_model_count, ability_label="Blast"
+    )
+
+
+def blast_attack_bonus_for_profile(
+    profile: WeaponProfile,
+    *,
+    target_model_count: int,
+    target_keywords: tuple[str, ...] = (),
+) -> int:
+    value = weapon_ability_int_value(profile, AbilityKind.BLAST, target_keywords=target_keywords)
+    if value is None:
+        return 0
+    return blast_attack_bonus(target_model_count=target_model_count, blast_value=value)
 
 
 def cleave_attack_bonus(
@@ -318,11 +334,17 @@ def cleave_attack_bonus(
     )
     if value is None or not single_target:
         return 0
+    return _attack_bonus_per_five(
+        value=value, target_model_count=target_model_count, ability_label="Cleave"
+    )
+
+
+def _attack_bonus_per_five(*, value: int, target_model_count: int, ability_label: str) -> int:
     if type(target_model_count) is not int:
-        raise GameLifecycleError("Cleave target_model_count must be an integer.")
+        raise GameLifecycleError(f"{ability_label} target_model_count must be an integer.")
     if target_model_count < 0:
-        raise GameLifecycleError("Cleave target_model_count must not be negative.")
-    return value * (target_model_count // 5)
+        raise GameLifecycleError(f"{ability_label} target_model_count must not be negative.")
+    return _validate_positive_int(f"{ability_label} value", value) * (target_model_count // 5)
 
 
 def melta_damage_bonus(
@@ -408,8 +430,15 @@ def _ability_descriptors(
     )
     ability_ids = {descriptor.ability_id for descriptor in descriptors}
     if any(
-        len(sources) > 1 and any(source.ability_id in ability_ids for source in sources)
-        for _, sources in weapon_instance_groups(profile)
+        len(sources) > 1
+        and (
+            any(source.ability_id in ability_ids for source in sources)
+            or (
+                ability_kind is AbilityKind.BLAST
+                and family == f"weapon-keyword:{WeaponKeyword.BLAST.value}"
+            )
+        )
+        for family, sources in weapon_instance_groups(profile)
     ):
         raise GameLifecycleError("Weapon ability requires controlling-player selection.")
     return descriptors

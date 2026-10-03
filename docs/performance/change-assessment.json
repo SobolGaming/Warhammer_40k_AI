@@ -1,594 +1,522 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "b65099255a85b0b02281b78905ce42754c53b594",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:dd58803f47745215e32902db7f7d7a4b219c72d1cd4984e9a9483c6807c212aa",
-  "operation_map_sha256": "39b9d37ea60be0a6d42faaedbe42f878820db8110e28f1f165ae16592d571b29",
+  "base": "6203cfe4988f3f18c6f74576b4cb8a0cac961b14",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6e2a14a1669f8714143714147162f6bb74d1b696daaac66fade6d515fb6dfd24",
+  "operation_map_sha256": "ca6fd88c453d16e8790e283ad6b9b781b824c4d8ff77a629ed8e3d838c34132c",
   "changes": {
-    "ci/test_shards/durations.json": {
-      "before_sha256": "baa787bcbff261292e0aa38a5737cce7c0a9d51a0ed95d9ad4569223af81c854",
-      "after_sha256": "0684e28d7eb2bde841e91efa1d39e9a86ad5f88e297ecd6e6b33fc0bdc575be3",
-      "owners": {
-        "@document": {
-          "before": "baa787bcbff261292e0aa38a5737cce7c0a9d51a0ed95d9ad4569223af81c854",
-          "after": "0684e28d7eb2bde841e91efa1d39e9a86ad5f88e297ecd6e6b33fc0bdc575be3"
-        }
-      }
-    },
-    "ci/test_shards/shard-1.txt": {
-      "before_sha256": "63722cb3b5ba0b0571a7f8fcae1bd3be400c80bb7bb4e132f57c7db7f0f1e171",
-      "after_sha256": "0685be77d51d7433d2107a2b8ebee4a44b0099a0664b4d654780a42f525d9438",
-      "owners": {
-        "@document": {
-          "before": "63722cb3b5ba0b0571a7f8fcae1bd3be400c80bb7bb4e132f57c7db7f0f1e171",
-          "after": "0685be77d51d7433d2107a2b8ebee4a44b0099a0664b4d654780a42f525d9438"
-        }
-      }
-    },
-    "ci/test_shards/shard-10.txt": {
-      "before_sha256": "a36890f13b2980cb3abfd0cbac12357385385f72283186ecac04eb0aa2061f82",
-      "after_sha256": "7e7bf0a5ba501a2b21987a85f39fdcac1cc1ee0318ba968ae0ad96d35b82f5d9",
-      "owners": {
-        "@document": {
-          "before": "a36890f13b2980cb3abfd0cbac12357385385f72283186ecac04eb0aa2061f82",
-          "after": "7e7bf0a5ba501a2b21987a85f39fdcac1cc1ee0318ba968ae0ad96d35b82f5d9"
-        }
-      }
-    },
-    "ci/test_shards/shard-11.txt": {
-      "before_sha256": "ca3c6622ea67e2c7f619a46753ac27d61ef32edebc2cecb53ac04c4cde638a6c",
-      "after_sha256": "967dda8d127b47840653c5a0d2b315239584f928a8902e097423cdd1a3f225ca",
-      "owners": {
-        "@document": {
-          "before": "ca3c6622ea67e2c7f619a46753ac27d61ef32edebc2cecb53ac04c4cde638a6c",
-          "after": "967dda8d127b47840653c5a0d2b315239584f928a8902e097423cdd1a3f225ca"
-        }
-      }
-    },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "5214f6c85c0ecff4551b6587c8265b93b15f2cec14c6bd1bb45375fa31cc51a9",
-      "after_sha256": "21f00b3165fe73eb9546583a270edaee61a028d2c5f6d8afa991a9216610f67c",
-      "owners": {
-        "@document": {
-          "before": "5214f6c85c0ecff4551b6587c8265b93b15f2cec14c6bd1bb45375fa31cc51a9",
-          "after": "21f00b3165fe73eb9546583a270edaee61a028d2c5f6d8afa991a9216610f67c"
-        }
-      }
-    },
-    "ci/test_shards/shard-2.txt": {
-      "before_sha256": "3d231b5b77f43335552091d6f04cd2acbf0e6575d0742a066537e0d40e1e76ea",
-      "after_sha256": "ab0896e75257d854e709c745c736c3f8609382daf77549a1b5c56ee9ddb8f412",
-      "owners": {
-        "@document": {
-          "before": "3d231b5b77f43335552091d6f04cd2acbf0e6575d0742a066537e0d40e1e76ea",
-          "after": "ab0896e75257d854e709c745c736c3f8609382daf77549a1b5c56ee9ddb8f412"
-        }
-      }
-    },
-    "ci/test_shards/shard-3.txt": {
-      "before_sha256": "84a8b1fd1ec8f8cca7fc28e15fb8d3bfff3562670ba9ff9502146806b13600a2",
-      "after_sha256": "96f16b1e24858e922b2c9130738afc1c70373e5169edabecfadf3de0343e33bd",
-      "owners": {
-        "@document": {
-          "before": "84a8b1fd1ec8f8cca7fc28e15fb8d3bfff3562670ba9ff9502146806b13600a2",
-          "after": "96f16b1e24858e922b2c9130738afc1c70373e5169edabecfadf3de0343e33bd"
-        }
-      }
-    },
-    "ci/test_shards/shard-4.txt": {
-      "before_sha256": "8f39d51fd617f12094d941202efd02d9d2c1b7e352dc4823f55901205c5e72a5",
-      "after_sha256": "8574982f06815307040c8ae3f029e8c66e12907b0d7c6ec1b524b2503be90270",
-      "owners": {
-        "@document": {
-          "before": "8f39d51fd617f12094d941202efd02d9d2c1b7e352dc4823f55901205c5e72a5",
-          "after": "8574982f06815307040c8ae3f029e8c66e12907b0d7c6ec1b524b2503be90270"
-        }
-      }
-    },
-    "ci/test_shards/shard-5.txt": {
-      "before_sha256": "169051d25f954ccddfeb63e92ddd2879e4ec71feee39b661de88b9989365d490",
-      "after_sha256": "46526353d4e6e23392ec5008f8e59e860e517033e1e18d9ce2280d946c80c589",
-      "owners": {
-        "@document": {
-          "before": "169051d25f954ccddfeb63e92ddd2879e4ec71feee39b661de88b9989365d490",
-          "after": "46526353d4e6e23392ec5008f8e59e860e517033e1e18d9ce2280d946c80c589"
-        }
-      }
-    },
-    "ci/test_shards/shard-6.txt": {
-      "before_sha256": "75d1e79ce4abd263804393e64acd4d33f7b9aafbfcddef877725d03a4ab3c5e2",
-      "after_sha256": "1880431d81900a6c747e3be369eb8b11746d9efa10299bf89fc72670b82dd623",
-      "owners": {
-        "@document": {
-          "before": "75d1e79ce4abd263804393e64acd4d33f7b9aafbfcddef877725d03a4ab3c5e2",
-          "after": "1880431d81900a6c747e3be369eb8b11746d9efa10299bf89fc72670b82dd623"
-        }
-      }
-    },
-    "ci/test_shards/shard-7.txt": {
-      "before_sha256": "b3d54a8462a7f9c8cf2e5343ff1dfafaaa7d04a5c3d5e20d90262053cf96ed78",
-      "after_sha256": "3e7eea485adaec178cc6cc81b5fe7c099d8e9e2e72518aff357170afea96123a",
-      "owners": {
-        "@document": {
-          "before": "b3d54a8462a7f9c8cf2e5343ff1dfafaaa7d04a5c3d5e20d90262053cf96ed78",
-          "after": "3e7eea485adaec178cc6cc81b5fe7c099d8e9e2e72518aff357170afea96123a"
-        }
-      }
-    },
-    "ci/test_shards/shard-8.txt": {
-      "before_sha256": "f3b3f7a3ee9ffe5cfff89a1e5833039672675b8cf5c48eb701c0a61e69db8fd3",
-      "after_sha256": "9a8b628016ad6aa0bb06a5128e6ac9c2e155be196212a2f77a35503e489f5a8f",
-      "owners": {
-        "@document": {
-          "before": "f3b3f7a3ee9ffe5cfff89a1e5833039672675b8cf5c48eb701c0a61e69db8fd3",
-          "after": "9a8b628016ad6aa0bb06a5128e6ac9c2e155be196212a2f77a35503e489f5a8f"
-        }
-      }
-    },
-    "ci/test_shards/shard-9.txt": {
-      "before_sha256": "435bd8d4920fa06f20cee5c3495b43c9c77f0480e1b9c5e8e3beacd7ee9412a9",
-      "after_sha256": "7a42902f65c31ba2cb595cdf6dc59e595358a01f04cc88f878cd7ee99e10828e",
-      "owners": {
-        "@document": {
-          "before": "435bd8d4920fa06f20cee5c3495b43c9c77f0480e1b9c5e8e3beacd7ee9412a9",
-          "after": "7a42902f65c31ba2cb595cdf6dc59e595358a01f04cc88f878cd7ee99e10828e"
-        }
-      }
-    },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "ab9e526084433ed24f9977c9f00f84848255dba2577a5c2bc7c7edc4c671e158",
-      "after_sha256": "c76dc8ef36a894af77d4ea3c3e084a9ee8a5cb6455b940d48b932348206e1932",
+      "before_sha256": "c76dc8ef36a894af77d4ea3c3e084a9ee8a5cb6455b940d48b932348206e1932",
+      "after_sha256": "a00b8aa3389cd6d1c00e82f9bfcac448a428d917b5e386e28bed0303222e778c",
       "owners": {
         "@document": {
-          "before": "ab9e526084433ed24f9977c9f00f84848255dba2577a5c2bc7c7edc4c671e158",
-          "after": "c76dc8ef36a894af77d4ea3c3e084a9ee8a5cb6455b940d48b932348206e1932"
+          "before": "c76dc8ef36a894af77d4ea3c3e084a9ee8a5cb6455b940d48b932348206e1932",
+          "after": "a00b8aa3389cd6d1c00e82f9bfcac448a428d917b5e386e28bed0303222e778c"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "029386e1a332de09010eebc15604730843964f1b6e978b290e68faed3c499b9c",
-      "after_sha256": "06c102f206e79214b3aeb01fcd852d88a844700cce555150c89c1dae5355152e",
+      "before_sha256": "06c102f206e79214b3aeb01fcd852d88a844700cce555150c89c1dae5355152e",
+      "after_sha256": "bf7e2e30b49f1f4c6cdeea05db0e13a6f37272a3cbceb626bd1e261e44564924",
       "owners": {
         "@document": {
-          "before": "029386e1a332de09010eebc15604730843964f1b6e978b290e68faed3c499b9c",
-          "after": "06c102f206e79214b3aeb01fcd852d88a844700cce555150c89c1dae5355152e"
+          "before": "06c102f206e79214b3aeb01fcd852d88a844700cce555150c89c1dae5355152e",
+          "after": "bf7e2e30b49f1f4c6cdeea05db0e13a6f37272a3cbceb626bd1e261e44564924"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "1045c535709e85fb1a3082b8d99a2131caef49ee96ad1bb63167d5e6b407f4c8",
-      "after_sha256": "d22ec4691397a472da521eacf6ab70fb69e2d845e62419fbfd6031a85e0dedba",
+      "before_sha256": "d22ec4691397a472da521eacf6ab70fb69e2d845e62419fbfd6031a85e0dedba",
+      "after_sha256": "062ad9528e7605e4fa64a31185f0734a659487c7d02e196f16c96a73f82e8b7e",
       "owners": {
         "@document": {
-          "before": "1045c535709e85fb1a3082b8d99a2131caef49ee96ad1bb63167d5e6b407f4c8",
-          "after": "d22ec4691397a472da521eacf6ab70fb69e2d845e62419fbfd6031a85e0dedba"
+          "before": "d22ec4691397a472da521eacf6ab70fb69e2d845e62419fbfd6031a85e0dedba",
+          "after": "062ad9528e7605e4fa64a31185f0734a659487c7d02e196f16c96a73f82e8b7e"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "ac5c55dc29eb69767c408e829f739bc3876a827fb070698e8d0df0114660605b",
-      "after_sha256": "e4a6bc8a52972284b541619b360a588897b5b3a239ff4c2bd0f1545cccaa2a15",
+      "before_sha256": "e4a6bc8a52972284b541619b360a588897b5b3a239ff4c2bd0f1545cccaa2a15",
+      "after_sha256": "932a53565cdb1f07ad62d4f1ca7f9d1fc445296c5eed54ea594cdf441239aadf",
       "owners": {
         "@document": {
-          "before": "ac5c55dc29eb69767c408e829f739bc3876a827fb070698e8d0df0114660605b",
-          "after": "e4a6bc8a52972284b541619b360a588897b5b3a239ff4c2bd0f1545cccaa2a15"
+          "before": "e4a6bc8a52972284b541619b360a588897b5b3a239ff4c2bd0f1545cccaa2a15",
+          "after": "932a53565cdb1f07ad62d4f1ca7f9d1fc445296c5eed54ea594cdf441239aadf"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "d73d24cdb3ebf69fbae3eeeb74c6c1a0620f5a7c854d0709fb685f78c429e8d8",
-      "after_sha256": "ae6c4fe51d47f42904c57c1cc8837fe6e1c6715835d20795636f6cb337dd4a61",
+      "before_sha256": "ae6c4fe51d47f42904c57c1cc8837fe6e1c6715835d20795636f6cb337dd4a61",
+      "after_sha256": "5cda7ad93f8f1f51f8b6a7720083401bbd165e6b3373e4792b59005ccdd3710a",
       "owners": {
         "@document": {
-          "before": "d73d24cdb3ebf69fbae3eeeb74c6c1a0620f5a7c854d0709fb685f78c429e8d8",
-          "after": "ae6c4fe51d47f42904c57c1cc8837fe6e1c6715835d20795636f6cb337dd4a61"
+          "before": "ae6c4fe51d47f42904c57c1cc8837fe6e1c6715835d20795636f6cb337dd4a61",
+          "after": "5cda7ad93f8f1f51f8b6a7720083401bbd165e6b3373e4792b59005ccdd3710a"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "7599d3352c28f92e8959bf35a7e22dc646f0bc76ea2bf49343f6560439264490",
-      "after_sha256": "a6acd6a081bd504b65b596eaa22c58ffab96fc9024dfb37cbe64df76add7f1f5",
+      "before_sha256": "a6acd6a081bd504b65b596eaa22c58ffab96fc9024dfb37cbe64df76add7f1f5",
+      "after_sha256": "c22b761f39880d1213423b329836f67045bcf97dc61d8f9212fd9c4d12894840",
       "owners": {
         "@document": {
-          "before": "7599d3352c28f92e8959bf35a7e22dc646f0bc76ea2bf49343f6560439264490",
-          "after": "a6acd6a081bd504b65b596eaa22c58ffab96fc9024dfb37cbe64df76add7f1f5"
+          "before": "a6acd6a081bd504b65b596eaa22c58ffab96fc9024dfb37cbe64df76add7f1f5",
+          "after": "c22b761f39880d1213423b329836f67045bcf97dc61d8f9212fd9c4d12894840"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "6297973355ead71bd404f00548e5cdd04b94061f6f6bbed5c045cc40e45ef586",
-      "after_sha256": "ee8b1d7b40532a7971b1f0cc434d141d7e312f4753c5ccd929a3720ba5ef6598",
+      "before_sha256": "ee8b1d7b40532a7971b1f0cc434d141d7e312f4753c5ccd929a3720ba5ef6598",
+      "after_sha256": "c1a2c33711d17973a8a0af50a11a9e34fbeacf37902027e7167345e817c4261b",
       "owners": {
         "@document": {
-          "before": "6297973355ead71bd404f00548e5cdd04b94061f6f6bbed5c045cc40e45ef586",
-          "after": "ee8b1d7b40532a7971b1f0cc434d141d7e312f4753c5ccd929a3720ba5ef6598"
+          "before": "ee8b1d7b40532a7971b1f0cc434d141d7e312f4753c5ccd929a3720ba5ef6598",
+          "after": "c1a2c33711d17973a8a0af50a11a9e34fbeacf37902027e7167345e817c4261b"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "fa7bfb34095eba929feffd387cdf377c454686ada3556815c6aa944cfe57d42a",
-      "after_sha256": "de6a8092bfc83b2babd846e3342b20ac182a4b63b1200316e04150dcce5a554d",
+      "before_sha256": "de6a8092bfc83b2babd846e3342b20ac182a4b63b1200316e04150dcce5a554d",
+      "after_sha256": "8d6356138119b792ea68b1b828bb1077aaa004a9397010b4b7aad30e2446e7ad",
       "owners": {
         "@document": {
-          "before": "fa7bfb34095eba929feffd387cdf377c454686ada3556815c6aa944cfe57d42a",
-          "after": "de6a8092bfc83b2babd846e3342b20ac182a4b63b1200316e04150dcce5a554d"
+          "before": "de6a8092bfc83b2babd846e3342b20ac182a4b63b1200316e04150dcce5a554d",
+          "after": "8d6356138119b792ea68b1b828bb1077aaa004a9397010b4b7aad30e2446e7ad"
         }
       }
     },
-    "data/source_audits/order112/baseline/tests/unit/test_order92_random_melee.py.txt": {
+    "data/source_audits/order113/baseline/tests/fire_overwatch_helpers.py.txt": {
       "before_sha256": null,
-      "after_sha256": "193d4216b590e00d6e24a8752b6726ab6547de76756598a0379b641c0823dcc7",
+      "after_sha256": "c1ebdfd064847148314f460855e344971b15f106fab48301ed6bf5712686c727",
       "owners": {
         "@document": {
           "before": null,
-          "after": "193d4216b590e00d6e24a8752b6726ab6547de76756598a0379b641c0823dcc7"
+          "after": "c1ebdfd064847148314f460855e344971b15f106fab48301ed6bf5712686c727"
         }
       }
     },
-    "data/source_audits/order112/historical-inputs.json": {
+    "data/source_audits/order113/baseline/tests/random_melee_helpers.py.txt": {
       "before_sha256": null,
-      "after_sha256": "f409d4e5acf6d391ee4bb38df985ba6992806a7032b66dafeb5ae325777e6259",
+      "after_sha256": "ccd6efd8890d2155b6b776b760c25a3c487427014927fa736eab895d5abd1790",
       "owners": {
         "@document": {
           "before": null,
-          "after": "f409d4e5acf6d391ee4bb38df985ba6992806a7032b66dafeb5ae325777e6259"
+          "after": "ccd6efd8890d2155b6b776b760c25a3c487427014927fa736eab895d5abd1790"
+        }
+      }
+    },
+    "data/source_audits/order113/baseline/tests/unit/test_fire_overwatch.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "2e7c01e62bc8a2c592fc9284045d2e14fb825ba2b62eddaa80d91160200ff0f7",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2e7c01e62bc8a2c592fc9284045d2e14fb825ba2b62eddaa80d91160200ff0f7"
+        }
+      }
+    },
+    "data/source_audits/order113/baseline/tests/unit/test_phase13d_weapon_ability_helpers.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "ace7694abb844ba2897559297f9d735187b25124b60b008b67b072b57993be01",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "ace7694abb844ba2897559297f9d735187b25124b60b008b67b072b57993be01"
+        }
+      }
+    },
+    "data/source_audits/order113/historical-inputs.json": {
+      "before_sha256": null,
+      "after_sha256": "c594f1e301bc4203505ab9785b21d549aa4867745e3477a4aa11f35509e54129",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c594f1e301bc4203505ab9785b21d549aa4867745e3477a4aa11f35509e54129"
         }
       }
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "b5bb3f33b8b2c52730a5ac2c7c1fbbfad85af64a25994813484905717361c64a",
-      "after_sha256": "0c32d2e6671fae49964ead2609387aba1ad1d8ce9990f1f78d08562eeb796af6",
+      "before_sha256": "0c32d2e6671fae49964ead2609387aba1ad1d8ce9990f1f78d08562eeb796af6",
+      "after_sha256": "55e170e1a706fc26df77d866fda514a2bbdb604401a5bb242e4db3b19b4c22eb",
       "owners": {
         "@document": {
-          "before": "b5bb3f33b8b2c52730a5ac2c7c1fbbfad85af64a25994813484905717361c64a",
-          "after": "0c32d2e6671fae49964ead2609387aba1ad1d8ce9990f1f78d08562eeb796af6"
+          "before": "0c32d2e6671fae49964ead2609387aba1ad1d8ce9990f1f78d08562eeb796af6",
+          "after": "55e170e1a706fc26df77d866fda514a2bbdb604401a5bb242e4db3b19b4c22eb"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "a0b71b1c3457b671e266da4452ef5e89ca81ca89e6288820890944931d491872",
-      "after_sha256": "2a059429554d852902fd17f3a2b01fce5a6dad5ffe97f2f527be5976ae0732d1",
+      "before_sha256": "2a059429554d852902fd17f3a2b01fce5a6dad5ffe97f2f527be5976ae0732d1",
+      "after_sha256": "7bf08f1e035cf863e148ef1b8c3a9c5fbb68a3a23d1fa43bd32bfed87311fdb7",
       "owners": {
         "@document": {
-          "before": "a0b71b1c3457b671e266da4452ef5e89ca81ca89e6288820890944931d491872",
-          "after": "2a059429554d852902fd17f3a2b01fce5a6dad5ffe97f2f527be5976ae0732d1"
+          "before": "2a059429554d852902fd17f3a2b01fce5a6dad5ffe97f2f527be5976ae0732d1",
+          "after": "7bf08f1e035cf863e148ef1b8c3a9c5fbb68a3a23d1fa43bd32bfed87311fdb7"
         }
       }
     },
-    "docs/ORDER_112_SCOPE_PLAN.md": {
+    "docs/ORDER_113_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "a3650c4e1ca9a86ced94fc19f6fb90ecbf8ee27405dc76858a2e392c00f05fd2",
+      "after_sha256": "77476dd002e4ea5b06631fd6f8b35e9a7a54570563fff3b1c988031e89f8cc48",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a3650c4e1ca9a86ced94fc19f6fb90ecbf8ee27405dc76858a2e392c00f05fd2"
+          "after": "77476dd002e4ea5b06631fd6f8b35e9a7a54570563fff3b1c988031e89f8cc48"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "6583488e5ae3b21ffb1136031405b328e19722c3b7f40824cd717c22bd091443",
-      "after_sha256": "7c911dd2ac7d9272670a1660537df197cfcb654b99c5cdcd1cf32b20dade14a2",
+      "before_sha256": "7c911dd2ac7d9272670a1660537df197cfcb654b99c5cdcd1cf32b20dade14a2",
+      "after_sha256": "71054dd23dcbc3b23058f521aa49dd5586db963770fd2f68c9cb7a26762d7cda",
       "owners": {
         "@document": {
-          "before": "6583488e5ae3b21ffb1136031405b328e19722c3b7f40824cd717c22bd091443",
-          "after": "7c911dd2ac7d9272670a1660537df197cfcb654b99c5cdcd1cf32b20dade14a2"
+          "before": "7c911dd2ac7d9272670a1660537df197cfcb654b99c5cdcd1cf32b20dade14a2",
+          "after": "71054dd23dcbc3b23058f521aa49dd5586db963770fd2f68c9cb7a26762d7cda"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "768c8e01044c0247b718b15c178873b4e44553dc1c0a3a4b69333dac4081a5ec",
-      "after_sha256": "847b0c3a63ce9cf8bffc925bc88c17040a6514ce9c20dda3b913e5e395120591",
+      "before_sha256": "847b0c3a63ce9cf8bffc925bc88c17040a6514ce9c20dda3b913e5e395120591",
+      "after_sha256": "674c84adc683af4536e5ff4bfe496ed4ec6cc094d2991e09f8c22efc68460ef3",
       "owners": {
         "@document": {
-          "before": "768c8e01044c0247b718b15c178873b4e44553dc1c0a3a4b69333dac4081a5ec",
-          "after": "847b0c3a63ce9cf8bffc925bc88c17040a6514ce9c20dda3b913e5e395120591"
+          "before": "847b0c3a63ce9cf8bffc925bc88c17040a6514ce9c20dda3b913e5e395120591",
+          "after": "674c84adc683af4536e5ff4bfe496ed4ec6cc094d2991e09f8c22efc68460ef3"
         }
       }
     },
-    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
-      "before_sha256": "8b918335da0384e0d4fb35aea95ecc90e3f4dffc7b8a802e3d95519fa8213c0d",
-      "after_sha256": "2368de5eb9823e8e877ee6022fc2ad661fd8addaa91b7d7c0f60314858c6b0d9",
+    "src/warhammer40k_core/core/weapon_ability_sources.py": {
+      "before_sha256": "8a4bce5f589513da103880deef0d9b5f32852b5c1feb64962874d4177bb8d2ec",
+      "after_sha256": "ec228f8089e8ddfb53ec002fbd0f66844a2c7bec468c462a54f1037475f7dcc5",
       "owners": {
-        "_resolve_grouped_current_pool": {
-          "before": "f4d5f983c203e81bb95793d3b4e2de68d53e317d27f749f79294b55a0a956491",
-          "after": "5ed96e2153ce923cea821fe64cb627bb33e9b8d3e3e41e603b63f87d25d802c1"
+        "weapon_keyword_for_ability_kind": {
+          "before": "70a4ec45be450738fba908e859230b3d6c5f32f32887a470ab91e68975aaf6d7",
+          "after": "715a5dcec156ece9d4a1369ab0e192fee105575c29049639088981aeaf30e3d5"
         }
       }
     },
-    "src/warhammer40k_core/engine/damage_allocation_targets.py": {
-      "before_sha256": "b37c5b3a1c96223133e9f509beaf02fbbcfda35e0cff809f46dbc823aa00a437",
-      "after_sha256": "10b7a292e110344698396ae37667fea58c0565b20b6e011303232c74a442e0b4",
+    "src/warhammer40k_core/core/weapon_profiles.py": {
+      "before_sha256": "a926249cff249f2a80158c306ccff285ba79af16bcd9c16fd4dc16a8eed8c93e",
+      "after_sha256": "cadad1000d56d141b43250bf2624074be447cc8af4e8ef3c94791fc60b306674",
+      "owners": {
+        "AbilityDescriptor.blast": {
+          "before": null,
+          "after": "67aa111949dd6b7019d9fbc1211ad8c38c623a775be8703c9928e7e8a55366ed"
+        },
+        "AbilityKind": {
+          "before": "cc0134c6ae7918182c871e37e2dcc44061a8313ad4294b4aef0302f18b4b4dee",
+          "after": "3dd02ae3f1a3cd097b67faf1ccc468f9f76feefddbc45bd8a5d7b7959ab7f4ff"
+        },
+        "_validate_supported_ability_shape": {
+          "before": "042c5b4703cd7f3871c04414550e39c911e6d416ef6cac68c6c873555ab0410a",
+          "after": "dad373cf48cbcc495f6cf03eb9dec26b7de13c92fec29dc1cc0922574df1b4a9"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_selection.py": {
+      "before_sha256": "eb875248728e55bff73be89cf50dc6f95f722cba0862cfc45d796ca461aa970e",
+      "after_sha256": "f277e4be0ad979b81a77732266e5f4a1238e396dc51db8a4fcc5273415c0a885",
+      "owners": {
+        "_validate_weapon_profile_signature_shape": {
+          "before": "cb4155ffd56f9e9f030057bf5e2c346eea23093789120b6f9961c571d384f3f1",
+          "after": "4c31624b32b6ada51b857c0d35415f66b2467baecce3e9c57a526563f3a3c514"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/catalog_rule_consumption.py": {
+      "before_sha256": "c2112c4e8b258a27124860545fc3d08f41774a981761c60b4c63049670cbbe72",
+      "after_sha256": "1b738a7432b84769eabf7a5e5ae7303bd81ca5c3223ef60652e65dbd2b12afef",
+      "owners": {
+        "_required_weapon_ability_choice_value_parameter": {
+          "before": "59712b54791a2e77975ebcad7998f5848fec7b23d445e7a564363e0449673c96",
+          "after": null
+        },
+        "_weapon_ability_choice_has_supported_runtime_shape": {
+          "before": "dc9755b8e8df5e8570e700f45809422c76fd9b04d5ae5d601e1d968a26f38cc4",
+          "after": "16ce635d8f2b44b176319ed75f83484743e0ad0666922f376fc7ba14c9372be5"
+        },
+        "_weapon_ability_descriptor_for_grant": {
+          "before": "104d38e2082404b3901593e89a36f84d9614cf569b79b4f49f59d2ef98682f18",
+          "after": "e2ce2dc08ab375ce1488d657d1b9751ea46a416b0df0b3b2e7d294586fa51782"
+        },
+        "_weapon_keyword_grant_has_supported_runtime_shape": {
+          "before": "6e06c8e45683440f67e8c140f87ba84d66127850fcc61f560f8440588dfe1b9b",
+          "after": "b0178191b06467e9a0b6d0bce59dccb7b4ebcdd69f80cf9817cab605f484ce5a"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/catalog_selected_target_pair_support.py": {
+      "before_sha256": "57d7002c154d4964f00116ddaf55adccdfedb1a3dd1a55b3a95ac3fc6a5d4b79",
+      "after_sha256": "025cd5b4d959f8e3eb6109caf3dc9e40cacdfa246edaa71c5664fc93fbd42a6d",
+      "owners": {
+        "_weapon_ability_grant_is_supported": {
+          "before": "9967944d3395cbed9d7b255e098ef10f07e0b6a70169c30f10a49f680f4f9db9",
+          "after": "5e121837ed3705a3df643eefaa987471a5b3914eb5ec160e22307c4a4481cb4b"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/shooting_declaration_validation.py": {
+      "before_sha256": "e8a4d31a05f1a70ae5df9790f303b9825c86097257e3fbe15bbf54178d45336b",
+      "after_sha256": "4e004b4e68580b3f5d1888b1b1b1aaeaf2d1cfea3858e4fb46bcc482956c1ab6",
       "owners": {
         "@module": {
-          "before": "1f95e0f4a369b716b03ee6635bb6962f78ecd97a8e328fa49939a53c3edb10d7",
-          "after": "efdbb61e410dd5f0781f66ff8a73702291db1ab061e7a9a1c8a19719dce3769d"
+          "before": "86ebca95573463f7b66a241eca771cdf7cd5d5714d0facf7f1ab6b469f95d35b",
+          "after": "40df0be78bb50d69e235c8f0cb924e1559bb3acb46638caf57c98d31ac22c990"
         },
-        "_has_placed_pending_destruction": {
-          "before": null,
-          "after": "da1118e82a472f0d2b92d145691b389efe9b949ed13758ff9e5c12695bda8ca1"
-        },
-        "damage_allocation_target_state": {
-          "before": "d64155eda96c92c08588fc3523bfb30ad7d5bcfd20abc2c72f0b8cd2934a3066",
-          "after": "70b199e615ec6520f0a3f2a53919a55581d9960056aeab65d8520bd5dff570b6"
+        "_apply_phase13d_weapon_modifiers": {
+          "before": "a697db91b8974f35ab12258fe8b25328abb578d104a3c995b35b6ea541af452a",
+          "after": "55da8547f357cb92458f52861029ab5aa5b84a9617194f97c3ed3bcd884eb355"
         }
       }
     },
-    "src/warhammer40k_core/engine/fight_rules_unit_melee.py": {
-      "before_sha256": "1d69d278a11ea5648c75e46c219b4561744ff02f4e27688f995dc3a8b4907ea0",
-      "after_sha256": "24611fcca8e160d011eadb53863a34b2d13e84400e244a260b86ccc6201b1689",
+    "src/warhammer40k_core/engine/rule_ir_weapon_modifiers.py": {
+      "before_sha256": "c4ec4ac8559038beb03e226bed314d9384a7149f094699d4d944fff4739072e2",
+      "after_sha256": "3ff3578cf943a37c8c2795669b435d027568cffb022c58b931442b4d568dae25",
       "owners": {
-        "_committed_weapon_rows": {
-          "before": null,
-          "after": "4c0aa88ea8305e0a631c8f6abb32e001ad85c0144a440e058e2932363ea872a4"
+        "_required_positive_weapon_ability_value": {
+          "before": "248bce0a4da05716d0ed753a4111b3e505ea808d61e9a09403f6d5b2f5eefcdf",
+          "after": null
         },
-        "validate_rules_unit_melee_declaration": {
-          "before": "5f6a83c29b6a15533d8e3f49d93a4fb17292c4b214b54d60508e6ca73ac0a1fc",
-          "after": "9b238c48b4249e10a3e2a81a0728adb4b8238e791b5f495f1ce5bfaa139b42b8"
+        "_required_weapon_ability_value": {
+          "before": "6a2b8cf6779c41e6aeaba81aa3870ba231d541c4aaf9b5e825b8ecf7bb9d9f50",
+          "after": null
+        },
+        "_weapon_ability_descriptor": {
+          "before": "8e39e7f00f8b1c378486da6e2f51f59aca50f2a22d87e052a01a0796ed41c59f",
+          "after": "ac53dccd6a459c96fe55924e7852ec7a29fa6d693b8e9682ddc65efc4b019ce5"
         }
       }
     },
-    "src/warhammer40k_core/engine/fight_weapon_selection.py": {
-      "before_sha256": "46279b57bfaa84ba487d333aba6db38edf18a013908b91e05e7f0a3b8fe50f2a",
-      "after_sha256": "a114eef1c3ddbdac8b05ad8c07575c280631e1b5164ad22ffd7a051186f67abf",
-      "owners": {
-        "validate_melee_declaration_rules": {
-          "before": "91267edc116781fb99b2e699ec48451d20cbd5aebb70476531acb84cdbf39114",
-          "after": "c8653109eac7f520228a0b4e1f158c385ec9a057b9fd5b713ef81ecb98d57cf8"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/melee_weapon_commitment.py": {
-      "before_sha256": "74380001d5f43490b9c6884fc7bf8a413f3054b7924b30b3941a7b8199b5b8fe",
-      "after_sha256": "68fe6c4e769405892d0f21bf420993cf92ef0f5884f3961c82f163f68f2b946a",
-      "owners": {
-        "chosen_rows": {
-          "before": "f9131d1615fc5b74ccc524fe1d3fc7380a0f1b31b3fb1fbcdca7ac43c1195aaa",
-          "after": "ecdee40d39cedd8f3b0f2204d3efa57d8f3e6f49aa54109c78010815d13ed0c2"
-        },
-        "selection_request": {
-          "before": "73cc36c4d03469eeb894898dbba6ebdc3369417190584a2d3d70f3bf8d772aa4",
-          "after": "26f0ff25ba13fe607dc056325c29561a9e0f1e59abea86aca4cd6eb1a418fc4e"
-        },
-        "selection_stages": {
-          "before": "692fb62bb93563ebf48586d53f0e3e6cceb19ceb5e304defea552d4b4dc8a3d3",
-          "after": "838e7a4d7ae1771c8126acd9c86ebc35d0bbd0d2b57cd877d838bf6a1ce3a187"
-        }
-      }
-    },
-    "tests/code_quality/test_order92_melee_commitment.py": {
-      "before_sha256": "33085cb7e9d0fb3e5cf34628ca40e8966d7e1a5ea2426b6a90335aa0fdeb7b9e",
-      "after_sha256": "cc761b3cd45dba7d97b1f767c142d8e3e04c1cd5be1572e53f11f8c8bb36a133",
-      "owners": {
-        "test_deferred_allocation_uses_current_sequence_without_global_presence_grant": {
-          "before": null,
-          "after": "e3583d34819621e2ca060ecf632095170fb0233a3da3a4c7a1d437f94bd13040"
-        },
-        "test_extra_attacks_commitment_never_offers_a_skip": {
-          "before": null,
-          "after": "d8ba1e85a4b21f20739b7c3b595dbf716ce5090cf70dfd37ff76355f827c3c20"
-        }
-      }
-    },
-    "tests/code_quality/test_order97_inventory.py": {
-      "before_sha256": "b8f306cd721dd3ac9314164cec56a4901d6a5c06e4f4d7988f935790551c709c",
-      "after_sha256": "b3b766714a2704c41d073a282d556ab1ec2a53063ed00fc68242235f501cbf01",
+    "src/warhammer40k_core/engine/weapon_abilities.py": {
+      "before_sha256": "e66d59d91d3aa2ec3bf232bf26fd0bf50c16da8f365800c65f0c7b383181d200",
+      "after_sha256": "c19109ab2a042eba9069733921549b38fed570068286d6766111e1d78f44163a",
       "owners": {
         "@module": {
-          "before": "7f8b9c9c86add27271ea6ee07a9e226a52e1adf222355d8c85640d8187906ba5",
-          "after": "58d8c1f3c2291ea21ad31cbd883fd8440f73f3dc66fdfc33d5a5e7f55bfb249d"
+          "before": "db50ffb3ffd3c5a7ab1089f0ae846b79e0afe7869263726323088982795cc7c6",
+          "after": "50f2d57d16960019e8079c4580190df3631472a35bb7cdb79c75082bf621b674"
         },
-        "test_original_assertions_remain_exact_and_fail_closed": {
-          "before": "417fb02395d676c00f55296c07321c2658a7a1b0192b40041284ca9d8adabe9d",
-          "after": "1276b434a6f1e7ce0d4820877fbab5b0514c79052207a0b0066280901cccf95f"
+        "_ability_descriptors": {
+          "before": "155ee9cc539334b797dbab556272d4bd4324f10be12b0b294d586d7041687573",
+          "after": "cb18db012a08be7f9f8074f019f34a9339dab306f05e958e29c2dff485f8250d"
+        },
+        "_attack_bonus_per_five": {
+          "before": null,
+          "after": "4127b4fe750b027583322bfcfde575db8e2878fa1aca7c10873d1f854fbc155a"
+        },
+        "blast_attack_bonus": {
+          "before": "bb4487cd9015c1db9bbd9a861c660da9b790bf84533acd82398d3ddc41c9f4b4",
+          "after": "fba4c25cfcdae40b72bbc810ee52c0db2c2dee3a827ff56ab5e45efd2cdcbcb2"
+        },
+        "blast_attack_bonus_for_profile": {
+          "before": null,
+          "after": "239a16dd6d9008ed4bcd6137245493e9fbf9d4536b5ca9a3bb181c555629968e"
+        },
+        "cleave_attack_bonus": {
+          "before": "70e692552c8a4b7edc5d4ab2ef9892fa192c412e60df2b5404a7f8e2cda7b784",
+          "after": "ce36807980c323f45246767884bf428836f351b81ac6b57a1f79a0342d4aeb33"
+        },
+        "weapon_ability_applies": {
+          "before": "e89a0c5f0b08998caef999caca26ee719be8f44dc24c77cf4bf32f8eea73a932",
+          "after": "1a7ba81dbc7e77896579546aff7f92fb9033b2faff06b70a656b3e8b74ec025c"
+        },
+        "weapon_ability_value": {
+          "before": "232f3367196811e604cb0a2d65f04d6bd98aed42bfed05aa76605ae8f7f8ee57",
+          "after": "e3776f9b45de122799a25294a9b447ed23ae2f6ee1ff17acee1557755dcf32f3"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/weapon_ability_grants.py": {
+      "before_sha256": null,
+      "after_sha256": "8ce18dbb4de70700292f4582196e1afa69f9c81b890c1d57d79d66060def05bb",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "b9c9ace151765d0af8a6f9932106a7c465a41f3d2bca4e07fa8b3e26cd933e05"
+        },
+        "weapon_ability_descriptor_for_grant": {
+          "before": null,
+          "after": "4e97fd2377591db8a37e7c9152da7faa5819bdbfca1a82946fff68d768519e0c"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/wahapedia_bridge.py": {
+      "before_sha256": "479fad2e0cfefe16a9f33aec97b8ca6a531792d21c6df2fce46e4e7eb9ebce26",
+      "after_sha256": "11c27f4c9249b523b7a10637804ed6ee77237ef521b737c919cb7405f9717a5e",
+      "owners": {
+        "_valued_weapon_ability_entry": {
+          "before": "97b1430e3d6a074bfedcc4d19c97a87c88034e9028096f9d69424b0e2e047a32",
+          "after": "1e35227da50deccb6219bdd2a440659b580cc2de87815770044e42953009a994"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/weapon_keyword_values.py": {
+      "before_sha256": null,
+      "after_sha256": "9ae026a4febde3af2b036adf14ce455bb4748937ac75ba4fb243e1e26a069944",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "946ef07c3ab5d359da31cfd2547a473177fc134281470f0a0dc4c3a12c9a0063"
+        },
+        "valued_weapon_keyword": {
+          "before": null,
+          "after": "640763f2c6606835cda97da741593857fa2417bc287e8795273301172c3f3dc0"
+        }
+      }
+    },
+    "tests/code_quality/test_order113_attack_counts.py": {
+      "before_sha256": null,
+      "after_sha256": "4056fe56eca61ac1f816b78f3230c83172ca0cdc67cd6d27d369c5c33b920268",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "5fbe74395cbda75552557a1ce42a80d08ff720843ae96f0b3e6b130ae5d8e4e5"
+        },
+        "test_order113_pinned_selected_clauses_keep_literal_hashes": {
+          "before": null,
+          "after": "248e10259c6c803c367899eb9482c38a6291fd11e58cfb01524b24c3b1a130fd"
+        },
+        "test_order113_shared_consumers_do_not_fix_blast_x_to_one": {
+          "before": null,
+          "after": "49a8fc9a41515c52144f7c2d48b4cd885f68791db6e7c153aeaeaece0dcc9d49"
+        }
+      }
+    },
+    "tests/fire_overwatch_helpers.py": {
+      "before_sha256": "c1ebdfd064847148314f460855e344971b15f106fab48301ed6bf5712686c727",
+      "after_sha256": "2308770c2b9af893ce72fa5acb85b5340035143b5cd6c913192cca4d6c80cd65",
+      "owners": {
+        "@module": {
+          "before": "3f9bff8668d513759a5ef7a6717342888b67df43081961de0bebd33559fd012e",
+          "after": "b4de160a787248f055c4abf8b4657878dd6a9561639d80a2b9945db93cd2f4a1"
+        },
+        "overwatch_session": {
+          "before": "c70823403be9cd4bf59f4025ef1c2a8f54d55ed10587ca37114a2656050a5d8b",
+          "after": "2cddbf27d4520f211b892c0115398ce728583c88d842a74d6514ec06bcf1e7f1"
+        }
+      }
+    },
+    "tests/random_melee_helpers.py": {
+      "before_sha256": "ccd6efd8890d2155b6b776b760c25a3c487427014927fa736eab895d5abd1790",
+      "after_sha256": "8fcf80415c3facc1f56312e627c7d0330754097873897645a82a2415d0c21839",
+      "owners": {
+        "random_melee_session": {
+          "before": "0e9c9e4acb44953cee42a631aa4f03b8989a6af6d10b6072b4973b8264d27988",
+          "after": "3201ee1b9cd259fd44598859df8eae13ed49d29306dd6c64c5d0ab5a087e2731"
+        }
+      }
+    },
+    "tests/unit/engine/test_catalog_weapon_ability_runtime_helpers.py": {
+      "before_sha256": "73366ceb6c2179726718d6c9ad6b8b46d12d7c5755c5f7454010633fb90a961a",
+      "after_sha256": "25e8bbe98b7f8120fd8bddad1b4af9b8e804bfd2cbd1fcba9a7d599bc1de5add",
+      "owners": {
+        "test_order113_blast_choice_and_selected_pair_shapes": {
+          "before": null,
+          "after": "640a173e6cdee8ed20a04f8553ba25c3e6ecfce9f0f1d84dc983329d3227b06d"
+        },
+        "test_order113_generic_blast_grants_preserve_value_or_reject_it": {
+          "before": null,
+          "after": "ea3eadf5e19576ced76e1f9cb3f410544509e8ceb56be7f6255ab6bd8e9d44c9"
+        },
+        "test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values": {
+          "before": "a697d659f8a18a5aea9c55501bf2b16f189000826c08e5d4a8ff378bfb2f1b20",
+          "after": "b1bf61a0b478cd3e5f80f57843b9595e6dc1922397e7958732bc62e82288b2ac"
+        }
+      }
+    },
+    "tests/unit/rules/test_wahapedia_bridge_normalization.py": {
+      "before_sha256": "33f1487de33625f721d6e44667d01a00377741312b7f9ea1da080aafa2065c6d",
+      "after_sha256": "4b0a678e3c3e3982bdc8f2bf54acab48811eeefdc602058dddf03622e451736e",
+      "owners": {
+        "test_order113_bridge_preserves_blast_x_and_cleave_x": {
+          "before": null,
+          "after": "718466b0a4be8a72f2f27639ef8cbfcb2544723c87d61277e31a9caf2a2909e1"
+        }
+      }
+    },
+    "tests/unit/test_fire_overwatch.py": {
+      "before_sha256": "2e7c01e62bc8a2c592fc9284045d2e14fb825ba2b62eddaa80d91160200ff0f7",
+      "after_sha256": "856baed9d3081c36aac1d578baa69a4cfe003c0dd02bbc4990c696f410ed8668",
+      "owners": {
+        "test_order113_blast_occurrence_choice_rejects_invalid_before_random_roll": {
+          "before": null,
+          "after": "88034966fbfb22bbe348c2c9a97ff3505cc95486314ab492e93717faac1cd157"
+        },
+        "test_order113_blast_x_reaction_uses_shared_frozen_counts": {
+          "before": null,
+          "after": "52be565e3796c74846c58c1a858401098ed3c638f2d247aaa8c6af48b47ecf34"
         }
       }
     },
     "tests/unit/test_order92_random_melee.py": {
-      "before_sha256": "193d4216b590e00d6e24a8752b6726ab6547de76756598a0379b641c0823dcc7",
-      "after_sha256": "c4e211eff004b643e3762d4e4c3e7efe8a43d35feebef5f5446ec4cc487dc356",
+      "before_sha256": "c4e211eff004b643e3762d4e4c3e7efe8a43d35feebef5f5446ec4cc487dc356",
+      "after_sha256": "d7f160998f9f191f4c41694c49fa1fb1ebac4b628c518728f3b62f735e71484f",
       "owners": {
-        "@module": {
-          "before": "20fde3793e5422f9f544ce784c0e57cb97f36af493f6ad68a5714fa5c0793726",
-          "after": "b8ccf40ad68b0fbd4b83a0ef4102a6dce7a246cbcf6bd8197bcc2619a4d9e550"
-        },
-        "_assert_deferred_allocation_boundary": {
+        "test_order113_cleave_fixed_random_attached_restore_fork_replay": {
           "before": null,
-          "after": "3c079c1826a62a8a4ab479f3e45bc9ea2b5ad4b8ea9dd5f4e388151f0f33293d"
-        },
-        "_lethal_extra_session": {
-          "before": null,
-          "after": "a8a76e24d96d4c533551e6da5085da3f20b4466cd82afb17545895fbca6cc472"
-        },
-        "test_each_physical_extra_weapon_is_required": {
-          "before": null,
-          "after": "93d1a4d04c97b03cfd4172967a48c9974f4910bd566e0422422dc06d4a7d5b80"
-        },
-        "test_extra_weapons_cannot_be_skipped_and_retry_restores_and_replays": {
-          "before": null,
-          "after": "9b3553c14f6066ce15e716672cae00a87b96b6a563e4ac2c653e6dc2da7fcfe8"
-        },
-        "test_ineligible_extra_bearer_does_not_require_a_declaration": {
-          "before": null,
-          "after": "1997d90532f558b4274b5e15f1219aa63a9eb316b2624629a8afd067eca53a78"
-        },
-        "test_lethal_primary_and_mandatory_extra_finish_before_deferred_destruction": {
-          "before": null,
-          "after": "b029b58e095873d626e1235458fb05cd952246bffdf65a9c27c94cea0fd38ad9"
-        },
-        "test_living_attached_recipient_remains_allocatable_after_component_death": {
-          "before": null,
-          "after": "6a787746b9293d5df901efda46f3d874ff0c3242435bddcbc84f3f371f864388"
-        },
-        "test_mandatory_extra_selection_obeys_physical_one_shot_availability": {
-          "before": null,
-          "after": "0c0f9da012e097b1d8d005ee39cc20d54fb850577365888348762b36c9765a41"
+          "after": "d945dc65677729f753ac302dd69b1b32678569ef51cfd5c2748c32513782b8b6"
         }
       }
     },
-    "tests/unit/test_phase17_emperors_children_datasheet_overlay.py": {
-      "before_sha256": "ce761236492de7f67a7bf991c348cc75095f5ee268032ee9a444ea2e7369b904",
-      "after_sha256": "4cfae93b18b029197c1a8e4103ba892cd2619b80bc99afef1f54614bfbe50658",
+    "tests/unit/test_phase13b_shooting_declarations.py": {
+      "before_sha256": "cf6ef7d483e90543ce905adf1e53a80d3417f7d26844286b348230c2447d1563",
+      "after_sha256": "019eb9cc369000a128b52b481de30662454d98581727597d57611f5412d73226",
       "owners": {
-        "_advance_fight_session_to_poison_request": {
-          "before": "8627ab82632c6cdefa7463055fb2e5cd3db99efed3fc22d4d7ddb69fab3d0e4c",
-          "after": "10939fb31f308739b4eaed98c978f089b82f81c437016fed8fe9ebfcae33dd26"
+        "test_order113_blast_x_shared_declaration_count": {
+          "before": null,
+          "after": "e94636237a976e3a5a2c06d4d3ba4010563a0ae4ec87188602b380a730321a67"
+        }
+      }
+    },
+    "tests/unit/test_phase13d_weapon_ability_helpers.py": {
+      "before_sha256": "ace7694abb844ba2897559297f9d735187b25124b60b008b67b072b57993be01",
+      "after_sha256": "ee67372352116eb27c6080ac785de96f92771d8433058745023a97288ef01225",
+      "owners": {
+        "test_order113_attack_count_sources_require_one_occurrence_without_stacking": {
+          "before": null,
+          "after": "8acf9432a70d3f33db4099981f5b87dc21002c20267f79f85caec07970fbb31f"
+        },
+        "test_order113_blast_applicability_and_grouping_require_keyword": {
+          "before": null,
+          "after": "2bd9d49ee9305c4bf192d48a1a04cfb932e6334f4a28fdbda0b3afc22a75fa0a"
+        },
+        "test_order113_blast_descriptor_preserves_value_condition_and_payload": {
+          "before": null,
+          "after": "2480e5d4f50af401669b4d76c6de608430ef2ca44ab63209ffb9bd98123bd869"
+        },
+        "test_order113_blast_x_uses_complete_groups_of_five": {
+          "before": null,
+          "after": "22e3ac87624430f42c80baaddcdacf5ae3b0c36b6c616ec7e37c06fbe28ae822"
+        },
+        "test_order113_invalid_blast_value_fails_closed": {
+          "before": null,
+          "after": "6f81c98a880ec6cf433a9651e8909a0e63f027acc24811d86afe618d84daeb18"
         }
       }
     },
     "tools/core_rules_order97_history.py": {
-      "before_sha256": "166e73066f4f1269b33b05c6980da8a3a0d39ae6b998a72139810c75d83dd6ea",
-      "after_sha256": "87d7d7ebd50238e779b62ed3b528753028cfeb7fd7f07b6e10c04b8eee657a35",
+      "before_sha256": "87d7d7ebd50238e779b62ed3b528753028cfeb7fd7f07b6e10c04b8eee657a35",
+      "after_sha256": "6a7a80ba5f0d5cf165f3c7ad12a84e84a4e183e1874dfc9e8b79fe7ed0f8f73f",
       "owners": {
         "@module": {
-          "before": "8645fcc295af6c3dcb583b39445eecedaee57b638307298d481ac27fa9c41013",
-          "after": "63b975c8dc9650a17e7ea73f3fd0ade71f0fc4d95097a522a85ab0fc35417d7a"
+          "before": "63b975c8dc9650a17e7ea73f3fd0ade71f0fc4d95097a522a85ab0fc35417d7a",
+          "after": "4af5577c475f70ed9e874cd5fbcfcdf146743daa6fa50e04a8c0b7e651a8776a"
         },
         "historical_evidence_path": {
-          "before": "bd0fb725ef2f94ea0f72a48406e44adcafe27b205967378c00fdedb855c681ad",
-          "after": "108b2518ad2851f9c695b0d802e22a33d21d74b0674cb3dbf47dee81c36a6990"
+          "before": "108b2518ad2851f9c695b0d802e22a33d21d74b0674cb3dbf47dee81c36a6990",
+          "after": "2ab039a4c7fbf9eb96f8ebd33e88f5b9770a0d12a29fedf7dbf01ac3a77e5360"
         }
       }
     }
   },
   "rows": {
-    "ci/test_shards/durations.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
-    },
-    "ci/test_shards/shard-1.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
-    },
-    "ci/test_shards/shard-10.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
-    },
-    "ci/test_shards/shard-11.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
-    },
-    "ci/test_shards/shard-12.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
-    },
-    "ci/test_shards/shard-2.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
-    },
-    "ci/test_shards/shard-3.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
-    },
-    "ci/test_shards/shard-4.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
-    },
-    "ci/test_shards/shard-5.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
-    },
-    "ci/test_shards/shard-6.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
-    },
-    "ci/test_shards/shard-7.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
-    },
-    "ci/test_shards/shard-8.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
-    },
-    "ci/test_shards/shard-9.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Refresh the unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
-    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish regenerated examples and manifest with exact runtime identity; contract44.2 schemas, payload families and viewer policy unchanged.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Regenerate existing Contract44.2 examples/manifests for runtime identity; schemas, envelope families and viewer policy unchanged.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -596,9 +524,9 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish regenerated examples and manifest with exact runtime identity; contract44.2 schemas, payload families and viewer policy unchanged.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Regenerate existing Contract44.2 examples/manifests for runtime identity; schemas, envelope families and viewer policy unchanged.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -606,9 +534,9 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish regenerated examples and manifest with exact runtime identity; contract44.2 schemas, payload families and viewer policy unchanged.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Regenerate existing Contract44.2 examples/manifests for runtime identity; schemas, envelope families and viewer policy unchanged.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -616,9 +544,9 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish regenerated examples and manifest with exact runtime identity; contract44.2 schemas, payload families and viewer policy unchanged.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Regenerate existing Contract44.2 examples/manifests for runtime identity; schemas, envelope families and viewer policy unchanged.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -626,9 +554,9 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish regenerated examples and manifest with exact runtime identity; contract44.2 schemas, payload families and viewer policy unchanged.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Regenerate existing Contract44.2 examples/manifests for runtime identity; schemas, envelope families and viewer policy unchanged.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -636,9 +564,9 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish regenerated examples and manifest with exact runtime identity; contract44.2 schemas, payload families and viewer policy unchanged.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Regenerate existing Contract44.2 examples/manifests for runtime identity; schemas, envelope families and viewer policy unchanged.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -646,9 +574,9 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish regenerated examples and manifest with exact runtime identity; contract44.2 schemas, payload families and viewer policy unchanged.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Regenerate existing Contract44.2 examples/manifests for runtime identity; schemas, envelope families and viewer policy unchanged.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -656,61 +584,91 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish regenerated examples and manifest with exact runtime identity; contract44.2 schemas, payload families and viewer policy unchanged.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Regenerate existing Contract44.2 examples/manifests for runtime identity; schemas, envelope families and viewer policy unchanged.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
-    "data/source_audits/order112/baseline/tests/unit/test_order92_random_melee.py.txt": {
+    "data/source_audits/order113/baseline/tests/fire_overwatch_helpers.py.txt": {
       "category": "rule_semantics",
       "operations": [
-        "order112-source-evidence"
+        "order113-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Retain authenticated exact-base bytes of the Order97-pinned regression file and register its bounded hash-checked historical mapping, preserving original source assertions without repinning.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Retain exact-base bytes for four original Order97-pinned regression/fixture inputs with bounded hash-checked historical mapping. Original source selection and histories remain immutable.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
-    "data/source_audits/order112/historical-inputs.json": {
+    "data/source_audits/order113/baseline/tests/random_melee_helpers.py.txt": {
       "category": "rule_semantics",
       "operations": [
-        "order112-source-evidence"
+        "order113-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Retain authenticated exact-base bytes of the Order97-pinned regression file and register its bounded hash-checked historical mapping, preserving original source assertions without repinning.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Retain exact-base bytes for four original Order97-pinned regression/fixture inputs with bounded hash-checked historical mapping. Original source selection and histories remain immutable.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "data/source_audits/order113/baseline/tests/unit/test_fire_overwatch.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order113-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Retain exact-base bytes for four original Order97-pinned regression/fixture inputs with bounded hash-checked historical mapping. Original source selection and histories remain immutable.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "data/source_audits/order113/baseline/tests/unit/test_phase13d_weapon_ability_helpers.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order113-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Retain exact-base bytes for four original Order97-pinned regression/fixture inputs with bounded hash-checked historical mapping. Original source selection and histories remain immutable.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "data/source_audits/order113/historical-inputs.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order113-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Retain exact-base bytes for four original Order97-pinned regression/fixture inputs with bounded hash-checked historical mapping. Original source selection and histories remain immutable.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document source-backed scope, actual roadmap implementation, adapter finite-selection rule, operation ownership or static mandatory-selection regression audit.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Record scoped source obligations, actual roadmap behavior, existing adapter contract justification and exact diff-bound performance ownership.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document source-backed scope, actual roadmap implementation, adapter finite-selection rule, operation ownership or static mandatory-selection regression audit.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Record scoped source obligations, actual roadmap behavior, existing adapter contract justification and exact diff-bound performance ownership.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
-    "docs/ORDER_112_SCOPE_PLAN.md": {
+    "docs/ORDER_113_SCOPE_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document source-backed scope, actual roadmap implementation, adapter finite-selection rule, operation ownership or static mandatory-selection regression audit.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Record scoped source obligations, actual roadmap behavior, existing adapter contract justification and exact diff-bound performance ownership.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document source-backed scope, actual roadmap implementation, adapter finite-selection rule, operation ownership or static mandatory-selection regression audit.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Record scoped source obligations, actual roadmap behavior, existing adapter contract justification and exact diff-bound performance ownership.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -718,105 +676,219 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Regenerate exact runtime identity for scoped melee-selection and deferred-allocation owners.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Regenerate exact runtime identity for the scoped Blast/Cleave owners.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
-    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
+    "src/warhammer40k_core/core/weapon_ability_sources.py": {
       "category": "rule_semantics",
       "operations": [
-        "order112-deferred-allocation"
+        "order113-attack-counts"
       ],
       "selected_families": [],
-      "rationale": "Owner-approved O112-CR-1 normal-play prerequisite: classify placement-matched deferred casualties using the current resolving sequence, while preserving living recipients, general presence, true absence and destruction timing. Bounded rule branch only.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
-    "src/warhammer40k_core/engine/damage_allocation_targets.py": {
+    "src/warhammer40k_core/core/weapon_profiles.py": {
       "category": "rule_semantics",
       "operations": [
-        "order112-deferred-allocation"
+        "order113-attack-counts"
       ],
       "selected_families": [],
-      "rationale": "Owner-approved O112-CR-1 normal-play prerequisite: classify placement-matched deferred casualties using the current resolving sequence, while preserving living recipients, general presence, true absence and destruction timing. Bounded rule branch only.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
-    "src/warhammer40k_core/engine/fight_rules_unit_melee.py": {
+    "src/warhammer40k_core/engine/attack_sequence_selection.py": {
       "category": "rule_semantics",
       "operations": [
-        "order112-extra-attacks-selection"
+        "order113-attack-counts"
       ],
       "selected_families": [],
-      "rationale": "Require all eligible physical Extra Attacks weapons in existing declaration validation and finite random-A choices. Apply the existing committed profile inventory filter at attached-component validation so permitted primary/profile choices remain playable.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
-    "src/warhammer40k_core/engine/fight_weapon_selection.py": {
+    "src/warhammer40k_core/engine/catalog_rule_consumption.py": {
       "category": "rule_semantics",
       "operations": [
-        "order112-extra-attacks-selection"
+        "order113-attack-counts"
       ],
       "selected_families": [],
-      "rationale": "Require all eligible physical Extra Attacks weapons in existing declaration validation and finite random-A choices. Apply the existing committed profile inventory filter at attached-component validation so permitted primary/profile choices remain playable.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
-    "src/warhammer40k_core/engine/melee_weapon_commitment.py": {
+    "src/warhammer40k_core/engine/catalog_selected_target_pair_support.py": {
       "category": "rule_semantics",
       "operations": [
-        "order112-extra-attacks-selection"
+        "order113-attack-counts"
       ],
       "selected_families": [],
-      "rationale": "Require all eligible physical Extra Attacks weapons in existing declaration validation and finite random-A choices. Apply the existing committed profile inventory filter at attached-component validation so permitted primary/profile choices remain playable.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
-    "tests/code_quality/test_order92_melee_commitment.py": {
-      "category": "governance",
-      "operations": [],
+    "src/warhammer40k_core/engine/phases/shooting_declaration_validation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order113-attack-counts"
+      ],
       "selected_families": [],
-      "rationale": "Document source-backed scope, actual roadmap implementation, adapter finite-selection rule, operation ownership or static mandatory-selection regression audit.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
-    "tests/code_quality/test_order97_inventory.py": {
-      "category": "governance",
-      "operations": [],
+    "src/warhammer40k_core/engine/rule_ir_weapon_modifiers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order113-attack-counts"
+      ],
       "selected_families": [],
-      "rationale": "Document source-backed scope, actual roadmap implementation, adapter finite-selection rule, operation ownership or static mandatory-selection regression audit.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "src/warhammer40k_core/engine/weapon_abilities.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order113-attack-counts"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "src/warhammer40k_core/engine/weapon_ability_grants.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order113-attack-counts"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "src/warhammer40k_core/rules/wahapedia_bridge.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order113-attack-counts"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "src/warhammer40k_core/rules/weapon_keyword_values.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order113-attack-counts"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "tests/code_quality/test_order113_attack_counts.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order113-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Exercise descriptor/grant boundary branches, occurrence choices and invalid pre-roll submissions, fixed/random attached ordinary/reaction/melee facade counts and engine-created persistence/fork/viewer/replay. Preserve existing positive commitment, split, replacement and lethal controls.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "tests/fire_overwatch_helpers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order113-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Exercise descriptor/grant boundary branches, occurrence choices and invalid pre-roll submissions, fixed/random attached ordinary/reaction/melee facade counts and engine-created persistence/fork/viewer/replay. Preserve existing positive commitment, split, replacement and lethal controls.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "tests/random_melee_helpers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order113-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Exercise descriptor/grant boundary branches, occurrence choices and invalid pre-roll submissions, fixed/random attached ordinary/reaction/melee facade counts and engine-created persistence/fork/viewer/replay. Preserve existing positive commitment, split, replacement and lethal controls.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "tests/unit/engine/test_catalog_weapon_ability_runtime_helpers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order113-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Exercise descriptor/grant boundary branches, occurrence choices and invalid pre-roll submissions, fixed/random attached ordinary/reaction/melee facade counts and engine-created persistence/fork/viewer/replay. Preserve existing positive commitment, split, replacement and lethal controls.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "tests/unit/rules/test_wahapedia_bridge_normalization.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order113-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Exercise descriptor/grant boundary branches, occurrence choices and invalid pre-roll submissions, fixed/random attached ordinary/reaction/melee facade counts and engine-created persistence/fork/viewer/replay. Preserve existing positive commitment, split, replacement and lethal controls.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "tests/unit/test_fire_overwatch.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order113-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Exercise descriptor/grant boundary branches, occurrence choices and invalid pre-roll submissions, fixed/random attached ordinary/reaction/melee facade counts and engine-created persistence/fork/viewer/replay. Preserve existing positive commitment, split, replacement and lethal controls.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
     "tests/unit/test_order92_random_melee.py": {
       "category": "rule_semantics",
       "operations": [
-        "order112-extra-attacks-regressions"
+        "order113-regressions"
       ],
       "selected_families": [],
-      "rationale": "Add scoped physical-copy, Extra-only, bearer eligibility, One Shot, fixed/random attached facade omission/retry, profile choice, persistence/fork/viewer/replay controls to the existing random-melee regression module; correct the Fulgrim facade fixture to include engine-enumerated mandatory Extra Attacks while preserving its primary and poison/replay assertions.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Exercise descriptor/grant boundary branches, occurrence choices and invalid pre-roll submissions, fixed/random attached ordinary/reaction/melee facade counts and engine-created persistence/fork/viewer/replay. Preserve existing positive commitment, split, replacement and lethal controls.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
-    "tests/unit/test_phase17_emperors_children_datasheet_overlay.py": {
+    "tests/unit/test_phase13b_shooting_declarations.py": {
       "category": "rule_semantics",
       "operations": [
-        "order112-extra-attacks-regressions"
+        "order113-regressions"
       ],
       "selected_families": [],
-      "rationale": "Add scoped physical-copy, Extra-only, bearer eligibility, One Shot, fixed/random attached facade omission/retry, profile choice, persistence/fork/viewer/replay controls to the existing random-melee regression module; correct the Fulgrim facade fixture to include engine-enumerated mandatory Extra Attacks while preserving its primary and poison/replay assertions.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Exercise descriptor/grant boundary branches, occurrence choices and invalid pre-roll submissions, fixed/random attached ordinary/reaction/melee facade counts and engine-created persistence/fork/viewer/replay. Preserve existing positive commitment, split, replacement and lethal controls.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+    },
+    "tests/unit/test_phase13d_weapon_ability_helpers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order113-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Exercise descriptor/grant boundary branches, occurrence choices and invalid pre-roll submissions, fixed/random attached ordinary/reaction/melee facade counts and engine-created persistence/fork/viewer/replay. Preserve existing positive commitment, split, replacement and lethal controls.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     },
     "tools/core_rules_order97_history.py": {
       "category": "rule_semantics",
       "operations": [
-        "order112-source-evidence"
+        "order113-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Retain authenticated exact-base bytes of the Order97-pinned regression file and register its bounded hash-checked historical mapping, preserving original source assertions without repinning.",
-      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
-      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+      "rationale": "Retain exact-base bytes for four original Order97-pinned regression/fixture inputs with bounded hash-checked historical mapping. Original source selection and histories remain immutable.",
+      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
+      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
     }
   },
   "milestone": "ordinary",

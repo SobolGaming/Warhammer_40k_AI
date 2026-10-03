@@ -377,6 +377,20 @@ def test_phase17k_bridge_normalizes_conditioned_valued_and_anti_weapon_keywords(
     }
 
 
+def test_order113_bridge_preserves_blast_x_and_cleave_x() -> None:
+    artifacts = conditioned_weapon_keyword_bridge_artifacts("[BLAST 2, CLEAVE 3: INFANTRY]")
+    package = build_canonical_catalog_package(
+        package_id=catalog_package_id(),
+        catalog_version=catalog_version(),
+        source_artifacts=artifacts,
+    )
+    profile = package.army_catalog.wargear[0].weapon_profiles[0]
+    by_kind = {ability.ability_kind: ability for ability in profile.abilities}
+    assert by_kind[AbilityKind.BLAST].parameters[0].value == 2
+    assert by_kind[AbilityKind.CLEAVE].parameters[0].value == 3
+    assert by_kind[AbilityKind.CLEAVE].target_keywords == ("INFANTRY",)
+
+
 def test_phase17k_bridge_allows_duplicate_anti_weapon_keyword_descriptors() -> None:
     artifacts = conditioned_weapon_keyword_bridge_artifacts("[ANTI-INFANTRY 2+, ANTI-VEHICLE 4+]")
     package = build_canonical_catalog_package(

@@ -5191,6 +5191,10 @@ def _weapon_keyword_grant_has_supported_runtime_shape(
 ) -> bool:
     if _optional_weapon_scope_parameter(parameters) is None:
         return False
+    if keyword is WeaponKeyword.BLAST:
+        return "weapon_ability_value" not in parameters or (
+            _optional_positive_int_parameter(parameters, key="weapon_ability_value") is not None
+        )
     if keyword in _VALUE_REQUIRED_WEAPON_KEYWORDS:
         return _optional_positive_int_parameter(parameters, key="weapon_ability_value") is not None
     return keyword is not WeaponKeyword.HUNTER
@@ -5213,6 +5217,10 @@ def _weapon_ability_choice_has_supported_runtime_shape(
         return False
     if _optional_named_weapon_choice_target_scope(parameters) is None:
         return False
+    if keyword is WeaponKeyword.BLAST:
+        return "weapon_ability_value" not in parameters or (
+            _optional_positive_int_parameter(parameters, key="weapon_ability_value") is not None
+        )
     if keyword in _VALUE_REQUIRED_WEAPON_KEYWORDS:
         if keyword is WeaponKeyword.SUSTAINED_HITS:
             return _optional_weapon_ability_choice_value_parameter(parameters) is not None
@@ -5225,34 +5233,9 @@ def _weapon_ability_descriptor_for_grant(
     parameters: Mapping[str, object],
     keyword: WeaponKeyword,
 ) -> AbilityDescriptor | None:
-    if keyword is WeaponKeyword.LETHAL_HITS:
-        return AbilityDescriptor.lethal_hits()
-    if keyword is WeaponKeyword.DEVASTATING_WOUNDS:
-        return AbilityDescriptor.devastating_wounds()
-    if keyword is WeaponKeyword.HEAVY:
-        return AbilityDescriptor.heavy()
-    if keyword is WeaponKeyword.SUSTAINED_HITS:
-        return AbilityDescriptor.sustained_hits(
-            _required_weapon_ability_choice_value_parameter(
-                parameters,
-                key="weapon_ability_value",
-            )
-        )
-    if keyword is WeaponKeyword.RAPID_FIRE:
-        return AbilityDescriptor.rapid_fire(
-            _required_positive_int_parameter(parameters, key="weapon_ability_value")
-        )
-    if keyword is WeaponKeyword.MELTA:
-        return AbilityDescriptor.melta(
-            _required_positive_int_parameter(parameters, key="weapon_ability_value")
-        )
-    if keyword is WeaponKeyword.CLEAVE:
-        return AbilityDescriptor.cleave(
-            _required_positive_int_parameter(parameters, key="weapon_ability_value")
-        )
-    if keyword is WeaponKeyword.HUNTER:
-        raise GameLifecycleError("Catalog weapon keyword grant cannot infer Hunter targets.")
-    return None
+    from warhammer40k_core.engine.weapon_ability_grants import weapon_ability_descriptor_for_grant
+
+    return weapon_ability_descriptor_for_grant(parameters=parameters, keyword=keyword)
 
 
 _VALUE_REQUIRED_WEAPON_KEYWORDS = frozenset(
@@ -5336,17 +5319,6 @@ def _required_string_parameter(parameters: Mapping[str, object], *, key: str) ->
     if type(value) is not str:
         raise GameLifecycleError(f"Catalog rule parameter {key} must be a string.")
     return _validate_identifier(key, value)
-
-
-def _required_weapon_ability_choice_value_parameter(
-    parameters: Mapping[str, object],
-    *,
-    key: str,
-) -> int | str:
-    value = _optional_weapon_ability_choice_value_parameter(parameters)
-    if value is None:
-        raise GameLifecycleError(f"Catalog rule parameter {key} must be positive or D3.")
-    return value
 
 
 def _optional_weapon_ability_choice_value_parameter(
