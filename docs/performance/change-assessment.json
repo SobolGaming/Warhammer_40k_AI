@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "b65099255a85b0b02281b78905ce42754c53b594",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:dd58803f47745215e32902db7f7d7a4b219c72d1cd4984e9a9483c6807c212aa",
-  "operation_map_sha256": "6689727bc2524467fdfc99493d302f5d322dfc2ded480e0d5332f6f7387c7154",
+  "operation_map_sha256": "39b9d37ea60be0a6d42faaedbe42f878820db8110e28f1f165ae16592d571b29",
   "changes": {
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "ab9e526084433ed24f9977c9f00f84848255dba2577a5c2bc7c7edc4c671e158",
@@ -136,11 +136,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "6583488e5ae3b21ffb1136031405b328e19722c3b7f40824cd717c22bd091443",
-      "after_sha256": "3801faec982215ea352b7d024543e99e084379535e185530e0ec18f38c48cc80",
+      "after_sha256": "7c911dd2ac7d9272670a1660537df197cfcb654b99c5cdcd1cf32b20dade14a2",
       "owners": {
         "@document": {
           "before": "6583488e5ae3b21ffb1136031405b328e19722c3b7f40824cd717c22bd091443",
-          "after": "3801faec982215ea352b7d024543e99e084379535e185530e0ec18f38c48cc80"
+          "after": "7c911dd2ac7d9272670a1660537df197cfcb654b99c5cdcd1cf32b20dade14a2"
         }
       }
     },
@@ -291,6 +291,16 @@
         "test_mandatory_extra_selection_obeys_physical_one_shot_availability": {
           "before": null,
           "after": "0c0f9da012e097b1d8d005ee39cc20d54fb850577365888348762b36c9765a41"
+        }
+      }
+    },
+    "tests/unit/test_phase17_emperors_children_datasheet_overlay.py": {
+      "before_sha256": "ce761236492de7f67a7bf991c348cc75095f5ee268032ee9a444ea2e7369b904",
+      "after_sha256": "4cfae93b18b029197c1a8e4103ba892cd2619b80bc99afef1f54614bfbe50658",
+      "owners": {
+        "_advance_fight_session_to_poison_request": {
+          "before": "8627ab82632c6cdefa7463055fb2e5cd3db99efed3fc22d4d7ddb69fab3d0e4c",
+          "after": "10939fb31f308739b4eaed98c978f089b82f81c437016fed8fe9ebfcae33dd26"
         }
       }
     },
@@ -524,7 +534,17 @@
         "order112-extra-attacks-regressions"
       ],
       "selected_families": [],
-      "rationale": "Add scoped physical-copy, Extra-only, bearer eligibility, One Shot, fixed/random attached facade omission/retry, profile choice, persistence/fork/viewer/replay controls to the existing random-melee regression module.",
+      "rationale": "Add scoped physical-copy, Extra-only, bearer eligibility, One Shot, fixed/random attached facade omission/retry, profile choice, persistence/fork/viewer/replay controls to the existing random-melee regression module; correct the Fulgrim facade fixture to include engine-enumerated mandatory Extra Attacks while preserving its primary and poison/replay assertions.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
+    "tests/unit/test_phase17_emperors_children_datasheet_overlay.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order112-extra-attacks-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Add scoped physical-copy, Extra-only, bearer eligibility, One Shot, fixed/random attached facade omission/retry, profile choice, persistence/fork/viewer/replay controls to the existing random-melee regression module; correct the Fulgrim facade fixture to include engine-enumerated mandatory Extra Attacks while preserving its primary and poison/replay assertions.",
       "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
       "unchanged_work": "Bounded melee rule selection, existing committed-inventory filtering and allocation-only deferred-death rule classification. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
     },

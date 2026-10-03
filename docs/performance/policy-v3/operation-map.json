@@ -2721,7 +2721,8 @@
     },
     "order112-extra-attacks-regressions": {
       "paths": [
-        "tests/unit/test_order92_random_melee.py"
+        "tests/unit/test_order92_random_melee.py",
+        "tests/unit/test_phase17_emperors_children_datasheet_overlay.py"
       ],
       "owners": [
         "@module",
@@ -2732,7 +2733,8 @@
         "_lethal_extra_session",
         "_assert_deferred_allocation_boundary",
         "test_lethal_primary_and_mandatory_extra_finish_before_deferred_destruction",
-        "test_living_attached_recipient_remains_allocatable_after_component_death"
+        "test_living_attached_recipient_remains_allocatable_after_component_death",
+        "_advance_fight_session_to_poison_request"
       ],
       "families": [],
       "sensitive": false,
