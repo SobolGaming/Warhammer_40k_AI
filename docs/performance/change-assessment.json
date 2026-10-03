@@ -1,424 +1,408 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "fc12fa214642f1b1f2a31b56be7323b7d76dbebc",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7c1b35ca1948018391a7eb72d8c708973121d651afac3ccb887b22d38168512d",
-  "operation_map_sha256": "80333d14010f82af1816d94c3b1dcfde2812b9de98e3e92abdd18debecb0ded8",
+  "base": "5c3de70b20089c9adbede4326a74155f892de1ff",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:444e46884a1bc62fc1b14dd57665a36bbf005aef795a707b5b77cf1d00265068",
+  "operation_map_sha256": "6f21d87dcccc2687b8f4bd938679f12857593be8a3f0f2fdf8ed47fe72d72cd9",
   "changes": {
     "README.md": {
-      "before_sha256": "73e3615d6600911967331475d01d439b6e25286ed942e09f493d13dcb0a5457c",
-      "after_sha256": "a4fd5f093ac4be76fe54e4246a699c38d333025efe94ad993e527ce753a3769c",
+      "before_sha256": "a4fd5f093ac4be76fe54e4246a699c38d333025efe94ad993e527ce753a3769c",
+      "after_sha256": "10e90d9d65cbc514a1481f733d69c9d3eba99736c15236254f3a6684ad40081b",
       "owners": {
         "@document": {
-          "before": "73e3615d6600911967331475d01d439b6e25286ed942e09f493d13dcb0a5457c",
-          "after": "a4fd5f093ac4be76fe54e4246a699c38d333025efe94ad993e527ce753a3769c"
+          "before": "a4fd5f093ac4be76fe54e4246a699c38d333025efe94ad993e527ce753a3769c",
+          "after": "10e90d9d65cbc514a1481f733d69c9d3eba99736c15236254f3a6684ad40081b"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "169a3151e265b8a7043cbf02e2308addbe71302d2fd0f14e4b2714c0f9aa7771",
-      "after_sha256": "311b06ac470b395c4280c5ebbc806bb9fa872138aac0bcc9f07cb5be720f6f80",
+      "before_sha256": "311b06ac470b395c4280c5ebbc806bb9fa872138aac0bcc9f07cb5be720f6f80",
+      "after_sha256": "b47a12ecbd0b5ea4d54f15959300690447ac3ceb09b0dadefd1469304eb7f70c",
       "owners": {
         "@document": {
-          "before": "169a3151e265b8a7043cbf02e2308addbe71302d2fd0f14e4b2714c0f9aa7771",
-          "after": "311b06ac470b395c4280c5ebbc806bb9fa872138aac0bcc9f07cb5be720f6f80"
+          "before": "311b06ac470b395c4280c5ebbc806bb9fa872138aac0bcc9f07cb5be720f6f80",
+          "after": "b47a12ecbd0b5ea4d54f15959300690447ac3ceb09b0dadefd1469304eb7f70c"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "6a11b05c53a6de4215bf0eacf7c3d8ff48dc410cd38d009d5bd3cc39f1cf26c0",
-      "after_sha256": "6518dd02bb7d141df4561ef1000fc7b3b2dd18d33a51b9ac8eb534c4c7103c33",
+      "before_sha256": "6518dd02bb7d141df4561ef1000fc7b3b2dd18d33a51b9ac8eb534c4c7103c33",
+      "after_sha256": "7ba1119ca0d293bf5eabf7f6c312a80739127af71524d2f3b60d379a7cd8eb8a",
       "owners": {
         "@document": {
-          "before": "6a11b05c53a6de4215bf0eacf7c3d8ff48dc410cd38d009d5bd3cc39f1cf26c0",
-          "after": "6518dd02bb7d141df4561ef1000fc7b3b2dd18d33a51b9ac8eb534c4c7103c33"
+          "before": "6518dd02bb7d141df4561ef1000fc7b3b2dd18d33a51b9ac8eb534c4c7103c33",
+          "after": "7ba1119ca0d293bf5eabf7f6c312a80739127af71524d2f3b60d379a7cd8eb8a"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "07fff556ee04b57d9dbda52749da5253cfec088e2b0756543fd25137f57404e7",
-      "after_sha256": "7ee901049464be1622daa95a619ef46c33e2af57342af008a4a0d858947dee8b",
+      "before_sha256": "7ee901049464be1622daa95a619ef46c33e2af57342af008a4a0d858947dee8b",
+      "after_sha256": "3a65bf7d7e2f517d7ac67b78e31c8ac3d9659e4f42e0015bebaa84abb5e82be4",
       "owners": {
         "@document": {
-          "before": "07fff556ee04b57d9dbda52749da5253cfec088e2b0756543fd25137f57404e7",
-          "after": "7ee901049464be1622daa95a619ef46c33e2af57342af008a4a0d858947dee8b"
+          "before": "7ee901049464be1622daa95a619ef46c33e2af57342af008a4a0d858947dee8b",
+          "after": "3a65bf7d7e2f517d7ac67b78e31c8ac3d9659e4f42e0015bebaa84abb5e82be4"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "1bf79462b579f6d625206390a3a092a9d089a51140242d41077d154fed37c803",
-      "after_sha256": "c52171e4db3672d3a3d9691fdfc1aa3b61f4e02353ad4a7caebb6db0d9ba271d",
+      "before_sha256": "c52171e4db3672d3a3d9691fdfc1aa3b61f4e02353ad4a7caebb6db0d9ba271d",
+      "after_sha256": "8f115cb8e85bfb3218eecce9dcdfdb90c5e00d687ce295fcfb30af00c19ce668",
       "owners": {
         "@document": {
-          "before": "1bf79462b579f6d625206390a3a092a9d089a51140242d41077d154fed37c803",
-          "after": "c52171e4db3672d3a3d9691fdfc1aa3b61f4e02353ad4a7caebb6db0d9ba271d"
+          "before": "c52171e4db3672d3a3d9691fdfc1aa3b61f4e02353ad4a7caebb6db0d9ba271d",
+          "after": "8f115cb8e85bfb3218eecce9dcdfdb90c5e00d687ce295fcfb30af00c19ce668"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "712d9e66875e8ecea4c97d66e8a3ef0fb4800c0f8edaeabd62e6d3c1e39600e0",
-      "after_sha256": "778819ee79788fac682792ecfbb75049baa10fca7c3edc3bd73fe064d2ee0408",
+      "before_sha256": "778819ee79788fac682792ecfbb75049baa10fca7c3edc3bd73fe064d2ee0408",
+      "after_sha256": "10ec2d98abea3b51a8e03de1f2bd7f9db2d39f3e7b85016a6982f2565aa33795",
       "owners": {
         "@document": {
-          "before": "712d9e66875e8ecea4c97d66e8a3ef0fb4800c0f8edaeabd62e6d3c1e39600e0",
-          "after": "778819ee79788fac682792ecfbb75049baa10fca7c3edc3bd73fe064d2ee0408"
+          "before": "778819ee79788fac682792ecfbb75049baa10fca7c3edc3bd73fe064d2ee0408",
+          "after": "10ec2d98abea3b51a8e03de1f2bd7f9db2d39f3e7b85016a6982f2565aa33795"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "6c661aa205d1f7e0c033a78a4cfef66dc44b82066dc43969fabce88d6af6d247",
-      "after_sha256": "c3f696f76d140af0c4473617fde26bcbe3a22b01b46e77af32409fad5543f01a",
+      "before_sha256": "c3f696f76d140af0c4473617fde26bcbe3a22b01b46e77af32409fad5543f01a",
+      "after_sha256": "b2ec56190a7625360ca97db3201ab2592145c408f4f0325be9ce249f832c4124",
       "owners": {
         "@document": {
-          "before": "6c661aa205d1f7e0c033a78a4cfef66dc44b82066dc43969fabce88d6af6d247",
-          "after": "c3f696f76d140af0c4473617fde26bcbe3a22b01b46e77af32409fad5543f01a"
+          "before": "c3f696f76d140af0c4473617fde26bcbe3a22b01b46e77af32409fad5543f01a",
+          "after": "b2ec56190a7625360ca97db3201ab2592145c408f4f0325be9ce249f832c4124"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "55f06cfb1d1bc1fff73b354e22acfb7c762b2d72636166884ca21b9d3c648b5a",
-      "after_sha256": "d96f93795d967f5f97dbf38c5ca0be421af985c4565a0288ecaf35d9af70d69b",
+      "before_sha256": "d96f93795d967f5f97dbf38c5ca0be421af985c4565a0288ecaf35d9af70d69b",
+      "after_sha256": "83adb741a219b9205ea2b695d00033f9cf6b0b1c29cc582b9777b051e92e8f0f",
       "owners": {
         "@document": {
-          "before": "55f06cfb1d1bc1fff73b354e22acfb7c762b2d72636166884ca21b9d3c648b5a",
-          "after": "d96f93795d967f5f97dbf38c5ca0be421af985c4565a0288ecaf35d9af70d69b"
+          "before": "d96f93795d967f5f97dbf38c5ca0be421af985c4565a0288ecaf35d9af70d69b",
+          "after": "83adb741a219b9205ea2b695d00033f9cf6b0b1c29cc582b9777b051e92e8f0f"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "ed8e81759a17332ffec21999ea2f57a8380225af60cdfafbdee99feae9be4f88",
-      "after_sha256": "c5a5cc2fd5c7ba77683d9998c65e34a19c25bd3a5b59b268a591d96b22985dbb",
+      "before_sha256": "c5a5cc2fd5c7ba77683d9998c65e34a19c25bd3a5b59b268a591d96b22985dbb",
+      "after_sha256": "b381c5bccce347fc7ce0462903092dfc94fa58f457517713370c6c30d87b2d55",
       "owners": {
         "@document": {
-          "before": "ed8e81759a17332ffec21999ea2f57a8380225af60cdfafbdee99feae9be4f88",
-          "after": "c5a5cc2fd5c7ba77683d9998c65e34a19c25bd3a5b59b268a591d96b22985dbb"
+          "before": "c5a5cc2fd5c7ba77683d9998c65e34a19c25bd3a5b59b268a591d96b22985dbb",
+          "after": "b381c5bccce347fc7ce0462903092dfc94fa58f457517713370c6c30d87b2d55"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "6e2005500359bf31b5e5b867b52f81230de4e91563ebe94d57ef608881a981cc",
-      "after_sha256": "28c2f296aae86df51ce39a0853f9271ef4aa49c18248b08ce1f4799bbdea3306",
+      "before_sha256": "28c2f296aae86df51ce39a0853f9271ef4aa49c18248b08ce1f4799bbdea3306",
+      "after_sha256": "259c5e3f7970414199a066045abf60f76fc98c5548c52232ec650ed87f107b40",
       "owners": {
         "@document": {
-          "before": "6e2005500359bf31b5e5b867b52f81230de4e91563ebe94d57ef608881a981cc",
-          "after": "28c2f296aae86df51ce39a0853f9271ef4aa49c18248b08ce1f4799bbdea3306"
+          "before": "28c2f296aae86df51ce39a0853f9271ef4aa49c18248b08ce1f4799bbdea3306",
+          "after": "259c5e3f7970414199a066045abf60f76fc98c5548c52232ec650ed87f107b40"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "e2c38cf6ec2a6f1d46840101451f90181471ff0cfdf0a0a9766caa859f9dae5c",
-      "after_sha256": "e6bdbec918f950cea30b7bf28754ff5fb3b651cc683bfa73706de5fa7e531ded",
+      "before_sha256": "e6bdbec918f950cea30b7bf28754ff5fb3b651cc683bfa73706de5fa7e531ded",
+      "after_sha256": "f11a16d11826a455c132cc18f260f1dea898ea258b33284148fb75e57af17e4e",
       "owners": {
         "@document": {
-          "before": "e2c38cf6ec2a6f1d46840101451f90181471ff0cfdf0a0a9766caa859f9dae5c",
-          "after": "e6bdbec918f950cea30b7bf28754ff5fb3b651cc683bfa73706de5fa7e531ded"
+          "before": "e6bdbec918f950cea30b7bf28754ff5fb3b651cc683bfa73706de5fa7e531ded",
+          "after": "f11a16d11826a455c132cc18f260f1dea898ea258b33284148fb75e57af17e4e"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "f25fb7bba968dee79aea3d9db2302a9f25e124a78df5252663214894e27196b6",
-      "after_sha256": "ea1bb92b350fcd0a5cea7fc4f836b3a3718eed6d0390a08548d9db1e00996cad",
+      "before_sha256": "ea1bb92b350fcd0a5cea7fc4f836b3a3718eed6d0390a08548d9db1e00996cad",
+      "after_sha256": "948d13ef038d5620ee01f60fc4f24f34c641ba2acd635a09a05556e243991435",
       "owners": {
         "@document": {
-          "before": "f25fb7bba968dee79aea3d9db2302a9f25e124a78df5252663214894e27196b6",
-          "after": "ea1bb92b350fcd0a5cea7fc4f836b3a3718eed6d0390a08548d9db1e00996cad"
+          "before": "ea1bb92b350fcd0a5cea7fc4f836b3a3718eed6d0390a08548d9db1e00996cad",
+          "after": "948d13ef038d5620ee01f60fc4f24f34c641ba2acd635a09a05556e243991435"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "eb2bcc03517f2e3de7616885693ebfa3042b73f54082c9db948d39682bc065f5",
-      "after_sha256": "84ce770da3894a14648f3fdcee97bf6285a8f7fd564ede5df9ac0e527cd3697d",
+      "before_sha256": "84ce770da3894a14648f3fdcee97bf6285a8f7fd564ede5df9ac0e527cd3697d",
+      "after_sha256": "e39e556db2595629914778b3d37757f4b1a52c9f559b225fb094f8aac89bb0c1",
       "owners": {
         "@document": {
-          "before": "eb2bcc03517f2e3de7616885693ebfa3042b73f54082c9db948d39682bc065f5",
-          "after": "84ce770da3894a14648f3fdcee97bf6285a8f7fd564ede5df9ac0e527cd3697d"
+          "before": "84ce770da3894a14648f3fdcee97bf6285a8f7fd564ede5df9ac0e527cd3697d",
+          "after": "e39e556db2595629914778b3d37757f4b1a52c9f559b225fb094f8aac89bb0c1"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "3f5733620eeb64623d626db7a3a9da25385d6c5ef381e25d175679280d300928",
-      "after_sha256": "767a2d66b861889198c62b8fca92add6c6927c4bd1f091409f68ad9e6af0a47b",
+      "before_sha256": "767a2d66b861889198c62b8fca92add6c6927c4bd1f091409f68ad9e6af0a47b",
+      "after_sha256": "b2f4dc730b7a8df500d313129723b517404986a01fad8f384f1e2bed418e62fa",
       "owners": {
         "@document": {
-          "before": "3f5733620eeb64623d626db7a3a9da25385d6c5ef381e25d175679280d300928",
-          "after": "767a2d66b861889198c62b8fca92add6c6927c4bd1f091409f68ad9e6af0a47b"
+          "before": "767a2d66b861889198c62b8fca92add6c6927c4bd1f091409f68ad9e6af0a47b",
+          "after": "b2f4dc730b7a8df500d313129723b517404986a01fad8f384f1e2bed418e62fa"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "df6946382e250439f3fe45abe60a681dd7fef8b3d7347761bdeac9202cbac033",
-      "after_sha256": "ddc6ea6781b750468202f72bc9ee57ec4a9fba62001402947a900c9eb4a75ee6",
+      "before_sha256": "ddc6ea6781b750468202f72bc9ee57ec4a9fba62001402947a900c9eb4a75ee6",
+      "after_sha256": "a88038a5cb6ac2249dae74d549f88772bf99ce541f04924fad1b8103972b09dd",
       "owners": {
         "@document": {
-          "before": "df6946382e250439f3fe45abe60a681dd7fef8b3d7347761bdeac9202cbac033",
-          "after": "ddc6ea6781b750468202f72bc9ee57ec4a9fba62001402947a900c9eb4a75ee6"
+          "before": "ddc6ea6781b750468202f72bc9ee57ec4a9fba62001402947a900c9eb4a75ee6",
+          "after": "a88038a5cb6ac2249dae74d549f88772bf99ce541f04924fad1b8103972b09dd"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "ae144aac1506dff3e0d9ac8b5ffb3aba1be80cf962ae331fc8fbcc71f09cd084",
-      "after_sha256": "ddbf17b988f8606158cad911c19d2e7e8e7de2a0de70dded7e0f480d425657c6",
+      "before_sha256": "ddbf17b988f8606158cad911c19d2e7e8e7de2a0de70dded7e0f480d425657c6",
+      "after_sha256": "e362047e689338bb0dfcbbdf89e7c11841a95eff87c1aeaf7813fd0bf1455d41",
       "owners": {
         "@document": {
-          "before": "ae144aac1506dff3e0d9ac8b5ffb3aba1be80cf962ae331fc8fbcc71f09cd084",
-          "after": "ddbf17b988f8606158cad911c19d2e7e8e7de2a0de70dded7e0f480d425657c6"
+          "before": "ddbf17b988f8606158cad911c19d2e7e8e7de2a0de70dded7e0f480d425657c6",
+          "after": "e362047e689338bb0dfcbbdf89e7c11841a95eff87c1aeaf7813fd0bf1455d41"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "4f47a824a16e449dcaf148f56a1569b085ace984d7752aa39f88a1b5c8fdf61e",
-      "after_sha256": "b2217b9ac8af82746d70971dce1c5102ecde50d6c559e6752e4e04c87babb9d1",
+      "before_sha256": "b2217b9ac8af82746d70971dce1c5102ecde50d6c559e6752e4e04c87babb9d1",
+      "after_sha256": "203669e0b3e9ebf8339309dc9a521801de64c1752018c6bfa45d50b377ab0971",
       "owners": {
         "@document": {
-          "before": "4f47a824a16e449dcaf148f56a1569b085ace984d7752aa39f88a1b5c8fdf61e",
-          "after": "b2217b9ac8af82746d70971dce1c5102ecde50d6c559e6752e4e04c87babb9d1"
+          "before": "b2217b9ac8af82746d70971dce1c5102ecde50d6c559e6752e4e04c87babb9d1",
+          "after": "203669e0b3e9ebf8339309dc9a521801de64c1752018c6bfa45d50b377ab0971"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "8377e303db97e1055c307f43eea7ee38ef6a6b0e5da5811dbd4acd484354fae4",
-      "after_sha256": "1b101f23fc6a8b017ba1df2a6f13ea60c62616071144460ca0e6bc8f5c2921b8",
+      "before_sha256": "1b101f23fc6a8b017ba1df2a6f13ea60c62616071144460ca0e6bc8f5c2921b8",
+      "after_sha256": "daaa3c6620b6d790899ed3bca5b7c0b8215730428972dba7c064bd75a9755fe3",
       "owners": {
         "@document": {
-          "before": "8377e303db97e1055c307f43eea7ee38ef6a6b0e5da5811dbd4acd484354fae4",
-          "after": "1b101f23fc6a8b017ba1df2a6f13ea60c62616071144460ca0e6bc8f5c2921b8"
+          "before": "1b101f23fc6a8b017ba1df2a6f13ea60c62616071144460ca0e6bc8f5c2921b8",
+          "after": "daaa3c6620b6d790899ed3bca5b7c0b8215730428972dba7c064bd75a9755fe3"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "1d842a47d374001766d1717d0b608fb478024119cbd7097245fb95c98e181f14",
-      "after_sha256": "6011f20d1be35c1b971a412d59060c855a91a675b9d414fbab82c8c90af12f30",
+      "before_sha256": "6011f20d1be35c1b971a412d59060c855a91a675b9d414fbab82c8c90af12f30",
+      "after_sha256": "ab2cb8833e5e5cf38e5d8a622465dc111670b7556e8eda60889c9521380673bf",
       "owners": {
         "@document": {
-          "before": "1d842a47d374001766d1717d0b608fb478024119cbd7097245fb95c98e181f14",
-          "after": "6011f20d1be35c1b971a412d59060c855a91a675b9d414fbab82c8c90af12f30"
+          "before": "6011f20d1be35c1b971a412d59060c855a91a675b9d414fbab82c8c90af12f30",
+          "after": "ab2cb8833e5e5cf38e5d8a622465dc111670b7556e8eda60889c9521380673bf"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "1b2bdd8613e8f88ca65e99dbf92589196985449ec9569bc06adb405e8f7c1633",
-      "after_sha256": "98bef450413c793cbe7d556fb161a175c541119fe313ec3d884dbfbfd6dd235e",
+      "before_sha256": "98bef450413c793cbe7d556fb161a175c541119fe313ec3d884dbfbfd6dd235e",
+      "after_sha256": "a3cdeda03985db875d242c28bd364ea49a7cca19a330e1002026429741befc7e",
       "owners": {
         "@document": {
-          "before": "1b2bdd8613e8f88ca65e99dbf92589196985449ec9569bc06adb405e8f7c1633",
-          "after": "98bef450413c793cbe7d556fb161a175c541119fe313ec3d884dbfbfd6dd235e"
+          "before": "98bef450413c793cbe7d556fb161a175c541119fe313ec3d884dbfbfd6dd235e",
+          "after": "a3cdeda03985db875d242c28bd364ea49a7cca19a330e1002026429741befc7e"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "0c864fb6eb2f34487f37c47a07970b30faaa6d24912c56152f8388ed46d8c418",
-      "after_sha256": "0da5a90e44173aa949df87eddad66f7abb349456bda45b3f404a1a94c3313238",
+      "before_sha256": "0da5a90e44173aa949df87eddad66f7abb349456bda45b3f404a1a94c3313238",
+      "after_sha256": "00d37d5988cf305811d4403f6009169dbaa4fd95ac5cff9d8af4ccbc1a27c4f8",
       "owners": {
         "@document": {
-          "before": "0c864fb6eb2f34487f37c47a07970b30faaa6d24912c56152f8388ed46d8c418",
-          "after": "0da5a90e44173aa949df87eddad66f7abb349456bda45b3f404a1a94c3313238"
+          "before": "0da5a90e44173aa949df87eddad66f7abb349456bda45b3f404a1a94c3313238",
+          "after": "00d37d5988cf305811d4403f6009169dbaa4fd95ac5cff9d8af4ccbc1a27c4f8"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "859b4465cd0321fa4bbd20e8df3110dc8a0ccf98bdb9c3f4f6607524132f1e79",
-      "after_sha256": "d34177dd6dfd6e721dfe2f49fb71f265013a2d10f64a441d3e3a0b00255b1328",
+      "before_sha256": "d34177dd6dfd6e721dfe2f49fb71f265013a2d10f64a441d3e3a0b00255b1328",
+      "after_sha256": "1dedd67c14d250e2de54a4b7a806b22b2d806a3fed02cadeb09158e728279d63",
       "owners": {
         "@document": {
-          "before": "859b4465cd0321fa4bbd20e8df3110dc8a0ccf98bdb9c3f4f6607524132f1e79",
-          "after": "d34177dd6dfd6e721dfe2f49fb71f265013a2d10f64a441d3e3a0b00255b1328"
-        }
-      }
-    },
-    "data/source_audits/order104/baseline/tests/unit/test_phase13b_shooting_phase_declarations.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "eb2288b80e5a93ec2f5d644988ccbb5f045947d2937137d43da6880e2b9c1837",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "eb2288b80e5a93ec2f5d644988ccbb5f045947d2937137d43da6880e2b9c1837"
-        }
-      }
-    },
-    "data/source_audits/order104/historical-inputs.json": {
-      "before_sha256": null,
-      "after_sha256": "229bf8b5f6803dc7857ed44fc3cf997cf944ab5c8d900234dd7b8dd0d4df6263",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "229bf8b5f6803dc7857ed44fc3cf997cf944ab5c8d900234dd7b8dd0d4df6263"
-        }
-      }
-    },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "dea5d82258ad97685225af964121bef78ef6014b7cccc09c0e06f3b4f476170e",
-      "after_sha256": "fdf762106542f3a07137c5aa162430656bf5b38e52861e5e43120b6ae051cef7",
-      "owners": {
-        "@document": {
-          "before": "dea5d82258ad97685225af964121bef78ef6014b7cccc09c0e06f3b4f476170e",
-          "after": "fdf762106542f3a07137c5aa162430656bf5b38e52861e5e43120b6ae051cef7"
+          "before": "d34177dd6dfd6e721dfe2f49fb71f265013a2d10f64a441d3e3a0b00255b1328",
+          "after": "1dedd67c14d250e2de54a4b7a806b22b2d806a3fed02cadeb09158e728279d63"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "2af9873d25c146519ecb7a86a65cb77607acc166dbfe94dc3ec12c531ec88b38",
-      "after_sha256": "c62234be7f9b0b629a92af4ca77e4433bedc4cabafc866f647d3d51c12cd9beb",
+      "before_sha256": "c62234be7f9b0b629a92af4ca77e4433bedc4cabafc866f647d3d51c12cd9beb",
+      "after_sha256": "0076b6d07a8f4fe8aac489abb0a0af7d229eae184dde4be344f0eeedf35a1f74",
       "owners": {
         "@document": {
-          "before": "2af9873d25c146519ecb7a86a65cb77607acc166dbfe94dc3ec12c531ec88b38",
-          "after": "c62234be7f9b0b629a92af4ca77e4433bedc4cabafc866f647d3d51c12cd9beb"
+          "before": "c62234be7f9b0b629a92af4ca77e4433bedc4cabafc866f647d3d51c12cd9beb",
+          "after": "0076b6d07a8f4fe8aac489abb0a0af7d229eae184dde4be344f0eeedf35a1f74"
         }
       }
     },
-    "docs/ORDER_104_SCOPE_PLAN.md": {
+    "docs/ORDER_105_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "2add2ac1e0d5fc4b9593ece97ab0b1e51dfd1103bb881798f95242b98961c0fa",
+      "after_sha256": "36c31d04747575420af6cad6e507bdb62ab8110a027a6085d5fb1edbc8a9a1a2",
       "owners": {
         "@document": {
           "before": null,
-          "after": "2add2ac1e0d5fc4b9593ece97ab0b1e51dfd1103bb881798f95242b98961c0fa"
+          "after": "36c31d04747575420af6cad6e507bdb62ab8110a027a6085d5fb1edbc8a9a1a2"
+        }
+      }
+    },
+    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
+      "before_sha256": "7ab2e78e1d70b5df63cd4ccacd830fa098cfa735aa31358695bdc6675da844f8",
+      "after_sha256": "130c91bcc173640eae41ae3ea0e6b63ac70a49a059071f6ecbc930c0a7ea2297",
+      "owners": {
+        "@document": {
+          "before": "7ab2e78e1d70b5df63cd4ccacd830fa098cfa735aa31358695bdc6675da844f8",
+          "after": "130c91bcc173640eae41ae3ea0e6b63ac70a49a059071f6ecbc930c0a7ea2297"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "371eeecf6e00644167d4bbb3c13652fa651e5b48c5a8a0e716324fb5f79fd7b2",
-      "after_sha256": "eb240368dbd9158fa59565da15b6d1cc6602bdc40f9d1de705c085a66fc9d889",
+      "before_sha256": "eb240368dbd9158fa59565da15b6d1cc6602bdc40f9d1de705c085a66fc9d889",
+      "after_sha256": "f21290274165fb885a12102d81a7b0630eb0968d7c4b6a5dc07c2e790efd7abd",
       "owners": {
         "@document": {
-          "before": "371eeecf6e00644167d4bbb3c13652fa651e5b48c5a8a0e716324fb5f79fd7b2",
-          "after": "eb240368dbd9158fa59565da15b6d1cc6602bdc40f9d1de705c085a66fc9d889"
+          "before": "eb240368dbd9158fa59565da15b6d1cc6602bdc40f9d1de705c085a66fc9d889",
+          "after": "f21290274165fb885a12102d81a7b0630eb0968d7c4b6a5dc07c2e790efd7abd"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "063d55288bf9909894518e79616a7277f2be8ff577826d031682db2687b97ea9",
-      "after_sha256": "f2916a20ebefcb3815611a5edaa7892395859edd14552ffe62085e8001272018",
+      "before_sha256": "f2916a20ebefcb3815611a5edaa7892395859edd14552ffe62085e8001272018",
+      "after_sha256": "a1ed5bbfbc3649d3e6dc26f2eedeba5403a609b4e5c2e360da1700c0576f4057",
       "owners": {
         "@document": {
-          "before": "063d55288bf9909894518e79616a7277f2be8ff577826d031682db2687b97ea9",
-          "after": "f2916a20ebefcb3815611a5edaa7892395859edd14552ffe62085e8001272018"
+          "before": "f2916a20ebefcb3815611a5edaa7892395859edd14552ffe62085e8001272018",
+          "after": "a1ed5bbfbc3649d3e6dc26f2eedeba5403a609b4e5c2e360da1700c0576f4057"
         }
       }
     },
-    "src/warhammer40k_core/engine/shooting_targets.py": {
-      "before_sha256": "a3307db53454734da9d71987e47f139362d3cda6628c25c092e2e66ea16de6ce",
-      "after_sha256": "1411582e5bbabd9a5dc44ec6647ec29b90f3779ec43f7b802c5064ac74e7fc75",
+    "src/warhammer40k_core/engine/attack_sequence_hazardous.py": {
+      "before_sha256": "25f64be8aaa39b0846136be0749744d2777becee10f33be15beedf25299fd693",
+      "after_sha256": "7c014cafc80fe4063412be1bfdda15a0635b17f12332eedf6d580b02ee92a9da",
       "owners": {
-        "_LineOfSightRangeEvidence": {
-          "before": "790c5b6ceb1fce48128450f85b54131cdd1854ab7c49a8afd4be74e68ccf4a57",
-          "after": "1fccecb8d8464286b49c75ddeca4ef17a49f808fbccaa422c25ae3de375c2ddb"
-        },
-        "_best_line_of_sight_range_evidence": {
-          "before": "b9a9a40de3c6fc2488018be0bc2933b7b34e9a2db5e1d3958adbb0ebe889d517",
-          "after": "1fa1554762f3efb3380772c98149e9b9d04e5b94d2b20f3400ce96a606eed599"
-        },
-        "_plunging_fire_applies": {
-          "before": "8194979e88bc6ee42c5cb3d304a58fdca6b7c87d1c100adb19ca4ce66b949914",
-          "after": "73fedf47d1520bd69c57daae6771fd3421db614c11f0fc7e30482b75b3b16fea"
-        },
-        "_target_candidate": {
-          "before": "55e62d0a0fc0dc16566d4d6fb7baedffa1b82df715529158a93cc60ff87e7cc1",
-          "after": "90bbe593b2c3dbe4fb7415feb252573c08ebec472b49efa2d4a603679a2c0775"
+        "_hazardous_mortal_wounds_for_attacker": {
+          "before": "58c8f740b577c2096b7f3cae0c3a209a084c66adbfabb9dbd913af879f53ebb0",
+          "after": "0a097f6a040a18dca15423f3cd9d2d39706c751ff1c24a24acfb91be58c4d852"
         }
       }
     },
-    "tests/code_quality/test_order97_inventory.py": {
-      "before_sha256": "cd3e257be956f62d995210d6b137097156bb2849ae12fddb870384d1994db6d4",
-      "after_sha256": "a98f3cd6d26fd7428180437ee00cdaf19754d41200c93d31a8d1fe47b79ec2fb",
+    "src/warhammer40k_core/engine/emergency_disembark.py": {
+      "before_sha256": "2614600a4f7ebbec8f310e749d35ed40b4c0ad56a46b28cb08f419758ca6c642",
+      "after_sha256": "2657ee3c4c3aa0f06d706c7203b53e0225031ff3a57fb586f124f6f058f808ad",
+      "owners": {
+        "_rules_unit_hazard_mortal_wounds_per_failed_roll": {
+          "before": "d90c8dfac074a87fda77b976c9a58711447c765909ab8686ecc093fd654ecccf",
+          "after": null
+        },
+        "resolve_destroyed_transport_rules_unit_hazard_rolls_service": {
+          "before": "8dc85934886e8546a40e8872ff0011eadc3c2b917b5a63174f28ba924e8c2fcd",
+          "after": "05d5e6a274b082fcad0bbf73de282e33e326c6549e10ea777ad1f8ac189cbd37"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/hazard.py": {
+      "before_sha256": "4edeae38b8df7473d34245d25ee263ac1f367a7d1db8611bffc7500a8a7d9bdc",
+      "after_sha256": "b25a78e39bd761540141589e634c7ef63ba9f8ad7f50cb64ca81fb04e8b5a4ef",
       "owners": {
         "@module": {
-          "before": "aa05a8ad70e0bfee3925c989f8be4347c02fa924859b445adb4ef281f0af49ee",
-          "after": "8239bc607792c6218f57547453a7d42d3afa8d32ed9d904c85f952d4f621bae3"
+          "before": "37196d3ccd4e934c9859d9436fec08cc47e7985ca6337f23206406dfff28ecef",
+          "after": "262eda8b29b0f53e55adc4e7b53b6458c4d04f01a009f268c03666f3b4ad7c57"
         },
-        "test_original_assertions_remain_exact_and_fail_closed": {
-          "before": "e9aa176168f08a9e839d853d0541a3e123950eac2b80d29537551c0f5ecd2df9",
-          "after": "629d384dd5a994a7bc91f2be6174021381d6a12d4c8aecd102f3ea01169e8213"
+        "_canonical_keyword": {
+          "before": "214e49807492cc19d87dbabcb90c21408b222549431b6f3087d785fc61e17cba",
+          "after": null
+        },
+        "hazard_mortal_wounds_per_failed_roll": {
+          "before": "707bc16c9da49eafe108baabbbc1309b63478f2c225d5ef652d69ff56d1b68f9",
+          "after": "98398e37863f73f8d13594c0f3369b94c0655c8aab18a9ecc260357ab4854e29"
         }
       }
     },
-    "tests/integration/test_retained_shooting.py": {
-      "before_sha256": "bd7df29729ad3b7357cab2ed49eba427bfa838492e5916f92411b057297228cf",
-      "after_sha256": "01b0ae41c5cc85b342352a61932ea962e281a750ea258a2c1cee579bb73f8dac",
+    "src/warhammer40k_core/engine/phases/movement_rules_unit_disembark.py": {
+      "before_sha256": "0edf1974b5e7f7c4fc5b33f01da9e119974fcad135d135c2f84cafaf27653c48",
+      "after_sha256": "e99226ebe0ddd7012a9adfc0cbc130c13b2954383cd1fd6011d69f5a78ce06d7",
       "owners": {
-        "test_order_30_for_the_chapter_shoots_after_own_hazardous_death": {
-          "before": "809da172101e0b96b9f19315454cb32b588530d541142d4b5b88435b9c6ac993",
-          "after": "c7590e3c9c7498df07b07bfedd25f7245004bac44e36651b2e7f7d7e9b7769a1"
+        "@module": {
+          "before": "4e9f9661d5643ea1737ae9d5a63e21e8d893a83d259b439e84e8f162255ce8f1",
+          "after": "3c078e6ac9a65d6be4a97d1a58bb90732ed9d987624fa4e0e358c87130539175"
+        },
+        "_resolve_rules_unit_combat_components": {
+          "before": "3efd25d57ae9ea11f6de8110bc65ff6fded629efdc2794770b0883d1dfb67d4c",
+          "after": "5829555b3f0adb4cd47441d509755468a04efaccf2509dc6053c505d5d1cbba5"
         }
       }
     },
-    "tests/range_visibility_helpers.py": {
+    "tests/code_quality/test_order105_hazard_authority.py": {
       "before_sha256": null,
-      "after_sha256": "6cfca9539c2ade432fd83125ca1976ed708ec6ffba51c5cd6d50e7a725ad65d4",
+      "after_sha256": "3b27864bdeb429160b8528edaac1c6d397459cecffe325151fda10b8a417cd38",
       "owners": {
         "@module": {
           "before": null,
-          "after": "a77da4817b29647c2be7ef909bf9e4c67b50b4e2e5bcf7cd659d78f7342e1ce6"
+          "after": "e81d795bd22259c8207046241c44abe01fbcca74545b665321e4854c71ed7efe"
         },
-        "range_visibility_scene": {
+        "test_hazard_consumers_share_model_count_authority": {
           "before": null,
-          "after": "1569623391bca253edd47882c7f4639fb1d5fa241eaeede45581d8b363315c98"
+          "after": "c5a2b24cb39cb535f6e915f7bb6509681310af5ccca6e310c112a3a939d5e44d"
         }
       }
     },
-    "tests/unit/test_order104_range_visibility.py": {
+    "tests/hazard_all_models_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "65825ef84e39edb7eca7b40042a2e22a715787d7a10763971041e699e1f8ff05",
+      "after_sha256": "8285d320137f18abb72c2076d3930216f050804294646ac93d60df63a541bd09",
       "owners": {
         "@module": {
           "before": null,
-          "after": "e9057cd7f9d02da64ccdb29c3a45bca1c59b340df4f124f62ef4af0bae86182b"
+          "after": "8905cd32d4959932889a7ffa3fc0ca6f86940396019a4556084170bf720a78a5"
         },
-        "test_detection_and_visibility_remain_required": {
+        "hazard_scene": {
           "before": null,
-          "after": "fa410f04385c2bf45378a939d5a5e494068ef0016bc07ecc8584b471ec523e60"
+          "after": "140fce27b6e16cc20bc3af59945a3dca117d7e5b263b5d852dfd8f2fadc41107"
+        }
+      }
+    },
+    "tests/unit/test_order105_hazard.py": {
+      "before_sha256": null,
+      "after_sha256": "07f2e2108496f655231b0d118df3faa844a4439535e93333af8829ef945887fc",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "671683126fa15e189246f13268106fd3fefb48a1c9dad3c747bbaa62e54cac73"
         },
-        "test_different_enemy_units_cannot_combine_range_and_visibility": {
+        "test_attached_combat_hazard_counts_the_whole_unit": {
           "before": null,
-          "after": "210e676b6a25cbb8c01af7c4f502f90737766a03db0fe0a5fe85ffb0b8873fe2"
+          "after": "e63d6f192d1737e55dc51a7e3fadafb5c5e9f8cce177923c30e0614849891ce5"
         },
-        "test_facade_accepts_separate_witnesses_with_restore_continuation_and_replay": {
+        "test_each_large_model_qualifies_even_with_additional_infantry_keyword": {
           "before": null,
-          "after": "334eca76f2b6c73e9df6ef01b7c0e72e8eb9031fefc0811986ba46137e6a32e9"
+          "after": "02b8304429e3808ca9fab49dcd02dc540cc7bd6457feafe1066a9fabcd1f8062"
         },
-        "test_hidden_near_model_still_supplies_rapid_fire_half_range": {
+        "test_mixed_emergency_hazard_resolves_complete_cargo": {
           "before": null,
-          "after": "59a46493104ff7f43992b0c25b2462357a5519c006c0ca0373a1ce510239537f"
+          "after": "da4ca28b4e329f8086e022a332950a45d92036203f8c2a916bfb95cc801a0b40"
         },
-        "test_range_and_visibility_use_independent_models_with_complete_witnesses": {
+        "test_mixed_hazardous_facade_restore_and_replay": {
           "before": null,
-          "after": "e949fd4aee00296017b618536f7ba8246380ed52b8c8d1700688b8e466a94c1a"
+          "after": "bcc8a22c75550139a6fb13780be34405f4ee1da593a9c1e40e99e6eb7d7791ea"
         },
-        "test_visibility_does_not_replace_required_weapon_range": {
+        "test_mixed_model_hazard_uses_every_model": {
           "before": null,
-          "after": "616083ca6b6718b7cd8649648e77b9a908ace28fce54019e9382318fd5fa63b4"
+          "after": "d27222b54cabbfeac5d5be4d55abdca3034fd84f9f45a96eba4fb872528ec186"
+        },
+        "test_removed_ordinary_models_do_not_supply_current_hazard_keywords": {
+          "before": null,
+          "after": "5524ea6da233323c07ffa57191bb6033abd55b0dd7673252a55f8014439b5401"
+        },
+        "test_rules_present_retained_model_keeps_its_own_hazard_keywords": {
+          "before": null,
+          "after": "995affb4628fde4694d5d4b8437ed78930c3589bebf1bf9c2afe34880e2cdf00"
         }
       }
     },
     "tests/unit/test_phase13b_shooting_declarations.py": {
-      "before_sha256": "7058214ec9f8540a5ca78a9b2a3150954c2d676838ba6d464e04cd50e997b238",
-      "after_sha256": "7f3db2643ba583f649f989b05054f928731fe456c9e08d6b958706cb48b700ab",
+      "before_sha256": "7f3db2643ba583f649f989b05054f928731fe456c9e08d6b958706cb48b700ab",
+      "after_sha256": "cf6ef7d483e90543ce905adf1e53a80d3417f7d26844286b348230c2447d1563",
       "owners": {
-        "test_phase13e_mixed_fight_on_death_target_replays_geometry_and_living_allocation": {
-          "before": "b2fa00bb409aef9ab13dac75d6c3cee5eb663a0d683dc52f80d3a2c778240d16",
-          "after": "caf109a0da214e7e373616f10897964cc6f416bfa9ac9bff0f1342c0c3cf571d"
-        }
-      }
-    },
-    "tests/unit/test_phase13b_shooting_phase_declarations.py": {
-      "before_sha256": "eb2288b80e5a93ec2f5d644988ccbb5f045947d2937137d43da6880e2b9c1837",
-      "after_sha256": "fccb77a79c0cc9d8413f4a87dcc32065fbb92a2e1fe376bf801fca5640b97b9e",
-      "owners": {
-        "test_retained_base_alone_establishes_mixed_target_engagement_context": {
-          "before": "fb206bd389dbc5f6f7e00fac84bcef365034109ff64ec9e4b271b1bb44e2fe96",
-          "after": "10ab17f76a351c8de252a25174a3e8620b74bd0d1d765563f13a51df4a3bbf05"
-        }
-      }
-    },
-    "tools/core_rules_order97_history.py": {
-      "before_sha256": "b7aaffafb2109364f65262bdb23d3e0470692e1a9cd58ce6945060836d16ef4c",
-      "after_sha256": "ee913d8989627a04e1c5df2e1da430935e2b3fb46185e8036ebfa7bd650dc2e8",
-      "owners": {
-        "@module": {
-          "before": "51fd0365ac20032ff718fed47fd7f24e5fc621c1351febaa49b5da8ee4f7474d",
-          "after": "2097289ee79c088cf907f05da9c98b5cbd8d6cd99764de9cd0710f8c4c94c7c5"
-        },
-        "historical_evidence_path": {
-          "before": "3215bddafa5fac07041c91ad2fb1eb4f990124fdcc0463737917f8de495b4c34",
-          "after": "9e68f5ddd645dae89c28266572f2a229da76c1627166d26b35611623ed9b9d42"
+        "test_phase13d_hazardous_tests_resolve_after_all_attacks": {
+          "before": "d5f16ae07bb0e966d1860cfb574172f0dc1e22f132d0a1d03ae783820b370c48",
+          "after": "49037f99268102277e31751962416ff40f42990af108edcba81320966016ff59"
         }
       }
     }
@@ -428,165 +412,178 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
         "issue533-client-regressions",
-        "order104-client-regressions"
+        "order104-client-regressions",
+        "order105-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
         "issue533-client-regressions",
-        "order104-client-regressions"
+        "order104-client-regressions",
+        "order105-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
         "issue533-client-regressions",
-        "order104-client-regressions"
+        "order104-client-regressions",
+        "order105-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
         "issue533-client-regressions",
-        "order104-client-regressions"
+        "order104-client-regressions",
+        "order105-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
         "issue533-client-regressions",
-        "order104-client-regressions"
+        "order104-client-regressions",
+        "order105-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
         "issue533-client-regressions",
-        "order104-client-regressions"
+        "order104-client-regressions",
+        "order105-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
         "issue533-client-regressions",
-        "order104-client-regressions"
+        "order104-client-regressions",
+        "order105-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
         "issue533-client-regressions",
-        "order104-client-regressions"
+        "order104-client-regressions",
+        "order105-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
         "issue533-client-regressions",
-        "order104-client-regressions"
+        "order104-client-regressions",
+        "order105-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
         "issue533-client-regressions",
-        "order104-client-regressions"
+        "order104-client-regressions",
+        "order105-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
         "issue533-client-regressions",
-        "order104-client-regressions"
+        "order104-client-regressions",
+        "order105-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
         "issue533-client-regressions",
-        "order104-client-regressions"
+        "order104-client-regressions",
+        "order105-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory",
         "issue533-client-regressions",
-        "order104-client-regressions"
+        "order104-client-regressions",
+        "order105-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -595,12 +592,13 @@
         "issue532-contract44-publication",
         "issue533-contract-publication",
         "order103-contract-publication",
-        "order104-contract-publication"
+        "order104-contract-publication",
+        "order105-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -609,12 +607,13 @@
         "issue532-contract44-publication",
         "issue533-contract-publication",
         "order103-contract-publication",
-        "order104-contract-publication"
+        "order104-contract-publication",
+        "order105-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -623,12 +622,13 @@
         "issue532-contract44-publication",
         "issue533-contract-publication",
         "order103-contract-publication",
-        "order104-contract-publication"
+        "order104-contract-publication",
+        "order105-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -637,12 +637,13 @@
         "issue532-contract44-publication",
         "issue533-contract-publication",
         "order103-contract-publication",
-        "order104-contract-publication"
+        "order104-contract-publication",
+        "order105-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -651,12 +652,13 @@
         "issue532-contract44-publication",
         "issue533-contract-publication",
         "order103-contract-publication",
-        "order104-contract-publication"
+        "order104-contract-publication",
+        "order105-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -665,12 +667,13 @@
         "issue532-contract44-publication",
         "issue533-contract-publication",
         "order103-contract-publication",
-        "order104-contract-publication"
+        "order104-contract-publication",
+        "order105-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -679,12 +682,13 @@
         "issue532-contract44-publication",
         "issue533-contract-publication",
         "order103-contract-publication",
-        "order104-contract-publication"
+        "order104-contract-publication",
+        "order105-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -693,64 +697,45 @@
         "issue532-contract44-publication",
         "issue533-contract-publication",
         "order103-contract-publication",
-        "order104-contract-publication"
+        "order104-contract-publication",
+        "order105-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
-    },
-    "data/source_audits/order104/baseline/tests/unit/test_phase13b_shooting_phase_declarations.py.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "order104-historical-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
-    },
-    "data/source_audits/order104/historical-inputs.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "order104-historical-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
-    },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
-    "docs/ORDER_104_SCOPE_PLAN.md": {
+    "docs/ORDER_105_SCOPE_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+    },
+    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -758,91 +743,90 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
-    "src/warhammer40k_core/engine/shooting_targets.py": {
+    "src/warhammer40k_core/engine/attack_sequence_hazardous.py": {
       "category": "rule_semantics",
       "operations": [
-        "order104-range-visibility-authority"
+        "order105-hazard-all-models-authority"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
-    "tests/code_quality/test_order97_inventory.py": {
+    "src/warhammer40k_core/engine/emergency_disembark.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order105-hazard-all-models-authority",
+        "transport-rule-branch"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+    },
+    "src/warhammer40k_core/engine/hazard.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order105-hazard-all-models-authority"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+    },
+    "src/warhammer40k_core/engine/phases/movement_rules_unit_disembark.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "movement-rule-branch",
+        "order105-hazard-all-models-authority",
+        "transport-rule-branch"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+    },
+    "tests/code_quality/test_order105_hazard_authority.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
-    "tests/integration/test_retained_shooting.py": {
+    "tests/hazard_all_models_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "order103-tests-integration-test_retained_shooting",
-        "order104-client-regressions"
+        "order105-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
-    "tests/range_visibility_helpers.py": {
+    "tests/unit/test_order105_hazard.py": {
       "category": "rule_semantics",
       "operations": [
-        "order104-client-regressions"
+        "order105-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
-    },
-    "tests/unit/test_order104_range_visibility.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order104-client-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     },
     "tests/unit/test_phase13b_shooting_declarations.py": {
       "category": "rule_semantics",
       "operations": [
-        "order104-client-regressions"
+        "order105-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
-    },
-    "tests/unit/test_phase13b_shooting_phase_declarations.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order104-client-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
-    },
-    "tools/core_rules_order97_history.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue534-order97-history",
-        "issue535-order97-history",
-        "order104-historical-evidence",
-        "shock-source-generation-and-audit"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Order104 targeting semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order104/P04H/C04-09 applies faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01: different models in one canonical target rules unit may satisfy weapon range and bearer visibility; retain complete evidence and shared ordinary/reaction authority.",
-      "unchanged_work": "The existing target loop, range queries, complete LOS resolution, cover and cache owners remain in place. Per-observer evidence keeps the independent range and eligible visibility tuples rather than intersecting them. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
+      "rationale": "Bounded Order105 Hazard wound-count semantics repair and required runtime identity publication. Owner-approved sequential review policy selects serial smoke for this semantic change; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order105/P06D/C06-04 applies 06.03-obligation-04: three Hazard mortal wounds require every rules-present model to be MONSTER or VEHICLE; preserve one wound for mixed Infantry/Vehicle units and shared attack/transport authority.",
+      "unchanged_work": "The existing unit/model traversal, simultaneous rolls, mortal-wound allocation, transport placement, persistence and replay owners remain in place. A shared each-model keyword predicate replaces unit unions and component-derived count combinations. This adds no geometry algorithm, cache policy, serialization traversal or deliberate performance change. Current serial live smoke and complete semantic/work/cache controls remain mandatory; no historical benchmark refresh is selected solely for a changed runtime ID."
     }
   },
   "milestone": "ordinary",

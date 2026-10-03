@@ -2058,6 +2058,82 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order105-hazard-all-models-authority": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_sequence_hazardous.py",
+        "src/warhammer40k_core/engine/emergency_disembark.py",
+        "src/warhammer40k_core/engine/hazard.py",
+        "src/warhammer40k_core/engine/phases/movement_rules_unit_disembark.py"
+      ],
+      "owners": [
+        "@module",
+        "_canonical_keyword",
+        "_hazardous_mortal_wounds_for_attacker",
+        "_resolve_rules_unit_combat_components",
+        "_rules_unit_hazard_mortal_wounds_per_failed_roll",
+        "hazard_mortal_wounds_per_failed_roll",
+        "resolve_destroyed_transport_rules_unit_hazard_rolls_service"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order105-contract-publication": {
+      "paths": [
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order105-client-regressions": {
+      "paths": [
+        "ci/test_shards/durations.json",
+        "ci/test_shards/shard-1.txt",
+        "ci/test_shards/shard-10.txt",
+        "ci/test_shards/shard-11.txt",
+        "ci/test_shards/shard-12.txt",
+        "ci/test_shards/shard-2.txt",
+        "ci/test_shards/shard-3.txt",
+        "ci/test_shards/shard-4.txt",
+        "ci/test_shards/shard-5.txt",
+        "ci/test_shards/shard-6.txt",
+        "ci/test_shards/shard-7.txt",
+        "ci/test_shards/shard-8.txt",
+        "ci/test_shards/shard-9.txt",
+        "tests/code_quality/test_order105_hazard_authority.py",
+        "tests/hazard_all_models_helpers.py",
+        "tests/unit/test_order105_hazard.py",
+        "tests/unit/test_phase13b_shooting_declarations.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "hazard_scene",
+        "test_attached_combat_hazard_counts_the_whole_unit",
+        "test_each_large_model_qualifies_even_with_additional_infantry_keyword",
+        "test_hazard_consumers_share_model_count_authority",
+        "test_mixed_emergency_hazard_resolves_complete_cargo",
+        "test_mixed_hazardous_facade_restore_and_replay",
+        "test_mixed_model_hazard_uses_every_model",
+        "test_phase13d_hazardous_tests_resolve_after_all_attacks",
+        "test_removed_ordinary_models_do_not_supply_current_hazard_keywords",
+        "test_rules_present_retained_model_keeps_its_own_hazard_keywords"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

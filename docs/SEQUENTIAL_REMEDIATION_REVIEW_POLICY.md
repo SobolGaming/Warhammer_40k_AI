@@ -70,6 +70,14 @@ consumer paths, supported input boundaries, pending checks and exact base/head.
 Reviewers derive requirements from that evidence rather than treating the author's
 conclusions as approval.
 
+## Roadmap completion record
+
+Every implementation PR must update its own Orders-table **How it is currently
+done** cell in `CORE_RULES_REMEDIATION_ROADMAP.md` before the final input freeze.
+Replace generic audit-gap text with the concrete prior behavior and the resulting
+shared implementation, grounded in the scoped source, code and tests. Preserve
+unrelated table content and carry this requirement into the next-order handoff.
+
 ## Subsequent-order model plan and evaluation
 
 The owner's subsequent direction supersedes the earlier Sol High/Ultra plan:
