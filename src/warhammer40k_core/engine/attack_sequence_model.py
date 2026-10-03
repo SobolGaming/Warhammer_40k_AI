@@ -530,15 +530,21 @@ class HitRoll:
             raise GameLifecycleError("HitRoll raw face does not match its dice state.")
         if self.final_roll != max(1, self.unmodified_roll + self.capped_modifier):
             raise GameLifecycleError("HitRoll final roll does not match its modifier trace.")
-        expected_critical = critical_rule.matches(self.unmodified_roll)
-        unmodified_meets_minimum = (
-            self.unmodified_roll == self.minimum_unmodified_success
-            if self.success_requires_exact
-            else self.unmodified_roll >= self.minimum_unmodified_success
+        from warhammer40k_core.engine.hit_thresholds import HitThresholds, classify_hit_roll
+
+        expected_success, expected_critical = classify_hit_roll(
+            unmodified_roll=self.unmodified_roll,
+            final_roll=self.final_roll,
+            target_number=self.target_number,
+            thresholds=HitThresholds(
+                self.minimum_unmodified_success,
+                critical_rule.value,
+                self.threshold_source_ids,
+                self.critical_is_threshold,
+                self.success_requires_exact,
+            ),
+            unmodified_success_threshold_active=threshold_flag,
         )
-        threshold_success = threshold_flag and unmodified_meets_minimum
-        target_success = unmodified_meets_minimum and self.final_roll >= self.target_number
-        expected_success = expected_critical or threshold_success or target_success
         if self.successful != expected_success:
             raise GameLifecycleError("HitRoll success flag does not match roll semantics.")
         if self.critical != expected_critical:

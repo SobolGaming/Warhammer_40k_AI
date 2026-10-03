@@ -6,9 +6,13 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from tools import v963_snap_source as snap  # noqa: E402
+
 ARTIFACT_PATH = (
     ROOT
     / "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_critical_hits_2026_09/artifacts/package.json"
@@ -16,7 +20,7 @@ ARTIFACT_PATH = (
 AUDIT_PATH = ROOT / "data/source_audits/maintained_app_mirrors/critical_hits_2026_09_13.audit.json"
 POLICY = "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02"
 PACKAGE_ID = "gw-11e-core-critical-hits"
-VERSION = "maintained-app-mirrors-observed-2026-09-13"
+VERSION = "maintained-app-mirrors-observed-2026-10-01"
 OBSERVED_AT = "2026-09-13T00:36:53+00:00"
 AUDIT_ID = "core-critical-hits-maintained-app-mirrors-2026-09-13"
 RULES = (
@@ -140,6 +144,67 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
         )
         evidence.append(review)
         evidence.append(row)
+    source_text = snap.source_text()
+    consumers = [
+        "warhammer40k_core.engine.hit_thresholds:resolve_hit_thresholds",
+        "warhammer40k_core.engine.hit_thresholds:classify_hit_roll",
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit",
+        "warhammer40k_core.engine.attack_sequence_model:HitRoll",
+    ]
+    rules.append(
+        {
+            "source_id": snap.SOURCE_ID,
+            "section_id": "15.09 current observation",
+            "source_text": source_text,
+            "transcription_sha256": hashlib.sha256(source_text.encode()).hexdigest(),
+            "load_support_status": "loaded",
+            "semantic_execution_status": "executable_engine_runtime",
+            "runtime_consumer_ids": consumers,
+        }
+    )
+    current = {
+        **evidence[1],
+        "evidence_id": "core-snap-shooting-mirror:current-observation",
+        "rule_source_id": snap.SOURCE_ID,
+        "review_audit_id": snap.AUDIT_ID,
+        "review_audit_row_id": snap.ROW_ID,
+        "review_audit_source_observation_sha256": snap.audit_row()["source_observation_sha256"],
+        "source_title": "Game Datamissions complete 15.09 Snap Shooting",
+        "source_url": snap.SOURCE_URL,
+        "observed_at": snap.OBSERVED_AT,
+        "app_version": None,
+        "capture_artifact_path": None,
+        "capture_sha256": None,
+        "transcription_sha256": hashlib.sha256(source_text.encode()).hexdigest(),
+        "runtime_consumer_ids": consumers,
+        "observation_sha256": "",
+    }
+    current["observation_sha256"] = _hash(
+        {
+            **current,
+            "load_support_status": "not_loaded",
+            "semantic_execution_status": "not_certified",
+            "runtime_consumer_ids": [],
+        }
+    )
+    review = {
+        **evidence[0],
+        "evidence_id": "core-snap-shooting-review:current-observation",
+        "rule_source_id": snap.SOURCE_ID,
+        "source_title": "Reviewed complete 15.09 Snap Shooting transcription",
+        "transcription_sha256": hashlib.sha256(source_text.encode()).hexdigest(),
+        "runtime_consumer_ids": consumers,
+        "observation_sha256": "",
+    }
+    review["observation_sha256"] = _hash(
+        {
+            **review,
+            "load_support_status": "not_loaded",
+            "semantic_execution_status": "not_certified",
+            "runtime_consumer_ids": [],
+        }
+    )
+    evidence.extend((review, current))
     artifact: dict[str, object] = {
         "artifact_schema": "core-v2-core-critical-hits-source-v1",
         "source_package_id": PACKAGE_ID,
@@ -167,7 +232,19 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-    for path, payload in zip((ARTIFACT_PATH, AUDIT_PATH), build_payloads(), strict=True):
+    artifact, historical_audit = build_payloads()
+    current_audit = {
+        "audit_id": snap.AUDIT_ID,
+        "rows": [snap.audit_row()],
+        "source_authority": "project_authoritative_app_mirror",
+        "version_qualification": "Complete retained live body observed at the stated timestamp; no live-body App version asserted. V963 identifies the change separately; v931 FAQ evidence is retained unchanged.",
+        "selected_record": snap.selected_record(),
+    }
+    for path, payload in (
+        (ARTIFACT_PATH, artifact),
+        (AUDIT_PATH, historical_audit),
+        (ROOT / "data/source_audits/v963_snap/source.audit.json", current_audit),
+    ):
         raw = (json.dumps(payload, indent=2, ensure_ascii=False) + "\n").encode()
         if args.check:
             if path.read_bytes() != raw:

@@ -1,0 +1,44 @@
+{
+  "reviewed_commit": "8007555ef23e85c11d39b294acec02bd83fc3271",
+  "also_present_at_base": "d6989dd266abc0e5d8e8f7de90020f9eddace1a7",
+  "purpose": "Retain the original Order97 source and Snap critical-six assertions as historical facts, not current V963-SNAP compliance.",
+  "current_evidence": "docs/V963_SNAP_SCOPE_PLAN.md",
+  "files": [
+    {
+      "path": "tests/unit/test_critical_hits.py",
+      "historical_path": "data/source_audits/v963_snap/baseline/tests/unit/test_critical_hits.py.txt",
+      "git_revision": "8007555ef23e85c11d39b294acec02bd83fc3271",
+      "git_path": "tests/unit/test_critical_hits.py",
+      "sha256": "bd7ebe4e8384476ff252f4c5b14d58ef8aadba25d2d6a60655c488c6767759b7",
+      "bytes": 18406,
+      "order97_file_pin": "bd7ebe4e8384476ff252f4c5b14d58ef8aadba25d2d6a60655c488c6767759b7"
+    },
+    {
+      "path": "tests/unit/test_lethal_hits.py",
+      "historical_path": "data/source_audits/v963_snap/baseline/tests/unit/test_lethal_hits.py.txt",
+      "git_revision": "8007555ef23e85c11d39b294acec02bd83fc3271",
+      "git_path": "tests/unit/test_lethal_hits.py",
+      "sha256": "e1420132cd93943381e99b7f3ffd789ac834ba3a78e1ebbc61f4c1193b3b2ca5",
+      "bytes": 22456,
+      "order97_file_pin": "e1420132cd93943381e99b7f3ffd789ac834ba3a78e1ebbc61f4c1193b3b2ca5"
+    },
+    {
+      "path": "tests/fire_overwatch_helpers.py",
+      "historical_path": "data/source_audits/v963_snap/baseline/tests/fire_overwatch_helpers.py.txt",
+      "git_revision": "8007555ef23e85c11d39b294acec02bd83fc3271",
+      "git_path": "tests/fire_overwatch_helpers.py",
+      "sha256": "c1ebdfd064847148314f460855e344971b15f106fab48301ed6bf5712686c727",
+      "bytes": 9357,
+      "order97_file_pin": "c1ebdfd064847148314f460855e344971b15f106fab48301ed6bf5712686c727"
+    },
+    {
+      "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_critical_hits_2026_09/artifacts/package.json",
+      "historical_path": "data/source_audits/v963_snap/baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_critical_hits_2026_09/artifacts/package.json.txt",
+      "git_revision": "8007555ef23e85c11d39b294acec02bd83fc3271",
+      "git_path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_critical_hits_2026_09/artifacts/package.json",
+      "sha256": "d4e25297d34f21a9f3b504b78eb010f9c667914a87d6332a4c9a72bb4ca3badb",
+      "bytes": 7868,
+      "order97_file_pin": null
+    }
+  ]
+}

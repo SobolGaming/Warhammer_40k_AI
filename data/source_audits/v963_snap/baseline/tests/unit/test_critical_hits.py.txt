@@ -17,8 +17,8 @@ def test_critical_hits_respect_raw_faces_and_mode_floors(
 ) -> None:
     hit = hit_roll(raw=raw, mode=mode, modifier=modifier)
     threshold = 6 if mode in {"snap", "overwatch", "indirect"} else 4
-    critical = mode not in {"snap", "overwatch"} and raw >= threshold
-    expected = (raw == 6 if mode in {"snap", "overwatch"} else critical) or (
+    critical = raw >= threshold
+    expected = critical or (
         mode == "normal" and raw != 1 and max(1, raw + max(-1, min(1, modifier))) >= 5
     )
     assert hit.critical is critical
@@ -37,35 +37,8 @@ def test_snap_ignores_generic_threshold_but_accepts_explicit_permission(
     explicit = hit_roll(raw=4, mode=mode, status=status, explicit_snap=True)
     assert not ordinary.successful
     assert not ordinary.critical
-    assert explicit.successful is (status == "minimum_unmodified_hit_success")
-    assert not explicit.critical
-
-
-@pytest.mark.parametrize("mode", ["snap", "overwatch"])
-@pytest.mark.parametrize("modifier", [-3, 0, 3])
-@pytest.mark.parametrize("sustained", [1, 2, "D3"])
-@pytest.mark.parametrize("explicit", [False, True])
-def test_v963_snap_six_is_an_ordinary_hit_without_sustained_triggers(
-    mode: str, modifier: int, sustained: int | str, explicit: bool
-) -> None:
-    from warhammer40k_core.core.weapon_profiles import AbilityDescriptor, WeaponKeyword
-
-    hit = hit_roll(
-        raw=6,
-        mode=mode,
-        modifier=modifier,
-        explicit_snap=explicit,
-        abilities=(AbilityDescriptor.sustained_hits(sustained), AbilityDescriptor.lethal_hits()),
-        keywords=(WeaponKeyword.SUSTAINED_HITS, WeaponKeyword.LETHAL_HITS),
-    )
-    assert hit.successful
-    assert not hit.critical
-    assert hit.generated_hits == 1
-    assert hit.roll_state is not None
-    assert hit.roll_state.original_result.spec.reroll_forbidden_rule_ids
-    assert HitRoll.from_payload(hit.to_payload()) == hit
-    with pytest.raises(GameLifecycleError, match="critical flag"):
-        replace(hit, critical=True)
+    assert explicit.successful
+    assert explicit.critical is (status == "critical_hit_threshold")
 
 
 def test_melee_uses_the_same_critical_success_authority() -> None:
@@ -348,7 +321,6 @@ def test_critical_sources_are_pinned_loaded_and_executable() -> None:
     assert tuple(row.source_id for row in artifact.rules) == (
         source.CRITICAL_SUCCESS_SOURCE_ID,
         source.SNAP_CRITICAL_SOURCE_ID,
-        source.SNAP_NO_CRITICAL_SOURCE_ID,
     )
     assert source.source_package().source_catalog.catalog_sha256()
     for row in artifact.rules:
@@ -475,125 +447,13 @@ def test_order84_assigned_hit_reaches_shared_critical_and_trigger_consumers(
 @pytest.mark.parametrize("assigned", [6, 7])
 def test_order84_default_critical_and_snap_require_exact_six(mode: str, assigned: int) -> None:
     hit = hit_roll(raw=2, assigned_value=assigned, mode=mode, grant_threshold=False)
-    assert hit.critical is (assigned == 6 and mode not in {"snap", "overwatch"})
+    assert hit.critical is (assigned == 6)
     assert hit.successful is (assigned == 6 or mode in {"normal", "indirect"})
     assert HitRoll.from_payload(hit.to_payload()) == hit
 
 
 @pytest.mark.parametrize("mode", ["snap", "overwatch"])
-def test_v963_critical_only_snap_threshold_cannot_grant_hits(mode: str) -> None:
+def test_order84_explicit_snap_threshold_accepts_assigned_seven(mode: str) -> None:
     hit = hit_roll(raw=2, assigned_value=7, mode=mode, threshold=6, explicit_snap=True)
-    assert not hit.critical
-    assert not hit.successful
-
-
-@pytest.mark.parametrize("snap", [True, False])
-@pytest.mark.parametrize("random_attacks", [False, True])
-@pytest.mark.parametrize("sustained", [1, "D3"])
-def test_v963_full_resolution_preserves_critical_wounds_restore_fork_and_replay(
-    snap: bool, random_attacks: bool, sustained: int | str
-) -> None:
-    import json
-    from typing import cast
-
-    from tests.fire_overwatch_helpers import choose_shooter, pending_overwatch
-    from tests.lethal_hits_helpers import attack_completed, attack_steps, complete_attack
-    from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
-    from tests.v963_snap_helpers import snap_consumer_session
-
-    from warhammer40k_core.adapters.event_stream import EventStreamCursor
-    from warhammer40k_core.adapters.local_session import LocalGameSession
-    from warhammer40k_core.engine.event_log import JsonValue, canonical_json
-    from warhammer40k_core.engine.phase import LifecycleStatusKind
-    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
-
-    session = snap_consumer_session(
-        snap=snap,
-        random_attacks=random_attacks,
-        sustained=sustained,
-        wound_source="generic" if random_attacks else "anti",
-    )
-    request = pending_overwatch(session) if snap else pending_request(session)
-    initial = session.lifecycle.to_payload()
-    if snap:
-        status = choose_shooter(session, request)
-        assert status.status_kind is not LifecycleStatusKind.INVALID, status
-    # Legal persistence at a pending hit boundary and after full resolution;
-    # forks complete independently through the same declaration/attack path.
-    fork = None
-    checkpointed = False
-    for _ in range(150):
-        if attack_completed(session):
-            break
-        request = pending_request(session)
-        if not checkpointed and attack_steps(session, "hit"):
-            checkpoint = json.loads(canonical_json(session.to_persistence_payload()))
-            restored = LocalGameSession.from_persistence_payload(checkpoint)
-            assert restored.to_persistence_payload() == session.to_persistence_payload()
-            for viewer in ("player-a", "player-b"):
-                assert restored.view(viewer_player_id=viewer) == session.view(
-                    viewer_player_id=viewer
-                )
-            checkpointed = True
-        if fork is None:
-            fork = session.fork()
-            untouched = session.lifecycle.to_payload()
-            complete_attack(fork, choice="roll-to-wound")
-            assert session.lifecycle.to_payload() == untouched
-        if request.decision_type == "select_lethal_hit_wound":
-            assert not snap
-            status = session.submit_option(
-                request_id=request.request_id,
-                result_id=f"{request.request_id}:fixture-choice",
-                option_id="roll-to-wound",
-            )
-            assert status.status_kind is not LifecycleStatusKind.INVALID, status
-        else:
-            submit_fixture_request(session, request)
-    assert attack_completed(session)
-    assert fork is not None
-    assert fork.lifecycle.to_payload() == session.lifecycle.to_payload()
-    hits = [cast(dict[str, JsonValue], row["payload"]) for row in attack_steps(session, "hit")]
-    assert hits
-    assert any(hit["successful"] for hit in hits)
-    if snap:
-        assert all(hit["critical"] is False and hit["generated_hits"] == 1 for hit in hits)
-        assert all(hit["successful"] is (hit["unmodified_roll"] == 6) for hit in hits)
-        assert not attack_steps(session, "critical_hit")
-        assert not any(
-            record.request.decision_type == "select_lethal_hit_wound"
-            for record in session.lifecycle.decision_controller.records
-        )
-        assert not any(
-            event.event_type == "dice_rolled"
-            and isinstance(event.payload, dict)
-            and cast(dict[str, JsonValue], event.payload["spec"])["roll_type"]
-            == "attack_sequence.sustained_hits.generated_hits"
-            for event in session.lifecycle.decision_controller.event_log.records
-        )
-    else:
-        assert attack_steps(session, "critical_hit")
-        assert any(cast(int, hit["generated_hits"]) > 1 for hit in hits)
-        assert any(
-            record.request.decision_type == "select_lethal_hit_wound"
-            for record in session.lifecycle.decision_controller.records
-        )
-    wounds = [cast(dict[str, JsonValue], row["payload"]) for row in attack_steps(session, "wound")]
-    assert any(wound["critical"] is True and wound["skipped"] is False for wound in wounds)
-    assert any(
-        event.event_type == "devastating_wounds_deferred"
-        for event in session.lifecycle.decision_controller.event_log.records
-    )
-    completed = LocalGameSession.from_persistence_payload(session.to_persistence_payload())
-    for viewer in ("player-a", "player-b"):
-        assert completed.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
-        assert completed.events_since(EventStreamCursor(), viewer_player_id=viewer) == (
-            session.events_since(EventStreamCursor(), viewer_player_id=viewer)
-        )
-    artifact = ReplayArtifact.capture(
-        artifact_id="v963-snap",
-        initial_lifecycle_payload=initial,
-        final_lifecycle=session.lifecycle,
-    )
-    result = ReplayRunner.from_payload(artifact.to_payload()).run()
-    assert result.status is ReplayRunStatus.REPRODUCED, result
+    assert hit.critical
+    assert hit.successful

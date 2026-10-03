@@ -47,9 +47,7 @@ def test_choices_devastating_sustained_restore_and_replay(phase: BattlePhase, ch
         assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
     # Fixed legal result identities exercise an original critical wound in each
     # phase without replacing RNG or the engine's decision controller.
-    first_result_id = (
-        "order103-fixture-01-00" if phase is BattlePhase.FIGHT else "order103-fixture-12-00"
-    )
+    first_result_id = "order56:first-choice-2-order64-2"
     for current in (session, restored):
         current.submit_option(
             request_id=request.request_id, result_id=first_result_id, option_id=choice
@@ -199,7 +197,7 @@ def test_noneligible_hits_have_no_lethal_choice(phase: BattlePhase, mode: str) -
     )
 
 
-def test_v963_out_of_phase_snap_has_no_lethal_choice_and_replays() -> None:
+def test_out_of_phase_snap_shooting_choice_uses_attacking_owner_and_replays() -> None:
     from tests.phase13b_shooting_declaration_helpers import _proposal_from_request
 
     from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -285,19 +283,12 @@ def test_v963_out_of_phase_snap_has_no_lethal_choice_and_replays() -> None:
             ).to_payload()
         ),
     )
+    request = reach_lethal_choice(session)
+    assert request.actor_id == "player-a"
     restored = LocalGameSession.from_persistence_payload(session.to_persistence_payload())
     complete_attack(session, choice="roll-to-wound")
     complete_attack(restored, choice="roll-to-wound")
     assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()
-    assert not attack_steps(session, "critical_hit")
-    assert any(
-        isinstance(row["payload"], dict) and row["payload"]["successful"]
-        for row in attack_steps(session, "hit")
-    )
-    assert not any(
-        record.request.decision_type == "select_lethal_hit_wound"
-        for record in session.lifecycle.decision_controller.records
-    )
     artifact = ReplayArtifact.capture(
         artifact_id="order44:overwatch",
         initial_lifecycle_payload=initial,

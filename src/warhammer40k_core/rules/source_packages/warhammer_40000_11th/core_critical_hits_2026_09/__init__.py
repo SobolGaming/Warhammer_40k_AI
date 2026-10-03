@@ -23,11 +23,12 @@ from warhammer40k_core.rules.source_evidence import (
 )
 from warhammer40k_core.rules.source_packages.artifact_loader import package_artifact_bytes
 
-EXPECTED_ARTIFACT_SHA256: Final = "d4e25297d34f21a9f3b504b78eb010f9c667914a87d6332a4c9a72bb4ca3badb"
+EXPECTED_ARTIFACT_SHA256: Final = "5422bd3564432cb008756895208bdb536aaa88b846576a3f13352e99d72fc1ed"
 SOURCE_PACKAGE_ID: Final = "gw-11e-core-critical-hits"
-SOURCE_VERSION: Final = "maintained-app-mirrors-observed-2026-09-13"
+SOURCE_VERSION: Final = "maintained-app-mirrors-observed-2026-10-01"
 CRITICAL_SUCCESS_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:critical-hit-success-faq"
 SNAP_CRITICAL_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:snap-critical-hit-faq"
+SNAP_NO_CRITICAL_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:snap-shooting-no-critical-hits"
 
 
 class CriticalHitsSourceError(ValueError):
@@ -65,7 +66,7 @@ def validate_source_artifact_bytes(raw: bytes) -> CriticalHitsSourceArtifact:
         or artifact.source_package_id != SOURCE_PACKAGE_ID
         or artifact.source_version != SOURCE_VERSION
         or tuple(rule.source_id for rule in artifact.rules)
-        != (CRITICAL_SUCCESS_SOURCE_ID, SNAP_CRITICAL_SOURCE_ID)
+        != (CRITICAL_SUCCESS_SOURCE_ID, SNAP_CRITICAL_SOURCE_ID, SNAP_NO_CRITICAL_SOURCE_ID)
     ):
         raise CriticalHitsSourceError("Critical hits source identity drifted.")
     for rule in artifact.rules:
@@ -102,7 +103,7 @@ def _build_source_package() -> RuleSourcePackage:
         source_catalog=SourceCatalog(
             package_id=package_id,
             catalog_version=CatalogVersion.dated(
-                version_id=SOURCE_VERSION, source_date=date(2026, 9, 13)
+                version_id=SOURCE_VERSION, source_date=date(2026, 10, 1)
             ),
             documents=(
                 SourceDocument(

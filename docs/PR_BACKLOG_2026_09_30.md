@@ -146,7 +146,14 @@ with v963 change metadata retained separately. The current body is not labeled
 v963 solely from that selector. Full 03.02, 12.08, 04.03.05 and weaponless FAQ
 comparisons preserve their existing authority. Historical Order 62 consequences
 and two Order 97 source expectations are explicitly superseded; original
-receipts remain immutable. Other intake rows remain open.
+receipts remain immutable.
+
+The owner approved V963-SNAP immediately after Order114 / PR #554 and before
+Order115. The dedicated repair selects the complete retained October 1 15.09
+record: shared Snap classification forbids Critical Hits and all their triggers,
+while exact-six success, no hit rerolls, Critical Wounds and wound-stage effects
+remain. See [source, consumers and validation](V963_SNAP_SCOPE_PLAN.md). Historical
+v931 FAQ and Order97 evidence stay immutable. Other intake rows remain open.
 
 ## Subsequent-order review policy and separate integrity queue
 

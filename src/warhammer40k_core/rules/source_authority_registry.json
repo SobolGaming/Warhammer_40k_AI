@@ -1150,6 +1150,16 @@
           "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
           "identity_kind": "observed_at",
           "identity_value": "2026-10-01T12:04:31.127429+00:00"
+        },
+        {
+          "row_id": "rule:15.09:current-observation",
+          "source_observation_sha256": "b38c6f030e05553a286764a28a01147423c7035598039b1dcaa8208f76138c90",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/core-rules",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-snap-shooting-maintained-app-mirror-2026-10-01",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-10-01T12:04:31.127429+00:00"
         }
       ],
       "legacy_observations": [
@@ -1635,12 +1645,13 @@
         {
           "namespace": "games-workshop",
           "package_name": "gw-11e-core-critical-hits",
-          "version": "maintained-app-mirrors-observed-2026-09-13",
+          "version": "maintained-app-mirrors-observed-2026-10-01",
           "allowed_rule_source_ids": [
             "gw-11e-core-critical-hits:critical-hit-success-faq",
-            "gw-11e-core-critical-hits:snap-critical-hit-faq"
+            "gw-11e-core-critical-hits:snap-critical-hit-faq",
+            "gw-11e-core-critical-hits:snap-shooting-no-critical-hits"
           ],
-          "catalog_sha256": "060e96c0dc1d23bd3de4a64733ff24843caafaf49229d4c76c7155188133b036"
+          "catalog_sha256": "866683e53b3192ba3bbb53b5e112d77cc125283ef25eed7f249d76330ab7e714"
         },
         {
           "namespace": "games-workshop",
