@@ -264,6 +264,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | Hook / consumer | Abilities / rules |
 | --- | --- |
 | `army-mustering:required-datasheet-option` | No current generated rows |
+| `catalog-ir:action-battle-shock-permission` | No current generated rows |
 | `catalog-ir:advance-roll-reroll` | Superlative Strategist |
 | `catalog-ir:agile-manoeuvre-roll-reroll` | Superlative Strategist |
 | `catalog-ir:armor-penetration-characteristic-modifier` | No current generated rows |

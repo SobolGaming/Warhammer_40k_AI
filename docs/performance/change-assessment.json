@@ -164,6 +164,16 @@
         }
       }
     },
+    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
+      "before_sha256": "22ec90cf78d2c06d12c92baf440046fb68ee72de5af613532a32946e86482b4f",
+      "after_sha256": "52cb76d74fbc9bac0fed661381d846fc2a0e4fd75c61d9c5d43fb3b9585e52d1",
+      "owners": {
+        "@document": {
+          "before": "22ec90cf78d2c06d12c92baf440046fb68ee72de5af613532a32946e86482b4f",
+          "after": "52cb76d74fbc9bac0fed661381d846fc2a0e4fd75c61d9c5d43fb3b9585e52d1"
+        }
+      }
+    },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "before_sha256": "3f0255b6636ced74683815a9073dbd3ec67f1842b6d233287d059e7a48b505d8",
       "after_sha256": "b5bb3f33b8b2c52730a5ac2c7c1fbbfad85af64a25994813484905717361c64a",
@@ -847,6 +857,14 @@
       "operations": [
         "order110-source-evidence"
       ],
+      "selected_families": [],
+      "rationale": "Bounded Order110 source-backed Action Battle-shock correction, regression evidence and required runtime identity publication. The approved sequential policy selects serial smoke; no deliberate performance optimization or demonstrated serious regression.",
+      "source_obligation": "Order110/P16C/C16-04 implements the two pinned Core16.01 FAQs: becoming Battle-shocked stops an Action; an explicit start-while-shocked permission also permits continuation. All independent restrictions and movement interruption remain.",
+      "unchanged_work": "Adds bounded scans of active Actions and relevant structured unit ability clauses at Action eligibility/status transitions. Terminal event recording reuses the movement interruption owner; explicit permission does not change other Action restrictions. This rule work is not claimed free. Geometry/search algorithms, cache policy and historical benchmarks remain unchanged. Existing live semantic/work/cache checks and serial current-runtime smoke remain mandatory; no detailed benchmark or full-game certification is claimed."
+    },
+    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
       "rationale": "Bounded Order110 source-backed Action Battle-shock correction, regression evidence and required runtime identity publication. The approved sequential policy selects serial smoke; no deliberate performance optimization or demonstrated serious regression.",
       "source_obligation": "Order110/P16C/C16-04 implements the two pinned Core16.01 FAQs: becoming Battle-shocked stops an Action; an explicit start-while-shocked permission also permits continuation. All independent restrictions and movement interruption remain.",
