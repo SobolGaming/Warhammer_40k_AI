@@ -1,402 +1,436 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "3a3d4cdf1342715d3de49e986d741f7466a7b915",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b0339d24d145ee6258ed5ca2b60887f707bbf66abb8e111123539e439200544a",
-  "operation_map_sha256": "bc534dfdfa6f0810490a096f98012f3529f5e06a3b9f543b06f8d90ce613d961",
+  "base": "1ce35d51f1d5e82eb99e909bb8803a7d54e5a969",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:dbc661b6db3a3d2fd70762295400666c19d04546112cf9db323ed8adea311a90",
+  "operation_map_sha256": "ebb033dc3a41e479b1ac1db4c59f1cd113177dee4c7ca68066564da5fafa1564",
   "changes": {
     "README.md": {
-      "before_sha256": "10e90d9d65cbc514a1481f733d69c9d3eba99736c15236254f3a6684ad40081b",
-      "after_sha256": "e466e226251083a83768ad60b62c05542e4778277b7f0af71c046a14fd96bb8c",
+      "before_sha256": "e466e226251083a83768ad60b62c05542e4778277b7f0af71c046a14fd96bb8c",
+      "after_sha256": "2cfae629440baae25b8afcbb865e527005674f2e0c1dcb959ecc40cc2fb409ef",
       "owners": {
         "@document": {
-          "before": "10e90d9d65cbc514a1481f733d69c9d3eba99736c15236254f3a6684ad40081b",
-          "after": "e466e226251083a83768ad60b62c05542e4778277b7f0af71c046a14fd96bb8c"
+          "before": "e466e226251083a83768ad60b62c05542e4778277b7f0af71c046a14fd96bb8c",
+          "after": "2cfae629440baae25b8afcbb865e527005674f2e0c1dcb959ecc40cc2fb409ef"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "12cfe5a69d57eaa7b82943adfdfda3c61e1445bd56ca2c2524b9da2b150c3879",
-      "after_sha256": "f75294a9ec05e2f410e363ad8b7a6950ef30c2e531d3f6af2d9131033dbdc74f",
+      "before_sha256": "f75294a9ec05e2f410e363ad8b7a6950ef30c2e531d3f6af2d9131033dbdc74f",
+      "after_sha256": "ffd11b5979c5df49ee2f17f990e9cc9e68149497d4c4616a7b943297ec05149c",
       "owners": {
         "@document": {
-          "before": "12cfe5a69d57eaa7b82943adfdfda3c61e1445bd56ca2c2524b9da2b150c3879",
-          "after": "f75294a9ec05e2f410e363ad8b7a6950ef30c2e531d3f6af2d9131033dbdc74f"
+          "before": "f75294a9ec05e2f410e363ad8b7a6950ef30c2e531d3f6af2d9131033dbdc74f",
+          "after": "ffd11b5979c5df49ee2f17f990e9cc9e68149497d4c4616a7b943297ec05149c"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "e85be5ef6743dcd78bb45f4f982110c44b2c5668628d9f1e315f8765f2c943d1",
-      "after_sha256": "706b36f6f47abb46e53c4707f7badb13e5c1be246508b37c31aad7a24a7eedde",
+      "before_sha256": "706b36f6f47abb46e53c4707f7badb13e5c1be246508b37c31aad7a24a7eedde",
+      "after_sha256": "76fb04ae517e00ecfb159fc51f88275a250f54536e6eadf57146a33f52b52699",
       "owners": {
         "@document": {
-          "before": "e85be5ef6743dcd78bb45f4f982110c44b2c5668628d9f1e315f8765f2c943d1",
-          "after": "706b36f6f47abb46e53c4707f7badb13e5c1be246508b37c31aad7a24a7eedde"
+          "before": "706b36f6f47abb46e53c4707f7badb13e5c1be246508b37c31aad7a24a7eedde",
+          "after": "76fb04ae517e00ecfb159fc51f88275a250f54536e6eadf57146a33f52b52699"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "28155790704ef19b6c1d8bd273e769c663bb303246771e713bf74f335f0a4cab",
-      "after_sha256": "cc0ab654c881bfb4cce4c65ac2a5c9c293809b50a188eebaae12c1f234ff4021",
+      "before_sha256": "cc0ab654c881bfb4cce4c65ac2a5c9c293809b50a188eebaae12c1f234ff4021",
+      "after_sha256": "08976a76e5d8ee2d081a009acebacd254ad4d80c91f46d483e0195df11e0e839",
       "owners": {
         "@document": {
-          "before": "28155790704ef19b6c1d8bd273e769c663bb303246771e713bf74f335f0a4cab",
-          "after": "cc0ab654c881bfb4cce4c65ac2a5c9c293809b50a188eebaae12c1f234ff4021"
+          "before": "cc0ab654c881bfb4cce4c65ac2a5c9c293809b50a188eebaae12c1f234ff4021",
+          "after": "08976a76e5d8ee2d081a009acebacd254ad4d80c91f46d483e0195df11e0e839"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "ac5f3f200595652a9b2b63d6849cd2a81278312df047d8fa88054c4e75729241",
-      "after_sha256": "441e08f06e5a75056116d88a3c2b8da86b44b53370488592128a808ba91c06eb",
+      "before_sha256": "441e08f06e5a75056116d88a3c2b8da86b44b53370488592128a808ba91c06eb",
+      "after_sha256": "61777d17da89c31c5fe6064bb3c9905891c49220529d93c90efd8a8d8f560fee",
       "owners": {
         "@document": {
-          "before": "ac5f3f200595652a9b2b63d6849cd2a81278312df047d8fa88054c4e75729241",
-          "after": "441e08f06e5a75056116d88a3c2b8da86b44b53370488592128a808ba91c06eb"
+          "before": "441e08f06e5a75056116d88a3c2b8da86b44b53370488592128a808ba91c06eb",
+          "after": "61777d17da89c31c5fe6064bb3c9905891c49220529d93c90efd8a8d8f560fee"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "b08267baff63b30016562170b49197b3430153010906331391a19d1879c4f278",
-      "after_sha256": "6025967b7cf4e852ce62dd9e7b27f5d10999b83b68d651f5ff7d0abd04aa155c",
+      "before_sha256": "6025967b7cf4e852ce62dd9e7b27f5d10999b83b68d651f5ff7d0abd04aa155c",
+      "after_sha256": "948b861a24d369f55fcba38c8186ea292171d3b195197df0fa705820096c7d0f",
       "owners": {
         "@document": {
-          "before": "b08267baff63b30016562170b49197b3430153010906331391a19d1879c4f278",
-          "after": "6025967b7cf4e852ce62dd9e7b27f5d10999b83b68d651f5ff7d0abd04aa155c"
+          "before": "6025967b7cf4e852ce62dd9e7b27f5d10999b83b68d651f5ff7d0abd04aa155c",
+          "after": "948b861a24d369f55fcba38c8186ea292171d3b195197df0fa705820096c7d0f"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "61db5b3a48c6c6c332792db04daf3d22e6747d8dd3d3bff9e2ae13c4429e3498",
-      "after_sha256": "0747394a161781921db8eede966156728789ba38bc0d0b7bbc2decacc812119d",
+      "before_sha256": "0747394a161781921db8eede966156728789ba38bc0d0b7bbc2decacc812119d",
+      "after_sha256": "ea71856c6e95e230c78dd476ce0754fcf6bc83e1c082af30e3351347096c0e7e",
       "owners": {
         "@document": {
-          "before": "61db5b3a48c6c6c332792db04daf3d22e6747d8dd3d3bff9e2ae13c4429e3498",
-          "after": "0747394a161781921db8eede966156728789ba38bc0d0b7bbc2decacc812119d"
+          "before": "0747394a161781921db8eede966156728789ba38bc0d0b7bbc2decacc812119d",
+          "after": "ea71856c6e95e230c78dd476ce0754fcf6bc83e1c082af30e3351347096c0e7e"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "6e2542d2ec8ca2c0e945084e871b88c211a0bdd3b315622921f82a43277a1fc1",
-      "after_sha256": "04e451c0adf55b2f8b736f3877830be38b4dc7508b72c702338e44ad20852895",
+      "before_sha256": "04e451c0adf55b2f8b736f3877830be38b4dc7508b72c702338e44ad20852895",
+      "after_sha256": "b0cceeeae99d1b0a418abef239c688691766a238b762ba73f36b8b67b00bacab",
       "owners": {
         "@document": {
-          "before": "6e2542d2ec8ca2c0e945084e871b88c211a0bdd3b315622921f82a43277a1fc1",
-          "after": "04e451c0adf55b2f8b736f3877830be38b4dc7508b72c702338e44ad20852895"
+          "before": "04e451c0adf55b2f8b736f3877830be38b4dc7508b72c702338e44ad20852895",
+          "after": "b0cceeeae99d1b0a418abef239c688691766a238b762ba73f36b8b67b00bacab"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "bf4062ef1118e3e87d5675bc181f020edbfaa5a1bd05fe481bc24c83c067b518",
-      "after_sha256": "ab292034b5866d67fe6d317fe16938f3ca4e976400e9260b472c7744e8ffadf5",
+      "before_sha256": "ab292034b5866d67fe6d317fe16938f3ca4e976400e9260b472c7744e8ffadf5",
+      "after_sha256": "7e70c271012311f08d1cfe28a55126c80ee9f5e68449c26c18999af3c8d468e7",
       "owners": {
         "@document": {
-          "before": "bf4062ef1118e3e87d5675bc181f020edbfaa5a1bd05fe481bc24c83c067b518",
-          "after": "ab292034b5866d67fe6d317fe16938f3ca4e976400e9260b472c7744e8ffadf5"
+          "before": "ab292034b5866d67fe6d317fe16938f3ca4e976400e9260b472c7744e8ffadf5",
+          "after": "7e70c271012311f08d1cfe28a55126c80ee9f5e68449c26c18999af3c8d468e7"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "5f245ff7685c49e526f0c80df54805614bc5ece8240564a649a67594c4453182",
-      "after_sha256": "116ebf7feba8b030b8c77232bf1d39c19068d685cd2b59e8d7e19a67f9612f03",
+      "before_sha256": "116ebf7feba8b030b8c77232bf1d39c19068d685cd2b59e8d7e19a67f9612f03",
+      "after_sha256": "96f856f1fbef62e63999c96150a65c95b843cb50e6fc43b9a7fab6203918be44",
       "owners": {
         "@document": {
-          "before": "5f245ff7685c49e526f0c80df54805614bc5ece8240564a649a67594c4453182",
-          "after": "116ebf7feba8b030b8c77232bf1d39c19068d685cd2b59e8d7e19a67f9612f03"
+          "before": "116ebf7feba8b030b8c77232bf1d39c19068d685cd2b59e8d7e19a67f9612f03",
+          "after": "96f856f1fbef62e63999c96150a65c95b843cb50e6fc43b9a7fab6203918be44"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "927e18d28bceb7ca7f7bf6e7a196b68267298a65a4ad6fcf4e8455b74f903f94",
-      "after_sha256": "cfaa09e3eed8ace731587a04ad15bc6957c4e3e6ae7e1a5786c379090b3202b8",
+      "before_sha256": "cfaa09e3eed8ace731587a04ad15bc6957c4e3e6ae7e1a5786c379090b3202b8",
+      "after_sha256": "6f35ce44dc334714f44c4a8acb8be86e1a247382049af05413cc3f465cf82747",
       "owners": {
         "@document": {
-          "before": "927e18d28bceb7ca7f7bf6e7a196b68267298a65a4ad6fcf4e8455b74f903f94",
-          "after": "cfaa09e3eed8ace731587a04ad15bc6957c4e3e6ae7e1a5786c379090b3202b8"
+          "before": "cfaa09e3eed8ace731587a04ad15bc6957c4e3e6ae7e1a5786c379090b3202b8",
+          "after": "6f35ce44dc334714f44c4a8acb8be86e1a247382049af05413cc3f465cf82747"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "b7e1fe3015b852b0cebe3dffe53616200ae001160b66083983f00c9b1ea2f62d",
-      "after_sha256": "5bee2980055261e009b5113c5a6ee425526dd8796062337886f50f653b5a0d5e",
+      "before_sha256": "5bee2980055261e009b5113c5a6ee425526dd8796062337886f50f653b5a0d5e",
+      "after_sha256": "ee23faa16f2579611d648e684f67b5958391494fb25fa1e8105a19f484028754",
       "owners": {
         "@document": {
-          "before": "b7e1fe3015b852b0cebe3dffe53616200ae001160b66083983f00c9b1ea2f62d",
-          "after": "5bee2980055261e009b5113c5a6ee425526dd8796062337886f50f653b5a0d5e"
+          "before": "5bee2980055261e009b5113c5a6ee425526dd8796062337886f50f653b5a0d5e",
+          "after": "ee23faa16f2579611d648e684f67b5958391494fb25fa1e8105a19f484028754"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "0d639bd067ba7ea098fae34cdf742f93143bf739548d0516b497f49f43c32d1a",
-      "after_sha256": "4c4d7148e8cf871035da3afaaac458351fba9622465d0cf7e083c371c037a15c",
+      "before_sha256": "4c4d7148e8cf871035da3afaaac458351fba9622465d0cf7e083c371c037a15c",
+      "after_sha256": "758cb486d39f7cdb43d8eec1d158fd838768a663769db40a1aee61e0e6d52f4e",
       "owners": {
         "@document": {
-          "before": "0d639bd067ba7ea098fae34cdf742f93143bf739548d0516b497f49f43c32d1a",
-          "after": "4c4d7148e8cf871035da3afaaac458351fba9622465d0cf7e083c371c037a15c"
+          "before": "4c4d7148e8cf871035da3afaaac458351fba9622465d0cf7e083c371c037a15c",
+          "after": "758cb486d39f7cdb43d8eec1d158fd838768a663769db40a1aee61e0e6d52f4e"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "3cca02e74c66956f62f7591d436f51357eee059a814e581f227abe7b3b7df153",
-      "after_sha256": "75e0a7c0328538f982a95365388b267f4001d0801617eb3e952ca0d231a8ebd9",
+      "before_sha256": "75e0a7c0328538f982a95365388b267f4001d0801617eb3e952ca0d231a8ebd9",
+      "after_sha256": "f9cd93017c23464d14fa10af1298f124aa57a3de075c8d6c7841a3d56bf94677",
       "owners": {
         "@document": {
-          "before": "3cca02e74c66956f62f7591d436f51357eee059a814e581f227abe7b3b7df153",
-          "after": "75e0a7c0328538f982a95365388b267f4001d0801617eb3e952ca0d231a8ebd9"
+          "before": "75e0a7c0328538f982a95365388b267f4001d0801617eb3e952ca0d231a8ebd9",
+          "after": "f9cd93017c23464d14fa10af1298f124aa57a3de075c8d6c7841a3d56bf94677"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "94d41d37c6919db920a39a39c29dab18be664886097314de7cc7e7f093fe7474",
-      "after_sha256": "0e48ccb1dbf4e65565a2fb92969eb47b0ee75881e9740bef1e57efb6c663ba4b",
+      "before_sha256": "0e48ccb1dbf4e65565a2fb92969eb47b0ee75881e9740bef1e57efb6c663ba4b",
+      "after_sha256": "bf21ad4885ec75a42fcd9d0eeedd20b1f12ea6cf1bea5a940e4ecdec4823b9d4",
       "owners": {
         "@document": {
-          "before": "94d41d37c6919db920a39a39c29dab18be664886097314de7cc7e7f093fe7474",
-          "after": "0e48ccb1dbf4e65565a2fb92969eb47b0ee75881e9740bef1e57efb6c663ba4b"
+          "before": "0e48ccb1dbf4e65565a2fb92969eb47b0ee75881e9740bef1e57efb6c663ba4b",
+          "after": "bf21ad4885ec75a42fcd9d0eeedd20b1f12ea6cf1bea5a940e4ecdec4823b9d4"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "19487cf2da057da7cc99349768f6318c34b2768b1e04317ef3bbc819d99d4b51",
-      "after_sha256": "f629ab2705dd12e42453415e0096be9bfab393aabd50a76ac64cbd0db85a1846",
+      "before_sha256": "f629ab2705dd12e42453415e0096be9bfab393aabd50a76ac64cbd0db85a1846",
+      "after_sha256": "e55ecb918493a00763269b6b570730654f51b7691e05749fac5d322b9dae12b2",
       "owners": {
         "@document": {
-          "before": "19487cf2da057da7cc99349768f6318c34b2768b1e04317ef3bbc819d99d4b51",
-          "after": "f629ab2705dd12e42453415e0096be9bfab393aabd50a76ac64cbd0db85a1846"
+          "before": "f629ab2705dd12e42453415e0096be9bfab393aabd50a76ac64cbd0db85a1846",
+          "after": "e55ecb918493a00763269b6b570730654f51b7691e05749fac5d322b9dae12b2"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "bd97268d5debf72f5f5356c85c1ad7ea5c0db93fbdf12beead3b26b5d8db95d9",
-      "after_sha256": "c20d3fc4e0b08344c5a657ec700b71a7e0abe90a03cfd9e41c839f8d8441ff3f",
+      "before_sha256": "c20d3fc4e0b08344c5a657ec700b71a7e0abe90a03cfd9e41c839f8d8441ff3f",
+      "after_sha256": "26909dbbc3fae97a81f29af0adf88cff58782eb3abbfc409f92f24505961635c",
       "owners": {
         "@document": {
-          "before": "bd97268d5debf72f5f5356c85c1ad7ea5c0db93fbdf12beead3b26b5d8db95d9",
-          "after": "c20d3fc4e0b08344c5a657ec700b71a7e0abe90a03cfd9e41c839f8d8441ff3f"
+          "before": "c20d3fc4e0b08344c5a657ec700b71a7e0abe90a03cfd9e41c839f8d8441ff3f",
+          "after": "26909dbbc3fae97a81f29af0adf88cff58782eb3abbfc409f92f24505961635c"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "e897a26a15ec777e67b82e8d9db5325b28b399e3d2851a018e0ccae0cb8c4469",
-      "after_sha256": "99fb4496d16914b9ec5f5a03db3b14bccff966a450210f1502cae1f8703f8d08",
+      "before_sha256": "99fb4496d16914b9ec5f5a03db3b14bccff966a450210f1502cae1f8703f8d08",
+      "after_sha256": "1433693756ba69a76aac1e8d58748fb5d96a00ef05b90fb55674052444fe580c",
       "owners": {
         "@document": {
-          "before": "e897a26a15ec777e67b82e8d9db5325b28b399e3d2851a018e0ccae0cb8c4469",
-          "after": "99fb4496d16914b9ec5f5a03db3b14bccff966a450210f1502cae1f8703f8d08"
+          "before": "99fb4496d16914b9ec5f5a03db3b14bccff966a450210f1502cae1f8703f8d08",
+          "after": "1433693756ba69a76aac1e8d58748fb5d96a00ef05b90fb55674052444fe580c"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "e15b34f541eb51e11e908a24cd4386d08a878a5d713ee3f1930ca8f434ec7bd9",
-      "after_sha256": "13a94062d9cd04be35c68cee698011cde4c362d997e46d91c8399a2382853f93",
+      "before_sha256": "13a94062d9cd04be35c68cee698011cde4c362d997e46d91c8399a2382853f93",
+      "after_sha256": "f3b45427dd7c45fb2bc5b9ebb4c2c6a608b185f0fbe222be3bd754fd319745f4",
       "owners": {
         "@document": {
-          "before": "e15b34f541eb51e11e908a24cd4386d08a878a5d713ee3f1930ca8f434ec7bd9",
-          "after": "13a94062d9cd04be35c68cee698011cde4c362d997e46d91c8399a2382853f93"
+          "before": "13a94062d9cd04be35c68cee698011cde4c362d997e46d91c8399a2382853f93",
+          "after": "f3b45427dd7c45fb2bc5b9ebb4c2c6a608b185f0fbe222be3bd754fd319745f4"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "f8bcf5d58dbf71b0bdac5150ad58e5ebe64e2dbf712a7f5dcc29fca5bbb8ba77",
-      "after_sha256": "861a086b87c2999b027463705ef8a9576a25a79702c081dc8ef90766e01d3126",
+      "before_sha256": "861a086b87c2999b027463705ef8a9576a25a79702c081dc8ef90766e01d3126",
+      "after_sha256": "92b0da7c1ce1f65e78e34ad2c01f91b166f106e86f872aebb73cf539967df0aa",
       "owners": {
         "@document": {
-          "before": "f8bcf5d58dbf71b0bdac5150ad58e5ebe64e2dbf712a7f5dcc29fca5bbb8ba77",
-          "after": "861a086b87c2999b027463705ef8a9576a25a79702c081dc8ef90766e01d3126"
+          "before": "861a086b87c2999b027463705ef8a9576a25a79702c081dc8ef90766e01d3126",
+          "after": "92b0da7c1ce1f65e78e34ad2c01f91b166f106e86f872aebb73cf539967df0aa"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "8dcc312d98a691262180df60704f89ce254eaec22872b56275adfd85dac761a9",
-      "after_sha256": "99d954eba1ee0c9d5dbddfadddf9584ac9dab2874ad1f844d6d0727c12930535",
+      "before_sha256": "99d954eba1ee0c9d5dbddfadddf9584ac9dab2874ad1f844d6d0727c12930535",
+      "after_sha256": "1d0fb57c188af1fcec8cbb5e053708326163e64531d7836ad054178f534712af",
       "owners": {
         "@document": {
-          "before": "8dcc312d98a691262180df60704f89ce254eaec22872b56275adfd85dac761a9",
-          "after": "99d954eba1ee0c9d5dbddfadddf9584ac9dab2874ad1f844d6d0727c12930535"
+          "before": "99d954eba1ee0c9d5dbddfadddf9584ac9dab2874ad1f844d6d0727c12930535",
+          "after": "1d0fb57c188af1fcec8cbb5e053708326163e64531d7836ad054178f534712af"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "4183d9a28c313658dba59254c26d7533538e63d348244d059e10977143692c0c",
-      "after_sha256": "1f70baa7b54739f03bff083fa54f2b00f1dfab47b82e16518d74b5c8cc1989fb",
+      "before_sha256": "1f70baa7b54739f03bff083fa54f2b00f1dfab47b82e16518d74b5c8cc1989fb",
+      "after_sha256": "28d6f91e6733795fbf98584461a36bdbcd4476ef7a8db3d34c2aebbf678bd451",
       "owners": {
         "@document": {
-          "before": "4183d9a28c313658dba59254c26d7533538e63d348244d059e10977143692c0c",
-          "after": "1f70baa7b54739f03bff083fa54f2b00f1dfab47b82e16518d74b5c8cc1989fb"
+          "before": "1f70baa7b54739f03bff083fa54f2b00f1dfab47b82e16518d74b5c8cc1989fb",
+          "after": "28d6f91e6733795fbf98584461a36bdbcd4476ef7a8db3d34c2aebbf678bd451"
+        }
+      }
+    },
+    "data/source_audits/order107/baseline/tests/unit/test_order97_secondary_clause_evidence.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "82ed94bc4d54196a40d3138e0670fcbdd5ed316177576734e90451892ff5a047",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "82ed94bc4d54196a40d3138e0670fcbdd5ed316177576734e90451892ff5a047"
+        }
+      }
+    },
+    "data/source_audits/order107/baseline/tests/unit/test_phase15d_fight_resolution.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "67cf08c00ab604314870841204a8a007518037f9308c1b82e8684217f609dcb3",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "67cf08c00ab604314870841204a8a007518037f9308c1b82e8684217f609dcb3"
+        }
+      }
+    },
+    "data/source_audits/order107/historical-inputs.json": {
+      "before_sha256": null,
+      "after_sha256": "abff3f6516cd2489ed63009bf2253d8a06a7487b1501343cb650e626c423baec",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "abff3f6516cd2489ed63009bf2253d8a06a7487b1501343cb650e626c423baec"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "48cbd652eecc5fc0008aa97cecdebb19c0488c8b107bb754869112746c820e84",
-      "after_sha256": "7bce5c55072ae1de37179b14869b6febde6bf96476707f0be8f382a0d6eee5dd",
+      "before_sha256": "7bce5c55072ae1de37179b14869b6febde6bf96476707f0be8f382a0d6eee5dd",
+      "after_sha256": "78e2e114692aff32b9c8c0d9b6c3c47e7727ed8904e61e8d123d1a96f059836c",
       "owners": {
         "@document": {
-          "before": "48cbd652eecc5fc0008aa97cecdebb19c0488c8b107bb754869112746c820e84",
-          "after": "7bce5c55072ae1de37179b14869b6febde6bf96476707f0be8f382a0d6eee5dd"
+          "before": "7bce5c55072ae1de37179b14869b6febde6bf96476707f0be8f382a0d6eee5dd",
+          "after": "78e2e114692aff32b9c8c0d9b6c3c47e7727ed8904e61e8d123d1a96f059836c"
         }
       }
     },
-    "docs/ORDER_106_SCOPE_PLAN.md": {
+    "docs/ORDER_107_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "c163b6eb61bf33c740dad21fc648513ab044effe460fab7ce07a1b6a5a178243",
+      "after_sha256": "70fccd65c91d2fc64bfa333ec7f6c89ddbbfbdc4802a3644eb3d010e784c34dd",
       "owners": {
         "@document": {
           "before": null,
-          "after": "c163b6eb61bf33c740dad21fc648513ab044effe460fab7ce07a1b6a5a178243"
+          "after": "70fccd65c91d2fc64bfa333ec7f6c89ddbbfbdc4802a3644eb3d010e784c34dd"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "ded7b36f211e83346c92c17129178fe900fc61e69cdcb53621b06143b7b44fa4",
-      "after_sha256": "9d423721ba206455e619b702a885637707e0b545dc24e8496dce8e2e835fccd1",
+      "before_sha256": "9d423721ba206455e619b702a885637707e0b545dc24e8496dce8e2e835fccd1",
+      "after_sha256": "73b89625aad3e1a62007a2e3232fa178b1b830e21bd8ddec0e1d2d113d79ed79",
       "owners": {
         "@document": {
-          "before": "ded7b36f211e83346c92c17129178fe900fc61e69cdcb53621b06143b7b44fa4",
-          "after": "9d423721ba206455e619b702a885637707e0b545dc24e8496dce8e2e835fccd1"
+          "before": "9d423721ba206455e619b702a885637707e0b545dc24e8496dce8e2e835fccd1",
+          "after": "73b89625aad3e1a62007a2e3232fa178b1b830e21bd8ddec0e1d2d113d79ed79"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "8dacf7a7b59e28edcc0085c4289e4512d0978f52f0e9c00252a991630d685101",
-      "after_sha256": "b325a0a761b38417c6295480e03f48009b0dfb9a1fb29de2b7e637de18cd46e4",
+      "before_sha256": "b325a0a761b38417c6295480e03f48009b0dfb9a1fb29de2b7e637de18cd46e4",
+      "after_sha256": "aea46c8e15891b2f9229300da96cd3e772c2e95f8cb3c9a4a6405984f3acdcae",
       "owners": {
         "@document": {
-          "before": "8dacf7a7b59e28edcc0085c4289e4512d0978f52f0e9c00252a991630d685101",
-          "after": "b325a0a761b38417c6295480e03f48009b0dfb9a1fb29de2b7e637de18cd46e4"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/consolidation_model_constraints.py": {
-      "before_sha256": "b8989d4b4d8172fb02836b3645ff02601f543a71b2dcba715eaf64e8d841074d",
-      "after_sha256": "745dee697613138750cd2df2013ba08178f977759de64061267e06a7e73e37e8",
-      "owners": {
-        "@module": {
-          "before": "1b4c0d4bc2fa4cb3da33756658227d384fa48f90ecf04294cd3e6d5847ae25dc",
-          "after": "45196a6d5765c7b6444f8c3f22168c58dbeed567b48545913c08d50385ad45f0"
-        },
-        "_query": {
-          "before": "ce6d596d61555882c7cbf625ad8597bc160a9d470fca3c1291adde80382ed73e",
-          "after": "e9dafd9744958a5b540f43be401bb34047c2a217821e449ee494d159d5d37a3e"
-        },
-        "consolidation_model_violation": {
-          "before": "3864947eaf96a1b98058cdb10b66dcc8825dee879a1f032e6f0a9941ffbb0b0d",
-          "after": "0152dd8afbf5d6e58be7832238d21b52b22bc47b55ca7ad870dcfb9c428909c1"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/fight_pile_in_validation.py": {
-      "before_sha256": null,
-      "after_sha256": "adf4137fa7c8edb185165db296429feb86920bab8df116a3d1782d2e2bf6b3be",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "9f3109e8005a5206242b46c0b8c5dde4d88ab9c8da59b255c17eae65a6408f29"
-        },
-        "validate_pile_in_endpoint": {
-          "before": null,
-          "after": "e41eface67316517def103de7682aaca7d5b8f8aacacf176800b4463ccb15067"
+          "before": "b325a0a761b38417c6295480e03f48009b0dfb9a1fb29de2b7e637de18cd46e4",
+          "after": "aea46c8e15891b2f9229300da96cd3e772c2e95f8cb3c9a4a6405984f3acdcae"
         }
       }
     },
     "src/warhammer40k_core/engine/fight_resolution.py": {
-      "before_sha256": "d027b9c6f9a6391e718e5543819af6c525aee09a2d4fd1c484b8db3f1a28acf0",
-      "after_sha256": "720cc1824545636bdc2a2961abe83aa012aa275b53ae8618be793734a7a41774",
+      "before_sha256": "720cc1824545636bdc2a2961abe83aa012aa275b53ae8618be793734a7a41774",
+      "after_sha256": "8806f9f1451a7c14ba178ed1d30db6c7e9812f67042d46a230c7a76c27197a88",
       "owners": {
-        "_pile_in_endpoint_validation": {
-          "before": "b4b16dae20f010b737fd133cca6fccde648b306c75265243195c34c1c3b9af56",
-          "after": "6e4c0d70c5164604ec8c98b5e27e5cab3b0b7a69bd0508cbf2473dc44f2b3bd4"
+        "@module": {
+          "before": "177f404274316a7479fef6bee1c3a03fe7e94fcea9d02bbf9db4c40416db405b",
+          "after": "b5b220a3adc62a3a4849426a1ef45615bf567928b81b90241c83c231389dad5e"
+        },
+        "fight_movement_maximum_distance_inches": {
+          "before": "b47cc77e28d384553fb54438c1bf35c260c9a323c03f8829e679bbd2fa952cbc",
+          "after": "9ef9255b95ae6c6492149c6626ae5cadca93b59bdb1002e41798fbb14a12c3db"
         }
       }
     },
-    "src/warhammer40k_core/engine/fight_rules_unit_movement.py": {
-      "before_sha256": "29a5864078484eb1d076811f9cf444b3e5d0f46b53c1b539478fd1bf7a48e0cf",
-      "after_sha256": "2f6c0e5817c3b7d2b039045cbbbdba4b2cc8c4bd0fafd957e9f85f5b1513637e",
+    "tests/code_quality/test_order97_inventory.py": {
+      "before_sha256": "a98f3cd6d26fd7428180437ee00cdaf19754d41200c93d31a8d1fe47b79ec2fb",
+      "after_sha256": "918beec821766cbea6d3d9bb6849ae0c229abfd805b473d8861ba06e52e780aa",
       "owners": {
-        "_endpoint_validation": {
-          "before": "d0f639a003bd9b8396f40615138cc066373e1e0c16446235fd91e63593b1628f",
-          "after": "49ed436de01c36f4062c0dece45dba5c239b8e8522d35904aa7d6e8af338a85b"
+        "@module": {
+          "before": "8239bc607792c6218f57547453a7d42d3afa8d32ed9d904c85f952d4f621bae3",
+          "after": "6e0cea8c8a16812f299f52688ece5e106d8325cd96c0b8d1e935a54b53a8551e"
+        },
+        "test_original_assertions_remain_exact_and_fail_closed": {
+          "before": "629d384dd5a994a7bc91f2be6174021381d6a12d4c8aecd102f3ea01169e8213",
+          "after": "a611ca02a4aa378e4bea799b7dcf1b37fa69931d2e16a368eb77f34090d295d1"
         }
       }
     },
-    "tests/code_quality/test_phase14i_14h_closeout.py": {
-      "before_sha256": "5edd42bf0225c4a02b0d633f4d3022b36e8a13d45beabdab760cab831f428ea5",
-      "after_sha256": "5b4eb873f50ba994a66b73d4bfabda60d54494f9a9657e5c0228d2811aacc79b",
-      "owners": {
-        "test_p12_consolidation_shares_objective_model_and_forced_fight_owners": {
-          "before": "dbf04a0c70bf3f531f61c325c5a5930cc2d309e6fc639db506f9470fcf9c67b7",
-          "after": "406af8eba678589957801f674fef85e20f70dd54bf023ba52f4a49fce8e71daf"
-        }
-      }
-    },
-    "tests/integration/test_ws13_adapter_phase_families.py": {
-      "before_sha256": "58d2c2eb9974cba72f03133b3cc22b9c102eaff791cdcf4e2bfcdc0df36b8c30",
-      "after_sha256": "221db5bd51aae14b71667f8b3fe1d3b53d088e9f9ae0be206953550b13deaca9",
-      "owners": {
-        "test_local_session_moves_attached_rules_unit_once_and_replays_canonical_event": {
-          "before": "45b178dc8e0dcc27e17651fd896ecd29dafa9b9bca7cdccd77d2b62bd5984e6f",
-          "after": "4b6a0d3b165b0e45a0e4a25c0d4bcf77e43ec0783499445a7ba52b4e9dcccb66"
-        }
-      }
-    },
-    "tests/unit/test_order106_pile_in.py": {
+    "tests/fight_distance_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "a2dc4ca28ce2807bdc29f573e70ace7dd4b35b2c4c11eafe7d2731e5839fc45d",
+      "after_sha256": "0f010da94a5b3128e3a54d4faef63f8b3b9e8942c58c4cae267382b5445f86f7",
       "owners": {
         "@module": {
           "before": null,
-          "after": "c64525f72336fa7910bdc9dcaa750fadb7c8a726157ebe1ec9bab1c832bf2829"
+          "after": "f76ce014d967ea78fd8e221c6259eb1771369f4922c7d0ab027e851fda7f61ca"
         },
-        "_session": {
+        "set_fight_distance_step": {
           "before": null,
-          "after": "ec089a402c6e9a60e96f86642d12d37cd1c3c5e50baadab13e199ce4211cf6a7"
-        },
-        "_submit": {
-          "before": null,
-          "after": "33b420fae6e873c1f92e83e1fab7dfe87a6695db4095f868222c6d0d7594e7a0"
-        },
-        "test_pile_in_closest_identity_is_attached_target_unit_not_one_component": {
-          "before": null,
-          "after": "b28aa1e9837e56a4052ad446dd5ddca263e48b61ea0637d87ee4b47662e32465"
-        },
-        "test_pile_in_coherency_unresolved_does_not_invent_unattainability": {
-          "before": null,
-          "after": "651c92321ef3a91c40e7c0e0547814927fefeb1181157df8ed9a5221500d1559"
-        },
-        "test_pile_in_legal_closest_engagement_restores_and_replays": {
-          "before": null,
-          "after": "8672c8437fe28e4aca10124edd3a13232e94b1a71b0127371013955c9df170bc"
-        },
-        "test_pile_in_proven_unattainable_model_may_move_closer_without_engaging": {
-          "before": null,
-          "after": "7070ad74d6d96551bfab05f32f7f4e9d074fac2bd5ddead0e99fee3396e0df16"
-        },
-        "test_pile_in_rejects_switching_target_or_avoidable_nonengagement": {
-          "before": null,
-          "after": "c6452f013aa0bb77eb27c1d03045cd7c737065e7fb16c96387e7198c647ba2e5"
-        },
-        "test_pile_in_stationary_and_closed_loop_paths": {
-          "before": null,
-          "after": "52704c69f88cb2891d2a62e92d51bf50a9e969ccca2e49b46b8bf5d02cf0486e"
-        },
-        "test_pile_in_tied_closest_targets_allow_either_target": {
-          "before": null,
-          "after": "56294cd7b7baef1c53f089c52ae4ade3d66670156d35e87411d8450c5b81cff3"
+          "after": "af963eb3746d540daa36c893480cc759ef2dd0f348cd928d444dc5074d63c02b"
         }
       }
     },
-    "tests/unit/test_phase15c_fight_order.py": {
-      "before_sha256": "2f54e9dc1a8a8c17fcd6b65bb1091e5aefd372f78fa04647bd09e45427bd1e01",
-      "after_sha256": "632e37f25205a8f096cce373880ef4c17dbd655c9d4656cdd0216ada5f9c2814",
+    "tests/unit/test_order107_fight_distance_window.py": {
+      "before_sha256": null,
+      "after_sha256": "a277836d818551779cf23fec0cf231600ea6cbb702859171bc6ccbe8e67a7233",
       "owners": {
-        "test_fight_on_death_survivor_move_checkpoint_uses_living_only_global_coherency": {
-          "before": "2190ccdc76f7c41629a888fd1588248ceb312a1110a6d0e7feb221bcc368396c",
-          "after": "910084da7b3a62bec988311b3aa607afbe9f88b3a0502ae9860dd9c22cf327c5"
+        "@module": {
+          "before": null,
+          "after": "57593e66ce7b2f86258820d6b2348421d1a75acd2ad7181d75c234e88cf60e61"
         },
-        "test_phase15d_restore_accepts_pile_in_completed_before_fight_on_death_retention": {
-          "before": "e5e6991924b749ac8b3141c5cfbbedac0307c49ea078dbd0c05baf33b39543ba",
-          "after": "2f0d1ebbed396f679da37d877d28bf6af8c931b062794e0ebca28be4d15fffbd"
+        "_move": {
+          "before": null,
+          "after": "93a6c46b9721c3dc93cf5d4874f4aea79d4c369c323ea82b68e05d8ff4918a0a"
         },
-        "test_phase15d_restore_rejects_omitted_living_target_authority_model": {
-          "before": "e444fe8fd2af6187ef4b69d308af0e683fe0a6135f6050522f1ac7cad059f4ec",
-          "after": "ca782864f10c63115d42ed780c00ff3f11d54903ee4597e212206dafd9d31722"
+        "_overrun": {
+          "before": null,
+          "after": "3b03a1940b46459d9e7d36cd8625657e9822a4157fc0f96606ba71aeec79bb6b"
+        },
+        "_restore": {
+          "before": null,
+          "after": "f69d30df8544630dfb92d3659b89088e4c8d162fe750091233e617046875ab97"
+        },
+        "_session": {
+          "before": null,
+          "after": "025ae5dd4632bef2e9c89ae6bc27245a5d115a4fb704bf16c144aa541ee7215b"
+        },
+        "test_extra_distance_requires_matching_phase_and_step": {
+          "before": null,
+          "after": "e056f191de628dfbd52fc91c1b5e6e086b8ec8316febafe01e6098c77625b70e"
+        },
+        "test_matching_pile_in_step_keeps_extra_distance_and_historical_restore": {
+          "before": null,
+          "after": "c377ed49a5a9ad6049f540579147f5a64cca6e22ee2a19e2d0ddc01c593da5ac"
+        },
+        "test_overrun_rejects_extra_distance_then_restores_retries_and_replays": {
+          "before": null,
+          "after": "2533c96146adfbd9708f72b6c96222c6b05669126ee081cb59391217bd8a5c87"
+        },
+        "test_overrun_request_uses_core_distance": {
+          "before": null,
+          "after": "2cfd7551665c4230b88e3693839407062c4e2c0e554e770756d792a2f43a2183"
+        }
+      }
+    },
+    "tests/unit/test_order97_secondary_clause_evidence.py": {
+      "before_sha256": "82ed94bc4d54196a40d3138e0670fcbdd5ed316177576734e90451892ff5a047",
+      "after_sha256": "58a2d5c0d82e7c2c30de1b5e93cbeb52d91d3261856fe80fe9e3c00ba083153f",
+      "owners": {
+        "@module": {
+          "before": "0aff24f9c89f749b10da47751a80bc4fe1e97c5b243da809a474c54edfe46b29",
+          "after": "bcfa2ea13474b2fd62f5ba34331bc87eb1093be4db1b29c762de3be51f7f1149"
+        },
+        "test_order97_extra_fight_distance_preserves_target_range": {
+          "before": "21fde9d475789359930ffeb206d7309ce236d4160e404b1cb462ffc8638ea2c4",
+          "after": "4fcb868deffec9df319847bd5e51e1bb461bfd783fc81e350fa6c35326ce4f05"
+        }
+      }
+    },
+    "tests/unit/test_phase15d_fight_resolution.py": {
+      "before_sha256": "67cf08c00ab604314870841204a8a007518037f9308c1b82e8684217f609dcb3",
+      "after_sha256": "17ec7136bf4bef30e32102e4c9f5843acc8cf3945b53e9e53173beb8c251ce81",
+      "owners": {
+        "@module": {
+          "before": "e5dd355e559b0e9a58824b37ce931d2cb79440df2c53a91ec841c38ecdab52b4",
+          "after": "1e5a4c264a6b33dd799a8317db79c360ab01d726f23b67e7b7a9bd810120e946"
+        },
+        "test_phase15d_attached_no_move_is_atomic_and_distance_effect_is_lineage_aware": {
+          "before": "f2ab7c8ee3ba3b8adc52227741fb63864c371b3ba7f8b25fa41920b357dbb3a7",
+          "after": "83d9b8ddf1047ff37ca3fb0fb7ce7dab004dee456c6becdc49cc242536b1d9d5"
+        },
+        "test_phase15d_fight_movement_no_move_and_source_linked_distance_effects": {
+          "before": "d6718d09755c923761242db6f3177790a8f78ac01a4ba558e4d96061c2ba2604",
+          "after": "4226126c8fc27304d5ff0f8602356b634de8ee5d14c90369d1a1bf6136cac2c0"
+        }
+      }
+    },
+    "tests/unit/test_phase17g_aeldari_army_rule.py": {
+      "before_sha256": "59df236f91eb994ebfb4e17ec48d0f0a7e03679d82a63aac6f621742b76a83eb",
+      "after_sha256": "144c2d669ec1a8b7f9a7249590b9c8be2f7c68183366c744e696f412c4eb1143",
+      "owners": {
+        "test_aeldari_sudden_strike_fight_movement_distance_uses_lifecycle_effect": {
+          "before": "4f93d1e65dc1a7e312278ce30c8a82e0c940f31ec6c6ba27bb7548bae02eb4d8",
+          "after": "9ff2f8e83e15ef835bf55eddc967878621b386ed6b47269e1a979d2f0a959ede"
+        }
+      }
+    },
+    "tools/core_rules_order97_history.py": {
+      "before_sha256": "ee913d8989627a04e1c5df2e1da430935e2b3fb46185e8036ebfa7bd650dc2e8",
+      "after_sha256": "21e6135a412bf1fe14693dfbf15aed82b941c852b474308ea900b4cc493e9312",
+      "owners": {
+        "@module": {
+          "before": "2097289ee79c088cf907f05da9c98b5cbd8d6cd99764de9cd0710f8c4c94c7c5",
+          "after": "b2cb5d9b44ea09782be291633f26ce0604fc9cb439f9de38ab75d9b729c70547"
+        },
+        "historical_evidence_path": {
+          "before": "9e68f5ddd645dae89c28266572f2a229da76c1627166d26b35611623ed9b9d42",
+          "after": "89e586bdc52b2796542b7e20e926fdfa641b735884e8b29b889fcc57ecb1da7d"
         }
       }
     }
@@ -406,9 +440,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
@@ -417,12 +451,13 @@
         "issue533-client-regressions",
         "order104-client-regressions",
         "order105-client-regressions",
-        "order106-client-regressions"
+        "order106-client-regressions",
+        "order107-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -431,12 +466,13 @@
         "issue533-client-regressions",
         "order104-client-regressions",
         "order105-client-regressions",
-        "order106-client-regressions"
+        "order106-client-regressions",
+        "order107-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -445,12 +481,13 @@
         "issue533-client-regressions",
         "order104-client-regressions",
         "order105-client-regressions",
-        "order106-client-regressions"
+        "order106-client-regressions",
+        "order107-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -459,12 +496,13 @@
         "issue533-client-regressions",
         "order104-client-regressions",
         "order105-client-regressions",
-        "order106-client-regressions"
+        "order106-client-regressions",
+        "order107-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -473,12 +511,13 @@
         "issue533-client-regressions",
         "order104-client-regressions",
         "order105-client-regressions",
-        "order106-client-regressions"
+        "order106-client-regressions",
+        "order107-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -487,12 +526,13 @@
         "issue533-client-regressions",
         "order104-client-regressions",
         "order105-client-regressions",
-        "order106-client-regressions"
+        "order106-client-regressions",
+        "order107-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -501,12 +541,13 @@
         "issue533-client-regressions",
         "order104-client-regressions",
         "order105-client-regressions",
-        "order106-client-regressions"
+        "order106-client-regressions",
+        "order107-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -515,12 +556,13 @@
         "issue533-client-regressions",
         "order104-client-regressions",
         "order105-client-regressions",
-        "order106-client-regressions"
+        "order106-client-regressions",
+        "order107-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -529,12 +571,13 @@
         "issue533-client-regressions",
         "order104-client-regressions",
         "order105-client-regressions",
-        "order106-client-regressions"
+        "order106-client-regressions",
+        "order107-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -543,12 +586,13 @@
         "issue533-client-regressions",
         "order104-client-regressions",
         "order105-client-regressions",
-        "order106-client-regressions"
+        "order106-client-regressions",
+        "order107-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -557,12 +601,13 @@
         "issue533-client-regressions",
         "order104-client-regressions",
         "order105-client-regressions",
-        "order106-client-regressions"
+        "order106-client-regressions",
+        "order107-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -571,12 +616,13 @@
         "issue533-client-regressions",
         "order104-client-regressions",
         "order105-client-regressions",
-        "order106-client-regressions"
+        "order106-client-regressions",
+        "order107-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -585,12 +631,13 @@
         "issue533-client-regressions",
         "order104-client-regressions",
         "order105-client-regressions",
-        "order106-client-regressions"
+        "order106-client-regressions",
+        "order107-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -601,12 +648,13 @@
         "order103-contract-publication",
         "order104-contract-publication",
         "order105-contract-publication",
-        "order106-contract-publication"
+        "order106-contract-publication",
+        "order107-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -617,12 +665,13 @@
         "order103-contract-publication",
         "order104-contract-publication",
         "order105-contract-publication",
-        "order106-contract-publication"
+        "order106-contract-publication",
+        "order107-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -633,12 +682,13 @@
         "order103-contract-publication",
         "order104-contract-publication",
         "order105-contract-publication",
-        "order106-contract-publication"
+        "order106-contract-publication",
+        "order107-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -649,12 +699,13 @@
         "order103-contract-publication",
         "order104-contract-publication",
         "order105-contract-publication",
-        "order106-contract-publication"
+        "order106-contract-publication",
+        "order107-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -665,12 +716,13 @@
         "order103-contract-publication",
         "order104-contract-publication",
         "order105-contract-publication",
-        "order106-contract-publication"
+        "order106-contract-publication",
+        "order107-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -681,12 +733,13 @@
         "order103-contract-publication",
         "order104-contract-publication",
         "order105-contract-publication",
-        "order106-contract-publication"
+        "order106-contract-publication",
+        "order107-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -697,12 +750,13 @@
         "order103-contract-publication",
         "order104-contract-publication",
         "order105-contract-publication",
-        "order106-contract-publication"
+        "order106-contract-publication",
+        "order107-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -713,36 +767,67 @@
         "order103-contract-publication",
         "order104-contract-publication",
         "order105-contract-publication",
-        "order106-contract-publication"
+        "order106-contract-publication",
+        "order107-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+    },
+    "data/source_audits/order107/baseline/tests/unit/test_order97_secondary_clause_evidence.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order107-historical-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve original Order97 assertion evidence while current fixtures establish the source-required phase and step. Add a bounded mapping through the existing authenticated historical resolver.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "Only the existing offline audit mapping inventory and immutable original file copies change. Runtime movement, replay, serializers, search and caches do not consume this archive. All prior archive bytes and pins remain unchanged; current gameplay tests still execute normally."
+    },
+    "data/source_audits/order107/baseline/tests/unit/test_phase15d_fight_resolution.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order107-historical-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve original Order97 assertion evidence while current fixtures establish the source-required phase and step. Add a bounded mapping through the existing authenticated historical resolver.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "Only the existing offline audit mapping inventory and immutable original file copies change. Runtime movement, replay, serializers, search and caches do not consume this archive. All prior archive bytes and pins remain unchanged; current gameplay tests still execute normally."
+    },
+    "data/source_audits/order107/historical-inputs.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order107-historical-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve original Order97 assertion evidence while current fixtures establish the source-required phase and step. Add a bounded mapping through the existing authenticated historical resolver.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "Only the existing offline audit mapping inventory and immutable original file copies change. Runtime movement, replay, serializers, search and caches do not consume this archive. All prior archive bytes and pins remain unchanged; current gameplay tests still execute normally."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
-    "docs/ORDER_106_SCOPE_PLAN.md": {
+    "docs/ORDER_107_SCOPE_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -750,92 +835,93 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
-    },
-    "src/warhammer40k_core/engine/consolidation_model_constraints.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "fight-rule-branch",
-        "order106-pile-in-authority"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
-    },
-    "src/warhammer40k_core/engine/fight_pile_in_validation.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "fight-rule-branch",
-        "order106-pile-in-authority"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
     "src/warhammer40k_core/engine/fight_resolution.py": {
       "category": "rule_semantics",
       "operations": [
         "fight-rule-branch",
-        "order106-pile-in-authority"
+        "order106-pile-in-authority",
+        "order107-fight-distance-window"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
-    "src/warhammer40k_core/engine/fight_rules_unit_movement.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "fight-rule-branch",
-        "movement-rule-branch",
-        "order106-pile-in-authority"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
-    },
-    "tests/code_quality/test_phase14i_14h_closeout.py": {
+    "tests/code_quality/test_order97_inventory.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
-    "tests/integration/test_ws13_adapter_phase_families.py": {
+    "tests/fight_distance_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "order106-client-regressions"
+        "order107-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
-    "tests/unit/test_order106_pile_in.py": {
+    "tests/unit/test_order107_fight_distance_window.py": {
       "category": "rule_semantics",
       "operations": [
-        "order106-client-regressions"
+        "order107-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
     },
-    "tests/unit/test_phase15c_fight_order.py": {
+    "tests/unit/test_order97_secondary_clause_evidence.py": {
       "category": "rule_semantics",
       "operations": [
-        "order106-client-regressions"
+        "order107-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
-      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+    },
+    "tests/unit/test_phase15d_fight_resolution.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order107-client-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+    },
+    "tests/unit/test_phase17g_aeldari_army_rule.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order107-client-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+    },
+    "tools/core_rules_order97_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue534-order97-history",
+        "issue535-order97-history",
+        "order104-historical-evidence",
+        "order107-historical-evidence",
+        "shock-source-generation-and-audit"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve original Order97 assertion evidence while current fixtures establish the source-required phase and step. Add a bounded mapping through the existing authenticated historical resolver.",
+      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "unchanged_work": "Only the existing offline audit mapping inventory and immutable original file copies change. Runtime movement, replay, serializers, search and caches do not consume this archive. All prior archive bytes and pins remain unchanged; current gameplay tests still execute normally."
     }
   },
   "milestone": "ordinary",

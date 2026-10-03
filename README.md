@@ -2,6 +2,10 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 107 / P12D limits extra Pile In and Consolidation distance to their matching
+Fight phase steps. Overrun retains three inches through the shared ordinary and
+attached movement authority. See [source, scope and validation](docs/ORDER_107_SCOPE_PLAN.md).
+
 Order 106 / P12C requires each moved Pile In model to approach its initially
 closest selected target and engage it when a legal witnessed move can do so.
 Ordinary and attached units share the existing movement reachability constraints,

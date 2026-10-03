@@ -1,0 +1,26 @@
+{
+  "reviewed_commit": "19f1c507541321b7c1ed04f80e2c1110a1fa786d",
+  "also_present_at_base": "1ce35d51f1d5e82eb99e909bb8803a7d54e5a969",
+  "purpose": "Authenticate original Order 97 evidence after current distance-query fixtures establish the matching Fight step. The original assertions and file pins remain unchanged. These copies are historical evidence, not current Order107 semantic compliance.",
+  "current_evidence": "docs/ORDER_107_SCOPE_PLAN.md",
+  "files": [
+    {
+      "path": "tests/unit/test_order97_secondary_clause_evidence.py",
+      "historical_path": "data/source_audits/order107/baseline/tests/unit/test_order97_secondary_clause_evidence.py.txt",
+      "git_revision": "19f1c507541321b7c1ed04f80e2c1110a1fa786d",
+      "git_path": "tests/unit/test_order97_secondary_clause_evidence.py",
+      "sha256": "82ed94bc4d54196a40d3138e0670fcbdd5ed316177576734e90451892ff5a047",
+      "bytes": 47002,
+      "order97_file_pin": "82ed94bc4d54196a40d3138e0670fcbdd5ed316177576734e90451892ff5a047"
+    },
+    {
+      "path": "tests/unit/test_phase15d_fight_resolution.py",
+      "historical_path": "data/source_audits/order107/baseline/tests/unit/test_phase15d_fight_resolution.py.txt",
+      "git_revision": "19f1c507541321b7c1ed04f80e2c1110a1fa786d",
+      "git_path": "tests/unit/test_phase15d_fight_resolution.py",
+      "sha256": "67cf08c00ab604314870841204a8a007518037f9308c1b82e8684217f609dcb3",
+      "bytes": 319702,
+      "order97_file_pin": "67cf08c00ab604314870841204a8a007518037f9308c1b82e8684217f609dcb3"
+    }
+  ]
+}

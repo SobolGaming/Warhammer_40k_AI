@@ -18,6 +18,7 @@ from tools.core_rules_order97_history import (
     ORDER102_MAPPING,
     ORDER103_MAPPING,
     ORDER104_MAPPING,
+    ORDER107_MAPPING,
     historical_evidence_path,
 )
 
@@ -178,7 +179,16 @@ def test_order97_rejects_duplicated_nonoperative_disposition(
 
 
 @pytest.mark.parametrize(
-    ("reference", "mapping_name", "base", "sha256", "byte_count", "prior_mappings"),
+    (
+        "reference",
+        "mapping_name",
+        "base",
+        "sha256",
+        "byte_count",
+        "prior_mappings",
+        "reviewed_commit",
+        "file_count",
+    ),
     [
         (
             "tests/unit/test_phase16b_prebattle.py",
@@ -187,6 +197,8 @@ def test_order97_rejects_duplicated_nonoperative_disposition(
             "c1fcf7728167c259abfd08e08565aa2c1f637837751afd8d40b29f6f258959fb",
             104510,
             (MAPPING, ORDER102_MAPPING, ORDER103_MAPPING),
+            "8007555ef23e85c11d39b294acec02bd83fc3271",
+            1,
         ),
         (
             "tests/unit/test_order64_reserve_lifetimes.py",
@@ -195,6 +207,8 @@ def test_order97_rejects_duplicated_nonoperative_disposition(
             "93853589f0f45bd115d87ca6ef07467af5442b7ad8822e08c8683c973b15ea2e",
             14378,
             (MAPPING, ORDER102_MAPPING, ORDER103_MAPPING, ISSUE535_MAPPING),
+            "8007555ef23e85c11d39b294acec02bd83fc3271",
+            1,
         ),
         (
             "tests/unit/test_phase13b_shooting_phase_declarations.py",
@@ -203,6 +217,42 @@ def test_order97_rejects_duplicated_nonoperative_disposition(
             "eb2288b80e5a93ec2f5d644988ccbb5f045947d2937137d43da6880e2b9c1837",
             193517,
             (MAPPING, ORDER102_MAPPING, ORDER103_MAPPING, ISSUE535_MAPPING, ISSUE534_MAPPING),
+            "8007555ef23e85c11d39b294acec02bd83fc3271",
+            1,
+        ),
+        (
+            "tests/unit/test_order97_secondary_clause_evidence.py",
+            ORDER107_MAPPING,
+            "1ce35d51f1d5e82eb99e909bb8803a7d54e5a969",
+            "82ed94bc4d54196a40d3138e0670fcbdd5ed316177576734e90451892ff5a047",
+            47002,
+            (
+                MAPPING,
+                ORDER102_MAPPING,
+                ORDER103_MAPPING,
+                ISSUE535_MAPPING,
+                ISSUE534_MAPPING,
+                ORDER104_MAPPING,
+            ),
+            "19f1c507541321b7c1ed04f80e2c1110a1fa786d",
+            2,
+        ),
+        (
+            "tests/unit/test_phase15d_fight_resolution.py",
+            ORDER107_MAPPING,
+            "1ce35d51f1d5e82eb99e909bb8803a7d54e5a969",
+            "67cf08c00ab604314870841204a8a007518037f9308c1b82e8684217f609dcb3",
+            319702,
+            (
+                MAPPING,
+                ORDER102_MAPPING,
+                ORDER103_MAPPING,
+                ISSUE535_MAPPING,
+                ISSUE534_MAPPING,
+                ORDER104_MAPPING,
+            ),
+            "19f1c507541321b7c1ed04f80e2c1110a1fa786d",
+            2,
         ),
     ],
 )
@@ -214,6 +264,8 @@ def test_original_assertions_remain_exact_and_fail_closed(
     sha256: str,
     byte_count: int,
     prior_mappings: tuple[str, ...],
+    reviewed_commit: str,
+    file_count: int,
 ) -> None:
     for name in prior_mappings:
         path = tmp_path / name
@@ -225,10 +277,10 @@ def test_original_assertions_remain_exact_and_fail_closed(
     map_path.parent.mkdir(parents=True, exist_ok=True)
     map_path.write_bytes((audit.ROOT / mapping_name).read_bytes())
     mapping = json.loads(map_path.read_bytes())
-    assert mapping["reviewed_commit"] == "8007555ef23e85c11d39b294acec02bd83fc3271"
+    assert mapping["reviewed_commit"] == reviewed_commit
     assert mapping["also_present_at_base"] == base
-    assert len(mapping["files"]) == 1
-    row = mapping["files"][0]
+    assert len(mapping["files"]) == file_count
+    row = next(item for item in mapping["files"] if item["path"] == reference)
     assert row["path"] == row["git_path"] == reference
     assert row["git_revision"] == mapping["reviewed_commit"]
     assert row["sha256"] == row["order97_file_pin"] == sha256
