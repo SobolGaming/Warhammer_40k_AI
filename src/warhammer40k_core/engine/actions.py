@@ -20,6 +20,7 @@ class MissionActionStatus(StrEnum):
 
 
 MISSION_ACTION_UNIT_MOVED_INTERRUPTION_REASON = "unit_moved"
+MISSION_ACTION_UNIT_BATTLE_SHOCKED_INTERRUPTION_REASON = "unit_battle_shocked"
 MISSION_ACTION_UNIT_DESTROYED_INTERRUPTION_REASON = "unit_destroyed"
 MISSION_ACTION_UNIT_LEFT_BATTLEFIELD_INTERRUPTION_REASON = "unit_left_battlefield"
 MISSION_ACTION_COMPLETION_CONDITION_FAILED_REASON = "completion_condition_failed"
@@ -225,11 +226,13 @@ class MissionActionState:
         scoring_source_id: str,
         victory_points: int,
         battle_shocked_unit_ids: tuple[str, ...] = (),
+        battle_shock_permission_source_ids: tuple[str, ...] = (),
     ) -> Self:
         _reject_battle_shocked_action_unit(
             unit_instance_id=unit_instance_id,
             battle_shocked_unit_ids=battle_shocked_unit_ids,
             action_state="start",
+            permission_source_ids=battle_shock_permission_source_ids,
         )
         return cls(
             action_id=action_id,
@@ -258,6 +261,7 @@ class MissionActionState:
         award: VictoryPointAward,
         transaction_id: str,
         battle_shocked_unit_ids: tuple[str, ...] = (),
+        battle_shock_permission_source_ids: tuple[str, ...] = (),
     ) -> Self:
         if self.status is not MissionActionStatus.STARTED:
             raise GameLifecycleError("Only started mission Actions can complete.")
@@ -265,6 +269,7 @@ class MissionActionState:
             unit_instance_id=self.unit_instance_id,
             battle_shocked_unit_ids=battle_shocked_unit_ids,
             action_state="complete",
+            permission_source_ids=battle_shock_permission_source_ids,
         )
         requested_timing = _validate_identifier("completion_timing", completion_timing)
         if requested_timing != self.completion_timing:
@@ -307,6 +312,7 @@ class MissionActionState:
         phase: str,
         completion_timing: str,
         battle_shocked_unit_ids: tuple[str, ...] = (),
+        battle_shock_permission_source_ids: tuple[str, ...] = (),
     ) -> Self:
         if self.status is not MissionActionStatus.STARTED:
             raise GameLifecycleError("Only started mission Actions can complete.")
@@ -316,6 +322,7 @@ class MissionActionState:
             unit_instance_id=self.unit_instance_id,
             battle_shocked_unit_ids=battle_shocked_unit_ids,
             action_state="complete",
+            permission_source_ids=battle_shock_permission_source_ids,
         )
         requested_timing = _validate_identifier("completion_timing", completion_timing)
         if requested_timing != self.completion_timing:
@@ -347,7 +354,10 @@ class MissionActionState:
         if self.status is not MissionActionStatus.STARTED:
             raise GameLifecycleError("Only started mission Actions can be interrupted.")
         requested_reason = _validate_identifier("reason", reason)
-        if requested_reason not in self.interruption_conditions:
+        if (
+            requested_reason not in self.interruption_conditions
+            and requested_reason != MISSION_ACTION_UNIT_BATTLE_SHOCKED_INTERRUPTION_REASON
+        ):
             raise GameLifecycleError("Mission Action interruption reason is not configured.")
         return type(self)(
             action_id=self.action_id,
@@ -527,6 +537,7 @@ def _reject_battle_shocked_action_unit(
     unit_instance_id: str,
     battle_shocked_unit_ids: tuple[str, ...],
     action_state: str,
+    permission_source_ids: tuple[str, ...] = (),
 ) -> None:
     unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
     shocked_ids = set(
@@ -536,7 +547,10 @@ def _reject_battle_shocked_action_unit(
             min_length=0,
         )
     )
-    if unit_id in shocked_ids:
+    permission = _validate_identifier_tuple(
+        "battle_shock_permission_source_ids", permission_source_ids, min_length=0
+    )
+    if unit_id in shocked_ids and not permission:
         requested_state = _validate_identifier("action_state", action_state)
         raise GameLifecycleError(f"Battle-shocked units cannot {requested_state} actions.")
 

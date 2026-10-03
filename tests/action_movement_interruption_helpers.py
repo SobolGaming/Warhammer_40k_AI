@@ -56,7 +56,10 @@ def action_opportunity_session(
     attached: bool = False,
     mission_action_id: str = "maintain-control",
     pause_after_move: bool = False,
+    supporting_control: bool = False,
     catalog_transform: Callable[[ArmyCatalog], ArmyCatalog] | None = None,
+    starting_phase: BattlePhase = BattlePhase.SHOOTING,
+    game_id: str = "phase11c-game",
 ) -> tuple[LocalGameSession, str]:
     units = (
         (
@@ -91,9 +94,10 @@ def action_opportunity_session(
         defender_force_disposition_id="priority-assets",
     )
     state = phase17n_state_with_setup(
+        game_id=game_id,
         setup=setup,
         active_player_id="player-b",
-        phase=BattlePhase.SHOOTING,
+        phase=starting_phase,
         battle_round=1,
         player_b_units=units,
         player_b_attachment_declarations=attachments,
@@ -126,6 +130,20 @@ def action_opportunity_session(
                 ),
             )
         )
+        if supporting_control:
+            state.battlefield_state = state.battlefield_state.with_unit_placement(
+                with_model_offsets(
+                    spare,
+                    target,
+                    offsets=(
+                        (-1.5, -1.5),
+                        (0, -1.5),
+                        (1.5, -1.5),
+                        (3, -1.5),
+                        (4.5, -1.5),
+                    ),
+                )
+            )
     if mission_action_id == "cleanse-objective":
         state.secondary_mission_choices = [
             choice
@@ -189,11 +207,15 @@ def action_movement_session(
     attached: bool = False,
     mission_action_id: str = "maintain-control",
     pause_after_move: bool = False,
+    supporting_control: bool = False,
+    catalog_transform: Callable[[ArmyCatalog], ArmyCatalog] | None = None,
 ) -> tuple[LocalGameSession, str]:
     session, _ = action_opportunity_session(
         attached=attached,
         mission_action_id=mission_action_id,
         pause_after_move=pause_after_move,
+        supporting_control=supporting_control,
+        catalog_transform=catalog_transform,
     )
     lifecycle = session.lifecycle
     state = lifecycle.state

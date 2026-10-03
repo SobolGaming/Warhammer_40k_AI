@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+from warhammer40k_core.engine.mission_action_battle_shock import (
+    ACTION_BATTLE_SHOCK_CONSUMER_ID,
+    clause_grants_action_battle_shock_permission,
+    effect_grants_action_battle_shock_permission,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -37,6 +42,7 @@ _BATTLE_SHOCK_REROLL_ROLL_TYPES = frozenset(
 
 def registered_hook_ids() -> tuple[str, ...]:
     return (
+        ACTION_BATTLE_SHOCK_CONSUMER_ID,
         CATALOG_IR_CRITICAL_HIT_THRESHOLD_CONSUMER_ID,
         CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID,
         CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID,
@@ -54,6 +60,8 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Catalog contextual status consumer requires RuleClause values.")
     consumer_ids: set[str] = set()
+    if clause_grants_action_battle_shock_permission(clause):
+        consumer_ids.add(ACTION_BATTLE_SHOCK_CONSUMER_ID)
     if (
         clause.target is not None
         and clause.target.kind
@@ -91,6 +99,8 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
 def hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
     if type(effect) is not RuleEffectSpec:
         raise GameLifecycleError(_RULE_EFFECT_SPEC_ERROR)
+    if effect_grants_action_battle_shock_permission(effect):
+        return (ACTION_BATTLE_SHOCK_CONSUMER_ID,)
     if _effect_is_critical_hit_threshold(effect):
         return (CATALOG_IR_CRITICAL_HIT_THRESHOLD_CONSUMER_ID,)
     if _effect_is_shadow_of_chaos_status(effect):

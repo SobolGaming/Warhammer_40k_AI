@@ -8,6 +8,9 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.actions import MissionActionState
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.event_log import EventRecord
+from warhammer40k_core.engine.mission_action_battle_shock import (
+    action_battle_shock_permission_sources,
+)
 from warhammer40k_core.engine.mission_action_eligibility import (
     mission_action_unit_ineligibility_reason,
 )
@@ -364,7 +367,11 @@ def validate_primary_mission_action_start_evidence(
         raise GameLifecycleError("Primary Mission Action unit lacked positive Objective Control.")
     if {"AIRCRAFT", "FORTIFICATION"}.intersection(evidence.keyword_tokens):
         raise GameLifecycleError("Primary Mission Action unit has an ineligible keyword.")
-    if evidence.battle_shocked:
+    if evidence.battle_shocked and not action_battle_shock_permission_sources(
+        state=state,
+        unit_instance_id=evidence.unit_instance_id,
+        present_model_ids=evidence.placed_alive_model_instance_ids,
+    ):
         raise GameLifecycleError("Battle-shocked unit started a Primary Mission Action.")
     if evidence.within_enemy_engagement_range and "TITANIC" not in evidence.keyword_tokens:
         raise GameLifecycleError("Engaged non-Titanic unit started a Primary Mission Action.")
@@ -677,8 +684,6 @@ def evaluate_primary_mission_action_completion_evidence(
     evidence: PrimaryMissionActionCompletionEvidence,
     policy: MissionActionPolicyDescriptor,
 ) -> bool:
-    if evidence.action_unit_battle_shocked:
-        return False
     effect = policy.effect_descriptor
     if effect == PRIMARY_MISSION_ACTION_SURVEIL_EFFECT:
         return True

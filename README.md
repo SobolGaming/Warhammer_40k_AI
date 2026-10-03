@@ -2,6 +2,10 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 110 / P16C immediately interrupts Actions on newly applied Battle-shock.
+Explicit source permission allows shocked starts and continuation; original
+restrictions and movement interruption remain. See [scope and evidence](docs/ORDER_110_SCOPE_PLAN.md).
+
 Order 109 / P14B requires a controlling unit to be in objective range and contain
 a positive-OC model, which may be outside that range. Player scores still sum
 only in-range models. Shared Stratagem selection and frozen mission completion

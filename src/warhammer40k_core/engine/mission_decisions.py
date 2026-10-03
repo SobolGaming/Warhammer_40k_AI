@@ -15,6 +15,9 @@ from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRe
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.mission_action_battle_shock import (
+    action_battle_shock_permission_sources,
+)
 from warhammer40k_core.engine.mission_action_modifier_evaluation import (
     MISSION_ACTION_OC_SCOPE_KEY,
     mission_action_registry_for_request,
@@ -829,6 +832,8 @@ def _apply_start_mission_action(
     if rules_unit_is_battle_shocked(
         state=state,
         unit_instance_id=unit_instance_id,
+    ) and not action_battle_shock_permission_sources(
+        state=state, unit_instance_id=unit_instance_id
     ):
         raise GameLifecycleError("Battle-shocked units cannot start actions.")
     target_id = _payload_string(payload, key="target_id")
@@ -901,6 +906,9 @@ def _apply_start_mission_action(
         scoring_source_id=mission_action.scoring_source_id,
         victory_points=mission_action.victory_points,
         battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
+        battle_shock_permission_source_ids=action_battle_shock_permission_sources(
+            state=state, unit_instance_id=unit_instance_id
+        ),
     )
     if mission_action.completion_timing == "immediate":
         completed_state = action_state.complete_without_award(
@@ -908,6 +916,9 @@ def _apply_start_mission_action(
             phase=_current_phase(state).value,
             completion_timing=mission_action.completion_timing,
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
+            battle_shock_permission_source_ids=action_battle_shock_permission_sources(
+                state=state, unit_instance_id=unit_instance_id
+            ),
         )
         state.record_mission_action_state(completed_state)
     else:

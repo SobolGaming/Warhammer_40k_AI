@@ -1,5 +1,9 @@
 # CORE V2 external contract
 
+Contract 44.2 adds the public Action Battle-shock interruption source event,
+with existing submission, event and persistence envelopes. Exact runtime identity
+remains required. See [Order 110](../docs/ORDER_110_SCOPE_PLAN.md).
+
 Contract 44.1 publishes the complete current ordinary Shooting history required
 by Firing Deck declarations. Clients copy the advertised list; null means no
 ordinary history authority. Submissions, schemas and Contract 44 persistence
@@ -51,7 +55,7 @@ from HealingEffect and requires source-bound engagement evidence on battlefield
 revival events. See [35 to 36 migration](migrations/35-to-36.md).
 
 
-Contract version: `44.1.0`
+Contract version: `44.2.0`
 
 Order 81 / P03E restores the existing pending-proposal contract for all 13
 parameterized families. Interaction conformance examples now preserve the four

@@ -1070,8 +1070,10 @@ def phase17n_state_with_setup(
     player_b_units: tuple[UnitMusterSelection, ...] | None = None,
     player_b_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
     player_a_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
+    game_id: str = "phase11c-game",
 ) -> GameState:
     state = battle_state(
+        game_id=game_id,
         player_a_units=player_a_units,
         player_b_units=player_b_units,
         player_b_attachment_declarations=player_b_attachment_declarations,

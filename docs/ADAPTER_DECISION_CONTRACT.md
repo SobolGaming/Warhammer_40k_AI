@@ -7431,3 +7431,21 @@ The shared engine validates witnessed climbing contact and Dense floor transit.
 Solid opening volumes govern continuous visibility and every-part endpoints;
 physical transit keeps actual openings. Adapters must use engine diagnostics
 and witnesses. Normal saves and replay require the matching runtime build.
+
+
+## Order 110: Action interruption on Battle-shock
+
+Contract 44.2 adds the public `mission_action_battle_shock_applied` source event
+inside the existing event envelope. It records game, round, active player, phase,
+the Core FAQ source ID, original Battle-shock result ID, shocked rules-unit IDs
+and interrupted Action IDs. Each stopped Action receives the existing
+`mission_action_interrupted` terminal event with reason `unit_battle_shocked`
+and the source event ID/type. No new player choice or submission shape is added.
+
+Failed tests and direct movement-generated Battle-shock use the same status
+transition owner. An explicit catalog RuleIR permission is consumed by Action
+eligibility and continuation, without changing other Action restrictions.
+Adapters observe the ordinary public Action state/event path; clearing the later
+Battle-shock status cannot revive a terminal Action. Existing event and
+persistence schemas remain unchanged; saves/replays require the exact runtime
+identity. See [Order 110](ORDER_110_SCOPE_PLAN.md) for bounded source scope.
