@@ -218,7 +218,9 @@ class TerrainVisibilityContext:
                 self.terrain_areas,
             ),
         )
-        terrain_volumes = self.terrain_volumes
+        terrain_volumes = _validate_terrain_volume_tuple(
+            "TerrainVisibilityContext terrain_volumes", self.terrain_volumes
+        )
         if not terrain_volumes:
             terrain_volumes = tuple(
                 volume for feature in terrain_features for volume in feature.terrain_volumes()

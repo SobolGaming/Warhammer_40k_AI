@@ -1508,14 +1508,6 @@ def test_order74_terrain_proof_does_not_reuse_a_changed_query_or_invent_impossib
         terrain=terrain.terrain,
         terrain_features=terrain.terrain_features,
     )
-    if change == "support_alias":
-        # The original alias still prevents an unsound impossibility proof.
-        # Its reachable positive control needs physical room over the floor:
-        # a shared support ID cannot authorize ending inside a low Solid wall.
-        feature = terrain.terrain_features[0]
-        feature = replace(feature, walls=(replace(feature.walls[0], bottom_z_inches=3.1),))
-        terrain = replace(terrain, terrain=feature.wall_volumes(), terrain_features=(feature,))
-        query = replace(query, terrain_context=terrain)
     if change in {"raw", "target", "support_alias"}:
         assert movement_reachability(query).status.value == "reachable"
 

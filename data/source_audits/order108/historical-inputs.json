@@ -1,7 +1,7 @@
 {
   "reviewed_commit": "19f1c507541321b7c1ed04f80e2c1110a1fa786d",
   "also_present_at_base": "eebdaa2ccadef14b6115aea7caea3cb1c89eb564",
-  "purpose": "Retain original Order97 climb fixtures before legal contact and floor-avoidance route corrections. Original source assertions and file pins remain unchanged; these bytes are historical evidence, not Order108 compliance.",
+  "purpose": "Retain original Order97 climb fixtures before legal contact and floor-avoidance route corrections. Original source assertions and file pins remain unchanged; these bytes are historical evidence, not Order108 compliance. Preserve the original mixed-flight contact and support-alias positive fixtures before physical-legality corrections.",
   "current_evidence": "docs/ORDER_108_SCOPE_PLAN.md",
   "files": [
     {
@@ -12,6 +12,24 @@
       "sha256": "b317f4ff30b323d66f65f6fd31c5ace70587e69e652234f52fb4bc5af8b7792e",
       "bytes": 41571,
       "order97_file_pin": "b317f4ff30b323d66f65f6fd31c5ace70587e69e652234f52fb4bc5af8b7792e"
+    },
+    {
+      "path": "tests/unit/test_order51_flight.py",
+      "historical_path": "data/source_audits/order108/baseline/tests/unit/test_order51_flight.py.txt",
+      "git_revision": "19f1c507541321b7c1ed04f80e2c1110a1fa786d",
+      "git_path": "tests/unit/test_order51_flight.py",
+      "sha256": "cdad95b5084445d9dc66157cd631e3736eef76a24048cbe6313807c5dc7c9005",
+      "bytes": 30744,
+      "order97_file_pin": "cdad95b5084445d9dc66157cd631e3736eef76a24048cbe6313807c5dc7c9005"
+    },
+    {
+      "path": "tests/unit/test_visibility_pathing.py",
+      "historical_path": "data/source_audits/order108/baseline/tests/unit/test_visibility_pathing.py.txt",
+      "git_revision": "19f1c507541321b7c1ed04f80e2c1110a1fa786d",
+      "git_path": "tests/unit/test_visibility_pathing.py",
+      "sha256": "44dce3d5d6a33acf0990bd95f9f9c6d1b18286387a55fdf41ff2c4fb699d2f5c",
+      "bytes": 72219,
+      "order97_file_pin": "44dce3d5d6a33acf0990bd95f9f9c6d1b18286387a55fdf41ff2c4fb699d2f5c"
     }
   ]
 }

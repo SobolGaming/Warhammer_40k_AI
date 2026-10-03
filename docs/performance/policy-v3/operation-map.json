@@ -2400,8 +2400,10 @@
         "tests/code_quality/test_performance_policy.py",
         "tests/order108_terrain_helpers.py",
         "tests/unit/test_order108_terrain_semantics.py",
+        "tests/unit/test_order51_flight.py",
         "tests/unit/test_order97_secondary_clause_evidence.py",
-        "tests/unit/test_phase10i_terrain_movement.py"
+        "tests/unit/test_phase10i_terrain_movement.py",
+        "tests/unit/test_visibility_pathing.py"
       ],
       "owners": [
         "@document",
@@ -2420,10 +2422,12 @@
         "test_facade_terrain_rejection_retry_pending_completed_restore_and_replay",
         "test_floor_transit_permissions_and_valid_context_persistence",
         "test_forbidden_terrain_paths_are_rejected",
+        "test_heavy_uses_each_models_accepted_vertical_distance",
         "test_high_opening_and_body_protrusion_boundaries",
         "test_model_can_climb_tall_terrain_by_paying_vertical_distance",
         "test_order108_scope_preserves_other_assessment_obligations",
         "test_order108_smoke_scope_authenticates_complete_semantic_rows",
+        "test_order74_terrain_proof_does_not_reuse_a_changed_query_or_invent_impossibility",
         "test_order97_terrain_permitted_vertical_transit",
         "test_original_assertions_remain_exact_and_fail_closed",
         "test_oval_rotating_contact_uses_continuous_support_minimum",
@@ -2445,7 +2449,9 @@
     },
     "order108-historical-evidence": {
       "paths": [
+        "data/source_audits/order108/baseline/tests/unit/test_order51_flight.py.txt",
         "data/source_audits/order108/baseline/tests/unit/test_phase10i_terrain_movement.py.txt",
+        "data/source_audits/order108/baseline/tests/unit/test_visibility_pathing.py.txt",
         "data/source_audits/order108/historical-inputs.json",
         "tools/core_rules_order97_history.py"
       ],

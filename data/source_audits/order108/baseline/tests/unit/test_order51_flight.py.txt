@@ -386,36 +386,6 @@ def test_heavy_uses_each_models_accepted_vertical_distance(selected: bool, mixed
         ]
     assert state.battlefield_state is not None
     placement = state.battlefield_state.unit_placement_by_id(unit.unit_instance_id)
-    from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
-    from warhammer40k_core.geometry.terrain import (
-        TerrainFeatureDefinition,
-        TerrainFeatureKind,
-        TerrainWallDefinition,
-    )
-    from warhammer40k_core.geometry.terrain_classification import TerrainAreaClassification
-
-    # Non-FLY members climb alongside a real wall, retaining the original
-    # paths and per-model distance assertions without climbing empty space.
-    display = TerrainDisplayGeometry.axis_aligned_rectangle(
-        center_x_inches=14,
-        center_y_inches=21,
-        width_inches=10,
-        depth_inches=0.1,
-        display_template_id="order51-contact",
-    )
-    contact_wall = TerrainFeatureDefinition(
-        feature_id="order51-contact",
-        feature_kind=TerrainFeatureKind.BATTLEFIELD_DEBRIS_AND_STATUARY,
-        footprint_center_x_inches=14,
-        footprint_center_y_inches=21,
-        footprint_width_inches=10,
-        footprint_depth_inches=0.1,
-        rules_footprint_polygon=display.footprint_polygon,
-        display_geometry=display,
-        classification=TerrainAreaClassification.LIGHT,
-        walls=(TerrainWallDefinition("wall", 14, 21, 0, 10, 0.1, 2),),
-    )
-    state.battlefield_state = replace(state.battlefield_state, terrain_features=(contact_wall,))
     witness = PathWitness.for_paths(
         tuple(
             (

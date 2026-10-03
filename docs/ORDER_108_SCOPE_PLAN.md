@@ -96,6 +96,15 @@ bytes from merged Order 97 commit `19f1c507541321b7c1ed04f80e2c1110a1fa786d`
 are authenticated by the existing historical resolver. No original assertion
 or source pin is repinned.
 
+The mixed-flight distance fixture retains its original paths and every distance
+assertion while declaring a nearby wall for its non-FLY members to climb. The
+support-alias cache test retains its original conservative proof assertion;
+its reachability positive control raises the physical wall above the supported
+floor, since a shared support ID cannot permit an endpoint inside Solid.
+Original bytes of both test modules remain authenticated Order 97 evidence.
+Visibility volume inputs are validated before Solid augmentation, preserving
+the existing typed tuple boundary.
+
 Complete covered behavior at 85%, quality/type/lint/contracts, hosted CI and
 both clean exact-head reviews remain delivery requirements. The owner's
 performance direction selects the serial live smoke and exact-base assessment

@@ -1,8 +1,8 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "eebdaa2ccadef14b6115aea7caea3cb1c89eb564",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:98ecd4141aab60d54cee93bda732eb7c9e001e70484664949953e97733ebf36d",
-  "operation_map_sha256": "4f72a9565f3c1e6f3395c8c47bf9c4039e84eecb2cba025a4e804ec1552e896c",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2bb18b0c497c738d486c0889c91c9d39c3350382e4d06635c410d0c53dc1ae14",
+  "operation_map_sha256": "45809c0e30eca43930df9abaa35b8e8bf4be5b4083132d8ab0d936d1941e2123",
   "changes": {
     "ci/test_shards/durations.json": {
       "before_sha256": "ffd11b5979c5df49ee2f17f990e9cc9e68149497d4c4616a7b943297ec05149c",
@@ -136,81 +136,91 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "bf21ad4885ec75a42fcd9d0eeedd20b1f12ea6cf1bea5a940e4ecdec4823b9d4",
-      "after_sha256": "7ad3aa50c69a63606bd85cdfc5909fbc7c4432d37a698ab3c1881bfcf512f40c",
+      "after_sha256": "3da323c92bd7a22fbaa3a09e89ac6e5d1261ac2bdac62d4bdf9c65c8dce65ec5",
       "owners": {
         "@document": {
           "before": "bf21ad4885ec75a42fcd9d0eeedd20b1f12ea6cf1bea5a940e4ecdec4823b9d4",
-          "after": "7ad3aa50c69a63606bd85cdfc5909fbc7c4432d37a698ab3c1881bfcf512f40c"
+          "after": "3da323c92bd7a22fbaa3a09e89ac6e5d1261ac2bdac62d4bdf9c65c8dce65ec5"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "e55ecb918493a00763269b6b570730654f51b7691e05749fac5d322b9dae12b2",
-      "after_sha256": "86431ae8abb96a76801faaed546195eb421367ac18b0161c2b8401bb293df6cb",
+      "after_sha256": "e9c062fdb7db441780f61ac1258b48c7a4ed365ec6a854c2f6a41aef96517eea",
       "owners": {
         "@document": {
           "before": "e55ecb918493a00763269b6b570730654f51b7691e05749fac5d322b9dae12b2",
-          "after": "86431ae8abb96a76801faaed546195eb421367ac18b0161c2b8401bb293df6cb"
+          "after": "e9c062fdb7db441780f61ac1258b48c7a4ed365ec6a854c2f6a41aef96517eea"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "26909dbbc3fae97a81f29af0adf88cff58782eb3abbfc409f92f24505961635c",
-      "after_sha256": "415d6fea22b5b2ae105aba7c858ad192659200bc508063824515865a2929f0ce",
+      "after_sha256": "4b4398ef177b81629d159932268ee74050dab53e37dd5908ed2f99fda580b10a",
       "owners": {
         "@document": {
           "before": "26909dbbc3fae97a81f29af0adf88cff58782eb3abbfc409f92f24505961635c",
-          "after": "415d6fea22b5b2ae105aba7c858ad192659200bc508063824515865a2929f0ce"
+          "after": "4b4398ef177b81629d159932268ee74050dab53e37dd5908ed2f99fda580b10a"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "1433693756ba69a76aac1e8d58748fb5d96a00ef05b90fb55674052444fe580c",
-      "after_sha256": "89100011e30359b680cd0b4db49b4551a26deddafff7ac7cb4b908eab1b13613",
+      "after_sha256": "ac695743a13152211ffdde8c7fe396a0b78a9e31618e6109dcbd72313060e8ce",
       "owners": {
         "@document": {
           "before": "1433693756ba69a76aac1e8d58748fb5d96a00ef05b90fb55674052444fe580c",
-          "after": "89100011e30359b680cd0b4db49b4551a26deddafff7ac7cb4b908eab1b13613"
+          "after": "ac695743a13152211ffdde8c7fe396a0b78a9e31618e6109dcbd72313060e8ce"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "f3b45427dd7c45fb2bc5b9ebb4c2c6a608b185f0fbe222be3bd754fd319745f4",
-      "after_sha256": "7554ad12fd139f886de90a02fcc817e337e43e7d5750626fc2f92b464a69a3b1",
+      "after_sha256": "ed034d526f5199276fb4c6a4c209c651f1bf816277a84a3c044d5e87777b872d",
       "owners": {
         "@document": {
           "before": "f3b45427dd7c45fb2bc5b9ebb4c2c6a608b185f0fbe222be3bd754fd319745f4",
-          "after": "7554ad12fd139f886de90a02fcc817e337e43e7d5750626fc2f92b464a69a3b1"
+          "after": "ed034d526f5199276fb4c6a4c209c651f1bf816277a84a3c044d5e87777b872d"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "92b0da7c1ce1f65e78e34ad2c01f91b166f106e86f872aebb73cf539967df0aa",
-      "after_sha256": "e7bc227e68ce8819fb755323809e791992a523444783f4ce9309bc0bccd5c089",
+      "after_sha256": "17d7781f19a2a962c94ccddb3d5a72fb778843ba389d69eea6c2a4466cc76624",
       "owners": {
         "@document": {
           "before": "92b0da7c1ce1f65e78e34ad2c01f91b166f106e86f872aebb73cf539967df0aa",
-          "after": "e7bc227e68ce8819fb755323809e791992a523444783f4ce9309bc0bccd5c089"
+          "after": "17d7781f19a2a962c94ccddb3d5a72fb778843ba389d69eea6c2a4466cc76624"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "1d0fb57c188af1fcec8cbb5e053708326163e64531d7836ad054178f534712af",
-      "after_sha256": "140fed738bf69f2bfbdd081f017f623615c7c7955ab0185e1959a306fa2cadd0",
+      "after_sha256": "ab9f4c72dcad950fadfb0fda8863b1e35065afdca59e9ec29fd8ed8316148b4e",
       "owners": {
         "@document": {
           "before": "1d0fb57c188af1fcec8cbb5e053708326163e64531d7836ad054178f534712af",
-          "after": "140fed738bf69f2bfbdd081f017f623615c7c7955ab0185e1959a306fa2cadd0"
+          "after": "ab9f4c72dcad950fadfb0fda8863b1e35065afdca59e9ec29fd8ed8316148b4e"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "28d6f91e6733795fbf98584461a36bdbcd4476ef7a8db3d34c2aebbf678bd451",
-      "after_sha256": "71421dcb3c36eed837d17d1954f04838851fd27d2c894404609eaffa20dccc13",
+      "after_sha256": "02c9a35970848312b28a0b42b182a8cd63b5964c628190945a44bac66dd0a6b1",
       "owners": {
         "@document": {
           "before": "28d6f91e6733795fbf98584461a36bdbcd4476ef7a8db3d34c2aebbf678bd451",
-          "after": "71421dcb3c36eed837d17d1954f04838851fd27d2c894404609eaffa20dccc13"
+          "after": "02c9a35970848312b28a0b42b182a8cd63b5964c628190945a44bac66dd0a6b1"
+        }
+      }
+    },
+    "data/source_audits/order108/baseline/tests/unit/test_order51_flight.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "cdad95b5084445d9dc66157cd631e3736eef76a24048cbe6313807c5dc7c9005",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "cdad95b5084445d9dc66157cd631e3736eef76a24048cbe6313807c5dc7c9005"
         }
       }
     },
@@ -224,13 +234,23 @@
         }
       }
     },
-    "data/source_audits/order108/historical-inputs.json": {
+    "data/source_audits/order108/baseline/tests/unit/test_visibility_pathing.py.txt": {
       "before_sha256": null,
-      "after_sha256": "2288418c2004dc0664e353dc00cb2fbd290827529fa5b631a2f9dcebaa58ef6f",
+      "after_sha256": "44dce3d5d6a33acf0990bd95f9f9c6d1b18286387a55fdf41ff2c4fb699d2f5c",
       "owners": {
         "@document": {
           "before": null,
-          "after": "2288418c2004dc0664e353dc00cb2fbd290827529fa5b631a2f9dcebaa58ef6f"
+          "after": "44dce3d5d6a33acf0990bd95f9f9c6d1b18286387a55fdf41ff2c4fb699d2f5c"
+        }
+      }
+    },
+    "data/source_audits/order108/historical-inputs.json": {
+      "before_sha256": null,
+      "after_sha256": "36849bc5a2a436eee161e961f16e8445612bccfef82f46a99be4548c5f528606",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "36849bc5a2a436eee161e961f16e8445612bccfef82f46a99be4548c5f528606"
         }
       }
     },
@@ -256,11 +276,11 @@
     },
     "docs/ORDER_108_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "c0ca06145499d3fb37d8d87201377d2bff56b36d680df67804463d05925dff58",
+      "after_sha256": "85e21647651d23b49f7ecea7b6b156e9214ed6b7cb25c1e2f4051d630e7e90eb",
       "owners": {
         "@document": {
           "before": null,
-          "after": "c0ca06145499d3fb37d8d87201377d2bff56b36d680df67804463d05925dff58"
+          "after": "85e21647651d23b49f7ecea7b6b156e9214ed6b7cb25c1e2f4051d630e7e90eb"
         }
       }
     },
@@ -276,31 +296,31 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "73b89625aad3e1a62007a2e3232fa178b1b830e21bd8ddec0e1d2d113d79ed79",
-      "after_sha256": "c7e3e42df0ae8f0ddb3e07c6e13deff08d81ac873b789c84260c9ea4bc6b3fe1",
+      "after_sha256": "09ebf454a3228b57de98012d12c6e5fd27bd34458863ef8c5b172d142ed3eb0e",
       "owners": {
         "@document": {
           "before": "73b89625aad3e1a62007a2e3232fa178b1b830e21bd8ddec0e1d2d113d79ed79",
-          "after": "c7e3e42df0ae8f0ddb3e07c6e13deff08d81ac873b789c84260c9ea4bc6b3fe1"
+          "after": "09ebf454a3228b57de98012d12c6e5fd27bd34458863ef8c5b172d142ed3eb0e"
         }
       }
     },
     "docs/performance/policy-v3/order108-rule-semantics.json": {
       "before_sha256": null,
-      "after_sha256": "9c1a62289227d12cb587f77d16d5a1b49aed6688b6b2d675535e1b0c3267a42a",
+      "after_sha256": "9ab8d531f9c9810c1fe97bc00c152a0a469c8f75ac51557cc963fe3a12c320f9",
       "owners": {
         "@document": {
           "before": null,
-          "after": "9c1a62289227d12cb587f77d16d5a1b49aed6688b6b2d675535e1b0c3267a42a"
+          "after": "9ab8d531f9c9810c1fe97bc00c152a0a469c8f75ac51557cc963fe3a12c320f9"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "aea46c8e15891b2f9229300da96cd3e772c2e95f8cb3c9a4a6405984f3acdcae",
-      "after_sha256": "1f4de472d71ffacdd70d95fdf17e1e90fe5329fe395551229d65958859800ab6",
+      "after_sha256": "9fe993028b81072793a2a70603728bbbcbf1643950027fc8145e0a16c0f4c942",
       "owners": {
         "@document": {
           "before": "aea46c8e15891b2f9229300da96cd3e772c2e95f8cb3c9a4a6405984f3acdcae",
-          "after": "1f4de472d71ffacdd70d95fdf17e1e90fe5329fe395551229d65958859800ab6"
+          "after": "9fe993028b81072793a2a70603728bbbcbf1643950027fc8145e0a16c0f4c942"
         }
       }
     },
@@ -316,11 +336,11 @@
     },
     "src/warhammer40k_core/core/visibility.py": {
       "before_sha256": "a38c5807c0cc94170dadc30d9a773c9d9c1cc3d584543736254bbe6d774ef9aa",
-      "after_sha256": "1eae8c735a6a0dfd233420b77d153e38e54685682e0c4c7758136a6764e695de",
+      "after_sha256": "912d675f133d3266aa67ddf667042a74bbe17eb9b2e73e757a2260f13d7c4b47",
       "owners": {
         "TerrainVisibilityContext.__post_init__": {
           "before": "6850f3dbac1953f602744e3c91adc53975f2a75fbf50256db136c8d57e272683",
-          "after": "7d4ec6cbfa58df8b9223d28b413c82459429046fde9c475adc22d981eb698610"
+          "after": "1a91aaffed956fab8af6940d5038da18792a38f1a2f1b5dbf18e5ae71a8fd0fb"
         },
         "_terrain_volume_feature_index": {
           "before": "7500284b51f004c409926d151abeb325906d8bc3c49e4d9139138bcd4388eaed",
@@ -640,6 +660,16 @@
         }
       }
     },
+    "tests/unit/test_order51_flight.py": {
+      "before_sha256": "cdad95b5084445d9dc66157cd631e3736eef76a24048cbe6313807c5dc7c9005",
+      "after_sha256": "98c0643d79011eb48020fd3e2ae759e7dc847ed20e6aee94594e41bc419be4a2",
+      "owners": {
+        "test_heavy_uses_each_models_accepted_vertical_distance": {
+          "before": "e1ada5eeea9c1cbce2676a957ca8af156753426afceb5be814fa943503183dde",
+          "after": "7aa0225fd4eb3d430e570c710bed804c15e5073b9302dbd5336ae784b042fa7b"
+        }
+      }
+    },
     "tests/unit/test_order97_secondary_clause_evidence.py": {
       "before_sha256": "58a2d5c0d82e7c2c30de1b5e93cbeb52d91d3261856fe80fe9e3c00ba083153f",
       "after_sha256": "6fe0b7d41c8fa1748618c0da4194a7cf327a84fa0ef4e43714f5f42a55971009",
@@ -672,13 +702,23 @@
         }
       }
     },
+    "tests/unit/test_visibility_pathing.py": {
+      "before_sha256": "44dce3d5d6a33acf0990bd95f9f9c6d1b18286387a55fdf41ff2c4fb699d2f5c",
+      "after_sha256": "da8420295b157cb0773da63cec8fee6a025e024e354cfc93b8dca57b6c82ebb3",
+      "owners": {
+        "test_order74_terrain_proof_does_not_reuse_a_changed_query_or_invent_impossibility": {
+          "before": "f41a67c1ca2247715fc15ce8de18c601e345143892059cfbe923cd9b2b700ade",
+          "after": "cc465aabfa0f38fe5e8d2659090aecf2fd4db8b3d141a40c1c9c674834349d23"
+        }
+      }
+    },
     "tools/core_rules_order97_history.py": {
       "before_sha256": "21e6135a412bf1fe14693dfbf15aed82b941c852b474308ea900b4cc493e9312",
-      "after_sha256": "c2af4ad4b08c782798ae4e917d7e82f72047943d3b2b75becf9316af5280296d",
+      "after_sha256": "aaffbd1201541287535befd8b16ae5756d6b73b0fd8745e72b5694f81721a82c",
       "owners": {
         "@module": {
           "before": "b2cb5d9b44ea09782be291633f26ce0604fc9cb439f9de38ab75d9b729c70547",
-          "after": "87df32050432011c6c68ff661c51fc1c30ce3f6e78028b8311eb6c16449adc15"
+          "after": "6ac954624df82d9b90722471335cbd1019c14d08a5105860e643cf4022d56310"
         },
         "historical_evidence_path": {
           "before": "89e586bdc52b2796542b7e20e926fdfa641b735884e8b29b889fcc57ecb1da7d",
@@ -1058,7 +1098,27 @@
       "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
       "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
+    "data/source_audits/order108/baseline/tests/unit/test_order51_flight.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order108-historical-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve original Order97 assertion evidence while current fixtures establish source-required legal climbing contact. Add a bounded mapping through the existing authenticated historical resolver.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "Only the existing offline audit mapping inventory and immutable original file copies change. Runtime movement, replay, serializers, search and caches do not consume this archive. All prior archive bytes and pins remain unchanged; current gameplay tests still execute normally."
+    },
     "data/source_audits/order108/baseline/tests/unit/test_phase10i_terrain_movement.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order108-historical-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve original Order97 assertion evidence while current fixtures establish source-required legal climbing contact. Add a bounded mapping through the existing authenticated historical resolver.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "Only the existing offline audit mapping inventory and immutable original file copies change. Runtime movement, replay, serializers, search and caches do not consume this archive. All prior archive bytes and pins remain unchanged; current gameplay tests still execute normally."
+    },
+    "data/source_audits/order108/baseline/tests/unit/test_visibility_pathing.py.txt": {
       "category": "rule_semantics",
       "operations": [
         "order108-historical-evidence"
@@ -1259,6 +1319,16 @@
       "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
       "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
+    "tests/unit/test_order51_flight.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order108-client-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
+    },
     "tests/unit/test_order97_secondary_clause_evidence.py": {
       "category": "rule_semantics",
       "operations": [
@@ -1270,6 +1340,16 @@
       "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "tests/unit/test_phase10i_terrain_movement.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order108-client-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
+    },
+    "tests/unit/test_visibility_pathing.py": {
       "category": "rule_semantics",
       "operations": [
         "order108-client-regressions"
