@@ -802,13 +802,15 @@ def test_action_permission_rejects_other_clause_shapes(variant: str) -> None:
     )
     assert descriptor.rule_ir_payload is not None
     clause = RuleIR.from_payload(cast(RuleIRPayload, descriptor.rule_ir_payload)).clauses[0]
-    assert clause.target is not None
-    assert clause.duration is not None
+    target = clause.target
+    duration = clause.duration
+    assert target is not None
+    assert duration is not None
     assert clause_grants_action_battle_shock_permission(clause)
     if variant == "target":
-        clause = replace(clause, target=replace(clause.target, kind=RuleTargetKind.THIS_MODEL))
+        clause = replace(clause, target=replace(target, kind=RuleTargetKind.THIS_MODEL))
     elif variant == "duration":
-        clause = replace(clause, duration=replace(clause.duration, kind=RuleDurationKind.IMMEDIATE))
+        clause = replace(clause, duration=replace(duration, kind=RuleDurationKind.IMMEDIATE))
     elif variant == "effect":
         clause = replace(
             clause,
@@ -823,6 +825,6 @@ def test_action_permission_rejects_other_clause_shapes(variant: str) -> None:
     else:
         clause = replace(
             clause,
-            target=replace(clause.target, parameters=parameters_from_pairs((("other", True),))),
+            target=replace(target, parameters=parameters_from_pairs((("other", True),))),
         )
     assert not clause_grants_action_battle_shock_permission(clause)

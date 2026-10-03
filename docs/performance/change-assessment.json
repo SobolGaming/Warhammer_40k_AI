@@ -536,7 +536,7 @@
     },
     "tests/unit/test_action_movement_interruption.py": {
       "before_sha256": "126c5d832a41779fc0e7ca28def1a7d82a63d7c7c58cbe2cdb8b4f5bb82735dd",
-      "after_sha256": "ea6b6b7e87a57ded5796b97c22b9905f68e312b5f13a1a43ba871cea0816f70b",
+      "after_sha256": "bed1af7a8f389b5161a82da78361db9c7ffcbc89d3d9663ef2cd7af2a2affaff",
       "owners": {
         "@module": {
           "before": "ba5b3173c30156c3b4c2dcf3fc3359da1a2d45d9898d984af2daae1bc6bfadcb",
@@ -552,7 +552,7 @@
         },
         "test_action_permission_rejects_other_clause_shapes": {
           "before": null,
-          "after": "5e0f7e09728c0280a51c7f94138d2b45072499956547d9a2732180cad8821ed7"
+          "after": "79d4cf86e85e25e4320b31d5ba235aca9a264cc23965d435d821471905487c12"
         },
         "test_action_permission_requires_present_granting_attached_component": {
           "before": null,
