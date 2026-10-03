@@ -42,3 +42,23 @@ def test_extra_attacks_commitment_never_offers_a_skip() -> None:
     )
     validator = (ENGINE / "fight_weapon_selection.py").read_text()
     assert 'violation_code="melee_extra_attacks_weapon_required"' in validator
+
+
+def test_deferred_allocation_uses_current_sequence_without_global_presence_grant() -> None:
+    tree = ast.parse((ENGINE / "attack_sequence_group_selection.py").read_text())
+    calls = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "damage_allocation_target_state"
+    ]
+    assert len(calls) == 1
+    assert any(
+        keyword.arg == "attack_sequence"
+        and isinstance(keyword.value, ast.Name)
+        and keyword.value.id == "attack_sequence"
+        for keyword in calls[0].keywords
+    )
+    presence = (ENGINE / "retained_model_presence.py").read_text()
+    assert "pending_attack_destructions" not in presence

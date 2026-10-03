@@ -2728,7 +2728,11 @@
         "test_each_physical_extra_weapon_is_required",
         "test_extra_weapons_cannot_be_skipped_and_retry_restores_and_replays",
         "test_ineligible_extra_bearer_does_not_require_a_declaration",
-        "test_mandatory_extra_selection_obeys_physical_one_shot_availability"
+        "test_mandatory_extra_selection_obeys_physical_one_shot_availability",
+        "_lethal_extra_session",
+        "_assert_deferred_allocation_boundary",
+        "test_lethal_primary_and_mandatory_extra_finish_before_deferred_destruction",
+        "test_living_attached_recipient_remains_allocatable_after_component_death"
       ],
       "families": [],
       "sensitive": false,
@@ -2744,6 +2748,21 @@
         "@document",
         "@module",
         "historical_evidence_path"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order112-deferred-allocation": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_sequence_group_selection.py",
+        "src/warhammer40k_core/engine/damage_allocation_targets.py"
+      ],
+      "owners": [
+        "@module",
+        "_has_placed_pending_destruction",
+        "_resolve_grouped_current_pool",
+        "damage_allocation_target_state"
       ],
       "families": [],
       "sensitive": false,

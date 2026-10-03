@@ -840,3 +840,282 @@ def test_extra_weapons_cannot_be_skipped_and_retry_restores_and_replays(
         .run()
         .reproduced_exactly
     )
+
+
+def _lethal_extra_session(*, random: bool) -> tuple[LocalGameSession, str]:
+    from tests.phase15c_fight_order_helpers import fight_lifecycle
+    from tests.retained_attack_helpers import lethal_retained_attack_catalog
+
+    from warhammer40k_core.core.dice import DiceExpression
+    from warhammer40k_core.core.wargear import Wargear
+    from warhammer40k_core.core.weapon_profiles import AttackProfile, WeaponKeyword
+    from warhammer40k_core.engine.damage_allocation import (
+        DestructionReactionKind,
+        DestructionReactionSource,
+    )
+
+    catalog = lethal_retained_attack_catalog()
+    blade = next(
+        gear for gear in catalog.wargear if gear.wargear_id == "core-leader-blade"
+    ).weapon_profiles[0]
+    if random:
+        blade = replace(blade, attack_profile=AttackProfile.dice(DiceExpression(1, 3, 3)))
+    extra = Wargear(
+        wargear_id="order112-lethal-extra",
+        name="Lethal Extra",
+        weapon_profiles=(
+            replace(
+                blade,
+                profile_id="order112-lethal-extra:standard",
+                keywords=(*blade.keywords, WeaponKeyword.EXTRA_ATTACKS),
+            ),
+        ),
+    )
+    catalog = replace(
+        catalog,
+        wargear=(
+            *tuple(
+                replace(gear, weapon_profiles=(blade,))
+                if gear.wargear_id == "core-leader-blade"
+                else gear
+                for gear in catalog.wargear
+            ),
+            extra,
+        ),
+        datasheets=tuple(
+            replace(
+                sheet,
+                wargear_options=tuple(
+                    replace(
+                        option,
+                        default_wargear_ids=(*option.default_wargear_ids, extra.wargear_id),
+                        allowed_wargear_ids=(*option.allowed_wargear_ids, extra.wargear_id),
+                        min_selections=2,
+                        max_selections=2,
+                    )
+                    for option in sheet.wargear_options
+                ),
+            )
+            if sheet.datasheet_id == "core-character-leader"
+            else sheet
+            for sheet in catalog.datasheets
+        ),
+    )
+    lifecycle, units = fight_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_ids=("enemy",),
+        origins={"intercessor-1": Pose.at(10, 10), "enemy": Pose.at(12, 10)},
+        game_id="order56-retained-fight-0",
+        model_count=1,
+        datasheet_id="core-character-leader",
+        model_profile_id="core-character-leader",
+        catalog=catalog,
+        fights_first_unit_keys=("intercessor-1",),
+    )
+    model_id = units["enemy"].own_models[0].model_instance_id
+    assert lifecycle.state is not None
+    lifecycle.state.record_model_destruction_reaction_sources(
+        model_instance_id=model_id,
+        sources=(
+            DestructionReactionSource(
+                source_id="order112-fight-on-death",
+                source_rule_id="order112-fight-on-death",
+                reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+            ),
+        ),
+    )
+    return LocalGameSession(lifecycle), model_id
+
+
+def _assert_deferred_allocation_boundary(session: LocalGameSession, model_id: str) -> None:
+    from warhammer40k_core.engine.damage_allocation_targets import (
+        DamageAllocationTargetState,
+        assert_damage_allocation_target_is_allocatable,
+        damage_allocation_target_state,
+    )
+    from warhammer40k_core.engine.phase import GameLifecycleError
+    from warhammer40k_core.engine.retained_model_presence import model_is_present_on_battlefield
+
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    assert state.fight_phase_state is not None
+    sequence = state.fight_phase_state.attack_sequence
+    assert sequence is not None
+    assert sequence.pending_attack_destructions
+    pending = sequence.pending_attack_destructions[0]
+    assert pending.damage_application.model_instance_id == model_id
+    target_id = pending.damage_application.target_unit_instance_id
+    assert sequence.attacks_resolved_event_id is not None
+    assert not model_is_present_on_battlefield(state=state, model_instance_id=model_id)
+    assert (
+        damage_allocation_target_state(state=state, target_unit_instance_id=target_id)
+        is DamageAllocationTargetState.ABSENT
+    )
+    with pytest.raises(GameLifecycleError, match="absent from the battlefield"):
+        assert_damage_allocation_target_is_allocatable(
+            state=state, target_unit_instance_id=target_id
+        )
+    assert (
+        damage_allocation_target_state(
+            state=state, target_unit_instance_id=target_id, attack_sequence=sequence
+        )
+        is DamageAllocationTargetState.PRESENT_WITHOUT_LIVING_MODELS
+    )
+    assert (
+        damage_allocation_target_state(
+            state=state,
+            target_unit_instance_id=target_id,
+            attack_sequence=replace(sequence, pending_attack_destructions=()),
+        )
+        is DamageAllocationTargetState.ABSENT
+    )
+    placement = state.battlefield_state.model_placement_or_none(model_id)
+    assert placement is not None
+    drifted = replace(
+        pending,
+        destroyed_model_placement=cast(
+            JsonValue, replace(placement, pose=Pose.at(30, 30)).to_payload()
+        ),
+    )
+    with pytest.raises(GameLifecycleError, match="Pending attack destruction placement drift"):
+        damage_allocation_target_state(
+            state=state,
+            target_unit_instance_id=target_id,
+            attack_sequence=replace(sequence, pending_attack_destructions=(drifted,)),
+        )
+
+
+@pytest.mark.parametrize("random", [False, True])
+def test_lethal_primary_and_mandatory_extra_finish_before_deferred_destruction(
+    random: bool,
+) -> None:
+    from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
+
+    from warhammer40k_core.engine.replay import ReplayArtifact
+
+    session, destroyed_model_id = _lethal_extra_session(random=random)
+    initial = session.lifecycle.to_payload()
+    retained = False
+    retained_declaration = False
+    restored_boundaries: set[str] = set()
+    for index in range(100):
+        request = pending_request(session)
+        if request.decision_type in {
+            "select_attack_weapon_group",
+            "select_destruction_reaction",
+            "submit_melee_declaration",
+        }:
+            checkpoint = session.to_persistence_payload()
+            fork = session.fork()
+            session = LocalGameSession.from_persistence_payload(json.loads(json.dumps(checkpoint)))
+            assert session.to_persistence_payload() == checkpoint
+            assert fork.to_persistence_payload() == checkpoint
+            restored_boundaries.add(request.decision_type)
+        if request.decision_type == "select_destruction_reaction":
+            _assert_deferred_allocation_boundary(session, destroyed_model_id)
+            events = session.lifecycle.decision_controller.event_log.records
+            skipped = [event for event in events if event.event_type == "attack_pool_not_allocated"]
+            if not random:
+                assert skipped
+                assert isinstance(skipped[-1].payload, dict)
+                assert skipped[-1].payload["reason"] == "target_present_without_living_models"
+            session.submit_option(
+                request_id=request.request_id,
+                result_id=f"order112-retain-{index}",
+                option_id="order112-fight-on-death",
+            )
+            retained = True
+        elif request.decision_type == "submit_melee_declaration":
+            payload = single_target_commitment_payload(request)
+            declarations = cast(list[dict[str, JsonValue]], payload["declarations"])
+            assert len(declarations) == 2
+            if retained:
+                before = session.to_persistence_payload()
+                invalid = dict(payload)
+                invalid["declarations"] = cast(list[JsonValue], declarations[:1])
+                status = session.submit_parameterized_payload(
+                    request_id=request.request_id,
+                    result_id="order112-retained-omit-extra",
+                    payload=invalid,
+                )
+                assert status.status_kind is LifecycleStatusKind.INVALID
+                assert session.to_persistence_payload() == before
+                retained_declaration = True
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id=f"order112-lethal-declare-{index}",
+                payload=payload,
+            )
+            assert status.status_kind is not LifecycleStatusKind.INVALID
+        else:
+            submit_fixture_request(session, request)
+        state = session.lifecycle.state
+        assert state is not None
+        assert state.battlefield_state is not None
+        if destroyed_model_id in state.battlefield_state.removed_model_ids:
+            break
+    else:
+        pytest.fail("Deferred destruction did not finish through the facade.")
+    assert retained
+    assert retained_declaration
+    events = session.lifecycle.decision_controller.event_log.records
+    assert (
+        sum(
+            event.event_type == "fight_on_death_destruction_completed"
+            and isinstance(event.payload, dict)
+            and event.payload["model_instance_id"] == destroyed_model_id
+            for event in events
+        )
+        == 1
+    )
+    assert restored_boundaries == {
+        "select_attack_weapon_group",
+        "select_destruction_reaction",
+        "submit_melee_declaration",
+    }
+    final = session.to_persistence_payload()
+    assert (
+        LocalGameSession.from_persistence_payload(
+            json.loads(json.dumps(final))
+        ).to_persistence_payload()
+        == final
+    )
+    artifact = ReplayArtifact.capture(
+        artifact_id="order112-lethal-extra",
+        final_lifecycle=session.lifecycle,
+        initial_lifecycle_payload=initial,
+    )
+    assert ReplayRunner.from_payload(artifact.to_payload()).run().reproduced_exactly
+
+
+def test_living_attached_recipient_remains_allocatable_after_component_death() -> None:
+    from warhammer40k_core.engine.damage_allocation_targets import (
+        DamageAllocationTargetState,
+        damage_allocation_target_state,
+    )
+
+    session = random_melee_session(attached=True)
+    state = session.lifecycle.state
+    assert state is not None
+    state.army_definitions = [
+        replace(
+            army,
+            units=tuple(
+                replace(
+                    unit,
+                    own_models=tuple(
+                        replace(model, wounds_remaining=0) for model in unit.own_models
+                    ),
+                )
+                if unit.unit_instance_id == "army-alpha:bodyguard"
+                else unit
+                for unit in army.units
+            ),
+        )
+        for army in state.army_definitions
+    ]
+    assert (
+        damage_allocation_target_state(state=state, target_unit_instance_id="army-alpha:bodyguard")
+        is DamageAllocationTargetState.ALLOCATABLE
+    )

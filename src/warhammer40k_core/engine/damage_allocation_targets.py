@@ -8,6 +8,7 @@ from warhammer40k_core.engine.retained_model_presence import model_is_present_on
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.attack_sequence_state import AttackSequence
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.rules_units import RulesUnitView
 
@@ -28,6 +29,7 @@ def damage_allocation_target_state(
     *,
     state: GameState,
     target_unit_instance_id: str,
+    attack_sequence: AttackSequence | None = None,
 ) -> DamageAllocationTargetState:
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_instance_id)
     battlefield = state.battlefield_state
@@ -47,12 +49,43 @@ def damage_allocation_target_state(
         for model in rules_unit.own_models
     ):
         return DamageAllocationTargetState.PRESENT_WITHOUT_LIVING_MODELS
+    if attack_sequence is not None and _has_placed_pending_destruction(
+        state=state, rules_unit=rules_unit, attack_sequence=attack_sequence
+    ):
+        return DamageAllocationTargetState.PRESENT_WITHOUT_LIVING_MODELS
     if rules_unit.own_models and all(
         not model.is_alive and model.model_instance_id in battlefield.removed_model_ids
         for model in rules_unit.own_models
     ):
         return DamageAllocationTargetState.DESTROYED_AND_REMOVED
     return DamageAllocationTargetState.ABSENT
+
+
+def _has_placed_pending_destruction(
+    *, state: GameState, rules_unit: RulesUnitView, attack_sequence: AttackSequence
+) -> bool:
+    """Recognize only this resolving sequence's still-placed deferred casualties.
+
+    This is allocation evidence, not general battlefield-presence authority.
+    The phase's stored sequence can lag behind the current resolution loop.
+    """
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Pending attack destruction requires battlefield_state.")
+    dead_model_ids = {
+        model.model_instance_id for model in rules_unit.own_models if not model.is_alive
+    }
+    for pending in attack_sequence.pending_attack_destructions:
+        damage = pending.damage_application
+        if damage.model_instance_id not in dead_model_ids:
+            continue
+        placement = battlefield.model_placement_or_none(damage.model_instance_id)
+        if placement is None:
+            continue
+        if placement.to_payload() != pending.destroyed_model_placement:
+            raise GameLifecycleError("Pending attack destruction placement drift.")
+        return True
+    return False
 
 
 def assert_damage_allocation_target_is_allocatable(

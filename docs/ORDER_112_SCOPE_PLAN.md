@@ -46,6 +46,21 @@ bearers, spent One Shot weapons and shared restore/replay consumers. Shooting,
 target replacement's permitted forgoing, and Order 113 are outside this repair.
 No new named handler, parsing, state owner or adapter path is required.
 
+The independent complete-play probe reproduced O112-CR-1 on this change and
+the exact base: after a primary weapon kills the last target, the next weapon
+pool treats the still-placed casualty awaiting deferred destruction as absent.
+Mandatory Extra Attacks makes that ordinary multiweapon prerequisite unavoidable.
+The owner explicitly approved the bounded shared damage-allocation repair in
+PR 552. `damage_allocation_targets` now recognizes a dead physical member whose
+placement matches a typed pending destruction on the **currently resolving**
+`AttackSequence`, supplied by grouped-pool resolution. The stored phase sequence
+can lag inside that loop and is not substituted. Living attached recipients take
+priority; an unbacked absent target still fails closed. General battlefield
+presence and destruction timing are unchanged: remaining pools cannot allocate
+damage to the casualty, and deferred reactions/removal still follow the existing
+attacks-resolved boundary exactly once. Fixed/random lethal facade regressions
+cover retained Extra Attacks, omission/retry, save/load/fork and exact replay.
+
 ## Acceptance and delivery
 
 Regressions must reproduce omission and the random finite skip on the base,
