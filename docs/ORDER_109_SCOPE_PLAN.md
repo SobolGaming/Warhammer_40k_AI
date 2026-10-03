@@ -98,3 +98,10 @@ checks, while preserving historical measurements.
 After Order109 merges, stop and hand off Order110 in a fresh session. Every
 subsequent order must update its own roadmap **How it is currently done** cell
 to the actual implementation, preserving unrelated rows and historical bytes.
+
+Existing Vital Link and primary-scoring persistence fixtures now record and finish
+their first-turn objective boundary before advancing. The later departure occurs
+in the subsequent turn. Both authoritative scoring rows are retained; redaction,
+coordinated tamper and erasure assertions still target the intended current
+boundary. This replaces incomplete synthetic fixture history without changing
+production authority or weakening the original scoring and rejection checks.

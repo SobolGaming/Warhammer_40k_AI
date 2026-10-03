@@ -473,13 +473,10 @@ def persisted_primary_scoring_boundary() -> tuple[
     ]
     if target_id != action.target_id:
         raise AssertionError("Step 5A persisted fixture Action target drifted.")
-    action_record = resolve_objective_control(
-        ObjectiveControlContext.from_game_state(
-            state,
-            timing=ObjectiveControlTiming.TURN_END,
-            phase=BattlePhase.FIGHT,
-            ruleset_descriptor=state.ruleset_descriptor_for_runtime_policy(),
-        )
+    action_record = state.record_objective_control_boundary(
+        completed_phase=BattlePhase.FIGHT,
+        timing=ObjectiveControlTiming.TURN_END,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
     resolved = resolve_primary_mission_actions_at_turn_end(
         state=state,
@@ -490,7 +487,16 @@ def persisted_primary_scoring_boundary() -> tuple[
     )
     if len(resolved) != 1 or len(state.primary_mission_progress_state.markers) != 1:
         raise AssertionError("Step 5A persisted fixture requires Action-created progress.")
+    score_primary_objective_control_boundary(
+        state=state,
+        record=action_record,
+        end_of_battle=False,
+        event_log=decisions.event_log,
+    )
 
+    state.battle_round = 2
+    state.active_player_id = "player-a"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.COMMAND)
     departed_unit = next(
         unit
         for army in state.army_definitions
@@ -516,9 +522,6 @@ def persisted_primary_scoring_boundary() -> tuple[
     if departure is None:
         raise AssertionError("Step 5A persisted fixture requires departure evidence.")
 
-    state.battle_round = 2
-    state.active_player_id = "player-a"
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.COMMAND)
     scoring_record = resolve_objective_control(
         ObjectiveControlContext.from_game_state(
             state,
@@ -784,12 +787,18 @@ def test_phase17n_step5a_public_payload_redacts_authoritative_state_evidence_reg
 ) -> None:
     state, evidence = persisted_primary_scoring_boundary
 
+    previous = next(
+        row
+        for row in state.primary_scoring_state_evidence_records
+        if row.evidence_id != evidence.evidence_id
+    )
     authoritative_payload = state.to_payload()
     assert authoritative_payload["primary_scoring_state_evidence_records"] == [
-        evidence.to_payload()
+        previous.to_payload(),
+        evidence.to_payload(),
     ]
     restored = GameState.from_payload(authoritative_payload)
-    assert restored.primary_scoring_state_evidence_records == [evidence]
+    assert restored.primary_scoring_state_evidence_records == [previous, evidence]
     for viewer_player_id in state.player_ids:
         assert (
             state.to_public_payload(viewer_player_id=viewer_player_id)[
@@ -903,13 +912,18 @@ def test_phase17n_step5a_persisted_restore_rejects_coordinated_rehash_and_ledger
     assert drifted.evidence_hash != evidence.evidence_hash
 
     payload = deepcopy(state.to_payload())
-    payload["primary_scoring_state_evidence_records"] = [drifted.to_payload()]
+    payload["primary_scoring_state_evidence_records"] = [
+        drifted.to_payload() if row["evidence_id"] == evidence.evidence_id else row
+        for row in payload["primary_scoring_state_evidence_records"]
+    ]
     updated_transactions = 0
     for ledger_payload in payload["victory_point_ledgers"]:
         for transaction_payload in ledger_payload["transactions"]:
             if transaction_payload["source_kind"] != "primary":
                 continue
             metadata = cast(dict[str, object], transaction_payload["metadata"])
+            if metadata.get("primary_scoring_state_evidence_id") != evidence.evidence_id:
+                continue
             metadata["primary_scoring_state_evidence_id"] = drifted.evidence_id
             metadata["primary_scoring_state_evidence_hash"] = drifted.evidence_hash
             updated_transactions += 1
@@ -1959,6 +1973,10 @@ def test_phase17n_step5a_restore_rejects_primary_scoring_bridge_erasure(
             index
             for index, transaction in enumerate(ledger["transactions"])
             if transaction["source_kind"] == "primary"
+            and cast(dict[str, object], transaction["metadata"]).get(
+                "primary_scoring_state_evidence_id"
+            )
+            == _evidence.evidence_id
         ]
         if not primary_indices:
             continue
@@ -1978,7 +1996,11 @@ def test_phase17n_step5a_restore_rejects_primary_scoring_bridge_erasure(
     if removed == 0:
         raise AssertionError("Step 5A erasure fixture requires Primary transactions.")
     if remove_evidence:
-        payload["primary_scoring_state_evidence_records"] = []
+        payload["primary_scoring_state_evidence_records"] = [
+            row
+            for row in payload["primary_scoring_state_evidence_records"]
+            if row["evidence_id"] != _evidence.evidence_id
+        ]
 
     with pytest.raises(
         GameLifecycleError,
@@ -1998,14 +2020,21 @@ def _coordinated_objective_control_forgery_payload(
         forged_record if record.record_id == forged_record.record_id else record
         for record in forged_state.objective_control_records
     ]
-    forged_state.primary_scoring_state_evidence_records = []
+    forged_state.primary_scoring_state_evidence_records = [
+        row
+        for row in forged_state.primary_scoring_state_evidence_records
+        if row.evidence_id != evidence.evidence_id
+    ]
     forged_evidence = build_primary_scoring_state_evidence(
         scoring_player_id=forged_record.active_player_id,
         state=forged_state,
         record=forged_record,
         end_of_battle=False,
     )
-    forged_state.primary_scoring_state_evidence_records = [forged_evidence]
+    forged_state.primary_scoring_state_evidence_records = [
+        forged_evidence if row.evidence_id == evidence.evidence_id else row
+        for row in state.primary_scoring_state_evidence_records
+    ]
     payload = deepcopy(forged_state.to_payload())
     updated_transactions = 0
     for ledger_payload in payload["victory_point_ledgers"]:

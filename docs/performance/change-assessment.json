@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "be9bda2bf56ffde3147727fb9dc869c4163ddabc",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8087b5a6b574f7f15439e7d9fc0a3f75e7a979b8d1b2b2d0a56f36d264a75471",
-  "operation_map_sha256": "8f4bd108e2187c1789774dde8766938e67df737321826931f3a9d9653e4fc6c4",
+  "operation_map_sha256": "f5b2a8243c5cf50b5826eb971930fff374ca466a12149283bcddb18fe43c21d0",
   "changes": {
     "README.md": {
       "before_sha256": "2cfae629440baae25b8afcbb865e527005674f2e0c1dcb959ecc40cc2fb409ef",
@@ -236,21 +236,21 @@
     },
     "docs/ORDER_109_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "4bc638389c04bb978d41d4131b988baf2744870922e0a60a6b71c9b298a3ba0d",
+      "after_sha256": "90b8e52b3660fe3fe734fbf3713c81c1e658109615b9fc3c370b5fd521e58e66",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4bc638389c04bb978d41d4131b988baf2744870922e0a60a6b71c9b298a3ba0d"
+          "after": "90b8e52b3660fe3fe734fbf3713c81c1e658109615b9fc3c370b5fd521e58e66"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "09ebf454a3228b57de98012d12c6e5fd27bd34458863ef8c5b172d142ed3eb0e",
-      "after_sha256": "045a2defccc63ca22bdaafb450c232a4ffce2817ff23c8a9d40f8813b6940af6",
+      "after_sha256": "c8de5d26149e00829d31a487a87de48a50f08ae5fb4eb58d351e5abd4fe8eed1",
       "owners": {
         "@document": {
           "before": "09ebf454a3228b57de98012d12c6e5fd27bd34458863ef8c5b172d142ed3eb0e",
-          "after": "045a2defccc63ca22bdaafb450c232a4ffce2817ff23c8a9d40f8813b6940af6"
+          "after": "c8de5d26149e00829d31a487a87de48a50f08ae5fb4eb58d351e5abd4fe8eed1"
         }
       }
     },
@@ -419,6 +419,42 @@
         "test_stratagem_selection_only_resolves_oc_for_in_range_candidates": {
           "before": null,
           "after": "4f50f8fa8242b669ae55d6f310143355b95cbb435e5b975878c0f07c38ba47eb"
+        }
+      }
+    },
+    "tests/unit/test_phase17n_primary_scoring_state_bridge.py": {
+      "before_sha256": "6091b5bcb68f228a83590114d9c62c5fa047635fad7961d7741296a2cef81683",
+      "after_sha256": "4690fd5963d6469bae13ad6b98149e09f6825d24122e9686ccabe2e32030b978",
+      "owners": {
+        "_coordinated_objective_control_forgery_payload": {
+          "before": "2129299be8ea45518a394041d02026c913fc912818ca988f86983a75ac6060f9",
+          "after": "89b0b0b050430f61411c377fde678ad82914e972d3b383dba9c389681d184539"
+        },
+        "persisted_primary_scoring_boundary": {
+          "before": "c7fbe9e9f235dd1d3943911f6c4d2689a690203931582bd60f6eb44783d8e475",
+          "after": "7e9236582be3e65a4807da01a8a6e3bacd98d644cc45ab89a0a33d535dc5d3a1"
+        },
+        "test_phase17n_step5a_persisted_restore_rejects_coordinated_rehash_and_ledger_update": {
+          "before": "16f920f02181e9313a152ca5d220c21f4979bb9263b2464b9982ad3537344b9c",
+          "after": "e31c48442575bb7b571078443cd81fa0d667991e974de4041207e63ea463ac32"
+        },
+        "test_phase17n_step5a_public_payload_redacts_authoritative_state_evidence_registry": {
+          "before": "9c5906a40e3468643c0da5a66d5ee396092fc40709afc7584792d87065685256",
+          "after": "6ab1ebe4b3a0f0c1421c1fa45e560f139e5a13ca612bb8ed71ead30ac99c739d"
+        },
+        "test_phase17n_step5a_restore_rejects_primary_scoring_bridge_erasure": {
+          "before": "6af2d00505fba2c38ebeee8904c85a4da77dcfcc880efb2e8c614871d82f6c8c",
+          "after": "c8cdf1fdf8ff000af5585e961fa8b2f58d4595d419006c036193291ab722069a"
+        }
+      }
+    },
+    "tests/unit/test_phase17n_step5e_operation_marker_conditions.py": {
+      "before_sha256": "d11275dbf13c4013585659dd222345590293eeacd2777ba1ac283f07f55e3a47",
+      "after_sha256": "aca2e9f7598dd1f422f5e07956ea254f811947cd6c49a52b96ea76dd120a619b",
+      "owners": {
+        "_two_turn_maintain_control_same_central": {
+          "before": "03fb6abde9f998cc2539dadcbc919ac3b091168deda983a62e6bbc1877c69487",
+          "after": "7053739ac3213e3e157704ee8c008cd8e54ed05850a26ab93bfa189046acafd8"
         }
       }
     }
@@ -902,6 +938,26 @@
       "unchanged_work": "Adds bounded checks of the selected rules unit's present members and reads existing immutable all-model boundary evidence; OC preparation includes out-of-range members when their unit is in objective range. This required rule work is not claimed free. Player scoring, geometry solver, cache policy, serialization shapes, recorded decision mechanism and historical benchmark workloads remain unchanged. Existing live semantic/work/cache checks and serial current-runtime smoke remain mandatory. No detailed benchmark or full-game certification is claimed."
     },
     "tests/unit/test_order109_unit_control.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order109-control-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order109 source-backed unit control correction, regression evidence and required runtime identity publication. The approved sequential policy selects serial smoke; no deliberate performance optimization or demonstrated serious regression.",
+      "source_obligation": "Order109/P14B/C14-04 implements Core14.02 block5 with01.04.01: player control, unit range and a positive-OC member anywhere in the same rules unit; player scores remain in-range OC sums. Frozen14.02.01 control and secured objectives are preserved.",
+      "unchanged_work": "Adds bounded checks of the selected rules unit's present members and reads existing immutable all-model boundary evidence; OC preparation includes out-of-range members when their unit is in objective range. This required rule work is not claimed free. Player scoring, geometry solver, cache policy, serialization shapes, recorded decision mechanism and historical benchmark workloads remain unchanged. Existing live semantic/work/cache checks and serial current-runtime smoke remain mandatory. No detailed benchmark or full-game certification is claimed."
+    },
+    "tests/unit/test_phase17n_primary_scoring_state_bridge.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order109-control-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order109 source-backed unit control correction, regression evidence and required runtime identity publication. The approved sequential policy selects serial smoke; no deliberate performance optimization or demonstrated serious regression.",
+      "source_obligation": "Order109/P14B/C14-04 implements Core14.02 block5 with01.04.01: player control, unit range and a positive-OC member anywhere in the same rules unit; player scores remain in-range OC sums. Frozen14.02.01 control and secured objectives are preserved.",
+      "unchanged_work": "Adds bounded checks of the selected rules unit's present members and reads existing immutable all-model boundary evidence; OC preparation includes out-of-range members when their unit is in objective range. This required rule work is not claimed free. Player scoring, geometry solver, cache policy, serialization shapes, recorded decision mechanism and historical benchmark workloads remain unchanged. Existing live semantic/work/cache checks and serial current-runtime smoke remain mandatory. No detailed benchmark or full-game certification is claimed."
+    },
+    "tests/unit/test_phase17n_step5e_operation_marker_conditions.py": {
       "category": "rule_semantics",
       "operations": [
         "order109-control-regressions"
