@@ -4304,7 +4304,7 @@ display geometry payload uses schema `terrain-display-v1`, coordinate space
 `display_template_id`, and an unclosed `footprint_polygon` list of
 `{x_inches, y_inches}` vertices. Adapters should render from these typed
 payloads. Each runtime feature also exposes its source-backed `classification`
-(`dense`, `light`, `mixed`, or `unknown`) independently from
+(`dense`, `light`, `exposed`, `mixed`, or `unknown`) independently from
 `terrain_feature_kind`; clients must not infer that classification from wall
 height, color, or feature kind. Exact-layout feature `source_id` values retain
 the source-hashed preset provenance, including the exact artifact package hash,
@@ -7421,3 +7421,13 @@ observer's weapon range. The complete `line_of_sight_witness` still includes
 blocked and visible target models. Clients must not intersect the two sets to
 infer legality. Ordinary Shooting, reaction attacks, persistence and replay use
 the engine's existing validation authority and unchanged payload shapes.
+
+
+### Order 108: terrain physical authority (Contract 44.1 unchanged)
+
+Terrain classification `exposed` is explicit and shares Light transit permission.
+Existing nonempty-string classification fields and proposal shapes are unchanged.
+The shared engine validates witnessed climbing contact and Dense floor transit.
+Solid opening volumes govern continuous visibility and every-part endpoints;
+physical transit keeps actual openings. Adapters must use engine diagnostics
+and witnesses. Normal saves and replay require the matching runtime build.

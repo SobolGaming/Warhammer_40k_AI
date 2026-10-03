@@ -2312,6 +2312,138 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order108-terrain-semantics": {
+      "paths": [
+        "src/warhammer40k_core/_engine_build_manifest.json",
+        "src/warhammer40k_core/core/terrain_areas.py",
+        "src/warhammer40k_core/core/visibility.py",
+        "src/warhammer40k_core/engine/endpoint_placement.py",
+        "src/warhammer40k_core/geometry/pathing.py",
+        "src/warhammer40k_core/geometry/terrain.py",
+        "src/warhammer40k_core/geometry/terrain_classification.py",
+        "src/warhammer40k_core/geometry/terrain_solid.py",
+        "src/warhammer40k_core/geometry/terrain_transit.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "TerrainAreaClassification",
+        "TerrainFeatureDefinition.solid_opening_volumes",
+        "TerrainFeatureDefinition.visibility_volumes",
+        "TerrainPathLegalityContext._append_terrain_volume_segment",
+        "TerrainPathLegalityContext._endpoint_violation_for_feature",
+        "TerrainPathLegalityContext._traversal_mode_for_terrain",
+        "TerrainPathLegalityContext.validate",
+        "TerrainVisibilityContext.__post_init__",
+        "_crosses_floor",
+        "_enclosed_cells",
+        "_fixed_facing",
+        "_moving_shape",
+        "_rotating_floor_crossing",
+        "_segment_contact",
+        "_terrain_pose",
+        "_terrain_shape",
+        "_terrain_volume_feature_index",
+        "aggregate_logical_terrain_area_classification",
+        "classified_feature_transit_permission",
+        "forbidden_dense_floor_crossing",
+        "path_retains_climbing_contact",
+        "solid_endpoint_intersection",
+        "solid_opening_volumes",
+        "terrain_endpoint_placement_violation"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order108-contract-publication": {
+      "paths": [
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order108-client-regressions": {
+      "paths": [
+        "ci/test_shards/durations.json",
+        "ci/test_shards/shard-1.txt",
+        "ci/test_shards/shard-10.txt",
+        "ci/test_shards/shard-11.txt",
+        "ci/test_shards/shard-12.txt",
+        "ci/test_shards/shard-2.txt",
+        "ci/test_shards/shard-3.txt",
+        "ci/test_shards/shard-4.txt",
+        "ci/test_shards/shard-5.txt",
+        "ci/test_shards/shard-6.txt",
+        "ci/test_shards/shard-7.txt",
+        "ci/test_shards/shard-8.txt",
+        "ci/test_shards/shard-9.txt",
+        "tests/code_quality/test_order97_inventory.py",
+        "tests/code_quality/test_performance_policy.py",
+        "tests/order108_terrain_helpers.py",
+        "tests/unit/test_order108_terrain_semantics.py",
+        "tests/unit/test_order97_secondary_clause_evidence.py",
+        "tests/unit/test_phase10i_terrain_movement.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_context",
+        "_feature_area",
+        "_terrain_context",
+        "_validate",
+        "terrain_session",
+        "test_contact_uses_base_edge_and_continuous_union_not_sampled_poses",
+        "test_exact_event_companion_ruins_apply_keyword_specific_wall_traversal",
+        "test_exact_event_dense_ruin_mobile_vertical_path_climbs_instead_of_passing_through",
+        "test_exposed_is_an_explicit_round_tripped_classification",
+        "test_exposed_logical_area_preserves_other_members_classification",
+        "test_facade_terrain_rejection_retry_pending_completed_restore_and_replay",
+        "test_floor_transit_permissions_and_valid_context_persistence",
+        "test_forbidden_terrain_paths_are_rejected",
+        "test_high_opening_and_body_protrusion_boundaries",
+        "test_model_can_climb_tall_terrain_by_paying_vertical_distance",
+        "test_order108_scope_preserves_other_assessment_obligations",
+        "test_order108_smoke_scope_authenticates_complete_semantic_rows",
+        "test_order97_terrain_permitted_vertical_transit",
+        "test_original_assertions_remain_exact_and_fail_closed",
+        "test_rotating_contact_accepts_clearance_and_rejects_lost_contact",
+        "test_shared_setup_endpoint_rejects_solid_window",
+        "test_solid_door_does_not_become_a_physical_transit_blocker",
+        "test_solid_volume_fills_only_enclosed_low_openings",
+        "test_solid_window_blocks_continuous_visibility",
+        "test_solid_windows_and_doors_share_visibility_and_endpoint_volume"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order108-historical-evidence": {
+      "paths": [
+        "data/source_audits/order108/baseline/tests/unit/test_phase10i_terrain_movement.py.txt",
+        "data/source_audits/order108/historical-inputs.json",
+        "tools/core_rules_order97_history.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "historical_evidence_path"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

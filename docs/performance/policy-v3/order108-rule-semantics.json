@@ -1,0 +1,145 @@
+{
+  "base": "eebdaa2ccadef14b6115aea7caea3cb1c89eb564",
+  "changes": {
+    "src/warhammer40k_core/core/visibility.py": {
+      "before_sha256": "a38c5807c0cc94170dadc30d9a773c9d9c1cc3d584543736254bbe6d774ef9aa",
+      "after_sha256": "1eae8c735a6a0dfd233420b77d153e38e54685682e0c4c7758136a6764e695de",
+      "owners": {
+        "TerrainVisibilityContext.__post_init__": {
+          "before": "6850f3dbac1953f602744e3c91adc53975f2a75fbf50256db136c8d57e272683",
+          "after": "7d4ec6cbfa58df8b9223d28b413c82459429046fde9c475adc22d981eb698610"
+        },
+        "_terrain_volume_feature_index": {
+          "before": "7500284b51f004c409926d151abeb325906d8bc3c49e4d9139138bcd4388eaed",
+          "after": "397007f4f77f54ee22eb06d4a0bc9436a83cb7cd94165a04563fa2a593dfd169"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/pathing.py": {
+      "before_sha256": "47361dc56c959bf3dc3697eee51e64f20e5902d94e66d606cea61b2d6bb26160",
+      "after_sha256": "a182a92a0464232848c808c76f12652eb41fd8cc441a6f120d2a4f8ed097b759",
+      "owners": {
+        "@module": {
+          "before": "b2cc7d8a7452320c07247f229ba01540c3aad2cfd525223d4d111287fd57efcf",
+          "after": "f1762c79176397c270f43aa389b7eedb830b936a8d8cc3848e6cac43926f7cca"
+        },
+        "TerrainPathLegalityContext._append_terrain_volume_segment": {
+          "before": "3f1144fc3296987ac744cceb39a4d0b7ca6f8780a76599f87d6b031d345fb23d",
+          "after": "1e9c0706513b91b717cb7a603fe7ccdeee04b83ae643c6ccf5c0142d6602ca63"
+        },
+        "TerrainPathLegalityContext._endpoint_violation_for_feature": {
+          "before": "f827db3e7b69619ef16cd1527e41f60a893f07be2c6a4585a52407080a1870b1",
+          "after": "4dced3d8c56dd13384f3c6b2f610ff574238f4a4027b7b480421d0afbc855d51"
+        },
+        "TerrainPathLegalityContext._traversal_mode_for_terrain": {
+          "before": "83a73dc2ab29dc85f8c04b1136245781c1fb28c1b26e5a6847aadeeb4fcf96ed",
+          "after": "03826265bd9041daa1644ad2d42de733c5b78afeed1ebc194a4730623ad1b2fb"
+        },
+        "TerrainPathLegalityContext.validate": {
+          "before": "670982748525a6234bc08a2f61b3d23693a336e935c0625f7d9b789b90b3d03e",
+          "after": "ef007607263ff23300ed60c7c90c0edcf6f5f453a60302091e305a5c03828db3"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/terrain.py": {
+      "before_sha256": "7fb2df7511b51aed1322fbfe277248d83b497615ac0a173cc16af3367dcc4338",
+      "after_sha256": "ab4a944671c715c6ff4536f654b7041b54e0a84bdb6c86089f23c02bd80ec688",
+      "owners": {
+        "@module": {
+          "before": "d870709b67b92c9a3173f9d5265a8f8661dbf547a3b8fc9e94057be9c3ebc862",
+          "after": "05988a75b1bf335687f57278591d22b099d2955a5e8f5b5c87425130a694cbeb"
+        },
+        "TerrainFeatureDefinition.solid_opening_volumes": {
+          "before": null,
+          "after": "a3ca132e911ac4507c0d534c61a7f38f15116e39eacc49ae6feb90f3cd50a492"
+        },
+        "TerrainFeatureDefinition.visibility_volumes": {
+          "before": null,
+          "after": "b22a77165e2db9c709654625da811d896d25309dd0c37d8af13ca4edb4a45587"
+        },
+        "classified_feature_transit_permission": {
+          "before": "158623e7d04a57d533dcfadfb8e81266a8c7258ae0a67d58268bca43d0f7e169",
+          "after": "b5e302276a59ff2a66f7142c62b869adbc01725788a87b90282b58b5d121a4a7"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/terrain_classification.py": {
+      "before_sha256": "fab678feafc4960c7c2ae6898b1be4d7466571efdbe434444e39b6cbc3f45a4b",
+      "after_sha256": "c93e8045e072a24a7245ceae7eed0cbd3578d93db52faa09684a40a7ed597075",
+      "owners": {
+        "TerrainAreaClassification": {
+          "before": "27c6d47939dc9f662a0fa67b509ac800291e3c5dc37fe37791ea20907153245d",
+          "after": "3d11cc34129ba3d01cd3f27a6e38e9bdaf132dec993d8defe5c098f30efac5ef"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/terrain_solid.py": {
+      "before_sha256": null,
+      "after_sha256": "5551e61b726f4b53c6f19a148d442de142a3126cc1e72d3aaa35ebad7d350451",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "3fc515fa4a413fbeaf57eae24aaf22c3767bed9d453bec4290fbadb0ee07f635"
+        },
+        "_enclosed_cells": {
+          "before": null,
+          "after": "c0e47029888db0406b896fd63b04a5f193d3c36e248df7244d7c9263f1a3138a"
+        },
+        "solid_endpoint_intersection": {
+          "before": null,
+          "after": "e8f9f113d5407feb9a59790e1cd3cc8cc46e563f8f2683faa9788103ad8f7cb9"
+        },
+        "solid_opening_volumes": {
+          "before": null,
+          "after": "8b4df7bc13322f2b86c78cebbfb2e31f0c4f81c0895e9ace42cdb0d84217c3a0"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/terrain_transit.py": {
+      "before_sha256": null,
+      "after_sha256": "74a34cf68aa79011281f6eb6adec53f465e4d7087e0fa0e107ada2fc12e745fc",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "a556398e56bf67d4d4760290f17dbcd9d466251f7cc3ec9932acafbeed6b413b"
+        },
+        "_crosses_floor": {
+          "before": null,
+          "after": "47262f1dde03341d233ce9ea3b9570517c5046b92a96a733373eda4f36365d10"
+        },
+        "_fixed_facing": {
+          "before": null,
+          "after": "38dcba484a71e3f8371090656cf0175f18cba1a490eb01af8d62f60869e7053b"
+        },
+        "_moving_shape": {
+          "before": null,
+          "after": "de25e339713e1895a1beedb0b2e4b87a6e4a37387dfdc425c18c5ebc0e3b5d84"
+        },
+        "_rotating_floor_crossing": {
+          "before": null,
+          "after": "ba35330be265a2da8774769766c582e87729a9a9d6f6fc752a43eb0dad2f879f"
+        },
+        "_segment_contact": {
+          "before": null,
+          "after": "2256ae0a20ecf996f58ac08f68641a92e60d868c154c1c411e3a3de969ae61e8"
+        },
+        "_terrain_pose": {
+          "before": null,
+          "after": "97745deb0bb3565da368044c92eb0a918fb44e604bf7987361259a93cfb0ba10"
+        },
+        "_terrain_shape": {
+          "before": null,
+          "after": "fc9b7eeee9a6fba814f42df8171a7f53a7fcdc567970fd89dcabe330c39452d8"
+        },
+        "forbidden_dense_floor_crossing": {
+          "before": null,
+          "after": "f3746f3a3139ec2abb136a9ddd70f5f319901b68b2cf0b63fb2c71e52c87b296"
+        },
+        "path_retains_climbing_contact": {
+          "before": null,
+          "after": "fc8b3f659d7430fecf2e391f1503ea847adec63ac95353540393065ae6aa75d2"
+        }
+      }
+    }
+  }
+}

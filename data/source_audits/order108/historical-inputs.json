@@ -1,0 +1,17 @@
+{
+  "reviewed_commit": "19f1c507541321b7c1ed04f80e2c1110a1fa786d",
+  "also_present_at_base": "eebdaa2ccadef14b6115aea7caea3cb1c89eb564",
+  "purpose": "Retain original Order97 climb fixtures before legal contact and floor-avoidance route corrections. Original source assertions and file pins remain unchanged; these bytes are historical evidence, not Order108 compliance.",
+  "current_evidence": "docs/ORDER_108_SCOPE_PLAN.md",
+  "files": [
+    {
+      "path": "tests/unit/test_phase10i_terrain_movement.py",
+      "historical_path": "data/source_audits/order108/baseline/tests/unit/test_phase10i_terrain_movement.py.txt",
+      "git_revision": "19f1c507541321b7c1ed04f80e2c1110a1fa786d",
+      "git_path": "tests/unit/test_phase10i_terrain_movement.py",
+      "sha256": "b317f4ff30b323d66f65f6fd31c5ace70587e69e652234f52fb4bc5af8b7792e",
+      "bytes": 41571,
+      "order97_file_pin": "b317f4ff30b323d66f65f6fd31c5ace70587e69e652234f52fb4bc5af8b7792e"
+    }
+  ]
+}

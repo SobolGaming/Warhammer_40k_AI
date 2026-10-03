@@ -1,449 +1,659 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "1ce35d51f1d5e82eb99e909bb8803a7d54e5a969",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:dbc661b6db3a3d2fd70762295400666c19d04546112cf9db323ed8adea311a90",
-  "operation_map_sha256": "ebb033dc3a41e479b1ac1db4c59f1cd113177dee4c7ca68066564da5fafa1564",
+  "base": "eebdaa2ccadef14b6115aea7caea3cb1c89eb564",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7c1defd9a60e7ed882f0f2872d7e14e9f2fd5b9f29c960902a465464dffff61b",
+  "operation_map_sha256": "f007872329cb2172ee516c109972f3f4c4ed5f8ff17aef5a5851198d46bb9d5a",
   "changes": {
-    "README.md": {
-      "before_sha256": "e466e226251083a83768ad60b62c05542e4778277b7f0af71c046a14fd96bb8c",
-      "after_sha256": "2cfae629440baae25b8afcbb865e527005674f2e0c1dcb959ecc40cc2fb409ef",
-      "owners": {
-        "@document": {
-          "before": "e466e226251083a83768ad60b62c05542e4778277b7f0af71c046a14fd96bb8c",
-          "after": "2cfae629440baae25b8afcbb865e527005674f2e0c1dcb959ecc40cc2fb409ef"
-        }
-      }
-    },
     "ci/test_shards/durations.json": {
-      "before_sha256": "f75294a9ec05e2f410e363ad8b7a6950ef30c2e531d3f6af2d9131033dbdc74f",
-      "after_sha256": "ffd11b5979c5df49ee2f17f990e9cc9e68149497d4c4616a7b943297ec05149c",
+      "before_sha256": "ffd11b5979c5df49ee2f17f990e9cc9e68149497d4c4616a7b943297ec05149c",
+      "after_sha256": "958a058125135d7b26d377a3834db0f137899a6ac142f454d5dc3191776b7fd3",
       "owners": {
         "@document": {
-          "before": "f75294a9ec05e2f410e363ad8b7a6950ef30c2e531d3f6af2d9131033dbdc74f",
-          "after": "ffd11b5979c5df49ee2f17f990e9cc9e68149497d4c4616a7b943297ec05149c"
+          "before": "ffd11b5979c5df49ee2f17f990e9cc9e68149497d4c4616a7b943297ec05149c",
+          "after": "958a058125135d7b26d377a3834db0f137899a6ac142f454d5dc3191776b7fd3"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "706b36f6f47abb46e53c4707f7badb13e5c1be246508b37c31aad7a24a7eedde",
-      "after_sha256": "76fb04ae517e00ecfb159fc51f88275a250f54536e6eadf57146a33f52b52699",
+      "before_sha256": "76fb04ae517e00ecfb159fc51f88275a250f54536e6eadf57146a33f52b52699",
+      "after_sha256": "7cae4d68035d8991a3d69ecd3e39f1532546fa8f82570374bee8c3112981be2f",
       "owners": {
         "@document": {
-          "before": "706b36f6f47abb46e53c4707f7badb13e5c1be246508b37c31aad7a24a7eedde",
-          "after": "76fb04ae517e00ecfb159fc51f88275a250f54536e6eadf57146a33f52b52699"
+          "before": "76fb04ae517e00ecfb159fc51f88275a250f54536e6eadf57146a33f52b52699",
+          "after": "7cae4d68035d8991a3d69ecd3e39f1532546fa8f82570374bee8c3112981be2f"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "cc0ab654c881bfb4cce4c65ac2a5c9c293809b50a188eebaae12c1f234ff4021",
-      "after_sha256": "08976a76e5d8ee2d081a009acebacd254ad4d80c91f46d483e0195df11e0e839",
+      "before_sha256": "08976a76e5d8ee2d081a009acebacd254ad4d80c91f46d483e0195df11e0e839",
+      "after_sha256": "2f62c2ec8fe1dbe09f40dfdbab14ac8a4c4f75d703911c85e336351d526818e3",
       "owners": {
         "@document": {
-          "before": "cc0ab654c881bfb4cce4c65ac2a5c9c293809b50a188eebaae12c1f234ff4021",
-          "after": "08976a76e5d8ee2d081a009acebacd254ad4d80c91f46d483e0195df11e0e839"
+          "before": "08976a76e5d8ee2d081a009acebacd254ad4d80c91f46d483e0195df11e0e839",
+          "after": "2f62c2ec8fe1dbe09f40dfdbab14ac8a4c4f75d703911c85e336351d526818e3"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "441e08f06e5a75056116d88a3c2b8da86b44b53370488592128a808ba91c06eb",
-      "after_sha256": "61777d17da89c31c5fe6064bb3c9905891c49220529d93c90efd8a8d8f560fee",
+      "before_sha256": "61777d17da89c31c5fe6064bb3c9905891c49220529d93c90efd8a8d8f560fee",
+      "after_sha256": "18f53d4521dc05d33d6bae9aa5987bafc9d46e4dcc29add900bd0f1d20e37738",
       "owners": {
         "@document": {
-          "before": "441e08f06e5a75056116d88a3c2b8da86b44b53370488592128a808ba91c06eb",
-          "after": "61777d17da89c31c5fe6064bb3c9905891c49220529d93c90efd8a8d8f560fee"
+          "before": "61777d17da89c31c5fe6064bb3c9905891c49220529d93c90efd8a8d8f560fee",
+          "after": "18f53d4521dc05d33d6bae9aa5987bafc9d46e4dcc29add900bd0f1d20e37738"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "6025967b7cf4e852ce62dd9e7b27f5d10999b83b68d651f5ff7d0abd04aa155c",
-      "after_sha256": "948b861a24d369f55fcba38c8186ea292171d3b195197df0fa705820096c7d0f",
+      "before_sha256": "948b861a24d369f55fcba38c8186ea292171d3b195197df0fa705820096c7d0f",
+      "after_sha256": "34f82b90b162bfce595692010d56f3d200a63b9765a1195b65d7c84c970ba714",
       "owners": {
         "@document": {
-          "before": "6025967b7cf4e852ce62dd9e7b27f5d10999b83b68d651f5ff7d0abd04aa155c",
-          "after": "948b861a24d369f55fcba38c8186ea292171d3b195197df0fa705820096c7d0f"
+          "before": "948b861a24d369f55fcba38c8186ea292171d3b195197df0fa705820096c7d0f",
+          "after": "34f82b90b162bfce595692010d56f3d200a63b9765a1195b65d7c84c970ba714"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "0747394a161781921db8eede966156728789ba38bc0d0b7bbc2decacc812119d",
-      "after_sha256": "ea71856c6e95e230c78dd476ce0754fcf6bc83e1c082af30e3351347096c0e7e",
+      "before_sha256": "ea71856c6e95e230c78dd476ce0754fcf6bc83e1c082af30e3351347096c0e7e",
+      "after_sha256": "af784c4ac3f0f4f065a5ebd543e6a704254b51e83a5bcde3b8fcae75aa794784",
       "owners": {
         "@document": {
-          "before": "0747394a161781921db8eede966156728789ba38bc0d0b7bbc2decacc812119d",
-          "after": "ea71856c6e95e230c78dd476ce0754fcf6bc83e1c082af30e3351347096c0e7e"
+          "before": "ea71856c6e95e230c78dd476ce0754fcf6bc83e1c082af30e3351347096c0e7e",
+          "after": "af784c4ac3f0f4f065a5ebd543e6a704254b51e83a5bcde3b8fcae75aa794784"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "04e451c0adf55b2f8b736f3877830be38b4dc7508b72c702338e44ad20852895",
-      "after_sha256": "b0cceeeae99d1b0a418abef239c688691766a238b762ba73f36b8b67b00bacab",
+      "before_sha256": "b0cceeeae99d1b0a418abef239c688691766a238b762ba73f36b8b67b00bacab",
+      "after_sha256": "bc939a4fbebbd2eb51af485def47d0695fc218c9441da88ea9886e9318f213b7",
       "owners": {
         "@document": {
-          "before": "04e451c0adf55b2f8b736f3877830be38b4dc7508b72c702338e44ad20852895",
-          "after": "b0cceeeae99d1b0a418abef239c688691766a238b762ba73f36b8b67b00bacab"
+          "before": "b0cceeeae99d1b0a418abef239c688691766a238b762ba73f36b8b67b00bacab",
+          "after": "bc939a4fbebbd2eb51af485def47d0695fc218c9441da88ea9886e9318f213b7"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "ab292034b5866d67fe6d317fe16938f3ca4e976400e9260b472c7744e8ffadf5",
-      "after_sha256": "7e70c271012311f08d1cfe28a55126c80ee9f5e68449c26c18999af3c8d468e7",
+      "before_sha256": "7e70c271012311f08d1cfe28a55126c80ee9f5e68449c26c18999af3c8d468e7",
+      "after_sha256": "6afc27b0f5808008e647cbc7c9214a199626f87440c18730836c8952fe91152f",
       "owners": {
         "@document": {
-          "before": "ab292034b5866d67fe6d317fe16938f3ca4e976400e9260b472c7744e8ffadf5",
-          "after": "7e70c271012311f08d1cfe28a55126c80ee9f5e68449c26c18999af3c8d468e7"
+          "before": "7e70c271012311f08d1cfe28a55126c80ee9f5e68449c26c18999af3c8d468e7",
+          "after": "6afc27b0f5808008e647cbc7c9214a199626f87440c18730836c8952fe91152f"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "116ebf7feba8b030b8c77232bf1d39c19068d685cd2b59e8d7e19a67f9612f03",
-      "after_sha256": "96f856f1fbef62e63999c96150a65c95b843cb50e6fc43b9a7fab6203918be44",
+      "before_sha256": "96f856f1fbef62e63999c96150a65c95b843cb50e6fc43b9a7fab6203918be44",
+      "after_sha256": "53e9a223160db5402de7160541badf64beb35d9bf60fd71e4f7c61a8d2c89351",
       "owners": {
         "@document": {
-          "before": "116ebf7feba8b030b8c77232bf1d39c19068d685cd2b59e8d7e19a67f9612f03",
-          "after": "96f856f1fbef62e63999c96150a65c95b843cb50e6fc43b9a7fab6203918be44"
+          "before": "96f856f1fbef62e63999c96150a65c95b843cb50e6fc43b9a7fab6203918be44",
+          "after": "53e9a223160db5402de7160541badf64beb35d9bf60fd71e4f7c61a8d2c89351"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "cfaa09e3eed8ace731587a04ad15bc6957c4e3e6ae7e1a5786c379090b3202b8",
-      "after_sha256": "6f35ce44dc334714f44c4a8acb8be86e1a247382049af05413cc3f465cf82747",
+      "before_sha256": "6f35ce44dc334714f44c4a8acb8be86e1a247382049af05413cc3f465cf82747",
+      "after_sha256": "92a854282ce52c78e39a0ddb139eda0bb42821262cca0c9330cc44e08264aba2",
       "owners": {
         "@document": {
-          "before": "cfaa09e3eed8ace731587a04ad15bc6957c4e3e6ae7e1a5786c379090b3202b8",
-          "after": "6f35ce44dc334714f44c4a8acb8be86e1a247382049af05413cc3f465cf82747"
+          "before": "6f35ce44dc334714f44c4a8acb8be86e1a247382049af05413cc3f465cf82747",
+          "after": "92a854282ce52c78e39a0ddb139eda0bb42821262cca0c9330cc44e08264aba2"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "5bee2980055261e009b5113c5a6ee425526dd8796062337886f50f653b5a0d5e",
-      "after_sha256": "ee23faa16f2579611d648e684f67b5958391494fb25fa1e8105a19f484028754",
+      "before_sha256": "ee23faa16f2579611d648e684f67b5958391494fb25fa1e8105a19f484028754",
+      "after_sha256": "f55a9593673848c0e1e89188e01b11fef1bfacbf177af99228a21b2f5dc0bdd8",
       "owners": {
         "@document": {
-          "before": "5bee2980055261e009b5113c5a6ee425526dd8796062337886f50f653b5a0d5e",
-          "after": "ee23faa16f2579611d648e684f67b5958391494fb25fa1e8105a19f484028754"
+          "before": "ee23faa16f2579611d648e684f67b5958391494fb25fa1e8105a19f484028754",
+          "after": "f55a9593673848c0e1e89188e01b11fef1bfacbf177af99228a21b2f5dc0bdd8"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "4c4d7148e8cf871035da3afaaac458351fba9622465d0cf7e083c371c037a15c",
-      "after_sha256": "758cb486d39f7cdb43d8eec1d158fd838768a663769db40a1aee61e0e6d52f4e",
+      "before_sha256": "758cb486d39f7cdb43d8eec1d158fd838768a663769db40a1aee61e0e6d52f4e",
+      "after_sha256": "9e04c816e67f6e99a1dde997d11e29e79772e0867d574ecf7cd240f07f4cd698",
       "owners": {
         "@document": {
-          "before": "4c4d7148e8cf871035da3afaaac458351fba9622465d0cf7e083c371c037a15c",
-          "after": "758cb486d39f7cdb43d8eec1d158fd838768a663769db40a1aee61e0e6d52f4e"
+          "before": "758cb486d39f7cdb43d8eec1d158fd838768a663769db40a1aee61e0e6d52f4e",
+          "after": "9e04c816e67f6e99a1dde997d11e29e79772e0867d574ecf7cd240f07f4cd698"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "75e0a7c0328538f982a95365388b267f4001d0801617eb3e952ca0d231a8ebd9",
-      "after_sha256": "f9cd93017c23464d14fa10af1298f124aa57a3de075c8d6c7841a3d56bf94677",
+      "before_sha256": "f9cd93017c23464d14fa10af1298f124aa57a3de075c8d6c7841a3d56bf94677",
+      "after_sha256": "cb623072aa622c2845308ea76a797bc6d0796c089fcafed3dac630185f6c7b87",
       "owners": {
         "@document": {
-          "before": "75e0a7c0328538f982a95365388b267f4001d0801617eb3e952ca0d231a8ebd9",
-          "after": "f9cd93017c23464d14fa10af1298f124aa57a3de075c8d6c7841a3d56bf94677"
+          "before": "f9cd93017c23464d14fa10af1298f124aa57a3de075c8d6c7841a3d56bf94677",
+          "after": "cb623072aa622c2845308ea76a797bc6d0796c089fcafed3dac630185f6c7b87"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "0e48ccb1dbf4e65565a2fb92969eb47b0ee75881e9740bef1e57efb6c663ba4b",
-      "after_sha256": "bf21ad4885ec75a42fcd9d0eeedd20b1f12ea6cf1bea5a940e4ecdec4823b9d4",
+      "before_sha256": "bf21ad4885ec75a42fcd9d0eeedd20b1f12ea6cf1bea5a940e4ecdec4823b9d4",
+      "after_sha256": "665c6ca7e3834c9b4612c257cced3edb9c30e0bc90f856da039734ba3f83c41e",
       "owners": {
         "@document": {
-          "before": "0e48ccb1dbf4e65565a2fb92969eb47b0ee75881e9740bef1e57efb6c663ba4b",
-          "after": "bf21ad4885ec75a42fcd9d0eeedd20b1f12ea6cf1bea5a940e4ecdec4823b9d4"
+          "before": "bf21ad4885ec75a42fcd9d0eeedd20b1f12ea6cf1bea5a940e4ecdec4823b9d4",
+          "after": "665c6ca7e3834c9b4612c257cced3edb9c30e0bc90f856da039734ba3f83c41e"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "f629ab2705dd12e42453415e0096be9bfab393aabd50a76ac64cbd0db85a1846",
-      "after_sha256": "e55ecb918493a00763269b6b570730654f51b7691e05749fac5d322b9dae12b2",
+      "before_sha256": "e55ecb918493a00763269b6b570730654f51b7691e05749fac5d322b9dae12b2",
+      "after_sha256": "e2662c76ca7c014cb0aff1670b1a028915acdc27ae09ac3a2ab5d4a7a3a7f3ae",
       "owners": {
         "@document": {
-          "before": "f629ab2705dd12e42453415e0096be9bfab393aabd50a76ac64cbd0db85a1846",
-          "after": "e55ecb918493a00763269b6b570730654f51b7691e05749fac5d322b9dae12b2"
+          "before": "e55ecb918493a00763269b6b570730654f51b7691e05749fac5d322b9dae12b2",
+          "after": "e2662c76ca7c014cb0aff1670b1a028915acdc27ae09ac3a2ab5d4a7a3a7f3ae"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "c20d3fc4e0b08344c5a657ec700b71a7e0abe90a03cfd9e41c839f8d8441ff3f",
-      "after_sha256": "26909dbbc3fae97a81f29af0adf88cff58782eb3abbfc409f92f24505961635c",
+      "before_sha256": "26909dbbc3fae97a81f29af0adf88cff58782eb3abbfc409f92f24505961635c",
+      "after_sha256": "1f40af5d266e171c83f188b94a2cae73748a6c2b916c1f08d4e3f91824f6fb38",
       "owners": {
         "@document": {
-          "before": "c20d3fc4e0b08344c5a657ec700b71a7e0abe90a03cfd9e41c839f8d8441ff3f",
-          "after": "26909dbbc3fae97a81f29af0adf88cff58782eb3abbfc409f92f24505961635c"
+          "before": "26909dbbc3fae97a81f29af0adf88cff58782eb3abbfc409f92f24505961635c",
+          "after": "1f40af5d266e171c83f188b94a2cae73748a6c2b916c1f08d4e3f91824f6fb38"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "99fb4496d16914b9ec5f5a03db3b14bccff966a450210f1502cae1f8703f8d08",
-      "after_sha256": "1433693756ba69a76aac1e8d58748fb5d96a00ef05b90fb55674052444fe580c",
+      "before_sha256": "1433693756ba69a76aac1e8d58748fb5d96a00ef05b90fb55674052444fe580c",
+      "after_sha256": "4a90d35d7e8c02e994bc13877ad0c1d96831d8c8d5a7423dbc90d2a7206fcc64",
       "owners": {
         "@document": {
-          "before": "99fb4496d16914b9ec5f5a03db3b14bccff966a450210f1502cae1f8703f8d08",
-          "after": "1433693756ba69a76aac1e8d58748fb5d96a00ef05b90fb55674052444fe580c"
+          "before": "1433693756ba69a76aac1e8d58748fb5d96a00ef05b90fb55674052444fe580c",
+          "after": "4a90d35d7e8c02e994bc13877ad0c1d96831d8c8d5a7423dbc90d2a7206fcc64"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "13a94062d9cd04be35c68cee698011cde4c362d997e46d91c8399a2382853f93",
-      "after_sha256": "f3b45427dd7c45fb2bc5b9ebb4c2c6a608b185f0fbe222be3bd754fd319745f4",
+      "before_sha256": "f3b45427dd7c45fb2bc5b9ebb4c2c6a608b185f0fbe222be3bd754fd319745f4",
+      "after_sha256": "b6a9d3300ab3ae248988e806eccbac8ce44a5fc9192689d6f23e20a7533ea3df",
       "owners": {
         "@document": {
-          "before": "13a94062d9cd04be35c68cee698011cde4c362d997e46d91c8399a2382853f93",
-          "after": "f3b45427dd7c45fb2bc5b9ebb4c2c6a608b185f0fbe222be3bd754fd319745f4"
+          "before": "f3b45427dd7c45fb2bc5b9ebb4c2c6a608b185f0fbe222be3bd754fd319745f4",
+          "after": "b6a9d3300ab3ae248988e806eccbac8ce44a5fc9192689d6f23e20a7533ea3df"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "861a086b87c2999b027463705ef8a9576a25a79702c081dc8ef90766e01d3126",
-      "after_sha256": "92b0da7c1ce1f65e78e34ad2c01f91b166f106e86f872aebb73cf539967df0aa",
+      "before_sha256": "92b0da7c1ce1f65e78e34ad2c01f91b166f106e86f872aebb73cf539967df0aa",
+      "after_sha256": "a2f55715e1447935990580d1208033729e070393dbf1c16dfb214bb423cd7982",
       "owners": {
         "@document": {
-          "before": "861a086b87c2999b027463705ef8a9576a25a79702c081dc8ef90766e01d3126",
-          "after": "92b0da7c1ce1f65e78e34ad2c01f91b166f106e86f872aebb73cf539967df0aa"
+          "before": "92b0da7c1ce1f65e78e34ad2c01f91b166f106e86f872aebb73cf539967df0aa",
+          "after": "a2f55715e1447935990580d1208033729e070393dbf1c16dfb214bb423cd7982"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "99d954eba1ee0c9d5dbddfadddf9584ac9dab2874ad1f844d6d0727c12930535",
-      "after_sha256": "1d0fb57c188af1fcec8cbb5e053708326163e64531d7836ad054178f534712af",
+      "before_sha256": "1d0fb57c188af1fcec8cbb5e053708326163e64531d7836ad054178f534712af",
+      "after_sha256": "bfc340c8cd0712fbbff2919c9446106dfc86f114fdc513ce74b05a3a8c4dd4e8",
       "owners": {
         "@document": {
-          "before": "99d954eba1ee0c9d5dbddfadddf9584ac9dab2874ad1f844d6d0727c12930535",
-          "after": "1d0fb57c188af1fcec8cbb5e053708326163e64531d7836ad054178f534712af"
+          "before": "1d0fb57c188af1fcec8cbb5e053708326163e64531d7836ad054178f534712af",
+          "after": "bfc340c8cd0712fbbff2919c9446106dfc86f114fdc513ce74b05a3a8c4dd4e8"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "1f70baa7b54739f03bff083fa54f2b00f1dfab47b82e16518d74b5c8cc1989fb",
-      "after_sha256": "28d6f91e6733795fbf98584461a36bdbcd4476ef7a8db3d34c2aebbf678bd451",
+      "before_sha256": "28d6f91e6733795fbf98584461a36bdbcd4476ef7a8db3d34c2aebbf678bd451",
+      "after_sha256": "2108889f3348090a2885e3afda14a515586f2c2b27f2f510334cdc449d6b342b",
       "owners": {
         "@document": {
-          "before": "1f70baa7b54739f03bff083fa54f2b00f1dfab47b82e16518d74b5c8cc1989fb",
-          "after": "28d6f91e6733795fbf98584461a36bdbcd4476ef7a8db3d34c2aebbf678bd451"
+          "before": "28d6f91e6733795fbf98584461a36bdbcd4476ef7a8db3d34c2aebbf678bd451",
+          "after": "2108889f3348090a2885e3afda14a515586f2c2b27f2f510334cdc449d6b342b"
         }
       }
     },
-    "data/source_audits/order107/baseline/tests/unit/test_order97_secondary_clause_evidence.py.txt": {
+    "data/source_audits/order108/baseline/tests/unit/test_phase10i_terrain_movement.py.txt": {
       "before_sha256": null,
-      "after_sha256": "82ed94bc4d54196a40d3138e0670fcbdd5ed316177576734e90451892ff5a047",
+      "after_sha256": "b317f4ff30b323d66f65f6fd31c5ace70587e69e652234f52fb4bc5af8b7792e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "82ed94bc4d54196a40d3138e0670fcbdd5ed316177576734e90451892ff5a047"
+          "after": "b317f4ff30b323d66f65f6fd31c5ace70587e69e652234f52fb4bc5af8b7792e"
         }
       }
     },
-    "data/source_audits/order107/baseline/tests/unit/test_phase15d_fight_resolution.py.txt": {
+    "data/source_audits/order108/historical-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "67cf08c00ab604314870841204a8a007518037f9308c1b82e8684217f609dcb3",
+      "after_sha256": "2288418c2004dc0664e353dc00cb2fbd290827529fa5b631a2f9dcebaa58ef6f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "67cf08c00ab604314870841204a8a007518037f9308c1b82e8684217f609dcb3"
+          "after": "2288418c2004dc0664e353dc00cb2fbd290827529fa5b631a2f9dcebaa58ef6f"
         }
       }
     },
-    "data/source_audits/order107/historical-inputs.json": {
-      "before_sha256": null,
-      "after_sha256": "abff3f6516cd2489ed63009bf2253d8a06a7487b1501343cb650e626c423baec",
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "before_sha256": "fdf762106542f3a07137c5aa162430656bf5b38e52861e5e43120b6ae051cef7",
+      "after_sha256": "3f0255b6636ced74683815a9073dbd3ec67f1842b6d233287d059e7a48b505d8",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "abff3f6516cd2489ed63009bf2253d8a06a7487b1501343cb650e626c423baec"
+          "before": "fdf762106542f3a07137c5aa162430656bf5b38e52861e5e43120b6ae051cef7",
+          "after": "3f0255b6636ced74683815a9073dbd3ec67f1842b6d233287d059e7a48b505d8"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "7bce5c55072ae1de37179b14869b6febde6bf96476707f0be8f382a0d6eee5dd",
-      "after_sha256": "78e2e114692aff32b9c8c0d9b6c3c47e7727ed8904e61e8d123d1a96f059836c",
+      "before_sha256": "78e2e114692aff32b9c8c0d9b6c3c47e7727ed8904e61e8d123d1a96f059836c",
+      "after_sha256": "8888768b2d078c2cb75f01a8fe4c70f6c8569623e361e2ac516f1ebfff3013dd",
       "owners": {
         "@document": {
-          "before": "7bce5c55072ae1de37179b14869b6febde6bf96476707f0be8f382a0d6eee5dd",
-          "after": "78e2e114692aff32b9c8c0d9b6c3c47e7727ed8904e61e8d123d1a96f059836c"
+          "before": "78e2e114692aff32b9c8c0d9b6c3c47e7727ed8904e61e8d123d1a96f059836c",
+          "after": "8888768b2d078c2cb75f01a8fe4c70f6c8569623e361e2ac516f1ebfff3013dd"
         }
       }
     },
-    "docs/ORDER_107_SCOPE_PLAN.md": {
+    "docs/ORDER_108_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "70fccd65c91d2fc64bfa333ec7f6c89ddbbfbdc4802a3644eb3d010e784c34dd",
+      "after_sha256": "a853874b4e1b6a2054a9dacec7d916fe50de892aee5bf7ab4b69dee490c99fc4",
       "owners": {
         "@document": {
           "before": null,
-          "after": "70fccd65c91d2fc64bfa333ec7f6c89ddbbfbdc4802a3644eb3d010e784c34dd"
+          "after": "a853874b4e1b6a2054a9dacec7d916fe50de892aee5bf7ab4b69dee490c99fc4"
+        }
+      }
+    },
+    "docs/performance/PERFORMANCE_POLICY.md": {
+      "before_sha256": "f33f3e065f4f1adae416069090eb3674c145ccc32a8376a2dc5b9d30374dbcd9",
+      "after_sha256": "5702f2af0f8155a427ffa1f5c3b511870fd3656775af7b4f519651da198b2fe2",
+      "owners": {
+        "@document": {
+          "before": "f33f3e065f4f1adae416069090eb3674c145ccc32a8376a2dc5b9d30374dbcd9",
+          "after": "5702f2af0f8155a427ffa1f5c3b511870fd3656775af7b4f519651da198b2fe2"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "9d423721ba206455e619b702a885637707e0b545dc24e8496dce8e2e835fccd1",
-      "after_sha256": "73b89625aad3e1a62007a2e3232fa178b1b830e21bd8ddec0e1d2d113d79ed79",
+      "before_sha256": "73b89625aad3e1a62007a2e3232fa178b1b830e21bd8ddec0e1d2d113d79ed79",
+      "after_sha256": "c56bd86fa24c8604efbbe62fb6db61eb9af44b1e43b7dbdc503e0642ec35136b",
       "owners": {
         "@document": {
-          "before": "9d423721ba206455e619b702a885637707e0b545dc24e8496dce8e2e835fccd1",
-          "after": "73b89625aad3e1a62007a2e3232fa178b1b830e21bd8ddec0e1d2d113d79ed79"
+          "before": "73b89625aad3e1a62007a2e3232fa178b1b830e21bd8ddec0e1d2d113d79ed79",
+          "after": "c56bd86fa24c8604efbbe62fb6db61eb9af44b1e43b7dbdc503e0642ec35136b"
+        }
+      }
+    },
+    "docs/performance/policy-v3/order108-rule-semantics.json": {
+      "before_sha256": null,
+      "after_sha256": "185209f5b23e197dee754f567393f2b02fd4f5b061890064dcedf2fe64e8b227",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "185209f5b23e197dee754f567393f2b02fd4f5b061890064dcedf2fe64e8b227"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "b325a0a761b38417c6295480e03f48009b0dfb9a1fb29de2b7e637de18cd46e4",
-      "after_sha256": "aea46c8e15891b2f9229300da96cd3e772c2e95f8cb3c9a4a6405984f3acdcae",
+      "before_sha256": "aea46c8e15891b2f9229300da96cd3e772c2e95f8cb3c9a4a6405984f3acdcae",
+      "after_sha256": "d09912f9d2f4faef39bb82f818cf2d7f0bef990594c9cb2b2d177d8d4ffc4291",
       "owners": {
         "@document": {
-          "before": "b325a0a761b38417c6295480e03f48009b0dfb9a1fb29de2b7e637de18cd46e4",
-          "after": "aea46c8e15891b2f9229300da96cd3e772c2e95f8cb3c9a4a6405984f3acdcae"
+          "before": "aea46c8e15891b2f9229300da96cd3e772c2e95f8cb3c9a4a6405984f3acdcae",
+          "after": "d09912f9d2f4faef39bb82f818cf2d7f0bef990594c9cb2b2d177d8d4ffc4291"
         }
       }
     },
-    "src/warhammer40k_core/engine/fight_resolution.py": {
-      "before_sha256": "720cc1824545636bdc2a2961abe83aa012aa275b53ae8618be793734a7a41774",
-      "after_sha256": "8806f9f1451a7c14ba178ed1d30db6c7e9812f67042d46a230c7a76c27197a88",
+    "src/warhammer40k_core/core/terrain_areas.py": {
+      "before_sha256": "8e8e7fc4c0f0d4c51862b88dfb1727721614a9fc8f2e5558c6d93bbc225386a4",
+      "after_sha256": "47b71e45d5809982cd69c470c1d56d22c0e6557d72710139249c0388c4b15495",
+      "owners": {
+        "aggregate_logical_terrain_area_classification": {
+          "before": "bddeb4b7bf0963fc5874659742dcf4d61cc0c3e2fb0a16e59cc4d2a290b700c3",
+          "after": "d659592f5f2d2cdc466548edc42e74ef50c26e6ba211eea6afc13f35a820b878"
+        }
+      }
+    },
+    "src/warhammer40k_core/core/visibility.py": {
+      "before_sha256": "a38c5807c0cc94170dadc30d9a773c9d9c1cc3d584543736254bbe6d774ef9aa",
+      "after_sha256": "1eae8c735a6a0dfd233420b77d153e38e54685682e0c4c7758136a6764e695de",
+      "owners": {
+        "TerrainVisibilityContext.__post_init__": {
+          "before": "6850f3dbac1953f602744e3c91adc53975f2a75fbf50256db136c8d57e272683",
+          "after": "7d4ec6cbfa58df8b9223d28b413c82459429046fde9c475adc22d981eb698610"
+        },
+        "_terrain_volume_feature_index": {
+          "before": "7500284b51f004c409926d151abeb325906d8bc3c49e4d9139138bcd4388eaed",
+          "after": "397007f4f77f54ee22eb06d4a0bc9436a83cb7cd94165a04563fa2a593dfd169"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/endpoint_placement.py": {
+      "before_sha256": "5bf2c80e77df5034a731583f489737c0feafa83f466c1d37e41be947f50d91a8",
+      "after_sha256": "125143d5a9931849f238e2cc78fcb33b09b8c18025203cb8f45e3bebc4712966",
       "owners": {
         "@module": {
-          "before": "177f404274316a7479fef6bee1c3a03fe7e94fcea9d02bbf9db4c40416db405b",
-          "after": "b5b220a3adc62a3a4849426a1ef45615bf567928b81b90241c83c231389dad5e"
+          "before": "2765395017fbdf1bb7659bf6d6e878514662847d238b300080503cbc44a42b10",
+          "after": "d3c654b814daff588590a78f4270117dc145b2ceb4a5617559d9e5ebcc6e0c42"
         },
-        "fight_movement_maximum_distance_inches": {
-          "before": "b47cc77e28d384553fb54438c1bf35c260c9a323c03f8829e679bbd2fa952cbc",
-          "after": "9ef9255b95ae6c6492149c6626ae5cadca93b59bdb1002e41798fbb14a12c3db"
+        "terrain_endpoint_placement_violation": {
+          "before": "9241de8069aa3bd621525fba61936e913b3eaf4a8c1df40dc579503ebc19a7e0",
+          "after": "c78688d429b9488419b985ad44cb7d1bc1090160a8bbe2600fef742c858cb12a"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/pathing.py": {
+      "before_sha256": "47361dc56c959bf3dc3697eee51e64f20e5902d94e66d606cea61b2d6bb26160",
+      "after_sha256": "a182a92a0464232848c808c76f12652eb41fd8cc441a6f120d2a4f8ed097b759",
+      "owners": {
+        "@module": {
+          "before": "b2cc7d8a7452320c07247f229ba01540c3aad2cfd525223d4d111287fd57efcf",
+          "after": "f1762c79176397c270f43aa389b7eedb830b936a8d8cc3848e6cac43926f7cca"
+        },
+        "TerrainPathLegalityContext._append_terrain_volume_segment": {
+          "before": "3f1144fc3296987ac744cceb39a4d0b7ca6f8780a76599f87d6b031d345fb23d",
+          "after": "1e9c0706513b91b717cb7a603fe7ccdeee04b83ae643c6ccf5c0142d6602ca63"
+        },
+        "TerrainPathLegalityContext._endpoint_violation_for_feature": {
+          "before": "f827db3e7b69619ef16cd1527e41f60a893f07be2c6a4585a52407080a1870b1",
+          "after": "4dced3d8c56dd13384f3c6b2f610ff574238f4a4027b7b480421d0afbc855d51"
+        },
+        "TerrainPathLegalityContext._traversal_mode_for_terrain": {
+          "before": "83a73dc2ab29dc85f8c04b1136245781c1fb28c1b26e5a6847aadeeb4fcf96ed",
+          "after": "03826265bd9041daa1644ad2d42de733c5b78afeed1ebc194a4730623ad1b2fb"
+        },
+        "TerrainPathLegalityContext.validate": {
+          "before": "670982748525a6234bc08a2f61b3d23693a336e935c0625f7d9b789b90b3d03e",
+          "after": "ef007607263ff23300ed60c7c90c0edcf6f5f453a60302091e305a5c03828db3"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/terrain.py": {
+      "before_sha256": "7fb2df7511b51aed1322fbfe277248d83b497615ac0a173cc16af3367dcc4338",
+      "after_sha256": "ab4a944671c715c6ff4536f654b7041b54e0a84bdb6c86089f23c02bd80ec688",
+      "owners": {
+        "@module": {
+          "before": "d870709b67b92c9a3173f9d5265a8f8661dbf547a3b8fc9e94057be9c3ebc862",
+          "after": "05988a75b1bf335687f57278591d22b099d2955a5e8f5b5c87425130a694cbeb"
+        },
+        "TerrainFeatureDefinition.solid_opening_volumes": {
+          "before": null,
+          "after": "a3ca132e911ac4507c0d534c61a7f38f15116e39eacc49ae6feb90f3cd50a492"
+        },
+        "TerrainFeatureDefinition.visibility_volumes": {
+          "before": null,
+          "after": "b22a77165e2db9c709654625da811d896d25309dd0c37d8af13ca4edb4a45587"
+        },
+        "classified_feature_transit_permission": {
+          "before": "158623e7d04a57d533dcfadfb8e81266a8c7258ae0a67d58268bca43d0f7e169",
+          "after": "b5e302276a59ff2a66f7142c62b869adbc01725788a87b90282b58b5d121a4a7"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/terrain_classification.py": {
+      "before_sha256": "fab678feafc4960c7c2ae6898b1be4d7466571efdbe434444e39b6cbc3f45a4b",
+      "after_sha256": "c93e8045e072a24a7245ceae7eed0cbd3578d93db52faa09684a40a7ed597075",
+      "owners": {
+        "TerrainAreaClassification": {
+          "before": "27c6d47939dc9f662a0fa67b509ac800291e3c5dc37fe37791ea20907153245d",
+          "after": "3d11cc34129ba3d01cd3f27a6e38e9bdaf132dec993d8defe5c098f30efac5ef"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/terrain_solid.py": {
+      "before_sha256": null,
+      "after_sha256": "5551e61b726f4b53c6f19a148d442de142a3126cc1e72d3aaa35ebad7d350451",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "3fc515fa4a413fbeaf57eae24aaf22c3767bed9d453bec4290fbadb0ee07f635"
+        },
+        "_enclosed_cells": {
+          "before": null,
+          "after": "c0e47029888db0406b896fd63b04a5f193d3c36e248df7244d7c9263f1a3138a"
+        },
+        "solid_endpoint_intersection": {
+          "before": null,
+          "after": "e8f9f113d5407feb9a59790e1cd3cc8cc46e563f8f2683faa9788103ad8f7cb9"
+        },
+        "solid_opening_volumes": {
+          "before": null,
+          "after": "8b4df7bc13322f2b86c78cebbfb2e31f0c4f81c0895e9ace42cdb0d84217c3a0"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/terrain_transit.py": {
+      "before_sha256": null,
+      "after_sha256": "74a34cf68aa79011281f6eb6adec53f465e4d7087e0fa0e107ada2fc12e745fc",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "a556398e56bf67d4d4760290f17dbcd9d466251f7cc3ec9932acafbeed6b413b"
+        },
+        "_crosses_floor": {
+          "before": null,
+          "after": "47262f1dde03341d233ce9ea3b9570517c5046b92a96a733373eda4f36365d10"
+        },
+        "_fixed_facing": {
+          "before": null,
+          "after": "38dcba484a71e3f8371090656cf0175f18cba1a490eb01af8d62f60869e7053b"
+        },
+        "_moving_shape": {
+          "before": null,
+          "after": "de25e339713e1895a1beedb0b2e4b87a6e4a37387dfdc425c18c5ebc0e3b5d84"
+        },
+        "_rotating_floor_crossing": {
+          "before": null,
+          "after": "ba35330be265a2da8774769766c582e87729a9a9d6f6fc752a43eb0dad2f879f"
+        },
+        "_segment_contact": {
+          "before": null,
+          "after": "2256ae0a20ecf996f58ac08f68641a92e60d868c154c1c411e3a3de969ae61e8"
+        },
+        "_terrain_pose": {
+          "before": null,
+          "after": "97745deb0bb3565da368044c92eb0a918fb44e604bf7987361259a93cfb0ba10"
+        },
+        "_terrain_shape": {
+          "before": null,
+          "after": "fc9b7eeee9a6fba814f42df8171a7f53a7fcdc567970fd89dcabe330c39452d8"
+        },
+        "forbidden_dense_floor_crossing": {
+          "before": null,
+          "after": "f3746f3a3139ec2abb136a9ddd70f5f319901b68b2cf0b63fb2c71e52c87b296"
+        },
+        "path_retains_climbing_contact": {
+          "before": null,
+          "after": "fc8b3f659d7430fecf2e391f1503ea847adec63ac95353540393065ae6aa75d2"
         }
       }
     },
     "tests/code_quality/test_order97_inventory.py": {
-      "before_sha256": "a98f3cd6d26fd7428180437ee00cdaf19754d41200c93d31a8d1fe47b79ec2fb",
-      "after_sha256": "918beec821766cbea6d3d9bb6849ae0c229abfd805b473d8861ba06e52e780aa",
+      "before_sha256": "918beec821766cbea6d3d9bb6849ae0c229abfd805b473d8861ba06e52e780aa",
+      "after_sha256": "71d151be0cb3a759b37467dd1c3a8ccd9f9fc4e1742544826a30d1ec53a73d05",
       "owners": {
         "@module": {
-          "before": "8239bc607792c6218f57547453a7d42d3afa8d32ed9d904c85f952d4f621bae3",
-          "after": "6e0cea8c8a16812f299f52688ece5e106d8325cd96c0b8d1e935a54b53a8551e"
+          "before": "6e0cea8c8a16812f299f52688ece5e106d8325cd96c0b8d1e935a54b53a8551e",
+          "after": "ce90657a03d40d844f58aba31502a3a44c5f184c2d96bd3f7eff48ead5e6a422"
         },
         "test_original_assertions_remain_exact_and_fail_closed": {
-          "before": "629d384dd5a994a7bc91f2be6174021381d6a12d4c8aecd102f3ea01169e8213",
-          "after": "a611ca02a4aa378e4bea799b7dcf1b37fa69931d2e16a368eb77f34090d295d1"
+          "before": "a611ca02a4aa378e4bea799b7dcf1b37fa69931d2e16a368eb77f34090d295d1",
+          "after": "8625b29c223f9a35bd7db64a709f2028d676f3b46da5b485d0900b6d4fefc06d"
         }
       }
     },
-    "tests/fight_distance_helpers.py": {
-      "before_sha256": null,
-      "after_sha256": "0f010da94a5b3128e3a54d4faef63f8b3b9e8942c58c4cae267382b5445f86f7",
+    "tests/code_quality/test_performance_policy.py": {
+      "before_sha256": "ff040858cc4c061e07aaa47441aa6fdf74cf9e516b33e4e33e797e280ae5b6fc",
+      "after_sha256": "a3bd6e4ac89024d6adca3d9c341d4d27ece13772edb0e044d82649da63a09124",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "f76ce014d967ea78fd8e221c6259eb1771369f4922c7d0ab027e851fda7f61ca"
+          "before": "11e72be41f78c86cbfe8a258a2ee3a374bfa826d2f3214cf36970f7fb073f5a9",
+          "after": "a49efcea4924e5b6afbd931551030bde32122441c0f66fad7932722ea46c6c84"
         },
-        "set_fight_distance_step": {
+        "_validate": {
+          "before": "c6831ce671fd65095c67ff4bc1c0585ee8115ee0049009cd954b49b63470fe07",
+          "after": "8657a6705e5afbbd066739d12ae0fe8d184a435824fd257e97a8ac5005eedafe"
+        },
+        "test_order108_scope_preserves_other_assessment_obligations": {
           "before": null,
-          "after": "af963eb3746d540daa36c893480cc759ef2dd0f348cd928d444dc5074d63c02b"
+          "after": "81b4fb7837df9550b6408d3be6c6c353b9a1c6923034afcf409011c1bc340a80"
+        },
+        "test_order108_smoke_scope_authenticates_complete_semantic_rows": {
+          "before": null,
+          "after": "fa492ce9847e680664d9425c11a0d950965617abf3f336d745cb9879a62563e7"
         }
       }
     },
-    "tests/unit/test_order107_fight_distance_window.py": {
+    "tests/order108_terrain_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "a277836d818551779cf23fec0cf231600ea6cbb702859171bc6ccbe8e67a7233",
+      "after_sha256": "dad6c8c9b13c75bfc935e2a4105403c13e9912d23d0307101ae134e49d690194",
       "owners": {
         "@module": {
           "before": null,
-          "after": "57593e66ce7b2f86258820d6b2348421d1a75acd2ad7181d75c234e88cf60e61"
+          "after": "8db38998a9b0c971c09c2334f29ed7b82768ad10a6f496120ddefae44f381d96"
         },
-        "_move": {
+        "terrain_session": {
           "before": null,
-          "after": "93a6c46b9721c3dc93cf5d4874f4aea79d4c369c323ea82b68e05d8ff4918a0a"
+          "after": "68b42e3f4149e9f7253cbada2dfe74be38c1fc4ad7c14b5f00c64c2854a976f1"
+        }
+      }
+    },
+    "tests/unit/test_order108_terrain_semantics.py": {
+      "before_sha256": null,
+      "after_sha256": "2cdcba523ffeebc8afce855a032c941fd9db4f6e476e5e3d40614af23d20ded5",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "c03e318d2f9ae9998625bc6f2bfddfa97c126baf25698e2b37b87b21d55acdfc"
         },
-        "_overrun": {
+        "_context": {
           "before": null,
-          "after": "3b03a1940b46459d9e7d36cd8625657e9822a4157fc0f96606ba71aeec79bb6b"
+          "after": "23cef5e849201d98e06e9daea02812919d7a449f5f6f79d04c45c37fb061cc4c"
         },
-        "_restore": {
+        "_feature_area": {
           "before": null,
-          "after": "f69d30df8544630dfb92d3659b89088e4c8d162fe750091233e617046875ab97"
+          "after": "f6aff37976e0a3eaf0d64453ba69fbd4e54371d8421972c60768f55ab2e48101"
         },
-        "_session": {
+        "test_contact_uses_base_edge_and_continuous_union_not_sampled_poses": {
           "before": null,
-          "after": "025ae5dd4632bef2e9c89ae6bc27245a5d115a4fb704bf16c144aa541ee7215b"
+          "after": "e6a84603b8129771258cee0c63d014f8203f722f8d23a319528f1758163830f3"
         },
-        "test_extra_distance_requires_matching_phase_and_step": {
+        "test_exposed_is_an_explicit_round_tripped_classification": {
           "before": null,
-          "after": "e056f191de628dfbd52fc91c1b5e6e086b8ec8316febafe01e6098c77625b70e"
+          "after": "4af4a93edba1a64a9a734e1d0842dfa343f9b10303bf52846ab86c575761f941"
         },
-        "test_matching_pile_in_step_keeps_extra_distance_and_historical_restore": {
+        "test_exposed_logical_area_preserves_other_members_classification": {
           "before": null,
-          "after": "c377ed49a5a9ad6049f540579147f5a64cca6e22ee2a19e2d0ddc01c593da5ac"
+          "after": "33e31ca7eab003509c0bfa9c084c251ae0c22d54b88429e8210c7481adb77a33"
         },
-        "test_overrun_rejects_extra_distance_then_restores_retries_and_replays": {
+        "test_facade_terrain_rejection_retry_pending_completed_restore_and_replay": {
           "before": null,
-          "after": "2533c96146adfbd9708f72b6c96222c6b05669126ee081cb59391217bd8a5c87"
+          "after": "50323531ab9b6ab59822ceed7aa66512db9dda204056f63694a61dfce1d9795f"
         },
-        "test_overrun_request_uses_core_distance": {
+        "test_floor_transit_permissions_and_valid_context_persistence": {
           "before": null,
-          "after": "2cfd7551665c4230b88e3693839407062c4e2c0e554e770756d792a2f43a2183"
+          "after": "f89974acb32420695d103319818b3e8503e3d14d3dd53a44bac8202afe0d7ab8"
+        },
+        "test_forbidden_terrain_paths_are_rejected": {
+          "before": null,
+          "after": "73d26d4851a255a30bc07041b2917409085fcc69c0ba0fb896fdfb06240580ca"
+        },
+        "test_high_opening_and_body_protrusion_boundaries": {
+          "before": null,
+          "after": "66544eb62b902bd4b17d782363dbc5888113dd65850845b8af9cfc6a7ddfc6b0"
+        },
+        "test_rotating_contact_accepts_clearance_and_rejects_lost_contact": {
+          "before": null,
+          "after": "95f9634b818b4fd1189c9a7506386628a015d15c3b5d1aa14d449668b3316a8a"
+        },
+        "test_shared_setup_endpoint_rejects_solid_window": {
+          "before": null,
+          "after": "b76f18edba2a1efff2aa839f3891f5898a6538ed139980cbdedd60a0712c9f3f"
+        },
+        "test_solid_door_does_not_become_a_physical_transit_blocker": {
+          "before": null,
+          "after": "5dd8ec5234a68acbce023e03fee1e8e71918efc11af7a1acd0ea27a29183d2e1"
+        },
+        "test_solid_volume_fills_only_enclosed_low_openings": {
+          "before": null,
+          "after": "42301295ad65260f77659423ba67580532af27bcded681648aa9cf24048b466c"
+        },
+        "test_solid_window_blocks_continuous_visibility": {
+          "before": null,
+          "after": "cefffba56e5f81258e23bead24be966e99be79b6763842ce57ed20215ae756fe"
+        },
+        "test_solid_windows_and_doors_share_visibility_and_endpoint_volume": {
+          "before": null,
+          "after": "b649181aca71cd9307efe2fd869d2e6873d8ac6e48fd172ee936d948b9e56a1a"
         }
       }
     },
     "tests/unit/test_order97_secondary_clause_evidence.py": {
-      "before_sha256": "82ed94bc4d54196a40d3138e0670fcbdd5ed316177576734e90451892ff5a047",
-      "after_sha256": "58a2d5c0d82e7c2c30de1b5e93cbeb52d91d3261856fe80fe9e3c00ba083153f",
+      "before_sha256": "58a2d5c0d82e7c2c30de1b5e93cbeb52d91d3261856fe80fe9e3c00ba083153f",
+      "after_sha256": "6fe0b7d41c8fa1748618c0da4194a7cf327a84fa0ef4e43714f5f42a55971009",
       "owners": {
-        "@module": {
-          "before": "0aff24f9c89f749b10da47751a80bc4fe1e97c5b243da809a474c54edfe46b29",
-          "after": "bcfa2ea13474b2fd62f5ba34331bc87eb1093be4db1b29c762de3be51f7f1149"
-        },
-        "test_order97_extra_fight_distance_preserves_target_range": {
-          "before": "21fde9d475789359930ffeb206d7309ce236d4160e404b1cb462ffc8638ea2c4",
-          "after": "4fcb868deffec9df319847bd5e51e1bb461bfd783fc81e350fa6c35326ce4f05"
+        "test_order97_terrain_permitted_vertical_transit": {
+          "before": "f84ccebc837cf346ec4fe1f7d714646c16c3d412b7c3c0d0334b42899b922c4f",
+          "after": "51aba5279848f9626cba1d2c6dc16342e80d96ae2411a45251206d5cde6bf658"
         }
       }
     },
-    "tests/unit/test_phase15d_fight_resolution.py": {
-      "before_sha256": "67cf08c00ab604314870841204a8a007518037f9308c1b82e8684217f609dcb3",
-      "after_sha256": "17ec7136bf4bef30e32102e4c9f5843acc8cf3945b53e9e53173beb8c251ce81",
+    "tests/unit/test_phase10i_terrain_movement.py": {
+      "before_sha256": "b317f4ff30b323d66f65f6fd31c5ace70587e69e652234f52fb4bc5af8b7792e",
+      "after_sha256": "8241e768f434ab9e44412b73b5fc16a119012bd77969d959dc682b1e079434a5",
       "owners": {
-        "@module": {
-          "before": "e5dd355e559b0e9a58824b37ce931d2cb79440df2c53a91ec841c38ecdab52b4",
-          "after": "1e5a4c264a6b33dd799a8317db79c360ab01d726f23b67e7b7a9bd810120e946"
+        "_terrain_context": {
+          "before": "ec60994d8d42d6a40a20a6f5183152b0d1717c13522d2f796035586f262c9204",
+          "after": "e73ddc4d73c60b50a9bdb80e1a5f18dfca0458b8d627f0052624628a6b63e88b"
         },
-        "test_phase15d_attached_no_move_is_atomic_and_distance_effect_is_lineage_aware": {
-          "before": "f2ab7c8ee3ba3b8adc52227741fb63864c371b3ba7f8b25fa41920b357dbb3a7",
-          "after": "83d9b8ddf1047ff37ca3fb0fb7ce7dab004dee456c6becdc49cc242536b1d9d5"
+        "test_exact_event_companion_ruins_apply_keyword_specific_wall_traversal": {
+          "before": "61de7d7bd6a267c5a48cf9ae6288391018385764339276f3ca801bc02b50190e",
+          "after": "16dcf34ef768f60c0a8c4922f545faed3772088a1dc4248305cc27656ba618ed"
         },
-        "test_phase15d_fight_movement_no_move_and_source_linked_distance_effects": {
-          "before": "d6718d09755c923761242db6f3177790a8f78ac01a4ba558e4d96061c2ba2604",
-          "after": "4226126c8fc27304d5ff0f8602356b634de8ee5d14c90369d1a1bf6136cac2c0"
-        }
-      }
-    },
-    "tests/unit/test_phase17g_aeldari_army_rule.py": {
-      "before_sha256": "59df236f91eb994ebfb4e17ec48d0f0a7e03679d82a63aac6f621742b76a83eb",
-      "after_sha256": "144c2d669ec1a8b7f9a7249590b9c8be2f7c68183366c744e696f412c4eb1143",
-      "owners": {
-        "test_aeldari_sudden_strike_fight_movement_distance_uses_lifecycle_effect": {
-          "before": "4f93d1e65dc1a7e312278ce30c8a82e0c940f31ec6c6ba27bb7548bae02eb4d8",
-          "after": "9ff2f8e83e15ef835bf55eddc967878621b386ed6b47269e1a979d2f0a959ede"
+        "test_exact_event_dense_ruin_mobile_vertical_path_climbs_instead_of_passing_through": {
+          "before": "e364f086d3d202685c3cb46a5084cb1061258ffb984833590b87c120bd7fe62b",
+          "after": "c519a11c4541116ef3ee53251186020a9117410663e0c4f5569ac3c1ddb50dd1"
+        },
+        "test_model_can_climb_tall_terrain_by_paying_vertical_distance": {
+          "before": "01686ec181e3ffcc178399dd2e5c5a038a17b983e4434a9d1f64898aa944334b",
+          "after": "f20a6e890d6913771c349c0853f9f747605daee875c5c7c9b3ab3af423f8aa80"
         }
       }
     },
     "tools/core_rules_order97_history.py": {
-      "before_sha256": "ee913d8989627a04e1c5df2e1da430935e2b3fb46185e8036ebfa7bd650dc2e8",
-      "after_sha256": "21e6135a412bf1fe14693dfbf15aed82b941c852b474308ea900b4cc493e9312",
+      "before_sha256": "21e6135a412bf1fe14693dfbf15aed82b941c852b474308ea900b4cc493e9312",
+      "after_sha256": "c2af4ad4b08c782798ae4e917d7e82f72047943d3b2b75becf9316af5280296d",
       "owners": {
         "@module": {
-          "before": "2097289ee79c088cf907f05da9c98b5cbd8d6cd99764de9cd0710f8c4c94c7c5",
-          "after": "b2cb5d9b44ea09782be291633f26ce0604fc9cb439f9de38ab75d9b729c70547"
+          "before": "b2cb5d9b44ea09782be291633f26ce0604fc9cb439f9de38ab75d9b729c70547",
+          "after": "87df32050432011c6c68ff661c51fc1c30ce3f6e78028b8311eb6c16449adc15"
         },
         "historical_evidence_path": {
-          "before": "9e68f5ddd645dae89c28266572f2a229da76c1627166d26b35611623ed9b9d42",
-          "after": "89e586bdc52b2796542b7e20e926fdfa641b735884e8b29b889fcc57ecb1da7d"
+          "before": "89e586bdc52b2796542b7e20e926fdfa641b735884e8b29b889fcc57ecb1da7d",
+          "after": "9d899bf66b8cc6b18c9345a7dcffaa200d3ec9c5d8d3122dc932529df926bda5"
+        }
+      }
+    },
+    "tools/performance_policy.py": {
+      "before_sha256": "cb0eaa37e89350cc8e0e7a69e732ea7ca01ae42e954f1b746d9c9e9d243a6712",
+      "after_sha256": "16073ea4598f5761138d954843fc3bed19c015ab3d64cfa4847fc51801db677f",
+      "owners": {
+        "@module": {
+          "before": "1f92445e497285daa4b460bafab130333478375869b0aec5151f331bbecd2587",
+          "after": "519450c30ea07090f3518111e4187c2c45a59c9d51ef206298b667d4b8d203ab"
+        },
+        "_order108_smoke_operations": {
+          "before": null,
+          "after": "1040a4c0db1a323360fd6eb7503acd6cfb77b88744ef6b6c831a2c8bfae50ad9"
+        },
+        "validate_assessment": {
+          "before": "b3f595493df313b2e2f865ad34314a0822c3e4a41b4eedd19581b975d9dbd35e",
+          "after": "3df8de54ba443b6b9e6f42bf52648c0faf4eadfaa83ab8b930c8f9e896208b2d"
         }
       }
     }
   },
   "rows": {
-    "README.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
-    },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
       "operations": [
@@ -452,12 +662,13 @@
         "order104-client-regressions",
         "order105-client-regressions",
         "order106-client-regressions",
-        "order107-client-regressions"
+        "order107-client-regressions",
+        "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -467,12 +678,13 @@
         "order104-client-regressions",
         "order105-client-regressions",
         "order106-client-regressions",
-        "order107-client-regressions"
+        "order107-client-regressions",
+        "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -482,12 +694,13 @@
         "order104-client-regressions",
         "order105-client-regressions",
         "order106-client-regressions",
-        "order107-client-regressions"
+        "order107-client-regressions",
+        "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -497,12 +710,13 @@
         "order104-client-regressions",
         "order105-client-regressions",
         "order106-client-regressions",
-        "order107-client-regressions"
+        "order107-client-regressions",
+        "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -512,12 +726,13 @@
         "order104-client-regressions",
         "order105-client-regressions",
         "order106-client-regressions",
-        "order107-client-regressions"
+        "order107-client-regressions",
+        "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -527,12 +742,13 @@
         "order104-client-regressions",
         "order105-client-regressions",
         "order106-client-regressions",
-        "order107-client-regressions"
+        "order107-client-regressions",
+        "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -542,12 +758,13 @@
         "order104-client-regressions",
         "order105-client-regressions",
         "order106-client-regressions",
-        "order107-client-regressions"
+        "order107-client-regressions",
+        "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -557,12 +774,13 @@
         "order104-client-regressions",
         "order105-client-regressions",
         "order106-client-regressions",
-        "order107-client-regressions"
+        "order107-client-regressions",
+        "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -572,12 +790,13 @@
         "order104-client-regressions",
         "order105-client-regressions",
         "order106-client-regressions",
-        "order107-client-regressions"
+        "order107-client-regressions",
+        "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -587,12 +806,13 @@
         "order104-client-regressions",
         "order105-client-regressions",
         "order106-client-regressions",
-        "order107-client-regressions"
+        "order107-client-regressions",
+        "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -602,12 +822,13 @@
         "order104-client-regressions",
         "order105-client-regressions",
         "order106-client-regressions",
-        "order107-client-regressions"
+        "order107-client-regressions",
+        "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -617,12 +838,13 @@
         "order104-client-regressions",
         "order105-client-regressions",
         "order106-client-regressions",
-        "order107-client-regressions"
+        "order107-client-regressions",
+        "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -632,12 +854,13 @@
         "order104-client-regressions",
         "order105-client-regressions",
         "order106-client-regressions",
-        "order107-client-regressions"
+        "order107-client-regressions",
+        "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -649,12 +872,13 @@
         "order104-contract-publication",
         "order105-contract-publication",
         "order106-contract-publication",
-        "order107-contract-publication"
+        "order107-contract-publication",
+        "order108-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -666,12 +890,13 @@
         "order104-contract-publication",
         "order105-contract-publication",
         "order106-contract-publication",
-        "order107-contract-publication"
+        "order107-contract-publication",
+        "order108-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -683,12 +908,13 @@
         "order104-contract-publication",
         "order105-contract-publication",
         "order106-contract-publication",
-        "order107-contract-publication"
+        "order107-contract-publication",
+        "order108-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -700,12 +926,13 @@
         "order104-contract-publication",
         "order105-contract-publication",
         "order106-contract-publication",
-        "order107-contract-publication"
+        "order107-contract-publication",
+        "order108-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -717,12 +944,13 @@
         "order104-contract-publication",
         "order105-contract-publication",
         "order106-contract-publication",
-        "order107-contract-publication"
+        "order107-contract-publication",
+        "order108-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -734,12 +962,13 @@
         "order104-contract-publication",
         "order105-contract-publication",
         "order106-contract-publication",
-        "order107-contract-publication"
+        "order107-contract-publication",
+        "order108-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -751,12 +980,13 @@
         "order104-contract-publication",
         "order105-contract-publication",
         "order106-contract-publication",
-        "order107-contract-publication"
+        "order107-contract-publication",
+        "order108-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -768,146 +998,234 @@
         "order104-contract-publication",
         "order105-contract-publication",
         "order106-contract-publication",
-        "order107-contract-publication"
+        "order107-contract-publication",
+        "order108-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
-    "data/source_audits/order107/baseline/tests/unit/test_order97_secondary_clause_evidence.py.txt": {
+    "data/source_audits/order108/baseline/tests/unit/test_phase10i_terrain_movement.py.txt": {
       "category": "rule_semantics",
       "operations": [
-        "order107-historical-evidence"
+        "order108-historical-evidence"
       ],
       "selected_families": [],
-      "rationale": "Preserve original Order97 assertion evidence while current fixtures establish the source-required phase and step. Add a bounded mapping through the existing authenticated historical resolver.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "rationale": "Preserve original Order97 assertion evidence while current fixtures establish source-required legal climbing contact. Add a bounded mapping through the existing authenticated historical resolver.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
       "unchanged_work": "Only the existing offline audit mapping inventory and immutable original file copies change. Runtime movement, replay, serializers, search and caches do not consume this archive. All prior archive bytes and pins remain unchanged; current gameplay tests still execute normally."
     },
-    "data/source_audits/order107/baseline/tests/unit/test_phase15d_fight_resolution.py.txt": {
+    "data/source_audits/order108/historical-inputs.json": {
       "category": "rule_semantics",
       "operations": [
-        "order107-historical-evidence"
+        "order108-historical-evidence"
       ],
       "selected_families": [],
-      "rationale": "Preserve original Order97 assertion evidence while current fixtures establish the source-required phase and step. Add a bounded mapping through the existing authenticated historical resolver.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "rationale": "Preserve original Order97 assertion evidence while current fixtures establish source-required legal climbing contact. Add a bounded mapping through the existing authenticated historical resolver.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
       "unchanged_work": "Only the existing offline audit mapping inventory and immutable original file copies change. Runtime movement, replay, serializers, search and caches do not consume this archive. All prior archive bytes and pins remain unchanged; current gameplay tests still execute normally."
     },
-    "data/source_audits/order107/historical-inputs.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "order107-historical-evidence"
-      ],
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
-      "rationale": "Preserve original Order97 assertion evidence while current fixtures establish the source-required phase and step. Add a bounded mapping through the existing authenticated historical resolver.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "Only the existing offline audit mapping inventory and immutable original file copies change. Runtime movement, replay, serializers, search and caches do not consume this archive. All prior archive bytes and pins remain unchanged; current gameplay tests still execute normally."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
-    "docs/ORDER_107_SCOPE_PLAN.md": {
+    "docs/ORDER_108_SCOPE_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
+    },
+    "docs/performance/PERFORMANCE_POLICY.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
+    },
+    "docs/performance/policy-v3/order108-rule-semantics.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
       "operations": [
+        "order108-terrain-semantics",
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
-    "src/warhammer40k_core/engine/fight_resolution.py": {
+    "src/warhammer40k_core/core/terrain_areas.py": {
       "category": "rule_semantics",
       "operations": [
-        "fight-rule-branch",
-        "order106-pile-in-authority",
-        "order107-fight-distance-window"
+        "order108-terrain-semantics"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
+    },
+    "src/warhammer40k_core/core/visibility.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order108-terrain-semantics",
+        "visibility-query"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
+    },
+    "src/warhammer40k_core/engine/endpoint_placement.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order108-terrain-semantics"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
+    },
+    "src/warhammer40k_core/geometry/pathing.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "geometry-search",
+        "order108-terrain-semantics"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
+    },
+    "src/warhammer40k_core/geometry/terrain.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "geometry-search",
+        "order108-terrain-semantics"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
+    },
+    "src/warhammer40k_core/geometry/terrain_classification.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "geometry-search",
+        "order108-terrain-semantics"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
+    },
+    "src/warhammer40k_core/geometry/terrain_solid.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "geometry-search",
+        "order108-terrain-semantics"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
+    },
+    "src/warhammer40k_core/geometry/terrain_transit.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "geometry-search",
+        "order108-terrain-semantics"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "tests/code_quality/test_order97_inventory.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
-    "tests/fight_distance_helpers.py": {
+    "tests/code_quality/test_performance_policy.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
+    },
+    "tests/order108_terrain_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "order107-client-regressions"
+        "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
-    "tests/unit/test_order107_fight_distance_window.py": {
+    "tests/unit/test_order108_terrain_semantics.py": {
       "category": "rule_semantics",
       "operations": [
-        "order107-client-regressions"
+        "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "tests/unit/test_order97_secondary_clause_evidence.py": {
       "category": "rule_semantics",
       "operations": [
-        "order107-client-regressions"
+        "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
-    "tests/unit/test_phase15d_fight_resolution.py": {
+    "tests/unit/test_phase10i_terrain_movement.py": {
       "category": "rule_semantics",
       "operations": [
-        "order107-client-regressions"
+        "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
-    },
-    "tests/unit/test_phase17g_aeldari_army_rule.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order107-client-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Order107 source-backed movement distance window repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
-      "unchanged_work": "The shared distance query now checks the current battle phase and Fight step before scanning the existing source-linked extra-distance effects. Outside the matching step it returns the existing core budget. The effect scan, movement solvers, witnessed-path validation, caches, historical reconstruction and search algorithms are unchanged. This constant-time source-required window gate is a bounded semantic repair under the owner's explicit smoke-default policy. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     },
     "tools/core_rules_order97_history.py": {
       "category": "rule_semantics",
@@ -916,12 +1234,21 @@
         "issue535-order97-history",
         "order104-historical-evidence",
         "order107-historical-evidence",
+        "order108-historical-evidence",
         "shock-source-generation-and-audit"
       ],
       "selected_families": [],
-      "rationale": "Preserve original Order97 assertion evidence while current fixtures establish the source-required phase and step. Add a bounded mapping through the existing authenticated historical resolver.",
-      "source_obligation": "Order107/P12D/C12-06 implements FAQ9657bb5d-72da-4d42-9927-731c9fc0e315 block2: unqualified extra Pile In and Consolidation distance applies only in the matching step of the Fight phase.",
+      "rationale": "Preserve original Order97 assertion evidence while current fixtures establish source-required legal climbing contact. Add a bounded mapping through the existing authenticated historical resolver.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
       "unchanged_work": "Only the existing offline audit mapping inventory and immutable original file copies change. Runtime movement, replay, serializers, search and caches do not consume this archive. All prior archive bytes and pins remain unchanged; current gameplay tests still execute normally."
+    },
+    "tools/performance_policy.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded Order108 source-backed terrain movement and Solid semantics repair, regression evidence and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order108/P13B/C13-02 implements selected Core13.06 Exposed traversal, Dense floor restrictions and climbing contact;13.06.01/13.11 prohibit low Solid opening endpoints and visibility while preserving physical passage.",
+      "unchanged_work": "This repair adds source-required continuous climbing contact, Dense-floor crossing and enclosed Solid opening checks using the existing physical witness and visibility owners. Physical traversal remains distinct from Solid visibility/endpoints. Existing decision authority, serialization shapes, cache controls and original benchmark workloads remain required and unchanged; the added rule work is not presented as zero-cost. The owner explicitly requires serial live smoke for this semantic repair unless a deliberate performance change or serious demonstrated regression applies. Exact Order108 source/AST authentication binds the narrow geometry/visibility selector policy; all live correctness/work/cache checks remain mandatory, historical measurements remain unchanged and no full-game certification is claimed."
     }
   },
   "milestone": "ordinary",
