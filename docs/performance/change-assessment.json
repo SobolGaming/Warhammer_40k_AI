@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "b65099255a85b0b02281b78905ce42754c53b594",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c6742fd9c191929948bbca5ed81e8e47d5b3714d41519de0377de56b7c457e0b",
-  "operation_map_sha256": "0f616c62ff66cd72069b8172aa7150b541f318e7c5a5158611c94a579b9d8530",
+  "operation_map_sha256": "57e6e3267e2cd77e3def9d32ea42805961d9de4fc695266c654c2893401ed859",
   "changes": {
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "ab9e526084433ed24f9977c9f00f84848255dba2577a5c2bc7c7edc4c671e158",
@@ -84,6 +84,26 @@
         }
       }
     },
+    "data/source_audits/order112/baseline/tests/unit/test_order92_random_melee.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "193d4216b590e00d6e24a8752b6726ab6547de76756598a0379b641c0823dcc7",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "193d4216b590e00d6e24a8752b6726ab6547de76756598a0379b641c0823dcc7"
+        }
+      }
+    },
+    "data/source_audits/order112/historical-inputs.json": {
+      "before_sha256": null,
+      "after_sha256": "f409d4e5acf6d391ee4bb38df985ba6992806a7032b66dafeb5ae325777e6259",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f409d4e5acf6d391ee4bb38df985ba6992806a7032b66dafeb5ae325777e6259"
+        }
+      }
+    },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "before_sha256": "b5bb3f33b8b2c52730a5ac2c7c1fbbfad85af64a25994813484905717361c64a",
       "after_sha256": "0c32d2e6671fae49964ead2609387aba1ad1d8ce9990f1f78d08562eeb796af6",
@@ -116,11 +136,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "6583488e5ae3b21ffb1136031405b328e19722c3b7f40824cd717c22bd091443",
-      "after_sha256": "650ab03e306a03748c926f62edc7cbe625501b5c7def6b1271c33d7345c4c4a5",
+      "after_sha256": "d9ba38ae0787f4bb743110b8170f0bbbde2d0ccff557d53a2bb5d7ee1a57ca66",
       "owners": {
         "@document": {
           "before": "6583488e5ae3b21ffb1136031405b328e19722c3b7f40824cd717c22bd091443",
-          "after": "650ab03e306a03748c926f62edc7cbe625501b5c7def6b1271c33d7345c4c4a5"
+          "after": "d9ba38ae0787f4bb743110b8170f0bbbde2d0ccff557d53a2bb5d7ee1a57ca66"
         }
       }
     },
@@ -186,6 +206,20 @@
         }
       }
     },
+    "tests/code_quality/test_order97_inventory.py": {
+      "before_sha256": "b8f306cd721dd3ac9314164cec56a4901d6a5c06e4f4d7988f935790551c709c",
+      "after_sha256": "b3b766714a2704c41d073a282d556ab1ec2a53063ed00fc68242235f501cbf01",
+      "owners": {
+        "@module": {
+          "before": "7f8b9c9c86add27271ea6ee07a9e226a52e1adf222355d8c85640d8187906ba5",
+          "after": "58d8c1f3c2291ea21ad31cbd883fd8440f73f3dc66fdfc33d5a5e7f55bfb249d"
+        },
+        "test_original_assertions_remain_exact_and_fail_closed": {
+          "before": "417fb02395d676c00f55296c07321c2658a7a1b0192b40041284ca9d8adabe9d",
+          "after": "1276b434a6f1e7ce0d4820877fbab5b0514c79052207a0b0066280901cccf95f"
+        }
+      }
+    },
     "tests/unit/test_order92_random_melee.py": {
       "before_sha256": "193d4216b590e00d6e24a8752b6726ab6547de76756598a0379b641c0823dcc7",
       "after_sha256": "0f1c1262a4fb9ebda3a4d0c4ee2c22c9c410eb64f71e489f8e74e5f5aad7ffc1",
@@ -209,6 +243,20 @@
         "test_mandatory_extra_selection_obeys_physical_one_shot_availability": {
           "before": null,
           "after": "0c0f9da012e097b1d8d005ee39cc20d54fb850577365888348762b36c9765a41"
+        }
+      }
+    },
+    "tools/core_rules_order97_history.py": {
+      "before_sha256": "166e73066f4f1269b33b05c6980da8a3a0d39ae6b998a72139810c75d83dd6ea",
+      "after_sha256": "87d7d7ebd50238e779b62ed3b528753028cfeb7fd7f07b6e10c04b8eee657a35",
+      "owners": {
+        "@module": {
+          "before": "8645fcc295af6c3dcb583b39445eecedaee57b638307298d481ac27fa9c41013",
+          "after": "63b975c8dc9650a17e7ea73f3fd0ade71f0fc4d95097a522a85ab0fc35417d7a"
+        },
+        "historical_evidence_path": {
+          "before": "bd0fb725ef2f94ea0f72a48406e44adcafe27b205967378c00fdedb855c681ad",
+          "after": "108b2518ad2851f9c695b0d802e22a33d21d74b0674cb3dbf47dee81c36a6990"
         }
       }
     }
@@ -294,6 +342,26 @@
       "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
       "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
     },
+    "data/source_audits/order112/baseline/tests/unit/test_order92_random_melee.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order112-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Retain authenticated exact-base bytes of the Order97-pinned regression file and register its bounded hash-checked historical mapping, preserving original source assertions without repinning.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
+    "data/source_audits/order112/historical-inputs.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order112-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Retain authenticated exact-base bytes of the Order97-pinned regression file and register its bounded hash-checked historical mapping, preserving original source assertions without repinning.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
@@ -374,6 +442,14 @@
       "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
       "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
     },
+    "tests/code_quality/test_order97_inventory.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document source-backed scope, actual roadmap implementation, adapter finite-selection rule, operation ownership or static mandatory-selection regression audit.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
     "tests/unit/test_order92_random_melee.py": {
       "category": "rule_semantics",
       "operations": [
@@ -381,6 +457,16 @@
       ],
       "selected_families": [],
       "rationale": "Add scoped physical-copy, Extra-only, bearer eligibility, One Shot, fixed/random attached facade omission/retry, profile choice, persistence/fork/viewer/replay controls to the existing random-melee regression module.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
+    "tools/core_rules_order97_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order112-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Retain authenticated exact-base bytes of the Order97-pinned regression file and register its bounded hash-checked historical mapping, preserving original source assertions without repinning.",
       "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
       "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
     }

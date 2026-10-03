@@ -1,0 +1,18 @@
+{
+  "reviewed_commit": "b65099255a85b0b02281b78905ce42754c53b594",
+  "also_present_at_base": "b65099255a85b0b02281b78905ce42754c53b594",
+  "purpose": "Preserve the original Order97 random-melee regression file before Order112 adds mandatory Extra Attacks controls. Historical assertions are not new Order112 semantic evidence.",
+  "current_evidence": "docs/ORDER_112_SCOPE_PLAN.md",
+  "files": [
+    {
+      "path": "tests/unit/test_order92_random_melee.py",
+      "historical_path": "data/source_audits/order112/baseline/tests/unit/test_order92_random_melee.py.txt",
+      "git_revision": "b65099255a85b0b02281b78905ce42754c53b594",
+      "git_path": "tests/unit/test_order92_random_melee.py",
+      "sha256": "193d4216b590e00d6e24a8752b6726ab6547de76756598a0379b641c0823dcc7",
+      "bytes": 23682,
+      "order97_file_pin": "193d4216b590e00d6e24a8752b6726ab6547de76756598a0379b641c0823dcc7"
+    }
+  ],
+  "original_order97_reviewed_commit": "8007555ef23e85c11d39b294acec02bd83fc3271"
+}
