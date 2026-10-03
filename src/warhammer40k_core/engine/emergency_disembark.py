@@ -334,20 +334,8 @@ def resolve_destroyed_transport_rules_unit_hazard_rolls_service(
         disembark_mode=disembark_mode,
         roll_threshold=HAZARD_ROLL_FAILURE_THRESHOLD,
         model_rolls=model_rolls,
-        mortal_wounds_per_failed_roll=_rules_unit_hazard_mortal_wounds_per_failed_roll(rules_unit),
+        mortal_wounds_per_failed_roll=hazard_mortal_wounds_per_failed_roll(rules_unit),
     )
-
-
-def _rules_unit_hazard_mortal_wounds_per_failed_roll(rules_unit: RulesUnitView) -> int:
-    values = {
-        hazard_mortal_wounds_per_failed_roll(component.unit)
-        for component in rules_unit.living_components
-    }
-    if len(values) != 1:
-        raise GameLifecycleError(
-            "Destroyed Transport hazard rules-unit components disagree on mortal wounds."
-        )
-    return values.pop()
 
 
 def resolve_destroyed_transport_disembark_service(

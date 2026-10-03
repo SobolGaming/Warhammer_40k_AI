@@ -22,7 +22,10 @@ from warhammer40k_core.engine.emergency_disembark import (
     transport_hazard_mortal_wound_application_id,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.hazard import CORE_HAZARD_ROLLS_RULE_ID
+from warhammer40k_core.engine.hazard import (
+    CORE_HAZARD_ROLLS_RULE_ID,
+    hazard_mortal_wounds_per_failed_roll,
+)
 from warhammer40k_core.engine.ingress_placement_restrictions import IngressPlacementRestrictions
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
@@ -523,6 +526,7 @@ def _resolve_rules_unit_combat_components(
     component_by_id = {
         component.unit.unit_instance_id: component.unit for component in rules_unit.components
     }
+    mortal_wounds_per_failed_roll = hazard_mortal_wounds_per_failed_roll(rules_unit)
     for component_placement in selection.attempted_placement.component_unit_placements:
         physical_selection = DisembarkSelection(
             player_id=selection.player_id,
@@ -553,7 +557,7 @@ def _resolve_rules_unit_combat_components(
             RulesUnitCombatDisembarkModelRoll(
                 component_unit_instance_id=component_placement.unit_instance_id,
                 roll=roll,
-                mortal_wounds_per_failed_roll=(component_result.mortal_wounds_per_failed_roll),
+                mortal_wounds_per_failed_roll=mortal_wounds_per_failed_roll,
             )
             for roll in component_result.model_rolls
         )

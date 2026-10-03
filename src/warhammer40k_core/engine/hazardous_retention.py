@@ -69,6 +69,7 @@ def validate_retained_hazardous_progress(
         raise GameLifecycleError("Retained Hazardous application source binding drift.")
     validate_hazardous_mortal_wound_source_context(
         state=state,
+        event_records=event_records,
         attack_sequence=sequence,
         source_context_payload=progress.source_context,
         mortal_wounds=progress.mortal_wounds,

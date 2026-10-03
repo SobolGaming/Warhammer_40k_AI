@@ -7381,6 +7381,21 @@ def test_phase13d_hazardous_tests_resolve_after_all_attacks(
     attacker = units["intercessor-1"]
     if replacement_attacker_keywords is not None:
         attacker = with_unit_keywords(attacker, keywords=replacement_attacker_keywords)
+        if len(replacement_attacker_keywords) == 2:
+            # The FAQ concerns distinct Infantry and large models in one unit.
+            attacker = replace(
+                attacker,
+                own_models=tuple(
+                    replace(
+                        model,
+                        keyword_assignment=replace(
+                            model.keyword_assignment,
+                            keywords=(replacement_attacker_keywords[index % 2],),
+                        ),
+                    )
+                    for index, model in enumerate(attacker.own_models)
+                ),
+            )
         _replace_unit_instance_in_state(state=state, replacement=attacker)
     defender = units["enemy"]
     battlefield = state.battlefield_state

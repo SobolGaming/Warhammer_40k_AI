@@ -77,6 +77,7 @@ def pending_hazardous_logical_deaths(
             raise GameLifecycleError("Retained Hazardous casualties precede completed attacks.")
         validate_hazardous_mortal_wound_source_context(
             state=state,
+            event_records=event_records,
             attack_sequence=sequence,
             source_context_payload=context,
             mortal_wounds=authority.mortal_wounds,

@@ -2,6 +2,11 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 105 / P06D applies the all-model MONSTER/VEHICLE requirement to Hazard
+and Hazardous wound counts. Mixed and attached units share the same count across
+attacks and transport disembarkation; the Infantry/Vehicle FAQ retains one wound.
+See [source, scope and validation](docs/ORDER_105_SCOPE_PLAN.md).
+
 Order 104 / P04H permits a visible enemy model and a different in-range enemy
 model in the same target rules unit. Shared ordinary and reaction shooting keep
 complete visibility witnesses and bearer-specific range evidence. See

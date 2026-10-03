@@ -894,6 +894,7 @@ def _continue_hazardous_after_mortal_wound_feel_no_pain(
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     source_context = validate_hazardous_mortal_wound_source_context(
         state=state,
+        event_records=decisions.event_log.records,
         attack_sequence=attack_sequence,
         source_context_payload=routed.progress.source_context,
         mortal_wounds=routed.progress.mortal_wounds,

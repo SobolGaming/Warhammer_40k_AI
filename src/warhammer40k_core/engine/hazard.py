@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec, DiceRollState
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rules_units import RulesUnitView
 from warhammer40k_core.engine.unit_factory import UnitInstance
 
 CORE_HAZARD_ROLLS_RULE_ID = "core_rules_hazard_rolls"
@@ -42,16 +43,21 @@ def failed_hazard_roll_indices(roll_state: DiceRollState) -> tuple[int, ...]:
     )
 
 
-def hazard_mortal_wounds_per_failed_roll(unit: UnitInstance) -> int:
-    if type(unit) is not UnitInstance:
-        raise GameLifecycleError("Hazard mortal wounds require a UnitInstance.")
-    keyword_set = {_canonical_keyword(keyword) for keyword in unit.keywords}
-    if "INFANTRY" in keyword_set:
-        return 1
-    if "MONSTER" in keyword_set or "VEHICLE" in keyword_set:
-        return 3
-    return 1
-
-
-def _canonical_keyword(keyword: str) -> str:
-    return keyword.strip().upper().replace(" ", "_").replace("-", "_")
+def hazard_mortal_wounds_per_failed_roll(unit: UnitInstance | RulesUnitView) -> int:
+    """06.03: every rules-present model, not the unit keyword union, must qualify."""
+    if type(unit) is UnitInstance:
+        models = unit.alive_own_models()
+    elif type(unit) is RulesUnitView:
+        models = tuple(
+            model
+            for model in unit.own_models
+            if model.is_alive or model.model_instance_id in unit.retained_model_ids
+        )
+    else:
+        raise GameLifecycleError("Hazard mortal wounds require a UnitInstance or RulesUnitView.")
+    return (
+        3
+        if models
+        and all("MONSTER" in model.keywords or "VEHICLE" in model.keywords for model in models)
+        else 1
+    )
