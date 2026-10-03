@@ -57,6 +57,7 @@ def weapon_keyword_for_ability_kind(kind: AbilityKind) -> WeaponKeyword | None:
         AbilityKind.SUSTAINED_HITS: WeaponKeyword.SUSTAINED_HITS,
         AbilityKind.LETHAL_HITS: WeaponKeyword.LETHAL_HITS,
         AbilityKind.CLEAVE: WeaponKeyword.CLEAVE,
+        AbilityKind.BLAST: WeaponKeyword.BLAST,
         AbilityKind.MELTA: WeaponKeyword.MELTA,
         AbilityKind.RAPID_FIRE: WeaponKeyword.RAPID_FIRE,
         AbilityKind.HEAVY: WeaponKeyword.HEAVY,
@@ -112,18 +113,40 @@ def validate_weapon_ability_sources(profile: WeaponProfile) -> tuple[AbilitySour
 def preserve_native_keyword_occurrences(
     profile: WeaponProfile, keyword_occurrences: tuple[WeaponKeyword, ...]
 ) -> WeaponProfile:
-    """Retain repeated native keyword slots after catalog keyword canonicalization."""
+    """Retain bare and described native slots after keyword canonicalization."""
     counts = Counter(weapon_keyword_ability_id(keyword) for keyword in keyword_occurrences)
     if not any(count > 1 for count in counts.values()):
         return profile
+    described_counts = Counter(
+        weapon_keyword_ability_id(keyword)
+        for ability in profile.abilities
+        if (keyword := weapon_keyword_for_ability_kind(ability.ability_kind)) is not None
+    )
+    bare_counts = counts - described_counts
     sources = weapon_ability_sources(profile)
+    existing_ids = {source.ability_id for source in sources}
+    # A descriptor replaces its own keyword occurrence, not other bare sources
+    # in the same family (e.g. native [BLAST, BLAST 2]).
+    sources = (
+        *sources,
+        *(
+            AbilitySourceInstance(
+                owner_id=profile.stable_identity(),
+                source_id=profile.stable_identity(),
+                source_instance_id=profile.stable_identity(),
+                slot_id=ability_id,
+                ability_id=ability_id,
+            )
+            for ability_id in sorted(bare_counts)
+            if ability_id not in existing_ids
+        ),
+    )
     repeated = tuple(
         replace(source, slot_id=f"{source.slot_id}:source-occurrence:{occurrence}")
         for source in sources
-        for occurrence in range(2, counts[source.ability_id] + 1)
+        for occurrence in range(2, bare_counts[source.ability_id] + 1)
     )
-    # Descriptor-bearing keywords already have one occurrence per descriptor.
-    if not repeated:
+    if not repeated and sources == weapon_ability_sources(profile):
         return profile
     return replace(profile, ability_sources=(*sources, *repeated))
 

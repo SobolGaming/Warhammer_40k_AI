@@ -525,6 +525,7 @@ def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values()
         (WeaponKeyword.RAPID_FIRE, {"weapon_ability_value": 2}, AbilityKind.RAPID_FIRE),
         (WeaponKeyword.MELTA, {"weapon_ability_value": 3}, AbilityKind.MELTA),
         (WeaponKeyword.CLEAVE, {"weapon_ability_value": 4}, AbilityKind.CLEAVE),
+        (WeaponKeyword.BLAST, {"weapon_ability_value": 2}, AbilityKind.BLAST),
     ):
         descriptor = _weapon_ability_descriptor_for_grant(
             parameters=parameters,
@@ -635,3 +636,78 @@ def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values()
         _weapon_scope_matches_profile(weapon_scope="bad scope", profile=melee_profile)
     with pytest.raises(GameLifecycleError, match="Unsupported catalog weapon keyword grant scope"):
         _weapon_scope_matches_profile(weapon_scope="ranged weapons", profile=ranged_profile)
+
+
+@pytest.mark.parametrize("value", [None, 2, True, 0, -1, "2"])
+def test_order113_generic_blast_grants_preserve_value_or_reject_it(value: object) -> None:
+    from warhammer40k_core.engine.rule_ir_weapon_modifiers import _weapon_ability_descriptor
+
+    parameters: dict[str, object] = {"weapon_scope": "ranged"}
+    if value is not None:
+        parameters["weapon_ability_value"] = value
+    supported = value is None or (type(value) is int and value > 0)
+    from warhammer40k_core.rules.rule_ir import RuleParameterValue
+
+    effect = rule_effect(
+        RuleEffectKind.GRANT_WEAPON_ABILITY,
+        **{
+            key: cast(RuleParameterValue, item)
+            for key, item in {"weapon_ability": "Blast", **parameters}.items()
+        },
+    )
+    if supported:
+        assert _weapon_keyword_grant_consumer_ids_for_effect(effect)
+        catalog = _weapon_ability_descriptor_for_grant(
+            parameters=parameters, keyword=WeaponKeyword.BLAST
+        )
+        generic = _weapon_ability_descriptor(parameters, keyword=WeaponKeyword.BLAST)
+        assert catalog == generic
+        if value is None:
+            assert catalog is None
+        else:
+            assert catalog == AbilityDescriptor.blast(cast(int, value))
+    else:
+        with pytest.raises(GameLifecycleError, match="positive integer"):
+            _weapon_keyword_grant_consumer_ids_for_effect(effect)
+        with pytest.raises(GameLifecycleError, match="positive integer"):
+            _weapon_ability_descriptor_for_grant(parameters=parameters, keyword=WeaponKeyword.BLAST)
+        with pytest.raises(GameLifecycleError, match="positive integer"):
+            _weapon_ability_descriptor(parameters, keyword=WeaponKeyword.BLAST)
+
+
+@pytest.mark.parametrize("value", [None, 2, True, 0, -1, "2"])
+def test_order113_blast_choice_and_selected_pair_shapes(value: object) -> None:
+    from warhammer40k_core.engine.catalog_rule_consumption import (
+        _weapon_ability_choice_has_supported_runtime_shape,
+    )
+    from warhammer40k_core.engine.catalog_selected_target_pair_support import (
+        _weapon_ability_grant_is_supported,
+    )
+    from warhammer40k_core.rules.rule_ir import RuleParameterValue
+
+    parameters: dict[str, object] = {"weapon_ability": "Blast", "weapon_scope": "ranged"}
+    if value is not None:
+        parameters["weapon_ability_value"] = value
+    supported = value is None or (type(value) is int and value > 0)
+    assert (
+        _weapon_ability_grant_is_supported(
+            {key: cast(RuleParameterValue, item) for key, item in parameters.items()}
+        )
+        is supported
+    )
+    choice = {
+        **parameters,
+        "selection_kind": "select_one",
+        "selection_group_id": "order113:group",
+        "selection_option_id": "order113:option",
+        "selection_option_index": 1,
+        "target_scope": "this_model",
+        "weapon_name": "Core bolt rifle",
+    }
+    if supported:
+        assert _weapon_ability_choice_has_supported_runtime_shape(
+            choice, keyword=WeaponKeyword.BLAST
+        )
+    else:
+        with pytest.raises(GameLifecycleError, match="positive integer"):
+            _weapon_ability_choice_has_supported_runtime_shape(choice, keyword=WeaponKeyword.BLAST)

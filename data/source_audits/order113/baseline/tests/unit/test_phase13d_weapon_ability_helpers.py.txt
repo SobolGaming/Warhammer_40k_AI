@@ -222,74 +222,6 @@ def test_phase13d_weapon_ability_helpers_use_structured_descriptors() -> None:
     assert heavy_rule_id() == HEAVY_RULE_ID
 
 
-@pytest.mark.parametrize("count", [0, 4, 5, 9, 10, 12, 16])
-def test_order113_blast_x_uses_complete_groups_of_five(count: int) -> None:
-    assert blast_attack_bonus(target_model_count=count, blast_value=2) == 2 * (count // 5)
-
-
-def test_order113_blast_descriptor_preserves_value_condition_and_payload() -> None:
-    descriptor = AbilityDescriptor.blast(2, target_keywords=("INFANTRY",))
-    assert descriptor.ability_kind is AbilityKind.BLAST
-    assert AbilityDescriptor.from_payload(descriptor.to_payload()) == descriptor
-    profile = _profile(keywords=(WeaponKeyword.BLAST,), abilities=(descriptor,))
-    assert weapon_ability_int_value(profile, AbilityKind.BLAST, target_keywords=("INFANTRY",)) == 2
-    assert (
-        weapon_ability_int_value(profile, AbilityKind.BLAST, target_keywords=("VEHICLE",)) is None
-    )
-
-
-@pytest.mark.parametrize("cleave", [False, True])
-def test_order113_attack_count_sources_require_one_occurrence_without_stacking(
-    cleave: bool,
-) -> None:
-    from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
-    from warhammer40k_core.engine.ability_instance_selection import (
-        selected_weapon_profile,
-        weapon_instance_selection_requests,
-    )
-    from warhammer40k_core.engine.weapon_abilities import blast_attack_bonus_for_profile
-
-    keyword = WeaponKeyword.CLEAVE if cleave else WeaponKeyword.BLAST
-    descriptor = AbilityDescriptor.cleave(1) if cleave else None
-    profile = _profile(keywords=(keyword,), abilities=() if descriptor is None else (descriptor,))
-    profile = grant_weapon_ability(
-        profile,
-        keyword=keyword,
-        ability=AbilityDescriptor.cleave(2) if cleave else AbilityDescriptor.blast(2),
-        source_id="order113:grant",
-        source_instance_id="order113:grant:occurrence",
-    )
-    requests = weapon_instance_selection_requests(
-        profile, actor_id="player-a", request_id="order113"
-    )
-    assert len(requests) == 1
-    assert len(requests[0].options) == 2
-    if cleave:
-        with pytest.raises(GameLifecycleError, match="controlling-player selection"):
-            cleave_attack_bonus(profile, single_target=True, target_model_count=12)
-    else:
-        with pytest.raises(GameLifecycleError, match="controlling-player selection"):
-            blast_attack_bonus_for_profile(profile, target_model_count=12)
-    bonuses: list[int] = []
-    for option in requests[0].options:
-        selected = selected_weapon_profile(profile, (option.option_id,))
-        selected = WeaponProfile.from_payload(selected.to_payload())
-        bonuses.append(
-            cleave_attack_bonus(selected, single_target=True, target_model_count=12)
-            if cleave
-            else blast_attack_bonus_for_profile(selected, target_model_count=12)
-        )
-    assert sorted(bonuses) == [2, 4]
-
-
-@pytest.mark.parametrize("value", [True, 0, -1, "2"])
-def test_order113_invalid_blast_value_fails_closed(value: object) -> None:
-    with pytest.raises(WeaponProfileError):
-        AbilityDescriptor.blast(cast(int, value))
-    with pytest.raises(GameLifecycleError):
-        blast_attack_bonus(target_model_count=12, blast_value=cast(int, value))
-
-
 def test_phase13d_sustained_hits_d3_requires_resolved_d3_on_critical_hits() -> None:
     descriptor = AbilityDescriptor.sustained_hits(SUSTAINED_HITS_D3_VALUE)
     profile = _profile(
@@ -876,23 +808,3 @@ def test_order56_deadly_demise_instance_choice_is_mandatory() -> None:
     assert tuple(option.option_id for option in request.options) == ("demise:1", "demise:3")
     assert request.actor_id == "player:b"
     assert not any(option.option_id == "decline" for option in request.options)
-
-
-@pytest.mark.parametrize("plain", [False, True])
-def test_order113_blast_applicability_and_grouping_require_keyword(plain: bool) -> None:
-    from warhammer40k_core.engine.attack_sequence_selection import (
-        _validate_weapon_profile_signature_shape,
-    )
-    from warhammer40k_core.engine.weapon_abilities import weapon_ability_applies
-
-    profile = _profile(
-        keywords=(WeaponKeyword.BLAST,), abilities=() if plain else (AbilityDescriptor.blast(2),)
-    )
-    assert weapon_ability_applies(profile, AbilityKind.BLAST, target_keywords=())
-    _validate_weapon_profile_signature_shape(profile)
-    if not plain:
-        orphan = replace(profile, keywords=())
-        with pytest.raises(GameLifecycleError, match="descriptor requires the weapon keyword"):
-            weapon_ability_int_value(orphan, AbilityKind.BLAST)
-        with pytest.raises(GameLifecycleError, match="descriptor requires the weapon keyword"):
-            _validate_weapon_profile_signature_shape(orphan)

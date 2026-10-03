@@ -1,0 +1,45 @@
+{
+  "reviewed_commit": "6203cfe4988f3f18c6f74576b4cb8a0cac961b14",
+  "also_present_at_base": "6203cfe4988f3f18c6f74576b4cb8a0cac961b14",
+  "purpose": "Retain original Order97 assertions before bounded Order113 Blast/Cleave regressions and canonical fixture extension. Historical assertions are not new Order113 gameplay evidence.",
+  "current_evidence": "docs/ORDER_113_SCOPE_PLAN.md",
+  "files": [
+    {
+      "path": "tests/fire_overwatch_helpers.py",
+      "historical_path": "data/source_audits/order113/baseline/tests/fire_overwatch_helpers.py.txt",
+      "git_revision": "6203cfe4988f3f18c6f74576b4cb8a0cac961b14",
+      "git_path": "tests/fire_overwatch_helpers.py",
+      "sha256": "c1ebdfd064847148314f460855e344971b15f106fab48301ed6bf5712686c727",
+      "bytes": 9357,
+      "order97_file_pin": "c1ebdfd064847148314f460855e344971b15f106fab48301ed6bf5712686c727"
+    },
+    {
+      "path": "tests/random_melee_helpers.py",
+      "historical_path": "data/source_audits/order113/baseline/tests/random_melee_helpers.py.txt",
+      "git_revision": "6203cfe4988f3f18c6f74576b4cb8a0cac961b14",
+      "git_path": "tests/random_melee_helpers.py",
+      "sha256": "ccd6efd8890d2155b6b776b760c25a3c487427014927fa736eab895d5abd1790",
+      "bytes": 8235,
+      "order97_file_pin": "ccd6efd8890d2155b6b776b760c25a3c487427014927fa736eab895d5abd1790"
+    },
+    {
+      "path": "tests/unit/test_fire_overwatch.py",
+      "historical_path": "data/source_audits/order113/baseline/tests/unit/test_fire_overwatch.py.txt",
+      "git_revision": "6203cfe4988f3f18c6f74576b4cb8a0cac961b14",
+      "git_path": "tests/unit/test_fire_overwatch.py",
+      "sha256": "2e7c01e62bc8a2c592fc9284045d2e14fb825ba2b62eddaa80d91160200ff0f7",
+      "bytes": 45032,
+      "order97_file_pin": "2e7c01e62bc8a2c592fc9284045d2e14fb825ba2b62eddaa80d91160200ff0f7"
+    },
+    {
+      "path": "tests/unit/test_phase13d_weapon_ability_helpers.py",
+      "historical_path": "data/source_audits/order113/baseline/tests/unit/test_phase13d_weapon_ability_helpers.py.txt",
+      "git_revision": "6203cfe4988f3f18c6f74576b4cb8a0cac961b14",
+      "git_path": "tests/unit/test_phase13d_weapon_ability_helpers.py",
+      "sha256": "ace7694abb844ba2897559297f9d735187b25124b60b008b67b072b57993be01",
+      "bytes": 32458,
+      "order97_file_pin": "ace7694abb844ba2897559297f9d735187b25124b60b008b67b072b57993be01"
+    }
+  ],
+  "original_order97_reviewed_commit": "8007555ef23e85c11d39b294acec02bd83fc3271"
+}
