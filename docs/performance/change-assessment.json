@@ -1,440 +1,228 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "31c93c25b4655938616fe37c01c40b1b788e69a8",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:dae0a4a5ce5d01626bb9e44181289993dadc8143554714174e5ea4fce5725fcb",
-  "operation_map_sha256": "f8a2f235a1b148e246c6fefd27c2379d6d8214ce407f77bcc8726568107dbd41",
+  "base": "b65099255a85b0b02281b78905ce42754c53b594",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c6742fd9c191929948bbca5ed81e8e47d5b3714d41519de0377de56b7c457e0b",
+  "operation_map_sha256": "0f616c62ff66cd72069b8172aa7150b541f318e7c5a5158611c94a579b9d8530",
   "changes": {
-    "ci/test_shards/durations.json": {
-      "before_sha256": "755ecbfaf3275c7962950bd8300754c45afc5fbdb62125e7b5d87356e9c5f2b9",
-      "after_sha256": "baa787bcbff261292e0aa38a5737cce7c0a9d51a0ed95d9ad4569223af81c854",
-      "owners": {
-        "@document": {
-          "before": "755ecbfaf3275c7962950bd8300754c45afc5fbdb62125e7b5d87356e9c5f2b9",
-          "after": "baa787bcbff261292e0aa38a5737cce7c0a9d51a0ed95d9ad4569223af81c854"
-        }
-      }
-    },
-    "ci/test_shards/shard-1.txt": {
-      "before_sha256": "ba07e69399b6fe551daf416970016ac14189e24f09a80abfeee20ff7f0c4faaa",
-      "after_sha256": "63722cb3b5ba0b0571a7f8fcae1bd3be400c80bb7bb4e132f57c7db7f0f1e171",
-      "owners": {
-        "@document": {
-          "before": "ba07e69399b6fe551daf416970016ac14189e24f09a80abfeee20ff7f0c4faaa",
-          "after": "63722cb3b5ba0b0571a7f8fcae1bd3be400c80bb7bb4e132f57c7db7f0f1e171"
-        }
-      }
-    },
-    "ci/test_shards/shard-10.txt": {
-      "before_sha256": "7b5eeee7957d439d316df702a06419544b5d68e410b2a00d92a99c865fa97123",
-      "after_sha256": "a36890f13b2980cb3abfd0cbac12357385385f72283186ecac04eb0aa2061f82",
-      "owners": {
-        "@document": {
-          "before": "7b5eeee7957d439d316df702a06419544b5d68e410b2a00d92a99c865fa97123",
-          "after": "a36890f13b2980cb3abfd0cbac12357385385f72283186ecac04eb0aa2061f82"
-        }
-      }
-    },
-    "ci/test_shards/shard-11.txt": {
-      "before_sha256": "f6e3dd7be365ce53dd9e9daea2b35c30b02939d27c2c1ec21e63788ceeb91932",
-      "after_sha256": "ca3c6622ea67e2c7f619a46753ac27d61ef32edebc2cecb53ac04c4cde638a6c",
-      "owners": {
-        "@document": {
-          "before": "f6e3dd7be365ce53dd9e9daea2b35c30b02939d27c2c1ec21e63788ceeb91932",
-          "after": "ca3c6622ea67e2c7f619a46753ac27d61ef32edebc2cecb53ac04c4cde638a6c"
-        }
-      }
-    },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "729416670ffe3c824f6bc4a36bc9169fff0d3a04c77449e1f5fd252add22ce7e",
-      "after_sha256": "5214f6c85c0ecff4551b6587c8265b93b15f2cec14c6bd1bb45375fa31cc51a9",
-      "owners": {
-        "@document": {
-          "before": "729416670ffe3c824f6bc4a36bc9169fff0d3a04c77449e1f5fd252add22ce7e",
-          "after": "5214f6c85c0ecff4551b6587c8265b93b15f2cec14c6bd1bb45375fa31cc51a9"
-        }
-      }
-    },
-    "ci/test_shards/shard-2.txt": {
-      "before_sha256": "024a30ef56ec43b7875cd27c1a34b1e7576055eac8ff34ca5c9874ead4bcf2a0",
-      "after_sha256": "3d231b5b77f43335552091d6f04cd2acbf0e6575d0742a066537e0d40e1e76ea",
-      "owners": {
-        "@document": {
-          "before": "024a30ef56ec43b7875cd27c1a34b1e7576055eac8ff34ca5c9874ead4bcf2a0",
-          "after": "3d231b5b77f43335552091d6f04cd2acbf0e6575d0742a066537e0d40e1e76ea"
-        }
-      }
-    },
-    "ci/test_shards/shard-3.txt": {
-      "before_sha256": "2109021a894cede4bbc6366ef1397d7757303fa085c8db5d82b8ad2e55ba61c5",
-      "after_sha256": "84a8b1fd1ec8f8cca7fc28e15fb8d3bfff3562670ba9ff9502146806b13600a2",
-      "owners": {
-        "@document": {
-          "before": "2109021a894cede4bbc6366ef1397d7757303fa085c8db5d82b8ad2e55ba61c5",
-          "after": "84a8b1fd1ec8f8cca7fc28e15fb8d3bfff3562670ba9ff9502146806b13600a2"
-        }
-      }
-    },
-    "ci/test_shards/shard-4.txt": {
-      "before_sha256": "e91b529d733fe7289c875a3c97df11264e96681c95e73ac4afe1a4fa2cc11498",
-      "after_sha256": "8f39d51fd617f12094d941202efd02d9d2c1b7e352dc4823f55901205c5e72a5",
-      "owners": {
-        "@document": {
-          "before": "e91b529d733fe7289c875a3c97df11264e96681c95e73ac4afe1a4fa2cc11498",
-          "after": "8f39d51fd617f12094d941202efd02d9d2c1b7e352dc4823f55901205c5e72a5"
-        }
-      }
-    },
-    "ci/test_shards/shard-5.txt": {
-      "before_sha256": "cababaa7ff77d9c9d60a5b4d58158919dda110b01170a3cfdb9679ba4aa8e1c1",
-      "after_sha256": "169051d25f954ccddfeb63e92ddd2879e4ec71feee39b661de88b9989365d490",
-      "owners": {
-        "@document": {
-          "before": "cababaa7ff77d9c9d60a5b4d58158919dda110b01170a3cfdb9679ba4aa8e1c1",
-          "after": "169051d25f954ccddfeb63e92ddd2879e4ec71feee39b661de88b9989365d490"
-        }
-      }
-    },
-    "ci/test_shards/shard-6.txt": {
-      "before_sha256": "9387d4926e5d9b4070e025630aeed3a0a93ddead8f01b53bc6c4542d05f5e724",
-      "after_sha256": "75d1e79ce4abd263804393e64acd4d33f7b9aafbfcddef877725d03a4ab3c5e2",
-      "owners": {
-        "@document": {
-          "before": "9387d4926e5d9b4070e025630aeed3a0a93ddead8f01b53bc6c4542d05f5e724",
-          "after": "75d1e79ce4abd263804393e64acd4d33f7b9aafbfcddef877725d03a4ab3c5e2"
-        }
-      }
-    },
-    "ci/test_shards/shard-7.txt": {
-      "before_sha256": "aaef678264274c4f835472273ff930217e9c65639c83f1e1e6cfbd263660b54f",
-      "after_sha256": "b3d54a8462a7f9c8cf2e5343ff1dfafaaa7d04a5c3d5e20d90262053cf96ed78",
-      "owners": {
-        "@document": {
-          "before": "aaef678264274c4f835472273ff930217e9c65639c83f1e1e6cfbd263660b54f",
-          "after": "b3d54a8462a7f9c8cf2e5343ff1dfafaaa7d04a5c3d5e20d90262053cf96ed78"
-        }
-      }
-    },
-    "ci/test_shards/shard-8.txt": {
-      "before_sha256": "b428de966ee49edf2fd243af1a5f286b708fef5d7939ef4214e354002b3fe213",
-      "after_sha256": "f3b3f7a3ee9ffe5cfff89a1e5833039672675b8cf5c48eb701c0a61e69db8fd3",
-      "owners": {
-        "@document": {
-          "before": "b428de966ee49edf2fd243af1a5f286b708fef5d7939ef4214e354002b3fe213",
-          "after": "f3b3f7a3ee9ffe5cfff89a1e5833039672675b8cf5c48eb701c0a61e69db8fd3"
-        }
-      }
-    },
-    "ci/test_shards/shard-9.txt": {
-      "before_sha256": "6d084da75fa1b57d0892e94afaa414d4efce8907dab05f75c205fedb7f004a38",
-      "after_sha256": "435bd8d4920fa06f20cee5c3495b43c9c77f0480e1b9c5e8e3beacd7ee9412a9",
-      "owners": {
-        "@document": {
-          "before": "6d084da75fa1b57d0892e94afaa414d4efce8907dab05f75c205fedb7f004a38",
-          "after": "435bd8d4920fa06f20cee5c3495b43c9c77f0480e1b9c5e8e3beacd7ee9412a9"
-        }
-      }
-    },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "964a42eef1350133321a6ace1b8ead4651710993385863bdcc540bd869e871a3",
-      "after_sha256": "ab9e526084433ed24f9977c9f00f84848255dba2577a5c2bc7c7edc4c671e158",
+      "before_sha256": "ab9e526084433ed24f9977c9f00f84848255dba2577a5c2bc7c7edc4c671e158",
+      "after_sha256": "06286d9263a5233e926d46e81dfbcc6328564079cd7347e3f0f1745752fc2be3",
       "owners": {
         "@document": {
-          "before": "964a42eef1350133321a6ace1b8ead4651710993385863bdcc540bd869e871a3",
-          "after": "ab9e526084433ed24f9977c9f00f84848255dba2577a5c2bc7c7edc4c671e158"
+          "before": "ab9e526084433ed24f9977c9f00f84848255dba2577a5c2bc7c7edc4c671e158",
+          "after": "06286d9263a5233e926d46e81dfbcc6328564079cd7347e3f0f1745752fc2be3"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "fe3d2fb3b29f4e7ba174fb6addc0c1bb24d55d963b8e2aca1298b957a971007a",
-      "after_sha256": "029386e1a332de09010eebc15604730843964f1b6e978b290e68faed3c499b9c",
+      "before_sha256": "029386e1a332de09010eebc15604730843964f1b6e978b290e68faed3c499b9c",
+      "after_sha256": "b14663b8e0d21674272db20b0eebcb82111e72bf6409d72fedd6d1ca8058108a",
       "owners": {
         "@document": {
-          "before": "fe3d2fb3b29f4e7ba174fb6addc0c1bb24d55d963b8e2aca1298b957a971007a",
-          "after": "029386e1a332de09010eebc15604730843964f1b6e978b290e68faed3c499b9c"
+          "before": "029386e1a332de09010eebc15604730843964f1b6e978b290e68faed3c499b9c",
+          "after": "b14663b8e0d21674272db20b0eebcb82111e72bf6409d72fedd6d1ca8058108a"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "6772278535282b9c40a5feb65795df263d17fd9af366b9ddd585523ef8cedf26",
-      "after_sha256": "1045c535709e85fb1a3082b8d99a2131caef49ee96ad1bb63167d5e6b407f4c8",
+      "before_sha256": "1045c535709e85fb1a3082b8d99a2131caef49ee96ad1bb63167d5e6b407f4c8",
+      "after_sha256": "23c7175b099cd61995991fc9b36d699bcde13217f11d120ce1ff737dabb45180",
       "owners": {
         "@document": {
-          "before": "6772278535282b9c40a5feb65795df263d17fd9af366b9ddd585523ef8cedf26",
-          "after": "1045c535709e85fb1a3082b8d99a2131caef49ee96ad1bb63167d5e6b407f4c8"
+          "before": "1045c535709e85fb1a3082b8d99a2131caef49ee96ad1bb63167d5e6b407f4c8",
+          "after": "23c7175b099cd61995991fc9b36d699bcde13217f11d120ce1ff737dabb45180"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "0e8a15877f8daa035e5a2a564a69d744b4bd28017a894d9310dc98ac9434c26b",
-      "after_sha256": "ac5c55dc29eb69767c408e829f739bc3876a827fb070698e8d0df0114660605b",
+      "before_sha256": "ac5c55dc29eb69767c408e829f739bc3876a827fb070698e8d0df0114660605b",
+      "after_sha256": "73b539dabbe377d579b4788c621386eb6545bb2962629178a72627e96b8eefae",
       "owners": {
         "@document": {
-          "before": "0e8a15877f8daa035e5a2a564a69d744b4bd28017a894d9310dc98ac9434c26b",
-          "after": "ac5c55dc29eb69767c408e829f739bc3876a827fb070698e8d0df0114660605b"
+          "before": "ac5c55dc29eb69767c408e829f739bc3876a827fb070698e8d0df0114660605b",
+          "after": "73b539dabbe377d579b4788c621386eb6545bb2962629178a72627e96b8eefae"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "daf97b9d51349a0944fbed30d5d124923800b1f53785eb87fc929a809d61a639",
-      "after_sha256": "d73d24cdb3ebf69fbae3eeeb74c6c1a0620f5a7c854d0709fb685f78c429e8d8",
+      "before_sha256": "d73d24cdb3ebf69fbae3eeeb74c6c1a0620f5a7c854d0709fb685f78c429e8d8",
+      "after_sha256": "3c35024ac1179a29a329cbba485c112ccf6357b62a009a716c3788b3905494f9",
       "owners": {
         "@document": {
-          "before": "daf97b9d51349a0944fbed30d5d124923800b1f53785eb87fc929a809d61a639",
-          "after": "d73d24cdb3ebf69fbae3eeeb74c6c1a0620f5a7c854d0709fb685f78c429e8d8"
+          "before": "d73d24cdb3ebf69fbae3eeeb74c6c1a0620f5a7c854d0709fb685f78c429e8d8",
+          "after": "3c35024ac1179a29a329cbba485c112ccf6357b62a009a716c3788b3905494f9"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "5844a3ea20e134796428b3168ae45ceb0afceadfa9618101683a39878a0fa7dd",
-      "after_sha256": "7599d3352c28f92e8959bf35a7e22dc646f0bc76ea2bf49343f6560439264490",
+      "before_sha256": "7599d3352c28f92e8959bf35a7e22dc646f0bc76ea2bf49343f6560439264490",
+      "after_sha256": "fe3a1574ad2beb1d86307bd6c78301421602afeabb73ca0ce6a95c628abfb05c",
       "owners": {
         "@document": {
-          "before": "5844a3ea20e134796428b3168ae45ceb0afceadfa9618101683a39878a0fa7dd",
-          "after": "7599d3352c28f92e8959bf35a7e22dc646f0bc76ea2bf49343f6560439264490"
+          "before": "7599d3352c28f92e8959bf35a7e22dc646f0bc76ea2bf49343f6560439264490",
+          "after": "fe3a1574ad2beb1d86307bd6c78301421602afeabb73ca0ce6a95c628abfb05c"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "380cbda0361f6971bbf885bc8a5ab17a1df245ac821fd99865f39e24604c9480",
-      "after_sha256": "6297973355ead71bd404f00548e5cdd04b94061f6f6bbed5c045cc40e45ef586",
+      "before_sha256": "6297973355ead71bd404f00548e5cdd04b94061f6f6bbed5c045cc40e45ef586",
+      "after_sha256": "a82bed7ac97a3c4803d128ce515e8360cde7f8e1cbbb5ad712ec1f4db037dc68",
       "owners": {
         "@document": {
-          "before": "380cbda0361f6971bbf885bc8a5ab17a1df245ac821fd99865f39e24604c9480",
-          "after": "6297973355ead71bd404f00548e5cdd04b94061f6f6bbed5c045cc40e45ef586"
+          "before": "6297973355ead71bd404f00548e5cdd04b94061f6f6bbed5c045cc40e45ef586",
+          "after": "a82bed7ac97a3c4803d128ce515e8360cde7f8e1cbbb5ad712ec1f4db037dc68"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "2a17abbb8cb5b0b4d925a526fe5fe2ecf7441657194627c8d8f36ec7a2d1ef53",
-      "after_sha256": "fa7bfb34095eba929feffd387cdf377c454686ada3556815c6aa944cfe57d42a",
+      "before_sha256": "fa7bfb34095eba929feffd387cdf377c454686ada3556815c6aa944cfe57d42a",
+      "after_sha256": "96968c87a476999fd90afaa8c86555d888f691da5b686900d87f413d2ac7680f",
       "owners": {
         "@document": {
-          "before": "2a17abbb8cb5b0b4d925a526fe5fe2ecf7441657194627c8d8f36ec7a2d1ef53",
-          "after": "fa7bfb34095eba929feffd387cdf377c454686ada3556815c6aa944cfe57d42a"
+          "before": "fa7bfb34095eba929feffd387cdf377c454686ada3556815c6aa944cfe57d42a",
+          "after": "96968c87a476999fd90afaa8c86555d888f691da5b686900d87f413d2ac7680f"
+        }
+      }
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "before_sha256": "b5bb3f33b8b2c52730a5ac2c7c1fbbfad85af64a25994813484905717361c64a",
+      "after_sha256": "0c32d2e6671fae49964ead2609387aba1ad1d8ce9990f1f78d08562eeb796af6",
+      "owners": {
+        "@document": {
+          "before": "b5bb3f33b8b2c52730a5ac2c7c1fbbfad85af64a25994813484905717361c64a",
+          "after": "0c32d2e6671fae49964ead2609387aba1ad1d8ce9990f1f78d08562eeb796af6"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "5ce7e36f7a6f54f14e317d363a95511b25e479e0a08311b7b0358383e3fa848c",
-      "after_sha256": "a0b71b1c3457b671e266da4452ef5e89ca81ca89e6288820890944931d491872",
+      "before_sha256": "a0b71b1c3457b671e266da4452ef5e89ca81ca89e6288820890944931d491872",
+      "after_sha256": "0cad7748bd2c9945f8e26e4ce92f21768224826c355ef16148c4c5405066984e",
       "owners": {
         "@document": {
-          "before": "5ce7e36f7a6f54f14e317d363a95511b25e479e0a08311b7b0358383e3fa848c",
-          "after": "a0b71b1c3457b671e266da4452ef5e89ca81ca89e6288820890944931d491872"
+          "before": "a0b71b1c3457b671e266da4452ef5e89ca81ca89e6288820890944931d491872",
+          "after": "0cad7748bd2c9945f8e26e4ce92f21768224826c355ef16148c4c5405066984e"
         }
       }
     },
-    "docs/ORDER_111_SCOPE_PLAN.md": {
+    "docs/ORDER_112_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "39612a1f50d10d000293332a07166c1edef891ebb0d28a2a12fcad8af553edaf",
+      "after_sha256": "671326da2764a050e7f70fd6202918c114e8dac5b19edb8f7f9661c522a90d7d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "39612a1f50d10d000293332a07166c1edef891ebb0d28a2a12fcad8af553edaf"
+          "after": "671326da2764a050e7f70fd6202918c114e8dac5b19edb8f7f9661c522a90d7d"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "620831b0babdf07a0c856ee303633cfa015972a5e4b6e14422e467cf1be4b958",
-      "after_sha256": "6583488e5ae3b21ffb1136031405b328e19722c3b7f40824cd717c22bd091443",
+      "before_sha256": "6583488e5ae3b21ffb1136031405b328e19722c3b7f40824cd717c22bd091443",
+      "after_sha256": "650ab03e306a03748c926f62edc7cbe625501b5c7def6b1271c33d7345c4c4a5",
       "owners": {
         "@document": {
-          "before": "620831b0babdf07a0c856ee303633cfa015972a5e4b6e14422e467cf1be4b958",
-          "after": "6583488e5ae3b21ffb1136031405b328e19722c3b7f40824cd717c22bd091443"
+          "before": "6583488e5ae3b21ffb1136031405b328e19722c3b7f40824cd717c22bd091443",
+          "after": "650ab03e306a03748c926f62edc7cbe625501b5c7def6b1271c33d7345c4c4a5"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "2868381d8fcc6e13fa669b7fa1c9099c24c984481aa6b7150f31bb131a8b3ffb",
-      "after_sha256": "768c8e01044c0247b718b15c178873b4e44553dc1c0a3a4b69333dac4081a5ec",
+      "before_sha256": "768c8e01044c0247b718b15c178873b4e44553dc1c0a3a4b69333dac4081a5ec",
+      "after_sha256": "c7da96e5e8f8833512a55e1c460df66803c65aa01a555eadb1490a1aba1e8c86",
       "owners": {
         "@document": {
-          "before": "2868381d8fcc6e13fa669b7fa1c9099c24c984481aa6b7150f31bb131a8b3ffb",
-          "after": "768c8e01044c0247b718b15c178873b4e44553dc1c0a3a4b69333dac4081a5ec"
+          "before": "768c8e01044c0247b718b15c178873b4e44553dc1c0a3a4b69333dac4081a5ec",
+          "after": "c7da96e5e8f8833512a55e1c460df66803c65aa01a555eadb1490a1aba1e8c86"
         }
       }
     },
-    "src/warhammer40k_core/engine/movement_legality.py": {
-      "before_sha256": "3bd40343368e7e8d58be23beb1b17393887a26bc18117901a5fa96a0dd83e960",
-      "after_sha256": "40aecf748ac8f676d0b5c022ee1675daa3e34377492f8ddfbeb97c9c41ba539c",
+    "src/warhammer40k_core/engine/fight_rules_unit_melee.py": {
+      "before_sha256": "1d69d278a11ea5648c75e46c219b4561744ff02f4e27688f995dc3a8b4907ea0",
+      "after_sha256": "24611fcca8e160d011eadb53863a34b2d13e84400e244a260b86ccc6201b1689",
       "owners": {
-        "MovementLegalityContext.to_path_validation_context": {
-          "before": "d1326c456240d01dbf1dc026d88fdc83cd2efc50ced1f01ff4401d0031246e9a",
-          "after": "46d914dd143635b0a4878325f692a4333e7be5c92802d64a34956038e9a1e3d5"
+        "_committed_weapon_rows": {
+          "before": null,
+          "after": "4c0aa88ea8305e0a631c8f6abb32e001ad85c0144a440e058e2932363ea872a4"
+        },
+        "validate_rules_unit_melee_declaration": {
+          "before": "5f6a83c29b6a15533d8e3f49d93a4fb17292c4b214b54d60508e6ca73ac0a1fc",
+          "after": "9b238c48b4249e10a3e2a81a0728adb4b8238e791b5f495f1ce5bfaa139b42b8"
         }
       }
     },
-    "tests/unit/test_order111_friendly_transit.py": {
-      "before_sha256": null,
-      "after_sha256": "4ced23daaf5854be68c66d85e5f50c71ee65e3691d1a136f66e8ec1b44967954",
+    "src/warhammer40k_core/engine/fight_weapon_selection.py": {
+      "before_sha256": "46279b57bfaa84ba487d333aba6db38edf18a013908b91e05e7f0a3b8fe50f2a",
+      "after_sha256": "a114eef1c3ddbdac8b05ad8c07575c280631e1b5164ad22ffd7a051186f67abf",
+      "owners": {
+        "validate_melee_declaration_rules": {
+          "before": "91267edc116781fb99b2e699ec48451d20cbd5aebb70476531acb84cdbf39114",
+          "after": "c8653109eac7f520228a0b4e1f158c385ec9a057b9fd5b713ef81ecb98d57cf8"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/melee_weapon_commitment.py": {
+      "before_sha256": "74380001d5f43490b9c6884fc7bf8a413f3054b7924b30b3941a7b8199b5b8fe",
+      "after_sha256": "68fe6c4e769405892d0f21bf420993cf92ef0f5884f3961c82f163f68f2b946a",
+      "owners": {
+        "chosen_rows": {
+          "before": "f9131d1615fc5b74ccc524fe1d3fc7380a0f1b31b3fb1fbcdca7ac43c1195aaa",
+          "after": "ecdee40d39cedd8f3b0f2204d3efa57d8f3e6f49aa54109c78010815d13ed0c2"
+        },
+        "selection_request": {
+          "before": "73cc36c4d03469eeb894898dbba6ebdc3369417190584a2d3d70f3bf8d772aa4",
+          "after": "26f0ff25ba13fe607dc056325c29561a9e0f1e59abea86aca4cd6eb1a418fc4e"
+        },
+        "selection_stages": {
+          "before": "692fb62bb93563ebf48586d53f0e3e6cceb19ceb5e304defea552d4b4dc8a3d3",
+          "after": "838e7a4d7ae1771c8126acd9c86ebc35d0bbd0d2b57cd877d838bf6a1ce3a187"
+        }
+      }
+    },
+    "tests/code_quality/test_order92_melee_commitment.py": {
+      "before_sha256": "33085cb7e9d0fb3e5cf34628ca40e8966d7e1a5ea2426b6a90335aa0fdeb7b9e",
+      "after_sha256": "94303e8e9bc9865d0ff11d0849364f40e689c5806f0dbe0d5ccee5f522557586",
+      "owners": {
+        "test_extra_attacks_commitment_never_offers_a_skip": {
+          "before": null,
+          "after": "d8ba1e85a4b21f20739b7c3b595dbf716ce5090cf70dfd37ff76355f827c3c20"
+        }
+      }
+    },
+    "tests/unit/test_order92_random_melee.py": {
+      "before_sha256": "193d4216b590e00d6e24a8752b6726ab6547de76756598a0379b641c0823dcc7",
+      "after_sha256": "a38d2d517a0c234f2b921bc0f6cb9e158a5f2900a4af4d6c88b1e373315dbc54",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "41e8a290d958f56d25f5cc7588a45feab3914e53212ff5513a73df3ed83eab97"
+          "before": "20fde3793e5422f9f544ce784c0e57cb97f36af493f6ad68a5714fa5c0793726",
+          "after": "b8ccf40ad68b0fbd4b83a0ef4102a6dce7a246cbcf6bd8197bcc2619a4d9e550"
         },
-        "_assert_round_trip": {
+        "test_each_physical_extra_weapon_is_required": {
           "before": null,
-          "after": "369e601f8586f7fd9feba975936ba2227cc694ad2df0bf187488639a1c30f62e"
+          "after": "93d1a4d04c97b03cfd4172967a48c9974f4910bd566e0422422dc06d4a7d5b80"
         },
-        "_catalog": {
+        "test_extra_weapons_cannot_be_skipped_and_retry_restores_and_replays": {
           "before": null,
-          "after": "ea7cb86b95085bf12bb4970bc03e4dadceb2def04e5a3f59b8c6e46184f54625"
+          "after": "77c87d6c9ab9ef7aded13ad2bcdc35512ede591dea9f3732d16ab7e95197d603"
         },
-        "test_fall_back_through_friendly_model_retries_restores_and_replays": {
+        "test_ineligible_extra_bearer_does_not_require_a_declaration": {
           "before": null,
-          "after": "5bf2844270b6f0c45223034056f494d43fee458a84e3c48e20b60eacd237d968"
+          "after": "1997d90532f558b4274b5e15f1219aa63a9eb316b2624629a8afd067eca53a78"
         },
-        "test_friendly_transit_uses_move_scope_and_retains_endpoint_and_enemy_rules": {
+        "test_mandatory_extra_selection_obeys_physical_one_shot_availability": {
           "before": null,
-          "after": "41b66daee97933f653f5dade1bea94fdadf957fc6e97a6aa310ecfe29c5a9727"
-        },
-        "test_pile_in_friendly_transit_uses_facade_and_replays": {
-          "before": null,
-          "after": "a1ad2b5db3aae96cec626753f6fa63a0b396b24938a184db0f84f78864f4047b"
+          "after": "0c0f9da012e097b1d8d005ee39cc20d54fb850577365888348762b36c9765a41"
         }
       }
     }
   },
   "rows": {
-    "ci/test_shards/durations.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
-    },
-    "ci/test_shards/shard-1.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
-    },
-    "ci/test_shards/shard-10.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
-    },
-    "ci/test_shards/shard-11.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
-    },
-    "ci/test_shards/shard-12.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
-    },
-    "ci/test_shards/shard-2.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
-    },
-    "ci/test_shards/shard-3.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
-    },
-    "ci/test_shards/shard-4.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
-    },
-    "ci/test_shards/shard-5.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
-    },
-    "ci/test_shards/shard-6.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
-    },
-    "ci/test_shards/shard-7.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
-    },
-    "ci/test_shards/shard-8.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
-    },
-    "ci/test_shards/shard-9.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
-    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Existing contract publication owner regenerates examples and manifest for the exact runtime build. No schema, contract version, payload family or viewer policy is changed.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
+      "rationale": "Publish regenerated examples and manifest with exact runtime identity; contract44.2 schemas, payload families and viewer policy unchanged.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -442,9 +230,9 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Existing contract publication owner regenerates examples and manifest for the exact runtime build. No schema, contract version, payload family or viewer policy is changed.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
+      "rationale": "Publish regenerated examples and manifest with exact runtime identity; contract44.2 schemas, payload families and viewer policy unchanged.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -452,9 +240,9 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Existing contract publication owner regenerates examples and manifest for the exact runtime build. No schema, contract version, payload family or viewer policy is changed.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
+      "rationale": "Publish regenerated examples and manifest with exact runtime identity; contract44.2 schemas, payload families and viewer policy unchanged.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -462,9 +250,9 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Existing contract publication owner regenerates examples and manifest for the exact runtime build. No schema, contract version, payload family or viewer policy is changed.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
+      "rationale": "Publish regenerated examples and manifest with exact runtime identity; contract44.2 schemas, payload families and viewer policy unchanged.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -472,9 +260,9 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Existing contract publication owner regenerates examples and manifest for the exact runtime build. No schema, contract version, payload family or viewer policy is changed.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
+      "rationale": "Publish regenerated examples and manifest with exact runtime identity; contract44.2 schemas, payload families and viewer policy unchanged.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -482,9 +270,9 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Existing contract publication owner regenerates examples and manifest for the exact runtime build. No schema, contract version, payload family or viewer policy is changed.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
+      "rationale": "Publish regenerated examples and manifest with exact runtime identity; contract44.2 schemas, payload families and viewer policy unchanged.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -492,9 +280,9 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Existing contract publication owner regenerates examples and manifest for the exact runtime build. No schema, contract version, payload family or viewer policy is changed.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
+      "rationale": "Publish regenerated examples and manifest with exact runtime identity; contract44.2 schemas, payload families and viewer policy unchanged.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -502,33 +290,41 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Existing contract publication owner regenerates examples and manifest for the exact runtime build. No schema, contract version, payload family or viewer policy is changed.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
+      "rationale": "Publish regenerated examples and manifest with exact runtime identity; contract44.2 schemas, payload families and viewer policy unchanged.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document source-backed scope, actual roadmap implementation, adapter finite-selection rule, operation ownership or static mandatory-selection regression audit.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the literal selected source, bounded implementation, truthful consumer-path qualifications, actual roadmap behavior and reviewed regression owner mapping.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
+      "rationale": "Document source-backed scope, actual roadmap implementation, adapter finite-selection rule, operation ownership or static mandatory-selection regression audit.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
     },
-    "docs/ORDER_111_SCOPE_PLAN.md": {
+    "docs/ORDER_112_SCOPE_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the literal selected source, bounded implementation, truthful consumer-path qualifications, actual roadmap behavior and reviewed regression owner mapping.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
+      "rationale": "Document source-backed scope, actual roadmap implementation, adapter finite-selection rule, operation ownership or static mandatory-selection regression audit.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the literal selected source, bounded implementation, truthful consumer-path qualifications, actual roadmap behavior and reviewed regression owner mapping.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
+      "rationale": "Document source-backed scope, actual roadmap implementation, adapter finite-selection rule, operation ownership or static mandatory-selection regression audit.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -536,29 +332,57 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the exact runtime manifest for the scoped movement collision rule repair; this records current runtime identity without changing loader or serialization work.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
+      "rationale": "Regenerate exact runtime identity for three scoped melee-selection owners.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
     },
-    "src/warhammer40k_core/engine/movement_legality.py": {
+    "src/warhammer40k_core/engine/fight_rules_unit_melee.py": {
       "category": "rule_semantics",
       "operations": [
-        "movement-rule-branch"
+        "order112-extra-attacks-selection"
       ],
       "selected_families": [],
-      "rationale": "Order111 changes the existing friendly blocker Boolean condition to honor the pinned other-than-Normal/Advance FAQ. No new collision/search algorithm is introduced.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
+      "rationale": "Require all eligible physical Extra Attacks weapons in existing declaration validation and finite random-A choices. Apply the existing committed profile inventory filter at attached-component validation so permitted primary/profile choices remain playable.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
     },
-    "tests/unit/test_order111_friendly_transit.py": {
+    "src/warhammer40k_core/engine/fight_weapon_selection.py": {
       "category": "rule_semantics",
       "operations": [
-        "order111-friendly-transit-regressions"
+        "order112-extra-attacks-selection"
       ],
       "selected_families": [],
-      "rationale": "Add scoped direct policy and real facade regressions for transit, negative controls, isolated fork continuation, persistence, viewer output and replay; historical workload fixtures remain unchanged.",
-      "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
-      "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
+      "rationale": "Require all eligible physical Extra Attacks weapons in existing declaration validation and finite random-A choices. Apply the existing committed profile inventory filter at attached-component validation so permitted primary/profile choices remain playable.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
+    "src/warhammer40k_core/engine/melee_weapon_commitment.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order112-extra-attacks-selection"
+      ],
+      "selected_families": [],
+      "rationale": "Require all eligible physical Extra Attacks weapons in existing declaration validation and finite random-A choices. Apply the existing committed profile inventory filter at attached-component validation so permitted primary/profile choices remain playable.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
+    "tests/code_quality/test_order92_melee_commitment.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document source-backed scope, actual roadmap implementation, adapter finite-selection rule, operation ownership or static mandatory-selection regression audit.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
+    },
+    "tests/unit/test_order92_random_melee.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order112-extra-attacks-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Add scoped physical-copy, Extra-only, bearer eligibility, One Shot, fixed/random attached facade omission/retry, profile choice, persistence/fork/viewer/replay controls to the existing random-melee regression module.",
+      "source_obligation": "Order112/P24L/C24-12, pinned rule:24:24.11:1 blocks1-3: every eligible physical Extra Attacks weapon plus a permitted primary when available; retain Extra-only clause24.11.01, physical ownership, random commitment, typed retry and replay.",
+      "unchanged_work": "Bounded melee rule selection and existing committed-inventory filtering. No algorithm/search/cache/serialization change, workload change or runtime dependency update. Existing query owners, physical roll budgets, shared mutation and history authentication remain. Owner sequential policy requires quiet current-runtime smoke and all live semantic/work/cache gates; no intentional performance optimization or full-game timing certification."
     }
   },
   "milestone": "ordinary",

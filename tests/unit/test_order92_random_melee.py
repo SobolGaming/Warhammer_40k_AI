@@ -1,16 +1,29 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from typing import cast
 
 import pytest
-from tests.random_melee_helpers import declaration_payload, melee_boundary, random_melee_session
+from tests.phase15d_fight_resolution_helpers import melee_fixture, melee_proposal, melee_request
+from tests.random_melee_helpers import (
+    declaration_payload,
+    melee_boundary,
+    random_melee_session,
+    single_target_commitment_payload,
+)
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.fight_resolution import (
+    MeleeTargetAllocation,
+    MeleeWeaponDeclaration,
+    validate_melee_declaration_rules,
+)
 from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.engine.replay import ReplayRunner
+from warhammer40k_core.geometry.pose import Pose
 
 
 def test_random_melee_commits_weapon_before_generating_attacks() -> None:
@@ -570,4 +583,256 @@ def test_unengaged_random_leader_does_not_change_fixed_bodyguard_declaration() -
     assert any(
         e.event_type == "melee_declaration_accepted"
         for e in session.lifecycle.decision_controller.event_log.records
+    )
+
+
+# Order 112: mandatory equipped Extra Attacks selection.
+@pytest.mark.parametrize("extra_only", [False, True])
+@pytest.mark.parametrize("copies", [1, 2])
+def test_each_physical_extra_weapon_is_required(extra_only: bool, copies: int) -> None:
+    catalog, ruleset, scenario, attacker, target, _ = melee_fixture(include_extra_attacks=True)
+    catalog = replace(
+        catalog,
+        wargear=tuple(
+            replace(
+                gear,
+                weapon_profiles=(
+                    gear.weapon_profiles[0],
+                    replace(gear.weapon_profiles[0], profile_id="core-extra-blade:alternate"),
+                ),
+            )
+            if gear.wargear_id == "core-extra-blade"
+            else gear
+            for gear in catalog.wargear
+        ),
+    )
+    gear = (() if extra_only else ("core-leader-blade",)) + ("core-extra-blade",) * copies
+    attacker = replace(
+        attacker,
+        own_models=tuple(replace(model, wargear_ids=gear) for model in attacker.own_models),
+    )
+    scenario = replace(
+        scenario, armies=(replace(scenario.armies[0], units=(attacker,)), scenario.armies[1])
+    )
+    request = melee_request(catalog=catalog, ruleset=ruleset, scenario=scenario, attacker=attacker)
+    declarations = tuple(
+        MeleeWeaponDeclaration(
+            attacker_model_instance_id=cast(str, row["model_instance_id"]),
+            wargear_id=cast(str, row["wargear_id"]),
+            weapon_profile_id=cast(str, row["weapon_profile_id"]),
+            weapon_instance_id=cast(str, row["weapon_instance_id"]),
+            target_allocations=(MeleeTargetAllocation(target.unit_instance_id),),
+        )
+        for row in request.available_weapons
+        if isinstance(row, dict) and row["weapon_profile_id"] != "core-extra-blade:standard"
+    )
+    assert len(declarations) == copies + (not extra_only)
+    for selected in (declarations[:-1], declarations):
+        validation = validate_melee_declaration_rules(
+            scenario=scenario,
+            ruleset_descriptor=ruleset,
+            request=request,
+            proposal=melee_proposal(request=request, attacker=attacker, declarations=selected),
+            army_catalog=catalog,
+        )
+        assert validation.is_valid is (selected == declarations)
+        if selected and selected != declarations:
+            assert validation.violations[0].violation_code == "melee_extra_attacks_weapon_required"
+
+
+@pytest.mark.parametrize("destroyed", [False, True])
+def test_ineligible_extra_bearer_does_not_require_a_declaration(destroyed: bool) -> None:
+    catalog, ruleset, scenario, attacker, target, _ = melee_fixture(include_extra_attacks=True)
+    primary = attacker.own_models[0]
+    extra = replace(
+        primary,
+        model_instance_id=f"{attacker.unit_instance_id}:extra-bearer",
+        wargear_ids=("core-extra-blade",),
+        wounds_remaining=0 if destroyed else primary.current_wounds,
+    )
+    attacker = replace(attacker, own_models=(primary, extra))
+    placement = scenario.battlefield_state.unit_placement_by_id(attacker.unit_instance_id)
+    extra_placement = replace(
+        placement.model_placements[0],
+        model_instance_id=extra.model_instance_id,
+        pose=Pose.at(10, 10) if destroyed else Pose.at(30, 30),
+    )
+    scenario = replace(
+        scenario,
+        armies=(replace(scenario.armies[0], units=(attacker,)), scenario.armies[1]),
+        battlefield_state=scenario.battlefield_state.with_unit_placement(
+            placement.with_model_placements((*placement.model_placements, extra_placement))
+        ),
+    )
+    request = melee_request(catalog=catalog, ruleset=ruleset, scenario=scenario, attacker=attacker)
+    declaration = MeleeWeaponDeclaration(
+        attacker_model_instance_id=primary.model_instance_id,
+        wargear_id="core-leader-blade",
+        weapon_profile_id="core-leader-blade:standard",
+        target_allocations=(MeleeTargetAllocation(target.unit_instance_id),),
+    )
+    assert validate_melee_declaration_rules(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        request=request,
+        proposal=melee_proposal(request=request, attacker=attacker, declarations=(declaration,)),
+        army_catalog=catalog,
+    ).is_valid
+
+
+@pytest.mark.parametrize("spent", [False, True])
+def test_mandatory_extra_selection_obeys_physical_one_shot_availability(spent: bool) -> None:
+    from warhammer40k_core.core.weapon_profiles import WeaponKeyword
+    from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+    from warhammer40k_core.engine.fight_resolution import available_melee_weapons_payloads
+    from warhammer40k_core.engine.phase import BattlePhase
+
+    session = random_melee_session(random=False, extra=True)
+    melee_boundary(session)
+    state = session.lifecycle.state
+    assert state is not None
+    catalog = session.lifecycle.config.army_catalog
+    assert catalog is not None
+    catalog = replace(
+        catalog,
+        wargear=tuple(
+            replace(
+                gear,
+                weapon_profiles=tuple(
+                    replace(profile, keywords=(*profile.keywords, WeaponKeyword.ONE_SHOT))
+                    for profile in gear.weapon_profiles
+                ),
+            )
+            if gear.wargear_id == "order92-extra"
+            else gear
+            for gear in catalog.wargear
+        ),
+    )
+    scenario = battlefield_scenario_for_state(state=state)
+    attacker = scenario.armies[0].unit_by_id("army-alpha:attacker")
+    ruleset = session.lifecycle.config.ruleset_descriptor
+    request = melee_request(catalog=catalog, ruleset=ruleset, scenario=scenario, attacker=attacker)
+    extra = next(
+        row
+        for row in request.available_weapons
+        if isinstance(row, dict) and row["wargear_id"] == "order92-extra"
+    )
+    assert isinstance(extra, dict)
+    if spent:
+        state.record_one_shot_weapon_selected(
+            weapon_instance_id=cast(str, extra["weapon_instance_id"]),
+            model_instance_id=cast(str, extra["model_instance_id"]),
+            wargear_id="order92-extra",
+            weapon_profile_id=cast(str, extra["weapon_profile_id"]),
+            source_phase=BattlePhase.FIGHT,
+            selection_id="order112:previous-use",
+        )
+    request = replace(
+        request,
+        available_weapons=available_melee_weapons_payloads(
+            scenario=scenario,
+            ruleset_descriptor=ruleset,
+            unit=attacker,
+            army_catalog=catalog,
+            state=state,
+            source_decision_result_id=request.source_decision_result_id,
+        ),
+    )
+    declaration = MeleeWeaponDeclaration(
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        wargear_id="core-leader-blade",
+        weapon_profile_id="core-leader-blade:standard",
+        target_allocations=(MeleeTargetAllocation("army-beta:target-a"),),
+    )
+    result = validate_melee_declaration_rules(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        request=request,
+        proposal=melee_proposal(request=request, attacker=attacker, declarations=(declaration,)),
+        army_catalog=catalog,
+        state=state,
+    )
+    assert result.is_valid is spent
+    if not spent:
+        assert result.violations[0].violation_code == "melee_extra_attacks_weapon_required"
+
+
+@pytest.mark.parametrize("random", [False, True])
+@pytest.mark.parametrize("attached", [False, True])
+def test_extra_weapons_cannot_be_skipped_and_retry_restores_and_replays(
+    random: bool, attached: bool
+) -> None:
+    from warhammer40k_core.adapters.event_stream import EventStreamCursor
+
+    session = random_melee_session(random=random, extra=True, attached=attached, profiles=True)
+    request = melee_boundary(session)
+    index = 0
+    while request.decision_type == "select_melee_weapon":
+        assert all(option.payload is not None for option in request.options)
+        assert "skip_extra" not in {option.option_id for option in request.options}
+        assert not any(
+            event.event_type == "random_characteristic_rolled"
+            for event in session.lifecycle.decision_controller.event_log.records
+        )
+        pending = session.to_persistence_payload()
+        session = LocalGameSession.from_persistence_payload(json.loads(json.dumps(pending)))
+        assert session.to_persistence_payload() == pending
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id=request.options[-1].option_id,
+            result_id=f"order112-commit-{index}",
+        )
+        assert status.decision_request is not None
+        request = status.decision_request
+        index += 1
+    assert request.decision_type == "submit_melee_declaration"
+    payload = single_target_commitment_payload(request)
+    declarations = cast(list[dict[str, JsonValue]], payload["declarations"])
+    # Fixed-A requests expose alternative profiles; select exactly one per weapon.
+    selected: dict[str, dict[str, JsonValue]] = {}
+    for declaration in declarations:
+        selected[cast(str, declaration["weapon_instance_id"])] = declaration
+    declarations = list(selected.values())
+    assert len(declarations) == 2
+    assert {row["wargear_id"] for row in declarations} == {"core-leader-blade", "order92-extra"}
+    payload["declarations"] = cast(list[JsonValue], declarations)
+    before = session.to_persistence_payload()
+    pending = LocalGameSession.from_persistence_payload(json.loads(json.dumps(before)))
+    assert pending.to_persistence_payload() == before
+    invalid = dict(
+        payload, declarations=[row for row in declarations if row["wargear_id"] != "order92-extra"]
+    )
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id, result_id="order112-omitted-extra", payload=invalid
+    )
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert session.to_persistence_payload() == before
+    fork = session.fork()
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id, result_id="order112-complete", payload=payload
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert fork.to_persistence_payload() == before
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.fight_phase_state is not None
+    sequence = state.fight_phase_state.attack_sequence
+    assert sequence is not None
+    assert {pool.weapon_instance_id for pool in sequence.attack_pools} == set(selected)
+    assert sum(
+        event.event_type == "random_characteristic_rolled"
+        for event in session.lifecycle.decision_controller.event_log.records
+    ) == (2 if random else 0)
+    accepted = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(json.loads(json.dumps(accepted)))
+    assert restored.to_persistence_payload() == accepted
+    for viewer in ("player-a", "player-b"):
+        assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
+        assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == (
+            session.events_since(EventStreamCursor(), viewer_player_id=viewer)
+        )
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="order112-extra"))
+        .run()
+        .reproduced_exactly
     )

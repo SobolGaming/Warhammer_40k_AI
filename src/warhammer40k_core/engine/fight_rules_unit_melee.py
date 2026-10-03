@@ -182,14 +182,7 @@ def validate_rules_unit_melee_declaration(
         from warhammer40k_core.engine.melee_pool_authority import commitment_inventory
 
         expected_rows = commitment_inventory(expected_rows, state)
-        expected_rows = tuple(
-            row
-            for row in expected_rows
-            if isinstance(row, dict)
-            and row["weapon_instance_id"] in committed_budgets
-            and row["weapon_profile_id"]
-            == committed_budgets[str(row["weapon_instance_id"])].weapon_profile_id
-        )
+        expected_rows = _committed_weapon_rows(expected_rows, committed_budgets)
     from warhammer40k_core.engine.weapon_modifier_selection import authenticated_melee_modifier_rows
 
     try:
@@ -257,6 +250,8 @@ def validate_rules_unit_melee_declaration(
             selected_melee_rows_for_physical_targets,
         )
 
+        if committed_budgets is not None:
+            physical_rows = _committed_weapon_rows(physical_rows, committed_budgets)
         physical_rows = selected_melee_rows_for_physical_targets(
             state=state,
             current=physical_rows,
@@ -293,6 +288,18 @@ def validate_rules_unit_melee_declaration(
     return ProposalValidationResult.valid(
         proposal_request_id=request.request_id,
         proposal_kind=ProposalKind.MELEE_DECLARATION,
+    )
+
+
+def _committed_weapon_rows(
+    rows: tuple[JsonValue, ...], budgets: dict[str, MeleeAttackBudget]
+) -> tuple[JsonValue, ...]:
+    return tuple(
+        row
+        for row in rows
+        if isinstance(row, dict)
+        and row["weapon_instance_id"] in budgets
+        and row["weapon_profile_id"] == budgets[str(row["weapon_instance_id"])].weapon_profile_id
     )
 
 

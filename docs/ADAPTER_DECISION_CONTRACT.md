@@ -7098,8 +7098,12 @@ against its decisions, historical phase, host and restriction inventory. Contrac
 The owner-approved timing convention is documented in [Order 92](ORDER_92_SCOPE_PLAN.md).
 For a Fight activation with eligible random-A melee weapons, the engine emits
 finite `select_melee_weapon` requests. Select one emitted physical weapon/profile
-option for each model's primary weapon, and one profile or `skip_extra` for each
-Extra Attacks weapon. The engine commits all choices before generating any A dice.
+option for each model's primary weapon, and one profile for every eligible physical
+Extra Attacks weapon. Order 112 removes the former `skip_extra` option to enforce
+24.11. Fixed-A declarations likewise require every eligible equipped Extra Attacks
+weapon, identified by its physical weapon ID, or return
+`melee_extra_attacks_weapon_required`. Extra-only models remain legal. The engine
+commits all choices before generating any A dice.
 Each request binds the activation result, stage and physical inventory. Inventory rows
 include `melee_target_facts`, keyed by physical target ID, with canonical target ID,
 then-alive model IDs and canonical keywords. These immutable facts authenticate

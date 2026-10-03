@@ -33,3 +33,12 @@ def test_all_fight_hosts_share_the_committed_declaration_boundary() -> None:
         or "validate_melee_commitment_history(lifecycle)" in lifecycle
     )
     assert "_melee_commitment_dispatch.decision_dispatch_handlers(self)" in lifecycle
+
+
+def test_extra_attacks_commitment_never_offers_a_skip() -> None:
+    tree = ast.parse((ENGINE / "melee_weapon_commitment.py").read_text())
+    assert not any(
+        isinstance(node, ast.Constant) and node.value == "skip_extra" for node in ast.walk(tree)
+    )
+    validator = (ENGINE / "fight_weapon_selection.py").read_text()
+    assert 'violation_code="melee_extra_attacks_weapon_required"' in validator
