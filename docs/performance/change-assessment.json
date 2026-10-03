@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "3a3d4cdf1342715d3de49e986d741f7466a7b915",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b0339d24d145ee6258ed5ca2b60887f707bbf66abb8e111123539e439200544a",
-  "operation_map_sha256": "315b2c5fc9790895eaf2ffb7fe228b2a29a53448d390211284291df2bd1c5108",
+  "operation_map_sha256": "bc534dfdfa6f0810490a096f98012f3529f5e06a3b9f543b06f8d90ce613d961",
   "changes": {
     "README.md": {
       "before_sha256": "10e90d9d65cbc514a1481f733d69c9d3eba99736c15236254f3a6684ad40081b",
@@ -236,21 +236,21 @@
     },
     "docs/ORDER_106_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "7740f53c9a21fb37306b9d7d58fef566c71d2565c7779dc5da1fea98071c5b29",
+      "after_sha256": "c163b6eb61bf33c740dad21fc648513ab044effe460fab7ce07a1b6a5a178243",
       "owners": {
         "@document": {
           "before": null,
-          "after": "7740f53c9a21fb37306b9d7d58fef566c71d2565c7779dc5da1fea98071c5b29"
+          "after": "c163b6eb61bf33c740dad21fc648513ab044effe460fab7ce07a1b6a5a178243"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "ded7b36f211e83346c92c17129178fe900fc61e69cdcb53621b06143b7b44fa4",
-      "after_sha256": "cbf1d7d887c525c66c0f78378512adcfc8d05918879a353272fb26029a7a9eb1",
+      "after_sha256": "9d423721ba206455e619b702a885637707e0b545dc24e8496dce8e2e835fccd1",
       "owners": {
         "@document": {
           "before": "ded7b36f211e83346c92c17129178fe900fc61e69cdcb53621b06143b7b44fa4",
-          "after": "cbf1d7d887c525c66c0f78378512adcfc8d05918879a353272fb26029a7a9eb1"
+          "after": "9d423721ba206455e619b702a885637707e0b545dc24e8496dce8e2e835fccd1"
         }
       }
     },
@@ -323,6 +323,16 @@
         "test_p12_consolidation_shares_objective_model_and_forced_fight_owners": {
           "before": "dbf04a0c70bf3f531f61c325c5a5930cc2d309e6fc639db506f9470fcf9c67b7",
           "after": "406af8eba678589957801f674fef85e20f70dd54bf023ba52f4a49fce8e71daf"
+        }
+      }
+    },
+    "tests/integration/test_ws13_adapter_phase_families.py": {
+      "before_sha256": "58d2c2eb9974cba72f03133b3cc22b9c102eaff791cdcf4e2bfcdc0df36b8c30",
+      "after_sha256": "221db5bd51aae14b71667f8b3fe1d3b53d088e9f9ae0be206953550b13deaca9",
+      "owners": {
+        "test_local_session_moves_attached_rules_unit_once_and_replays_canonical_event": {
+          "before": "45b178dc8e0dcc27e17651fd896ecd29dafa9b9bca7cdccd77d2b62bd5984e6f",
+          "after": "4b6a0d3b165b0e45a0e4a25c0d4bcf77e43ec0783499445a7ba52b4e9dcccb66"
         }
       }
     },
@@ -792,6 +802,16 @@
     "tests/code_quality/test_phase14i_14h_closeout.py": {
       "category": "governance",
       "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
+      "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",
+      "unchanged_work": "Pile In now invokes the existing shared per-model closest-target and authenticated movement-reachability authority already used by Consolidation. The existing solver, path validation, cache and search algorithms are unchanged; Pile In supplies its own existing movement permissions, budget and continuing-engagement constraints. A moved model already engaging its initially closest target needs no reachability query. The added source-required query for a moved nonengaging model is assessed as a bounded semantic repair under the owner's explicit smoke-default policy, not a deliberate performance change. Full current semantic/work/cache checks remain mandatory. Historical performance identities and measurements are unchanged; no full-game certification is claimed."
+    },
+    "tests/integration/test_ws13_adapter_phase_families.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order106-client-regressions"
+      ],
       "selected_families": [],
       "rationale": "Bounded Order106 source-backed movement obligation repair and required runtime identity publication. The owner-approved sequential policy selects serial smoke for this repair; no deliberate performance change or demonstrated serious regression.",
       "source_obligation": "Order106/P12C/C12-05 implements rule12.03 block12: moved models approach the initially closest selected Pile In target and engage it if legally attainable; preserve source-backed budgets, coherent witnessed paths, continuing engagements and unresolved-proof failure.",

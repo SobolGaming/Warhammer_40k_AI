@@ -2197,6 +2197,7 @@
         "ci/test_shards/shard-8.txt",
         "ci/test_shards/shard-9.txt",
         "tests/code_quality/test_phase14i_14h_closeout.py",
+        "tests/integration/test_ws13_adapter_phase_families.py",
         "tests/unit/test_order106_pile_in.py",
         "tests/unit/test_phase15c_fight_order.py"
       ],
@@ -2206,6 +2207,7 @@
         "_session",
         "_submit",
         "test_fight_on_death_survivor_move_checkpoint_uses_living_only_global_coherency",
+        "test_local_session_moves_attached_rules_unit_once_and_replays_canonical_event",
         "test_p12_consolidation_shares_objective_model_and_forced_fight_owners",
         "test_phase15d_restore_accepts_pile_in_completed_before_fight_on_death_retention",
         "test_phase15d_restore_rejects_omitted_living_target_authority_model",

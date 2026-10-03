@@ -70,6 +70,13 @@ physical-versus-living coherency, and checkpoint assertion. No RNG seed or
 historical assertion pin changes. The existing authenticated historical archive
 retains the original pinned test bytes.
 
+The attached movement integration fixture in
+`test_ws13_adapter_phase_families.py` now places its Leader beside the Bodyguard
+rank at `(8.4, 20)`. Its unchanged quarter-inch move ends within Engagement Range
+instead of stopping just outside it despite attainable engagement. Physical
+bases remain separated; every canonical movement, event and exact replay
+assertion, and all seeds, are preserved.
+
 Exact base reproductions and final receipts are kept in the sibling `order106-state` evidence directory. Required complete covered behavior
 at 85%, quality/type/lint/contract gates, hosted CI and both clean exact-head
 reviews remain separate delivery requirements.
