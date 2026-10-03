@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b0339d24d145ee6258ed5ca2b60887f707bbf66abb8e111123539e439200544a",
-  "fingerprint": "b0339d24d145ee6258ed5ca2b60887f707bbf66abb8e111123539e439200544a",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:dbc661b6db3a3d2fd70762295400666c19d04546112cf9db323ed8adea311a90",
+  "fingerprint": "dbc661b6db3a3d2fd70762295400666c19d04546112cf9db323ed8adea311a90",
   "resource_count": 3044,
   "resources": [
     {
@@ -10040,9 +10040,9 @@
       "sha256": "adf4137fa7c8edb185165db296429feb86920bab8df116a3d1782d2e2bf6b3be"
     },
     {
-      "byte_length": 94300,
+      "byte_length": 94869,
       "path": "warhammer40k_core/engine/fight_resolution.py",
-      "sha256": "720cc1824545636bdc2a2961abe83aa012aa275b53ae8618be793734a7a41774"
+      "sha256": "8806f9f1451a7c14ba178ed1d30db6c7e9812f67042d46a230c7a76c27197a88"
     },
     {
       "byte_length": 28227,

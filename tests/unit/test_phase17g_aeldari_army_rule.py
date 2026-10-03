@@ -1091,6 +1091,21 @@ def test_aeldari_sudden_strike_fight_movement_distance_uses_lifecycle_effect() -
     assert melee_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
 
     state = _state(lifecycle)
+    activation_fight_state = state.fight_phase_state
+    assert activation_fight_state is not None
+    for kind in (ProposalKind.PILE_IN, ProposalKind.CONSOLIDATE):
+        assert (
+            fight_movement_maximum_distance_inches(
+                state=state, unit_instance_id=_AELDARI_UNIT_ID, proposal_kind=kind
+            )
+            == 3.0
+        )
+    state.replace_fight_phase_state(
+        activation_fight_state.with_current_step(
+            current_step=FightPhaseStepKind.PILE_IN,
+            policy=state.runtime_ruleset_descriptor().fight_policy,
+        )
+    )
     assert (
         fight_movement_maximum_distance_inches(
             state=state,
@@ -1098,6 +1113,12 @@ def test_aeldari_sudden_strike_fight_movement_distance_uses_lifecycle_effect() -
             proposal_kind=ProposalKind.PILE_IN,
         )
         == 6.0
+    )
+    state.replace_fight_phase_state(
+        activation_fight_state.with_current_step(
+            current_step=FightPhaseStepKind.CONSOLIDATE,
+            policy=state.runtime_ruleset_descriptor().fight_policy,
+        )
     )
     assert (
         fight_movement_maximum_distance_inches(
@@ -1107,6 +1128,7 @@ def test_aeldari_sudden_strike_fight_movement_distance_uses_lifecycle_effect() -
         )
         == 6.0
     )
+    state.replace_fight_phase_state(activation_fight_state)
     used_event = _last_event_payload(lifecycle, "fight_activation_ability_used")
     persisting_effect = cast(dict[str, JsonValue], used_event["persisting_effect"])
     effect_payload = cast(dict[str, JsonValue], persisting_effect["effect_payload"])

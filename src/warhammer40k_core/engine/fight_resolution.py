@@ -7,6 +7,7 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.objectives import ObjectiveMarker, ObjectiveMarkerPayload
 from warhammer40k_core.core.ruleset_descriptor import (
     ConsolidationModeKind,
+    FightPhaseStepKind,
     MovementMode,
     RulesetDescriptor,
     consolidation_mode_kind_from_token,
@@ -1184,6 +1185,20 @@ def fight_movement_maximum_distance_inches(
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
     resolved_kind = _fight_movement_proposal_kind(proposal_kind)
     maximum_distance = _maximum_distance_for_proposal_kind(resolved_kind)
+    required_step = (
+        FightPhaseStepKind.PILE_IN
+        if resolved_kind is ProposalKind.PILE_IN
+        else FightPhaseStepKind.CONSOLIDATE
+    )
+    fight_state = state.fight_phase_state
+    # Extra distance is confined to its matching step (Fight phase FAQ 11).
+    # An Overrun Pile In is still in the Fight step, not the Pile In step.
+    if (
+        state.current_battle_phase is not BattlePhase.FIGHT
+        or fight_state is None
+        or fight_state.current_step is not required_step
+    ):
+        return maximum_distance
     for effect in state.persisting_effects:
         if requested_unit_id not in effect.target_unit_instance_ids:
             continue

@@ -2222,6 +2222,96 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order107-fight-distance-window": {
+      "paths": [
+        "src/warhammer40k_core/engine/fight_resolution.py"
+      ],
+      "owners": [
+        "@module",
+        "fight_movement_maximum_distance_inches"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order107-contract-publication": {
+      "paths": [
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order107-client-regressions": {
+      "paths": [
+        "ci/test_shards/durations.json",
+        "ci/test_shards/shard-1.txt",
+        "ci/test_shards/shard-10.txt",
+        "ci/test_shards/shard-11.txt",
+        "ci/test_shards/shard-12.txt",
+        "ci/test_shards/shard-2.txt",
+        "ci/test_shards/shard-3.txt",
+        "ci/test_shards/shard-4.txt",
+        "ci/test_shards/shard-5.txt",
+        "ci/test_shards/shard-6.txt",
+        "ci/test_shards/shard-7.txt",
+        "ci/test_shards/shard-8.txt",
+        "ci/test_shards/shard-9.txt",
+        "tests/code_quality/test_order97_inventory.py",
+        "tests/fight_distance_helpers.py",
+        "tests/unit/test_order107_fight_distance_window.py",
+        "tests/unit/test_order97_secondary_clause_evidence.py",
+        "tests/unit/test_phase15d_fight_resolution.py",
+        "tests/unit/test_phase17g_aeldari_army_rule.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_move",
+        "_overrun",
+        "_restore",
+        "_session",
+        "set_fight_distance_step",
+        "test_aeldari_sudden_strike_fight_movement_distance_uses_lifecycle_effect",
+        "test_extra_distance_requires_matching_phase_and_step",
+        "test_matching_pile_in_step_keeps_extra_distance_and_historical_restore",
+        "test_order97_extra_fight_distance_preserves_target_range",
+        "test_original_assertions_remain_exact_and_fail_closed",
+        "test_overrun_rejects_extra_distance_then_restores_retries_and_replays",
+        "test_overrun_request_uses_core_distance",
+        "test_phase15d_attached_no_move_is_atomic_and_distance_effect_is_lineage_aware",
+        "test_phase15d_fight_movement_no_move_and_source_linked_distance_effects"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order107-historical-evidence": {
+      "paths": [
+        "data/source_audits/order107/baseline/tests/unit/test_order97_secondary_clause_evidence.py.txt",
+        "data/source_audits/order107/baseline/tests/unit/test_phase15d_fight_resolution.py.txt",
+        "data/source_audits/order107/historical-inputs.json",
+        "tools/core_rules_order97_history.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "historical_evidence_path"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

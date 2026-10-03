@@ -5,7 +5,6 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
-from tests.fight_distance_helpers import set_fight_distance_step
 from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.unit_keyword_helpers import with_unit_keywords
 
@@ -18,7 +17,6 @@ from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     ConsolidationModeKind,
-    FightPhaseStepKind,
     MovementMode,
     RulesetDescriptor,
     SetupStepKind,
@@ -5750,7 +5748,6 @@ def test_phase15d_attached_no_move_is_atomic_and_distance_effect_is_lineage_awar
         ).displacements
         == ()
     )
-    set_fight_distance_step(state, policy=ruleset.fight_policy, step=FightPhaseStepKind.PILE_IN)
     assert (
         rules_unit_fight_movement_maximum_distance_inches(
             state=state,
@@ -6199,7 +6196,6 @@ def test_phase15d_fight_movement_no_move_and_source_linked_distance_effects() ->
         )
         == ()
     )
-    set_fight_distance_step(state, policy=ruleset.fight_policy, step=FightPhaseStepKind.PILE_IN)
     assert (
         fight_movement_maximum_distance_inches(
             state=state,
@@ -6272,7 +6268,6 @@ def test_phase15d_fight_movement_no_move_and_source_linked_distance_effects() ->
         )
         == 6.0
     )
-    set_fight_distance_step(state, policy=ruleset.fight_policy, step=FightPhaseStepKind.CONSOLIDATE)
     assert (
         fight_movement_maximum_distance_inches(
             state=state,
@@ -6302,9 +6297,6 @@ def test_phase15d_fight_movement_no_move_and_source_linked_distance_effects() ->
                 "consolidate_distance_inches": 5.0,
             },
         )
-    )
-    set_fight_distance_step(
-        drift_state, policy=ruleset.fight_policy, step=FightPhaseStepKind.PILE_IN
     )
     with pytest.raises(GameLifecycleError, match="movement distance source_id drift"):
         fight_movement_maximum_distance_inches(
