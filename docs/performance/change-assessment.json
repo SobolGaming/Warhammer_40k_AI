@@ -1,216 +1,216 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "eebdaa2ccadef14b6115aea7caea3cb1c89eb564",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7c1defd9a60e7ed882f0f2872d7e14e9f2fd5b9f29c960902a465464dffff61b",
-  "operation_map_sha256": "f007872329cb2172ee516c109972f3f4c4ed5f8ff17aef5a5851198d46bb9d5a",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bd68a82fd062a078bca5234baca92f4859fc4187b15a2cb17054dbf16eceab7f",
+  "operation_map_sha256": "4f72a9565f3c1e6f3395c8c47bf9c4039e84eecb2cba025a4e804ec1552e896c",
   "changes": {
     "ci/test_shards/durations.json": {
       "before_sha256": "ffd11b5979c5df49ee2f17f990e9cc9e68149497d4c4616a7b943297ec05149c",
-      "after_sha256": "958a058125135d7b26d377a3834db0f137899a6ac142f454d5dc3191776b7fd3",
+      "after_sha256": "bf14de096129ef08146d48ff25e276a416238697e5e6850e2681cff6139a684e",
       "owners": {
         "@document": {
           "before": "ffd11b5979c5df49ee2f17f990e9cc9e68149497d4c4616a7b943297ec05149c",
-          "after": "958a058125135d7b26d377a3834db0f137899a6ac142f454d5dc3191776b7fd3"
+          "after": "bf14de096129ef08146d48ff25e276a416238697e5e6850e2681cff6139a684e"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "76fb04ae517e00ecfb159fc51f88275a250f54536e6eadf57146a33f52b52699",
-      "after_sha256": "7cae4d68035d8991a3d69ecd3e39f1532546fa8f82570374bee8c3112981be2f",
+      "after_sha256": "34de73356bf39dca893e1502a926e17986ee381cb5160df8388090665d528573",
       "owners": {
         "@document": {
           "before": "76fb04ae517e00ecfb159fc51f88275a250f54536e6eadf57146a33f52b52699",
-          "after": "7cae4d68035d8991a3d69ecd3e39f1532546fa8f82570374bee8c3112981be2f"
+          "after": "34de73356bf39dca893e1502a926e17986ee381cb5160df8388090665d528573"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "08976a76e5d8ee2d081a009acebacd254ad4d80c91f46d483e0195df11e0e839",
-      "after_sha256": "2f62c2ec8fe1dbe09f40dfdbab14ac8a4c4f75d703911c85e336351d526818e3",
+      "after_sha256": "54f6437e9ca5924246d4eec25893c0f11cd2c2c7bdf3b5bbc95363d65e5ebf2a",
       "owners": {
         "@document": {
           "before": "08976a76e5d8ee2d081a009acebacd254ad4d80c91f46d483e0195df11e0e839",
-          "after": "2f62c2ec8fe1dbe09f40dfdbab14ac8a4c4f75d703911c85e336351d526818e3"
+          "after": "54f6437e9ca5924246d4eec25893c0f11cd2c2c7bdf3b5bbc95363d65e5ebf2a"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "61777d17da89c31c5fe6064bb3c9905891c49220529d93c90efd8a8d8f560fee",
-      "after_sha256": "18f53d4521dc05d33d6bae9aa5987bafc9d46e4dcc29add900bd0f1d20e37738",
+      "after_sha256": "cec52bfbd17f283c8e13f68ad2b46c32bef175c508948dce29891b99e412984e",
       "owners": {
         "@document": {
           "before": "61777d17da89c31c5fe6064bb3c9905891c49220529d93c90efd8a8d8f560fee",
-          "after": "18f53d4521dc05d33d6bae9aa5987bafc9d46e4dcc29add900bd0f1d20e37738"
+          "after": "cec52bfbd17f283c8e13f68ad2b46c32bef175c508948dce29891b99e412984e"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "948b861a24d369f55fcba38c8186ea292171d3b195197df0fa705820096c7d0f",
-      "after_sha256": "34f82b90b162bfce595692010d56f3d200a63b9765a1195b65d7c84c970ba714",
+      "after_sha256": "8bd42b5d6bf561117d71e3975533e3103a94a7e86ea24ccfee21085fea8b3570",
       "owners": {
         "@document": {
           "before": "948b861a24d369f55fcba38c8186ea292171d3b195197df0fa705820096c7d0f",
-          "after": "34f82b90b162bfce595692010d56f3d200a63b9765a1195b65d7c84c970ba714"
+          "after": "8bd42b5d6bf561117d71e3975533e3103a94a7e86ea24ccfee21085fea8b3570"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "ea71856c6e95e230c78dd476ce0754fcf6bc83e1c082af30e3351347096c0e7e",
-      "after_sha256": "af784c4ac3f0f4f065a5ebd543e6a704254b51e83a5bcde3b8fcae75aa794784",
+      "after_sha256": "0d2c64a59fcac81400d14e8db54da81d97c641ef8347177fe67f004963daaee9",
       "owners": {
         "@document": {
           "before": "ea71856c6e95e230c78dd476ce0754fcf6bc83e1c082af30e3351347096c0e7e",
-          "after": "af784c4ac3f0f4f065a5ebd543e6a704254b51e83a5bcde3b8fcae75aa794784"
+          "after": "0d2c64a59fcac81400d14e8db54da81d97c641ef8347177fe67f004963daaee9"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "b0cceeeae99d1b0a418abef239c688691766a238b762ba73f36b8b67b00bacab",
-      "after_sha256": "bc939a4fbebbd2eb51af485def47d0695fc218c9441da88ea9886e9318f213b7",
+      "after_sha256": "2bfd70df359643f0b198b293ccf407724672ae9e0f1fc28c0b77d972920ab82c",
       "owners": {
         "@document": {
           "before": "b0cceeeae99d1b0a418abef239c688691766a238b762ba73f36b8b67b00bacab",
-          "after": "bc939a4fbebbd2eb51af485def47d0695fc218c9441da88ea9886e9318f213b7"
+          "after": "2bfd70df359643f0b198b293ccf407724672ae9e0f1fc28c0b77d972920ab82c"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "7e70c271012311f08d1cfe28a55126c80ee9f5e68449c26c18999af3c8d468e7",
-      "after_sha256": "6afc27b0f5808008e647cbc7c9214a199626f87440c18730836c8952fe91152f",
+      "after_sha256": "5926d6daf2c07561d799483b1ffded728cd6913dd358f0cf95136615ded5af7a",
       "owners": {
         "@document": {
           "before": "7e70c271012311f08d1cfe28a55126c80ee9f5e68449c26c18999af3c8d468e7",
-          "after": "6afc27b0f5808008e647cbc7c9214a199626f87440c18730836c8952fe91152f"
+          "after": "5926d6daf2c07561d799483b1ffded728cd6913dd358f0cf95136615ded5af7a"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "96f856f1fbef62e63999c96150a65c95b843cb50e6fc43b9a7fab6203918be44",
-      "after_sha256": "53e9a223160db5402de7160541badf64beb35d9bf60fd71e4f7c61a8d2c89351",
+      "after_sha256": "03691817f85563faa0315ea6e62666ec5b31bbea1dd09311195ffbb26aa1231d",
       "owners": {
         "@document": {
           "before": "96f856f1fbef62e63999c96150a65c95b843cb50e6fc43b9a7fab6203918be44",
-          "after": "53e9a223160db5402de7160541badf64beb35d9bf60fd71e4f7c61a8d2c89351"
+          "after": "03691817f85563faa0315ea6e62666ec5b31bbea1dd09311195ffbb26aa1231d"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "6f35ce44dc334714f44c4a8acb8be86e1a247382049af05413cc3f465cf82747",
-      "after_sha256": "92a854282ce52c78e39a0ddb139eda0bb42821262cca0c9330cc44e08264aba2",
+      "after_sha256": "de4c7c306709b00531c752427a4b039f4aa86c42f94b0b74ee5656fb673d72ea",
       "owners": {
         "@document": {
           "before": "6f35ce44dc334714f44c4a8acb8be86e1a247382049af05413cc3f465cf82747",
-          "after": "92a854282ce52c78e39a0ddb139eda0bb42821262cca0c9330cc44e08264aba2"
+          "after": "de4c7c306709b00531c752427a4b039f4aa86c42f94b0b74ee5656fb673d72ea"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "ee23faa16f2579611d648e684f67b5958391494fb25fa1e8105a19f484028754",
-      "after_sha256": "f55a9593673848c0e1e89188e01b11fef1bfacbf177af99228a21b2f5dc0bdd8",
+      "after_sha256": "75603c523fcf19959563275d0b16a5372f099cd274be6c24e182fa45d04ccfd2",
       "owners": {
         "@document": {
           "before": "ee23faa16f2579611d648e684f67b5958391494fb25fa1e8105a19f484028754",
-          "after": "f55a9593673848c0e1e89188e01b11fef1bfacbf177af99228a21b2f5dc0bdd8"
+          "after": "75603c523fcf19959563275d0b16a5372f099cd274be6c24e182fa45d04ccfd2"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "758cb486d39f7cdb43d8eec1d158fd838768a663769db40a1aee61e0e6d52f4e",
-      "after_sha256": "9e04c816e67f6e99a1dde997d11e29e79772e0867d574ecf7cd240f07f4cd698",
+      "after_sha256": "01c10b381f4c1c746803473ba3b4ca68b2ee3dee09c6dd551fafd653c97adc6b",
       "owners": {
         "@document": {
           "before": "758cb486d39f7cdb43d8eec1d158fd838768a663769db40a1aee61e0e6d52f4e",
-          "after": "9e04c816e67f6e99a1dde997d11e29e79772e0867d574ecf7cd240f07f4cd698"
+          "after": "01c10b381f4c1c746803473ba3b4ca68b2ee3dee09c6dd551fafd653c97adc6b"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "f9cd93017c23464d14fa10af1298f124aa57a3de075c8d6c7841a3d56bf94677",
-      "after_sha256": "cb623072aa622c2845308ea76a797bc6d0796c089fcafed3dac630185f6c7b87",
+      "after_sha256": "2afc7850c92e8ed49d68bdbee41b516865950edbe97579953bd3ffe4b8c6f72a",
       "owners": {
         "@document": {
           "before": "f9cd93017c23464d14fa10af1298f124aa57a3de075c8d6c7841a3d56bf94677",
-          "after": "cb623072aa622c2845308ea76a797bc6d0796c089fcafed3dac630185f6c7b87"
+          "after": "2afc7850c92e8ed49d68bdbee41b516865950edbe97579953bd3ffe4b8c6f72a"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "bf21ad4885ec75a42fcd9d0eeedd20b1f12ea6cf1bea5a940e4ecdec4823b9d4",
-      "after_sha256": "665c6ca7e3834c9b4612c257cced3edb9c30e0bc90f856da039734ba3f83c41e",
+      "after_sha256": "8a3ae962b1c0b474cc7b0f7f8bd1c2da80dcd3235f278ef1f844096670cf6e4a",
       "owners": {
         "@document": {
           "before": "bf21ad4885ec75a42fcd9d0eeedd20b1f12ea6cf1bea5a940e4ecdec4823b9d4",
-          "after": "665c6ca7e3834c9b4612c257cced3edb9c30e0bc90f856da039734ba3f83c41e"
+          "after": "8a3ae962b1c0b474cc7b0f7f8bd1c2da80dcd3235f278ef1f844096670cf6e4a"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "e55ecb918493a00763269b6b570730654f51b7691e05749fac5d322b9dae12b2",
-      "after_sha256": "e2662c76ca7c014cb0aff1670b1a028915acdc27ae09ac3a2ab5d4a7a3a7f3ae",
+      "after_sha256": "6ec7707d7a8e50186dbe2c998c5df338528d51f0fef26d79482b6b024c6ed2a4",
       "owners": {
         "@document": {
           "before": "e55ecb918493a00763269b6b570730654f51b7691e05749fac5d322b9dae12b2",
-          "after": "e2662c76ca7c014cb0aff1670b1a028915acdc27ae09ac3a2ab5d4a7a3a7f3ae"
+          "after": "6ec7707d7a8e50186dbe2c998c5df338528d51f0fef26d79482b6b024c6ed2a4"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "26909dbbc3fae97a81f29af0adf88cff58782eb3abbfc409f92f24505961635c",
-      "after_sha256": "1f40af5d266e171c83f188b94a2cae73748a6c2b916c1f08d4e3f91824f6fb38",
+      "after_sha256": "e8d2d414009006c74c390f1a7e67b838dcc0ed7af035cc8e00bc4dd183645955",
       "owners": {
         "@document": {
           "before": "26909dbbc3fae97a81f29af0adf88cff58782eb3abbfc409f92f24505961635c",
-          "after": "1f40af5d266e171c83f188b94a2cae73748a6c2b916c1f08d4e3f91824f6fb38"
+          "after": "e8d2d414009006c74c390f1a7e67b838dcc0ed7af035cc8e00bc4dd183645955"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "1433693756ba69a76aac1e8d58748fb5d96a00ef05b90fb55674052444fe580c",
-      "after_sha256": "4a90d35d7e8c02e994bc13877ad0c1d96831d8c8d5a7423dbc90d2a7206fcc64",
+      "after_sha256": "5eca4460ac14063809a067920fced9537e9031e27a48384ff993a6eca2e587e8",
       "owners": {
         "@document": {
           "before": "1433693756ba69a76aac1e8d58748fb5d96a00ef05b90fb55674052444fe580c",
-          "after": "4a90d35d7e8c02e994bc13877ad0c1d96831d8c8d5a7423dbc90d2a7206fcc64"
+          "after": "5eca4460ac14063809a067920fced9537e9031e27a48384ff993a6eca2e587e8"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "f3b45427dd7c45fb2bc5b9ebb4c2c6a608b185f0fbe222be3bd754fd319745f4",
-      "after_sha256": "b6a9d3300ab3ae248988e806eccbac8ce44a5fc9192689d6f23e20a7533ea3df",
+      "after_sha256": "70d4a1c2fc0835898ecf0e3d941cbc74376470a7cbf0cf868399260f919e7753",
       "owners": {
         "@document": {
           "before": "f3b45427dd7c45fb2bc5b9ebb4c2c6a608b185f0fbe222be3bd754fd319745f4",
-          "after": "b6a9d3300ab3ae248988e806eccbac8ce44a5fc9192689d6f23e20a7533ea3df"
+          "after": "70d4a1c2fc0835898ecf0e3d941cbc74376470a7cbf0cf868399260f919e7753"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "92b0da7c1ce1f65e78e34ad2c01f91b166f106e86f872aebb73cf539967df0aa",
-      "after_sha256": "a2f55715e1447935990580d1208033729e070393dbf1c16dfb214bb423cd7982",
+      "after_sha256": "ea614bc3983497053c37786a0c1d375a554645c2fb7ff8153298309fa8c6d4ea",
       "owners": {
         "@document": {
           "before": "92b0da7c1ce1f65e78e34ad2c01f91b166f106e86f872aebb73cf539967df0aa",
-          "after": "a2f55715e1447935990580d1208033729e070393dbf1c16dfb214bb423cd7982"
+          "after": "ea614bc3983497053c37786a0c1d375a554645c2fb7ff8153298309fa8c6d4ea"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "1d0fb57c188af1fcec8cbb5e053708326163e64531d7836ad054178f534712af",
-      "after_sha256": "bfc340c8cd0712fbbff2919c9446106dfc86f114fdc513ce74b05a3a8c4dd4e8",
+      "after_sha256": "687a286f7111ed2b4a4a6d5f13159f21a362e5e26946bf3908dca2be23e559e3",
       "owners": {
         "@document": {
           "before": "1d0fb57c188af1fcec8cbb5e053708326163e64531d7836ad054178f534712af",
-          "after": "bfc340c8cd0712fbbff2919c9446106dfc86f114fdc513ce74b05a3a8c4dd4e8"
+          "after": "687a286f7111ed2b4a4a6d5f13159f21a362e5e26946bf3908dca2be23e559e3"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "28d6f91e6733795fbf98584461a36bdbcd4476ef7a8db3d34c2aebbf678bd451",
-      "after_sha256": "2108889f3348090a2885e3afda14a515586f2c2b27f2f510334cdc449d6b342b",
+      "after_sha256": "e2a7a6b9c84f4667df456641a31c1ad0e75a1dc29abba25f133f8c7c8476f9bc",
       "owners": {
         "@document": {
           "before": "28d6f91e6733795fbf98584461a36bdbcd4476ef7a8db3d34c2aebbf678bd451",
-          "after": "2108889f3348090a2885e3afda14a515586f2c2b27f2f510334cdc449d6b342b"
+          "after": "e2a7a6b9c84f4667df456641a31c1ad0e75a1dc29abba25f133f8c7c8476f9bc"
         }
       }
     },
@@ -246,21 +246,21 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "78e2e114692aff32b9c8c0d9b6c3c47e7727ed8904e61e8d123d1a96f059836c",
-      "after_sha256": "8888768b2d078c2cb75f01a8fe4c70f6c8569623e361e2ac516f1ebfff3013dd",
+      "after_sha256": "6f054ba6fcb81af59ec4edf62017490acf1ffa58121ea54c8bc7d65ab00d329f",
       "owners": {
         "@document": {
           "before": "78e2e114692aff32b9c8c0d9b6c3c47e7727ed8904e61e8d123d1a96f059836c",
-          "after": "8888768b2d078c2cb75f01a8fe4c70f6c8569623e361e2ac516f1ebfff3013dd"
+          "after": "6f054ba6fcb81af59ec4edf62017490acf1ffa58121ea54c8bc7d65ab00d329f"
         }
       }
     },
     "docs/ORDER_108_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "a853874b4e1b6a2054a9dacec7d916fe50de892aee5bf7ab4b69dee490c99fc4",
+      "after_sha256": "c0ca06145499d3fb37d8d87201377d2bff56b36d680df67804463d05925dff58",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a853874b4e1b6a2054a9dacec7d916fe50de892aee5bf7ab4b69dee490c99fc4"
+          "after": "c0ca06145499d3fb37d8d87201377d2bff56b36d680df67804463d05925dff58"
         }
       }
     },
@@ -276,31 +276,31 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "73b89625aad3e1a62007a2e3232fa178b1b830e21bd8ddec0e1d2d113d79ed79",
-      "after_sha256": "c56bd86fa24c8604efbbe62fb6db61eb9af44b1e43b7dbdc503e0642ec35136b",
+      "after_sha256": "c7e3e42df0ae8f0ddb3e07c6e13deff08d81ac873b789c84260c9ea4bc6b3fe1",
       "owners": {
         "@document": {
           "before": "73b89625aad3e1a62007a2e3232fa178b1b830e21bd8ddec0e1d2d113d79ed79",
-          "after": "c56bd86fa24c8604efbbe62fb6db61eb9af44b1e43b7dbdc503e0642ec35136b"
+          "after": "c7e3e42df0ae8f0ddb3e07c6e13deff08d81ac873b789c84260c9ea4bc6b3fe1"
         }
       }
     },
     "docs/performance/policy-v3/order108-rule-semantics.json": {
       "before_sha256": null,
-      "after_sha256": "185209f5b23e197dee754f567393f2b02fd4f5b061890064dcedf2fe64e8b227",
+      "after_sha256": "32a89016d24c30ac0edc3469fa9a2a3316db6986f78750927935382449ccb5b5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "185209f5b23e197dee754f567393f2b02fd4f5b061890064dcedf2fe64e8b227"
+          "after": "32a89016d24c30ac0edc3469fa9a2a3316db6986f78750927935382449ccb5b5"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "aea46c8e15891b2f9229300da96cd3e772c2e95f8cb3c9a4a6405984f3acdcae",
-      "after_sha256": "d09912f9d2f4faef39bb82f818cf2d7f0bef990594c9cb2b2d177d8d4ffc4291",
+      "after_sha256": "9d192257359810b842c621d73e3d0d774a85777fe3e8e1ced4ca8d9bc6f00e16",
       "owners": {
         "@document": {
           "before": "aea46c8e15891b2f9229300da96cd3e772c2e95f8cb3c9a4a6405984f3acdcae",
-          "after": "d09912f9d2f4faef39bb82f818cf2d7f0bef990594c9cb2b2d177d8d4ffc4291"
+          "after": "9d192257359810b842c621d73e3d0d774a85777fe3e8e1ced4ca8d9bc6f00e16"
         }
       }
     },
@@ -370,7 +370,7 @@
     },
     "src/warhammer40k_core/geometry/terrain.py": {
       "before_sha256": "7fb2df7511b51aed1322fbfe277248d83b497615ac0a173cc16af3367dcc4338",
-      "after_sha256": "ab4a944671c715c6ff4536f654b7041b54e0a84bdb6c86089f23c02bd80ec688",
+      "after_sha256": "0c81c16e7b496028d87243d28684d8e53b1d8e7d832bcf520241e5346c0aa31a",
       "owners": {
         "@module": {
           "before": "d870709b67b92c9a3173f9d5265a8f8661dbf547a3b8fc9e94057be9c3ebc862",
@@ -378,7 +378,7 @@
         },
         "TerrainFeatureDefinition.solid_opening_volumes": {
           "before": null,
-          "after": "a3ca132e911ac4507c0d534c61a7f38f15116e39eacc49ae6feb90f3cd50a492"
+          "after": "2aa79aabc5530852c5cbd4d990d8ef4afe0a05b40993049d4adb329be5f4eba5"
         },
         "TerrainFeatureDefinition.visibility_volumes": {
           "before": null,
@@ -402,37 +402,49 @@
     },
     "src/warhammer40k_core/geometry/terrain_solid.py": {
       "before_sha256": null,
-      "after_sha256": "5551e61b726f4b53c6f19a148d442de142a3126cc1e72d3aaa35ebad7d350451",
+      "after_sha256": "ceb03ad6f5381c137cb1cdc390e1bef5c46b8547f94363ce52d610383254132d",
       "owners": {
         "@module": {
           "before": null,
-          "after": "3fc515fa4a413fbeaf57eae24aaf22c3767bed9d453bec4290fbadb0ee07f635"
+          "after": "bdb06a7a590ed8b361dbff6998c74992b048d2c2ca323238eb066911e0f49524"
         },
         "_enclosed_cells": {
           "before": null,
           "after": "c0e47029888db0406b896fd63b04a5f193d3c36e248df7244d7c9263f1a3138a"
         },
+        "_floor_depth_boundaries": {
+          "before": null,
+          "after": "818c665bdd9cda7f3bdc2b5bd51129cd9bc14e38dbb727b0c9b376f17dde28d2"
+        },
+        "_floor_strip": {
+          "before": null,
+          "after": "fe9c0e6b4f96a402cbd6b5d627b9abb6b6651604b541f1ed54c03650225273fc"
+        },
         "solid_endpoint_intersection": {
           "before": null,
-          "after": "e8f9f113d5407feb9a59790e1cd3cc8cc46e563f8f2683faa9788103ad8f7cb9"
+          "after": "eb480c4f235f91923d0a5ec36a9c549708914bef7193f52ae12aa116af5c971a"
         },
         "solid_opening_volumes": {
           "before": null,
-          "after": "8b4df7bc13322f2b86c78cebbfb2e31f0c4f81c0895e9ace42cdb0d84217c3a0"
+          "after": "fd1cf5d7cfc7ca777f825b92204a6090091516e7f2e4d7313f0b04f63589e31f"
         }
       }
     },
     "src/warhammer40k_core/geometry/terrain_transit.py": {
       "before_sha256": null,
-      "after_sha256": "74a34cf68aa79011281f6eb6adec53f465e4d7087e0fa0e107ada2fc12e745fc",
+      "after_sha256": "3258e0a0952f89c3fb430ba518e006b9811460ba3321d65076b2f8dd2bf59357",
       "owners": {
         "@module": {
           "before": null,
-          "after": "a556398e56bf67d4d4760290f17dbcd9d466251f7cc3ec9932acafbeed6b413b"
+          "after": "ecfc564b6c16181be7a0103642ee9d943f0556b00a760c10814b6d2f6014d832"
+        },
+        "_contact_at_pose": {
+          "before": null,
+          "after": "0f90d90e5d9f9679c011783d630a5697b68102b295d746e761ff9363f406efcb"
         },
         "_crosses_floor": {
           "before": null,
-          "after": "47262f1dde03341d233ce9ea3b9570517c5046b92a96a733373eda4f36365d10"
+          "after": "2d22ddee22c0033a783ce5f8c3148e39088dc0397733e2dc14d30cd25c5f957d"
         },
         "_fixed_facing": {
           "before": null,
@@ -442,13 +454,25 @@
           "before": null,
           "after": "de25e339713e1895a1beedb0b2e4b87a6e4a37387dfdc425c18c5ebc0e3b5d84"
         },
+        "_oval_face_contact": {
+          "before": null,
+          "after": "d22a14673c4fe31e0df66300980ac387eaba6f42e9b8d86aff2801225eb5c610"
+        },
         "_rotating_floor_crossing": {
           "before": null,
-          "after": "ba35330be265a2da8774769766c582e87729a9a9d6f6fc752a43eb0dad2f879f"
+          "after": "7a8f7c5099981d06469026c1cca7997235614eb3d4e8a85dc7481bb656f3519f"
+        },
+        "_rotation_clear_of_floor": {
+          "before": null,
+          "after": "47471c4bc26f1183fd99a80941d77b4c9d3c86611295920a490baa30c44a146e"
+        },
+        "_rotation_contact_certificate": {
+          "before": null,
+          "after": "446fb48fb0ae6a400b0730907747a13c4e640b5bc87c4c99cad6c9b23cc68e00"
         },
         "_segment_contact": {
           "before": null,
-          "after": "2256ae0a20ecf996f58ac08f68641a92e60d868c154c1c411e3a3de969ae61e8"
+          "after": "bc9415ce46ed1399d5790a445d37838d9a5170ec2daaf8276ced6af2cb7e8178"
         },
         "_terrain_pose": {
           "before": null,
@@ -506,25 +530,25 @@
     },
     "tests/order108_terrain_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "dad6c8c9b13c75bfc935e2a4105403c13e9912d23d0307101ae134e49d690194",
+      "after_sha256": "8cdecf6b7bb55cf199ce5843f8a742f428f50e2709ab8d10d682300d11ae038e",
       "owners": {
         "@module": {
           "before": null,
-          "after": "8db38998a9b0c971c09c2334f29ed7b82768ad10a6f496120ddefae44f381d96"
+          "after": "3ee9c571a2b8cf9e4df146fd6d3f8dcfdb22da0a6077223a304070be0438d3d5"
         },
         "terrain_session": {
           "before": null,
-          "after": "68b42e3f4149e9f7253cbada2dfe74be38c1fc4ad7c14b5f00c64c2854a976f1"
+          "after": "46911c2c4674dda01bc496a687e84c971b673535109666ed08bff397d3d1d981"
         }
       }
     },
     "tests/unit/test_order108_terrain_semantics.py": {
       "before_sha256": null,
-      "after_sha256": "2cdcba523ffeebc8afce855a032c941fd9db4f6e476e5e3d40614af23d20ded5",
+      "after_sha256": "c05268539da2b448b65c030d0081e26ac7057d480d5e1804e6a61f019c8ecae2",
       "owners": {
         "@module": {
           "before": null,
-          "after": "c03e318d2f9ae9998625bc6f2bfddfa97c126baf25698e2b37b87b21d55acdfc"
+          "after": "1db8f39d9da439b88388fd3c59cb124946eae0a522b523c30e5cdac00b04d890"
         },
         "_context": {
           "before": null,
@@ -546,6 +570,10 @@
           "before": null,
           "after": "33e31ca7eab003509c0bfa9c084c251ae0c22d54b88429e8210c7481adb77a33"
         },
+        "test_facade_exact_contact_rotation_accepts_and_persists": {
+          "before": null,
+          "after": "f90f12bfa832163c340de92bc388899859310c729fbdbc3b3f3513d04988c057"
+        },
         "test_facade_terrain_rejection_retry_pending_completed_restore_and_replay": {
           "before": null,
           "after": "50323531ab9b6ab59822ceed7aa66512db9dda204056f63694a61dfce1d9795f"
@@ -562,13 +590,37 @@
           "before": null,
           "after": "66544eb62b902bd4b17d782363dbc5888113dd65850845b8af9cfc6a7ddfc6b0"
         },
+        "test_oval_rotating_contact_uses_continuous_support_minimum": {
+          "before": null,
+          "after": "60fabab0a9407ee6cc8fd3cb050a988b48ff4ebceeff69fe55e43c86cfc70ddf"
+        },
+        "test_physical_floor_can_close_solid_window_without_sealing_open_top": {
+          "before": null,
+          "after": "557a9117a4792688b23bc7d1bf0d403c61f4dbfd3a996775364b417f9224d063"
+        },
+        "test_rotating_climb_exact_contact_boundary_is_continuously_decidable": {
+          "before": null,
+          "after": "5d167d189b7cd09fa4d3e9e809425ad6fc60e3e85e522a7ddcb3cff39e5918a3"
+        },
         "test_rotating_contact_accepts_clearance_and_rejects_lost_contact": {
           "before": null,
           "after": "95f9634b818b4fd1189c9a7506386628a015d15c3b5d1aa14d449668b3316a8a"
         },
+        "test_rotating_floor_clearance_retains_tangent_endpoint": {
+          "before": null,
+          "after": "42bf4b162e06b70914e0c6c605b1e8cae5dc99da48ce4e50dc898ddd7c14f9bc"
+        },
+        "test_rotating_floor_crossing_proves_actual_shape_clearance": {
+          "before": null,
+          "after": "e18120e8fa045bc9a4b3f63d28ced5ae95eeed8cc7ebc8ad003abc69f1b765fd"
+        },
         "test_shared_setup_endpoint_rejects_solid_window": {
           "before": null,
           "after": "b76f18edba2a1efff2aa839f3891f5898a6538ed139980cbdedd60a0712c9f3f"
+        },
+        "test_solid_ceiling_does_not_fill_space_between_parallel_walls": {
+          "before": null,
+          "after": "57dbc7d2d54a596f1d266ce3ee7ac21bfeba04622204bdc8967b4893cfabbc9a"
         },
         "test_solid_door_does_not_become_a_physical_transit_blocker": {
           "before": null,

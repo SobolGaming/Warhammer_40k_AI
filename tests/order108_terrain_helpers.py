@@ -11,6 +11,7 @@ from tests.phase13b_shooting_declaration_helpers import (
     _scenario_with_unit_pose,
 )
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.core.datasheet import BaseSizeDefinition
 from warhammer40k_core.engine.event_log import EventLog
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.phase import BattlePhase
@@ -19,7 +20,31 @@ from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
 
-def terrain_session(feature: TerrainFeatureDefinition) -> LocalGameSession:
+def terrain_session(
+    feature: TerrainFeatureDefinition, *, rotating_rectangle: bool = False
+) -> LocalGameSession:
+    catalog = _compact_intercessor_catalog(_canonical_catalog())
+    if rotating_rectangle:
+        catalog = replace(
+            catalog,
+            datasheets=tuple(
+                replace(
+                    sheet,
+                    model_profiles=tuple(
+                        replace(
+                            profile,
+                            base_size=BaseSizeDefinition.rectangular(
+                                length_mm=6.35, width_mm=3.175
+                            ),
+                        )
+                        for profile in sheet.model_profiles
+                    ),
+                )
+                if sheet.datasheet_id == "core-intercessor-like-infantry"
+                else sheet
+                for sheet in catalog.datasheets
+            ),
+        )
     config = _config(
         game_id="order108-terrain",
         alpha_unit_ids=("mover",),
@@ -27,7 +52,7 @@ def terrain_session(feature: TerrainFeatureDefinition) -> LocalGameSession:
         alpha_unit_specs=(("mover", "core-intercessor-like-infantry", "core-intercessor-like", 1),),
         enemy_datasheet=("core-intercessor-like-infantry", "core-intercessor-like", 1),
         enemy_unit_specs=(("enemy", "core-intercessor-like-infantry", "core-intercessor-like", 1),),
-        catalog=_compact_intercessor_catalog(_canonical_catalog()),
+        catalog=catalog,
     )
     assert config.mission_setup is not None
     config = replace(
@@ -48,7 +73,11 @@ def terrain_session(feature: TerrainFeatureDefinition) -> LocalGameSession:
                 unit=unit,
                 army_id=army.army_id,
                 player_id=army.player_id,
-                poses=(Pose.at(10, 20) if army.player_id == "player-a" else Pose.at(30, 20),),
+                poses=(
+                    Pose.at(10, 20, facing_degrees=90 if rotating_rectangle else 0)
+                    if army.player_id == "player-a"
+                    else Pose.at(30, 20),
+                ),
             )
     lifecycle = GameLifecycle()
     lifecycle.start(config)

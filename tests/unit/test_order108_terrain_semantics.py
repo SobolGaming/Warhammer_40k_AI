@@ -34,7 +34,7 @@ from warhammer40k_core.engine.movement_proposals import (
     MovementProposalRequest,
 )
 from warhammer40k_core.engine.phase import LifecycleStatusKind
-from warhammer40k_core.geometry.base import CircularBase, RectangularBase
+from warhammer40k_core.geometry.base import CircularBase, OvalBase, RectangularBase
 from warhammer40k_core.geometry.model_body import ModelBodyPart
 from warhammer40k_core.geometry.pathing import PathWitness, TerrainPathLegalityContext
 from warhammer40k_core.geometry.pose import Pose
@@ -383,3 +383,213 @@ def test_exposed_logical_area_preserves_other_members_classification(other: str)
     assert (
         aggregate_logical_terrain_area_classification("group", (exposed, companion)).value == other
     )
+
+
+@pytest.mark.parametrize(
+    ("x", "first", "last", "valid"),
+    [
+        (0.4, 90, 0, True),
+        (0.35, 0, 45, True),
+        (0.35, 45, 0, True),
+        (0.35, 0, 180, False),
+        (0.349, 0, 45, False),
+    ],
+)
+@pytest.mark.parametrize("wall_angle", [0, 37, 90])
+@pytest.mark.parametrize("frame", [False, True])
+def test_rotating_climb_exact_contact_boundary_is_continuously_decidable(
+    x: float, first: float, last: float, valid: bool, wall_angle: float, frame: bool
+) -> None:
+    feature = enclosed_window_feature()
+    wall = feature.wall_volumes()[0]
+    radians = math.radians(wall_angle)
+    c, s = math.cos(radians), math.sin(radians)
+    wall = replace(
+        wall,
+        bottom_center=replace(
+            wall.bottom_center,
+            x=round(wall.bottom_center.x * c - wall.bottom_center.y * s, 12),
+            y=round(wall.bottom_center.x * s + wall.bottom_center.y * c, 12),
+        ),
+        rotation_degrees=wall_angle,
+    )
+    start = Pose.at(
+        round(x * c + 1.5 * s, 12), round(x * s - 1.5 * c, 12), facing_degrees=first + wall_angle
+    )
+    end = Pose.at(start.position.x, start.position.y, 0.5, facing_degrees=last + wall_angle)
+    model = Model(
+        "rectangle", start, RectangularBase(0.2, 0.1), ModelVolume(0.2), measures_every_part=frame
+    )
+    assert path_retains_climbing_contact(model, (start, end), (wall,)) is valid
+    if wall_angle == 0:
+        context = _context(
+            model, (start, end, replace(end, position=start.position)), feature, "INFANTRY"
+        )
+        assert context.validate().is_valid is valid
+        assert (
+            TerrainPathLegalityContext.from_payload(context.to_payload()).validate().is_valid
+            is valid
+        )
+
+
+def test_facade_exact_contact_rotation_accepts_and_persists() -> None:
+    feature = enclosed_window_feature()
+    wall = feature.walls[0]
+    feature = _feature_area(replace(feature, walls=()), 10.625, 20)
+    feature = replace(
+        feature,
+        walls=(
+            replace(
+                wall,
+                center_x_inches=10.625,
+                center_y_inches=20,
+                width_inches=0.125,
+                depth_inches=4,
+            ),
+        ),
+    )
+    session = terrain_session(feature, rotating_rectangle=True)
+    request = pending_request(session)
+    session.submit_option(
+        request_id=request.request_id, option_id="army-alpha:mover", result_id="unit"
+    )
+    request = pending_request(session)
+    session.submit_option(request_id=request.request_id, option_id="normal_move", result_id="move")
+    assert_persistence_viewers_replay(session)
+    session = LocalGameSession.from_persistence_payload(
+        json.loads(json.dumps(session.to_persistence_payload()))
+    )
+    request = pending_request(session)
+    proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    model = state.battlefield_state.unit_placement_by_id("army-alpha:mover").model_placements[0]
+    outcome = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="legal-boundary-climb",
+        payload=validate_json_value(
+            MovementProposalPayload(
+                proposal_request_id=request.request_id,
+                proposal_kind=proposal.proposal_kind,
+                unit_instance_id="army-alpha:mover",
+                movement_phase_action="normal_move",
+                movement_mode="normal",
+                witness=PathWitness.for_paths(
+                    (
+                        (
+                            model.model_instance_id,
+                            (model.pose, Pose.at(10, 20, 0.5), Pose.at(10, 20)),
+                        ),
+                    )
+                ),
+            ).to_payload()
+        ),
+    )
+    assert outcome.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert_persistence_viewers_replay(session)
+
+
+@pytest.mark.parametrize(
+    ("first", "last", "valid"), [(45, 0, True), (0, 45, True), (45, 135, False)]
+)
+def test_oval_rotating_contact_uses_continuous_support_minimum(
+    first: float, last: float, valid: bool
+) -> None:
+    support = math.sqrt(0.1**2 / 2 + 0.05**2 / 2)
+    start = Pose.at(0.95 - 0.5 - support + 1e-12, -1.5, facing_degrees=first)
+    end = Pose.at(start.position.x, start.position.y, 0.5, facing_degrees=last)
+    model = Model("oval", start, OvalBase(0.2, 0.1), ModelVolume(0.2))
+    assert (
+        path_retains_climbing_contact(model, (start, end), enclosed_window_feature().wall_volumes())
+        is valid
+    )
+
+
+@pytest.mark.parametrize("ceiling", [True, False])
+@pytest.mark.parametrize("width", [0.05, 0.1, 0.2])
+def test_physical_floor_can_close_solid_window_without_sealing_open_top(
+    ceiling: bool, width: float
+) -> None:
+    feature = enclosed_window_feature()
+    feature = replace(
+        feature,
+        walls=tuple(w for w in feature.walls if w.wall_id != "lintel"),
+        floors=(TerrainFloorDefinition("ceiling", 1, 0, 2, width, 4, 0.1),) if ceiling else (),
+    )
+    observer = Model("observer", Pose.at(0, 0, 1.4), CircularBase(0.1), ModelVolume(0.2))
+    target = replace(observer, model_id="target", pose=Pose.at(3, 0, 1.4))
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        los_cache_key="floor-lintel",
+        observer_model=observer,
+        target_models=(target,),
+        terrain_features=(feature,),
+        target_model_keywords=(("target", ("INFANTRY",)),),
+    )
+    assert context.resolve_line_of_sight().unit_visible is not ceiling
+    assert (
+        solid_endpoint_intersection(replace(observer, pose=Pose.at(1, 0, 1.4)), feature) is not None
+    ) is ceiling
+    restored = TerrainFeatureDefinition.from_payload(feature.to_payload())
+    assert restored.solid_opening_volumes() == feature.solid_opening_volumes()
+
+
+@pytest.mark.parametrize("x", [0.0, 2.2])
+def test_rotating_floor_crossing_proves_actual_shape_clearance(x: float) -> None:
+    feature = replace(
+        enclosed_window_feature(),
+        walls=(),
+        floors=(TerrainFloorDefinition("floor", 0, 0, 1, 4, 4, 0.01),),
+    )
+    model = Model("vehicle", Pose.at(x, 0), RectangularBase(0.2, 1), ModelVolume(0.2))
+    end = Pose.at(x, 0, 2, facing_degrees=1)
+    path = (model.pose, end, Pose.at(x, 0, facing_degrees=1))
+    context = _context(model, path, feature, "VEHICLE")
+    result = context.validate()
+    assert result.is_valid is (x > 2)
+    if x == 0:
+        assert result.violations[0].violation_code == "dense_floor_transit_forbidden"
+    assert TerrainPathLegalityContext.from_payload(context.to_payload()).validate() == result
+
+
+@pytest.mark.parametrize("base", [RectangularBase(1, 0.2), OvalBase(1, 0.2)])
+def test_rotating_floor_clearance_retains_tangent_endpoint(
+    base: RectangularBase | OvalBase,
+) -> None:
+    support = (
+        (0.5 + 0.1) / math.sqrt(2)
+        if isinstance(base, RectangularBase)
+        else math.sqrt(0.5**2 / 2 + 0.1**2 / 2)
+    )
+    x = 2 + support + 1e-12
+    feature = replace(
+        enclosed_window_feature(),
+        walls=(),
+        floors=(TerrainFloorDefinition("floor", 0, 0, 1, 4, 4, 0.01),),
+    )
+    model = Model("vehicle", Pose.at(x, 0, facing_degrees=45), base, ModelVolume(0.2))
+    path = (model.pose, Pose.at(x, 0, 2, facing_degrees=90), Pose.at(x, 0, facing_degrees=90))
+    context = _context(model, path, feature, "VEHICLE")
+    assert context.validate().is_valid
+    assert TerrainPathLegalityContext.from_payload(context.to_payload()).validate().is_valid
+
+
+def test_solid_ceiling_does_not_fill_space_between_parallel_walls() -> None:
+    feature = enclosed_window_feature()
+    feature = replace(
+        feature,
+        walls=tuple(
+            replace(
+                feature.walls[0],
+                wall_id=f"side-{x}",
+                center_x_inches=x,
+                center_y_inches=0,
+                depth_inches=4,
+            )
+            for x in (-1, 1)
+        ),
+        floors=(TerrainFloorDefinition("ceiling", 0, 0, 2, 2.1, 4, 0.1),),
+    )
+    model = Model("inside", Pose.at(0, 0), CircularBase(0.1), ModelVolume(0.2))
+    assert solid_endpoint_intersection(model, feature) is None

@@ -816,7 +816,7 @@ class TerrainFeatureDefinition:
 
     def solid_opening_volumes(self) -> tuple[ObstacleVolume, ...]:
         return (
-            solid_opening_volumes(self.feature_id, self.walls)
+            solid_opening_volumes(self.feature_id, self.walls, self.floors)
             if self.classification
             in {TerrainAreaClassification.DENSE, TerrainAreaClassification.MIXED}
             else ()

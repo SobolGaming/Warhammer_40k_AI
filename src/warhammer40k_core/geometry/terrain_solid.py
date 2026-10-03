@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.geometry.terrain import (
         ObstacleVolume,
         TerrainFeatureDefinition,
+        TerrainFloorDefinition,
         TerrainWallDefinition,
     )
 
@@ -32,7 +33,9 @@ type Box = tuple[float, float, float, float, float, float]
 
 @lru_cache(maxsize=256)
 def solid_opening_volumes(
-    feature_id: str, walls: tuple[TerrainWallDefinition, ...]
+    feature_id: str,
+    walls: tuple[TerrainWallDefinition, ...],
+    floors: tuple[TerrainFloorDefinition, ...] = (),
 ) -> tuple[ObstacleVolume, ...]:
     from warhammer40k_core.geometry.terrain import ObstacleVolume
 
@@ -61,10 +64,29 @@ def solid_opening_volumes(
         # with either their long dimension in width or in depth).
         for swap in (False, True):
             oriented = [(b[2], b[3], b[0], b[1], b[4], b[5]) if swap else b for b in boxes]
-            depths = sorted({v for b in oriented for v in b[2:4]})
+            depths = sorted(
+                {
+                    *(v for b in oriented for v in b[2:4]),
+                    *(
+                        depth
+                        for floor in floors
+                        for depth in _floor_depth_boundaries(floor, angle, swap)
+                    ),
+                }
+            )
             for lo, hi in pairwise(depths):
                 active = [b for b in oriented if b[2] <= lo and b[3] >= hi]
-                for left, right, bottom, top in _enclosed_cells(active):
+                if not active:
+                    continue
+                # Slabs can close a wall opening, but do not create wall
+                # surfaces or fill the interior between parallel walls.
+                closures = [
+                    box
+                    for floor in floors
+                    if any(b[1] - b[0] >= b[3] - b[2] for b in active)
+                    if (box := _floor_strip(floor, angle, swap, lo, hi)) is not None
+                ]
+                for left, right, bottom, top in _enclosed_cells(active + closures):
                     top = min(3.0, top)
                     if bottom >= top:
                         continue
@@ -86,6 +108,58 @@ def solid_opening_volumes(
     return tuple(result)
 
 
+def _floor_depth_boundaries(
+    floor: TerrainFloorDefinition, angle: float, swap: bool
+) -> tuple[float, ...]:
+    c, s = math.cos(math.radians(angle)), math.sin(math.radians(angle))
+    nx, ny = (c, s) if swap else (-s, c)
+    fc, fs = (
+        math.cos(math.radians(floor.rotation_degrees)),
+        math.sin(math.radians(floor.rotation_degrees)),
+    )
+    center = floor.center_x_inches * nx + floor.center_y_inches * ny
+    a = (fc * nx + fs * ny) * floor.width_inches / 2
+    b = (-fs * nx + fc * ny) * floor.depth_inches / 2
+    return tuple(round(center + i * a + j * b, 12) for i in (-1, 1) for j in (-1, 1))
+
+
+def _floor_strip(
+    floor: TerrainFloorDefinition, angle: float, swap: bool, lo: float, hi: float
+) -> Box | None:
+    """Exact covered interval across one wall strip, including rotated slabs."""
+    c, s = math.cos(math.radians(angle)), math.sin(math.radians(angle))
+    u, v = (c, s), (-s, c)
+    if swap:
+        u, v = v, u
+    fc, fs = (
+        math.cos(math.radians(floor.rotation_degrees)),
+        math.sin(math.radians(floor.rotation_degrees)),
+    )
+    left, right = -math.inf, math.inf
+    for axis, extent in (((fc, fs), floor.width_inches), ((-fs, fc), floor.depth_inches)):
+        a = round(axis[0] * u[0] + axis[1] * u[1], 12)
+        b = round(axis[0] * v[0] + axis[1] * v[1], 12)
+        center = axis[0] * floor.center_x_inches + axis[1] * floor.center_y_inches
+        for depth in (lo, hi):
+            offset = round(b * depth - center, 12)
+            if a == 0:
+                if abs(offset) > extent / 2:
+                    return None
+            else:
+                bounds = sorted(((-extent / 2 - offset) / a, (extent / 2 - offset) / a))
+                left, right = max(left, bounds[0]), min(right, bounds[1])
+    if left >= right:
+        return None
+    return (
+        round(left, 12),
+        round(right, 12),
+        lo,
+        hi,
+        floor.bottom_z_inches,
+        floor.bottom_z_inches + floor.thickness_inches,
+    )
+
+
 def solid_endpoint_intersection(model: Model, feature: TerrainFeatureDefinition) -> str | None:
     """All model parts obey Solid even when their support base sits on a floor."""
     from warhammer40k_core.geometry.physical_model import physical_prisms
@@ -98,7 +172,7 @@ def solid_endpoint_intersection(model: Model, feature: TerrainFeatureDefinition)
         return None
     for volume in (
         *feature.wall_volumes(),
-        *solid_opening_volumes(feature.feature_id, feature.walls),
+        *solid_opening_volumes(feature.feature_id, feature.walls, feature.floors),
     ):
         top = min(3.0, volume.top_z_inches())
         for part in physical_prisms(model):

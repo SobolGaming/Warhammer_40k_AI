@@ -35,7 +35,9 @@ to a logical area containing Light; all-Exposed areas remain Exposed.
 covering ordinary, attached, Charge, Fight and reactive consumers through their
 shared movement authority. Fixed-facing translation uses analytic footprint
 formulas over the entire segment, with a convex certificate for the common
-single-volume case. Rotating witnesses use a conservative translation/rotation
+single-volume case. Rotating witnesses use invariant inner disks, rectangular
+support concavity between quadrant boundaries, and exact elliptical face
+support minima. Remaining intervals use a conservative translation/rotation
 displacement bound. Unresolved boundary calculations raise a domain error,
 never sampled acceptance. Ordinary models measure from their support base;
 FRAME models retain their all-part measurement rule. Taking to the Skies
@@ -43,13 +45,18 @@ exempts climbing contact.
 
 The Dense floor predicate runs before the old thin-volume free-traversal
 shortcut. It checks vertical support-base passage through actual floor slabs
-and preserves Infantry, Beasts and Swarm permission. Exposed/Light transit
+and preserves Infantry, Beasts and Swarm permission. Exact interval support
+separation proves clearance beside slabs for both fixed and rotating bases;
+shrinking midpoint displacement bounds handle remaining rotating intervals. Exposed/Light transit
 remains permitted. Existing endpoint support and upper-surface keyword gates
 remain authoritative. A path entirely below a physical lintel is clear of it.
 
 `terrain_solid.py` derives enclosed cells in aligned wall surfaces, with ground
-closing a door's bottom, and clips them at three inches. The partition follows
-rectangle boundaries; it does not fill area polygons, open corners, arbitrary
+closing a door's bottom, and clips them at three inches. Physical floor/ceiling
+slabs also close openings within existing wall strips, including a slab narrower
+than the wall thickness. Floor boundaries participate in the strip partition;
+a slab does not create a new wall surface or fill the space between walls. The
+partition follows rectangle boundaries; it does not fill area polygons, open corners, arbitrary
 gaps between unrelated features, or the interior of a roofless ruin. Rotated
 walls use local axes. Visibility adds these volumes to its continuous LOS
 authority, including explicit-volume contexts and feature attribution. Movement

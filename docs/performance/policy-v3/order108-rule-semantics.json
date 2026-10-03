@@ -43,7 +43,7 @@
     },
     "src/warhammer40k_core/geometry/terrain.py": {
       "before_sha256": "7fb2df7511b51aed1322fbfe277248d83b497615ac0a173cc16af3367dcc4338",
-      "after_sha256": "ab4a944671c715c6ff4536f654b7041b54e0a84bdb6c86089f23c02bd80ec688",
+      "after_sha256": "0c81c16e7b496028d87243d28684d8e53b1d8e7d832bcf520241e5346c0aa31a",
       "owners": {
         "@module": {
           "before": "d870709b67b92c9a3173f9d5265a8f8661dbf547a3b8fc9e94057be9c3ebc862",
@@ -51,7 +51,7 @@
         },
         "TerrainFeatureDefinition.solid_opening_volumes": {
           "before": null,
-          "after": "a3ca132e911ac4507c0d534c61a7f38f15116e39eacc49ae6feb90f3cd50a492"
+          "after": "2aa79aabc5530852c5cbd4d990d8ef4afe0a05b40993049d4adb329be5f4eba5"
         },
         "TerrainFeatureDefinition.visibility_volumes": {
           "before": null,
@@ -75,37 +75,49 @@
     },
     "src/warhammer40k_core/geometry/terrain_solid.py": {
       "before_sha256": null,
-      "after_sha256": "5551e61b726f4b53c6f19a148d442de142a3126cc1e72d3aaa35ebad7d350451",
+      "after_sha256": "ceb03ad6f5381c137cb1cdc390e1bef5c46b8547f94363ce52d610383254132d",
       "owners": {
         "@module": {
           "before": null,
-          "after": "3fc515fa4a413fbeaf57eae24aaf22c3767bed9d453bec4290fbadb0ee07f635"
+          "after": "bdb06a7a590ed8b361dbff6998c74992b048d2c2ca323238eb066911e0f49524"
         },
         "_enclosed_cells": {
           "before": null,
           "after": "c0e47029888db0406b896fd63b04a5f193d3c36e248df7244d7c9263f1a3138a"
         },
+        "_floor_depth_boundaries": {
+          "before": null,
+          "after": "818c665bdd9cda7f3bdc2b5bd51129cd9bc14e38dbb727b0c9b376f17dde28d2"
+        },
+        "_floor_strip": {
+          "before": null,
+          "after": "fe9c0e6b4f96a402cbd6b5d627b9abb6b6651604b541f1ed54c03650225273fc"
+        },
         "solid_endpoint_intersection": {
           "before": null,
-          "after": "e8f9f113d5407feb9a59790e1cd3cc8cc46e563f8f2683faa9788103ad8f7cb9"
+          "after": "eb480c4f235f91923d0a5ec36a9c549708914bef7193f52ae12aa116af5c971a"
         },
         "solid_opening_volumes": {
           "before": null,
-          "after": "8b4df7bc13322f2b86c78cebbfb2e31f0c4f81c0895e9ace42cdb0d84217c3a0"
+          "after": "fd1cf5d7cfc7ca777f825b92204a6090091516e7f2e4d7313f0b04f63589e31f"
         }
       }
     },
     "src/warhammer40k_core/geometry/terrain_transit.py": {
       "before_sha256": null,
-      "after_sha256": "74a34cf68aa79011281f6eb6adec53f465e4d7087e0fa0e107ada2fc12e745fc",
+      "after_sha256": "3258e0a0952f89c3fb430ba518e006b9811460ba3321d65076b2f8dd2bf59357",
       "owners": {
         "@module": {
           "before": null,
-          "after": "a556398e56bf67d4d4760290f17dbcd9d466251f7cc3ec9932acafbeed6b413b"
+          "after": "ecfc564b6c16181be7a0103642ee9d943f0556b00a760c10814b6d2f6014d832"
+        },
+        "_contact_at_pose": {
+          "before": null,
+          "after": "0f90d90e5d9f9679c011783d630a5697b68102b295d746e761ff9363f406efcb"
         },
         "_crosses_floor": {
           "before": null,
-          "after": "47262f1dde03341d233ce9ea3b9570517c5046b92a96a733373eda4f36365d10"
+          "after": "2d22ddee22c0033a783ce5f8c3148e39088dc0397733e2dc14d30cd25c5f957d"
         },
         "_fixed_facing": {
           "before": null,
@@ -115,13 +127,25 @@
           "before": null,
           "after": "de25e339713e1895a1beedb0b2e4b87a6e4a37387dfdc425c18c5ebc0e3b5d84"
         },
+        "_oval_face_contact": {
+          "before": null,
+          "after": "d22a14673c4fe31e0df66300980ac387eaba6f42e9b8d86aff2801225eb5c610"
+        },
         "_rotating_floor_crossing": {
           "before": null,
-          "after": "ba35330be265a2da8774769766c582e87729a9a9d6f6fc752a43eb0dad2f879f"
+          "after": "7a8f7c5099981d06469026c1cca7997235614eb3d4e8a85dc7481bb656f3519f"
+        },
+        "_rotation_clear_of_floor": {
+          "before": null,
+          "after": "47471c4bc26f1183fd99a80941d77b4c9d3c86611295920a490baa30c44a146e"
+        },
+        "_rotation_contact_certificate": {
+          "before": null,
+          "after": "446fb48fb0ae6a400b0730907747a13c4e640b5bc87c4c99cad6c9b23cc68e00"
         },
         "_segment_contact": {
           "before": null,
-          "after": "2256ae0a20ecf996f58ac08f68641a92e60d868c154c1c411e3a3de969ae61e8"
+          "after": "bc9415ce46ed1399d5790a445d37838d9a5170ec2daaf8276ced6af2cb7e8178"
         },
         "_terrain_pose": {
           "before": null,
