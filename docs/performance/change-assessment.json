@@ -188,7 +188,7 @@
     },
     "tests/unit/test_order92_random_melee.py": {
       "before_sha256": "193d4216b590e00d6e24a8752b6726ab6547de76756598a0379b641c0823dcc7",
-      "after_sha256": "a38d2d517a0c234f2b921bc0f6cb9e158a5f2900a4af4d6c88b1e373315dbc54",
+      "after_sha256": "0f1c1262a4fb9ebda3a4d0c4ee2c22c9c410eb64f71e489f8e74e5f5aad7ffc1",
       "owners": {
         "@module": {
           "before": "20fde3793e5422f9f544ce784c0e57cb97f36af493f6ad68a5714fa5c0793726",
@@ -200,7 +200,7 @@
         },
         "test_extra_weapons_cannot_be_skipped_and_retry_restores_and_replays": {
           "before": null,
-          "after": "77c87d6c9ab9ef7aded13ad2bcdc35512ede591dea9f3732d16ab7e95197d603"
+          "after": "6d8166ece13cc28a562bd7259d9115a936afbfaacc9e4b5b5fc3f11f81da4146"
         },
         "test_ineligible_extra_bearer_does_not_require_a_declaration": {
           "before": null,

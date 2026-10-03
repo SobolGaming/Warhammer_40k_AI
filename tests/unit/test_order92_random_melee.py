@@ -797,11 +797,12 @@ def test_extra_weapons_cannot_be_skipped_and_retry_restores_and_replays(
     assert {row["wargear_id"] for row in declarations} == {"core-leader-blade", "order92-extra"}
     payload["declarations"] = cast(list[JsonValue], declarations)
     before = session.to_persistence_payload()
-    pending = LocalGameSession.from_persistence_payload(json.loads(json.dumps(before)))
-    assert pending.to_persistence_payload() == before
-    invalid = dict(
-        payload, declarations=[row for row in declarations if row["wargear_id"] != "order92-extra"]
-    )
+    restored_pending = LocalGameSession.from_persistence_payload(json.loads(json.dumps(before)))
+    assert restored_pending.to_persistence_payload() == before
+    invalid = dict(payload)
+    invalid["declarations"] = [
+        cast(JsonValue, row) for row in declarations if row["wargear_id"] != "order92-extra"
+    ]
     status = session.submit_parameterized_payload(
         request_id=request.request_id, result_id="order112-omitted-extra", payload=invalid
     )
