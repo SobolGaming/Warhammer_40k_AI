@@ -1,8 +1,8 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "6653b86daf7d1bc51e1d0158691fe640bb3a2a4d",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f57d6caa7bf1dbcd016be558f43c4230be78126cca2b211eda2a882a12fa1f91",
-  "operation_map_sha256": "fa770e51c34c670ef9c64e4a93f6768ae35d2d31b359b36d7372c1a1a50e8020",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:14644cb7799aa3db990d75b63bcbb23722b848d6008d37c43b34944d1faeda1c",
+  "operation_map_sha256": "373f39b7dd4257a8b5a39005ba79ed4c9342a8832985f7305d34de722e35c1d9",
   "changes": {
     "conformance/typescript/src/contract.ts": {
       "before_sha256": "41ad8dd41c3be6544cfe7fd88afe7cc306fff703e003c6549b491220c175861e",
@@ -26,81 +26,81 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "84dc4f0c94526177e222bb9128bd05e7ba7858a8d8580e0a659425a967511146",
-      "after_sha256": "a41979cc0f4997f0c6161d8e6e925985afeea41b2560101f825706e30c051d4e",
+      "after_sha256": "d8355e0fc34be8a48833bb2bf942d7fd2dfddb0fe989b1228e87071ffcc7e7ba",
       "owners": {
         "@document": {
           "before": "84dc4f0c94526177e222bb9128bd05e7ba7858a8d8580e0a659425a967511146",
-          "after": "a41979cc0f4997f0c6161d8e6e925985afeea41b2560101f825706e30c051d4e"
+          "after": "d8355e0fc34be8a48833bb2bf942d7fd2dfddb0fe989b1228e87071ffcc7e7ba"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "6967659a3b05eaad11f276bf6f0a8aca04d28b05d65fe67659ccab88b71e2f68",
-      "after_sha256": "c48305c88004d5d87d28dc36eeca30fa79d1f6227e8bd49d389a5b188c6e2a19",
+      "after_sha256": "88f521adb11d8a01181e47a6c448a59e9bb8d3f20c86bde69f8dcc655f23d7c6",
       "owners": {
         "@document": {
           "before": "6967659a3b05eaad11f276bf6f0a8aca04d28b05d65fe67659ccab88b71e2f68",
-          "after": "c48305c88004d5d87d28dc36eeca30fa79d1f6227e8bd49d389a5b188c6e2a19"
+          "after": "88f521adb11d8a01181e47a6c448a59e9bb8d3f20c86bde69f8dcc655f23d7c6"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "038c2c2e718c0ac48e869ca83a2925fd8f04c539db42d560c161d8b16a7df280",
-      "after_sha256": "1836a7e3360d71911f75e42586a95c402bb2a3cfb089b3511c73ba498c82673f",
+      "after_sha256": "4fead325329c1b03f570c2c2e6d478f076bdc6278146ab3c229a12f21e77a0b2",
       "owners": {
         "@document": {
           "before": "038c2c2e718c0ac48e869ca83a2925fd8f04c539db42d560c161d8b16a7df280",
-          "after": "1836a7e3360d71911f75e42586a95c402bb2a3cfb089b3511c73ba498c82673f"
+          "after": "4fead325329c1b03f570c2c2e6d478f076bdc6278146ab3c229a12f21e77a0b2"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "ee7a77cc5dd4572add45b15fe12630c7564d78e3d506b1fbbbe54fb08186baca",
-      "after_sha256": "956bd39bfb38be0a466a82b0da61b450059d7e211bc702f1bfb068814fcc3602",
+      "after_sha256": "14672d8adb6ebe073ff2a0f3c442ae7981ba5a77ff65f0f51784d65dc2b199c9",
       "owners": {
         "@document": {
           "before": "ee7a77cc5dd4572add45b15fe12630c7564d78e3d506b1fbbbe54fb08186baca",
-          "after": "956bd39bfb38be0a466a82b0da61b450059d7e211bc702f1bfb068814fcc3602"
+          "after": "14672d8adb6ebe073ff2a0f3c442ae7981ba5a77ff65f0f51784d65dc2b199c9"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "f73ce4ef6d9ca3d0bd30065dab6630cb952555efb537f946349c5122c5bd7273",
-      "after_sha256": "1406629d116cd51afa7f410bbf034e2a4af7d8f14368cb2ba44508278be7f9dc",
+      "after_sha256": "7d4defc303ac8cc23c6b4dc63a16ca2ad6bb54fd265f0cdcd4c9f1f5adb1f070",
       "owners": {
         "@document": {
           "before": "f73ce4ef6d9ca3d0bd30065dab6630cb952555efb537f946349c5122c5bd7273",
-          "after": "1406629d116cd51afa7f410bbf034e2a4af7d8f14368cb2ba44508278be7f9dc"
+          "after": "7d4defc303ac8cc23c6b4dc63a16ca2ad6bb54fd265f0cdcd4c9f1f5adb1f070"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "381bde4c4bea927a670170d9c08dfe7b114f5383aa4563949c2d6776b7f26e92",
-      "after_sha256": "900cfcb76d1d8503f0bc08de06eddaba507aa7ae9fa015abca2904440be1d454",
+      "after_sha256": "57463f358b6d134a19bcd5cb1d665a587a48c5dcf38db3476b51013b50e769f6",
       "owners": {
         "@document": {
           "before": "381bde4c4bea927a670170d9c08dfe7b114f5383aa4563949c2d6776b7f26e92",
-          "after": "900cfcb76d1d8503f0bc08de06eddaba507aa7ae9fa015abca2904440be1d454"
+          "after": "57463f358b6d134a19bcd5cb1d665a587a48c5dcf38db3476b51013b50e769f6"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "cc6f937fad9206aff2e2900f4494d8bb58c7810efd680e637648104425cd21c4",
-      "after_sha256": "edc75d6fc6751bf59af82d908747b913c5bd85124bf879b20fe844769a38afc0",
+      "after_sha256": "7b3022bd6c6507957e8a28cdb903b836e9d20ed5bf58505b14ea0c694bb3eec0",
       "owners": {
         "@document": {
           "before": "cc6f937fad9206aff2e2900f4494d8bb58c7810efd680e637648104425cd21c4",
-          "after": "edc75d6fc6751bf59af82d908747b913c5bd85124bf879b20fe844769a38afc0"
+          "after": "7b3022bd6c6507957e8a28cdb903b836e9d20ed5bf58505b14ea0c694bb3eec0"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "909652200e08572926d47a0508498941d8c9b6d11fde412870955b80624694e1",
-      "after_sha256": "4297fcf293dfce161912096193408751a6c7bd2e38289e259cff029ee2d4c975",
+      "after_sha256": "5321c5e598d9ac9cd811363d2f6f4bfe30e2028c0df638cda2c06e0969cb84a0",
       "owners": {
         "@document": {
           "before": "909652200e08572926d47a0508498941d8c9b6d11fde412870955b80624694e1",
-          "after": "4297fcf293dfce161912096193408751a6c7bd2e38289e259cff029ee2d4c975"
+          "after": "5321c5e598d9ac9cd811363d2f6f4bfe30e2028c0df638cda2c06e0969cb84a0"
         }
       }
     },
@@ -111,6 +111,16 @@
         "@document": {
           "before": "78f37b615b74cfeb662bd66b1b9d6d2cc6102923d58468ea0d664314ab3923a0",
           "after": "e2640cdc7e9676c40b69c96736ca8ca47295921049886f9633c24e6ccb099b89"
+        }
+      }
+    },
+    "data/source_audits/order114/baseline/tests/order61_embark_helpers.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "50c7bc022d3045cff1c6ae3ed2c7a4b427ed457d4f82a3a5050f500fee2213f8",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "50c7bc022d3045cff1c6ae3ed2c7a4b427ed457d4f82a3a5050f500fee2213f8"
         }
       }
     },
@@ -126,11 +136,11 @@
     },
     "data/source_audits/order114/historical-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "6cbb3f6da99d02b753c6912daebd51f4b634485b9cc0e6b38bb4e52174a291ef",
+      "after_sha256": "4c38d99defecfc2cc4758eff7c0cae877ee726b70a0fbf6921472c2f7b65113e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "6cbb3f6da99d02b753c6912daebd51f4b634485b9cc0e6b38bb4e52174a291ef"
+          "after": "4c38d99defecfc2cc4758eff7c0cae877ee726b70a0fbf6921472c2f7b65113e"
         }
       }
     },
@@ -156,31 +166,31 @@
     },
     "docs/ORDER_114_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "1722ea25424c1925c038c788f6c1c29c5108b7906ba7501b27714dfcffff54c9",
+      "after_sha256": "90526fa9a04dff8d0c4f74ac57cf8e74d1371e5adf81f9233376c3f32d1b86c8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "1722ea25424c1925c038c788f6c1c29c5108b7906ba7501b27714dfcffff54c9"
+          "after": "90526fa9a04dff8d0c4f74ac57cf8e74d1371e5adf81f9233376c3f32d1b86c8"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "faaf8ed55b44aa98cf74c3e84296c7a16835d98edcd76083f55966c94d86cd2d",
-      "after_sha256": "bd5c32a31dd6af4c7d3e2f84c3770d4fb1684d5198409d6f4461553cfe168312",
+      "after_sha256": "1821ef48f87dd596909b3553f231ed3f887d614c3fdbb96f310115b4ee06b99a",
       "owners": {
         "@document": {
           "before": "faaf8ed55b44aa98cf74c3e84296c7a16835d98edcd76083f55966c94d86cd2d",
-          "after": "bd5c32a31dd6af4c7d3e2f84c3770d4fb1684d5198409d6f4461553cfe168312"
+          "after": "1821ef48f87dd596909b3553f231ed3f887d614c3fdbb96f310115b4ee06b99a"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "0d4517b9f2462e5fa815ef54e7d31c0ecfa1c26777a51e9728278abda30367c2",
-      "after_sha256": "e79a1333a2a0d0835a17919da420ab366d170722a9452e09b5ba9cf88201491a",
+      "after_sha256": "cbb24560c604c7943c5a421378490377202deef972888cf27e5ea9225396f001",
       "owners": {
         "@document": {
           "before": "0d4517b9f2462e5fa815ef54e7d31c0ecfa1c26777a51e9728278abda30367c2",
-          "after": "e79a1333a2a0d0835a17919da420ab366d170722a9452e09b5ba9cf88201491a"
+          "after": "cbb24560c604c7943c5a421378490377202deef972888cf27e5ea9225396f001"
         }
       }
     },
@@ -219,6 +229,20 @@
         "validated_embark_movement_completions": {
           "before": "c3e90e700bbfe6ad239c0545d954bfb641fb9097669c5cb450e1b082be868684",
           "after": "7f01d58fa38ecf8ef72470a4c23fb8e52c0131fe1f5dc3839b4297dc57840ecf"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/movement_selection_history.py": {
+      "before_sha256": "d1a97cbb4a9f190c89be32c355bfd1ee1b248bb9cd9f60bdee6443abf96f3694",
+      "after_sha256": "b4e867b8988580dcf41229f32902dec7c7093013f3cbe3b1d51eedeac262b2f0",
+      "owners": {
+        "@module": {
+          "before": "1ba2e67e80abe4d900298b46c06ada181cb5453943cce5bc884628338a055045",
+          "after": "b732b6061aa83caca1ff3f570e002ab4bb323edc7915fee5414ecd6b18aa8e09"
+        },
+        "MovementSelectionHistory.observe": {
+          "before": "223a2da8d8856a2179022bc71a6659506b624358a42f54c787669928727768c8",
+          "after": "b7c433e9d0802cce444e3346324572ac7f036293885234ed68fda72e6b4251b1"
         }
       }
     },
@@ -482,7 +506,7 @@
     },
     "tests/code_quality/test_order114_embark.py": {
       "before_sha256": null,
-      "after_sha256": "facd546090727e023bea48ec0f52402a8d38bd0603ad76a3cf6eaf2b44650283",
+      "after_sha256": "3b9f5e75452788a7df86f44c72981ff74858a14e8dd276a4fdae037eab5ce280",
       "owners": {
         "@module": {
           "before": null,
@@ -498,7 +522,7 @@
         },
         "test_source_embark_dispatch_is_registered_with_validator_and_applier": {
           "before": null,
-          "after": "eae6bf67575ae0cc481ab8b6b98255a67fa8491b05d926836e1bf8af5345b2f0"
+          "after": "ca31263f82061de094d02b605425dc01e54d7e4fd7bd932461df9b7ef7a54c53"
         }
       }
     },
@@ -534,9 +558,23 @@
         }
       }
     },
+    "tests/order61_embark_helpers.py": {
+      "before_sha256": "50c7bc022d3045cff1c6ae3ed2c7a4b427ed457d4f82a3a5050f500fee2213f8",
+      "after_sha256": "5572cc73eaecd34cf9bcb9be875a088792673d93f910a75d43b766112b38f913",
+      "owners": {
+        "@module": {
+          "before": "832bcc45ee9863e1d6a2839c7232ee4a79e8117b2995e7cc7e8a12aaade1e6fd",
+          "after": "b74bd74d48b419bf636ef4517e8244f9dd8d779b5f89ef7f56f2042767c7dd68"
+        },
+        "embark_session": {
+          "before": "44ade6db370bc9695d8ea470af5fa56718dfefa4ddfda21db39c175da4787d30",
+          "after": "1e0a4c0a7353f1f58672570affe79228167224884b02b3ffdbdeb8c2225c6833"
+        }
+      }
+    },
     "tests/unit/test_order61_embark.py": {
       "before_sha256": "da8b4ef4113860b0a74efd875cb563fe8e7079f1f28b8e06d63f473a7d7f4e95",
-      "after_sha256": "f4f6a5a71261ab6b7b248947d8f2a76e2f77e946a28fe575d439005d8dae44cc",
+      "after_sha256": "b73391a3dff3173ff871192c5435cb14748afd08a372a18c36c647c1afd0781d",
       "owners": {
         "@module": {
           "before": "37aae69e29f8cbf18c0f7d1c8f90c6cdc56ae3d79dad20d19e37999830b9aab2",
@@ -569,16 +607,20 @@
         "test_source_embark_revalidates_supported_drift_before_queue_pop": {
           "before": null,
           "after": "847130723b0a629cbec3946659d81027d8f196c4e2576164f02a588ad84f5b41"
+        },
+        "test_source_embark_then_rejected_disembark_retry_restores_and_replays": {
+          "before": null,
+          "after": "7d8469fbd73548cdbdfaefaa355c7a1fac2d6d5b5565ad12f9f499571cf2d3e8"
         }
       }
     },
     "tools/core_rules_order97_history.py": {
       "before_sha256": "e28e10ebc07c0de9d0fc876d992dee31be302051884dc9f7f28e50c7038ea777",
-      "after_sha256": "9c7026b55baa5e89d8f1c7dbc9330bbe151614e3bae3373d4a9feab170d1a96b",
+      "after_sha256": "b43275eae52269ab401f33bea1f2a946f0aa686f3299a132cab4e0c2624d4ce5",
       "owners": {
         "@module": {
           "before": "4af5577c475f70ed9e874cd5fbcfcdf146743daa6fa50e04a8c0b7e651a8776a",
-          "after": "f1e15043d3bfea07cb81ee7e0f83166fe87e8c1f9de91dffd7ae8377ea3ca216"
+          "after": "510de5b46724e2ca1315964952387a7aba1ed743022d07ea34003587c161bf00"
         },
         "historical_evidence_path": {
           "before": "2ab039a4c7fbf9eb96f8ebd33e88f5b9770a0d12a29fedf7dbf01ac3a77e5360",
@@ -698,6 +740,16 @@
       "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
       "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
+    "data/source_audits/order114/baseline/tests/order61_embark_helpers.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order114-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Retain exact original Order97-pinned Order61 test bytes via bounded hash-checked base archive; preserve original source and historical facts.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
     "data/source_audits/order114/baseline/tests/unit/test_order61_embark.py.txt": {
       "category": "rule_semantics",
       "operations": [
@@ -781,6 +833,16 @@
       "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "src/warhammer40k_core/engine/movement_decision_authority.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order114-embark-permissions"
+      ],
+      "selected_families": [],
+      "rationale": "Represent source-owned no-movement embark permission, separately preserve post-disembark authority, and route shared finite options/validation/group cargo mutation and engine-created history restoration. Extract existing responsibilities from frozen modules. Ordinary bounded rule branches; no search/cache/algorithm optimization.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "src/warhammer40k_core/engine/movement_selection_history.py": {
       "category": "rule_semantics",
       "operations": [
         "order114-embark-permissions"
@@ -901,6 +963,16 @@
       "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "tests/order114_embark_helpers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order114-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Exercise actual disembark followed by source embark/decline, attached group cargo authority, invalid pre-pop drift, ordinary move controls and valid engine-created save/load/fork/viewer/replay.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "tests/order61_embark_helpers.py": {
       "category": "rule_semantics",
       "operations": [
         "order114-regressions"

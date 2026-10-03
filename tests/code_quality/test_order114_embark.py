@@ -53,6 +53,9 @@ def test_source_embark_dispatch_is_registered_with_validator_and_applier() -> No
     history = (ENGINE / "movement_decision_authority.py").read_text(encoding="utf-8")
     assert "validate_source_embark_request(request)" in history
     assert "validate_source_embark_event(record, payload)" in history
+    selection_history = (ENGINE / "movement_selection_history.py").read_text(encoding="utf-8")
+    assert "validate_source_embark_event(record, payload)" in selection_history
+    assert 'event.event_type == "unit_embarked"' in selection_history
 
 
 def test_order114_retains_original_order97_assertion_bytes_and_source_obligation() -> None:

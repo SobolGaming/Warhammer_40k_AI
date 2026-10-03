@@ -2877,6 +2877,7 @@
         "src/warhammer40k_core/adapters/external_contract.py",
         "src/warhammer40k_core/engine/lifecycle.py",
         "src/warhammer40k_core/engine/movement_decision_authority.py",
+        "src/warhammer40k_core/engine/movement_selection_history.py",
         "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
         "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py",
         "src/warhammer40k_core/engine/transport_embark_context.py",
@@ -2902,6 +2903,7 @@
         "EmbarkSelection.to_payload",
         "EmbarkSelectionPayload",
         "GameLifecycle._build_decision_dispatch_registry",
+        "MovementSelectionHistory.observe",
         "NoMovementEmbarkContext",
         "NoMovementEmbarkContext.__post_init__",
         "NoMovementEmbarkContext.from_payload",
@@ -2934,12 +2936,14 @@
         "tests/code_quality/test_order114_embark.py",
         "tests/code_quality/test_order61_embark.py",
         "tests/order114_embark_helpers.py",
+        "tests/order61_embark_helpers.py",
         "tests/unit/test_order61_embark.py"
       ],
       "owners": [
         "@module",
         "attached_source_embark_session",
         "disembark_at_transport",
+        "embark_session",
         "source_embark_session",
         "test_attached_source_embark_moves_every_component_and_restores_replays",
         "test_embark_uses_shared_types_geometry_and_mutation_without_name_gates",
@@ -2951,7 +2955,8 @@
         "test_source_embark_after_disembark_requires_the_distinct_explicit_permission",
         "test_source_embark_after_real_disembark_facade_restore_fork_replay",
         "test_source_embark_dispatch_is_registered_with_validator_and_applier",
-        "test_source_embark_revalidates_supported_drift_before_queue_pop"
+        "test_source_embark_revalidates_supported_drift_before_queue_pop",
+        "test_source_embark_then_rejected_disembark_retry_restores_and_replays"
       ],
       "families": [],
       "sensitive": false,
@@ -2959,6 +2964,7 @@
     },
     "order114-source-evidence": {
       "paths": [
+        "data/source_audits/order114/baseline/tests/order61_embark_helpers.py.txt",
         "data/source_audits/order114/baseline/tests/unit/test_order61_embark.py.txt",
         "data/source_audits/order114/historical-inputs.json",
         "tools/core_rules_order97_history.py"

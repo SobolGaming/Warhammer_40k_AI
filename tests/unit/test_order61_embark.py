@@ -548,3 +548,105 @@ def test_no_movement_context_identity_cannot_be_forged_into_another_selection(fi
             movement_phase_action=TransportMovementStatus.NOT_MOVED,
             source_context=wrong,
         )
+
+
+def test_source_embark_then_rejected_disembark_retry_restores_and_replays() -> None:
+    from tests.disembark_eligibility_helpers import PASSENGER_ID
+    from tests.order60_emergency_disembark_helpers import emergency_disembark_unit_placement
+    from tests.order114_embark_helpers import disembark_at_transport
+    from tests.psychic_modifier_helpers import pending_request
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.damage_allocation import unit_by_id
+    from warhammer40k_core.engine.event_log import validate_json_value
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.movement_proposals import PlacementProposalPayload, ProposalKind
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
+    from warhammer40k_core.engine.transport_source_embark import (
+        no_movement_embark_permission_effect,
+    )
+    from warhammer40k_core.engine.transports import DisembarkModeKind
+
+    session = embark_session()
+    state = session.lifecycle.state
+    assert state is not None
+    state.record_persisting_effect(
+        no_movement_embark_permission_effect(
+            context=NoMovementEmbarkContext(
+                source_rule_id="faq:c2df3e97-f21e-4fc9-943e-37072c08c10e",
+                permission_effect_id="order114:retry-permission",
+                occasion_id="order114:retry-occasion",
+                battle_round=state.battle_round,
+                turn_player_id="player-a",
+                phase=BattlePhase.MOVEMENT,
+                unit_instance_id=UNIT_ID,
+            ),
+            owner_player_id="player-a",
+            allow_after_disembark=False,
+        )
+    )
+    initial = session.lifecycle.to_payload()
+    GameLifecycle.from_payload(json.loads(json.dumps(initial)))
+    for option_id, result_id in (
+        (UNIT_ID, "order114:retry-source-unit"),
+        (TRANSPORT_ID, "order114:retry-source-embark"),
+        (PASSENGER_ID, "order114:retry-passenger"),
+        ("disembark", "order114:retry-disembark"),
+    ):
+        request = pending_request(session)
+        status = session.submit_option(
+            request_id=request.request_id, result_id=result_id, option_id=option_id
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    request = pending_request(session)
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="order114:retry-invalid-placement",
+        payload=validate_json_value(
+            PlacementProposalPayload(
+                proposal_request_id=request.request_id,
+                proposal_kind=ProposalKind.DISEMBARK,
+                unit_instance_id=PASSENGER_ID,
+                placement_kind=BattlefieldPlacementKind.DISEMBARK,
+                attempted_placement=emergency_disembark_unit_placement(
+                    unit_by_id(state=state, unit_instance_id=PASSENGER_ID),
+                    army_id="army-alpha",
+                    player_id="player-a",
+                    center_x=30,
+                    center_y=10,
+                ),
+                transport_unit_instance_id=TRANSPORT_ID,
+                disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
+                transport_movement_status=TransportMovementStatus.NOT_MOVED,
+            ).to_payload()
+        ),
+    )
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert pending_request(session).decision_type == "select_movement_unit"
+    assert any(
+        event.event_type == "movement_setup_failed"
+        for event in session.lifecycle.decision_controller.event_log.records
+    )
+    checkpoint = session.lifecycle.to_payload()
+    restored = LocalGameSession(GameLifecycle.from_payload(json.loads(json.dumps(checkpoint))))
+    for viewer in state.player_ids:
+        assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
+        assert restored.events_since(
+            EventStreamCursor(), viewer_player_id=viewer
+        ) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)
+    for active in (session, restored):
+        disembark_at_transport(active)
+        GameLifecycle.from_payload(json.loads(json.dumps(active.lifecycle.to_payload())))
+    assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()
+    assert (
+        ReplayRunner(
+            ReplayArtifact.capture(
+                artifact_id="order114:retry-replay",
+                final_lifecycle=session.lifecycle,
+                initial_lifecycle_payload=initial,
+            )
+        )
+        .run()
+        .reproduced_exactly
+    )

@@ -55,6 +55,11 @@ accepted selection and event; the existing cargo-location history binds its
 physical removal and exact carrier membership. Existing witnessed-move bindings
 continue to handle ordinary embark.
 
+The ordered failed-setup selection history also consumes accepted source
+`unit_embarked` events to close an actually selected Movement unit with zero
+distance. This preserves the next passenger's rule-invalid placement retry and
+engine-created save/load/replay continuation without manufacturing a move event.
+
 The bug-class search covered the selection constructor, both shared finite option
 and acceptance consumers, setup-turn prevalidation, movement-completion history,
 cargo-location history, restore and adapter dispatch. Off-battlefield friendly
@@ -72,10 +77,14 @@ post-disembark permission, stale permission/capacity/distance before queue pop,
 and attached-unit removal/cargo authority. Valid engine-created checkpoints,
 both viewer projections/event deltas, isolated forks and exact replay are covered.
 
-The original Order97 test-file bytes are retained from exact base
+The original Order97 test and fixture bytes are retained from exact base
 `6653b86daf7d1bc51e1d0158691fe640bb3a2a4d` in a bounded hash-checked historical
 mapping. They are historical assertions, not new Order114 gameplay evidence.
 New implementation evidence lives in the tests and this scope record.
+The ordinary embark fixture now seeds nearby poses before Command snapshots;
+it no longer changes physical location after those historical snapshots. The
+continuation regression checks that its initial checkpoint restores before any
+source embark or rejected placement is submitted.
 
 Apply `SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md`: block on incorrect rules, normal
 legal-play failures, valid engine-created save/load/replay failures and necessary
