@@ -1,5 +1,9 @@
 # CORE V2 external contract
 
+Contract44.3 adds typed source occasions to finite embark choices without
+manufacturing movement. Shared submissions and existing persistence envelopes
+remain; see [Order114](../docs/ORDER_114_SCOPE_PLAN.md) and the adapter contract.
+
 Contract 44.2 adds the public Action Battle-shock interruption source event,
 with existing submission, event and persistence envelopes. Exact runtime identity
 remains required. See [Order 110](../docs/ORDER_110_SCOPE_PLAN.md).
@@ -55,7 +59,7 @@ from HealingEffect and requires source-bound engagement evidence on battlefield
 revival events. See [35 to 36 migration](migrations/35-to-36.md).
 
 
-Contract version: `44.2.0`
+Contract version: `44.3.0`
 
 Order 81 / P03E restores the existing pending-proposal contract for all 13
 parameterized families. Interaction conformance examples now preserve the four

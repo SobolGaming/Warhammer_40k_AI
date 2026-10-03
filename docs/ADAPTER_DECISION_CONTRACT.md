@@ -7474,3 +7474,45 @@ count, including attached members, through casualties and target replacement.
 Accepted profiles, source IDs and count rule IDs already use JSON-safe payloads.
 Existing viewer redaction and exact runtime identity govern saves/replays.
 Regenerated runtime/examples are required; no old-history conversion is added.
+
+
+## Order114: source-owned embark without a movement action
+
+Contract44.3 adds a source-owned occasion to the existing finite
+`select_embark_transport` family. Source providers supply the typed permitting
+context; adapters continue to copy one offered option through
+`FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision`.
+No new proposal kind, parameterized family, persistence envelope or visibility
+policy is introduced. Existing disembark placement proposals retain their path.
+
+A no-movement request has `source_context` instead of `movement_context`.
+It records `source_rule_id`, `permission_effect_id`, `occasion_id`,
+`battle_round`, `turn_player_id`, `phase` and `unit_instance_id`, with the
+physical `spatial_context_hash`. Each Transport option carries the same
+`EmbarkSelection` shape plus its `source_context` and
+`movement_phase_action: not_moved`. Adapters must select the offered option ID;
+they may not create a context, permission, override or movement completion.
+Ordinary post-move requests retain their original movement context and witnessed
+completion. `not_moved` describes this embark operation and does not erase
+actual earlier movement or disembark/setup history.
+
+The current source permission, its owner and occurrence, full option payloads,
+physical context, setup-turn restrictions, capacity and distance are revalidated
+before queue pop. Drift returns typed `source_embark_context_drift`; the pending
+request, authoritative state and recorded decisions remain unchanged. Malformed,
+stale, wrong-actor and unoffered finite submissions retain the shared finite
+contract's invalid result. No no-movement embark is available from Remain
+Stationary, Ingress or an ungranted post-disembark exception.
+
+Acceptance uses the shared engine cargo/battlefield/departure mutation and emits
+`unit_embarked`, now carrying the exact `embark_selection`. Source decline emits
+`source_embark_declined` with the source context and request/result identity,
+consumes that occasion and preserves ordinary action selection. Source acceptance
+creates no movement witness or synthetic Normal/Advance/Fall Back completion.
+Original post-disembark restrictions and current cargo ownership persist.
+
+Save/load, isolated fork and replay bind the accepted finite selection and source
+context independently of ordinary movement-completion bindings. The existing
+shared viewer redaction remains authoritative for projections, requests,
+decisions, events and transport metadata. Named faction ability loading/timing
+and non-Core source-specific transport distance are outside Order114.

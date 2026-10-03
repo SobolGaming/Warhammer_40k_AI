@@ -109,9 +109,16 @@ def validated_embark_movement_completions(
             continue
         request = DecisionRequest.from_payload(cast(DecisionRequestPayload, event.payload))
         request_payload = request.payload
-        if not isinstance(request_payload, dict) or request.actor_id != request_payload.get(
-            "active_player_id"
-        ):
+        if not isinstance(request_payload, dict):
+            raise GameLifecycleError("Embark decision authority drift.")
+        if "source_context" in request_payload:
+            from warhammer40k_core.engine.transport_source_embark_history import (
+                validate_source_embark_request,
+            )
+
+            validate_source_embark_request(request)
+            continue
+        if request.actor_id != request_payload.get("active_player_id"):
             raise GameLifecycleError("Embark decision authority drift.")
         context = request_payload.get("movement_context")
         if not isinstance(context, dict):
@@ -229,7 +236,11 @@ def _validate_embark_events(
         if (
             record.request.decision_type != "select_embark_transport"
             or record.result.selected_option_id != payload.get("transport_unit_instance_id")
-            or record.request.actor_id != payload.get("active_player_id")
+            or (
+                isinstance(request_payload, dict)
+                and "source_context" not in request_payload
+                and record.request.actor_id != payload.get("active_player_id")
+            )
             or not isinstance(request_payload, dict)
         ):
             raise GameLifecycleError("Embark decision authority drift.")
@@ -238,6 +249,13 @@ def _validate_embark_events(
             for key in ("game_id", "battle_round", "active_player_id", "phase", "unit_instance_id")
         ):
             raise GameLifecycleError("Embark request context drift.")
+        if "source_context" in request_payload:
+            from warhammer40k_core.engine.transport_source_embark_history import (
+                validate_source_embark_event,
+            )
+
+            validate_source_embark_event(record, payload)
+            continue
         request_event = next(
             candidate
             for candidate in event_records[:index]
