@@ -1004,10 +1004,17 @@ def _two_turn_maintain_control_same_central() -> tuple[
     _bind_force_dispositions(state)
     if target_id != action.target_id:
         raise AssertionError("Step 5E accumulated Maintain Control target drifted.")
-    _complete_started_maintain_control(
+    first_record = _complete_started_maintain_control(
         state=state,
         decisions=decisions,
-        store_record=False,
+        store_record=True,
+    )
+    assert first_record is not None
+    score_primary_objective_control_boundary(
+        state=state,
+        record=first_record,
+        end_of_battle=False,
+        event_log=decisions.event_log,
     )
     first_markers = _active_maintain_control_markers(state)
     assert len(first_markers) == 1

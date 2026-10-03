@@ -2,6 +2,11 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 109 / P14B requires a controlling unit to be in objective range and contain
+a positive-OC model, which may be outside that range. Player scores still sum
+only in-range models. Shared Stratagem selection and frozen mission completion
+preserve attached units, restore and replay. See [source resolution and scope](docs/ORDER_109_SCOPE_PLAN.md).
+
 Order 107 / P12D limits extra Pile In and Consolidation distance to their matching
 Fight phase steps. Overrun retains three inches through the shared ordinary and
 attached movement authority. See [source, scope and validation](docs/ORDER_107_SCOPE_PLAN.md).

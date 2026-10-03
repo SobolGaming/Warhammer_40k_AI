@@ -85,16 +85,27 @@ def prepare_objective_control(
             and rules_unit_is_battle_shocked(state=state, unit_instance_id=unit.unit_instance_id)
         ) or (state is None and unit.unit_instance_id in context.battle_shocked_unit_ids):
             continue
+        in_range = any(
+            measurement.within_control_range
+            for geometry in geometries
+            for measurement in measure_rules_unit_to_objective(
+                scenario=context.scenario, rules_unit=unit, objective=geometry
+            )
+        )
+        # Unit control also depends on OC-positive members outside objective range.
         model_ids = tuple(
             sorted(
-                {
-                    measurement.model_instance_id
-                    for geometry in geometries
-                    for measurement in measure_rules_unit_to_objective(
-                        scenario=context.scenario, rules_unit=unit, objective=geometry
-                    )
-                    if measurement.within_control_range
-                }
+                model.model_instance_id
+                for model in unit.own_models
+                if in_range
+                and (
+                    model.is_alive
+                    or model.model_instance_id in context.scenario.present_destroyed_model_ids
+                )
+                and context.scenario.battlefield_state.model_placement_or_none(
+                    model.model_instance_id
+                )
+                is not None
             )
         )
         if not model_ids or not any(
