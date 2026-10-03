@@ -794,7 +794,10 @@ def test_extra_weapons_cannot_be_skipped_and_retry_restores_and_replays(
         selected[cast(str, declaration["weapon_instance_id"])] = declaration
     declarations = list(selected.values())
     assert len(declarations) == 2
-    assert {row["wargear_id"] for row in declarations} == {"core-leader-blade", "order92-extra"}
+    assert {cast(str, row["wargear_id"]) for row in declarations} == {
+        "core-leader-blade",
+        "order92-extra",
+    }
     payload["declarations"] = cast(list[JsonValue], declarations)
     before = session.to_persistence_payload()
     restored_pending = LocalGameSession.from_persistence_payload(json.loads(json.dumps(before)))
