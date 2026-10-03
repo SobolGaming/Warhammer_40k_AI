@@ -363,7 +363,7 @@ def _rotation_clear_of_floor(model: Model, start: Pose, end: Pose, floor: Terrai
             support_squared = rational(base.radius) ** 2 * determinant
         else:
             a, b = rational(base.length) / 2, rational(base.width) / 2
-            supports = []
+            supports: list[Fraction] = []
             for pose in (start, end):
                 c, s = rational_rotation(pose.facing.degrees)
                 u, v = a * (c * nx + s * ny), b * (c * ny - s * nx)

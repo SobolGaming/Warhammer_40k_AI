@@ -105,7 +105,7 @@
     },
     "src/warhammer40k_core/geometry/terrain_transit.py": {
       "before_sha256": null,
-      "after_sha256": "3258e0a0952f89c3fb430ba518e006b9811460ba3321d65076b2f8dd2bf59357",
+      "after_sha256": "73715094a6f4394631b794c809005d5c95ac6a05fda62d52ddc40fa8bd869410",
       "owners": {
         "@module": {
           "before": null,
@@ -137,7 +137,7 @@
         },
         "_rotation_clear_of_floor": {
           "before": null,
-          "after": "47471c4bc26f1183fd99a80941d77b4c9d3c86611295920a490baa30c44a146e"
+          "after": "7040d36d180fba27152e1f56bb809f6c40733e2bb0026f2e0135bd96ac91f95d"
         },
         "_rotation_contact_certificate": {
           "before": null,

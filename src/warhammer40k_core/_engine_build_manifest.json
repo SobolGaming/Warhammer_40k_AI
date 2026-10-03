@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bd68a82fd062a078bca5234baca92f4859fc4187b15a2cb17054dbf16eceab7f",
-  "fingerprint": "bd68a82fd062a078bca5234baca92f4859fc4187b15a2cb17054dbf16eceab7f",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:98ecd4141aab60d54cee93bda732eb7c9e001e70484664949953e97733ebf36d",
+  "fingerprint": "98ecd4141aab60d54cee93bda732eb7c9e001e70484664949953e97733ebf36d",
   "resource_count": 3046,
   "resources": [
     {
@@ -13325,9 +13325,9 @@
       "sha256": "ceb03ad6f5381c137cb1cdc390e1bef5c46b8547f94363ce52d610383254132d"
     },
     {
-      "byte_length": 17291,
+      "byte_length": 17307,
       "path": "warhammer40k_core/geometry/terrain_transit.py",
-      "sha256": "3258e0a0952f89c3fb430ba518e006b9811460ba3321d65076b2f8dd2bf59357"
+      "sha256": "73715094a6f4394631b794c809005d5c95ac6a05fda62d52ddc40fa8bd869410"
     },
     {
       "byte_length": 2030,
