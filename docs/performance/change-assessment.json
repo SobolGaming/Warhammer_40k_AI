@@ -6,131 +6,131 @@
   "changes": {
     "ci/test_shards/durations.json": {
       "before_sha256": "755ecbfaf3275c7962950bd8300754c45afc5fbdb62125e7b5d87356e9c5f2b9",
-      "after_sha256": "a728ab4a916e7f04396212d677b198a560b88d8d3549e29d317888c30939ba2e",
+      "after_sha256": "baa787bcbff261292e0aa38a5737cce7c0a9d51a0ed95d9ad4569223af81c854",
       "owners": {
         "@document": {
           "before": "755ecbfaf3275c7962950bd8300754c45afc5fbdb62125e7b5d87356e9c5f2b9",
-          "after": "a728ab4a916e7f04396212d677b198a560b88d8d3549e29d317888c30939ba2e"
+          "after": "baa787bcbff261292e0aa38a5737cce7c0a9d51a0ed95d9ad4569223af81c854"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "ba07e69399b6fe551daf416970016ac14189e24f09a80abfeee20ff7f0c4faaa",
-      "after_sha256": "cd19bca634bb537c4aea3251c840a939bec9f16d94ad86aab5c318e4867d7f88",
+      "after_sha256": "63722cb3b5ba0b0571a7f8fcae1bd3be400c80bb7bb4e132f57c7db7f0f1e171",
       "owners": {
         "@document": {
           "before": "ba07e69399b6fe551daf416970016ac14189e24f09a80abfeee20ff7f0c4faaa",
-          "after": "cd19bca634bb537c4aea3251c840a939bec9f16d94ad86aab5c318e4867d7f88"
+          "after": "63722cb3b5ba0b0571a7f8fcae1bd3be400c80bb7bb4e132f57c7db7f0f1e171"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "7b5eeee7957d439d316df702a06419544b5d68e410b2a00d92a99c865fa97123",
-      "after_sha256": "a63e4329ce189fa243b5af4934c8930d468addcba0df7f4e39f4c0d2ef0396f6",
+      "after_sha256": "a36890f13b2980cb3abfd0cbac12357385385f72283186ecac04eb0aa2061f82",
       "owners": {
         "@document": {
           "before": "7b5eeee7957d439d316df702a06419544b5d68e410b2a00d92a99c865fa97123",
-          "after": "a63e4329ce189fa243b5af4934c8930d468addcba0df7f4e39f4c0d2ef0396f6"
+          "after": "a36890f13b2980cb3abfd0cbac12357385385f72283186ecac04eb0aa2061f82"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "f6e3dd7be365ce53dd9e9daea2b35c30b02939d27c2c1ec21e63788ceeb91932",
-      "after_sha256": "c20bc94a3fb368da1b09ca1eb6329e8075b6812ea3f33721c1a0a5148f368bdb",
+      "after_sha256": "ca3c6622ea67e2c7f619a46753ac27d61ef32edebc2cecb53ac04c4cde638a6c",
       "owners": {
         "@document": {
           "before": "f6e3dd7be365ce53dd9e9daea2b35c30b02939d27c2c1ec21e63788ceeb91932",
-          "after": "c20bc94a3fb368da1b09ca1eb6329e8075b6812ea3f33721c1a0a5148f368bdb"
+          "after": "ca3c6622ea67e2c7f619a46753ac27d61ef32edebc2cecb53ac04c4cde638a6c"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "729416670ffe3c824f6bc4a36bc9169fff0d3a04c77449e1f5fd252add22ce7e",
-      "after_sha256": "e7a757acc282f2b6698e29c385ae0d85012db26a59228dc6ecdc5c520f1903ea",
+      "after_sha256": "5214f6c85c0ecff4551b6587c8265b93b15f2cec14c6bd1bb45375fa31cc51a9",
       "owners": {
         "@document": {
           "before": "729416670ffe3c824f6bc4a36bc9169fff0d3a04c77449e1f5fd252add22ce7e",
-          "after": "e7a757acc282f2b6698e29c385ae0d85012db26a59228dc6ecdc5c520f1903ea"
+          "after": "5214f6c85c0ecff4551b6587c8265b93b15f2cec14c6bd1bb45375fa31cc51a9"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "024a30ef56ec43b7875cd27c1a34b1e7576055eac8ff34ca5c9874ead4bcf2a0",
-      "after_sha256": "0c4fb0cab6025978176d5eaebae523e024d99434d97125f0079b325f8cb337c8",
+      "after_sha256": "3d231b5b77f43335552091d6f04cd2acbf0e6575d0742a066537e0d40e1e76ea",
       "owners": {
         "@document": {
           "before": "024a30ef56ec43b7875cd27c1a34b1e7576055eac8ff34ca5c9874ead4bcf2a0",
-          "after": "0c4fb0cab6025978176d5eaebae523e024d99434d97125f0079b325f8cb337c8"
+          "after": "3d231b5b77f43335552091d6f04cd2acbf0e6575d0742a066537e0d40e1e76ea"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "2109021a894cede4bbc6366ef1397d7757303fa085c8db5d82b8ad2e55ba61c5",
-      "after_sha256": "8566f6001f7cc5d5b8620f7ce6720a1394d30acccc4e2a63701466a959ca93a1",
+      "after_sha256": "84a8b1fd1ec8f8cca7fc28e15fb8d3bfff3562670ba9ff9502146806b13600a2",
       "owners": {
         "@document": {
           "before": "2109021a894cede4bbc6366ef1397d7757303fa085c8db5d82b8ad2e55ba61c5",
-          "after": "8566f6001f7cc5d5b8620f7ce6720a1394d30acccc4e2a63701466a959ca93a1"
+          "after": "84a8b1fd1ec8f8cca7fc28e15fb8d3bfff3562670ba9ff9502146806b13600a2"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "e91b529d733fe7289c875a3c97df11264e96681c95e73ac4afe1a4fa2cc11498",
-      "after_sha256": "4e93d9c9e04988246113133581709797562e487afeec0daee446ba4be5b31119",
+      "after_sha256": "8f39d51fd617f12094d941202efd02d9d2c1b7e352dc4823f55901205c5e72a5",
       "owners": {
         "@document": {
           "before": "e91b529d733fe7289c875a3c97df11264e96681c95e73ac4afe1a4fa2cc11498",
-          "after": "4e93d9c9e04988246113133581709797562e487afeec0daee446ba4be5b31119"
+          "after": "8f39d51fd617f12094d941202efd02d9d2c1b7e352dc4823f55901205c5e72a5"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "cababaa7ff77d9c9d60a5b4d58158919dda110b01170a3cfdb9679ba4aa8e1c1",
-      "after_sha256": "b494ebc810fba65f3e409fd4a71ace9cd04d0ada56e11096c5d56df04e2a9950",
+      "after_sha256": "169051d25f954ccddfeb63e92ddd2879e4ec71feee39b661de88b9989365d490",
       "owners": {
         "@document": {
           "before": "cababaa7ff77d9c9d60a5b4d58158919dda110b01170a3cfdb9679ba4aa8e1c1",
-          "after": "b494ebc810fba65f3e409fd4a71ace9cd04d0ada56e11096c5d56df04e2a9950"
+          "after": "169051d25f954ccddfeb63e92ddd2879e4ec71feee39b661de88b9989365d490"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "9387d4926e5d9b4070e025630aeed3a0a93ddead8f01b53bc6c4542d05f5e724",
-      "after_sha256": "e6326976c360771ef278d7e4d616bdb16a3970b653ce7eb9232b8bbc60a465eb",
+      "after_sha256": "75d1e79ce4abd263804393e64acd4d33f7b9aafbfcddef877725d03a4ab3c5e2",
       "owners": {
         "@document": {
           "before": "9387d4926e5d9b4070e025630aeed3a0a93ddead8f01b53bc6c4542d05f5e724",
-          "after": "e6326976c360771ef278d7e4d616bdb16a3970b653ce7eb9232b8bbc60a465eb"
+          "after": "75d1e79ce4abd263804393e64acd4d33f7b9aafbfcddef877725d03a4ab3c5e2"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "aaef678264274c4f835472273ff930217e9c65639c83f1e1e6cfbd263660b54f",
-      "after_sha256": "aee425054386780af6ff80484f16519ef99f22016bc2b0aa5b7321b2e6afa1e1",
+      "after_sha256": "b3d54a8462a7f9c8cf2e5343ff1dfafaaa7d04a5c3d5e20d90262053cf96ed78",
       "owners": {
         "@document": {
           "before": "aaef678264274c4f835472273ff930217e9c65639c83f1e1e6cfbd263660b54f",
-          "after": "aee425054386780af6ff80484f16519ef99f22016bc2b0aa5b7321b2e6afa1e1"
+          "after": "b3d54a8462a7f9c8cf2e5343ff1dfafaaa7d04a5c3d5e20d90262053cf96ed78"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "b428de966ee49edf2fd243af1a5f286b708fef5d7939ef4214e354002b3fe213",
-      "after_sha256": "6e61e9003e39c01d12f0fc3f2508059adafd0d6aeabb885374971d0cace10409",
+      "after_sha256": "f3b3f7a3ee9ffe5cfff89a1e5833039672675b8cf5c48eb701c0a61e69db8fd3",
       "owners": {
         "@document": {
           "before": "b428de966ee49edf2fd243af1a5f286b708fef5d7939ef4214e354002b3fe213",
-          "after": "6e61e9003e39c01d12f0fc3f2508059adafd0d6aeabb885374971d0cace10409"
+          "after": "f3b3f7a3ee9ffe5cfff89a1e5833039672675b8cf5c48eb701c0a61e69db8fd3"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "6d084da75fa1b57d0892e94afaa414d4efce8907dab05f75c205fedb7f004a38",
-      "after_sha256": "4dd5f32198389fc7391c378826d7a05cfad4703cdf2a38bbbb0ba7cd89b37d3b",
+      "after_sha256": "435bd8d4920fa06f20cee5c3495b43c9c77f0480e1b9c5e8e3beacd7ee9412a9",
       "owners": {
         "@document": {
           "before": "6d084da75fa1b57d0892e94afaa414d4efce8907dab05f75c205fedb7f004a38",
-          "after": "4dd5f32198389fc7391c378826d7a05cfad4703cdf2a38bbbb0ba7cd89b37d3b"
+          "after": "435bd8d4920fa06f20cee5c3495b43c9c77f0480e1b9c5e8e3beacd7ee9412a9"
         }
       }
     },
@@ -302,7 +302,7 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards from actual recovered Order110 phase timings and the new focused test timing, explicitly labeled representative evidence rather than a complete current behavioral gate.",
+      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
       "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
       "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
     },
@@ -312,7 +312,7 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards from actual recovered Order110 phase timings and the new focused test timing, explicitly labeled representative evidence rather than a complete current behavioral gate.",
+      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
       "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
       "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
     },
@@ -322,7 +322,7 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards from actual recovered Order110 phase timings and the new focused test timing, explicitly labeled representative evidence rather than a complete current behavioral gate.",
+      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
       "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
       "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
     },
@@ -332,7 +332,7 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards from actual recovered Order110 phase timings and the new focused test timing, explicitly labeled representative evidence rather than a complete current behavioral gate.",
+      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
       "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
       "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
     },
@@ -342,7 +342,7 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards from actual recovered Order110 phase timings and the new focused test timing, explicitly labeled representative evidence rather than a complete current behavioral gate.",
+      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
       "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
       "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
     },
@@ -352,7 +352,7 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards from actual recovered Order110 phase timings and the new focused test timing, explicitly labeled representative evidence rather than a complete current behavioral gate.",
+      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
       "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
       "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
     },
@@ -362,7 +362,7 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards from actual recovered Order110 phase timings and the new focused test timing, explicitly labeled representative evidence rather than a complete current behavioral gate.",
+      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
       "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
       "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
     },
@@ -372,7 +372,7 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards from actual recovered Order110 phase timings and the new focused test timing, explicitly labeled representative evidence rather than a complete current behavioral gate.",
+      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
       "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
       "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
     },
@@ -382,7 +382,7 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards from actual recovered Order110 phase timings and the new focused test timing, explicitly labeled representative evidence rather than a complete current behavioral gate.",
+      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
       "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
       "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
     },
@@ -392,7 +392,7 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards from actual recovered Order110 phase timings and the new focused test timing, explicitly labeled representative evidence rather than a complete current behavioral gate.",
+      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
       "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
       "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
     },
@@ -402,7 +402,7 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards from actual recovered Order110 phase timings and the new focused test timing, explicitly labeled representative evidence rather than a complete current behavioral gate.",
+      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
       "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
       "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
     },
@@ -412,7 +412,7 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards from actual recovered Order110 phase timings and the new focused test timing, explicitly labeled representative evidence rather than a complete current behavioral gate.",
+      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
       "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
       "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
     },
@@ -422,7 +422,7 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate all twelve shards from actual recovered Order110 phase timings and the new focused test timing, explicitly labeled representative evidence rather than a complete current behavioral gate.",
+      "rationale": "Regenerate all twelve shards from the complete 10529-case covered Order111 run at 2250c8283dc5b116ab91d2fb359315e09f5761c9 on Windows: 32 work-stealing workers plus 16 serial polygon cases, with serial branch coverage appended. Preserve actual successful JUnit timings and the complete current behavioral file inventory.",
       "source_obligation": "Order111/P09D/C09-04: FAQ 9b1c81f5-2ea0-40eb-9015-6a005367cd75 permits MONSTER/VEHICLE friendly transit for moves other than Normal/Advance; preserve enemy, endpoint and independent source exclusions.",
       "unchanged_work": "One bounded movement-mode condition changes the existing friendly blocker list. Witness traversal, collision sampling/search, cache keys/policy, state ownership and serialization/replay algorithms remain unchanged. The owner's sequential review policy requires serial current-runtime smoke and all live semantic/work/cache gates; no deliberate performance change or full-game timing certification is claimed."
     },
