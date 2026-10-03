@@ -2769,6 +2769,108 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order113-attack-counts": {
+      "paths": [
+        "src/warhammer40k_core/core/weapon_ability_sources.py",
+        "src/warhammer40k_core/core/weapon_profiles.py",
+        "src/warhammer40k_core/engine/attack_sequence_selection.py",
+        "src/warhammer40k_core/engine/catalog_rule_consumption.py",
+        "src/warhammer40k_core/engine/catalog_selected_target_pair_support.py",
+        "src/warhammer40k_core/engine/phases/shooting_declaration_validation.py",
+        "src/warhammer40k_core/engine/rule_ir_weapon_modifiers.py",
+        "src/warhammer40k_core/engine/weapon_abilities.py",
+        "src/warhammer40k_core/engine/weapon_ability_grants.py",
+        "src/warhammer40k_core/rules/wahapedia_bridge.py",
+        "src/warhammer40k_core/rules/weapon_keyword_values.py"
+      ],
+      "owners": [
+        "@module",
+        "AbilityDescriptor.blast",
+        "AbilityKind",
+        "_ability_descriptors",
+        "_apply_phase13d_weapon_modifiers",
+        "_attack_bonus_per_five",
+        "_required_positive_weapon_ability_value",
+        "_required_weapon_ability_choice_value_parameter",
+        "_required_weapon_ability_value",
+        "_validate_supported_ability_shape",
+        "_validate_weapon_profile_signature_shape",
+        "_valued_weapon_ability_entry",
+        "_weapon_ability_choice_has_supported_runtime_shape",
+        "_weapon_ability_descriptor",
+        "_weapon_ability_descriptor_for_grant",
+        "_weapon_ability_grant_is_supported",
+        "_weapon_keyword_grant_has_supported_runtime_shape",
+        "blast_attack_bonus",
+        "blast_attack_bonus_for_profile",
+        "cleave_attack_bonus",
+        "preserve_native_keyword_occurrences",
+        "valued_weapon_keyword",
+        "weapon_ability_applies",
+        "weapon_ability_descriptor_for_grant",
+        "weapon_ability_value",
+        "weapon_keyword_for_ability_kind"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order113-regressions": {
+      "paths": [
+        "tests/code_quality/test_order113_attack_counts.py",
+        "tests/fire_overwatch_helpers.py",
+        "tests/random_melee_helpers.py",
+        "tests/unit/engine/test_catalog_weapon_ability_runtime_helpers.py",
+        "tests/unit/rules/test_wahapedia_bridge_normalization.py",
+        "tests/unit/test_fire_overwatch.py",
+        "tests/unit/test_order92_random_melee.py",
+        "tests/unit/test_phase13b_shooting_declarations.py",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "overwatch_session",
+        "random_melee_session",
+        "test_order113_attack_count_sources_require_one_occurrence_without_stacking",
+        "test_order113_blast_applicability_and_grouping_require_keyword",
+        "test_order113_blast_choice_and_selected_pair_shapes",
+        "test_order113_blast_descriptor_preserves_value_condition_and_payload",
+        "test_order113_blast_occurrence_choice_rejects_invalid_before_random_roll",
+        "test_order113_blast_x_reaction_uses_shared_frozen_counts",
+        "test_order113_blast_x_shared_declaration_count",
+        "test_order113_blast_x_uses_complete_groups_of_five",
+        "test_order113_bridge_preserves_blast_x_and_cleave_x",
+        "test_order113_bridge_preserves_every_plain_and_valued_blast_choice",
+        "test_order113_cleave_fixed_random_attached_restore_fork_replay",
+        "test_order113_generic_blast_grants_preserve_value_or_reject_it",
+        "test_order113_ingested_mixed_blast_requires_player_choice",
+        "test_order113_invalid_blast_value_fails_closed",
+        "test_order113_pinned_selected_clauses_keep_literal_hashes",
+        "test_order113_shared_consumers_do_not_fix_blast_x_to_one",
+        "test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order113-source-evidence": {
+      "paths": [
+        "data/source_audits/order113/baseline/tests/fire_overwatch_helpers.py.txt",
+        "data/source_audits/order113/baseline/tests/random_melee_helpers.py.txt",
+        "data/source_audits/order113/baseline/tests/unit/test_fire_overwatch.py.txt",
+        "data/source_audits/order113/baseline/tests/unit/test_phase13d_weapon_ability_helpers.py.txt",
+        "data/source_audits/order113/historical-inputs.json",
+        "tools/core_rules_order97_history.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "historical_evidence_path"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

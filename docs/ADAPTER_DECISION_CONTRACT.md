@@ -7453,3 +7453,24 @@ Adapters observe the ordinary public Action state/event path; clearing the later
 Battle-shock status cannot revive a terminal Action. Existing event and
 persistence schemas remain unchanged; saves/replays require the exact runtime
 identity. See [Order 110](ORDER_110_SCOPE_PLAN.md) for bounded source scope.
+
+
+## Order113: Blast X and Cleave X (Contract 44.2 unchanged)
+
+Blast X adds the `blast` structured ability kind with the existing positive
+integer `value`, target-condition and source-instance descriptor payload shape.
+Bare Blast retains its source-defined one-per-five form. Native plain and valued
+grants belong to the same existing `select_weapon_ability_instance` family;
+adapters select one engine-enumerated occurrence ID, including equal-value
+sources, through existing finite/parameterized submission contracts. No new
+decision type, option payload field, proposal kind or visibility policy is added.
+
+The shared engine publishes computed physical attack pools through the existing
+Shooting/reaction events. Cleave X uses the existing melee proposal and committed
+random attack budget: only one selected target for all attacks of that weapon
+permits its bonus. Split allocations conserve the original physical budget and
+cannot distribute Cleave bonus dice. Both rules preserve the Select Targets
+count, including attached members, through casualties and target replacement.
+Accepted profiles, source IDs and count rule IDs already use JSON-safe payloads.
+Existing viewer redaction and exact runtime identity govern saves/replays.
+Regenerated runtime/examples are required; no old-history conversion is added.

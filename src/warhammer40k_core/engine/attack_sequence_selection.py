@@ -543,6 +543,10 @@ def _validate_weapon_profile_signature_shape(profile: WeaponProfile) -> None:
                 f"{keyword.value} requires a structured ability descriptor for identical attacks."
             )
     for ability in profile.abilities:
+        if ability.ability_kind is AbilityKind.BLAST:
+            if WeaponKeyword.BLAST not in profile.keywords:
+                raise GameLifecycleError("Blast descriptor requires the weapon keyword.")
+            continue
         if ability.ability_kind is AbilityKind.DEVASTATING_WOUNDS:
             devastating_wounds_resolution(profile)
             continue

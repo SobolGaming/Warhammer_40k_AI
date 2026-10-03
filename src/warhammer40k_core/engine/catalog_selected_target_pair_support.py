@@ -1000,6 +1000,8 @@ def _weapon_ability_grant_is_supported(parameters: dict[str, RuleParameterValue]
     ):
         return False
     value = parameters.get("weapon_ability_value")
+    if keyword == WeaponKeyword.BLAST.value:
+        return "weapon_ability_value" not in parameters or (type(value) is int and value >= 1)
     if keyword not in _VALUE_REQUIRED_WEAPON_KEYWORDS:
         return value is None
     if keyword == WeaponKeyword.SUSTAINED_HITS.value:

@@ -22,7 +22,6 @@ def random_melee_session(
     random: bool = True,
     extra: bool = False,
     cleave: bool = False,
-    target_attached: bool = False,
     profiles: bool = False,
     attacker_models: int = 1,
     attached: bool = False,
@@ -120,19 +119,6 @@ def random_melee_session(
             for sheet in catalog.datasheets
         ),
     )
-    if target_attached:
-        catalog = replace(
-            catalog,
-            datasheets=tuple(
-                replace(
-                    sheet,
-                    composition=tuple(replace(row, min_models=4) for row in sheet.composition),
-                )
-                if sheet.datasheet_id == "core-intercessor-like-infantry"
-                else sheet
-                for sheet in catalog.datasheets
-            ),
-        )
     lifecycle, _ = fight_lifecycle(
         alpha_unit_ids=("attacker", "bodyguard") if attached else ("attacker",),
         alpha_attachment_declarations=(
@@ -166,20 +152,9 @@ def random_melee_session(
         enemy_unit_specs=None
         if not cleave
         else {
-            "target-a": (
-                "core-intercessor-like-infantry",
-                "core-intercessor-like",
-                4 if target_attached else 5,
-            ),
+            "target-a": ("core-intercessor-like-infantry", "core-intercessor-like", 5),
             "target-b": ("core-character-leader", "core-character-leader", 1),
         },
-        enemy_attachment_declarations=(
-            AttachmentDeclaration(
-                source_unit_selection_id="target-b", bodyguard_unit_selection_id="target-a"
-            ),
-        )
-        if target_attached
-        else (),
         fights_first_unit_keys=("bodyguard",) if attached else ("attacker",),
         record_deployment=True,
     )

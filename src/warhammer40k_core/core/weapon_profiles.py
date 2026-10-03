@@ -78,6 +78,7 @@ class WeaponKeyword(StrEnum):
 
 
 class AbilityKind(StrEnum):
+    BLAST = "blast"
     DEVASTATING_WOUNDS = "devastating_wounds"
     SUSTAINED_HITS = "sustained_hits"
     LETHAL_HITS = "lethal_hits"
@@ -313,6 +314,31 @@ class AbilityDescriptor:
             ),
             target_keywords=canonical_target_keywords,
             timing=AbilityTiming.TARGET_DECLARATION,
+        )
+
+    @classmethod
+    def blast(
+        cls,
+        value: int,
+        *,
+        target_keywords: tuple[str, ...] = (),
+        target_keyword_match_mode: TargetKeywordMatchMode | None = None,
+    ) -> Self:
+        canonical_keywords, match_mode = _canonical_target_keyword_gate(
+            target_keywords, explicit_match_mode=target_keyword_match_mode
+        )
+        id_suffix = _target_keyword_ability_id_suffix(canonical_keywords, match_mode)
+        return cls(
+            ability_id=f"blast:{value}{id_suffix}",
+            name=f"Blast {value}{_target_keyword_name_suffix(canonical_keywords, match_mode)}",
+            ability_kind=AbilityKind.BLAST,
+            parameters=_parameters_with_target_keyword_match_mode(
+                (AbilityParameter.integer(value),),
+                target_keyword_match_mode=match_mode,
+                target_keywords=canonical_keywords,
+            ),
+            target_keywords=canonical_keywords,
+            timing=AbilityTiming.ATTACK_SEQUENCE,
         )
 
     @classmethod
@@ -1104,6 +1130,7 @@ def _validate_supported_ability_shape(
     condition: AbilityCondition | None,
 ) -> None:
     if ability_kind in {
+        AbilityKind.BLAST,
         AbilityKind.CLEAVE,
         AbilityKind.MELTA,
         AbilityKind.RAPID_FIRE,

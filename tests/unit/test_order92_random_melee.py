@@ -1119,3 +1119,59 @@ def test_living_attached_recipient_remains_allocatable_after_component_death() -
         damage_allocation_target_state(state=state, target_unit_instance_id="army-alpha:bodyguard")
         is DamageAllocationTargetState.ALLOCATABLE
     )
+
+
+@pytest.mark.parametrize("random", [False, True])
+@pytest.mark.parametrize("attached", [False, True])
+def test_order113_cleave_fixed_random_attached_restore_fork_replay(
+    random: bool, attached: bool
+) -> None:
+    session = random_melee_session(random=random, cleave=True, target_attached=attached)
+    if random:
+        request, budgets = _all_committed(session)
+        payload = _split(request, budgets[0], [cast(int, budgets[0]["base_attacks"]) + 2])
+        if attached:
+            allocation = cast(
+                list[dict[str, JsonValue]],
+                cast(list[dict[str, JsonValue]], payload["declarations"])[0]["target_allocations"],
+            )[0]
+            allocation["target_unit_instance_id"] = "attached-unit:army-beta:target-a"
+        expected = cast(int, budgets[0]["base_attacks"]) + 2
+    else:
+        request = melee_boundary(session)
+        payload = single_target_commitment_payload(request)
+        expected = 7
+    pending = session.to_persistence_payload()
+    assert (
+        LocalGameSession.from_persistence_payload(
+            json.loads(json.dumps(pending))
+        ).to_persistence_payload()
+        == pending
+    )
+    fork = session.fork()
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id, result_id="order113-cleave", payload=payload
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert fork.to_persistence_payload() == pending
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.fight_phase_state is not None
+    sequence = state.fight_phase_state.attack_sequence
+    assert sequence is not None
+    assert [pool.attacks for pool in sequence.attack_pools] == [expected]
+    assert sequence.attack_pools[0].targeting_rule_ids.count("weapon-ability:cleave:2") == 1
+    checkpoint = session.to_persistence_payload()
+    assert (
+        LocalGameSession.from_persistence_payload(
+            json.loads(json.dumps(checkpoint))
+        ).to_persistence_payload()
+        == checkpoint
+    )
+    for viewer in ("player-a", "player-b"):
+        session.view(viewer_player_id=viewer)
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="order113-cleave"))
+        .run()
+        .reproduced_exactly
+    )
