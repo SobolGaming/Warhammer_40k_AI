@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7e6f1a71a4ae347f98fa512cbcee8f8c9c03b409cf65c8464b55831daa6c6d54",
-  "fingerprint": "7e6f1a71a4ae347f98fa512cbcee8f8c9c03b409cf65c8464b55831daa6c6d54",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7c1b35ca1948018391a7eb72d8c708973121d651afac3ccb887b22d38168512d",
+  "fingerprint": "7c1b35ca1948018391a7eb72d8c708973121d651afac3ccb887b22d38168512d",
   "resource_count": 3043,
   "resources": [
     {
@@ -12515,9 +12515,9 @@
       "sha256": "388f3f2e9400c4263e7d08533d0a1f332c0d912a428c7eb688b6921b00d3001d"
     },
     {
-      "byte_length": 58746,
+      "byte_length": 58401,
       "path": "warhammer40k_core/engine/shooting_targets.py",
-      "sha256": "a3307db53454734da9d71987e47f139362d3cda6628c25c092e2e66ea16de6ce"
+      "sha256": "1411582e5bbabd9a5dc44ec6647ec29b90f3779ec43f7b802c5064ac74e7fc75"
     },
     {
       "byte_length": 7704,

@@ -1,0 +1,17 @@
+{
+  "reviewed_commit": "8007555ef23e85c11d39b294acec02bd83fc3271",
+  "also_present_at_base": "fc12fa214642f1b1f2a31b56be7323b7d76dbebc",
+  "purpose": "Authenticate the unchanged original Order 97 assertion inventory after correcting current per-observer range evidence assertions. This archive is historical evidence, not current Order104 semantic compliance; current tests still execute in normal suites.",
+  "current_evidence": "docs/ORDER_104_SCOPE_PLAN.md",
+  "files": [
+    {
+      "path": "tests/unit/test_phase13b_shooting_phase_declarations.py",
+      "historical_path": "data/source_audits/order104/baseline/tests/unit/test_phase13b_shooting_phase_declarations.py.txt",
+      "git_revision": "8007555ef23e85c11d39b294acec02bd83fc3271",
+      "git_path": "tests/unit/test_phase13b_shooting_phase_declarations.py",
+      "sha256": "eb2288b80e5a93ec2f5d644988ccbb5f045947d2937137d43da6880e2b9c1837",
+      "bytes": 193517,
+      "order97_file_pin": "eb2288b80e5a93ec2f5d644988ccbb5f045947d2937137d43da6880e2b9c1837"
+    }
+  ]
+}

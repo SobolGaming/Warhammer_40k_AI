@@ -818,12 +818,7 @@ def _target_candidate(
     indirect_fire_can_target_without_visibility = has_weapon_keyword(
         weapon_profile, WeaponKeyword.INDIRECT_FIRE
     ) and not has_weapon_keyword(weapon_profile, WeaponKeyword.TORRENT)
-    detectable_in_range_model_ids = tuple(
-        model_id
-        for model_id in target_in_range_model_ids
-        if model_id in detection_eligible_model_ids
-    )
-    if not detectable_in_range_model_ids and not indirect_fire_can_target_without_visibility:
+    if not detection_eligible_model_ids and not indirect_fire_can_target_without_visibility:
         return _invalid_candidate(
             attacker_unit=attacker_unit,
             weapon_profile=weapon_profile,
@@ -849,19 +844,17 @@ def _target_candidate(
     )
     indirect_no_visible = (
         evidence is not None
-        and not evidence.visible_and_in_range_target_model_ids
+        and not evidence.visible_target_model_ids
         and indirect_fire_can_target_without_visibility
     )
-    if evidence is None or (
-        not evidence.visible_and_in_range_target_model_ids and not indirect_no_visible
-    ):
+    if evidence is None or (not evidence.visible_target_model_ids and not indirect_no_visible):
         witness = None if evidence is None else evidence.witness
         return _invalid_candidate(
             attacker_unit=attacker_unit,
             weapon_profile=weapon_profile,
             target_unit_id=target_unit_id,
             violation_code=ShootingTargetViolationCode.NOT_VISIBLE,
-            message="No target model is both visible to and within range of the attacker.",
+            message="No target model is visible to an attacker with this unit in weapon range.",
             visibility_cache_key=visibility_cache_key,
             target_visible_model_ids=(),
             target_in_range_model_ids=target_in_range_model_ids,
@@ -899,7 +892,7 @@ def _target_candidate(
                 violation_code=ShootingTargetViolationCode.LOCKED_IN_COMBAT,
                 message=locked_validation,
                 visibility_cache_key=visibility_cache_key,
-                target_visible_model_ids=evidence.visible_and_in_range_target_model_ids,
+                target_visible_model_ids=evidence.visible_target_model_ids,
                 target_in_range_model_ids=target_in_range_model_ids,
                 line_of_sight_witness=witness,
                 observer_model_id=witness.observer_model_id,
@@ -920,8 +913,8 @@ def _target_candidate(
             violation_code=ShootingTargetViolationCode.LOCKED_IN_COMBAT,
             message=target_engagement_validation,
             visibility_cache_key=visibility_cache_key,
-            target_visible_model_ids=evidence.visible_and_in_range_target_model_ids,
-            target_in_range_model_ids=evidence.visible_and_in_range_target_model_ids,
+            target_visible_model_ids=evidence.visible_target_model_ids,
+            target_in_range_model_ids=evidence.in_range_target_model_ids,
             line_of_sight_witness=witness,
             observer_model_id=witness.observer_model_id,
         )
@@ -939,8 +932,8 @@ def _target_candidate(
             violation_code=ShootingTargetViolationCode.LOCKED_IN_COMBAT,
             message="Blast weapons cannot target units that are within Engagement Range.",
             visibility_cache_key=visibility_cache_key,
-            target_visible_model_ids=evidence.visible_and_in_range_target_model_ids,
-            target_in_range_model_ids=evidence.visible_and_in_range_target_model_ids,
+            target_visible_model_ids=evidence.visible_target_model_ids,
+            target_in_range_model_ids=evidence.in_range_target_model_ids,
             line_of_sight_witness=witness,
             observer_model_id=witness.observer_model_id,
         )
@@ -962,7 +955,7 @@ def _target_candidate(
             violation_code=ShootingTargetViolationCode.LONE_OPERATIVE,
             message="Lone Operative target is outside the allowed targeting distance.",
             visibility_cache_key=visibility_cache_key,
-            target_visible_model_ids=evidence.visible_and_in_range_target_model_ids,
+            target_visible_model_ids=evidence.visible_target_model_ids,
             target_in_range_model_ids=target_in_range_model_ids,
             line_of_sight_witness=witness,
             observer_model_id=witness.observer_model_id,
@@ -1016,14 +1009,8 @@ def _target_candidate(
         weapon_profile_id=weapon_profile.profile_id,
         target_unit_instance_id=target_unit_id,
         observer_model_id=witness.observer_model_id,
-        target_visible_model_ids=(
-            () if indirect_no_visible else evidence.visible_and_in_range_target_model_ids
-        ),
-        target_in_range_model_ids=(
-            target_in_range_model_ids
-            if indirect_no_visible
-            else evidence.visible_and_in_range_target_model_ids
-        ),
+        target_visible_model_ids=evidence.visible_target_model_ids,
+        target_in_range_model_ids=evidence.in_range_target_model_ids,
         line_of_sight_witness=witness,
         visibility_cache_key=visibility_cache_key,
         shooting_types=_shooting_types_for_target_candidate(
@@ -1106,7 +1093,7 @@ def _plunging_fire_applies(
         "AIRCRAFT",
     ):
         return False
-    if not evidence.visible_and_in_range_target_model_ids:
+    if not evidence.visible_target_model_ids:
         return False
     if not _target_unit_contains_ground_level_model(target_models):
         return False
@@ -1208,24 +1195,27 @@ def _best_line_of_sight_range_evidence(
         )
         witness = context.resolve_line_of_sight()
         cover_result = context.benefit_of_cover(witness)
-        visible_and_in_range_ids = tuple(
+        # FAQ 30: range and visibility may use different models in this target
+        # rules unit, but both requirements still belong to this firing model.
+        visible_ids = tuple(
             target_model_id
             for target_model_id in witness.visible_model_ids
-            if target_model_id in in_range_model_ids and target_model_id in eligible_model_ids
+            if target_model_id in eligible_model_ids
         )
         evidence = _LineOfSightRangeEvidence(
             witness=witness,
             cover_result=cover_result,
-            visible_and_in_range_target_model_ids=visible_and_in_range_ids,
+            visible_target_model_ids=visible_ids,
+            in_range_target_model_ids=in_range_model_ids,
         )
-        if not visible_and_in_range_ids:
+        if not visible_ids:
             if best_blocked_evidence is None:
                 best_blocked_evidence = evidence
             continue
         if best_evidence is None:
             best_evidence = evidence
             continue
-        if len(visible_and_in_range_ids) > len(best_evidence.visible_and_in_range_target_model_ids):
+        if len(visible_ids) > len(best_evidence.visible_target_model_ids):
             best_evidence = evidence
     return best_evidence if best_evidence is not None else best_blocked_evidence
 
@@ -1247,7 +1237,8 @@ class _TargetEngagementContext:
 class _LineOfSightRangeEvidence:
     witness: LineOfSightWitness
     cover_result: BenefitOfCoverResult
-    visible_and_in_range_target_model_ids: tuple[str, ...]
+    visible_target_model_ids: tuple[str, ...]
+    in_range_target_model_ids: tuple[str, ...]
 
 
 def _locked_in_combat_context(

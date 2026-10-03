@@ -135,8 +135,11 @@ def test_order_30_retained_shooter_keeps_range_restriction_and_ability_geometry(
 def test_order_30_for_the_chapter_shoots_after_own_hazardous_death(with_feel_no_pain: bool) -> None:
     lifecycle, units = _compact_shooting_lifecycle(
         catalog=for_the_chapter_catalog(hazardous=True),
-        # Contract 43 group payloads/IDs change RNG history; retain both own-Hazardous branches.
-        game_id="order103-fixture-02-01" if with_feel_no_pain else "order103-fixture-09-00",
+        # Order104's complete range/visibility evidence changes recorded RNG history.
+        # Keep real own-Hazardous destruction, including the optional FNP branch.
+        game_id="order104-own-hazardous-04-1"
+        if with_feel_no_pain
+        else "order104-own-hazardous-00-0",
         enemy_model_count=5,
     )
     state = lifecycle.state
