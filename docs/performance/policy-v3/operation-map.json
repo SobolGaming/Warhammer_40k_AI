@@ -2640,6 +2640,7 @@
         "tests/action_battle_shock_helpers.py",
         "tests/action_movement_interruption_helpers.py",
         "tests/code_quality/test_action_movement_interruption.py",
+        "tests/code_quality/test_order97_inventory.py",
         "tests/phase17n_primary_mission_helpers.py",
         "tests/unit/test_action_movement_interruption.py",
         "tests/unit/test_phase11e_mission_scoring_cleanup.py"
@@ -2661,7 +2662,24 @@
         "test_attached_action_cannot_complete_after_component_fails_battle_shock",
         "test_explicit_shocked_action_permission_preserves_movement_interruption_and_replay",
         "test_failed_battle_shock_producer_interrupts_or_preserves_started_action",
+        "test_original_assertions_remain_exact_and_fail_closed",
         "test_shocked_start_uses_explicit_catalog_permission_through_facade"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order110-source-evidence": {
+      "paths": [
+        "data/source_audits/order110/baseline/tests/action_movement_interruption_helpers.py.txt",
+        "data/source_audits/order110/baseline/tests/phase17n_primary_mission_helpers.py.txt",
+        "data/source_audits/order110/historical-inputs.json",
+        "tools/core_rules_order97_history.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "historical_evidence_path"
       ],
       "families": [],
       "sensitive": false,

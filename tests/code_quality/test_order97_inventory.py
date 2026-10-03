@@ -20,6 +20,7 @@ from tools.core_rules_order97_history import (
     ORDER104_MAPPING,
     ORDER107_MAPPING,
     ORDER108_MAPPING,
+    ORDER110_MAPPING,
     historical_evidence_path,
 )
 
@@ -272,6 +273,25 @@ def test_order97_rejects_duplicated_nonoperative_disposition(
             ),
             "19f1c507541321b7c1ed04f80e2c1110a1fa786d",
             3,
+        ),
+        (
+            "tests/action_movement_interruption_helpers.py",
+            ORDER110_MAPPING,
+            "582e1c101ea4c149797fc76c9a6ab3e3bc2e12f9",
+            "31ef2e759c99b7709b5afe9c7d442b1ee96c47ed837f5f6e0e3cca80d76bbc0d",
+            11503,
+            (
+                MAPPING,
+                ORDER102_MAPPING,
+                ORDER103_MAPPING,
+                ISSUE535_MAPPING,
+                ISSUE534_MAPPING,
+                ORDER104_MAPPING,
+                ORDER107_MAPPING,
+                ORDER108_MAPPING,
+            ),
+            "582e1c101ea4c149797fc76c9a6ab3e3bc2e12f9",
+            2,
         ),
     ],
 )

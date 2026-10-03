@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "582e1c101ea4c149797fc76c9a6ab3e3bc2e12f9",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7e9d50c0dff237ec0ead535c3b1e172a0333316b4b5d034a27905785e9402375",
-  "operation_map_sha256": "dcc9e3d18d9575dfcb33d6b75ab100e02dcce69daa530b3fa1790d52d278b66b",
+  "operation_map_sha256": "4edd31e0a30a0b0a486d767c38ff612c7393d2ab56fe184a65786ba4780e514b",
   "changes": {
     "README.md": {
       "before_sha256": "1627ac9332b340c5539f4dbf552f505c98ec85fda2d3cb23532dd68ad6ae8fdf",
@@ -134,6 +134,36 @@
         }
       }
     },
+    "data/source_audits/order110/baseline/tests/action_movement_interruption_helpers.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "31ef2e759c99b7709b5afe9c7d442b1ee96c47ed837f5f6e0e3cca80d76bbc0d",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "31ef2e759c99b7709b5afe9c7d442b1ee96c47ed837f5f6e0e3cca80d76bbc0d"
+        }
+      }
+    },
+    "data/source_audits/order110/baseline/tests/phase17n_primary_mission_helpers.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "1b150f4642c616e1582874547929ead9209bae9f8dbbbb4cb2602d426b20341f",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1b150f4642c616e1582874547929ead9209bae9f8dbbbb4cb2602d426b20341f"
+        }
+      }
+    },
+    "data/source_audits/order110/historical-inputs.json": {
+      "before_sha256": null,
+      "after_sha256": "98057295d7c92a1f19b76befb40679f214731417315a205cb4985d990cc7e77f",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "98057295d7c92a1f19b76befb40679f214731417315a205cb4985d990cc7e77f"
+        }
+      }
+    },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "before_sha256": "3f0255b6636ced74683815a9073dbd3ec67f1842b6d233287d059e7a48b505d8",
       "after_sha256": "b5bb3f33b8b2c52730a5ac2c7c1fbbfad85af64a25994813484905717361c64a",
@@ -166,11 +196,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "c8de5d26149e00829d31a487a87de48a50f08ae5fb4eb58d351e5abd4fe8eed1",
-      "after_sha256": "e59b865b36f0781793c25547a98556e82a4d290ea09f94eea34ed3e86dad62dc",
+      "after_sha256": "620831b0babdf07a0c856ee303633cfa015972a5e4b6e14422e467cf1be4b958",
       "owners": {
         "@document": {
           "before": "c8de5d26149e00829d31a487a87de48a50f08ae5fb4eb58d351e5abd4fe8eed1",
-          "after": "e59b865b36f0781793c25547a98556e82a4d290ea09f94eea34ed3e86dad62dc"
+          "after": "620831b0babdf07a0c856ee303633cfa015972a5e4b6e14422e467cf1be4b958"
         }
       }
     },
@@ -480,6 +510,20 @@
         }
       }
     },
+    "tests/code_quality/test_order97_inventory.py": {
+      "before_sha256": "050a3e6e1f8845785bc2ca1f6d740e29b68327eab0938b808653144c83f69d15",
+      "after_sha256": "b8f306cd721dd3ac9314164cec56a4901d6a5c06e4f4d7988f935790551c709c",
+      "owners": {
+        "@module": {
+          "before": "ce90657a03d40d844f58aba31502a3a44c5f184c2d96bd3f7eff48ead5e6a422",
+          "after": "7f8b9c9c86add27271ea6ee07a9e226a52e1adf222355d8c85640d8187906ba5"
+        },
+        "test_original_assertions_remain_exact_and_fail_closed": {
+          "before": "e7926f4320e242d03fb58247bedb9c76c2b57bda55cf625b44396a5723587619",
+          "after": "417fb02395d676c00f55296c07321c2658a7a1b0192b40041284ca9d8adabe9d"
+        }
+      }
+    },
     "tests/phase17n_primary_mission_helpers.py": {
       "before_sha256": "1b150f4642c616e1582874547929ead9209bae9f8dbbbb4cb2602d426b20341f",
       "after_sha256": "002f09328cf3c4d26c9f19d14f3ef98a19e9e9b3ecd9afb083a109593450caff",
@@ -535,6 +579,20 @@
         "test_attached_action_cannot_complete_after_component_fails_battle_shock": {
           "before": "0967442957fdba99c5aea7fc76bb48b44ee3f67002139a738c23c0fc1960df85",
           "after": "c987cafd3c32b25b8aaa53c7faffa997c0e5e476f119b07c793a697cb1b8bd94"
+        }
+      }
+    },
+    "tools/core_rules_order97_history.py": {
+      "before_sha256": "aaffbd1201541287535befd8b16ae5756d6b73b0fd8745e72b5694f81721a82c",
+      "after_sha256": "166e73066f4f1269b33b05c6980da8a3a0d39ae6b998a72139810c75d83dd6ea",
+      "owners": {
+        "@module": {
+          "before": "6ac954624df82d9b90722471335cbd1019c14d08a5105860e643cf4022d56310",
+          "after": "8645fcc295af6c3dcb583b39445eecedaee57b638307298d481ac27fa9c41013"
+        },
+        "historical_evidence_path": {
+          "before": "9d899bf66b8cc6b18c9345a7dcffaa200d3ec9c5d8d3122dc932529df926bda5",
+          "after": "bd0fb725ef2f94ea0f72a48406e44adcafe27b205967378c00fdedb855c681ad"
         }
       }
     }
@@ -758,6 +816,36 @@
         "issue533-contract-publication",
         "order103-contract-publication",
         "order110-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order110 source-backed Action Battle-shock correction, regression evidence and required runtime identity publication. The approved sequential policy selects serial smoke; no deliberate performance optimization or demonstrated serious regression.",
+      "source_obligation": "Order110/P16C/C16-04 implements the two pinned Core16.01 FAQs: becoming Battle-shocked stops an Action; an explicit start-while-shocked permission also permits continuation. All independent restrictions and movement interruption remain.",
+      "unchanged_work": "Adds bounded scans of active Actions and relevant structured unit ability clauses at Action eligibility/status transitions. Terminal event recording reuses the movement interruption owner; explicit permission does not change other Action restrictions. This rule work is not claimed free. Geometry/search algorithms, cache policy and historical benchmarks remain unchanged. Existing live semantic/work/cache checks and serial current-runtime smoke remain mandatory; no detailed benchmark or full-game certification is claimed."
+    },
+    "data/source_audits/order110/baseline/tests/action_movement_interruption_helpers.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order110-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order110 source-backed Action Battle-shock correction, regression evidence and required runtime identity publication. The approved sequential policy selects serial smoke; no deliberate performance optimization or demonstrated serious regression.",
+      "source_obligation": "Order110/P16C/C16-04 implements the two pinned Core16.01 FAQs: becoming Battle-shocked stops an Action; an explicit start-while-shocked permission also permits continuation. All independent restrictions and movement interruption remain.",
+      "unchanged_work": "Adds bounded scans of active Actions and relevant structured unit ability clauses at Action eligibility/status transitions. Terminal event recording reuses the movement interruption owner; explicit permission does not change other Action restrictions. This rule work is not claimed free. Geometry/search algorithms, cache policy and historical benchmarks remain unchanged. Existing live semantic/work/cache checks and serial current-runtime smoke remain mandatory; no detailed benchmark or full-game certification is claimed."
+    },
+    "data/source_audits/order110/baseline/tests/phase17n_primary_mission_helpers.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order110-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order110 source-backed Action Battle-shock correction, regression evidence and required runtime identity publication. The approved sequential policy selects serial smoke; no deliberate performance optimization or demonstrated serious regression.",
+      "source_obligation": "Order110/P16C/C16-04 implements the two pinned Core16.01 FAQs: becoming Battle-shocked stops an Action; an explicit start-while-shocked permission also permits continuation. All independent restrictions and movement interruption remain.",
+      "unchanged_work": "Adds bounded scans of active Actions and relevant structured unit ability clauses at Action eligibility/status transitions. Terminal event recording reuses the movement interruption owner; explicit permission does not change other Action restrictions. This rule work is not claimed free. Geometry/search algorithms, cache policy and historical benchmarks remain unchanged. Existing live semantic/work/cache checks and serial current-runtime smoke remain mandatory; no detailed benchmark or full-game certification is claimed."
+    },
+    "data/source_audits/order110/historical-inputs.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order110-source-evidence"
       ],
       "selected_families": [],
       "rationale": "Bounded Order110 source-backed Action Battle-shock correction, regression evidence and required runtime identity publication. The approved sequential policy selects serial smoke; no deliberate performance optimization or demonstrated serious regression.",
@@ -994,6 +1082,14 @@
       "source_obligation": "Order110/P16C/C16-04 implements the two pinned Core16.01 FAQs: becoming Battle-shocked stops an Action; an explicit start-while-shocked permission also permits continuation. All independent restrictions and movement interruption remain.",
       "unchanged_work": "Adds bounded scans of active Actions and relevant structured unit ability clauses at Action eligibility/status transitions. Terminal event recording reuses the movement interruption owner; explicit permission does not change other Action restrictions. This rule work is not claimed free. Geometry/search algorithms, cache policy and historical benchmarks remain unchanged. Existing live semantic/work/cache checks and serial current-runtime smoke remain mandatory; no detailed benchmark or full-game certification is claimed."
     },
+    "tests/code_quality/test_order97_inventory.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded Order110 source-backed Action Battle-shock correction, regression evidence and required runtime identity publication. The approved sequential policy selects serial smoke; no deliberate performance optimization or demonstrated serious regression.",
+      "source_obligation": "Order110/P16C/C16-04 implements the two pinned Core16.01 FAQs: becoming Battle-shocked stops an Action; an explicit start-while-shocked permission also permits continuation. All independent restrictions and movement interruption remain.",
+      "unchanged_work": "Adds bounded scans of active Actions and relevant structured unit ability clauses at Action eligibility/status transitions. Terminal event recording reuses the movement interruption owner; explicit permission does not change other Action restrictions. This rule work is not claimed free. Geometry/search algorithms, cache policy and historical benchmarks remain unchanged. Existing live semantic/work/cache checks and serial current-runtime smoke remain mandatory; no detailed benchmark or full-game certification is claimed."
+    },
     "tests/phase17n_primary_mission_helpers.py": {
       "category": "rule_semantics",
       "operations": [
@@ -1018,6 +1114,22 @@
       "category": "rule_semantics",
       "operations": [
         "order110-action-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Order110 source-backed Action Battle-shock correction, regression evidence and required runtime identity publication. The approved sequential policy selects serial smoke; no deliberate performance optimization or demonstrated serious regression.",
+      "source_obligation": "Order110/P16C/C16-04 implements the two pinned Core16.01 FAQs: becoming Battle-shocked stops an Action; an explicit start-while-shocked permission also permits continuation. All independent restrictions and movement interruption remain.",
+      "unchanged_work": "Adds bounded scans of active Actions and relevant structured unit ability clauses at Action eligibility/status transitions. Terminal event recording reuses the movement interruption owner; explicit permission does not change other Action restrictions. This rule work is not claimed free. Geometry/search algorithms, cache policy and historical benchmarks remain unchanged. Existing live semantic/work/cache checks and serial current-runtime smoke remain mandatory; no detailed benchmark or full-game certification is claimed."
+    },
+    "tools/core_rules_order97_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue534-order97-history",
+        "issue535-order97-history",
+        "order104-historical-evidence",
+        "order107-historical-evidence",
+        "order108-historical-evidence",
+        "order110-source-evidence",
+        "shock-source-generation-and-audit"
       ],
       "selected_families": [],
       "rationale": "Bounded Order110 source-backed Action Battle-shock correction, regression evidence and required runtime identity publication. The approved sequential policy selects serial smoke; no deliberate performance optimization or demonstrated serious regression.",

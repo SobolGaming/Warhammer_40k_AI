@@ -1,0 +1,27 @@
+{
+  "reviewed_commit": "582e1c101ea4c149797fc76c9a6ab3e3bc2e12f9",
+  "also_present_at_base": "582e1c101ea4c149797fc76c9a6ab3e3bc2e12f9",
+  "purpose": "Retain original Order97 Action and mission fixture inputs before Order110 adds explicit permission, genuine movement Battle-shock and completion controls. Historical evidence is not a claim of Order110 compliance.",
+  "current_evidence": "docs/ORDER_110_SCOPE_PLAN.md",
+  "files": [
+    {
+      "path": "tests/action_movement_interruption_helpers.py",
+      "historical_path": "data/source_audits/order110/baseline/tests/action_movement_interruption_helpers.py.txt",
+      "git_revision": "582e1c101ea4c149797fc76c9a6ab3e3bc2e12f9",
+      "git_path": "tests/action_movement_interruption_helpers.py",
+      "sha256": "31ef2e759c99b7709b5afe9c7d442b1ee96c47ed837f5f6e0e3cca80d76bbc0d",
+      "bytes": 11503,
+      "order97_file_pin": "31ef2e759c99b7709b5afe9c7d442b1ee96c47ed837f5f6e0e3cca80d76bbc0d"
+    },
+    {
+      "path": "tests/phase17n_primary_mission_helpers.py",
+      "historical_path": "data/source_audits/order110/baseline/tests/phase17n_primary_mission_helpers.py.txt",
+      "git_revision": "582e1c101ea4c149797fc76c9a6ab3e3bc2e12f9",
+      "git_path": "tests/phase17n_primary_mission_helpers.py",
+      "sha256": "1b150f4642c616e1582874547929ead9209bae9f8dbbbb4cb2602d426b20341f",
+      "bytes": 48134,
+      "order97_file_pin": "1b150f4642c616e1582874547929ead9209bae9f8dbbbb4cb2602d426b20341f"
+    }
+  ],
+  "original_order97_reviewed_commit": "8007555ef23e85c11d39b294acec02bd83fc3271"
+}
