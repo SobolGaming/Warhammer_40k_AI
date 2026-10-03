@@ -503,6 +503,7 @@ def capture_primary_mission_action_completion_evidence(
         completion_condition_met=False,
     )
     met = evaluate_primary_mission_action_completion_evidence(
+        state=state,
         evidence=evidence,
         policy=policy,
     )
@@ -659,6 +660,7 @@ def validate_primary_mission_action_completion_evidence(
     ):
         raise GameLifecycleError("Non-Vanguard Primary Mission Action has terrain evidence.")
     completion_condition_met = evaluate_primary_mission_action_completion_evidence(
+        state=state,
         evidence=evidence,
         policy=policy,
     )
@@ -671,6 +673,7 @@ def validate_primary_mission_action_completion_evidence(
 
 def evaluate_primary_mission_action_completion_evidence(
     *,
+    state: GameState,
     evidence: PrimaryMissionActionCompletionEvidence,
     policy: MissionActionPolicyDescriptor,
 ) -> bool:
@@ -680,12 +683,17 @@ def evaluate_primary_mission_action_completion_evidence(
     if effect == PRIMARY_MISSION_ACTION_SURVEIL_EFFECT:
         return True
     if effect in PRIMARY_MISSION_ACTION_OBJECTIVE_CONTROL_EFFECTS:
+        from warhammer40k_core.engine.unit_objective_control import boundary_unit_objective_control
+
         result = evidence.objective_control_result
-        return bool(
-            result is not None
-            and result.controlled_by_player_id == evidence.player_id
-            and evidence.action_unit_contributor_model_instance_ids
-        )
+        if result is None or evidence.objective_control_record_id is None:
+            return False
+        return boundary_unit_objective_control(
+            state=state,
+            record_id=evidence.objective_control_record_id,
+            player_id=evidence.player_id,
+            unit_identity_ids=evidence.action_unit_identity_ids,
+        ).controls(result)
     if effect == PRIMARY_MISSION_ACTION_VANGUARD_EFFECT:
         target_id = evidence.condition_target_id
         if target_id is None:

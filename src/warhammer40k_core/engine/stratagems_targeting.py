@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionHookRegistry
+from warhammer40k_core.engine.unit_objective_control import current_unit_objective_control
 
 from warhammer40k_core.engine.rapid_ingress_eligibility import (
     rapid_ingress_window_error,
@@ -490,6 +491,7 @@ def _target_unit_within_controlled_objective_range(
             context=context,
             target_binding=target_binding,
             ruleset_descriptor=ruleset_descriptor,
+            require_unit_control=False,
         )
     )
 
@@ -501,12 +503,14 @@ def _controlled_objective_marker_ids_for_target(
     context: StratagemEligibilityContext | None,
     target_binding: StratagemTargetBinding,
     ruleset_descriptor: RulesetDescriptor | None,
+    require_unit_control: bool = True,
 ) -> tuple[str, ...]:
     if state.mission_setup is None or state.battlefield_state is None:
         return ()
     if state.active_player_id is None:
         return ()
     target_unit_id = _require_target_unit_id(target_binding)
+    unit = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_id)
     record = resolve_objective_control(
         ObjectiveControlContext.from_game_state(
             state,
@@ -521,14 +525,23 @@ def _controlled_objective_marker_ids_for_target(
         record=record,
         states=tuple(state.sticky_objective_control_states),
     )
+    control = (
+        current_unit_objective_control(state=state, unit_instance_id=target_unit_id)
+        if require_unit_control
+        else None
+    )
     return tuple(
         sorted(
             result.objective_id
             for result in record.results
             if result.controlled_by_player_id == player_id
-            and _objective_control_result_has_unit(
-                result=result,
-                unit_instance_id=target_unit_id,
+            and (
+                control.controls(result)
+                if control is not None
+                else any(
+                    _objective_control_result_has_unit(result=result, unit_instance_id=component_id)
+                    for component_id in unit.component_unit_instance_ids
+                )
             )
         )
     )

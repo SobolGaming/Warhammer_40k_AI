@@ -56,12 +56,7 @@ def evaluate_objective_control_modifiers(
         raise GameLifecycleError("OC modifier choices require authoritative GameState.")
     if prepare_random_profiles:
         context = prepare_objective_control(context, decisions=decisions, scope_id=occurrence_id)
-    contributors = {
-        contribution.model_instance_id: contribution.unit_instance_id
-        for result in resolve_objective_control(context).results
-        for contribution in result.contributors
-        if not contribution.battle_shocked
-    }
+    contributors = dict(_unit_control_subjects(context))
     contributors.update({model_id: unit_id for unit_id, model_id in additional_subjects})
     traces: list[tuple[str, CharacteristicModifierTrace]] = []
     for model_id, unit_id in sorted(contributors.items()):
@@ -199,12 +194,7 @@ def require_objective_control_without_choices(context: ObjectiveControlContext) 
     state = context.state
     if state is None:
         raise GameLifecycleError("OC source validation requires authoritative state.")
-    subjects = {
-        (contribution.unit_instance_id, contribution.model_instance_id)
-        for result in resolve_objective_control(context).results
-        for contribution in result.contributors
-        if not contribution.battle_shocked
-    }
+    subjects = {(unit_id, model_id) for model_id, unit_id in _unit_control_subjects(context)}
     for unit_id, model_id in sorted(subjects):
         unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_id)
         _source, operations = _model_inventory(context, model_id=model_id, unit=unit)
@@ -220,6 +210,27 @@ def require_objective_control_without_choices(context: ObjectiveControlContext) 
             raise GameLifecycleError(
                 "Objective Control modifier choices require DecisionController."
             )
+
+
+def _unit_control_subjects(context: ObjectiveControlContext) -> tuple[tuple[str, str], ...]:
+    in_range_component_ids = {
+        contribution.unit_instance_id
+        for result in resolve_objective_control(context).results
+        for contribution in result.contributors
+        if not contribution.battle_shocked
+    }
+    return tuple(
+        (model.model_instance_id, unit.component_unit_id_for_model(model.model_instance_id))
+        for unit in rules_unit_views_from_armies(armies=context.scenario.armies)
+        if in_range_component_ids.intersection(unit.component_unit_instance_ids)
+        for model in unit.own_models
+        if (
+            model.is_alive
+            or model.model_instance_id in context.scenario.present_destroyed_model_ids
+        )
+        and context.scenario.battlefield_state.model_placement_or_none(model.model_instance_id)
+        is not None
+    )
 
 
 def _model_inventory(
