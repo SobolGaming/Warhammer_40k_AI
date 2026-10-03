@@ -316,7 +316,7 @@
     },
     "src/warhammer40k_core/core/weapon_ability_sources.py": {
       "before_sha256": "8a4bce5f589513da103880deef0d9b5f32852b5c1feb64962874d4177bb8d2ec",
-      "after_sha256": "0cf8eb7ae8027668321dddfd6e7021bbbe272f442f4aedbac837cc120e826150",
+      "after_sha256": "1f21a0961d2be2cde58d18cf1012339a041a6d59308abf5d30b8b8a674a7c150",
       "owners": {
         "preserve_native_keyword_occurrences": {
           "before": "427d7c9c3528c06248b6503b1f5435aa27bba5856e502e98ca26847150d43a88",
@@ -348,7 +348,7 @@
     },
     "src/warhammer40k_core/engine/attack_sequence_selection.py": {
       "before_sha256": "eb875248728e55bff73be89cf50dc6f95f722cba0862cfc45d796ca461aa970e",
-      "after_sha256": "f277e4be0ad979b81a77732266e5f4a1238e396dc51db8a4fcc5273415c0a885",
+      "after_sha256": "a281d79e1461e540fe27f7a2df214191f6a134fb0d6a5b7e8367b005037a7e44",
       "owners": {
         "_validate_weapon_profile_signature_shape": {
           "before": "cb4155ffd56f9e9f030057bf5e2c346eea23093789120b6f9961c571d384f3f1",
@@ -358,7 +358,7 @@
     },
     "src/warhammer40k_core/engine/catalog_rule_consumption.py": {
       "before_sha256": "c2112c4e8b258a27124860545fc3d08f41774a981761c60b4c63049670cbbe72",
-      "after_sha256": "1b738a7432b84769eabf7a5e5ae7303bd81ca5c3223ef60652e65dbd2b12afef",
+      "after_sha256": "8af26cbfbbd3eb8805f8040dcd77025ba234e56be2652f8030106ace883d772f",
       "owners": {
         "_required_weapon_ability_choice_value_parameter": {
           "before": "59712b54791a2e77975ebcad7998f5848fec7b23d445e7a564363e0449673c96",
@@ -390,7 +390,7 @@
     },
     "src/warhammer40k_core/engine/phases/shooting_declaration_validation.py": {
       "before_sha256": "e8a4d31a05f1a70ae5df9790f303b9825c86097257e3fbe15bbf54178d45336b",
-      "after_sha256": "4e004b4e68580b3f5d1888b1b1b1aaeaf2d1cfea3858e4fb46bcc482956c1ab6",
+      "after_sha256": "50fe91b9260016ba5d22fbd09af36abde1d9bfd6fefe8e2eb81148c61cd744a8",
       "owners": {
         "@module": {
           "before": "86ebca95573463f7b66a241eca771cdf7cd5d5714d0facf7f1ab6b469f95d35b",
@@ -404,7 +404,7 @@
     },
     "src/warhammer40k_core/engine/rule_ir_weapon_modifiers.py": {
       "before_sha256": "c4ec4ac8559038beb03e226bed314d9384a7149f094699d4d944fff4739072e2",
-      "after_sha256": "3ff3578cf943a37c8c2795669b435d027568cffb022c58b931442b4d568dae25",
+      "after_sha256": "04d67ae613efae90e708fa7bc088f9b78d2a401ea9f55120f6baf5f60fa7d9a7",
       "owners": {
         "_required_positive_weapon_ability_value": {
           "before": "248bce0a4da05716d0ed753a4111b3e505ea808d61e9a09403f6d5b2f5eefcdf",
@@ -498,7 +498,7 @@
     },
     "tests/code_quality/test_order113_attack_counts.py": {
       "before_sha256": null,
-      "after_sha256": "4056fe56eca61ac1f816b78f3230c83172ca0cdc67cd6d27d369c5c33b920268",
+      "after_sha256": "a63ac2d3c975a3e4e0e676a5a9912e98301ae7a7d127b33b7d5d4c5ca0a1ce7e",
       "owners": {
         "@module": {
           "before": null,
@@ -516,7 +516,7 @@
     },
     "tests/fire_overwatch_helpers.py": {
       "before_sha256": "c1ebdfd064847148314f460855e344971b15f106fab48301ed6bf5712686c727",
-      "after_sha256": "2308770c2b9af893ce72fa5acb85b5340035143b5cd6c913192cca4d6c80cd65",
+      "after_sha256": "35a93ee1470bd1e9a1a9caf1319fcaad1b30e2a5b14fffbb0b87fea4a3388362",
       "owners": {
         "@module": {
           "before": "3f9bff8668d513759a5ef7a6717342888b67df43081961de0bebd33559fd012e",
@@ -540,7 +540,7 @@
     },
     "tests/unit/engine/test_catalog_weapon_ability_runtime_helpers.py": {
       "before_sha256": "73366ceb6c2179726718d6c9ad6b8b46d12d7c5755c5f7454010633fb90a961a",
-      "after_sha256": "25e8bbe98b7f8120fd8bddad1b4af9b8e804bfd2cbd1fcba9a7d599bc1de5add",
+      "after_sha256": "d52f5ef540195376c9eaf64383fbd9177c1cff36837c3387fda3c2989a3721c2",
       "owners": {
         "test_order113_blast_choice_and_selected_pair_shapes": {
           "before": null,
@@ -558,7 +558,7 @@
     },
     "tests/unit/rules/test_wahapedia_bridge_normalization.py": {
       "before_sha256": "33f1487de33625f721d6e44667d01a00377741312b7f9ea1da080aafa2065c6d",
-      "after_sha256": "3bdebecb5f7c2b57803eef2699b651f3adac93e51f8880266341efe251d678d1",
+      "after_sha256": "4e608a698aa0a3c6d03d92f7278e99ea3a04b5526260663e735353516023c591",
       "owners": {
         "@module": {
           "before": "aa039e01ff11eb07581714332c5eeb444c5dc40b8d944ad761f65e420804a2f4",
@@ -576,7 +576,7 @@
     },
     "tests/unit/test_fire_overwatch.py": {
       "before_sha256": "2e7c01e62bc8a2c592fc9284045d2e14fb825ba2b62eddaa80d91160200ff0f7",
-      "after_sha256": "856baed9d3081c36aac1d578baa69a4cfe003c0dd02bbc4990c696f410ed8668",
+      "after_sha256": "e4c60c4f0a19dd3689f9e8740bcdd68be5e254ae26c2f6dda9cc6c8397c0d342",
       "owners": {
         "test_order113_blast_occurrence_choice_rejects_invalid_before_random_roll": {
           "before": null,
@@ -614,7 +614,7 @@
     },
     "tests/unit/test_phase13d_weapon_ability_helpers.py": {
       "before_sha256": "ace7694abb844ba2897559297f9d735187b25124b60b008b67b072b57993be01",
-      "after_sha256": "ee67372352116eb27c6080ac785de96f92771d8433058745023a97288ef01225",
+      "after_sha256": "97dd7ee99d21726d6b1f21f74ff5369f76c4c19278b8af6f9b20d994149b026d",
       "owners": {
         "test_order113_attack_count_sources_require_one_occurrence_without_stacking": {
           "before": null,
@@ -640,7 +640,7 @@
     },
     "tools/core_rules_order97_history.py": {
       "before_sha256": "87d7d7ebd50238e779b62ed3b528753028cfeb7fd7f07b6e10c04b8eee657a35",
-      "after_sha256": "6a7a80ba5f0d5cf165f3c7ad12a84e84a4e183e1874dfc9e8b79fe7ed0f8f73f",
+      "after_sha256": "e28e10ebc07c0de9d0fc876d992dee31be302051884dc9f7f28e50c7038ea777",
       "owners": {
         "@module": {
           "before": "63b975c8dc9650a17e7ea73f3fd0ade71f0fc4d95097a522a85ab0fc35417d7a",
