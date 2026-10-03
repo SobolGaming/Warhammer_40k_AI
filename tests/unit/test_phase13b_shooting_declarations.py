@@ -1131,6 +1131,111 @@ def test_order113_blast_x_shared_declaration_count(random_attacks: bool, attache
     assert ReplayRunner.from_payload(artifact.to_payload()).run().reproduced_exactly
 
 
+@pytest.mark.parametrize("conditioned", [False, True])
+@pytest.mark.parametrize("select_plain", [False, True])
+def test_order113_ingested_mixed_blast_requires_player_choice(
+    conditioned: bool, select_plain: bool
+) -> None:
+    from tests.setup_completion_helpers import record_current_battlefield_placements_for_fixture
+    from tests.support.wahapedia_source_fixtures import (
+        catalog_package_id,
+        catalog_version,
+        conditioned_weapon_keyword_bridge_artifacts,
+    )
+
+    from warhammer40k_core.core.weapon_ability_sources import weapon_keyword_ability_id
+    from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
+
+    description = "[BLAST, BLAST 2: MONSTER]" if conditioned else "[BLAST, BLAST 2]"
+    package = build_canonical_catalog_package(
+        package_id=catalog_package_id(),
+        catalog_version=catalog_version(),
+        source_artifacts=conditioned_weapon_keyword_bridge_artifacts(description),
+    )
+    profile = package.army_catalog.wargear[0].weapon_profiles[0]
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",), catalog=_catalog_with_extra_bolt_profile(profile)
+    )
+    record_current_battlefield_placements_for_fixture(
+        lifecycle.state, decisions=lifecycle.decision_controller
+    )
+    session = LocalGameSession(GameLifecycle.from_payload(lifecycle.to_payload()))
+    request = _decision_request(session.advance_until_decision_or_terminal())
+    request = _select_shooting_unit_and_type(
+        session.lifecycle,
+        selection_request=request,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        selection_result_id="order113-mixed-select",
+    )
+    target_id = units["enemy"].unit_instance_id
+    payload = cast(dict[str, object], request.payload)
+    proposal_request = cast(dict[str, object], payload["proposal_request"])
+    candidate = next(
+        row
+        for row in cast(list[dict[str, object]], proposal_request["target_candidates"])
+        if row["target_unit_instance_id"] == target_id
+        and row["weapon_profile_id"] == profile.profile_id
+        and row["is_legal"]
+    )
+    choices = cast(list[dict[str, object]], candidate["required_weapon_ability_selections"])
+    assert len(choices) == 1
+    options = cast(list[dict[str, object]], choices[0]["options"])
+    assert len(options) == 2
+    option = next(
+        row
+        for row in options
+        if (
+            cast(dict[str, object], cast(dict[str, object], row["payload"])["ability_source"])[
+                "ability_id"
+            ]
+            == weapon_keyword_ability_id(WeaponKeyword.BLAST)
+        )
+        == select_plain
+    )
+    checkpoint = session.to_persistence_payload()
+    assert (
+        LocalGameSession.from_persistence_payload(
+            json.loads(json.dumps(checkpoint))
+        ).to_persistence_payload()
+        == checkpoint
+    )
+    missing = _proposal_from_request(
+        request=request, target_unit_id=target_id, weapon_profile_id=profile.profile_id
+    )
+    invalid = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="order113-mixed-missing",
+        payload=validate_json_value(missing.to_payload()),
+    )
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert session.to_persistence_payload() == checkpoint
+    selected_id = cast(str, option["option_id"])
+    proposal = _proposal_from_request(
+        request=request,
+        target_unit_id=target_id,
+        weapon_profile_id=profile.profile_id,
+        selected_weapon_ability_ids=(selected_id,),
+    )
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="order113-mixed-declare",
+        payload=validate_json_value(proposal.to_payload()),
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    accepted = _last_event_payload(session.lifecycle, "shooting_declaration_accepted")
+    pool = cast(list[dict[str, object]], accepted["attack_pools"])[0]
+    bonus = 1 if select_plain else (0 if conditioned else 2)
+    assert pool["attacks"] == cast(int, profile.attack_profile.fixed_attacks) + bonus
+    assert pool["selected_weapon_ability_ids"] == [selected_id]
+    accepted_checkpoint = session.to_persistence_payload()
+    assert (
+        LocalGameSession.from_persistence_payload(
+            json.loads(json.dumps(accepted_checkpoint))
+        ).to_persistence_payload()
+        == accepted_checkpoint
+    )
+
+
 def test_phase13d_advanced_unit_allowed_to_shoot_does_not_gain_heavy_modifier() -> None:
     base_profile = _weapon_profile_by_wargear(
         wargear_id="core-bolt-rifle",

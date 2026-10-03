@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6e2a14a1669f8714143714147162f6bb74d1b696daaac66fade6d515fb6dfd24",
-  "fingerprint": "6e2a14a1669f8714143714147162f6bb74d1b696daaac66fade6d515fb6dfd24",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9a3cdf5ed915146346eeef746bb921e851d9ab05f8089c1a498d8eb3aeac22d8",
+  "fingerprint": "9a3cdf5ed915146346eeef746bb921e851d9ab05f8089c1a498d8eb3aeac22d8",
   "resource_count": 3050,
   "resources": [
     {
@@ -605,9 +605,9 @@
       "sha256": "855c441e9698cc212cfecb1c05aa9f367539f6afaa1a0260ca9ef7949b6bef83"
     },
     {
-      "byte_length": 9246,
+      "byte_length": 10116,
       "path": "warhammer40k_core/core/weapon_ability_sources.py",
-      "sha256": "da772fcd7946091926498d100b4006fb79c3604112f59e4870bc8d27c5f67134"
+      "sha256": "1f21a0961d2be2cde58d18cf1012339a041a6d59308abf5d30b8b8a674a7c150"
     },
     {
       "byte_length": 109,

@@ -89,6 +89,28 @@ No named handler, new decision family, fallback, cache, geometry solver, history
 migration or unsupported-content support is added. Coordinated hand-edited-history
 hardening remains separately queued absent a required boundary/normal reproduction.
 
+## Independent-review repair
+
+Both independent reviews reproduced a supported-input defect at the first frozen
+head: `[BLAST, BLAST 2]` ingestion discarded the bare occurrence, so the controlling
+player lost the source choice. The same loss removed the available bare bonus
+when Blast X was conditioned on a keyword absent from the selected target.
+The shared `preserve_native_keyword_occurrences` owner now subtracts described
+occurrences from the complete native keyword inventory and preserves every
+remaining bare slot. Descriptor identity and duplicate-slot identities remain
+separate; no default choice or stacked bonus is introduced. This is the sole
+canonical catalog occurrence-preservation call path. Other descriptor families
+continue to retain one occurrence per source descriptor.
+
+New canonical-ingestion controls cover both mixed orders, multiple bare or valued
+occurrences, plain-only and valued-only duplicates, and payload round-trip. Real
+LocalGameSession declarations require the offered choice, reject an omitted
+selection without mutation, execute either chosen occurrence, preserve the bare
+bonus against an inapplicable conditioned Blast X, and restore pending/accepted
+engine-created states. The red boundary run failed five mixed cases and passed
+two positive controls. The interrupted pre-repair aggregate and original review
+findings are retained, and cannot qualify the corrected implementation.
+
 ## Focused validation and remaining gates
 
 Focused red/green receipts and timestamps live in sibling `order113-state`.

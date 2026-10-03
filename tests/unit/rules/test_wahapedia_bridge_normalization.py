@@ -41,11 +41,16 @@ from warhammer40k_core.core.weapon_profiles import (
     AntiKeywordMatchMode,
     TargetKeywordMatchMode,
     WeaponKeyword,
+    WeaponProfile,
 )
 from warhammer40k_core.engine.ability_coverage import (
     WARLORD_RESTRICTION_MUSTERING_CONSUMER_ID,
     AbilityCoverageSupportStage,
     ability_coverage_row_for_descriptor,
+)
+from warhammer40k_core.engine.ability_instance_selection import (
+    selected_weapon_profile,
+    weapon_instance_selection_requests,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID,
@@ -59,6 +64,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_ir_consumers_for_rule,
     catalog_rule_ir_hook_ids_for_rule,
 )
+from warhammer40k_core.engine.weapon_abilities import blast_attack_bonus_for_profile
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
 from warhammer40k_core.rules.rule_ir import (
     RuleIR,
@@ -389,6 +395,44 @@ def test_order113_bridge_preserves_blast_x_and_cleave_x() -> None:
     assert by_kind[AbilityKind.BLAST].parameters[0].value == 2
     assert by_kind[AbilityKind.CLEAVE].parameters[0].value == 3
     assert by_kind[AbilityKind.CLEAVE].target_keywords == ("INFANTRY",)
+
+
+@pytest.mark.parametrize(
+    ("description", "values"),
+    [
+        ("[BLAST, BLAST 2]", (1, 2)),
+        ("[BLAST 2, BLAST]", (1, 2)),
+        ("[BLAST, BLAST 2, BLAST 3]", (1, 2, 3)),
+        ("[BLAST, BLAST, BLAST 2]", (1, 1, 2)),
+        ("[BLAST, BLAST 2, BLAST 2]", (1, 2, 2)),
+        ("[BLAST, BLAST]", (1, 1)),
+        ("[BLAST 2, BLAST 3]", (2, 3)),
+    ],
+)
+def test_order113_bridge_preserves_every_plain_and_valued_blast_choice(
+    description: str, values: tuple[int, ...]
+) -> None:
+    package = build_canonical_catalog_package(
+        package_id=catalog_package_id(),
+        catalog_version=catalog_version(),
+        source_artifacts=conditioned_weapon_keyword_bridge_artifacts(description),
+    )
+    original = package.army_catalog.wargear[0].weapon_profiles[0]
+    restored = WeaponProfile.from_payload(json.loads(json.dumps(original.to_payload())))
+    for profile in (original, restored):
+        requests = weapon_instance_selection_requests(
+            profile, actor_id="player-a", request_id="order113-ingested-source"
+        )
+        assert len(requests) == 1
+        assert len(requests[0].options) == len(values)
+        assert len({option.option_id for option in requests[0].options}) == len(values)
+        bonuses = sorted(
+            blast_attack_bonus_for_profile(
+                selected_weapon_profile(profile, (option.option_id,)), target_model_count=12
+            )
+            for option in requests[0].options
+        )
+        assert bonuses == [2 * value for value in values]
 
 
 def test_phase17k_bridge_allows_duplicate_anti_weapon_keyword_descriptors() -> None:
