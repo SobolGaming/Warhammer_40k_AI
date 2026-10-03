@@ -128,7 +128,7 @@ PRIMARY_BATTLEFIELD_DEPARTURE_CALLS = {
         "BattlefieldRemovalKind.INTO_RESERVES",
         "provider.occurrence_id",
     ),
-    "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": (
+    "src/warhammer40k_core/engine/transport_embark_mutation.py": (
         "BattlefieldRemovalKind.EMBARK",
         "result.result_id",
     ),
@@ -151,7 +151,7 @@ PRIMARY_BATTLEFIELD_DEPARTURE_CALL_NAMES = {
 }
 PRIMARY_BATTLEFIELD_DEPARTURE_OCCURRENCES = {
     "src/warhammer40k_core/engine/game_state.py": "provider.occurrence_id",
-    "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": "result.result_id",
+    "src/warhammer40k_core/engine/transport_embark_mutation.py": "result.result_id",
     "src/warhammer40k_core/engine/aircraft_turn_end.py": "source.event_id",
     "src/warhammer40k_core/engine/primary_unit_destruction_tracking.py": ("edge_occurrence_id"),
 }
@@ -540,12 +540,15 @@ def test_battlefield_removal_owners_converge_or_are_explicitly_non_authoritative
     assert "TimingTriggerKind.END_TURN" in aircraft_owner_source
 
     embark_helper_source = source_for(SRC_ROOT / "engine" / "transport_embark_groups.py")
-    embark_owner_source = source_for(
-        SRC_ROOT / "engine" / "phases" / "movement_fall_back_embark.py"
-    )
+    embark_owner_source = source_for(SRC_ROOT / "engine" / "transport_embark_mutation.py")
     assert "BattlefieldRemovalKind.EMBARK" in embark_helper_source
     assert "apply_embark_to_battlefield(" in embark_owner_source
     assert "record_primary_battlefield_departure(" in embark_owner_source
+    for consumer in (
+        SRC_ROOT / "engine" / "phases" / "movement_fall_back_embark.py",
+        SRC_ROOT / "engine" / "transport_source_embark.py",
+    ):
+        assert "apply_embark_mutation(" in source_for(consumer)
 
     reserve_owner_source = source_for(SRC_ROOT / "engine" / "game_state.py")
     assert "rules_unit_placement.without_from_battlefield(self.battlefield_state)" in (

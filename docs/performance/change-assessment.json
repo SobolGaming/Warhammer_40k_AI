@@ -666,6 +666,30 @@
         }
       }
     },
+    "tests/code_quality/test_phase14h_attack_resolution_convergence.py": {
+      "before_sha256": "67bdd7bf7f19b8e1c9fd3cebb60506702237b9e155ecd924326545db4bd4896f",
+      "after_sha256": "ba518e7f4f4c225ed3b9509fa3fd95492bd73e0be77a0a847ced44ffcb9cd979",
+      "owners": {
+        "@module": {
+          "before": "b94e9dfc8aee190c6a92864f5b3b0911ad2de629b5145b56e8af12694c1e08f6",
+          "after": "d1aa4e5cbbab8a46c494253338e534a27a11f4e67ad39abd5b1dfb70eccf18d4"
+        },
+        "test_battlefield_removal_owners_converge_or_are_explicitly_non_authoritative": {
+          "before": "44a4c7437bccb7d76a0f998f0afb1288d966d69667a7aedcc8baab47b53ea144",
+          "after": "d5e461827db26ac1a9733d3146cbaab679b695da4641d977ac3fcc1bb1442efa"
+        }
+      }
+    },
+    "tests/code_quality/test_unit_model_semantics.py": {
+      "before_sha256": "33071929293071663d5efb9fa861da7506332323ffd9f582ab458c6e324ab7ed",
+      "after_sha256": "5351de42735fec6c3a71a4a05fcb9c706027a3aef0c8263573b79a937dcd7f9d",
+      "owners": {
+        "test_p19_transport_cargo_uses_physical_components_and_shared_destruction_cleanup": {
+          "before": "287062e32c9da419d245d58519feac6f89a35d34cf9630ae969b06199c31638a",
+          "after": "666c37f664648ee07e51d2b84f173bd765d01d74a10f1deaae502c9f76eb5cde"
+        }
+      }
+    },
     "tests/order114_embark_helpers.py": {
       "before_sha256": null,
       "after_sha256": "79838814206e7572e85ce10699d7a1d30ec2adbe02a061ac2b61e3b857cbc9de",
@@ -1219,6 +1243,22 @@
       ],
       "selected_families": [],
       "rationale": "Exercise actual disembark followed by source embark/decline, attached group cargo authority, invalid pre-pop drift, ordinary move controls and valid engine-created save/load/fork/viewer/replay.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "tests/code_quality/test_phase14h_attack_resolution_convergence.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Migrate existing strict static embark provenance, battlefield mutation and physical-component audits to the extracted shared owner; retain ordinary/source delegation checks. Development-only audit repair after preserved 3-failure quality result, no runtime or behavioral test change.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "tests/code_quality/test_unit_model_semantics.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Migrate existing strict static embark provenance, battlefield mutation and physical-component audits to the extracted shared owner; retain ordinary/source delegation checks. Development-only audit repair after preserved 3-failure quality result, no runtime or behavioral test change.",
       "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
       "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
