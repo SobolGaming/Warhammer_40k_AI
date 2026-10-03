@@ -2669,6 +2669,22 @@
       "sensitive": false,
       "mandatory": false
     },
+    "order111-friendly-transit-regressions": {
+      "paths": [
+        "tests/unit/test_order111_friendly_transit.py"
+      ],
+      "owners": [
+        "@module",
+        "_assert_round_trip",
+        "_catalog",
+        "test_fall_back_through_friendly_model_retries_restores_and_replays",
+        "test_friendly_transit_uses_move_scope_and_retains_endpoint_and_enemy_rules",
+        "test_pile_in_friendly_transit_uses_facade_and_replays"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
     "order110-source-evidence": {
       "paths": [
         "data/source_audits/order110/baseline/tests/action_movement_interruption_helpers.py.txt",
