@@ -91,6 +91,18 @@ from warhammer40k_core.engine.transport_disembark_state import (
 from warhammer40k_core.engine.transport_embark_groups import (
     remove_embarking_rules_unit_from_battlefield,
 )
+from warhammer40k_core.engine.transport_embark_types import (
+    EmbarkResolution as EmbarkResolution,
+)
+from warhammer40k_core.engine.transport_embark_types import (
+    EmbarkResolutionPayload as EmbarkResolutionPayload,
+)
+from warhammer40k_core.engine.transport_embark_types import (
+    EmbarkSelection as EmbarkSelection,
+)
+from warhammer40k_core.engine.transport_embark_types import (
+    EmbarkSelectionPayload as EmbarkSelectionPayload,
+)
 from warhammer40k_core.engine.transport_embark_validation import resolve_embark as resolve_embark
 from warhammer40k_core.engine.transport_firing_deck import (
     FiringDeckResolution as FiringDeckResolution,
@@ -185,23 +197,6 @@ class TransportOperationViolationPayload(TypedDict):
     model_instance_id: str | None
     blocker_id: str | None
     source_rule_id: str | None
-
-
-class EmbarkSelectionPayload(TypedDict):
-    player_id: str
-    battle_round: int
-    unit_instance_id: str
-    transport_unit_instance_id: str
-    movement_phase_action: str
-    restriction_overrides: list[TransportRestrictionOverridePayload]
-
-
-class EmbarkResolutionPayload(TypedDict):
-    selection: EmbarkSelectionPayload
-    is_valid: bool
-    violations: list[TransportOperationViolationPayload]
-    updated_cargo_state: TransportCargoStatePayload | None
-    transition_batch: BattlefieldTransitionBatchPayload | None
 
 
 class DisembarkSelectionPayload(TypedDict):
@@ -621,175 +616,6 @@ class TransportOperationViolation:
             blocker_id=payload["blocker_id"],
             source_rule_id=payload["source_rule_id"],
         )
-
-
-@dataclass(frozen=True, slots=True)
-class EmbarkSelection:
-    player_id: str
-    battle_round: int
-    unit_instance_id: str
-    transport_unit_instance_id: str
-    movement_phase_action: TransportMovementStatus
-    restriction_overrides: tuple[TransportRestrictionOverride, ...] = ()
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "player_id",
-            _validate_identifier("EmbarkSelection player_id", self.player_id),
-        )
-        object.__setattr__(
-            self,
-            "battle_round",
-            _validate_positive_int("EmbarkSelection battle_round", self.battle_round),
-        )
-        object.__setattr__(
-            self,
-            "unit_instance_id",
-            _validate_identifier("EmbarkSelection unit_instance_id", self.unit_instance_id),
-        )
-        object.__setattr__(
-            self,
-            "transport_unit_instance_id",
-            _validate_identifier(
-                "EmbarkSelection transport_unit_instance_id",
-                self.transport_unit_instance_id,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "movement_phase_action",
-            transport_movement_status_from_token(self.movement_phase_action),
-        )
-        if self.movement_phase_action not in {
-            TransportMovementStatus.NORMAL_MOVE,
-            TransportMovementStatus.ADVANCE,
-            TransportMovementStatus.FALL_BACK,
-        }:
-            raise GameLifecycleError(
-                "EmbarkSelection requires a Normal, Advance, or Fall Back action."
-            )
-        object.__setattr__(
-            self,
-            "restriction_overrides",
-            _validate_transport_override_tuple(
-                "EmbarkSelection restriction_overrides",
-                self.restriction_overrides,
-            ),
-        )
-
-    def has_override(self, override_kind: TransportRestrictionOverrideKind) -> bool:
-        kind = transport_restriction_override_kind_from_token(override_kind)
-        return any(override.override_kind is kind for override in self.restriction_overrides)
-
-    def to_payload(self) -> EmbarkSelectionPayload:
-        return {
-            "player_id": self.player_id,
-            "battle_round": self.battle_round,
-            "unit_instance_id": self.unit_instance_id,
-            "transport_unit_instance_id": self.transport_unit_instance_id,
-            "movement_phase_action": self.movement_phase_action.value,
-            "restriction_overrides": [
-                override.to_payload() for override in self.restriction_overrides
-            ],
-        }
-
-    @classmethod
-    def from_payload(cls, payload: EmbarkSelectionPayload) -> Self:
-        return cls(
-            player_id=payload["player_id"],
-            battle_round=payload["battle_round"],
-            unit_instance_id=payload["unit_instance_id"],
-            transport_unit_instance_id=payload["transport_unit_instance_id"],
-            movement_phase_action=transport_movement_status_from_token(
-                payload["movement_phase_action"]
-            ),
-            restriction_overrides=tuple(
-                TransportRestrictionOverride.from_payload(override)
-                for override in payload["restriction_overrides"]
-            ),
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class EmbarkResolution:
-    selection: EmbarkSelection
-    violations: tuple[TransportOperationViolation, ...]
-    updated_cargo_state: TransportCargoState | None
-    transition_batch: BattlefieldTransitionBatch | None
-
-    def __post_init__(self) -> None:
-        if type(self.selection) is not EmbarkSelection:
-            raise GameLifecycleError("EmbarkResolution selection must be an EmbarkSelection.")
-        object.__setattr__(
-            self,
-            "violations",
-            _validate_transport_violation_tuple(
-                "EmbarkResolution violations",
-                self.violations,
-            ),
-        )
-        if self.updated_cargo_state is not None and type(self.updated_cargo_state) is not (
-            TransportCargoState
-        ):
-            raise GameLifecycleError(
-                "EmbarkResolution updated_cargo_state must be a TransportCargoState."
-            )
-        if self.transition_batch is not None and type(self.transition_batch) is not (
-            BattlefieldTransitionBatch
-        ):
-            raise GameLifecycleError(
-                "EmbarkResolution transition_batch must be a BattlefieldTransitionBatch."
-            )
-        if self.violations and (
-            self.updated_cargo_state is not None or self.transition_batch is not None
-        ):
-            raise GameLifecycleError("Invalid EmbarkResolution cannot include mutation records.")
-        if not self.violations and (
-            self.updated_cargo_state is None or self.transition_batch is None
-        ):
-            raise GameLifecycleError("Valid EmbarkResolution requires mutation records.")
-
-    @property
-    def is_valid(self) -> bool:
-        return not self.violations
-
-    def to_payload(self) -> EmbarkResolutionPayload:
-        return {
-            "selection": self.selection.to_payload(),
-            "is_valid": self.is_valid,
-            "violations": [violation.to_payload() for violation in self.violations],
-            "updated_cargo_state": (
-                None if self.updated_cargo_state is None else self.updated_cargo_state.to_payload()
-            ),
-            "transition_batch": None
-            if self.transition_batch is None
-            else self.transition_batch.to_payload(),
-        }
-
-    @classmethod
-    def from_payload(cls, payload: EmbarkResolutionPayload) -> Self:
-        transition_payload = payload["transition_batch"]
-        resolution = cls(
-            selection=EmbarkSelection.from_payload(payload["selection"]),
-            violations=tuple(
-                TransportOperationViolation.from_payload(violation)
-                for violation in payload["violations"]
-            ),
-            updated_cargo_state=(
-                None
-                if payload["updated_cargo_state"] is None
-                else TransportCargoState.from_payload(payload["updated_cargo_state"])
-            ),
-            transition_batch=(
-                None
-                if transition_payload is None
-                else BattlefieldTransitionBatch.from_payload(transition_payload)
-            ),
-        )
-        if resolution.is_valid != payload["is_valid"]:
-            raise GameLifecycleError("EmbarkResolution payload validity drift.")
-        return resolution
 
 
 @dataclass(frozen=True, slots=True)

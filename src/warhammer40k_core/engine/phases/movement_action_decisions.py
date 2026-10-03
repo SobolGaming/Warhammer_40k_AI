@@ -208,6 +208,21 @@ def _request_movement_action(
     movement_state = state.movement_phase_state
     if movement_state is None or movement_state.active_selection != active_selection:
         raise GameLifecycleError("Movement action request requires active selection state.")
+    from warhammer40k_core.engine.transport_source_embark import (
+        current_source_embark_context,
+        request_source_embark,
+    )
+
+    source_context = current_source_embark_context(
+        state=state,
+        unit_instance_id=active_selection.unit_instance_id,
+    )
+    if source_context is not None:
+        source_status = request_source_embark(
+            state=state, decisions=decisions, context=source_context
+        )
+        if source_status is not None:
+            return source_status
     from warhammer40k_core.engine.random_profile_evaluation import (
         evaluate_unit_profile_characteristics,
         has_random_profile_characteristics,

@@ -77,6 +77,16 @@ def resolve_embark(
     for effect in persisting_effects:
         if type(effect) is not PersistingEffect:
             raise GameLifecycleError("resolve_embark persisting_effects must contain effects.")
+    if selection.source_context is not None:
+        from warhammer40k_core.engine.transport_source_embark import (
+            validate_source_embark_selection,
+        )
+
+        validate_source_embark_selection(
+            selection=selection,
+            persisting_effects=persisting_effects,
+            turn_player_id=turn_player_id,
+        )
     active_cargo = cargo_state.for_movement_phase(battle_round=selection.battle_round)
     scenario.unit_instance_for_placement(unit_placement)
     transport = scenario.unit_instance_for_placement(transport_placement)

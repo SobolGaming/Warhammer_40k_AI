@@ -688,14 +688,18 @@ def test_p19_transport_cargo_uses_physical_components_and_shared_destruction_cle
     }.issubset(cleanup_attributes)
 
     embark_mutation = _function_node(
-        path=MOVEMENT_FALL_BACK_EMBARK,
-        function_name="_apply_valid_embark",
+        path=ENGINE / "transport_embark_mutation.py",
+        function_name="apply_embark_mutation",
     )
     embark_mutation_attributes = {
         node.attr for node in ast.walk(embark_mutation) if isinstance(node, ast.Attribute)
     }
     assert "component_unit_id_for_model" in embark_mutation_attributes
     assert "component_unit_instance_ids" not in embark_mutation_attributes
+    ordinary_embark = _function_node(
+        path=MOVEMENT_FALL_BACK_EMBARK, function_name="_apply_valid_embark"
+    )
+    assert "apply_embark_mutation" in _direct_call_names(ordinary_embark)
 
     cargo_integrity = _function_node(
         path=PRIMARY_BATTLEFIELD_DEPARTURE_INTEGRITY,

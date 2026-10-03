@@ -1,654 +1,784 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "6203cfe4988f3f18c6f74576b4cb8a0cac961b14",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9a3cdf5ed915146346eeef746bb921e851d9ab05f8089c1a498d8eb3aeac22d8",
-  "operation_map_sha256": "b792d99fb65eed2408aea9be770d796551aeaf246698a4b605296bf2b692e881",
+  "base": "6653b86daf7d1bc51e1d0158691fe640bb3a2a4d",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:14644cb7799aa3db990d75b63bcbb23722b848d6008d37c43b34944d1faeda1c",
+  "operation_map_sha256": "373f39b7dd4257a8b5a39005ba79ed4c9342a8832985f7305d34de722e35c1d9",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "0684e28d7eb2bde841e91efa1d39e9a86ad5f88e297ecd6e6b33fc0bdc575be3",
-      "after_sha256": "33bbc6b6a1f7d2b61b70a0f20a2c8880709582e0abaa50991e27e205f6778b09",
+      "before_sha256": "33bbc6b6a1f7d2b61b70a0f20a2c8880709582e0abaa50991e27e205f6778b09",
+      "after_sha256": "e54501609ebbc77988bc1f0c0e92eb93b7037174b1213904c4324caadca871ad",
       "owners": {
         "@document": {
-          "before": "0684e28d7eb2bde841e91efa1d39e9a86ad5f88e297ecd6e6b33fc0bdc575be3",
-          "after": "33bbc6b6a1f7d2b61b70a0f20a2c8880709582e0abaa50991e27e205f6778b09"
+          "before": "33bbc6b6a1f7d2b61b70a0f20a2c8880709582e0abaa50991e27e205f6778b09",
+          "after": "e54501609ebbc77988bc1f0c0e92eb93b7037174b1213904c4324caadca871ad"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "0685be77d51d7433d2107a2b8ebee4a44b0099a0664b4d654780a42f525d9438",
-      "after_sha256": "2f20363e4e1cea0b9e13fa175e526c9ab389ba449a47eff7a2107cb6425b8ee2",
+      "before_sha256": "2f20363e4e1cea0b9e13fa175e526c9ab389ba449a47eff7a2107cb6425b8ee2",
+      "after_sha256": "fb3fc5be7774a3cb5af80bc2f499e9beed382063614cf05793b5795db8ed0eee",
       "owners": {
         "@document": {
-          "before": "0685be77d51d7433d2107a2b8ebee4a44b0099a0664b4d654780a42f525d9438",
-          "after": "2f20363e4e1cea0b9e13fa175e526c9ab389ba449a47eff7a2107cb6425b8ee2"
+          "before": "2f20363e4e1cea0b9e13fa175e526c9ab389ba449a47eff7a2107cb6425b8ee2",
+          "after": "fb3fc5be7774a3cb5af80bc2f499e9beed382063614cf05793b5795db8ed0eee"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "7e7bf0a5ba501a2b21987a85f39fdcac1cc1ee0318ba968ae0ad96d35b82f5d9",
-      "after_sha256": "3d3d5423e11544c3869a86f80b43f0e96a98279966740687b754dc8b5afa2f41",
+      "before_sha256": "3d3d5423e11544c3869a86f80b43f0e96a98279966740687b754dc8b5afa2f41",
+      "after_sha256": "d5a75d47e5fc5d59624f04385104f39422f3f0bc3d095ed9c0f0b63d91d85721",
       "owners": {
         "@document": {
-          "before": "7e7bf0a5ba501a2b21987a85f39fdcac1cc1ee0318ba968ae0ad96d35b82f5d9",
-          "after": "3d3d5423e11544c3869a86f80b43f0e96a98279966740687b754dc8b5afa2f41"
+          "before": "3d3d5423e11544c3869a86f80b43f0e96a98279966740687b754dc8b5afa2f41",
+          "after": "d5a75d47e5fc5d59624f04385104f39422f3f0bc3d095ed9c0f0b63d91d85721"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "967dda8d127b47840653c5a0d2b315239584f928a8902e097423cdd1a3f225ca",
-      "after_sha256": "85703aab67a5d2811db3c1611ef8fc8e7e1a791e49f34fa8dc279dcae571a493",
+      "before_sha256": "85703aab67a5d2811db3c1611ef8fc8e7e1a791e49f34fa8dc279dcae571a493",
+      "after_sha256": "e27749225b4580fce393adf454beea63c4304cbc4e4af3e0c9d8828c657d5215",
       "owners": {
         "@document": {
-          "before": "967dda8d127b47840653c5a0d2b315239584f928a8902e097423cdd1a3f225ca",
-          "after": "85703aab67a5d2811db3c1611ef8fc8e7e1a791e49f34fa8dc279dcae571a493"
+          "before": "85703aab67a5d2811db3c1611ef8fc8e7e1a791e49f34fa8dc279dcae571a493",
+          "after": "e27749225b4580fce393adf454beea63c4304cbc4e4af3e0c9d8828c657d5215"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "21f00b3165fe73eb9546583a270edaee61a028d2c5f6d8afa991a9216610f67c",
-      "after_sha256": "101d6686587507328a195da07a5103b2f329e89ba134dc9ab699852a0e589f95",
+      "before_sha256": "101d6686587507328a195da07a5103b2f329e89ba134dc9ab699852a0e589f95",
+      "after_sha256": "83d545d3df43bd401148af497bb43a8ae84110bad8b1be4de297546de3cfee3d",
       "owners": {
         "@document": {
-          "before": "21f00b3165fe73eb9546583a270edaee61a028d2c5f6d8afa991a9216610f67c",
-          "after": "101d6686587507328a195da07a5103b2f329e89ba134dc9ab699852a0e589f95"
+          "before": "101d6686587507328a195da07a5103b2f329e89ba134dc9ab699852a0e589f95",
+          "after": "83d545d3df43bd401148af497bb43a8ae84110bad8b1be4de297546de3cfee3d"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "ab0896e75257d854e709c745c736c3f8609382daf77549a1b5c56ee9ddb8f412",
-      "after_sha256": "98ffc70c53b529a85486bd077099c1601acf8cbc8a6c4be5c2f0650d46114e3c",
+      "before_sha256": "98ffc70c53b529a85486bd077099c1601acf8cbc8a6c4be5c2f0650d46114e3c",
+      "after_sha256": "2a74f1cb0fb42b35dc0def3f7e53b7569dae65769b3398998a5b677605c2fed1",
       "owners": {
         "@document": {
-          "before": "ab0896e75257d854e709c745c736c3f8609382daf77549a1b5c56ee9ddb8f412",
-          "after": "98ffc70c53b529a85486bd077099c1601acf8cbc8a6c4be5c2f0650d46114e3c"
+          "before": "98ffc70c53b529a85486bd077099c1601acf8cbc8a6c4be5c2f0650d46114e3c",
+          "after": "2a74f1cb0fb42b35dc0def3f7e53b7569dae65769b3398998a5b677605c2fed1"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "96f16b1e24858e922b2c9130738afc1c70373e5169edabecfadf3de0343e33bd",
-      "after_sha256": "07bdfda5bb7938536b2f874bc2f041e37e7692775199c36f3505cfd0195f212d",
+      "before_sha256": "07bdfda5bb7938536b2f874bc2f041e37e7692775199c36f3505cfd0195f212d",
+      "after_sha256": "94ddf205acca90abd035394f110589360a61f80931a59562af4dcb6723059361",
       "owners": {
         "@document": {
-          "before": "96f16b1e24858e922b2c9130738afc1c70373e5169edabecfadf3de0343e33bd",
-          "after": "07bdfda5bb7938536b2f874bc2f041e37e7692775199c36f3505cfd0195f212d"
+          "before": "07bdfda5bb7938536b2f874bc2f041e37e7692775199c36f3505cfd0195f212d",
+          "after": "94ddf205acca90abd035394f110589360a61f80931a59562af4dcb6723059361"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "8574982f06815307040c8ae3f029e8c66e12907b0d7c6ec1b524b2503be90270",
-      "after_sha256": "0959560d57bbc2ba022ece587930573593715d9a70222d3a4ff5d54d7016c1de",
+      "before_sha256": "0959560d57bbc2ba022ece587930573593715d9a70222d3a4ff5d54d7016c1de",
+      "after_sha256": "d1ad9f6a5e6bcadbe4d2c48bc36ae33fa158bd4aa22bc642e85beafbff367da2",
       "owners": {
         "@document": {
-          "before": "8574982f06815307040c8ae3f029e8c66e12907b0d7c6ec1b524b2503be90270",
-          "after": "0959560d57bbc2ba022ece587930573593715d9a70222d3a4ff5d54d7016c1de"
+          "before": "0959560d57bbc2ba022ece587930573593715d9a70222d3a4ff5d54d7016c1de",
+          "after": "d1ad9f6a5e6bcadbe4d2c48bc36ae33fa158bd4aa22bc642e85beafbff367da2"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "46526353d4e6e23392ec5008f8e59e860e517033e1e18d9ce2280d946c80c589",
-      "after_sha256": "313761191090f49a0c817731590d1ec5cf7663d6f075d7fa0cbd6e76032aeacf",
+      "before_sha256": "313761191090f49a0c817731590d1ec5cf7663d6f075d7fa0cbd6e76032aeacf",
+      "after_sha256": "05764b563e14c127f9e189b41d56f725b1fe19d2051c8c2ae8b8b5f64e2d1065",
       "owners": {
         "@document": {
-          "before": "46526353d4e6e23392ec5008f8e59e860e517033e1e18d9ce2280d946c80c589",
-          "after": "313761191090f49a0c817731590d1ec5cf7663d6f075d7fa0cbd6e76032aeacf"
+          "before": "313761191090f49a0c817731590d1ec5cf7663d6f075d7fa0cbd6e76032aeacf",
+          "after": "05764b563e14c127f9e189b41d56f725b1fe19d2051c8c2ae8b8b5f64e2d1065"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "1880431d81900a6c747e3be369eb8b11746d9efa10299bf89fc72670b82dd623",
-      "after_sha256": "0e3707a803877e35dec2492dff722147ab3f98a15665ff0cfc83357f698d4c4f",
+      "before_sha256": "0e3707a803877e35dec2492dff722147ab3f98a15665ff0cfc83357f698d4c4f",
+      "after_sha256": "b3903f60e947b85a7cdf5a2fefd6819cb4682707b38cc8dd0cbb07165af5a93e",
       "owners": {
         "@document": {
-          "before": "1880431d81900a6c747e3be369eb8b11746d9efa10299bf89fc72670b82dd623",
-          "after": "0e3707a803877e35dec2492dff722147ab3f98a15665ff0cfc83357f698d4c4f"
+          "before": "0e3707a803877e35dec2492dff722147ab3f98a15665ff0cfc83357f698d4c4f",
+          "after": "b3903f60e947b85a7cdf5a2fefd6819cb4682707b38cc8dd0cbb07165af5a93e"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "3e7eea485adaec178cc6cc81b5fe7c099d8e9e2e72518aff357170afea96123a",
-      "after_sha256": "72ced4cee2656f53f2bf7be45750930311e75ab56db9a1bce05e62561f5ce5d1",
+      "before_sha256": "72ced4cee2656f53f2bf7be45750930311e75ab56db9a1bce05e62561f5ce5d1",
+      "after_sha256": "d1db7904e198ab4890d48e45e10b3f531deb01867e516531d3d5acb4c341c3d3",
       "owners": {
         "@document": {
-          "before": "3e7eea485adaec178cc6cc81b5fe7c099d8e9e2e72518aff357170afea96123a",
-          "after": "72ced4cee2656f53f2bf7be45750930311e75ab56db9a1bce05e62561f5ce5d1"
+          "before": "72ced4cee2656f53f2bf7be45750930311e75ab56db9a1bce05e62561f5ce5d1",
+          "after": "d1db7904e198ab4890d48e45e10b3f531deb01867e516531d3d5acb4c341c3d3"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "9a8b628016ad6aa0bb06a5128e6ac9c2e155be196212a2f77a35503e489f5a8f",
-      "after_sha256": "9d6f33442924bc927f901caa55815581a2aebb053855160238103c3e8c3bf3f6",
+      "before_sha256": "9d6f33442924bc927f901caa55815581a2aebb053855160238103c3e8c3bf3f6",
+      "after_sha256": "2abb268f4310efd335717061f4f2aa5529a49f443a30f9de6ad24e1cafec736d",
       "owners": {
         "@document": {
-          "before": "9a8b628016ad6aa0bb06a5128e6ac9c2e155be196212a2f77a35503e489f5a8f",
-          "after": "9d6f33442924bc927f901caa55815581a2aebb053855160238103c3e8c3bf3f6"
+          "before": "9d6f33442924bc927f901caa55815581a2aebb053855160238103c3e8c3bf3f6",
+          "after": "2abb268f4310efd335717061f4f2aa5529a49f443a30f9de6ad24e1cafec736d"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "7a42902f65c31ba2cb595cdf6dc59e595358a01f04cc88f878cd7ee99e10828e",
-      "after_sha256": "563dfe542280f4e0b3964ffb33f6c73e323e717695225b2be68837652b1c2f7c",
+      "before_sha256": "563dfe542280f4e0b3964ffb33f6c73e323e717695225b2be68837652b1c2f7c",
+      "after_sha256": "563eb9cf86d12a89d3ad70c8eb2aab3ce2dd58625ba8edc8143195556bb70325",
       "owners": {
         "@document": {
-          "before": "7a42902f65c31ba2cb595cdf6dc59e595358a01f04cc88f878cd7ee99e10828e",
-          "after": "563dfe542280f4e0b3964ffb33f6c73e323e717695225b2be68837652b1c2f7c"
+          "before": "563dfe542280f4e0b3964ffb33f6c73e323e717695225b2be68837652b1c2f7c",
+          "after": "563eb9cf86d12a89d3ad70c8eb2aab3ce2dd58625ba8edc8143195556bb70325"
+        }
+      }
+    },
+    "conformance/typescript/src/contract.ts": {
+      "before_sha256": "41ad8dd41c3be6544cfe7fd88afe7cc306fff703e003c6549b491220c175861e",
+      "after_sha256": "cdedfc659cd0107211da63559121e9381e329285cfea6a8dac94a8518ec3beaa",
+      "owners": {
+        "@document": {
+          "before": "41ad8dd41c3be6544cfe7fd88afe7cc306fff703e003c6549b491220c175861e",
+          "after": "cdedfc659cd0107211da63559121e9381e329285cfea6a8dac94a8518ec3beaa"
+        }
+      }
+    },
+    "contracts/README.md": {
+      "before_sha256": "6674761e46e7853c44819bfd9e07c87566c4061867c644f11d92edc257464611",
+      "after_sha256": "a51c587465b97dfb41b8dbfbd582ded0fef37a76a32b8c3a7b5af3a8a2076e4e",
+      "owners": {
+        "@document": {
+          "before": "6674761e46e7853c44819bfd9e07c87566c4061867c644f11d92edc257464611",
+          "after": "a51c587465b97dfb41b8dbfbd582ded0fef37a76a32b8c3a7b5af3a8a2076e4e"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "c76dc8ef36a894af77d4ea3c3e084a9ee8a5cb6455b940d48b932348206e1932",
-      "after_sha256": "84dc4f0c94526177e222bb9128bd05e7ba7858a8d8580e0a659425a967511146",
+      "before_sha256": "84dc4f0c94526177e222bb9128bd05e7ba7858a8d8580e0a659425a967511146",
+      "after_sha256": "d8355e0fc34be8a48833bb2bf942d7fd2dfddb0fe989b1228e87071ffcc7e7ba",
       "owners": {
         "@document": {
-          "before": "c76dc8ef36a894af77d4ea3c3e084a9ee8a5cb6455b940d48b932348206e1932",
-          "after": "84dc4f0c94526177e222bb9128bd05e7ba7858a8d8580e0a659425a967511146"
+          "before": "84dc4f0c94526177e222bb9128bd05e7ba7858a8d8580e0a659425a967511146",
+          "after": "d8355e0fc34be8a48833bb2bf942d7fd2dfddb0fe989b1228e87071ffcc7e7ba"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "06c102f206e79214b3aeb01fcd852d88a844700cce555150c89c1dae5355152e",
-      "after_sha256": "6967659a3b05eaad11f276bf6f0a8aca04d28b05d65fe67659ccab88b71e2f68",
+      "before_sha256": "6967659a3b05eaad11f276bf6f0a8aca04d28b05d65fe67659ccab88b71e2f68",
+      "after_sha256": "88f521adb11d8a01181e47a6c448a59e9bb8d3f20c86bde69f8dcc655f23d7c6",
       "owners": {
         "@document": {
-          "before": "06c102f206e79214b3aeb01fcd852d88a844700cce555150c89c1dae5355152e",
-          "after": "6967659a3b05eaad11f276bf6f0a8aca04d28b05d65fe67659ccab88b71e2f68"
+          "before": "6967659a3b05eaad11f276bf6f0a8aca04d28b05d65fe67659ccab88b71e2f68",
+          "after": "88f521adb11d8a01181e47a6c448a59e9bb8d3f20c86bde69f8dcc655f23d7c6"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "d22ec4691397a472da521eacf6ab70fb69e2d845e62419fbfd6031a85e0dedba",
-      "after_sha256": "038c2c2e718c0ac48e869ca83a2925fd8f04c539db42d560c161d8b16a7df280",
+      "before_sha256": "038c2c2e718c0ac48e869ca83a2925fd8f04c539db42d560c161d8b16a7df280",
+      "after_sha256": "4fead325329c1b03f570c2c2e6d478f076bdc6278146ab3c229a12f21e77a0b2",
       "owners": {
         "@document": {
-          "before": "d22ec4691397a472da521eacf6ab70fb69e2d845e62419fbfd6031a85e0dedba",
-          "after": "038c2c2e718c0ac48e869ca83a2925fd8f04c539db42d560c161d8b16a7df280"
+          "before": "038c2c2e718c0ac48e869ca83a2925fd8f04c539db42d560c161d8b16a7df280",
+          "after": "4fead325329c1b03f570c2c2e6d478f076bdc6278146ab3c229a12f21e77a0b2"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "e4a6bc8a52972284b541619b360a588897b5b3a239ff4c2bd0f1545cccaa2a15",
-      "after_sha256": "ee7a77cc5dd4572add45b15fe12630c7564d78e3d506b1fbbbe54fb08186baca",
+      "before_sha256": "ee7a77cc5dd4572add45b15fe12630c7564d78e3d506b1fbbbe54fb08186baca",
+      "after_sha256": "14672d8adb6ebe073ff2a0f3c442ae7981ba5a77ff65f0f51784d65dc2b199c9",
       "owners": {
         "@document": {
-          "before": "e4a6bc8a52972284b541619b360a588897b5b3a239ff4c2bd0f1545cccaa2a15",
-          "after": "ee7a77cc5dd4572add45b15fe12630c7564d78e3d506b1fbbbe54fb08186baca"
+          "before": "ee7a77cc5dd4572add45b15fe12630c7564d78e3d506b1fbbbe54fb08186baca",
+          "after": "14672d8adb6ebe073ff2a0f3c442ae7981ba5a77ff65f0f51784d65dc2b199c9"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "ae6c4fe51d47f42904c57c1cc8837fe6e1c6715835d20795636f6cb337dd4a61",
-      "after_sha256": "f73ce4ef6d9ca3d0bd30065dab6630cb952555efb537f946349c5122c5bd7273",
+      "before_sha256": "f73ce4ef6d9ca3d0bd30065dab6630cb952555efb537f946349c5122c5bd7273",
+      "after_sha256": "7d4defc303ac8cc23c6b4dc63a16ca2ad6bb54fd265f0cdcd4c9f1f5adb1f070",
       "owners": {
         "@document": {
-          "before": "ae6c4fe51d47f42904c57c1cc8837fe6e1c6715835d20795636f6cb337dd4a61",
-          "after": "f73ce4ef6d9ca3d0bd30065dab6630cb952555efb537f946349c5122c5bd7273"
+          "before": "f73ce4ef6d9ca3d0bd30065dab6630cb952555efb537f946349c5122c5bd7273",
+          "after": "7d4defc303ac8cc23c6b4dc63a16ca2ad6bb54fd265f0cdcd4c9f1f5adb1f070"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "a6acd6a081bd504b65b596eaa22c58ffab96fc9024dfb37cbe64df76add7f1f5",
-      "after_sha256": "381bde4c4bea927a670170d9c08dfe7b114f5383aa4563949c2d6776b7f26e92",
+      "before_sha256": "381bde4c4bea927a670170d9c08dfe7b114f5383aa4563949c2d6776b7f26e92",
+      "after_sha256": "57463f358b6d134a19bcd5cb1d665a587a48c5dcf38db3476b51013b50e769f6",
       "owners": {
         "@document": {
-          "before": "a6acd6a081bd504b65b596eaa22c58ffab96fc9024dfb37cbe64df76add7f1f5",
-          "after": "381bde4c4bea927a670170d9c08dfe7b114f5383aa4563949c2d6776b7f26e92"
+          "before": "381bde4c4bea927a670170d9c08dfe7b114f5383aa4563949c2d6776b7f26e92",
+          "after": "57463f358b6d134a19bcd5cb1d665a587a48c5dcf38db3476b51013b50e769f6"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "ee8b1d7b40532a7971b1f0cc434d141d7e312f4753c5ccd929a3720ba5ef6598",
-      "after_sha256": "cc6f937fad9206aff2e2900f4494d8bb58c7810efd680e637648104425cd21c4",
+      "before_sha256": "cc6f937fad9206aff2e2900f4494d8bb58c7810efd680e637648104425cd21c4",
+      "after_sha256": "7b3022bd6c6507957e8a28cdb903b836e9d20ed5bf58505b14ea0c694bb3eec0",
       "owners": {
         "@document": {
-          "before": "ee8b1d7b40532a7971b1f0cc434d141d7e312f4753c5ccd929a3720ba5ef6598",
-          "after": "cc6f937fad9206aff2e2900f4494d8bb58c7810efd680e637648104425cd21c4"
+          "before": "cc6f937fad9206aff2e2900f4494d8bb58c7810efd680e637648104425cd21c4",
+          "after": "7b3022bd6c6507957e8a28cdb903b836e9d20ed5bf58505b14ea0c694bb3eec0"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "de6a8092bfc83b2babd846e3342b20ac182a4b63b1200316e04150dcce5a554d",
-      "after_sha256": "909652200e08572926d47a0508498941d8c9b6d11fde412870955b80624694e1",
+      "before_sha256": "909652200e08572926d47a0508498941d8c9b6d11fde412870955b80624694e1",
+      "after_sha256": "5321c5e598d9ac9cd811363d2f6f4bfe30e2028c0df638cda2c06e0969cb84a0",
       "owners": {
         "@document": {
-          "before": "de6a8092bfc83b2babd846e3342b20ac182a4b63b1200316e04150dcce5a554d",
-          "after": "909652200e08572926d47a0508498941d8c9b6d11fde412870955b80624694e1"
+          "before": "909652200e08572926d47a0508498941d8c9b6d11fde412870955b80624694e1",
+          "after": "5321c5e598d9ac9cd811363d2f6f4bfe30e2028c0df638cda2c06e0969cb84a0"
         }
       }
     },
-    "data/source_audits/order113/baseline/tests/fire_overwatch_helpers.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "c1ebdfd064847148314f460855e344971b15f106fab48301ed6bf5712686c727",
+    "contracts/openapi.yaml": {
+      "before_sha256": "78f37b615b74cfeb662bd66b1b9d6d2cc6102923d58468ea0d664314ab3923a0",
+      "after_sha256": "e2640cdc7e9676c40b69c96736ca8ca47295921049886f9633c24e6ccb099b89",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "c1ebdfd064847148314f460855e344971b15f106fab48301ed6bf5712686c727"
+          "before": "78f37b615b74cfeb662bd66b1b9d6d2cc6102923d58468ea0d664314ab3923a0",
+          "after": "e2640cdc7e9676c40b69c96736ca8ca47295921049886f9633c24e6ccb099b89"
         }
       }
     },
-    "data/source_audits/order113/baseline/tests/random_melee_helpers.py.txt": {
+    "data/source_audits/order114/baseline/tests/order61_embark_helpers.py.txt": {
       "before_sha256": null,
-      "after_sha256": "ccd6efd8890d2155b6b776b760c25a3c487427014927fa736eab895d5abd1790",
+      "after_sha256": "50c7bc022d3045cff1c6ae3ed2c7a4b427ed457d4f82a3a5050f500fee2213f8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ccd6efd8890d2155b6b776b760c25a3c487427014927fa736eab895d5abd1790"
+          "after": "50c7bc022d3045cff1c6ae3ed2c7a4b427ed457d4f82a3a5050f500fee2213f8"
         }
       }
     },
-    "data/source_audits/order113/baseline/tests/unit/test_fire_overwatch.py.txt": {
+    "data/source_audits/order114/baseline/tests/unit/test_order61_embark.py.txt": {
       "before_sha256": null,
-      "after_sha256": "2e7c01e62bc8a2c592fc9284045d2e14fb825ba2b62eddaa80d91160200ff0f7",
+      "after_sha256": "da8b4ef4113860b0a74efd875cb563fe8e7079f1f28b8e06d63f473a7d7f4e95",
       "owners": {
         "@document": {
           "before": null,
-          "after": "2e7c01e62bc8a2c592fc9284045d2e14fb825ba2b62eddaa80d91160200ff0f7"
+          "after": "da8b4ef4113860b0a74efd875cb563fe8e7079f1f28b8e06d63f473a7d7f4e95"
         }
       }
     },
-    "data/source_audits/order113/baseline/tests/unit/test_phase13d_weapon_ability_helpers.py.txt": {
+    "data/source_audits/order114/historical-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "ace7694abb844ba2897559297f9d735187b25124b60b008b67b072b57993be01",
+      "after_sha256": "4c38d99defecfc2cc4758eff7c0cae877ee726b70a0fbf6921472c2f7b65113e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ace7694abb844ba2897559297f9d735187b25124b60b008b67b072b57993be01"
-        }
-      }
-    },
-    "data/source_audits/order113/historical-inputs.json": {
-      "before_sha256": null,
-      "after_sha256": "c594f1e301bc4203505ab9785b21d549aa4867745e3477a4aa11f35509e54129",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "c594f1e301bc4203505ab9785b21d549aa4867745e3477a4aa11f35509e54129"
+          "after": "4c38d99defecfc2cc4758eff7c0cae877ee726b70a0fbf6921472c2f7b65113e"
         }
       }
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "0c32d2e6671fae49964ead2609387aba1ad1d8ce9990f1f78d08562eeb796af6",
-      "after_sha256": "55e170e1a706fc26df77d866fda514a2bbdb604401a5bb242e4db3b19b4c22eb",
+      "before_sha256": "55e170e1a706fc26df77d866fda514a2bbdb604401a5bb242e4db3b19b4c22eb",
+      "after_sha256": "da32bc72c7e152941982b6b4d3fa02bc9ec27242aa3ac389a860a54118c3f0ec",
       "owners": {
         "@document": {
-          "before": "0c32d2e6671fae49964ead2609387aba1ad1d8ce9990f1f78d08562eeb796af6",
-          "after": "55e170e1a706fc26df77d866fda514a2bbdb604401a5bb242e4db3b19b4c22eb"
+          "before": "55e170e1a706fc26df77d866fda514a2bbdb604401a5bb242e4db3b19b4c22eb",
+          "after": "da32bc72c7e152941982b6b4d3fa02bc9ec27242aa3ac389a860a54118c3f0ec"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "2a059429554d852902fd17f3a2b01fce5a6dad5ffe97f2f527be5976ae0732d1",
-      "after_sha256": "7a78704261191ffc1ec47bfa26cc18a1aab283f8a44e80bc14f3a404e8c21d10",
+      "before_sha256": "7a78704261191ffc1ec47bfa26cc18a1aab283f8a44e80bc14f3a404e8c21d10",
+      "after_sha256": "454b829fa3cd79852bb9cdc2b770fbc8a2dc18c617a4ce45157969bc04243d0e",
       "owners": {
         "@document": {
-          "before": "2a059429554d852902fd17f3a2b01fce5a6dad5ffe97f2f527be5976ae0732d1",
-          "after": "7a78704261191ffc1ec47bfa26cc18a1aab283f8a44e80bc14f3a404e8c21d10"
+          "before": "7a78704261191ffc1ec47bfa26cc18a1aab283f8a44e80bc14f3a404e8c21d10",
+          "after": "454b829fa3cd79852bb9cdc2b770fbc8a2dc18c617a4ce45157969bc04243d0e"
         }
       }
     },
-    "docs/ORDER_113_SCOPE_PLAN.md": {
+    "docs/ORDER_114_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "2aec718fe19136118493658a88c36f21b281a7cae8d02e2a1fe6d71116f47c5d",
+      "after_sha256": "90526fa9a04dff8d0c4f74ac57cf8e74d1371e5adf81f9233376c3f32d1b86c8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "2aec718fe19136118493658a88c36f21b281a7cae8d02e2a1fe6d71116f47c5d"
+          "after": "90526fa9a04dff8d0c4f74ac57cf8e74d1371e5adf81f9233376c3f32d1b86c8"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "7c911dd2ac7d9272670a1660537df197cfcb654b99c5cdcd1cf32b20dade14a2",
-      "after_sha256": "faaf8ed55b44aa98cf74c3e84296c7a16835d98edcd76083f55966c94d86cd2d",
+      "before_sha256": "faaf8ed55b44aa98cf74c3e84296c7a16835d98edcd76083f55966c94d86cd2d",
+      "after_sha256": "1821ef48f87dd596909b3553f231ed3f887d614c3fdbb96f310115b4ee06b99a",
       "owners": {
         "@document": {
-          "before": "7c911dd2ac7d9272670a1660537df197cfcb654b99c5cdcd1cf32b20dade14a2",
-          "after": "faaf8ed55b44aa98cf74c3e84296c7a16835d98edcd76083f55966c94d86cd2d"
+          "before": "faaf8ed55b44aa98cf74c3e84296c7a16835d98edcd76083f55966c94d86cd2d",
+          "after": "1821ef48f87dd596909b3553f231ed3f887d614c3fdbb96f310115b4ee06b99a"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "847b0c3a63ce9cf8bffc925bc88c17040a6514ce9c20dda3b913e5e395120591",
-      "after_sha256": "0d4517b9f2462e5fa815ef54e7d31c0ecfa1c26777a51e9728278abda30367c2",
+      "before_sha256": "0d4517b9f2462e5fa815ef54e7d31c0ecfa1c26777a51e9728278abda30367c2",
+      "after_sha256": "cbb24560c604c7943c5a421378490377202deef972888cf27e5ea9225396f001",
       "owners": {
         "@document": {
-          "before": "847b0c3a63ce9cf8bffc925bc88c17040a6514ce9c20dda3b913e5e395120591",
-          "after": "0d4517b9f2462e5fa815ef54e7d31c0ecfa1c26777a51e9728278abda30367c2"
+          "before": "0d4517b9f2462e5fa815ef54e7d31c0ecfa1c26777a51e9728278abda30367c2",
+          "after": "cbb24560c604c7943c5a421378490377202deef972888cf27e5ea9225396f001"
         }
       }
     },
-    "src/warhammer40k_core/core/weapon_ability_sources.py": {
-      "before_sha256": "8a4bce5f589513da103880deef0d9b5f32852b5c1feb64962874d4177bb8d2ec",
-      "after_sha256": "1f21a0961d2be2cde58d18cf1012339a041a6d59308abf5d30b8b8a674a7c150",
+    "src/warhammer40k_core/adapters/external_contract.py": {
+      "before_sha256": "efe4240944cf979b5e0c2d9181f54885aba638c44443c360f4293fb48cedc7f8",
+      "after_sha256": "807dda874ea3c25f7cb1f0a32d51ac041a943efc60d1e7e551dcddfbbbe9b125",
       "owners": {
-        "preserve_native_keyword_occurrences": {
-          "before": "427d7c9c3528c06248b6503b1f5435aa27bba5856e502e98ca26847150d43a88",
-          "after": "989fe2f5ab8cc76e544bce69e1f0f13d1a4e1146820a49e2658d07e9fc2e7a5c"
+        "@module": {
+          "before": "eeeb99ad347a2a1791bc2451dfa29afad429ec8ad00ec057087112670c0973f7",
+          "after": "8214ffef5c817d25a9dc4d689e396ec1aff44affe4b892e9f05696a32178bc8a"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/lifecycle.py": {
+      "before_sha256": "7baf51c10f097dbd01e7754af8f07720da6190742473a9a4a87abf0af789fee6",
+      "after_sha256": "befd6d40414d246dcacadfd717ee3cdbd5d1ca39c1497ce434aef11aadcb52ee",
+      "owners": {
+        "@module": {
+          "before": "1595710d93d9c01148080c83eb2e430f367ab658426bbe925d611d2b3547ab87",
+          "after": "33de26d23f780169813b2aaccc6f70b71343e7390edab603fd57e3580062e9d6"
         },
-        "weapon_keyword_for_ability_kind": {
-          "before": "70a4ec45be450738fba908e859230b3d6c5f32f32887a470ab91e68975aaf6d7",
-          "after": "715a5dcec156ece9d4a1369ab0e192fee105575c29049639088981aeaf30e3d5"
+        "GameLifecycle._build_decision_dispatch_registry": {
+          "before": "fb8196ede597e598e552cbd4a60b0ba1ba0816baf5d87bdf99a2a8b1fb7df1dc",
+          "after": "1e37068bd9aa93da2cd9a80de2493bc434eb633ccf956185ead6080cac4439d1"
         }
       }
     },
-    "src/warhammer40k_core/core/weapon_profiles.py": {
-      "before_sha256": "a926249cff249f2a80158c306ccff285ba79af16bcd9c16fd4dc16a8eed8c93e",
-      "after_sha256": "cadad1000d56d141b43250bf2624074be447cc8af4e8ef3c94791fc60b306674",
+    "src/warhammer40k_core/engine/movement_decision_authority.py": {
+      "before_sha256": "2dc8ada1c711250a19587b830573daebdd9293bb5c8ee3442117fa09cabb3f12",
+      "after_sha256": "afb6dceb7e1de1f7e989792962ea8e2dbfd24f70ff8518fe504c1c427e27bbf5",
       "owners": {
-        "AbilityDescriptor.blast": {
+        "_validate_embark_events": {
+          "before": "13b093404d5cb40a50fe37ea6c68e458287aa90e2454389b07339e25afc706e5",
+          "after": "5d83c456920cff806fa7fb98e9b0a2bffadbebf6df04e1ba3373d716628f6d36"
+        },
+        "validated_embark_movement_completions": {
+          "before": "c3e90e700bbfe6ad239c0545d954bfb641fb9097669c5cb450e1b082be868684",
+          "after": "7f01d58fa38ecf8ef72470a4c23fb8e52c0131fe1f5dc3839b4297dc57840ecf"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/movement_selection_history.py": {
+      "before_sha256": "d1a97cbb4a9f190c89be32c355bfd1ee1b248bb9cd9f60bdee6443abf96f3694",
+      "after_sha256": "b4e867b8988580dcf41229f32902dec7c7093013f3cbe3b1d51eedeac262b2f0",
+      "owners": {
+        "@module": {
+          "before": "1ba2e67e80abe4d900298b46c06ada181cb5453943cce5bc884628338a055045",
+          "after": "b732b6061aa83caca1ff3f570e002ab4bb323edc7915fee5414ecd6b18aa8e09"
+        },
+        "MovementSelectionHistory.observe": {
+          "before": "223a2da8d8856a2179022bc71a6659506b624358a42f54c787669928727768c8",
+          "after": "b7c433e9d0802cce444e3346324572ac7f036293885234ed68fda72e6b4251b1"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_action_decisions.py": {
+      "before_sha256": "2a157377d4eeac1c591fac3f177a823a640b1696afcf7182a21a55815d798b25",
+      "after_sha256": "00a03963e855d8820184ec7c6174970f23171c3e541fa1f275a1aab5225d8a2d",
+      "owners": {
+        "_request_movement_action": {
+          "before": "b8c72a21af9d812cd3ce3eb440ed501c26ecdf5e2fa24d7de57a33418015bef3",
+          "after": "e101fb00fb5380db1abde8154435d423e80beb92cccd2db8e9318eadd490e1da"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": {
+      "before_sha256": "3c94a0677ba668500d5298d199c4766c15157d77b77a2d167b75f16b80cb88b2",
+      "after_sha256": "9ca88a7016481dc885513eef583f949bc43f6ca7ac11b13210f854172e2d9308",
+      "owners": {
+        "@module": {
+          "before": "2a8ef1ee956fb0d7c1dd45d00a9dfba6f92d3808d29461c23ed19f09aaf17b1d",
+          "after": "86f9d9b0f92f601b6ae93d9d7420a0138f1b9ffd2f68e6a47ecdc3f34ef4c8a6"
+        },
+        "_apply_valid_embark": {
+          "before": "6174541764086250cd096dbe038ecf55dd3d379d1541dc8e3e0da3c5a01c2ff4",
+          "after": "5f5128cdc6bb52570581702e5284f141a648d60a8629c6f00ef0863f260dc628"
+        },
+        "_post_move_embark_options": {
+          "before": "1898730a6dbb68ec75a077a40e8c1b5d68bf7aa4f7be42e1e1a7767ee275a9bf",
+          "after": "ae3eec32c30a815863c6ce96b31b88ce6d2b0f840606646067249d9d0a58f5ac"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/transport_embark_context.py": {
+      "before_sha256": null,
+      "after_sha256": "3ff68e4c09878a42fbc5b08109aafa576525776939291dcb669516dce8812789",
+      "owners": {
+        "@module": {
           "before": null,
-          "after": "67aa111949dd6b7019d9fbc1211ad8c38c623a775be8703c9928e7e8a55366ed"
+          "after": "933b9e230c7a46ed0b433a44309c4edb1cac5b44258df64c148b9a4493fb9744"
         },
-        "AbilityKind": {
-          "before": "cc0134c6ae7918182c871e37e2dcc44061a8313ad4294b4aef0302f18b4b4dee",
-          "after": "3dd02ae3f1a3cd097b67faf1ccc468f9f76feefddbc45bd8a5d7b7959ab7f4ff"
+        "NoMovementEmbarkContext": {
+          "before": null,
+          "after": "dc80d35918eb0b9c14894345fff16b449a968bf21ea94916268409d547cf70be"
         },
-        "_validate_supported_ability_shape": {
-          "before": "042c5b4703cd7f3871c04414550e39c911e6d416ef6cac68c6c873555ab0410a",
-          "after": "dad373cf48cbcc495f6cf03eb9dec26b7de13c92fec29dc1cc0922574df1b4a9"
+        "NoMovementEmbarkContext.__post_init__": {
+          "before": null,
+          "after": "48f0c75bdba36efbcdb9e45ccaf80c36114cc4a81478ad356418fd461b9fd96a"
+        },
+        "NoMovementEmbarkContext.from_payload": {
+          "before": null,
+          "after": "6b3b346962b60d62729dca90d72d1eaa93d6e8f9fdf1cf386908331213c8377d"
+        },
+        "NoMovementEmbarkContext.to_payload": {
+          "before": null,
+          "after": "0db28555d49223b91d80099c90f22431846a9c78299b96873136eab50e948eff"
+        },
+        "NoMovementEmbarkContextPayload": {
+          "before": null,
+          "after": "1a2c130510d1073d13f7f2e4acdfa4f490a866c9883b4c1ce5797c79b1acc327"
         }
       }
     },
-    "src/warhammer40k_core/engine/attack_sequence_selection.py": {
-      "before_sha256": "eb875248728e55bff73be89cf50dc6f95f722cba0862cfc45d796ca461aa970e",
-      "after_sha256": "a281d79e1461e540fe27f7a2df214191f6a134fb0d6a5b7e8367b005037a7e44",
+    "src/warhammer40k_core/engine/transport_embark_mutation.py": {
+      "before_sha256": null,
+      "after_sha256": "342f9ce21d2af5cda96befaa840f2f751f303e7aee9655f2eb063fde6b277699",
       "owners": {
-        "_validate_weapon_profile_signature_shape": {
-          "before": "cb4155ffd56f9e9f030057bf5e2c346eea23093789120b6f9961c571d384f3f1",
-          "after": "4c31624b32b6ada51b857c0d35415f66b2467baecce3e9c57a526563f3a3c514"
+        "@module": {
+          "before": null,
+          "after": "988e4092481f0ddf7b9b9f34605523715d34660d86254185d9fabba3e6ed08a2"
+        },
+        "apply_embark_mutation": {
+          "before": null,
+          "after": "80ba4650ccbf7d53311cb8c2e4ab87a5d15ce55e472b71b03512adad5ea1291e"
         }
       }
     },
-    "src/warhammer40k_core/engine/catalog_rule_consumption.py": {
-      "before_sha256": "c2112c4e8b258a27124860545fc3d08f41774a981761c60b4c63049670cbbe72",
-      "after_sha256": "8af26cbfbbd3eb8805f8040dcd77025ba234e56be2652f8030106ace883d772f",
+    "src/warhammer40k_core/engine/transport_embark_types.py": {
+      "before_sha256": null,
+      "after_sha256": "2d7d3e582b6e7ac90c98a331a402d5287496cca67a5e7875fe1aa5ecc30744e1",
       "owners": {
-        "_required_weapon_ability_choice_value_parameter": {
-          "before": "59712b54791a2e77975ebcad7998f5848fec7b23d445e7a564363e0449673c96",
+        "@module": {
+          "before": null,
+          "after": "e208885b28a55d8dcbc99ba72cc6e9e551032a545ca8fcdc9346fb1065d9a165"
+        },
+        "EmbarkResolution": {
+          "before": null,
+          "after": "5db0a93e4a4e72b67e6fdd9b439a5f9da0f87672471a20795d08179e0ce6e289"
+        },
+        "EmbarkResolution.__post_init__": {
+          "before": null,
+          "after": "3a35949c2bcc2c96a48192976b62c7af2cddc2e57bb80b2dd3daebdab52f5c67"
+        },
+        "EmbarkResolution.from_payload": {
+          "before": null,
+          "after": "c6a33d336d0c08d116798e84ffd16813b362834348692899b06484f165a9d020"
+        },
+        "EmbarkResolution.is_valid": {
+          "before": null,
+          "after": "4b3bb1ec33f1ce7eae76ae65a280739d68bbf343f4a4d70342eaeff4d9134c5b"
+        },
+        "EmbarkResolution.to_payload": {
+          "before": null,
+          "after": "b2bc22156a622b59aa893f598caad7ed477cf8a338b26692c89d6a5c6b096634"
+        },
+        "EmbarkResolutionPayload": {
+          "before": null,
+          "after": "aa4af4453c195f2632692125cae56d40018d04afd5fd1072265524657c61e69e"
+        },
+        "EmbarkSelection": {
+          "before": null,
+          "after": "6d102c2ae21c19dfa451c2ab9dfa4ebbbf9a23c612a9e44e84c4b2d256dd21e9"
+        },
+        "EmbarkSelection.__post_init__": {
+          "before": null,
+          "after": "a03fae5274a2a1be073898e03f12950b28a873e7049394b0b33011acc035cf5d"
+        },
+        "EmbarkSelection.from_payload": {
+          "before": null,
+          "after": "ccf876d3eeaf18dbeeeffed4e82f170703af7a27f907f92ad49e3005e0866bf8"
+        },
+        "EmbarkSelection.has_override": {
+          "before": null,
+          "after": "b9f7dd8bcb3a3de10e3a1ecbe5080facc5efc6ae092997648e45e8ac92c2b80f"
+        },
+        "EmbarkSelection.to_payload": {
+          "before": null,
+          "after": "c0c5b3f6419780c6c23fa3cbcf0d78a66e2bb9c9422bd34004cc73db70aab69e"
+        },
+        "EmbarkSelectionPayload": {
+          "before": null,
+          "after": "5a8daa83cc47c577327b21335821970f20283e580916ac5eb5eead135dad0876"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/transport_embark_validation.py": {
+      "before_sha256": "959d107810515b7e140be063f4bcff4139d275716afbfe5bc5aa83bcac6fef3a",
+      "after_sha256": "1b9b19bdd81e8b1254008e3b6a124b7c801ad3e0414ca8cbdc5b75dfe76c0cdb",
+      "owners": {
+        "resolve_embark": {
+          "before": "c6cf37796d81f09a90ca6c0a2a2eee3258ea6c2e900e776c7b36b7dc821c0fad",
+          "after": "485564e25860436eccb952825de38b649eb78ac858c69f3d3b886a338b66a445"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/transport_source_embark.py": {
+      "before_sha256": null,
+      "after_sha256": "f58caadd2a5fb34bd07d8da6d7b79e539918a0000b525d6f0e595b984e7c941a",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "808f66ec36e43947c8dacfe9da087bd0f813e80db16efcbff40e7d7e48b8c48f"
+        },
+        "_context": {
+          "before": null,
+          "after": "0210b60558424c924827718bed479b986b20ae4143b374ba8dc2bad375ab16f3"
+        },
+        "_options": {
+          "before": null,
+          "after": "930a71fc2f637896c2496ff3526604fbb80663d9bf0a86673f1e8b9fed8096be"
+        },
+        "_source_request": {
+          "before": null,
+          "after": "29d75e0bb44840b1831b0b9b810000832ab5425d78c97f399ac213fcd2582eb7"
+        },
+        "current_source_embark_context": {
+          "before": null,
+          "after": "c0b6f069186bdfd636614eb985bc7994c1317a81427cc22a0e68ad8e7f36a7e3"
+        },
+        "no_movement_embark_permission_effect": {
+          "before": null,
+          "after": "440948f9131fa5e3cfc21193ac6c3f57c3fca85a1b2ab385f769d818837b6fbb"
+        },
+        "request_source_embark": {
+          "before": null,
+          "after": "0b90de2c81d0ce90718b80b6b57f330466a342f15a97e2ab0313773f5023e415"
+        },
+        "source_embark_dispatch_handler": {
+          "before": null,
+          "after": "918ce34b34c56ba62470b1e19033599a39848f65e011f2abd0d780af2952f570"
+        },
+        "validate_source_embark_selection": {
+          "before": null,
+          "after": "718a298383c3e1436293c7e6042d9419f20dce0c2f6e71e0750a464757eef20d"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/transport_source_embark_history.py": {
+      "before_sha256": null,
+      "after_sha256": "6dd4a678603e9b290bfae8e1fc669474b99845a6b081ffc5da3b941a28a93a84",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "900ed63346908109e3a14ad02a7df9741bbb0cde659b08fa59b653fd91e17b56"
+        },
+        "validate_source_embark_event": {
+          "before": null,
+          "after": "845f1d7bab76d4f32924b4462f890a5a016c363facb65473843487db8d22ce82"
+        },
+        "validate_source_embark_request": {
+          "before": null,
+          "after": "fd4c7176154b982a8a77344b2eea67e43c0b4b9c17d755b75b4b8065d37619dc"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/transports.py": {
+      "before_sha256": "3075009a179675c01d551eeac9c14a1951902eac1aed54bdc54a696b79764fa4",
+      "after_sha256": "6c4795fc8a860bb92faf582277e9fdb0d46e3cfba34d3c22b74eefebf6cc49d2",
+      "owners": {
+        "@module": {
+          "before": "2d1c1e040925f516b8d697935ff6b6705b351f9fc7c4c96ff6b54072113de34e",
+          "after": "68f8b596dc2ef361dd465518da2702bddecffe2b6c6b860cb03d5eef89942e62"
+        },
+        "EmbarkResolution": {
+          "before": "5db0a93e4a4e72b67e6fdd9b439a5f9da0f87672471a20795d08179e0ce6e289",
           "after": null
         },
-        "_weapon_ability_choice_has_supported_runtime_shape": {
-          "before": "dc9755b8e8df5e8570e700f45809422c76fd9b04d5ae5d601e1d968a26f38cc4",
-          "after": "16ce635d8f2b44b176319ed75f83484743e0ad0666922f376fc7ba14c9372be5"
-        },
-        "_weapon_ability_descriptor_for_grant": {
-          "before": "104d38e2082404b3901593e89a36f84d9614cf569b79b4f49f59d2ef98682f18",
-          "after": "e2ce2dc08ab375ce1488d657d1b9751ea46a416b0df0b3b2e7d294586fa51782"
-        },
-        "_weapon_keyword_grant_has_supported_runtime_shape": {
-          "before": "6e06c8e45683440f67e8c140f87ba84d66127850fcc61f560f8440588dfe1b9b",
-          "after": "b0178191b06467e9a0b6d0bce59dccb7b4ebcdd69f80cf9817cab605f484ce5a"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/catalog_selected_target_pair_support.py": {
-      "before_sha256": "57d7002c154d4964f00116ddaf55adccdfedb1a3dd1a55b3a95ac3fc6a5d4b79",
-      "after_sha256": "025cd5b4d959f8e3eb6109caf3dc9e40cacdfa246edaa71c5664fc93fbd42a6d",
-      "owners": {
-        "_weapon_ability_grant_is_supported": {
-          "before": "9967944d3395cbed9d7b255e098ef10f07e0b6a70169c30f10a49f680f4f9db9",
-          "after": "5e121837ed3705a3df643eefaa987471a5b3914eb5ec160e22307c4a4481cb4b"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/phases/shooting_declaration_validation.py": {
-      "before_sha256": "e8a4d31a05f1a70ae5df9790f303b9825c86097257e3fbe15bbf54178d45336b",
-      "after_sha256": "50fe91b9260016ba5d22fbd09af36abde1d9bfd6fefe8e2eb81148c61cd744a8",
-      "owners": {
-        "@module": {
-          "before": "86ebca95573463f7b66a241eca771cdf7cd5d5714d0facf7f1ab6b469f95d35b",
-          "after": "40df0be78bb50d69e235c8f0cb924e1559bb3acb46638caf57c98d31ac22c990"
-        },
-        "_apply_phase13d_weapon_modifiers": {
-          "before": "a697db91b8974f35ab12258fe8b25328abb578d104a3c995b35b6ea541af452a",
-          "after": "55da8547f357cb92458f52861029ab5aa5b84a9617194f97c3ed3bcd884eb355"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/rule_ir_weapon_modifiers.py": {
-      "before_sha256": "c4ec4ac8559038beb03e226bed314d9384a7149f094699d4d944fff4739072e2",
-      "after_sha256": "04d67ae613efae90e708fa7bc088f9b78d2a401ea9f55120f6baf5f60fa7d9a7",
-      "owners": {
-        "_required_positive_weapon_ability_value": {
-          "before": "248bce0a4da05716d0ed753a4111b3e505ea808d61e9a09403f6d5b2f5eefcdf",
+        "EmbarkResolution.__post_init__": {
+          "before": "389f73d8cf2cf375634f815c02efc43644764f1ca2d176ae16d4b069513c0981",
           "after": null
         },
-        "_required_weapon_ability_value": {
-          "before": "6a2b8cf6779c41e6aeaba81aa3870ba231d541c4aaf9b5e825b8ecf7bb9d9f50",
+        "EmbarkResolution.from_payload": {
+          "before": "4d85c5ef14b8fee734d14084cddad2fa78605faf9b94f23414ffaab4fe3bc685",
           "after": null
         },
-        "_weapon_ability_descriptor": {
-          "before": "8e39e7f00f8b1c378486da6e2f51f59aca50f2a22d87e052a01a0796ed41c59f",
-          "after": "ac53dccd6a459c96fe55924e7852ec7a29fa6d693b8e9682ddc65efc4b019ce5"
+        "EmbarkResolution.is_valid": {
+          "before": "4b3bb1ec33f1ce7eae76ae65a280739d68bbf343f4a4d70342eaeff4d9134c5b",
+          "after": null
+        },
+        "EmbarkResolution.to_payload": {
+          "before": "b2bc22156a622b59aa893f598caad7ed477cf8a338b26692c89d6a5c6b096634",
+          "after": null
+        },
+        "EmbarkResolutionPayload": {
+          "before": "aa4af4453c195f2632692125cae56d40018d04afd5fd1072265524657c61e69e",
+          "after": null
+        },
+        "EmbarkSelection": {
+          "before": "255756e6ad1b3fc446461e587443bd05de264759544e82e2a3b4f5291b98ccbc",
+          "after": null
+        },
+        "EmbarkSelection.__post_init__": {
+          "before": "e8289a21a359c204f5e140fc9dc7e1f5be35ef56c8fef76e71ab54dfc7dea95d",
+          "after": null
+        },
+        "EmbarkSelection.from_payload": {
+          "before": "54b533b6690d7832b9c1d7434650d7498b7f74c6950160bc5c1cc8bbc56c2672",
+          "after": null
+        },
+        "EmbarkSelection.has_override": {
+          "before": "b9f7dd8bcb3a3de10e3a1ecbe5080facc5efc6ae092997648e45e8ac92c2b80f",
+          "after": null
+        },
+        "EmbarkSelection.to_payload": {
+          "before": "bdbabc09e0628c56f90cdebe84cc50aaddabbba2f2e89bee7107d0861532eb61",
+          "after": null
+        },
+        "EmbarkSelectionPayload": {
+          "before": "a57f515b9f5be4e729fc3a65ed565fb4e5a551bc752745462a21c931e5fef161",
+          "after": null
         }
       }
     },
-    "src/warhammer40k_core/engine/weapon_abilities.py": {
-      "before_sha256": "e66d59d91d3aa2ec3bf232bf26fd0bf50c16da8f365800c65f0c7b383181d200",
-      "after_sha256": "c19109ab2a042eba9069733921549b38fed570068286d6766111e1d78f44163a",
-      "owners": {
-        "@module": {
-          "before": "db50ffb3ffd3c5a7ab1089f0ae846b79e0afe7869263726323088982795cc7c6",
-          "after": "50f2d57d16960019e8079c4580190df3631472a35bb7cdb79c75082bf621b674"
-        },
-        "_ability_descriptors": {
-          "before": "155ee9cc539334b797dbab556272d4bd4324f10be12b0b294d586d7041687573",
-          "after": "cb18db012a08be7f9f8074f019f34a9339dab306f05e958e29c2dff485f8250d"
-        },
-        "_attack_bonus_per_five": {
-          "before": null,
-          "after": "4127b4fe750b027583322bfcfde575db8e2878fa1aca7c10873d1f854fbc155a"
-        },
-        "blast_attack_bonus": {
-          "before": "bb4487cd9015c1db9bbd9a861c660da9b790bf84533acd82398d3ddc41c9f4b4",
-          "after": "fba4c25cfcdae40b72bbc810ee52c0db2c2dee3a827ff56ab5e45efd2cdcbcb2"
-        },
-        "blast_attack_bonus_for_profile": {
-          "before": null,
-          "after": "239a16dd6d9008ed4bcd6137245493e9fbf9d4536b5ca9a3bb181c555629968e"
-        },
-        "cleave_attack_bonus": {
-          "before": "70e692552c8a4b7edc5d4ab2ef9892fa192c412e60df2b5404a7f8e2cda7b784",
-          "after": "ce36807980c323f45246767884bf428836f351b81ac6b57a1f79a0342d4aeb33"
-        },
-        "weapon_ability_applies": {
-          "before": "e89a0c5f0b08998caef999caca26ee719be8f44dc24c77cf4bf32f8eea73a932",
-          "after": "1a7ba81dbc7e77896579546aff7f92fb9033b2faff06b70a656b3e8b74ec025c"
-        },
-        "weapon_ability_value": {
-          "before": "232f3367196811e604cb0a2d65f04d6bd98aed42bfed05aa76605ae8f7f8ee57",
-          "after": "e3776f9b45de122799a25294a9b447ed23ae2f6ee1ff17acee1557755dcf32f3"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/weapon_ability_grants.py": {
+    "tests/code_quality/test_order114_embark.py": {
       "before_sha256": null,
-      "after_sha256": "8ce18dbb4de70700292f4582196e1afa69f9c81b890c1d57d79d66060def05bb",
+      "after_sha256": "3b9f5e75452788a7df86f44c72981ff74858a14e8dd276a4fdae037eab5ce280",
       "owners": {
         "@module": {
           "before": null,
-          "after": "b9c9ace151765d0af8a6f9932106a7c465a41f3d2bca4e07fa8b3e26cd933e05"
+          "after": "bf4e8d9e411de5630a1474ba0082882fe21afe3d843e084673bfdb968e44c5df"
         },
-        "weapon_ability_descriptor_for_grant": {
+        "test_embark_uses_shared_types_geometry_and_mutation_without_name_gates": {
           "before": null,
-          "after": "4e97fd2377591db8a37e7c9152da7faa5819bdbfca1a82946fff68d768519e0c"
+          "after": "877fcdd5153d2d3dd24a3cc00ed5db5d90b4b577389d599823636af548bc7abc"
+        },
+        "test_order114_retains_original_order97_assertion_bytes_and_source_obligation": {
+          "before": null,
+          "after": "4df52d4783a015a6094934fd2ba5d7e59be805462cef8a054f99e5f5e864a08f"
+        },
+        "test_source_embark_dispatch_is_registered_with_validator_and_applier": {
+          "before": null,
+          "after": "ca31263f82061de094d02b605425dc01e54d7e4fd7bd932461df9b7ef7a54c53"
         }
       }
     },
-    "src/warhammer40k_core/rules/wahapedia_bridge.py": {
-      "before_sha256": "479fad2e0cfefe16a9f33aec97b8ca6a531792d21c6df2fce46e4e7eb9ebce26",
-      "after_sha256": "11c27f4c9249b523b7a10637804ed6ee77237ef521b737c919cb7405f9717a5e",
+    "tests/code_quality/test_order61_embark.py": {
+      "before_sha256": "34f38c1265ed5b7b5d6492f2fb1fbfcecee9c1fbbacd39e3c343be45b45dbee1",
+      "after_sha256": "349536f6d5acd6e7c10fc666a6318173356416c0dfac6b24e28bef512236505b",
       "owners": {
-        "_valued_weapon_ability_entry": {
-          "before": "97b1430e3d6a074bfedcc4d19c97a87c88034e9028096f9d69424b0e2e047a32",
-          "after": "1e35227da50deccb6219bdd2a440659b580cc2de87815770044e42953009a994"
+        "test_every_embark_consumer_supplies_history_and_actual_turn": {
+          "before": "58a5ca4676323445451851bc822c9da67b2fb73da8fbfe2467fec3f6637222fd",
+          "after": "921c57762af89b5452667b1a9d1966320bc40068c7b1f482f4697368506846c9"
         }
       }
     },
-    "src/warhammer40k_core/rules/weapon_keyword_values.py": {
+    "tests/code_quality/test_phase14h_attack_resolution_convergence.py": {
+      "before_sha256": "67bdd7bf7f19b8e1c9fd3cebb60506702237b9e155ecd924326545db4bd4896f",
+      "after_sha256": "ba518e7f4f4c225ed3b9509fa3fd95492bd73e0be77a0a847ced44ffcb9cd979",
+      "owners": {
+        "@module": {
+          "before": "b94e9dfc8aee190c6a92864f5b3b0911ad2de629b5145b56e8af12694c1e08f6",
+          "after": "d1aa4e5cbbab8a46c494253338e534a27a11f4e67ad39abd5b1dfb70eccf18d4"
+        },
+        "test_battlefield_removal_owners_converge_or_are_explicitly_non_authoritative": {
+          "before": "44a4c7437bccb7d76a0f998f0afb1288d966d69667a7aedcc8baab47b53ea144",
+          "after": "d5e461827db26ac1a9733d3146cbaab679b695da4641d977ac3fcc1bb1442efa"
+        }
+      }
+    },
+    "tests/code_quality/test_unit_model_semantics.py": {
+      "before_sha256": "33071929293071663d5efb9fa861da7506332323ffd9f582ab458c6e324ab7ed",
+      "after_sha256": "5351de42735fec6c3a71a4a05fcb9c706027a3aef0c8263573b79a937dcd7f9d",
+      "owners": {
+        "test_p19_transport_cargo_uses_physical_components_and_shared_destruction_cleanup": {
+          "before": "287062e32c9da419d245d58519feac6f89a35d34cf9630ae969b06199c31638a",
+          "after": "666c37f664648ee07e51d2b84f173bd765d01d74a10f1deaae502c9f76eb5cde"
+        }
+      }
+    },
+    "tests/order114_embark_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "9ae026a4febde3af2b036adf14ce455bb4748937ac75ba4fb243e1e26a069944",
+      "after_sha256": "79838814206e7572e85ce10699d7a1d30ec2adbe02a061ac2b61e3b857cbc9de",
       "owners": {
         "@module": {
           "before": null,
-          "after": "946ef07c3ab5d359da31cfd2547a473177fc134281470f0a0dc4c3a12c9a0063"
+          "after": "18a65b4bb07acf54f28fb7a01ad8089e254f572ff5d631141fbc7291f3c14165"
         },
-        "valued_weapon_keyword": {
+        "attached_source_embark_session": {
           "before": null,
-          "after": "640763f2c6606835cda97da741593857fa2417bc287e8795273301172c3f3dc0"
+          "after": "f32ba97922a7a2acd1b2b0551355ae884ec942c86e454dad4bcfeb59b415b751"
+        },
+        "disembark_at_transport": {
+          "before": null,
+          "after": "d1a2c9dbff25f812743b8ad2c878f1681b3041977b7cfed11203453c7a647ec6"
+        },
+        "source_embark_session": {
+          "before": null,
+          "after": "7bcdfe5c84a5803b6b9ebf88f0553fb4f12e19ad51fe329b276036349bf2ad5b"
         }
       }
     },
-    "tests/code_quality/test_order113_attack_counts.py": {
-      "before_sha256": null,
-      "after_sha256": "a63ac2d3c975a3e4e0e676a5a9912e98301ae7a7d127b33b7d5d4c5ca0a1ce7e",
+    "tests/order61_embark_helpers.py": {
+      "before_sha256": "50c7bc022d3045cff1c6ae3ed2c7a4b427ed457d4f82a3a5050f500fee2213f8",
+      "after_sha256": "5572cc73eaecd34cf9bcb9be875a088792673d93f910a75d43b766112b38f913",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "5fbe74395cbda75552557a1ce42a80d08ff720843ae96f0b3e6b130ae5d8e4e5"
+          "before": "832bcc45ee9863e1d6a2839c7232ee4a79e8117b2995e7cc7e8a12aaade1e6fd",
+          "after": "b74bd74d48b419bf636ef4517e8244f9dd8d779b5f89ef7f56f2042767c7dd68"
         },
-        "test_order113_pinned_selected_clauses_keep_literal_hashes": {
-          "before": null,
-          "after": "248e10259c6c803c367899eb9482c38a6291fd11e58cfb01524b24c3b1a130fd"
-        },
-        "test_order113_shared_consumers_do_not_fix_blast_x_to_one": {
-          "before": null,
-          "after": "49a8fc9a41515c52144f7c2d48b4cd885f68791db6e7c153aeaeaece0dcc9d49"
+        "embark_session": {
+          "before": "44ade6db370bc9695d8ea470af5fa56718dfefa4ddfda21db39c175da4787d30",
+          "after": "1e0a4c0a7353f1f58672570affe79228167224884b02b3ffdbdeb8c2225c6833"
         }
       }
     },
-    "tests/fire_overwatch_helpers.py": {
-      "before_sha256": "c1ebdfd064847148314f460855e344971b15f106fab48301ed6bf5712686c727",
-      "after_sha256": "35a93ee1470bd1e9a1a9caf1319fcaad1b30e2a5b14fffbb0b87fea4a3388362",
+    "tests/unit/test_order61_embark.py": {
+      "before_sha256": "da8b4ef4113860b0a74efd875cb563fe8e7079f1f28b8e06d63f473a7d7f4e95",
+      "after_sha256": "b73391a3dff3173ff871192c5435cb14748afd08a372a18c36c647c1afd0781d",
       "owners": {
         "@module": {
-          "before": "3f9bff8668d513759a5ef7a6717342888b67df43081961de0bebd33559fd012e",
-          "after": "b4de160a787248f055c4abf8b4657878dd6a9561639d80a2b9945db93cd2f4a1"
+          "before": "37aae69e29f8cbf18c0f7d1c8f90c6cdc56ae3d79dad20d19e37999830b9aab2",
+          "after": "27237b1c2d7be374a759b099e1699ab7ad5b7112424cff6d81ef60f2266d4522"
         },
-        "overwatch_session": {
-          "before": "c70823403be9cd4bf59f4025ef1c2a8f54d55ed10587ca37114a2656050a5d8b",
-          "after": "2cddbf27d4520f211b892c0115398ce728583c88d842a74d6514ec06bcf1e7f1"
-        }
-      }
-    },
-    "tests/random_melee_helpers.py": {
-      "before_sha256": "ccd6efd8890d2155b6b776b760c25a3c487427014927fa736eab895d5abd1790",
-      "after_sha256": "8fcf80415c3facc1f56312e627c7d0330754097873897645a82a2415d0c21839",
-      "owners": {
-        "random_melee_session": {
-          "before": "0e9c9e4acb44953cee42a631aa4f03b8989a6af6d10b6072b4973b8264d27988",
-          "after": "3201ee1b9cd259fd44598859df8eae13ed49d29306dd6c64c5d0ab5a087e2731"
-        }
-      }
-    },
-    "tests/unit/engine/test_catalog_weapon_ability_runtime_helpers.py": {
-      "before_sha256": "73366ceb6c2179726718d6c9ad6b8b46d12d7c5755c5f7454010633fb90a961a",
-      "after_sha256": "d52f5ef540195376c9eaf64383fbd9177c1cff36837c3387fda3c2989a3721c2",
-      "owners": {
-        "test_order113_blast_choice_and_selected_pair_shapes": {
+        "test_attached_source_embark_moves_every_component_and_restores_replays": {
           "before": null,
-          "after": "640a173e6cdee8ed20a04f8553ba25c3e6ecfce9f0f1d84dc983329d3227b06d"
+          "after": "77067a4071f7eeb8314ef3b6fb1fdc3768e61daa657387a385bcf9314a6a0549"
         },
-        "test_order113_generic_blast_grants_preserve_value_or_reject_it": {
+        "test_no_movement_context_identity_cannot_be_forged_into_another_selection": {
           "before": null,
-          "after": "ea3eadf5e19576ced76e1f9cb3f410544509e8ceb56be7f6255ab6bd8e9d44c9"
+          "after": "1156a6cedc32ab1f2341fa8e161a31732a42bd31a1e7a1d4e98741b8c9e06eca"
         },
-        "test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values": {
-          "before": "a697d659f8a18a5aea9c55501bf2b16f189000826c08e5d4a8ff378bfb2f1b20",
-          "after": "b1bf61a0b478cd3e5f80f57843b9595e6dc1922397e7958732bc62e82288b2ac"
-        }
-      }
-    },
-    "tests/unit/rules/test_wahapedia_bridge_normalization.py": {
-      "before_sha256": "33f1487de33625f721d6e44667d01a00377741312b7f9ea1da080aafa2065c6d",
-      "after_sha256": "4e608a698aa0a3c6d03d92f7278e99ea3a04b5526260663e735353516023c591",
-      "owners": {
-        "@module": {
-          "before": "aa039e01ff11eb07581714332c5eeb444c5dc40b8d944ad761f65e420804a2f4",
-          "after": "bc8caeed1c51cda32cbd0637d7d3ca58ad6ae0550dacb08d669531fb84549571"
+        "test_no_movement_embark_preserves_source_context_without_a_move": {
+          "before": null,
+          "after": "1786e99a4f452f5692e8f93dbb5c5e755a0a36d0880e577fe102fd54c19e4767"
         },
-        "test_order113_bridge_preserves_blast_x_and_cleave_x": {
+        "test_ordinary_embark_still_requires_its_real_move": {
           "before": null,
-          "after": "718466b0a4be8a72f2f27639ef8cbfcb2544723c87d61277e31a9caf2a2909e1"
+          "after": "219b5304df9f6d8f02b1b7bb48e279a124ee624ada77cb5308a4cfc18bfa36a6"
         },
-        "test_order113_bridge_preserves_every_plain_and_valued_blast_choice": {
+        "test_source_embark_after_disembark_requires_the_distinct_explicit_permission": {
           "before": null,
-          "after": "9f11f39d6ddefab45767680ffd64bc5ce95e4dc569829fd48c50fd86681d2806"
-        }
-      }
-    },
-    "tests/unit/test_fire_overwatch.py": {
-      "before_sha256": "2e7c01e62bc8a2c592fc9284045d2e14fb825ba2b62eddaa80d91160200ff0f7",
-      "after_sha256": "e4c60c4f0a19dd3689f9e8740bcdd68be5e254ae26c2f6dda9cc6c8397c0d342",
-      "owners": {
-        "test_order113_blast_occurrence_choice_rejects_invalid_before_random_roll": {
-          "before": null,
-          "after": "88034966fbfb22bbe348c2c9a97ff3505cc95486314ab492e93717faac1cd157"
+          "after": "0047ed7848b7fd065d1919dc48f67a5fa85e944858aa77447d5dce5ad8d2c9ed"
         },
-        "test_order113_blast_x_reaction_uses_shared_frozen_counts": {
+        "test_source_embark_after_real_disembark_facade_restore_fork_replay": {
           "before": null,
-          "after": "52be565e3796c74846c58c1a858401098ed3c638f2d247aaa8c6af48b47ecf34"
-        }
-      }
-    },
-    "tests/unit/test_order92_random_melee.py": {
-      "before_sha256": "c4e211eff004b643e3762d4e4c3e7efe8a43d35feebef5f5446ec4cc487dc356",
-      "after_sha256": "d7f160998f9f191f4c41694c49fa1fb1ebac4b628c518728f3b62f735e71484f",
-      "owners": {
-        "test_order113_cleave_fixed_random_attached_restore_fork_replay": {
-          "before": null,
-          "after": "d945dc65677729f753ac302dd69b1b32678569ef51cfd5c2748c32513782b8b6"
-        }
-      }
-    },
-    "tests/unit/test_phase13b_shooting_declarations.py": {
-      "before_sha256": "cf6ef7d483e90543ce905adf1e53a80d3417f7d26844286b348230c2447d1563",
-      "after_sha256": "2e42180c0ef129b19fd0fd95a995e5cce04ab45ab601e882d397375031bde8dc",
-      "owners": {
-        "test_order113_blast_x_shared_declaration_count": {
-          "before": null,
-          "after": "e94636237a976e3a5a2c06d4d3ba4010563a0ae4ec87188602b380a730321a67"
+          "after": "2d7d086ad01d7c0e9a5d16f1e485f5bfad94eeb71c4165278ad59cfa80aebb09"
         },
-        "test_order113_ingested_mixed_blast_requires_player_choice": {
+        "test_source_embark_revalidates_supported_drift_before_queue_pop": {
           "before": null,
-          "after": "08ca6bc02090f6b67d17eb9fb8f433c2204c5bd29fcc9a54b9920fe37e1ec49d"
-        }
-      }
-    },
-    "tests/unit/test_phase13d_weapon_ability_helpers.py": {
-      "before_sha256": "ace7694abb844ba2897559297f9d735187b25124b60b008b67b072b57993be01",
-      "after_sha256": "97dd7ee99d21726d6b1f21f74ff5369f76c4c19278b8af6f9b20d994149b026d",
-      "owners": {
-        "test_order113_attack_count_sources_require_one_occurrence_without_stacking": {
-          "before": null,
-          "after": "8acf9432a70d3f33db4099981f5b87dc21002c20267f79f85caec07970fbb31f"
+          "after": "847130723b0a629cbec3946659d81027d8f196c4e2576164f02a588ad84f5b41"
         },
-        "test_order113_blast_applicability_and_grouping_require_keyword": {
+        "test_source_embark_then_rejected_disembark_retry_restores_and_replays": {
           "before": null,
-          "after": "2bd9d49ee9305c4bf192d48a1a04cfb932e6334f4a28fdbda0b3afc22a75fa0a"
-        },
-        "test_order113_blast_descriptor_preserves_value_condition_and_payload": {
-          "before": null,
-          "after": "2480e5d4f50af401669b4d76c6de608430ef2ca44ab63209ffb9bd98123bd869"
-        },
-        "test_order113_blast_x_uses_complete_groups_of_five": {
-          "before": null,
-          "after": "22e3ac87624430f42c80baaddcdacf5ae3b0c36b6c616ec7e37c06fbe28ae822"
-        },
-        "test_order113_invalid_blast_value_fails_closed": {
-          "before": null,
-          "after": "6f81c98a880ec6cf433a9651e8909a0e63f027acc24811d86afe618d84daeb18"
+          "after": "7d8469fbd73548cdbdfaefaa355c7a1fac2d6d5b5565ad12f9f499571cf2d3e8"
         }
       }
     },
     "tools/core_rules_order97_history.py": {
-      "before_sha256": "87d7d7ebd50238e779b62ed3b528753028cfeb7fd7f07b6e10c04b8eee657a35",
-      "after_sha256": "e28e10ebc07c0de9d0fc876d992dee31be302051884dc9f7f28e50c7038ea777",
+      "before_sha256": "e28e10ebc07c0de9d0fc876d992dee31be302051884dc9f7f28e50c7038ea777",
+      "after_sha256": "b43275eae52269ab401f33bea1f2a946f0aa686f3299a132cab4e0c2624d4ce5",
       "owners": {
         "@module": {
-          "before": "63b975c8dc9650a17e7ea73f3fd0ade71f0fc4d95097a522a85ab0fc35417d7a",
-          "after": "4af5577c475f70ed9e874cd5fbcfcdf146743daa6fa50e04a8c0b7e651a8776a"
+          "before": "4af5577c475f70ed9e874cd5fbcfcdf146743daa6fa50e04a8c0b7e651a8776a",
+          "after": "510de5b46724e2ca1315964952387a7aba1ed743022d07ea34003587c161bf00"
         },
         "historical_evidence_path": {
-          "before": "108b2518ad2851f9c695b0d802e22a33d21d74b0674cb3dbf47dee81c36a6990",
-          "after": "2ab039a4c7fbf9eb96f8ebd33e88f5b9770a0d12a29fedf7dbf01ac3a77e5360"
+          "before": "2ab039a4c7fbf9eb96f8ebd33e88f5b9770a0d12a29fedf7dbf01ac3a77e5360",
+          "after": "09144f01cb780f70490f39b088174fd1ee5c6ddd2310f275c25b4b7e07cfda00"
         }
       }
     }
@@ -660,9 +790,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -670,9 +800,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -680,9 +810,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -690,9 +820,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -700,9 +830,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -710,9 +840,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -720,9 +850,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -730,9 +860,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -740,9 +870,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -750,9 +880,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -760,9 +890,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -770,9 +900,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -780,9 +910,29 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Refresh the committed unchanged behavioral file inventory using actual complete current-run successful JUnit durations. Do not invent or zero-fill timings.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Refresh unchanged behavioral file inventory from complete successful current-run JUnit timings only.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "conformance/typescript/src/contract.ts": {
+      "category": "rule_semantics",
+      "operations": [
+        "order110-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Publish additive Contract44.3 source-context option/event shape and regenerate identity-bearing examples/manifests. Existing finite submission/envelope/visibility/schema authority remains.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "contracts/README.md": {
+      "category": "rule_semantics",
+      "operations": [
+        "order110-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Publish additive Contract44.3 source-context option/event shape and regenerate identity-bearing examples/manifests. Existing finite submission/envelope/visibility/schema authority remains.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -790,9 +940,9 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate existing Contract44.2 examples/manifests for runtime identity; schemas, envelope families and viewer policy unchanged.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Publish additive Contract44.3 source-context option/event shape and regenerate identity-bearing examples/manifests. Existing finite submission/envelope/visibility/schema authority remains.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -800,9 +950,9 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate existing Contract44.2 examples/manifests for runtime identity; schemas, envelope families and viewer policy unchanged.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Publish additive Contract44.3 source-context option/event shape and regenerate identity-bearing examples/manifests. Existing finite submission/envelope/visibility/schema authority remains.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -810,9 +960,9 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate existing Contract44.2 examples/manifests for runtime identity; schemas, envelope families and viewer policy unchanged.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Publish additive Contract44.3 source-context option/event shape and regenerate identity-bearing examples/manifests. Existing finite submission/envelope/visibility/schema authority remains.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -820,9 +970,9 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate existing Contract44.2 examples/manifests for runtime identity; schemas, envelope families and viewer policy unchanged.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Publish additive Contract44.3 source-context option/event shape and regenerate identity-bearing examples/manifests. Existing finite submission/envelope/visibility/schema authority remains.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -830,9 +980,9 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate existing Contract44.2 examples/manifests for runtime identity; schemas, envelope families and viewer policy unchanged.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Publish additive Contract44.3 source-context option/event shape and regenerate identity-bearing examples/manifests. Existing finite submission/envelope/visibility/schema authority remains.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -840,9 +990,9 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate existing Contract44.2 examples/manifests for runtime identity; schemas, envelope families and viewer policy unchanged.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Publish additive Contract44.3 source-context option/event shape and regenerate identity-bearing examples/manifests. Existing finite submission/envelope/visibility/schema authority remains.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -850,9 +1000,9 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate existing Contract44.2 examples/manifests for runtime identity; schemas, envelope families and viewer policy unchanged.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Publish additive Contract44.3 source-context option/event shape and regenerate identity-bearing examples/manifests. Existing finite submission/envelope/visibility/schema authority remains.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -860,91 +1010,81 @@
         "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate existing Contract44.2 examples/manifests for runtime identity; schemas, envelope families and viewer policy unchanged.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Publish additive Contract44.3 source-context option/event shape and regenerate identity-bearing examples/manifests. Existing finite submission/envelope/visibility/schema authority remains.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "data/source_audits/order113/baseline/tests/fire_overwatch_helpers.py.txt": {
+    "contracts/openapi.yaml": {
       "category": "rule_semantics",
       "operations": [
-        "order113-source-evidence"
+        "order110-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Retain exact-base bytes for four original Order97-pinned regression/fixture inputs with bounded hash-checked historical mapping. Original source selection and histories remain immutable.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Publish additive Contract44.3 source-context option/event shape and regenerate identity-bearing examples/manifests. Existing finite submission/envelope/visibility/schema authority remains.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "data/source_audits/order113/baseline/tests/random_melee_helpers.py.txt": {
+    "data/source_audits/order114/baseline/tests/order61_embark_helpers.py.txt": {
       "category": "rule_semantics",
       "operations": [
-        "order113-source-evidence"
+        "order114-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Retain exact-base bytes for four original Order97-pinned regression/fixture inputs with bounded hash-checked historical mapping. Original source selection and histories remain immutable.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Retain exact original Order97-pinned Order61 test bytes via bounded hash-checked base archive; preserve original source and historical facts.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "data/source_audits/order113/baseline/tests/unit/test_fire_overwatch.py.txt": {
+    "data/source_audits/order114/baseline/tests/unit/test_order61_embark.py.txt": {
       "category": "rule_semantics",
       "operations": [
-        "order113-source-evidence"
+        "order114-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Retain exact-base bytes for four original Order97-pinned regression/fixture inputs with bounded hash-checked historical mapping. Original source selection and histories remain immutable.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Retain exact original Order97-pinned Order61 test bytes via bounded hash-checked base archive; preserve original source and historical facts.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "data/source_audits/order113/baseline/tests/unit/test_phase13d_weapon_ability_helpers.py.txt": {
+    "data/source_audits/order114/historical-inputs.json": {
       "category": "rule_semantics",
       "operations": [
-        "order113-source-evidence"
+        "order114-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Retain exact-base bytes for four original Order97-pinned regression/fixture inputs with bounded hash-checked historical mapping. Original source selection and histories remain immutable.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
-    },
-    "data/source_audits/order113/historical-inputs.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "order113-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Retain exact-base bytes for four original Order97-pinned regression/fixture inputs with bounded hash-checked historical mapping. Original source selection and histories remain immutable.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Retain exact original Order97-pinned Order61 test bytes via bounded hash-checked base archive; preserve original source and historical facts.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record scoped source obligations, actual roadmap behavior, existing adapter contract justification and exact diff-bound performance ownership.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Record exact source obligations, implemented roadmap behavior, additive adapter contract and diff-bound performance ownership.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record scoped source obligations, actual roadmap behavior, existing adapter contract justification and exact diff-bound performance ownership.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Record exact source obligations, implemented roadmap behavior, additive adapter contract and diff-bound performance ownership.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "docs/ORDER_113_SCOPE_PLAN.md": {
+    "docs/ORDER_114_SCOPE_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record scoped source obligations, actual roadmap behavior, existing adapter contract justification and exact diff-bound performance ownership.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Record exact source obligations, implemented roadmap behavior, additive adapter contract and diff-bound performance ownership.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record scoped source obligations, actual roadmap behavior, existing adapter contract justification and exact diff-bound performance ownership.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Record exact source obligations, implemented roadmap behavior, additive adapter contract and diff-bound performance ownership.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -952,219 +1092,215 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Regenerate exact runtime identity for the scoped Blast/Cleave owners.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Regenerate exact runtime identity for scoped embark owners.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "src/warhammer40k_core/core/weapon_ability_sources.py": {
+    "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
       "operations": [
-        "order113-attack-counts"
+        "order114-embark-permissions"
       ],
       "selected_families": [],
-      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Represent source-owned no-movement embark permission, separately preserve post-disembark authority, and route shared finite options/validation/group cargo mutation and engine-created history restoration. Extract existing responsibilities from frozen modules. Ordinary bounded rule branches; no search/cache/algorithm optimization.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "src/warhammer40k_core/core/weapon_profiles.py": {
+    "src/warhammer40k_core/engine/lifecycle.py": {
       "category": "rule_semantics",
       "operations": [
-        "order113-attack-counts"
+        "order114-embark-permissions"
       ],
       "selected_families": [],
-      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Represent source-owned no-movement embark permission, separately preserve post-disembark authority, and route shared finite options/validation/group cargo mutation and engine-created history restoration. Extract existing responsibilities from frozen modules. Ordinary bounded rule branches; no search/cache/algorithm optimization.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "src/warhammer40k_core/engine/attack_sequence_selection.py": {
+    "src/warhammer40k_core/engine/movement_decision_authority.py": {
       "category": "rule_semantics",
       "operations": [
-        "order113-attack-counts"
+        "order114-embark-permissions"
       ],
       "selected_families": [],
-      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Represent source-owned no-movement embark permission, separately preserve post-disembark authority, and route shared finite options/validation/group cargo mutation and engine-created history restoration. Extract existing responsibilities from frozen modules. Ordinary bounded rule branches; no search/cache/algorithm optimization.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "src/warhammer40k_core/engine/catalog_rule_consumption.py": {
+    "src/warhammer40k_core/engine/movement_selection_history.py": {
       "category": "rule_semantics",
       "operations": [
-        "order113-attack-counts"
+        "order114-embark-permissions"
       ],
       "selected_families": [],
-      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Represent source-owned no-movement embark permission, separately preserve post-disembark authority, and route shared finite options/validation/group cargo mutation and engine-created history restoration. Extract existing responsibilities from frozen modules. Ordinary bounded rule branches; no search/cache/algorithm optimization.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "src/warhammer40k_core/engine/catalog_selected_target_pair_support.py": {
+    "src/warhammer40k_core/engine/phases/movement_action_decisions.py": {
       "category": "rule_semantics",
       "operations": [
-        "order113-attack-counts"
+        "order114-embark-permissions"
       ],
       "selected_families": [],
-      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Represent source-owned no-movement embark permission, separately preserve post-disembark authority, and route shared finite options/validation/group cargo mutation and engine-created history restoration. Extract existing responsibilities from frozen modules. Ordinary bounded rule branches; no search/cache/algorithm optimization.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "src/warhammer40k_core/engine/phases/shooting_declaration_validation.py": {
+    "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": {
       "category": "rule_semantics",
       "operations": [
-        "order113-attack-counts"
+        "order114-embark-permissions"
       ],
       "selected_families": [],
-      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Represent source-owned no-movement embark permission, separately preserve post-disembark authority, and route shared finite options/validation/group cargo mutation and engine-created history restoration. Extract existing responsibilities from frozen modules. Ordinary bounded rule branches; no search/cache/algorithm optimization.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "src/warhammer40k_core/engine/rule_ir_weapon_modifiers.py": {
+    "src/warhammer40k_core/engine/transport_embark_context.py": {
       "category": "rule_semantics",
       "operations": [
-        "order113-attack-counts"
+        "order114-embark-permissions"
       ],
       "selected_families": [],
-      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Represent source-owned no-movement embark permission, separately preserve post-disembark authority, and route shared finite options/validation/group cargo mutation and engine-created history restoration. Extract existing responsibilities from frozen modules. Ordinary bounded rule branches; no search/cache/algorithm optimization.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "src/warhammer40k_core/engine/weapon_abilities.py": {
+    "src/warhammer40k_core/engine/transport_embark_mutation.py": {
       "category": "rule_semantics",
       "operations": [
-        "order113-attack-counts"
+        "order114-embark-permissions"
       ],
       "selected_families": [],
-      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Represent source-owned no-movement embark permission, separately preserve post-disembark authority, and route shared finite options/validation/group cargo mutation and engine-created history restoration. Extract existing responsibilities from frozen modules. Ordinary bounded rule branches; no search/cache/algorithm optimization.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "src/warhammer40k_core/engine/weapon_ability_grants.py": {
+    "src/warhammer40k_core/engine/transport_embark_types.py": {
       "category": "rule_semantics",
       "operations": [
-        "order113-attack-counts"
+        "order114-embark-permissions"
       ],
       "selected_families": [],
-      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Represent source-owned no-movement embark permission, separately preserve post-disembark authority, and route shared finite options/validation/group cargo mutation and engine-created history restoration. Extract existing responsibilities from frozen modules. Ordinary bounded rule branches; no search/cache/algorithm optimization.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "src/warhammer40k_core/rules/wahapedia_bridge.py": {
+    "src/warhammer40k_core/engine/transport_embark_validation.py": {
       "category": "rule_semantics",
       "operations": [
-        "order113-attack-counts"
+        "order114-embark-permissions"
       ],
       "selected_families": [],
-      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Represent source-owned no-movement embark permission, separately preserve post-disembark authority, and route shared finite options/validation/group cargo mutation and engine-created history restoration. Extract existing responsibilities from frozen modules. Ordinary bounded rule branches; no search/cache/algorithm optimization.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "src/warhammer40k_core/rules/weapon_keyword_values.py": {
+    "src/warhammer40k_core/engine/transport_source_embark.py": {
       "category": "rule_semantics",
       "operations": [
-        "order113-attack-counts"
+        "order114-embark-permissions"
       ],
       "selected_families": [],
-      "rationale": "Preserve source-backed Blast X through boundary descriptors, shared catalog/RuleIR grants, occurrence selection and shared ordinary/reaction Shooting arithmetic; retain existing single-target Cleave semantics using common per-five arithmetic. Extract existing responsibilities from frozen modules and remove obsolete helpers. Ordinary rule branches, no search/cache/algorithm work.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Represent source-owned no-movement embark permission, separately preserve post-disembark authority, and route shared finite options/validation/group cargo mutation and engine-created history restoration. Extract existing responsibilities from frozen modules. Ordinary bounded rule branches; no search/cache/algorithm optimization.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "tests/code_quality/test_order113_attack_counts.py": {
+    "src/warhammer40k_core/engine/transport_source_embark_history.py": {
       "category": "rule_semantics",
       "operations": [
-        "order113-regressions"
+        "order114-embark-permissions"
       ],
       "selected_families": [],
-      "rationale": "Exercise descriptor/grant boundary branches, occurrence choices and invalid pre-roll submissions, fixed/random attached ordinary/reaction/melee facade counts and engine-created persistence/fork/viewer/replay. Preserve existing positive commitment, split, replacement and lethal controls.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Represent source-owned no-movement embark permission, separately preserve post-disembark authority, and route shared finite options/validation/group cargo mutation and engine-created history restoration. Extract existing responsibilities from frozen modules. Ordinary bounded rule branches; no search/cache/algorithm optimization.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "tests/fire_overwatch_helpers.py": {
+    "src/warhammer40k_core/engine/transports.py": {
       "category": "rule_semantics",
       "operations": [
-        "order113-regressions"
+        "order114-embark-permissions"
       ],
       "selected_families": [],
-      "rationale": "Exercise descriptor/grant boundary branches, occurrence choices and invalid pre-roll submissions, fixed/random attached ordinary/reaction/melee facade counts and engine-created persistence/fork/viewer/replay. Preserve existing positive commitment, split, replacement and lethal controls.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Represent source-owned no-movement embark permission, separately preserve post-disembark authority, and route shared finite options/validation/group cargo mutation and engine-created history restoration. Extract existing responsibilities from frozen modules. Ordinary bounded rule branches; no search/cache/algorithm optimization.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "tests/random_melee_helpers.py": {
+    "tests/code_quality/test_order114_embark.py": {
       "category": "rule_semantics",
       "operations": [
-        "order113-regressions"
+        "order114-regressions"
       ],
       "selected_families": [],
-      "rationale": "Exercise descriptor/grant boundary branches, occurrence choices and invalid pre-roll submissions, fixed/random attached ordinary/reaction/melee facade counts and engine-created persistence/fork/viewer/replay. Preserve existing positive commitment, split, replacement and lethal controls.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Exercise actual disembark followed by source embark/decline, attached group cargo authority, invalid pre-pop drift, ordinary move controls and valid engine-created save/load/fork/viewer/replay.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "tests/unit/engine/test_catalog_weapon_ability_runtime_helpers.py": {
+    "tests/code_quality/test_order61_embark.py": {
       "category": "rule_semantics",
       "operations": [
-        "order113-regressions"
+        "order114-regressions"
       ],
       "selected_families": [],
-      "rationale": "Exercise descriptor/grant boundary branches, occurrence choices and invalid pre-roll submissions, fixed/random attached ordinary/reaction/melee facade counts and engine-created persistence/fork/viewer/replay. Preserve existing positive commitment, split, replacement and lethal controls.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Exercise actual disembark followed by source embark/decline, attached group cargo authority, invalid pre-pop drift, ordinary move controls and valid engine-created save/load/fork/viewer/replay.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "tests/unit/rules/test_wahapedia_bridge_normalization.py": {
+    "tests/code_quality/test_phase14h_attack_resolution_convergence.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Migrate existing strict static embark provenance, battlefield mutation and physical-component audits to the extracted shared owner; retain ordinary/source delegation checks. Development-only audit repair after preserved 3-failure quality result, no runtime or behavioral test change.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "tests/code_quality/test_unit_model_semantics.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Migrate existing strict static embark provenance, battlefield mutation and physical-component audits to the extracted shared owner; retain ordinary/source delegation checks. Development-only audit repair after preserved 3-failure quality result, no runtime or behavioral test change.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
+    },
+    "tests/order114_embark_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "order113-regressions"
+        "order114-regressions"
       ],
       "selected_families": [],
-      "rationale": "Exercise descriptor/grant boundary branches, occurrence choices and invalid pre-roll submissions, fixed/random attached ordinary/reaction/melee facade counts and engine-created persistence/fork/viewer/replay. Preserve existing positive commitment, split, replacement and lethal controls.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Exercise actual disembark followed by source embark/decline, attached group cargo authority, invalid pre-pop drift, ordinary move controls and valid engine-created save/load/fork/viewer/replay.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "tests/unit/test_fire_overwatch.py": {
+    "tests/order61_embark_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "order113-regressions"
+        "order114-regressions"
       ],
       "selected_families": [],
-      "rationale": "Exercise descriptor/grant boundary branches, occurrence choices and invalid pre-roll submissions, fixed/random attached ordinary/reaction/melee facade counts and engine-created persistence/fork/viewer/replay. Preserve existing positive commitment, split, replacement and lethal controls.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Exercise actual disembark followed by source embark/decline, attached group cargo authority, invalid pre-pop drift, ordinary move controls and valid engine-created save/load/fork/viewer/replay.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
-    "tests/unit/test_order92_random_melee.py": {
+    "tests/unit/test_order61_embark.py": {
       "category": "rule_semantics",
       "operations": [
-        "order113-regressions"
+        "order114-regressions"
       ],
       "selected_families": [],
-      "rationale": "Exercise descriptor/grant boundary branches, occurrence choices and invalid pre-roll submissions, fixed/random attached ordinary/reaction/melee facade counts and engine-created persistence/fork/viewer/replay. Preserve existing positive commitment, split, replacement and lethal controls.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
-    },
-    "tests/unit/test_phase13b_shooting_declarations.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order113-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Exercise descriptor/grant boundary branches, occurrence choices and invalid pre-roll submissions, fixed/random attached ordinary/reaction/melee facade counts and engine-created persistence/fork/viewer/replay. Preserve existing positive commitment, split, replacement and lethal controls.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
-    },
-    "tests/unit/test_phase13d_weapon_ability_helpers.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order113-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Exercise descriptor/grant boundary branches, occurrence choices and invalid pre-roll submissions, fixed/random attached ordinary/reaction/melee facade counts and engine-created persistence/fork/viewer/replay. Preserve existing positive commitment, split, replacement and lethal controls.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Exercise actual disembark followed by source embark/decline, attached group cargo authority, invalid pre-pop drift, ordinary move controls and valid engine-created save/load/fork/viewer/replay.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     },
     "tools/core_rules_order97_history.py": {
       "category": "rule_semantics",
       "operations": [
-        "order113-source-evidence"
+        "order114-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Retain exact-base bytes for four original Order97-pinned regression/fixture inputs with bounded hash-checked historical mapping. Original source selection and histories remain immutable.",
-      "source_obligation": "Order113/P24M/C24-13: pinned rule:24:24.05:1 blocks1-3, bare Blast1 or Blast X adds X * floor(SelectTargets attached rules-unit models/5); explicit user Cleave X extension, rule:24:24.06:1 blocks1-2, same arithmetic only when all physical weapon attacks select one target. Preserve fixed/random commitments, source occurrence choice/nonstacking and shared engine authority.",
-      "unchanged_work": "No deliberate performance work or demonstrated severe regression; no algorithm/search/cache/serialization/workload/dependency change. Existing physical inventory and roll-budget authority, selected-target freezing, query owners and live semantic/work/cache gates remain. Parent runs quiet serial current-runtime smoke; no detailed-comparison or full-game certification claimed."
+      "rationale": "Retain exact original Order97-pinned Order61 test bytes via bounded hash-checked base archive; preserve original source and historical facts.",
+      "source_obligation": "Order114/P18J/C18-11: immutable FAQ c2df3e97-f21e-4fc9-943e-37072c08c10e answer block2 authorizes embark after disembarking because this embark is not a Normal/Advance/Fall-back move. Represent the explicit provider occasion and separate post-disembark permission without inventing a movement witness. Named ability loading/timing remains outside Core scope.",
+      "unchanged_work": "No deliberate performance change or demonstrated serious regression. No changed search/cache/algorithm/workload/dependency; existing group geometry, capacity, battlefield/cargo presence, finite decision, replay and live semantic/work/cache authority retained. Quiet serial current-runtime smoke required; no detailed comparison or full-game certification claimed."
     }
   },
   "milestone": "ordinary",

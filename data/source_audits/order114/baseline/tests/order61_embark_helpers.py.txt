@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from tests.core_stratagem_helpers import _config
+from tests.core_stratagem_helpers import _replace_unit_poses
 from tests.disembark_eligibility_helpers import TRANSPORT_ID, disembark_session
 from tests.order60_emergency_disembark_helpers import emergency_disembark_poses_around
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.phases.movement_fall_back_embark import (
     _post_move_embark_options,
@@ -16,15 +17,19 @@ UNIT_ID = "army-alpha:remaining-unit"
 
 
 def embark_session() -> LocalGameSession:
-    selection = _config().army_muster_requests[0].unit_selections[0]
-    poses = emergency_disembark_poses_around(
-        center_x=10,
-        center_y=10,
-        count=sum(profile.model_count for profile in selection.model_profile_selections),
-        step_degrees=40,
+    session = disembark_session()
+    state = session.lifecycle.state
+    assert state is not None
+    scenario = battlefield_scenario_for_state(state=state)
+    placement = scenario.battlefield_state.unit_placement_by_id(UNIT_ID)
+    _replace_unit_poses(
+        state,
+        unit_instance_id=UNIT_ID,
+        poses=emergency_disembark_poses_around(
+            center_x=10, center_y=10, count=len(placement.model_placements), step_degrees=40
+        ),
     )
-    # Seed setup before Command snapshots; later pose mutation corrupts valid origins.
-    return disembark_session(unit_poses={UNIT_ID: poses})
+    return session
 
 
 def embark_option_ids(session: LocalGameSession) -> tuple[str, ...]:

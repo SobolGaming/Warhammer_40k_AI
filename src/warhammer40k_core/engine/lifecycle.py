@@ -325,6 +325,7 @@ from warhammer40k_core.engine.tracked_targets import (
     apply_select_tracked_target_decision,
     invalid_select_tracked_target_status,
 )
+from warhammer40k_core.engine.transport_source_embark import source_embark_dispatch_handler
 from warhammer40k_core.engine.transports import (
     TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
     apply_transport_hazard_mortal_wound_feel_no_pain_decision,
@@ -1154,13 +1155,24 @@ class GameLifecycle:
                     )
                     for decision_type in _BATTLE_ROUND_DECISION_TYPES
                 ),
+                source_embark_dispatch_handler(
+                    state_provider=self._require_state,
+                    decisions=self.decision_controller,
+                    advance=self.advance_until_decision_or_terminal,
+                    ordinary_validator=self._pre_validate_movement_phase_decision,
+                    ordinary_applier=self._apply_movement_phase_decision,
+                ),
                 *(
                     DecisionDispatchHandler(
                         decision_type=decision_type,
                         pre_validator=self._pre_validate_movement_phase_decision,
                         applier=self._apply_movement_phase_decision,
                     )
-                    for decision_type in _MOVEMENT_DECISION_TYPES - {DICE_REROLL_DECISION_TYPE}
+                    for decision_type in _MOVEMENT_DECISION_TYPES
+                    - {
+                        DICE_REROLL_DECISION_TYPE,
+                        SELECT_EMBARK_TRANSPORT_DECISION_TYPE,
+                    }
                 ),
                 *(
                     DecisionDispatchHandler(

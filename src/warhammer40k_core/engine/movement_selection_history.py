@@ -11,6 +11,7 @@ from warhammer40k_core.engine.mutation_decision_authority import validate_record
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.phases.movement_model import MovementUnitSelection
 from warhammer40k_core.engine.phases.movement_state import MovementPhaseState
+from warhammer40k_core.engine.transport_source_embark_history import validate_source_embark_event
 from warhammer40k_core.engine.transports import DisembarkModeKind
 from warhammer40k_core.geometry.pathing import PathWitness, PathWitnessPayload
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import core_movement_phase_2026_08
@@ -36,10 +37,15 @@ class MovementSelectionHistory:
             "movement_unit_selected",
             "movement_activation_completed",
             "unit_disembarked",
+            "unit_embarked",
             "reinforcement_unit_arrived",
             "move_units_completed",
         }:
             return
+        if event.event_type == "unit_embarked":
+            selection = payload.get("embark_selection")
+            if not isinstance(selection, dict) or "source_context" not in selection:
+                return
         round_number = payload.get("battle_round")
         if type(round_number) is not int or round_number < 1:
             raise GameLifecycleError("Movement selection history requires a positive round.")
@@ -65,6 +71,17 @@ class MovementSelectionHistory:
         if record is None or record.request.request_id != payload.get("request_id"):
             raise GameLifecycleError("Movement selection history decision closure drift.")
         unit_id = _string(payload, "unit_instance_id")
+        if event.event_type == "unit_embarked":
+            validate_source_embark_event(record, payload)
+            if phase.active_selection is not None and (
+                phase.active_selection.unit_instance_id == unit_id
+            ):
+                self._phases[key] = phase.with_activation_complete(
+                    unit_id,
+                    maximum_model_distance_inches=0.0,
+                    maximum_model_horizontal_distance_inches=0.0,
+                )
+            return
         if (
             event.event_type == "reinforcement_unit_arrived"
             and payload.get("step") == "rapid_ingress"

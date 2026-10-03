@@ -43,7 +43,11 @@ def test_every_embark_consumer_supplies_history_and_actual_turn() -> None:
                 keywords = {argument.arg for argument in node.keywords}
                 assert {"movement_history", "turn_player_id"} <= keywords, path
                 calls.append(path.name)
-    assert calls == ["movement_fall_back_embark.py", "movement_fall_back_embark.py"]
+    assert sorted(calls) == [
+        "movement_fall_back_embark.py",
+        "movement_fall_back_embark.py",
+        "transport_source_embark.py",
+    ]
     owner = (engine / "transport_embark_validation.py").read_text(encoding="utf-8")
     assert "unit_disembarked_this_phase" not in owner
     assert "EMBARK_POLICY" in owner

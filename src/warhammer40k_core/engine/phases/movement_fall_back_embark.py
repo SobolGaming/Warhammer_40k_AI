@@ -1,6 +1,7 @@
 # ruff: noqa: E501,F401,F403,F405,I001
 # pyright: reportUnusedImport=false
 from __future__ import annotations
+from warhammer40k_core.engine.transport_embark_context import NoMovementEmbarkContext
 
 
 from typing import TYPE_CHECKING
@@ -658,6 +659,8 @@ def _post_move_embark_options(
     state: GameState,
     unit_instance_id: str,
     movement_phase_action: TransportMovementStatus,
+    source_context: NoMovementEmbarkContext | None = None,
+    restriction_overrides: tuple[TransportRestrictionOverride, ...] = (),
 ) -> tuple[DecisionOption, ...]:
     if state.active_player_id is None:
         raise GameLifecycleError("Embark requires the current turn owner.")
@@ -674,7 +677,7 @@ def _post_move_embark_options(
     placed_model_ids = set(scenario.battlefield_state.placed_model_ids())
     if any(
         model.is_alive and model.model_instance_id not in placed_model_ids
-        for model in rules_unit.own_models
+        for model in rules_unit.alive_models()
     ):
         return ()
     _rules_unit, rules_unit_placement = rules_unit_placement_for_movement(
@@ -687,15 +690,19 @@ def _post_move_embark_options(
     for cargo_state in state.transport_cargo_states:
         if cargo_state.player_id != unit_placement.player_id:
             continue
-        transport_placement = scenario.battlefield_state.unit_placement_by_id(
+        transport_placement = scenario.battlefield_state.unit_placement_or_none(
             cargo_state.transport_unit_instance_id
         )
+        if transport_placement is None:
+            continue
         selection = EmbarkSelection(
             player_id=unit_placement.player_id,
             battle_round=state.battle_round,
             unit_instance_id=unit_instance_id,
             transport_unit_instance_id=cargo_state.transport_unit_instance_id,
             movement_phase_action=movement_phase_action,
+            source_context=source_context,
+            restriction_overrides=restriction_overrides,
         )
         resolution = resolve_embark(
             movement_history=tuple(state.phase_movement_history),
@@ -873,68 +880,9 @@ def _apply_valid_embark(
     displacement_kind: ModelDisplacementKind,
     transition_batch: BattlefieldTransitionBatch,
 ) -> None:
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        raise GameLifecycleError("Embark requires battlefield_state.")
-    if embark.updated_cargo_state is None:
-        raise GameLifecycleError("Valid EmbarkResolution requires updated cargo state.")
-    if embark.transition_batch is None:
-        raise GameLifecycleError("Valid EmbarkResolution requires a transition batch.")
-    state.replace_battlefield_state(
-        apply_embark_to_battlefield(
-            battlefield_state=battlefield_state,
-            embark=embark,
-        )
-    )
-    state.replace_transport_cargo_state(embark.updated_cargo_state)
-    embarked_rules_unit = rules_unit_view_from_armies(
-        armies=tuple(state.army_definitions),
-        unit_instance_id=embark.selection.unit_instance_id,
-    )
-    departed_component_ids = tuple(
-        sorted(
-            {
-                embarked_rules_unit.component_unit_id_for_model(removal.model_instance_id)
-                for removal in embark.transition_batch.removals
-            }
-        )
-    )
-    departure_ids_before = tuple(
-        value.departure_id for value in state.primary_battlefield_departure_states
-    )
-    record_primary_battlefield_departure(
-        state=state,
-        rules_unit_instance_id=embarked_rules_unit.unit_instance_id,
-        affected_component_unit_instance_ids=departed_component_ids,
-        departed_component_unit_instance_ids=departed_component_ids,
-        removed_model_instance_ids=tuple(
-            removal.model_instance_id for removal in embark.transition_batch.removals
-        ),
-        removal_kind=BattlefieldRemovalKind.EMBARK,
-        occurrence_id=result.result_id,
-        source_id=result.result_id,
-    )
-    decisions.event_log.append(
-        "unit_embarked",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": embark.selection.player_id,
-            "phase": BattlePhase.MOVEMENT.value,
-            "unit_instance_id": embark.selection.unit_instance_id,
-            "transport_unit_instance_id": embark.selection.transport_unit_instance_id,
-            "request_id": result.request_id,
-            "result_id": result.result_id,
-            "phase_body_status": "unit_embarked",
-            "updated_cargo_state": validate_json_value(embark.updated_cargo_state.to_payload()),
-            "transition_batch": validate_json_value(embark.transition_batch.to_payload()),
-        },
-    )
-    record_new_primary_battlefield_departure_events(
-        state=state,
-        event_log=decisions.event_log,
-        departure_ids_before=departure_ids_before,
-    )
+    from warhammer40k_core.engine.transport_embark_mutation import apply_embark_mutation
+
+    apply_embark_mutation(state=state, decisions=decisions, embark=embark, result=result)
     _complete_movement_activation_with_record_ids(
         state=state,
         decisions=decisions,
