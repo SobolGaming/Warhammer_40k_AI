@@ -5,6 +5,9 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.activity_restrictions import has_activity_restriction
+from warhammer40k_core.engine.mission_action_battle_shock import (
+    action_battle_shock_permission_sources,
+)
 from warhammer40k_core.engine.objective_control import model_objective_control_characteristic
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
@@ -135,6 +138,8 @@ def mission_action_pre_oc_ineligibility_reason(
     if rules_unit_is_battle_shocked(
         state=state,
         unit_instance_id=rules_unit.unit_instance_id,
+    ) and not action_battle_shock_permission_sources(
+        state=state, unit_instance_id=rules_unit.unit_instance_id
     ):
         return MISSION_ACTION_UNIT_BATTLE_SHOCKED
     return None

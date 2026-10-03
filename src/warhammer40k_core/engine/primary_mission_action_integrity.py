@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.core.missions import MissionActionDefinition, ObjectiveMarkerRole
 from warhammer40k_core.engine.actions import (
     MISSION_ACTION_COMPLETION_CONDITION_FAILED_REASON,
+    MISSION_ACTION_UNIT_BATTLE_SHOCKED_INTERRUPTION_REASON,
     MissionActionState,
     MissionActionStatus,
 )
@@ -611,6 +612,7 @@ def _validate_action_status(
         if action.interrupted_reason not in {
             *policy.interruption_conditions,
             MISSION_ACTION_COMPLETION_CONDITION_FAILED_REASON,
+            MISSION_ACTION_UNIT_BATTLE_SHOCKED_INTERRUPTION_REASON,
         }:
             raise GameLifecycleError("Primary Mission Action interruption reason drifted.")
         return

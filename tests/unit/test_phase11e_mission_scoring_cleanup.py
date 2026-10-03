@@ -8351,12 +8351,17 @@ def test_attached_action_cannot_complete_after_component_fails_battle_shock() ->
 
     assert state.battle_shocked_unit_ids == [attached_id]
     assert rules_unit_is_battle_shocked(state=state, unit_instance_id=attached_id)
-    with pytest.raises(GameLifecycleError, match="cannot complete actions"):
+    interrupted = state.mission_action_state_by_id(action.action_id)
+    assert interrupted.status is MissionActionStatus.INTERRUPTED
+    assert interrupted.interrupted_reason == "unit_battle_shocked"
+    with pytest.raises(GameLifecycleError, match="Only started"):
         state.complete_mission_action(
             action_id=action.action_id,
             completion_phase=BattlePhase.FIGHT,
         )
-    assert state.mission_action_state_by_id(action.action_id).status is MissionActionStatus.STARTED
+    assert (
+        state.mission_action_state_by_id(action.action_id).status is MissionActionStatus.INTERRUPTED
+    )
 
 
 @pytest.mark.parametrize(

@@ -254,3 +254,38 @@ def _assert_versioned_fixture_inputs(base: dict[str, str], head: dict[str, str])
         if isinstance(node, ast.FunctionDef) and node.name in expected
     }
     assert actual == expected
+
+
+def test_action_battle_shock_interruption_has_one_status_mutation_owner() -> None:
+    for name, call in (
+        ("battle_shock_resolution.py", "apply_battle_shock_result_state"),
+        ("move_keyword_completion.py", "apply_direct_battle_shock_state"),
+    ):
+        tree = ast.parse((ENGINE / name).read_text())
+        calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == call
+        ]
+        assert calls
+        assert all(any(kw.arg == "decisions" for kw in node.keywords) for node in calls)
+    owner = (ENGINE / "battle_shock_state.py").read_text()
+    assert "interrupt_mission_actions_for_battle_shock(" in owner
+    for path in ENGINE.rglob("*.py"):
+        if path.name in {"actions.py", "primary_mission_action_interruptions.py"}:
+            continue
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        assert not any(
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == "interrupt"
+            and any(
+                kw.arg == "reason"
+                and isinstance(kw.value, ast.Constant)
+                and kw.value.value == "unit_battle_shocked"
+                for kw in node.keywords
+            )
+            for node in ast.walk(tree)
+        ), path

@@ -535,7 +535,9 @@ def record_precomputed_battle_shock_result_events(
             apply_battle_shock_result_state,
         )
 
-        state_update = apply_battle_shock_result_state(state=state, result=result)
+        state_update = apply_battle_shock_result_state(
+            state=state, result=result, decisions=decisions
+        )
     result_payload = validate_json_value(result.to_payload())
     resolved_payload = validate_json_value(
         {

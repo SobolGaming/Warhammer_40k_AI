@@ -8,6 +8,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.action_battle_shock_helpers import action_permission_catalog
 from tests.action_movement_interruption_helpers import (
     MovementCase,
     action_movement_session,
@@ -20,13 +21,21 @@ from tests.phase17n_step6g_secondary_certification_helpers import (
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind
 from warhammer40k_core.engine.actions import (
     MissionActionState,
     MissionActionStatePayload,
     MissionActionStatus,
 )
+from warhammer40k_core.engine.battle_shock_state import (
+    apply_direct_battle_shock_state,
+    clear_battle_shock_for_rules_unit,
+)
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.mission_action_battle_shock import (
+    action_battle_shock_permission_sources,
+)
 from warhammer40k_core.engine.mission_action_eligibility import (
     mission_action_prevents_rules_unit_from_shooting_this_phase,
     rules_unit_started_mission_action_this_turn,
@@ -41,6 +50,124 @@ from warhammer40k_core.engine.primary_mission_action_interruptions import (
 )
 from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.triggered_movement import DECLINE_TRIGGERED_MOVEMENT_OPTION_ID
+
+
+@pytest.mark.parametrize("attached", [False, True])
+@pytest.mark.parametrize("permission", [False, True])
+@pytest.mark.parametrize("mission_action_id", ["maintain-control", "cleanse-objective"])
+def test_action_battle_shock_transition_is_terminal_except_explicit_permission(
+    attached: bool,
+    permission: bool,
+    mission_action_id: str,
+) -> None:
+    session, unit_id = action_movement_session(
+        attached=attached,
+        mission_action_id=mission_action_id,
+        pause_after_move=True,
+        catalog_transform=action_permission_catalog if permission else None,
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    decisions = session.lifecycle.decision_controller
+    assert (
+        bool(action_battle_shock_permission_sources(state=state, unit_instance_id=unit_id))
+        is permission
+    )
+    apply_direct_battle_shock_state(
+        state=state,
+        decisions=decisions,
+        player_id="player-b",
+        unit_instance_id=unit_id,
+        source_result_id="test:order110:shock",
+        battle_round=state.battle_round,
+    )
+    action = state.mission_action_states[-1]
+    assert action.status is (
+        MissionActionStatus.STARTED if permission else MissionActionStatus.INTERRUPTED
+    )
+    assert action.interrupted_reason == (None if permission else "unit_battle_shocked")
+    assert mission_action_prevents_rules_unit_from_shooting_this_phase(
+        state=state, player_id="player-b", unit_instance_id=unit_id
+    )
+    assert rules_unit_started_mission_action_this_turn(
+        state=state, player_id="player-b", unit_instance_id=unit_id
+    )
+    # Clearing later status cannot revive an interrupted Action.
+    clear_battle_shock_for_rules_unit(state=state, unit_instance_id=unit_id)
+    assert state.mission_action_states[-1] == action
+    restored = GameLifecycle.from_payload(json.loads(json.dumps(session.lifecycle.to_payload())))
+    assert restored.to_payload() == session.lifecycle.to_payload()
+    for player in state.player_ids:
+        json.dumps(session.view(viewer_player_id=player), allow_nan=False)
+        json.dumps(
+            session.events_since(EventStreamCursor(0), viewer_player_id=player), allow_nan=False
+        )
+
+
+def test_explicit_shocked_action_permission_preserves_movement_interruption_and_replay() -> None:
+    session, unit_id = action_movement_session(catalog_transform=action_permission_catalog)
+    request = request_action_move(session, unit_id, "return")
+    initial = session.lifecycle.to_payload()
+    option = next(o for o in request.options if o.option_id != DECLINE_TRIGGERED_MOVEMENT_OPTION_ID)
+    status = session.submit_option(
+        request_id=request.request_id,
+        option_id=option.option_id,
+        result_id="order110:move",
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.mission_action_states[-1].interrupted_reason == "unit_moved"
+    assert (
+        GameLifecycle.from_payload(session.lifecycle.to_payload()).to_payload()
+        == session.lifecycle.to_payload()
+    )
+    replay = ReplayRunner(
+        ReplayArtifact.capture(
+            artifact_id="order110:permission-movement",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        )
+    ).run()
+    assert replay.reproduced_exactly, replay
+
+
+@pytest.mark.parametrize("permission", [False, True])
+def test_shocked_start_uses_explicit_catalog_permission_through_facade(permission: bool) -> None:
+    from tests.action_battle_shock_helpers import shocked_action_opportunity_session
+
+    session, _unit_id = shocked_action_opportunity_session(permission=permission)
+    state = session.lifecycle.state
+    assert state is not None
+    request = session.lifecycle.pending_decision_request()
+    assert request is not None
+    if not permission:
+        assert request.decision_type != "start_mission_action"
+        assert not state.mission_action_states
+        snapshot = session.lifecycle.to_payload()
+        assert GameLifecycle.from_payload(snapshot).to_payload() == snapshot
+        return
+    assert request.decision_type == "start_mission_action"
+    initial = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(initial).to_payload() == initial
+    option = next(o for o in request.options if o.option_id.startswith("start:"))
+    status = session.submit_option(
+        request_id=request.request_id,
+        option_id=option.option_id,
+        result_id="order110:shocked-start",
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    assert state.mission_action_states[-1].status is MissionActionStatus.STARTED
+    snapshot = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(snapshot).to_payload() == snapshot
+    replay = ReplayRunner(
+        ReplayArtifact.capture(
+            artifact_id="order110:shocked-start",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        )
+    ).run()
+    assert replay.reproduced_exactly, replay
 
 
 @pytest.mark.parametrize(
@@ -552,3 +679,152 @@ def test_secondary_terminal_authenticates_persisted_state_and_context(
 
     with pytest.raises(GameLifecycleError, match=diagnostic):
         GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize("permission", [False, True])
+def test_failed_battle_shock_producer_interrupts_or_preserves_started_action(
+    permission: bool,
+) -> None:
+    from tests.action_battle_shock_helpers import resolve_action_battle_shock_test
+
+    session, unit_id = action_movement_session(
+        mission_action_id="cleanse-objective",
+        pause_after_move=True,
+        supporting_control=True,
+        catalog_transform=action_permission_catalog if permission else None,
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    resolve_action_battle_shock_test(session, unit_id)
+    action = state.mission_action_states[-1]
+    assert action.status is (
+        MissionActionStatus.STARTED if permission else MissionActionStatus.INTERRUPTED
+    )
+    events = session.lifecycle.decision_controller.event_log.records
+    assert events[-1].event_type == "battle_shock_test_resolved"
+    if permission:
+        completed = state.complete_mission_action(
+            action_id=action.action_id, completion_phase=BattlePhase.FIGHT
+        )
+        assert completed.status is MissionActionStatus.COMPLETED
+    else:
+        assert events[-2].event_type == "mission_action_interrupted"
+        with pytest.raises(GameLifecycleError, match="Only started"):
+            state.complete_mission_action(
+                action_id=action.action_id, completion_phase=BattlePhase.FIGHT
+            )
+
+
+@pytest.mark.parametrize("source_kind", list(CatalogAbilitySourceKind))
+def test_action_permission_coverage_only_claims_supported_source_kind(
+    source_kind: CatalogAbilitySourceKind,
+) -> None:
+    from warhammer40k_core.core.army_catalog import ArmyCatalog
+    from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind
+    from warhammer40k_core.engine.ability_coverage import ability_coverage_row_for_descriptor
+    from warhammer40k_core.engine.mission_action_battle_shock import ACTION_BATTLE_SHOCK_CONSUMER_ID
+
+    catalog = action_permission_catalog(ArmyCatalog.phase9a_canonical_content_pack())
+    sheet = catalog.datasheets[0]
+    descriptor = replace(
+        sheet.abilities[-1],
+        source_kind=source_kind,
+        source_wargear_id="bolt-rifle" if source_kind is CatalogAbilitySourceKind.WARGEAR else None,
+    )
+    row = ability_coverage_row_for_descriptor(
+        catalog_id=catalog.catalog_id,
+        datasheet_id=sheet.datasheet_id,
+        datasheet_name=sheet.name,
+        ability=descriptor,
+    )
+    assert (ACTION_BATTLE_SHOCK_CONSUMER_ID in row.runtime_consumer_ids) is (
+        source_kind is CatalogAbilitySourceKind.DATASHEET
+    )
+
+
+def test_action_permission_requires_present_granting_attached_component() -> None:
+    from warhammer40k_core.core.army_catalog import ArmyCatalog
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    def leader_catalog(catalog: ArmyCatalog) -> ArmyCatalog:
+        granted = action_permission_catalog(catalog)
+        return replace(
+            catalog,
+            datasheets=tuple(
+                granted.datasheet_by_id(sheet.datasheet_id)
+                if sheet.datasheet_id == "core-character-leader"
+                else sheet
+                for sheet in catalog.datasheets
+            ),
+        )
+
+    session, unit_id = action_movement_session(
+        attached=True, pause_after_move=True, catalog_transform=leader_catalog
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    view = rules_unit_view_by_id(state=state, unit_instance_id=unit_id)
+    bodyguard_ids = tuple(
+        m.model_instance_id
+        for component in view.components
+        if component.unit.datasheet_id != "core-character-leader"
+        for m in component.unit.own_models
+    )
+    assert action_battle_shock_permission_sources(state=state, unit_instance_id=unit_id)
+    assert not action_battle_shock_permission_sources(
+        state=state, unit_instance_id=unit_id, present_model_ids=bodyguard_ids
+    )
+    assert not action_battle_shock_permission_sources(
+        state=state, unit_instance_id=unit_id, present_model_ids=()
+    )
+
+
+@pytest.mark.parametrize(
+    "variant", ["target", "duration", "effect", "extra_effect", "target_parameters"]
+)
+def test_action_permission_rejects_other_clause_shapes(variant: str) -> None:
+    from warhammer40k_core.core.army_catalog import ArmyCatalog
+    from warhammer40k_core.engine.mission_action_battle_shock import (
+        clause_grants_action_battle_shock_permission,
+    )
+    from warhammer40k_core.rules.rule_ir import (
+        RuleDurationKind,
+        RuleIR,
+        RuleIRPayload,
+        RuleTargetKind,
+        parameters_from_pairs,
+    )
+
+    descriptor = (
+        action_permission_catalog(ArmyCatalog.phase9a_canonical_content_pack())
+        .datasheets[0]
+        .abilities[-1]
+    )
+    assert descriptor.rule_ir_payload is not None
+    clause = RuleIR.from_payload(cast(RuleIRPayload, descriptor.rule_ir_payload)).clauses[0]
+    target = clause.target
+    duration = clause.duration
+    assert target is not None
+    assert duration is not None
+    assert clause_grants_action_battle_shock_permission(clause)
+    if variant == "target":
+        clause = replace(clause, target=replace(target, kind=RuleTargetKind.THIS_MODEL))
+    elif variant == "duration":
+        clause = replace(clause, duration=replace(duration, kind=RuleDurationKind.IMMEDIATE))
+    elif variant == "effect":
+        clause = replace(
+            clause,
+            effects=(
+                replace(
+                    clause.effects[0], parameters=parameters_from_pairs((("ability", "other"),))
+                ),
+            ),
+        )
+    elif variant == "extra_effect":
+        clause = replace(clause, effects=(*clause.effects, *clause.effects))
+    else:
+        clause = replace(
+            clause,
+            target=replace(target, parameters=parameters_from_pairs((("other", True),))),
+        )
+    assert not clause_grants_action_battle_shock_permission(clause)

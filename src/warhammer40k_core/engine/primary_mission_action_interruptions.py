@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.engine.actions import (
+    MISSION_ACTION_UNIT_BATTLE_SHOCKED_INTERRUPTION_REASON,
     MISSION_ACTION_UNIT_DESTROYED_INTERRUPTION_REASON,
     MISSION_ACTION_UNIT_LEFT_BATTLEFIELD_INTERRUPTION_REASON,
     MISSION_ACTION_UNIT_MOVED_INTERRUPTION_REASON,
@@ -20,6 +21,11 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
+from warhammer40k_core.engine.mission_action_battle_shock import (
+    ACTION_BATTLE_SHOCK_EVENT,
+    ACTION_BATTLE_SHOCK_SOURCE_ID,
+    action_battle_shock_permission_sources,
+)
 from warhammer40k_core.engine.mission_action_options import mission_action_for_state
 from warhammer40k_core.engine.mission_action_terminal_integrity import (
     MISSION_ACTION_TERMINAL_EVENT_TYPES,
@@ -66,6 +72,98 @@ class _InterruptionEvidence:
     phase: BattlePhase
 
 
+def interrupt_mission_actions_for_battle_shock(
+    *,
+    state: GameState,
+    decisions: DecisionController | None,
+    shocked_unit_ids: tuple[str, ...],
+    source_result_id: str,
+) -> tuple[MissionActionState, ...]:
+    """Terminally stop Actions at the shared status transition, before outcome hooks."""
+    candidates = tuple(
+        action
+        for action in state.mission_action_states
+        if action.status is MissionActionStatus.STARTED
+        and any(
+            rules_unit_identities_share_lineage(
+                state=state,
+                first_unit_instance_id=action.unit_instance_id,
+                second_unit_instance_id=unit_id,
+            )
+            for unit_id in shocked_unit_ids
+        )
+    )
+    interrupted = tuple(
+        action.interrupt(reason=MISSION_ACTION_UNIT_BATTLE_SHOCKED_INTERRUPTION_REASON)
+        for action in candidates
+        if not action_battle_shock_permission_sources(
+            state=state, unit_instance_id=action.unit_instance_id
+        )
+    )
+    if not interrupted:
+        return ()
+    phase = state.current_battle_phase
+    if phase is None:
+        raise GameLifecycleError("Action Battle-shock interruption requires battle phase.")
+    event = (
+        None
+        if decisions is None
+        else decisions.event_log.append(
+            ACTION_BATTLE_SHOCK_EVENT,
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": phase.value,
+                "source_rule_id": ACTION_BATTLE_SHOCK_SOURCE_ID,
+                "source_result_id": source_result_id,
+                "shocked_unit_instance_ids": list(shocked_unit_ids),
+                "interrupted_action_ids": [action.action_id for action in interrupted],
+            },
+        )
+    )
+    for action in interrupted:
+        state.replace_mission_action_state(action)
+        if decisions is not None and event is not None:
+            _record_interruption_event(
+                state=state,
+                decisions=decisions,
+                interrupted=action,
+                evidence=_InterruptionEvidence(
+                    0, event, MISSION_ACTION_UNIT_BATTLE_SHOCKED_INTERRUPTION_REASON, phase
+                ),
+            )
+    return interrupted
+
+
+def _record_interruption_event(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    interrupted: MissionActionState,
+    evidence: _InterruptionEvidence,
+) -> None:
+    policy = mission_action_for_state(state=state, mission_action_id=interrupted.mission_action_id)
+    decisions.event_log.append(
+        "mission_action_interrupted",
+        {
+            "game_id": state.game_id,
+            "battle_round": interrupted.battle_round_started,
+            "active_player_id": state.active_player_id,
+            "player_id": interrupted.player_id,
+            "phase": evidence.phase.value,
+            "action_id": interrupted.action_id,
+            "mission_action_id": interrupted.mission_action_id,
+            "unit_instance_id": interrupted.unit_instance_id,
+            "mission_action_state": validate_json_value(interrupted.to_payload()),
+            "interrupted_reason": interrupted.interrupted_reason,
+            "source_evidence_event_id": evidence.event.event_id,
+            "source_evidence_event_type": evidence.event.event_type,
+            "source_id": policy.source_id,
+        },
+    )
+
+
 def reconcile_primary_mission_action_interruptions(
     *,
     state: GameState,
@@ -98,25 +196,11 @@ def reconcile_primary_mission_action_interruptions(
         )
         if evidence is None:
             continue
-        policy = mission_action_for_state(state=state, mission_action_id=action.mission_action_id)
         interrupted = action.interrupt(reason=evidence.reason)
-        event_payload: dict[str, JsonValue] = {
-            "game_id": state.game_id,
-            "battle_round": action.battle_round_started,
-            "active_player_id": state.active_player_id,
-            "player_id": action.player_id,
-            "phase": evidence.phase.value,
-            "action_id": action.action_id,
-            "mission_action_id": action.mission_action_id,
-            "unit_instance_id": action.unit_instance_id,
-            "mission_action_state": validate_json_value(interrupted.to_payload()),
-            "interrupted_reason": interrupted.interrupted_reason,
-            "source_evidence_event_id": evidence.event.event_id,
-            "source_evidence_event_type": evidence.event.event_type,
-            "source_id": policy.source_id,
-        }
         state.replace_mission_action_state(interrupted)
-        decisions.event_log.append("mission_action_interrupted", event_payload)
+        _record_interruption_event(
+            state=state, decisions=decisions, interrupted=interrupted, evidence=evidence
+        )
         interrupted_states.append(interrupted)
     return tuple(interrupted_states)
 
@@ -141,7 +225,27 @@ def validate_primary_mission_action_interruption_evidence(
         for model in unit.own_models
     }
     supported_reasons: set[str] = set()
-    if evidence_event.event_type in _MOVE_COMPLETION_EVENTS:
+    if evidence_event.event_type == ACTION_BATTLE_SHOCK_EVENT:
+        shocked_ids = payload.get("shocked_unit_instance_ids")
+        action_ids = payload.get("interrupted_action_ids")
+        if (
+            payload.get("source_rule_id") != ACTION_BATTLE_SHOCK_SOURCE_ID
+            or not isinstance(shocked_ids, list)
+            or not all(type(value) is str for value in shocked_ids)
+            or not isinstance(action_ids, list)
+            or action.action_id not in action_ids
+            or not any(
+                rules_unit_identities_share_lineage(
+                    state=state,
+                    first_unit_instance_id=action.unit_instance_id,
+                    second_unit_instance_id=cast(str, unit_id),
+                )
+                for unit_id in shocked_ids
+            )
+        ):
+            raise GameLifecycleError("Action Battle-shock interruption evidence drifted.")
+        supported_reasons.add(MISSION_ACTION_UNIT_BATTLE_SHOCKED_INTERRUPTION_REASON)
+    elif evidence_event.event_type in _MOVE_COMPLETION_EVENTS:
         supported_reasons.update(
             row.reason
             for row in _transition_evidence(

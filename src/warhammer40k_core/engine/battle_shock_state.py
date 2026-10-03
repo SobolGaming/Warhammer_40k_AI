@@ -13,6 +13,7 @@ from warhammer40k_core.engine.rules_units import (
 )
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.decision_controller import DecisionController
     from warhammer40k_core.engine.game_state import GameState
 
 BATTLE_SHOCK_STATE_ALREADY = "already_battle_shocked"
@@ -26,7 +27,12 @@ def record_battle_shock_result(*, state: GameState, result: BattleShockResult) -
         raise GameLifecycleError("Battle-shocked unit is already marked.")
 
 
-def apply_battle_shock_result_state(*, state: GameState, result: BattleShockResult) -> str:
+def apply_battle_shock_result_state(
+    *,
+    state: GameState,
+    result: BattleShockResult,
+    decisions: DecisionController | None = None,
+) -> str:
     """Apply one result to its canonical current rules-unit identity."""
     if type(result) is not BattleShockResult:
         raise GameLifecycleError("GameState battle_shock_result must be a BattleShockResult.")
@@ -52,6 +58,7 @@ def apply_battle_shock_result_state(*, state: GameState, result: BattleShockResu
         unit_instance_id=result.request.unit_instance_id,
         source_result_id=result.result_id,
         battle_round=result.request.battle_round,
+        decisions=decisions,
     )
 
 
@@ -62,6 +69,7 @@ def apply_direct_battle_shock_state(
     unit_instance_id: str,
     source_result_id: str,
     battle_round: int,
+    decisions: DecisionController | None = None,
 ) -> str:
     """Apply status without inventing a Battle-shock test or its outcome triggers."""
     if (
@@ -112,6 +120,16 @@ def apply_direct_battle_shock_state(
     state.replace_battle_shock_state((shocked_unit_ids, shocked_unit_states))
     if already_ids:
         raise GameLifecycleError("Battle-shock state is partially duplicated.")
+    from warhammer40k_core.engine.primary_mission_action_interruptions import (
+        interrupt_mission_actions_for_battle_shock,
+    )
+
+    interrupt_mission_actions_for_battle_shock(
+        state=state,
+        decisions=decisions,
+        shocked_unit_ids=tuple(row.unit_instance_id for row in shocked_states),
+        source_result_id=source_result_id,
+    )
     return BATTLE_SHOCK_STATE_RECORDED
 
 

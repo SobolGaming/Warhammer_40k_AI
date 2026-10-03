@@ -236,6 +236,7 @@ def _resolve(
             unit_instance_id=view.unit_instance_id,
             source_result_id=result_id,
             battle_round=state.battle_round,
+            decisions=decisions,
         )
     decisions.event_log.append(
         MOVE_KEYWORD_ROLL_EVENT,

@@ -149,7 +149,6 @@ def resolve_primary_mission_action_at_turn_end(
             battle_round=state.battle_round,
             phase=completed_phase.value,
             completion_timing=action.completion_timing,
-            battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
         )
         completion_event_id = _next_event_id(decisions)
         marker = _marker_for_completed_action(

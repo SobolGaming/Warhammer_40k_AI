@@ -792,7 +792,13 @@ def _runtime_consumer_ids(
     if descriptor_consumption is not None:
         return descriptor_consumption.runtime_consumer_ids
     if rule_ir is not None:
-        return catalog_rule_ir_consumers_for_rule(rule_ir)
+        from warhammer40k_core.engine.mission_action_battle_shock import (
+            action_battle_shock_descriptor_consumer_ids,
+        )
+
+        return action_battle_shock_descriptor_consumer_ids(
+            ability=ability, consumer_ids=catalog_rule_ir_consumers_for_rule(rule_ir)
+        )
     return _descriptor_runtime_consumer_ids(ability)
 
 

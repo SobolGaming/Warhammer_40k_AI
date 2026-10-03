@@ -2557,6 +2557,133 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order110-action-battle-shock-semantics": {
+      "paths": [
+        "src/warhammer40k_core/_engine_build_manifest.json",
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/engine/ability_coverage.py",
+        "src/warhammer40k_core/engine/actions.py",
+        "src/warhammer40k_core/engine/battle_shock_resolution.py",
+        "src/warhammer40k_core/engine/battle_shock_state.py",
+        "src/warhammer40k_core/engine/catalog_contextual_status_consumption.py",
+        "src/warhammer40k_core/engine/game_state.py",
+        "src/warhammer40k_core/engine/mission_action_battle_shock.py",
+        "src/warhammer40k_core/engine/mission_action_eligibility.py",
+        "src/warhammer40k_core/engine/mission_decisions.py",
+        "src/warhammer40k_core/engine/move_keyword_completion.py",
+        "src/warhammer40k_core/engine/primary_mission_action_integrity.py",
+        "src/warhammer40k_core/engine/primary_mission_action_interruptions.py",
+        "src/warhammer40k_core/engine/primary_mission_action_lifecycle_policy.py",
+        "src/warhammer40k_core/engine/primary_mission_action_resolution.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "GameState.complete_mission_action",
+        "MissionActionState.complete",
+        "MissionActionState.complete_without_award",
+        "MissionActionState.interrupt",
+        "MissionActionState.start",
+        "_apply_start_mission_action",
+        "_record_interruption_event",
+        "_reject_battle_shocked_action_unit",
+        "_resolve",
+        "_runtime_consumer_ids",
+        "_validate_action_status",
+        "action_battle_shock_descriptor_consumer_ids",
+        "action_battle_shock_permission_sources",
+        "apply_battle_shock_result_state",
+        "apply_direct_battle_shock_state",
+        "clause_grants_action_battle_shock_permission",
+        "consumer_ids_for_clause",
+        "effect_grants_action_battle_shock_permission",
+        "evaluate_primary_mission_action_completion_evidence",
+        "hook_ids_for_effect",
+        "interrupt_mission_actions_for_battle_shock",
+        "mission_action_pre_oc_ineligibility_reason",
+        "reconcile_primary_mission_action_interruptions",
+        "record_precomputed_battle_shock_result_events",
+        "registered_hook_ids",
+        "resolve_primary_mission_action_at_turn_end",
+        "validate_primary_mission_action_interruption_evidence",
+        "validate_primary_mission_action_start_evidence"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order110-contract-publication": {
+      "paths": [
+        "conformance/typescript/src/contract.ts",
+        "contracts/README.md",
+        "contracts/compatibility-policy.md",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order110-action-regressions": {
+      "paths": [
+        "tests/action_battle_shock_helpers.py",
+        "tests/action_movement_interruption_helpers.py",
+        "tests/code_quality/test_action_movement_interruption.py",
+        "tests/code_quality/test_order97_inventory.py",
+        "tests/phase17n_primary_mission_helpers.py",
+        "tests/unit/test_action_movement_interruption.py",
+        "tests/unit/test_phase11e_mission_scoring_cleanup.py"
+      ],
+      "owners": [
+        "@module",
+        "action_movement_session",
+        "action_opportunity_session",
+        "action_permission_catalog",
+        "action_walker_catalog",
+        "phase17n_state_with_setup",
+        "resolve_action_battle_shock_test",
+        "shocked_action_opportunity_session",
+        "test_action_battle_shock_interruption_has_one_status_mutation_owner",
+        "test_action_battle_shock_transition_is_terminal_except_explicit_permission",
+        "test_action_permission_coverage_only_claims_supported_source_kind",
+        "test_action_permission_rejects_other_clause_shapes",
+        "test_action_permission_requires_present_granting_attached_component",
+        "test_attached_action_cannot_complete_after_component_fails_battle_shock",
+        "test_explicit_shocked_action_permission_preserves_movement_interruption_and_replay",
+        "test_failed_battle_shock_producer_interrupts_or_preserves_started_action",
+        "test_original_assertions_remain_exact_and_fail_closed",
+        "test_shocked_start_uses_explicit_catalog_permission_through_facade"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order110-source-evidence": {
+      "paths": [
+        "data/source_audits/order110/baseline/tests/action_movement_interruption_helpers.py.txt",
+        "data/source_audits/order110/baseline/tests/phase17n_primary_mission_helpers.py.txt",
+        "data/source_audits/order110/historical-inputs.json",
+        "tools/core_rules_order97_history.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "historical_evidence_path"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
