@@ -218,11 +218,23 @@ class TerrainVisibilityContext:
                 self.terrain_areas,
             ),
         )
-        terrain_volumes = self.terrain_volumes
+        terrain_volumes = _validate_terrain_volume_tuple(
+            "TerrainVisibilityContext terrain_volumes", self.terrain_volumes
+        )
         if not terrain_volumes:
             terrain_volumes = tuple(
                 volume for feature in terrain_features for volume in feature.terrain_volumes()
             )
+        volume_ids = {volume.terrain_id for volume in terrain_volumes}
+        terrain_volumes = (
+            *terrain_volumes,
+            *(
+                volume
+                for feature in terrain_features
+                for volume in feature.solid_opening_volumes()
+                if volume.terrain_id not in volume_ids
+            ),
+        )
         object.__setattr__(
             self,
             "terrain_volumes",
@@ -811,7 +823,7 @@ def _terrain_volume_feature_index(
 ) -> dict[str, TerrainFeatureDefinition]:
     index: dict[str, TerrainFeatureDefinition] = {}
     for feature in features:
-        for volume in feature.terrain_volumes():
+        for volume in feature.visibility_volumes():
             if volume.terrain_id in index:
                 raise GeometryError("Terrain feature volumes must not contain duplicate IDs.")
             index[volume.terrain_id] = feature

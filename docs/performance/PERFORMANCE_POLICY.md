@@ -92,6 +92,30 @@ reviewed. The checker verifies the declared coverage/triggers/evidence; independ
 exact-head review must judge semantic classification and dependency-role accuracy.
 There is no skip/exempt flag or environment-variable bypass.
 
+### Order108 source-backed terrain semantics
+
+The owner's subsequent-order direction in
+`docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md` makes the serial current-runtime
+smoke the default for bounded rule repairs. Detailed comparisons apply to
+deliberate performance changes or a demonstrated serious regression. Order108
+changes terrain predicates to implement the reviewed source obligations; it is
+not a performance optimization or a claim of full-game certification.
+
+`policy-v3/order108-rule-semantics.json` authenticates the complete before/after
+file hashes and changed owner AST hashes for this repair, against exact base
+`eebdaa2ccadef14b6115aea7caea3cb1c89eb564`. Only an exact matching `rule_semantics`
+row uses smoke instead of the detailed families otherwise selected by
+`geometry-search` and `visibility-query`. Those operations remain mandatory and
+sensitive in the operation map. A different base, path, file, owner, hash or
+category retains the original detailed-comparison requirement. Other sensitive
+operations, including cache policy, receive no exception.
+
+Every assessment row, source/unchanged-work explanation, current runtime binding,
+serial smoke and live semantic/work/cache check remains required. Historical
+measurements and the separate Order103 numerical recognition remain unchanged.
+Future orders cannot inherit this exact-base authentication; assess their own
+scope under the owner's direction and carry that maintenance into the handoff.
+
 ### Single owner-approved Order103 failure
 
 On 2026-10-02 at 11:20:34 UTC the owner approved delivery recognition of

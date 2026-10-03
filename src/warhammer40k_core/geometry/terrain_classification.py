@@ -8,6 +8,7 @@ class TerrainClassificationError(ValueError):
 
 
 class TerrainAreaClassification(StrEnum):
+    EXPOSED = "exposed"
     DENSE = "dense"
     LIGHT = "light"
     MIXED = "mixed"

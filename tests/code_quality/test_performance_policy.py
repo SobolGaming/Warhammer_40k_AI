@@ -14,6 +14,7 @@ from scripts.performance_smoke import CASE_LIMIT_SECONDS, CASES, PROCESS_LIMIT_S
 from tools.performance_policy import (
     ASSESSMENT,
     MAP,
+    ORDER108_SCOPE,
     POLICY,
     canonical_digest,
     changed_inputs,
@@ -81,11 +82,104 @@ def _assessment(
 
 
 def _validate(
-    value: dict[str, object], changes: dict[str, object], mapping: dict[str, object]
+    value: dict[str, object],
+    changes: dict[str, object],
+    mapping: dict[str, object],
+    *,
+    base: str = BASE,
 ) -> set[str]:
     return validate_assessment(
-        value, base=BASE, changes=changes, runtime_id=BUILD, operation_map=mapping
+        value, base=base, changes=changes, runtime_id=BUILD, operation_map=mapping
     )
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "src/warhammer40k_core/core/visibility.py",
+        "src/warhammer40k_core/geometry/pathing.py",
+        "src/warhammer40k_core/geometry/terrain.py",
+        "src/warhammer40k_core/geometry/terrain_classification.py",
+        "src/warhammer40k_core/geometry/terrain_solid.py",
+        "src/warhammer40k_core/geometry/terrain_transit.py",
+    ],
+)
+@pytest.mark.parametrize(
+    "drift",
+    [
+        "none",
+        "base",
+        "path",
+        "before_file",
+        "after_file",
+        "before_owner",
+        "after_owner",
+        "extra_owner",
+        "missing_owner",
+        "category",
+    ],
+)
+def test_order108_smoke_scope_authenticates_complete_semantic_rows(path: str, drift: str) -> None:
+    scope = read_object(ROOT / ORDER108_SCOPE)
+    base = str(scope["base"])
+    operation = "visibility-query" if "/core/" in path else "geometry-search"
+    value, changes, mapping = _assessment(path, category="rule_semantics", operations=(operation,))
+    change = copy.deepcopy(object_value(object_value(scope["changes"])[path]))
+    changes[path] = change
+    value["base"] = base
+    rows = object_value(value["rows"])
+    row = object_value(rows[path])
+    owners = object_value(change["owners"])
+    assert owners
+    owner = next(iter(owners))
+    if drift == "base":
+        base = BASE
+        value["base"] = base
+    elif drift == "path":
+        renamed = path.replace(".py", "_other.py")
+        changes[renamed] = changes.pop(path)
+        rows[renamed] = rows.pop(path)
+    elif drift in {"before_file", "after_file"}:
+        change[drift.removesuffix("_file") + "_sha256"] = "0" * 64
+    elif drift in {"before_owner", "after_owner"}:
+        object_value(owners[owner])[drift.removesuffix("_owner")] = "0" * 64
+    elif drift == "extra_owner":
+        owners["additional_operation"] = {"before": None, "after": "0" * 64}
+    elif drift == "missing_owner":
+        owners.pop(owner)
+    elif drift == "category":
+        row["category"] = "algorithm_or_search"
+    if drift == "none":
+        assert _validate(value, changes, mapping, base=base) == set()
+    else:
+        with pytest.raises(ValueError, match="Missing required detailed comparisons"):
+            _validate(value, changes, mapping, base=base)
+
+
+@pytest.mark.parametrize("failure", ["mandatory", "cache", "source", "work"])
+def test_order108_scope_preserves_other_assessment_obligations(failure: str) -> None:
+    path = "src/warhammer40k_core/geometry/terrain.py"
+    scope = read_object(ROOT / ORDER108_SCOPE)
+    value, changes, mapping = _assessment(
+        path, category="rule_semantics", operations=("geometry-search",)
+    )
+    value["base"] = scope["base"]
+    changes[path] = copy.deepcopy(object_value(scope["changes"])[path])
+    row = object_value(object_value(value["rows"])[path])
+    if failure == "mandatory":
+        row["operations"] = []
+        error = "Unknown/missing owner operation mapping"
+    elif failure == "cache":
+        # Even an authenticated row cannot suppress another sensitive operation.
+        object_value(object_value(mapping["operations"])["cache-policy"])["owners"] = ["*"]
+        value["operation_map_sha256"] = canonical_digest(mapping)
+        row["operations"] = ["geometry-search", "cache-policy"]
+        error = "Missing required detailed comparisons"
+    else:
+        row["source_obligation" if failure == "source" else "unchanged_work"] = ""
+        error = "Rule assessment lacks"
+    with pytest.raises(ValueError, match=error):
+        _validate(value, changes, mapping, base=str(scope["base"]))
 
 
 def test_governance_and_ordinary_rule_changes_do_not_refresh_all_history() -> None:

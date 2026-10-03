@@ -17,6 +17,7 @@ from tools.performance_order103_exception import RECOGNITION, validate_owner_rec
 POLICY = "rules-engine-performance-v3"
 ASSESSMENT = "docs/performance/change-assessment.json"
 MAP = "docs/performance/policy-v3/operation-map.json"
+ORDER108_SCOPE = "docs/performance/policy-v3/order108-rule-semantics.json"
 CATEGORIES = frozenset(
     {
         "governance",
@@ -181,6 +182,22 @@ def _governance(path: str) -> bool:
     )
 
 
+def _order108_smoke_operations(
+    *, base: str, path: str, category: str, change: object
+) -> frozenset[str]:
+    """Recognize only the owner's exact Order108 terrain-rule repair.
+
+    File and owner hashes authenticate the whole changed row. This affects only
+    detailed-family selection; mandatory mappings and live gates still apply.
+    """
+    if base != "eebdaa2ccadef14b6115aea7caea3cb1c89eb564" or category != "rule_semantics":
+        return frozenset()
+    scope = read_object(Path(__file__).resolve().parents[1] / ORDER108_SCOPE)
+    if scope["base"] != base or object_value(scope["changes"]).get(path) != change:
+        return frozenset()
+    return frozenset({"geometry-search", "visibility-query"})
+
+
 def validate_assessment(
     assessment: dict[str, object],
     *,
@@ -270,10 +287,14 @@ def validate_assessment(
         }
         if not chosen_families <= candidates or not chosen_families <= families.keys():
             raise ValueError(f"Unmapped detailed family: {path}")
+        smoke_operations = _order108_smoke_operations(
+            base=base, path=path, category=category, change=changes[path]
+        )
         required = {
             family
             for key in chosen_operations
-            if category in DETAILED or matching[key]["sensitive"] is True
+            if category in DETAILED
+            or (matching[key]["sensitive"] is True and key not in smoke_operations)
             for family in _strings(matching[key]["families"])
         }
         if not required <= chosen_families:

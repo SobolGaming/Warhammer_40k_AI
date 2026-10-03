@@ -82,6 +82,11 @@ from warhammer40k_core.geometry.terrain import (
     classified_feature_transit_permission,
     terrain_volume_from_payload,
 )
+from warhammer40k_core.geometry.terrain_solid import solid_endpoint_intersection
+from warhammer40k_core.geometry.terrain_transit import (
+    forbidden_dense_floor_crossing,
+    path_retains_climbing_contact,
+)
 from warhammer40k_core.geometry.volume import Model, ModelPayload
 
 type ModelPath = tuple[str, tuple[Pose, ...]]
@@ -1003,6 +1008,19 @@ class TerrainPathLegalityContext:
                 sampled_pose_count=len(sampled_path),
             )
 
+        floor_crossing = forbidden_dense_floor_crossing(
+            self.moving_model, path, self.terrain_features, self.movement_keywords
+        )
+        if floor_crossing is not None:
+            return TerrainPathLegalityResult.invalid(
+                TerrainTraversalViolation(
+                    violation_code="dense_floor_transit_forbidden",
+                    message="Model cannot pass vertically through a Dense floor or ceiling.",
+                    terrain_id=floor_crossing,
+                ),
+                segments=(),
+                sampled_pose_count=len(sampled_path),
+            )
         body_collision = body_intersects_terrain_endpoint(
             _model_at_pose(self.moving_model, path[-1]),
             (
@@ -1085,6 +1103,26 @@ class TerrainPathLegalityContext:
                 segments=tuple(segments),
                 sampled_pose_count=len(sampled_path),
             )
+        if not self.has_fly and not path_retains_climbing_contact(
+            self.moving_model,
+            path,
+            (
+                *self.terrain,
+                *(
+                    volume
+                    for feature in self.terrain_features
+                    for volume in feature.terrain_volumes()
+                ),
+            ),
+        ):
+            return TerrainPathLegalityResult.invalid(
+                TerrainTraversalViolation(
+                    violation_code="climbing_contact_required",
+                    message="Climbing models must remain within half an inch of terrain.",
+                ),
+                segments=tuple(segments),
+                sampled_pose_count=len(sampled_path),
+            )
         return TerrainPathLegalityResult.valid(
             segments=tuple(segments),
             sampled_pose_count=len(sampled_path),
@@ -1100,6 +1138,13 @@ class TerrainPathLegalityContext:
         sampled_path: tuple[Pose, ...],
         segments: list[TerrainPathSegment],
     ) -> TerrainTraversalViolation | None:
+        if all(
+            pose.position.z + self.moving_model.volume.height <= terrain.bottom_center.z
+            for pose in path
+        ):
+            # A physically empty doorway beneath a lintel is not transit
+            # through the lintel, even when Solid closes it for sight/endpoints.
+            return None
         touching_poses = tuple(
             pose
             for pose in sampled_path
@@ -1204,6 +1249,14 @@ class TerrainPathLegalityContext:
             free_height = max(free_height, self.terrain_as_if_absent_height_inches)
         if terrain.height <= free_height:
             return TerrainTraversalMode.FREELY_TRAVERSABLE
+        if (feature_policy is None or feature_policy.can_move_over) and all(
+            pose.position.z >= terrain.top_z_inches() for pose in touching_poses
+        ):
+            return TerrainTraversalMode.CLIMB
+        if feature is not None and self._can_move_through_feature(
+            feature=feature, feature_policy=feature_policy, touching_poses=touching_poses
+        ):
+            return self.terrain_movement_policy.infantry_beast_ruins_wall_traversal_mode
         can_move_over = feature_policy is None or feature_policy.can_move_over
         if type(terrain) is ObstacleVolume:
             if self._can_move_through_feature(
@@ -1251,6 +1304,13 @@ class TerrainPathLegalityContext:
         end_pose: Pose,
     ) -> TerrainTraversalViolation | None:
         end_model = _model_at_pose(self.moving_model, end_pose)
+        solid_blocker = solid_endpoint_intersection(end_model, feature)
+        if solid_blocker is not None:
+            return TerrainTraversalViolation(
+                violation_code=TerrainEndpointViolationCode.MODEL_CANNOT_BE_PLACED_AT_ENDPOINT.value,
+                message="Model cannot end through an enclosed Solid surface.",
+                terrain_id=solid_blocker,
+            )
         surfaces = feature.support_surfaces(
             no_overhang_required=feature_policy.no_overhang_required
         )

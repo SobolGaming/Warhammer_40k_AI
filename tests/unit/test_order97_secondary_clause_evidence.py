@@ -228,7 +228,15 @@ def test_order97_terrain_permitted_vertical_transit(
     )
     result = legality.to_terrain_path_legality_context(
         moving_model=mover,
-        witness=PathWitness.for_paths((("mover", (mover.pose, Pose.at(3, 1, 2), Pose.at(6, 1))),)),
+        # Approach horizontally before climbing within half an inch of the wall.
+        witness=PathWitness.for_paths(
+            (
+                (
+                    "mover",
+                    (mover.pose, Pose.at(2, 1), Pose.at(3, 1, 2), Pose.at(4, 1), Pose.at(6, 1)),
+                ),
+            )
+        ),
         terrain=(),
         terrain_features=(_terrain_feature(classification),),
         contact_footprint_available=True,

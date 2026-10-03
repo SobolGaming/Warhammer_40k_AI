@@ -35,6 +35,7 @@ from warhammer40k_core.geometry.terrain_classification import (
     TerrainClassificationError,
     terrain_area_classification_from_token,
 )
+from warhammer40k_core.geometry.terrain_solid import solid_opening_volumes
 from warhammer40k_core.geometry.volume import Model
 
 
@@ -91,7 +92,10 @@ def classified_feature_transit_permission(
         raise GeometryError("Classified transit requires a non-empty pose tuple.")
     if feature.classification is TerrainAreaClassification.UNKNOWN:
         return None
-    if feature.classification is TerrainAreaClassification.LIGHT:
+    if feature.classification in {
+        TerrainAreaClassification.LIGHT,
+        TerrainAreaClassification.EXPOSED,
+    }:
         return True
     if feature.classification not in {
         TerrainAreaClassification.DENSE,
@@ -808,6 +812,18 @@ class TerrainFeatureDefinition:
 
     def terrain_volumes(self) -> tuple[TerrainVolume, ...]:
         volumes = (*self.floor_volumes(), *self.wall_volumes())
+        return tuple(sorted(volumes, key=lambda volume: volume.terrain_id))
+
+    def solid_opening_volumes(self) -> tuple[ObstacleVolume, ...]:
+        return (
+            solid_opening_volumes(self.feature_id, self.walls, self.floors)
+            if self.classification
+            in {TerrainAreaClassification.DENSE, TerrainAreaClassification.MIXED}
+            else ()
+        )
+
+    def visibility_volumes(self) -> tuple[TerrainVolume, ...]:
+        volumes = (*self.terrain_volumes(), *self.solid_opening_volumes())
         return tuple(sorted(volumes, key=lambda volume: volume.terrain_id))
 
     def support_surfaces(self, *, no_overhang_required: bool) -> tuple[TerrainSupportSurface, ...]:

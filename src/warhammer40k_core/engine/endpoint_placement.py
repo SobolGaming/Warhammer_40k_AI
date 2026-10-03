@@ -16,6 +16,7 @@ from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.measurement import objective_marker_endpoint_is_clear
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainSupportSurface
+from warhammer40k_core.geometry.terrain_solid import solid_endpoint_intersection
 from warhammer40k_core.geometry.volume import Model
 
 
@@ -168,6 +169,14 @@ def terrain_endpoint_placement_violation(
     label = _validate_identifier("placement_label", placement_label)
     movement_keywords = {_canonical_keyword(keyword) for keyword in unit.keywords}
     for feature in features:
+        solid_blocker = solid_endpoint_intersection(model, feature)
+        if solid_blocker is not None:
+            return TerrainEndpointPlacementViolation(
+                violation_code=code,
+                message=f"{label} cannot penetrate Solid terrain.",
+                model_instance_id=model.model_id,
+                blocker_id=solid_blocker,
+            )
         feature_policy = ruleset_descriptor.terrain_movement_policy.policy_for_feature_kind(
             feature.feature_kind
         )

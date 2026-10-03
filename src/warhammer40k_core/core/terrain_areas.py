@@ -528,6 +528,8 @@ def aggregate_logical_terrain_area_classification(
                 f"{field_name} must not mix UNKNOWN with a known terrain classification."
             )
         return TerrainAreaClassification.UNKNOWN
+    if len(classifications) > 1:
+        classifications.discard(TerrainAreaClassification.EXPOSED)
     if len(classifications) == 1:
         return next(iter(classifications))
     return TerrainAreaClassification.MIXED
