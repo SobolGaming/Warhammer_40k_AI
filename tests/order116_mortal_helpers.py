@@ -223,7 +223,7 @@ def gathered_additional_mortal_session() -> LocalGameSession:
     assert isinstance(raw, dict)
     weapons = raw["available_weapons"]
     assert isinstance(weapons, list)
-    declarations = []
+    declarations: list[WeaponDeclaration] = []
     for weapon in weapons:
         assert isinstance(weapon, dict)
         declarations.append(

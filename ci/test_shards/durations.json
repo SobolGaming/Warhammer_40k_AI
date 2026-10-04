@@ -89,7 +89,7 @@
     "tests/unit/test_order109_unit_control.py": 294.574,
     "tests/unit/test_order111_friendly_transit.py": 80.044,
     "tests/unit/test_order115_absent_movement.py": 364.978,
-    "tests/unit/test_order116_additional_mortals.py": 466.91,
+    "tests/unit/test_order116_additional_mortals.py": 461.688,
     "tests/unit/test_order36_sequencing.py": 256.011,
     "tests/unit/test_order36_timing_authority.py": 217.991,
     "tests/unit/test_order51_flight.py": 172.388,
@@ -307,10 +307,10 @@
       "junit_sha256": [
         "0ee7187e3e13b302dc6ac5612188d73e78ccd27d7ba4c3be1809f11192cea105",
         "69bd3bdf4ce5daf72da06af82d5850e0362a5d9e9b7f7154b08e7c19ac4e2438",
-        "f62ac72d3fe8b452aabbf80454e32c5f816bd8b4808bbc39df20611692746b69",
+        "b07f7170a0b42e222275312198aae0234ed697bc6671aa7ce5ed9623c0322585",
         "fdabf3e267237367b7267b615190fffde3a8550e1306204d1492dd646004dd22"
       ],
-      "source": "Representative complete successful Order115 serial16/parallel10665 plus Order116 current20 successful focused cases; final complete current timing successor required",
+      "source": "Representative complete successful Order115 serial16/parallel10665 plus Order116 current20 successful focused cases including two-permission retries; final complete current timing successor required",
       "test_cases": 10701,
       "test_files": 301
     }
@@ -318,66 +318,66 @@
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 4427.98,
+      "duration_seconds": 4427.564,
       "shard_id": 1,
-      "test_file_count": 24
-    },
-    {
-      "duration_seconds": 4427.982,
-      "shard_id": 2,
       "test_file_count": 23
     },
     {
-      "duration_seconds": 4427.985,
+      "duration_seconds": 4427.592,
+      "shard_id": 2,
+      "test_file_count": 24
+    },
+    {
+      "duration_seconds": 4427.564,
       "shard_id": 3,
-      "test_file_count": 27
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 4428.052,
+      "duration_seconds": 4427.564,
       "shard_id": 4,
-      "test_file_count": 25
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 4427.981,
+      "duration_seconds": 4427.569,
       "shard_id": 5,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4427.988,
+      "duration_seconds": 4427.572,
       "shard_id": 6,
-      "test_file_count": 26
+      "test_file_count": 25
     },
     {
-      "duration_seconds": 4428.028,
+      "duration_seconds": 4427.59,
       "shard_id": 7,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4428.029,
+      "duration_seconds": 4427.566,
       "shard_id": 8,
-      "test_file_count": 25
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 4428.003,
+      "duration_seconds": 4427.564,
       "shard_id": 9,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4427.991,
+      "duration_seconds": 4427.565,
       "shard_id": 10,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4428.055,
+      "duration_seconds": 4427.57,
       "shard_id": 11,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4427.997,
+      "duration_seconds": 4427.569,
       "shard_id": 12,
       "test_file_count": 25
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 53136.071
+  "total_test_duration_seconds": 53130.849
 }

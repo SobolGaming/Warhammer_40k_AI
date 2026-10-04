@@ -297,10 +297,13 @@ def test_attack_mortal_producers_resume_once_after_command_reroll_windows(
     assert len(extra) >= 2
     ids = [
         (
-            cast(dict[str, JsonValue], e.payload)["attack_context_id"],
-            cast(dict[str, JsonValue], cast(dict[str, JsonValue], e.payload)["source_permission"])[
-                "effect_id"
-            ],
+            cast(str, cast(dict[str, JsonValue], e.payload)["attack_context_id"]),
+            cast(
+                str,
+                cast(
+                    dict[str, JsonValue], cast(dict[str, JsonValue], e.payload)["source_permission"]
+                )["effect_id"],
+            ),
         )
         for e in extra
     ]
