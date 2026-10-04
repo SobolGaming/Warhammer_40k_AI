@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "7c4765c9e95232c3343abb5130d60c98fe18348c",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7eca337e1d7d48ea725cd689bb0486e42a8ed19610a8a393cc1467eb185b9bcd",
-  "operation_map_sha256": "20b46dc2df334ec87e02c875211565a84ff53ca2412d2768a5cde9fc8e5d5946",
+  "operation_map_sha256": "99ce5a448e044e564c4d765304b4f6431e1ed1694159d807db08615197c10a4e",
   "changes": {
     "README.md": {
       "before_sha256": "737c8e84109ecbd146d5606bd53493172a2ae3893c4450a06d3778f486f80722",
@@ -141,6 +141,16 @@
         "@document": {
           "before": "e37c22d95ab101344dfb070abf89d03f2599fe5ea157a94c2995543da0de18ff",
           "after": "14ee580a704e2574064a0d260dbad125b094414850c236cf0cd818ea98b58e64"
+        }
+      }
+    },
+    "conformance/typescript/src/contract.ts": {
+      "before_sha256": "fc6a021b9216f55ff8817fb0f514490255d3ca65e257de60df24404bd308006c",
+      "after_sha256": "2d77c881af85a4ba689c4c3237bb16deb573cee21bb9f22205ee546f59301911",
+      "owners": {
+        "@document": {
+          "before": "fc6a021b9216f55ff8817fb0f514490255d3ca65e257de60df24404bd308006c",
+          "after": "2d77c881af85a4ba689c4c3237bb16deb573cee21bb9f22205ee546f59301911"
         }
       }
     },
@@ -286,11 +296,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "6a8135274fc34672bc61f6b40065cc5f419b57be203f4533913984b501d55577",
-      "after_sha256": "69bc85e2b8327c82d91ba27bed0bfc86bd692d35f384bc351276ae1da1d163ab",
+      "after_sha256": "0680bb5623379fb987cad158d622581903f5ea927e59e15f4fc07234e26040d9",
       "owners": {
         "@document": {
           "before": "6a8135274fc34672bc61f6b40065cc5f419b57be203f4533913984b501d55577",
-          "after": "69bc85e2b8327c82d91ba27bed0bfc86bd692d35f384bc351276ae1da1d163ab"
+          "after": "0680bb5623379fb987cad158d622581903f5ea927e59e15f4fc07234e26040d9"
         }
       }
     },
@@ -748,6 +758,16 @@
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+    },
+    "conformance/typescript/src/contract.ts": {
+      "category": "rule_semantics",
+      "operations": [
+        "order115-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
