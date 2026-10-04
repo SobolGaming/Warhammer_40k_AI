@@ -424,4 +424,12 @@ def defer_grouped_devastating_wounds(
             },
         )
         current = current.with_deferred_mortal_wounds(deferred)
+    from warhammer40k_core.engine.additional_attack_mortals import defer_additional_attack_mortals
+
+    current = defer_additional_attack_mortals(
+        state=state,
+        decisions=decisions,
+        attack_sequence=current,
+        wounded_contexts=wounded_contexts,
+    )
     return current, tuple(normal_contexts), None

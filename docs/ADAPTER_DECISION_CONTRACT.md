@@ -7537,3 +7537,20 @@ Internal serialized path/reachability context now carries explicit `pose_is_fixe
 authority. All engine producers and historical reconstructors derive it from the
 physical model's Movement descriptor. Runtime identity governs saves/replay; old
 histories stay on their original engine, with no conversion.
+
+## Order116 / Contract 44.3.3: additional attack mortal Core seam
+
+Existing attack finite/proposal submissions and viewer policy are unchanged.
+An engine-owned, phase/turn/source-model-bound permission produces additional
+mortal wounds for each successful wound. Ordinary damage resolves before the
+shared deferred mortal queue. Each entry retains its originating attack ID,
+source rule, weapon and permission snapshot, and uses ordinary mortal allocation
+and spill across models; Devastating Wounds retains its separate replacement and
+no-spill policy. The existing mortal recipient and optional Feel No Pain requests
+carry the new `additional_attack_mortal_wounds` source kind and source permission.
+`DeferredMortalWoundsPayload` now requires `source_permission` (null for
+Devastating Wounds). Additional mortal completion events record source rule and
+originating attack IDs. Runtime identity governs persistence/replay; old histories
+remain on the matching runtime, without conversion. Core source providers own
+permission conditions. Radiant Champion/Hallowed Ground remain load-only faction
+scaffolds and are not claimed as implemented gameplay.

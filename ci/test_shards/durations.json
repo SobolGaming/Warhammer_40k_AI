@@ -89,6 +89,7 @@
     "tests/unit/test_order109_unit_control.py": 294.574,
     "tests/unit/test_order111_friendly_transit.py": 80.044,
     "tests/unit/test_order115_absent_movement.py": 364.978,
+    "tests/unit/test_order116_additional_mortals.py": 186.837,
     "tests/unit/test_order36_sequencing.py": 256.011,
     "tests/unit/test_order36_timing_authority.py": 217.991,
     "tests/unit/test_order51_flight.py": 172.388,
@@ -305,76 +306,77 @@
     {
       "junit_sha256": [
         "0ee7187e3e13b302dc6ac5612188d73e78ccd27d7ba4c3be1809f11192cea105",
+        "ccae1bfb30938990945fcf3174cb91fac27d7066bcd86ade8688ebdce8a279b9",
         "fdabf3e267237367b7267b615190fffde3a8550e1306204d1492dd646004dd22"
       ],
-      "source": "Order115 complete successful exact-head covered inventory; 16 polygon cases serial with healthchecks and exact disjoint 32-worker remainder",
-      "test_cases": 10681,
-      "test_files": 300
+      "source": "Representative Order115 complete successful cohort plus 11 successful Order116 facade regressions; replace with fresh frozen Order116 full-cohort timing after the aggregate gate",
+      "test_cases": 10692,
+      "test_files": 301
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 4389.11,
+      "duration_seconds": 4404.662,
       "shard_id": 1,
-      "test_file_count": 23
-    },
-    {
-      "duration_seconds": 4389.085,
-      "shard_id": 2,
       "test_file_count": 24
     },
     {
-      "duration_seconds": 4389.082,
-      "shard_id": 3,
-      "test_file_count": 26
+      "duration_seconds": 4404.663,
+      "shard_id": 2,
+      "test_file_count": 23
     },
     {
-      "duration_seconds": 4389.105,
+      "duration_seconds": 4404.66,
+      "shard_id": 3,
+      "test_file_count": 25
+    },
+    {
+      "duration_seconds": 4404.672,
       "shard_id": 4,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4389.132,
+      "duration_seconds": 4404.681,
       "shard_id": 5,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4389.109,
+      "duration_seconds": 4404.67,
       "shard_id": 6,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4389.104,
+      "duration_seconds": 4404.658,
       "shard_id": 7,
-      "test_file_count": 24
+      "test_file_count": 27
     },
     {
-      "duration_seconds": 4389.087,
+      "duration_seconds": 4404.67,
       "shard_id": 8,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4389.085,
+      "duration_seconds": 4404.661,
       "shard_id": 9,
-      "test_file_count": 26
+      "test_file_count": 27
     },
     {
-      "duration_seconds": 4389.091,
+      "duration_seconds": 4404.659,
       "shard_id": 10,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4389.083,
+      "duration_seconds": 4404.676,
       "shard_id": 11,
-      "test_file_count": 26
+      "test_file_count": 25
     },
     {
-      "duration_seconds": 4389.088,
+      "duration_seconds": 4404.666,
       "shard_id": 12,
-      "test_file_count": 26
+      "test_file_count": 25
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 52669.161
+  "total_test_duration_seconds": 52855.998
 }

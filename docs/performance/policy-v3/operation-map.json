@@ -3181,6 +3181,97 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order116-movement-permission": {
+      "paths": [
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/engine/additional_attack_mortal_permissions.py",
+        "src/warhammer40k_core/engine/additional_attack_mortals.py",
+        "src/warhammer40k_core/engine/attack_sequence_damage_helpers.py",
+        "src/warhammer40k_core/engine/attack_sequence_deferred_mortals.py",
+        "src/warhammer40k_core/engine/attack_sequence_group_selection.py",
+        "src/warhammer40k_core/engine/attack_sequence_post_roll.py",
+        "src/warhammer40k_core/engine/deferred_mortal_wounds.py",
+        "src/warhammer40k_core/engine/model_destruction_cause_attack_restore.py"
+      ],
+      "owners": [
+        "@module",
+        "DeferredMortalWounds",
+        "DeferredMortalWounds.__post_init__",
+        "DeferredMortalWounds.application_suffix",
+        "DeferredMortalWounds.from_payload",
+        "DeferredMortalWounds.source_kind",
+        "DeferredMortalWounds.to_payload",
+        "DeferredMortalWoundsPayload",
+        "_apply_deferred_mortal_wound_feel_no_pain_decision",
+        "_apply_deferred_mortal_wounds",
+        "_has_pending_attack_mortal_continuation",
+        "_has_pending_devastating_wounds_continuation",
+        "additional_attack_mortal_permission_effect",
+        "additional_attack_mortal_permissions",
+        "apply_deferred_attack_mortals",
+        "defer_additional_attack_mortals",
+        "defer_grouped_devastating_wounds",
+        "emit_deferred_mortal_wounds_applied",
+        "validate_additional_attack_mortal_permission",
+        "validate_pending_attack_destruction_boundary"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order116-regressions": {
+      "paths": [
+        "tests/order116_mortal_helpers.py",
+        "tests/unit/test_order116_additional_mortals.py"
+      ],
+      "owners": [
+        "@module",
+        "additional_mortal_session",
+        "test_additional_mortal_pending_retry_restore_and_lethal_continuation",
+        "test_additional_mortal_permission_validates_schema_and_occurrence",
+        "test_additional_mortal_weapon_scope_is_source_owned",
+        "test_additional_mortals_coexist_with_native_devastating_wounds",
+        "test_source_backed_additional_mortals_preserve_attack_identity_and_damage_order",
+        "test_successful_wounds_generate_additional_mortals_even_after_successful_saves"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order116-source-evidence": {
+      "paths": [
+        "data/source_audits/order116/source.audit.json",
+        "tools/performance_policy.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_order116_smoke_operations",
+        "validate_assessment"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order116-contract-publication": {
+      "paths": [
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

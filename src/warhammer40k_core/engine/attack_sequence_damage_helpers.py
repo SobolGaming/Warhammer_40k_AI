@@ -26,7 +26,6 @@ from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
-from warhammer40k_core.engine.weapon_abilities import DEVASTATING_WOUNDS_RULE_ID
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -54,9 +53,17 @@ def emit_deferred_mortal_wounds_applied(
     attack_context_ids: tuple[str, ...],
     mortal_wounds: int,
     application: MortalWoundApplication,
+    source_rule_id: str,
+    source_kind: str,
 ) -> None:
+    if source_kind == "devastating_wounds":
+        event_type = "devastating_wounds_mortal_wounds_applied"
+    elif source_kind == "additional_attack_mortal_wounds":
+        event_type = "additional_attack_mortal_wounds_applied"
+    else:
+        raise GameLifecycleError("Unsupported deferred attack mortal source kind.")
     decisions.event_log.append(
-        "devastating_wounds_mortal_wounds_applied",
+        event_type,
         {
             "sequence_id": attack_sequence.sequence_id,
             "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
@@ -64,7 +71,7 @@ def emit_deferred_mortal_wounds_applied(
             "attack_context_ids": list(attack_context_ids),
             "mortal_wounds": mortal_wounds,
             "mortal_wound_application": application.to_payload(),
-            "source_rule_id": DEVASTATING_WOUNDS_RULE_ID,
+            "source_rule_id": source_rule_id,
         },
     )
 
