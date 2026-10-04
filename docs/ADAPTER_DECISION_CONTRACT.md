@@ -7516,3 +7516,12 @@ context independently of ordinary movement-completion bindings. The existing
 shared viewer redaction remains authoritative for projections, requests,
 decisions, events and transport metadata. Named faction ability loading/timing
 and non-Core source-specific transport distance are outside Order114.
+## V963-SNAP / Contract 44.3.1 - current Snap hit semantics
+
+The existing hit payload's `threshold_source_ids` records the selected 15.09
+no-critical source. Snap sixes are successful ordinary hits, with no Critical
+Hit event, Sustained generation, or Lethal choice. Critical Wounds and their
+wound-stage effects remain possible. Existing finite/proposal requests and
+viewer-scoped event/persistence/replay shapes cover this correction; no new
+decision or field is introduced. Old histories require their original runtime.
+See [source and complete consumer validation](V963_SNAP_SCOPE_PLAN.md).

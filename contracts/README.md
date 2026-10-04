@@ -59,7 +59,14 @@ from HealingEffect and requires source-bound engagement evidence on battlefield
 revival events. See [35 to 36 migration](migrations/35-to-36.md).
 
 
-Contract version: `44.3.0`
+Contract version: `44.3.1`
+
+V963-SNAP applies complete current Core 15.09: Snap hits are ordinary hits,
+so critical-hit effects never trigger; Critical Wounds remain possible.
+Existing hit/source payloads and decision, viewer, persistence and replay
+families cover this correction without shape changes. Old histories require
+their original runtime; released baselines remain immutable. See the
+[source and consumer record](../docs/V963_SNAP_SCOPE_PLAN.md).
 
 Order 81 / P03E restores the existing pending-proposal contract for all 13
 parameterized families. Interaction conformance examples now preserve the four

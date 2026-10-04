@@ -2977,6 +2977,104 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "v963-snap-hit-semantics": {
+      "paths": [
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/engine/attack_sequence_hit_wound.py",
+        "src/warhammer40k_core/engine/attack_sequence_model.py",
+        "src/warhammer40k_core/engine/hit_thresholds.py",
+        "src/warhammer40k_core/rules/source_authority_registry.py",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_critical_hits_2026_09/__init__.py"
+      ],
+      "owners": [
+        "@module",
+        "HitRoll.__post_init__",
+        "_build_source_package",
+        "_roll_hit",
+        "classify_hit_roll",
+        "resolve_hit_thresholds",
+        "validate_source_artifact_bytes"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "v963-snap-regressions": {
+      "paths": [
+        "tests/fire_overwatch_helpers.py",
+        "tests/unit/test_critical_hits.py",
+        "tests/unit/test_lethal_hits.py",
+        "tests/unit/test_phase13b_shooting_declarations.py",
+        "tests/v963_snap_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "overwatch_session",
+        "snap_consumer_session",
+        "test_critical_hits_respect_raw_faces_and_mode_floors",
+        "test_critical_sources_are_pinned_loaded_and_executable",
+        "test_order84_default_critical_and_snap_require_exact_six",
+        "test_order84_explicit_snap_threshold_accepts_assigned_seven",
+        "test_out_of_phase_snap_shooting_choice_uses_attacking_owner_and_replays",
+        "test_phase18b_command_reroll_window_opens_after_shooting_damage_roll",
+        "test_snap_ignores_generic_threshold_but_accepts_explicit_permission",
+        "test_v963_critical_only_snap_threshold_cannot_grant_hits",
+        "test_v963_full_resolution_preserves_critical_wounds_restore_fork_and_replay",
+        "test_v963_out_of_phase_snap_has_no_lethal_choice_and_replays",
+        "test_v963_snap_six_is_an_ordinary_hit_without_sustained_triggers"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "v963-snap-source-evidence": {
+      "paths": [
+        "data/source_audits/v963_snap/baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_critical_hits_2026_09/artifacts/package.json.txt",
+        "data/source_audits/v963_snap/baseline/tests/fire_overwatch_helpers.py.txt",
+        "data/source_audits/v963_snap/baseline/tests/unit/test_critical_hits.py.txt",
+        "data/source_audits/v963_snap/baseline/tests/unit/test_lethal_hits.py.txt",
+        "data/source_audits/v963_snap/historical-inputs.json",
+        "data/source_audits/v963_snap/source.audit.json",
+        "src/warhammer40k_core/rules/source_authority_registry.json",
+        "tools/build_core_critical_hits_source.py",
+        "tools/core_rules_order97_history.py",
+        "tools/v963_snap_source.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "audit_row",
+        "build_payloads",
+        "historical_evidence_path",
+        "main",
+        "selected_record",
+        "source_text"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "v963-snap-contract-publication": {
+      "paths": [
+        "conformance/typescript/src/contract.ts",
+        "contracts/README.md",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

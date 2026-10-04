@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.interpreted_dice import CriticalRollThreshold
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.runtime_modifiers import HitRollMinimumUnmodifiedSuccessContext
 from warhammer40k_core.engine.weapon_abilities import FIRE_OVERWATCH_RULE_ID, SNAP_SHOOTING_RULE_ID
@@ -43,6 +44,7 @@ def resolve_hit_thresholds(context: HitRollMinimumUnmodifiedSuccessContext) -> H
     success_requires_exact = is_snap
     if is_snap:
         source_ids.add(sources.SNAP_CRITICAL_SOURCE_ID)
+        source_ids.add(sources.SNAP_NO_CRITICAL_SOURCE_ID)
     for effect in _matching_generic_attack_effects(
         state=context.state,
         attacking_unit_instance_id=context.attacking_unit_instance_id,
@@ -75,13 +77,15 @@ def resolve_hit_thresholds(context: HitRollMinimumUnmodifiedSuccessContext) -> H
         )
         if not 2 <= value <= 6:
             raise GameLifecycleError("Hit threshold must be between 2 and 6.")
+        # A critical-only grant cannot supply hit permission when critical hits
+        # are forbidden. Explicit hit-success permissions remain independent.
+        if is_snap and status == "critical_hit_threshold":
+            continue
         source_ids.add(generic_rule_modifier_source_id(effect))
         success_requires_exact = False
         if status == "critical_hit_threshold":
             critical_is_threshold = True
             critical = min(critical, value)
-            if is_snap:
-                minimum = min(minimum, value)
         else:
             minimum = min(minimum, value)
     # Indirect Shooting's stated failed faces remain failures. Critical hits
@@ -93,6 +97,32 @@ def resolve_hit_thresholds(context: HitRollMinimumUnmodifiedSuccessContext) -> H
         critical_is_threshold,
         success_requires_exact,
     )
+
+
+def classify_hit_roll(
+    *,
+    unmodified_roll: int,
+    final_roll: int,
+    target_number: int,
+    thresholds: HitThresholds,
+    unmodified_success_threshold_active: bool,
+) -> tuple[bool, bool]:
+    """One hit classification for execution and persisted hit validation."""
+    critical_rule = CriticalRollThreshold(
+        thresholds.critical_threshold, thresholds.critical_is_threshold
+    )
+    snap = sources.SNAP_NO_CRITICAL_SOURCE_ID in thresholds.source_ids
+    critical = not snap and critical_rule.matches(unmodified_roll)
+    meets_minimum = (
+        unmodified_roll == thresholds.minimum_success
+        if thresholds.success_requires_exact
+        else unmodified_roll >= thresholds.minimum_success
+    )
+    successful = critical or (
+        meets_minimum
+        and (snap or unmodified_success_threshold_active or final_roll >= target_number)
+    )
+    return successful, critical
 
 
 def _targeting_rule_gate_applies(

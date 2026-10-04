@@ -37,6 +37,57 @@ def test_attack_hit_resolution_has_one_threshold_authority() -> None:
     assert "required_targeting_rule_id" in resolver
 
 
+def test_v963_execution_and_hit_restore_share_classification_and_keep_wound_owner() -> None:
+    engine = ROOT / "src/warhammer40k_core/engine"
+    hit_owner = (engine / "attack_sequence_hit_wound.py").read_text(encoding="utf-8")
+    model = (engine / "attack_sequence_model.py").read_text(encoding="utf-8")
+    resolver = (engine / "hit_thresholds.py").read_text(encoding="utf-8")
+    assert "successful, critical = classify_hit_roll(" in hit_owner
+    assert "expected_success, expected_critical = classify_hit_roll(" in model
+    assert "snap = sources.SNAP_NO_CRITICAL_SOURCE_ID in thresholds.source_ids" in resolver
+    assert "critical = not snap and critical_rule.matches(unmodified_roll)" in resolver
+    assert "critical_hit=critical" in hit_owner
+    assert "if critical and (" in hit_owner
+    assert "def _critical_wound_threshold(" in hit_owner
+    assert "critical = critical_threshold.matches(unmodified)" in hit_owner
+    lethal = (engine / "lethal_hits.py").read_text(encoding="utf-8")
+    assert "not hit.critical" in lethal
+    events = (engine / "attack_sequence_dice_rerolls.py").read_text(encoding="utf-8")
+    assert "if hit_roll.critical:" in events
+    assert "roll_critical=hit_roll.critical" in events
+    post_roll = (engine / "attack_sequence_post_roll.py").read_text(encoding="utf-8")
+    assert 'critical=payload["critical"]' in post_roll
+
+
+def test_v963_source_is_complete_and_historical_observations_remain_immutable() -> None:
+    import hashlib
+    import json
+    from typing import cast
+
+    from tools import v963_snap_source
+    from tools.build_core_critical_hits_source import build_payloads
+
+    selected = v963_snap_source.selected_record()
+    assert selected["ref"] == "15.09"
+    assert len(cast(list[object], selected["text"])) == 10
+    text = v963_snap_source.source_text()
+    assert "Those hits are not critical hits." in text
+    assert "unmodified hit roll of 6" in text
+    assert "cannot re\u2011roll hit rolls" in text
+    current, _audit = build_payloads()
+    mapping = json.loads(
+        (ROOT / "data/source_audits/v963_snap/historical-inputs.json").read_bytes()
+    )
+    for row in mapping["files"]:
+        raw = (ROOT / row["historical_path"]).read_bytes()
+        assert hashlib.sha256(raw).hexdigest() == row["sha256"]
+        assert len(raw) == row["bytes"]
+    package = next(row for row in mapping["files"] if row["path"].endswith("package.json"))
+    old = json.loads((ROOT / package["historical_path"]).read_bytes())
+    assert cast(list[object], current["rules"])[:2] == old["rules"]
+    assert cast(list[object], current["evidence"])[:4] == old["evidence"]
+
+
 def test_restoration_and_pre_submission_share_hit_authority() -> None:
     engine = ROOT / "src/warhammer40k_core/engine"
     for filename, function in (

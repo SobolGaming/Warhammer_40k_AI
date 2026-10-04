@@ -15,15 +15,7 @@ from tests.phase13b_shooting_declaration_helpers import (
 from tests.phase17n_primary_mission_helpers import append_authenticated_normal_move
 from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
 from warhammer40k_core.adapters.local_session import LocalGameSession
-from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.dice import DiceExpression
-from warhammer40k_core.core.weapon_profiles import (
-    AbilityDescriptor,
-    AbilityKind,
-    AttackProfile,
-    RangeProfile,
-    WeaponKeyword,
-)
+from warhammer40k_core.core.weapon_profiles import AttackProfile, RangeProfile, WeaponKeyword
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import validate_json_value
@@ -49,16 +41,11 @@ def overwatch_session(
     cp: int = 1,
     shooter_models: int = 1,
     weapon_range: int = 24,
-    attacks: int | None = 2,
+    attacks: int = 2,
     attached: bool = False,
     indirect: bool = False,
-    blast: int | None = None,
-    duplicate_blast: bool = False,
-    random_attacks: bool = False,
-    enemy_models: int = 1,
-    catalog: ArmyCatalog | None = None,
 ) -> LocalGameSession:
-    catalog = _compact_intercessor_catalog(_canonical_catalog()) if catalog is None else catalog
+    catalog = _compact_intercessor_catalog(_canonical_catalog())
     catalog = replace(
         catalog,
         wargear=tuple(
@@ -68,9 +55,7 @@ def overwatch_session(
                     replace(
                         profile,
                         range_profile=RangeProfile.distance(weapon_range),
-                        attack_profile=AttackProfile.fixed(attacks)
-                        if attacks is not None
-                        else profile.attack_profile,
+                        attack_profile=AttackProfile.fixed(attacks),
                         keywords=tuple(
                             dict.fromkeys(
                                 (
@@ -88,67 +73,6 @@ def overwatch_session(
             for item in catalog.wargear
         ),
     )
-    if blast is not None:
-        catalog = replace(
-            catalog,
-            wargear=tuple(
-                replace(
-                    item,
-                    weapon_profiles=tuple(
-                        replace(
-                            profile,
-                            attack_profile=AttackProfile.dice(DiceExpression(1, 6))
-                            if random_attacks
-                            else profile.attack_profile,
-                            keywords=(
-                                *(
-                                    keyword
-                                    for keyword in profile.keywords
-                                    if keyword is not WeaponKeyword.RAPID_FIRE
-                                ),
-                                WeaponKeyword.BLAST,
-                            ),
-                            abilities=(
-                                *(
-                                    ability
-                                    for ability in profile.abilities
-                                    if ability.ability_kind is not AbilityKind.RAPID_FIRE
-                                ),
-                                AbilityDescriptor.blast(blast),
-                            ),
-                        )
-                        for profile in item.weapon_profiles
-                    ),
-                )
-                if item.wargear_id == "core-bolt-rifle"
-                else item
-                for item in catalog.wargear
-            ),
-        )
-    if duplicate_blast:
-        from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
-
-        catalog = replace(
-            catalog,
-            wargear=tuple(
-                replace(
-                    item,
-                    weapon_profiles=tuple(
-                        grant_weapon_ability(
-                            replace(profile, abilities=()),
-                            keyword=WeaponKeyword.BLAST,
-                            ability=AbilityDescriptor.blast(2),
-                            source_id="order113:blast-grant",
-                            source_instance_id="order113:blast-grant:occurrence",
-                        )
-                        for profile in item.weapon_profiles
-                    ),
-                )
-                if item.wargear_id == "core-bolt-rifle"
-                else item
-                for item in catalog.wargear
-            ),
-        )
     lifecycle, _ = _shooting_lifecycle(
         alpha_unit_ids=("shooter", "leader") if attached else ("shooter",),
         game_id="order45-overwatch",
@@ -171,7 +95,7 @@ def overwatch_session(
         if attached
         else (),
         enemy_unit_specs=tuple(
-            (key, "core-intercessor-like-infantry", "core-intercessor-like", enemy_models)
+            (key, "core-intercessor-like-infantry", "core-intercessor-like", 1)
             for key in ("enemy", "enemy-2")
         )
         + (("enemy-leader", "core-character-leader", "core-character-leader", 1),) * attached,
@@ -194,10 +118,7 @@ def overwatch_session(
             poses=(
                 tuple(Pose.at(10 + index * 2, 10) for index in range(shooter_models))
                 if unit_id == SHOOTER
-                else tuple(
-                    Pose.at(pose.position.x, pose.position.y + index * 1.4)
-                    for index in range(enemy_models)
-                )
+                else (pose,)
             ),
         )
     if attached:

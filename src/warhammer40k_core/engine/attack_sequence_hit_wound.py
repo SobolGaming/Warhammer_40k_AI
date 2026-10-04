@@ -143,7 +143,7 @@ def _roll_hit(
         )
     else:
         base_minimum_success = 2
-    from warhammer40k_core.engine.hit_thresholds import resolve_hit_thresholds
+    from warhammer40k_core.engine.hit_thresholds import classify_hit_roll, resolve_hit_thresholds
 
     thresholds = resolve_hit_thresholds(
         HitRollMinimumUnmodifiedSuccessContext(
@@ -161,15 +161,14 @@ def _roll_hit(
         )
     )
     minimum_success = thresholds.minimum_success
-    critical = CriticalRollThreshold(
-        thresholds.critical_threshold, thresholds.critical_is_threshold
-    ).matches(unmodified)
-    meets_minimum = (
-        unmodified == minimum_success
-        if thresholds.success_requires_exact
-        else unmodified >= minimum_success
-    )
     unmodified_success_threshold_active = minimum_success < base_minimum_success
+    successful, critical = classify_hit_roll(
+        unmodified_roll=unmodified,
+        final_roll=final_roll,
+        target_number=skill,
+        thresholds=thresholds,
+        unmodified_success_threshold_active=unmodified_success_threshold_active,
+    )
     target_keywords = rules_unit_view_by_id(
         state=state,
         unit_instance_id=pool.target_unit_instance_id,
@@ -205,11 +204,7 @@ def _roll_hit(
         modifier=modifier,
         capped_modifier=capped_modifier,
         final_roll=final_roll,
-        successful=(
-            critical
-            or (unmodified_success_threshold_active and meets_minimum)
-            or (meets_minimum and final_roll >= skill)
-        ),
+        successful=successful,
         critical=critical,
         critical_threshold=thresholds.critical_threshold,
         critical_is_threshold=thresholds.critical_is_threshold,

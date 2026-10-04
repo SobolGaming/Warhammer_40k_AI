@@ -1,7 +1,7 @@
 {
   "artifact_schema": "core-v2-core-critical-hits-source-v1",
   "source_package_id": "gw-11e-core-critical-hits",
-  "source_version": "maintained-app-mirrors-observed-2026-10-01",
+  "source_version": "maintained-app-mirrors-observed-2026-09-13",
   "rules": [
     {
       "source_id": "gw-11e-core-critical-hits:critical-hit-success-faq",
@@ -25,20 +25,6 @@
       "runtime_consumer_ids": [
         "warhammer40k_core.engine.hit_thresholds:resolve_hit_thresholds",
         "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
-      ]
-    },
-    {
-      "source_id": "gw-11e-core-critical-hits:snap-shooting-no-critical-hits",
-      "section_id": "15.09 current observation",
-      "source_text": "SNAP SHOOTING\nEligible If\nAs stated in the rule allowing this shooting type.\nWhile Shooting\n• You can only target one visible enemy unit within 24\" of your unit (and only if it is an eligible target).\n• Each attack only hits on an unmodified hit roll of 6 (irrespective of the attacking weapon’s BS characteristic or any modifiers). Those hits are not critical hits.\n• You cannot re‑roll hit rolls.\nEffect\nYour unit shoots as described in Making Attacks (04).\nAfter Shooting\nUntil the end of the phase, your unit is not eligible to start an action.",
-      "transcription_sha256": "eb06f93ec5f4a77002863d54d86adc8e5676fc88e3a236a27db0d3a13c8fe6ce",
-      "load_support_status": "loaded",
-      "semantic_execution_status": "executable_engine_runtime",
-      "runtime_consumer_ids": [
-        "warhammer40k_core.engine.hit_thresholds:resolve_hit_thresholds",
-        "warhammer40k_core.engine.hit_thresholds:classify_hit_roll",
-        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit",
-        "warhammer40k_core.engine.attack_sequence_model:HitRoll"
       ]
     }
   ],
@@ -162,71 +148,7 @@
         "warhammer40k_core.engine.hit_thresholds:resolve_hit_thresholds",
         "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
       ]
-    },
-    {
-      "evidence_id": "core-snap-shooting-review:current-observation",
-      "rule_source_id": "gw-11e-core-critical-hits:snap-shooting-no-critical-hits",
-      "evidence_kind": "project_reviewed_app_transcription",
-      "authority": "unverified_transcription_only",
-      "project_authority_policy_id": null,
-      "review_audit_id": null,
-      "review_audit_row_id": null,
-      "review_audit_source_observation_sha256": null,
-      "provider_name": "CORE V2 Source Review",
-      "source_title": "Reviewed complete 15.09 Snap Shooting transcription",
-      "source_platform": "Repository",
-      "source_url": null,
-      "observed_at": null,
-      "app_version": null,
-      "app_build": null,
-      "capture_artifact_path": null,
-      "capture_sha256": null,
-      "transcription_sha256": "eb06f93ec5f4a77002863d54d86adc8e5676fc88e3a236a27db0d3a13c8fe6ce",
-      "official_corroborating_source_ids": [],
-      "verification_status": "unverified",
-      "provider_non_affiliation_recorded": false,
-      "observation_sha256": "6f21b85af2ea0c264d24f57e2fab3e0350223f1f25d197a042aacb2615a99b3e",
-      "load_support_status": "loaded",
-      "semantic_execution_status": "executable_engine_runtime",
-      "runtime_consumer_ids": [
-        "warhammer40k_core.engine.hit_thresholds:resolve_hit_thresholds",
-        "warhammer40k_core.engine.hit_thresholds:classify_hit_roll",
-        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit",
-        "warhammer40k_core.engine.attack_sequence_model:HitRoll"
-      ]
-    },
-    {
-      "evidence_id": "core-snap-shooting-mirror:current-observation",
-      "rule_source_id": "gw-11e-core-critical-hits:snap-shooting-no-critical-hits",
-      "evidence_kind": "third_party_mirror",
-      "authority": "project_authoritative_app_mirror",
-      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
-      "review_audit_id": "core-snap-shooting-maintained-app-mirror-2026-10-01",
-      "review_audit_row_id": "rule:15.09:current-observation",
-      "review_audit_source_observation_sha256": "b38c6f030e05553a286764a28a01147423c7035598039b1dcaa8208f76138c90",
-      "provider_name": "Game Datamissions",
-      "source_title": "Game Datamissions complete 15.09 Snap Shooting",
-      "source_platform": "Web",
-      "source_url": "https://game-datamissions.com/11th/rules/core-rules",
-      "observed_at": "2026-10-01T12:04:31.127429+00:00",
-      "app_version": null,
-      "app_build": null,
-      "capture_artifact_path": null,
-      "capture_sha256": null,
-      "transcription_sha256": "eb06f93ec5f4a77002863d54d86adc8e5676fc88e3a236a27db0d3a13c8fe6ce",
-      "official_corroborating_source_ids": [],
-      "verification_status": "authoritative_app_mirror",
-      "provider_non_affiliation_recorded": true,
-      "observation_sha256": "e788ff854c91f407c8aee2be9d19e76727f13b1fc06df50c5788eb3486a6875e",
-      "load_support_status": "loaded",
-      "semantic_execution_status": "executable_engine_runtime",
-      "runtime_consumer_ids": [
-        "warhammer40k_core.engine.hit_thresholds:resolve_hit_thresholds",
-        "warhammer40k_core.engine.hit_thresholds:classify_hit_roll",
-        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit",
-        "warhammer40k_core.engine.attack_sequence_model:HitRoll"
-      ]
     }
   ],
-  "package_hash": "3551c7d9c1526f38e2a404f3aee5184ff6667f2169041badbb3afdc3ed573d35"
+  "package_hash": "823333e2eaf3fe1f4521c1213561448091cff83f6feea171066b6d859d2a6cd2"
 }

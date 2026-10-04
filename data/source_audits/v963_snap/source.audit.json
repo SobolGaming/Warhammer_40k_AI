@@ -1,0 +1,38 @@
+{
+  "audit_id": "core-snap-shooting-maintained-app-mirror-2026-10-01",
+  "rows": [
+    {
+      "row_id": "rule:15.09:current-observation",
+      "provider_name": "Game Datamissions",
+      "source_url": "https://game-datamissions.com/11th/rules/core-rules",
+      "observed_at": "2026-10-01T12:04:31.127429+00:00",
+      "app_version": null,
+      "app_build": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-critical-hits:snap-shooting-no-critical-hits",
+      "capture_artifact_path": "data/source_audits/v963_shock/captures/core-page.js",
+      "capture_sha256": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026",
+      "transcription_sha256": "eb06f93ec5f4a77002863d54d86adc8e5676fc88e3a236a27db0d3a13c8fe6ce",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "b38c6f030e05553a286764a28a01147423c7035598039b1dcaa8208f76138c90"
+    }
+  ],
+  "source_authority": "project_authoritative_app_mirror",
+  "version_qualification": "Complete retained live body observed at the stated timestamp; no live-body App version asserted. V963 identifies the change separately; v931 FAQ evidence is retained unchanged.",
+  "selected_record": {
+    "ref": "15.09",
+    "title": "Snap Shooting",
+    "text": [
+      "\u000eEligible If",
+      "As stated in the rule allowing this \u0005shooting type\u0006.",
+      "\u000eWhile Shooting",
+      "• You can only target \u0001one\u0002 \u0005visible\u0006 enemy unit within 24\" of your unit (and only if it is an eligible target).",
+      "• Each attack only hits on an unmodified \u0005hit roll\u0006 of 6 (irrespective of the attacking weapon’s \u0005BS\u0006 characteristic or any modifiers). Those hits are \u0001not\u0002 \u0005critical hits\u0006.",
+      "• You cannot re‑roll \u0005hit rolls\u0006.",
+      "\u000eEffect",
+      "Your unit shoots as described in Making Attacks (04).",
+      "\u000eAfter Shooting",
+      "Until the end of the phase, your unit is \u0001not\u0002 \u0005eligible to start an action\u0006."
+    ]
+  }
+}

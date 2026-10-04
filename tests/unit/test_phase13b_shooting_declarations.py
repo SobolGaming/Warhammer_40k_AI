@@ -2062,7 +2062,6 @@ def test_phase18b_command_reroll_window_opens_after_shooting_damage_roll() -> No
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
     defender = units["enemy"]
-    defender_model = defender.own_models[0]
     battlefield = state.battlefield_state
     assert battlefield is not None
     state.battlefield_state = battlefield.with_removed_models(
@@ -2084,17 +2083,10 @@ def test_phase18b_command_reroll_window_opens_after_shooting_damage_roll() -> No
         attacker_player_id="player-a",
         reroll_forbidden_rule_ids=(SNAP_SHOOTING_RULE_ID,),
     )
-    save_spec = saving_throw_roll_spec(
-        save_kind=SaveKind.ARMOUR,
-        player_id="player-b",
-        allocated_model_id=defender_model.model_instance_id,
+    wound_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
         attack_context_id=attack_context_id,
-    )
-    damage_spec = DiceRollSpec(
-        expression=DiceExpression(quantity=1, sides=3),
-        reason="Phase 13C random Damage roll",
-        roll_type=f"random_characteristic.damage.per_attack.{attack_context_id}:damage",
-        actor_id="player-a",
+        attacker_player_id="player-a",
     )
     sequence = AttackSequence.start(
         sequence_id=sequence_id,
@@ -2124,8 +2116,7 @@ def test_phase18b_command_reroll_window_opens_after_shooting_damage_roll() -> No
             event_log=lifecycle.decision_controller.event_log,
             injected_results=(
                 _fixed_roll_result(roll_id=f"{sequence_id}:hit", spec=hit_spec, value=6),
-                _fixed_roll_result(roll_id=f"{sequence_id}:save", spec=save_spec, value=1),
-                _fixed_roll_result(roll_id=f"{sequence_id}:damage", spec=damage_spec, value=2),
+                _fixed_roll_result(roll_id=f"{sequence_id}:wound", spec=wound_spec, value=6),
             ),
         ),
         stratagem_index=eleventh_edition_stratagem_index(),
@@ -2136,9 +2127,49 @@ def test_phase18b_command_reroll_window_opens_after_shooting_damage_roll() -> No
         attack_sequence=_remaining,
         allocated_ids=_allocated,
         status=status,
-        result_id_prefix="phase18b-damage-lethal-choice",
+        result_id_prefix="phase18b-damage-model-choice",
     )
 
+    # Snap six is an ordinary hit. Resolve its real wound and decline that
+    # distinct reroll opportunity before reaching the Damage roll's window.
+    wound_request = _assert_command_reroll_request(
+        status,
+        actor_id="player-a",
+        phase_body_status="attack_wound_command_reroll_pending",
+        roll_type="attack_sequence.wound",
+        affected_unit_instance_id=attacker.unit_instance_id,
+    )
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            request=wound_request,
+            selected_option_id="decline_stratagem_window",
+            result_id="phase18b-damage-decline-wound-command-reroll",
+        )
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    _remaining, status = _continue_damage_model_choices(
+        lifecycle,
+        attack_sequence=None,
+        allocated_ids=_allocated,
+        status=status,
+        result_id_prefix="phase18b-damage-after-wound-choice",
+    )
+    hit_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"), AttackSequenceStep.HIT
+    )
+    assert cast(dict[str, object], hit_payload["payload"])["critical"] is False
+    wound_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"), AttackSequenceStep.WOUND
+    )
+    assert cast(dict[str, object], wound_payload["payload"])["critical"] is True
+    save_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"), AttackSequenceStep.SAVE
+    )
+    assert cast(dict[str, object], save_payload["payload"])["successful"] is False
+    assert not any(
+        record.request.decision_type == "select_lethal_hit_wound"
+        for record in lifecycle.decision_controller.records
+    )
     _assert_command_reroll_request(
         status,
         actor_id="player-a",
