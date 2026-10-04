@@ -937,8 +937,6 @@ def test_placeholder_phase_handler_emits_explicit_noop_and_advances_boundary() -
         "command_phase_scoring_hooks_resolved",
         "battle_shock_step_snapshot_created",
         "battle_shock_step_completed",
-        "timing_window_opened",
-        "timing_window_resolved",
         "end_boundary_objective_control_determined",
         "timing_window_opened",
         "timing_window_resolved",
@@ -952,17 +950,6 @@ def test_placeholder_phase_handler_emits_explicit_noop_and_advances_boundary() -
         "timing_window_resolved",
         "battle_phase_completed",
     )
-
-    body_events = decisions.event_log.records[16:18]
-    for event in body_events:
-        payload = event.payload
-        assert isinstance(payload, dict)
-        window = payload["timing_window"]
-        assert isinstance(window, dict)
-        descriptor = window["descriptor"]
-        assert isinstance(descriptor, dict)
-        assert descriptor["source_step"] == "command_abilities"
-        assert descriptor["source_rule_id"] == "rule:08:08.04:1"
 
 
 def test_phase_wrap_switches_active_player() -> None:

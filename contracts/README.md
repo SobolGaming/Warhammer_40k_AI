@@ -1,5 +1,8 @@
 # CORE V2 external contract
 
+Contract 44.3.7 publishes the Core Command-abilities timing seam through existing
+sequencing and event envelopes. See [Order 121](../docs/ORDER_121_SCOPE_PLAN.md).
+
 Contract44.3 adds typed source occasions to finite embark choices without
 manufacturing movement. Shared submissions and existing persistence envelopes
 remain; see [Order114](../docs/ORDER_114_SCOPE_PLAN.md) and the adapter contract.

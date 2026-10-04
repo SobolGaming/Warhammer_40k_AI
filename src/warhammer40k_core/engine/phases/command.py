@@ -24,6 +24,7 @@ from warhammer40k_core.engine.battle_shock_test_service import (
     BattleShockTestRuntime,
     materialize_battle_shock_test_request,
 )
+from warhammer40k_core.engine.command_abilities import resolve_command_abilities
 from warhammer40k_core.engine.command_battle_shock_history import (
     COMMAND_BATTLE_SHOCK_REROLL_SOURCE_KIND,
     ordered_completed_command_battle_shock_results,
@@ -64,6 +65,7 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_content.events import RuntimeContentEventIndex
 from warhammer40k_core.engine.game_state import (
     GameState,
     SecondaryMissionMode,
@@ -149,8 +151,13 @@ class CommandPhaseHandler:
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] = field(
         default_factory=_empty_ability_indexes
     )
+    runtime_event_index: RuntimeContentEventIndex = field(
+        default_factory=RuntimeContentEventIndex.empty
+    )
 
     def __post_init__(self) -> None:
+        if type(self.runtime_event_index) is not RuntimeContentEventIndex:
+            raise GameLifecycleError("CommandPhaseHandler runtime_event_index must be an index.")
         if type(self.stratagem_index) is not StratagemCatalogIndex:
             raise GameLifecycleError("CommandPhaseHandler stratagem_index must be an index.")
         if type(self.stratagem_cost_modifier_registry) is not StratagemCostModifierRegistry:
@@ -295,6 +302,17 @@ class CommandPhaseHandler:
                 stage=GameLifecycleStage.BATTLE,
                 payload={"phase": BattlePhase.COMMAND.value, "deferred_rules_ready": True},
             )
+
+        abilities_status = resolve_command_abilities(
+            state=state,
+            decisions=decisions,
+            index=self.runtime_event_index,
+            runtime_modifier_registry=self.runtime_modifier_registry,
+            ruleset_descriptor=self.ruleset_descriptor,
+            army_catalog=self.army_catalog,
+        )
+        if abilities_status is not None:
+            return abilities_status
 
         if not command_state.tactical_secondary_replacement_resolved:
             replacement_status = _request_tactical_secondary_replacement_if_available(

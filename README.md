@@ -2,6 +2,11 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order121 / P08C resolves source-backed unqualified Command abilities after
+Core CP/Battle-shock and before end-phase rules through the shared catalog,
+sequencing and continuation owners. Named faction activation remains deferred;
+see [source and scope](docs/ORDER_121_SCOPE_PLAN.md).
+
 Order 116 / P06E adds the generic source-permission attack seam for additional
 mortal wounds, preserving ordinary damage first, attack identity and shared
 allocation, persistence and replay. Named faction providers remain outside this

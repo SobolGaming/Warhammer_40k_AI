@@ -224,10 +224,12 @@ def test_category07_facade_round_turn_phase_order_and_restore() -> None:
         for player in ("player-a", "player-b"):
             expected.append((round_number, player, "start_turn", None))
             for phase in ("command", "movement", "shooting", "charge", "fight"):
-                expected.append((round_number, player, "start_phase", phase))
-                if phase == "command":
-                    expected.append((round_number, player, "during_phase", phase))
-                expected.append((round_number, player, "end_phase", phase))
+                expected.extend(
+                    (
+                        (round_number, player, "start_phase", phase),
+                        (round_number, player, "end_phase", phase),
+                    )
+                )
             expected.append((round_number, player, "end_turn", None))
         expected.append((round_number, "player-a", "end_battle_round", None))
     assert windows == expected
@@ -251,11 +253,7 @@ def test_category07_facade_round_turn_phase_order_and_restore() -> None:
             descriptor = cast(dict[str, JsonValue], window["descriptor"])
             if window["phase"] == completion["completed_phase"]:
                 boundaries.append(descriptor["trigger_kind"])
-        assert boundaries == (
-            ["start_phase", "during_phase", "end_phase"]
-            if completion["completed_phase"] == "command"
-            else ["start_phase", "end_phase"]
-        )
+        assert boundaries == ["start_phase", "end_phase"]
         assert (
             completion["next_phase"]
             == {

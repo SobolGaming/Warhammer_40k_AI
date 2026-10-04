@@ -31214,7 +31214,7 @@
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
       "equivalence_hash": "38bef2d3db9bbd222527f13740a68cf64f186882d808823398d4dbdc1fb41f4b",
-      "execution_status": "generic_ir_executable",
+      "execution_status": "engine_consumed",
       "faction_id": "death-guard",
       "faction_name": "Death Guard",
       "member_id": "datasheet-ability:000001370:4",
@@ -31224,7 +31224,9 @@
       "rule_id": "000001370:4",
       "rule_name": "Sevenfold Chant",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:command-point-gain"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
       "semantic_hash": "2fce7e7ca6a700db81d4a404efb42dd7193333e0edbea03977ce042a0788f0f2",
       "source_row_ids": [
@@ -31233,7 +31235,7 @@
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001370:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -121988,7 +121990,7 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "4bcc61688b7ec32015b08a5863a94fa86217fe496136f36dd418c55c8c3a43ce",
+  "source_payload_checksum_sha256": "5b979838f3c74b1bd364bc08f0214c29a0a234cfa0f4a3740abc7ebbca722057",
   "source_text_unavailable_member_count": 111,
   "structured_member_count": 807,
   "upstream_execution_checksum_sha256": "91d65afd0aa5502132997df65fad3e501cd3284d984d8557cc735cd6330958de"

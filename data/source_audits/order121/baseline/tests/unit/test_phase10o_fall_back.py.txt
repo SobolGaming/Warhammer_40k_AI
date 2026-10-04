@@ -1058,7 +1058,7 @@ def test_voluntary_desperate_escape_waits_for_delirium_fnp_before_embark(
     with_reroll: bool,
 ) -> None:
     # Retain the failed Battle-shock branch with the complete allocation audit history.
-    game_id = "order121-escape-reroll-0" if with_reroll else "order121-escape-fnp-4"
+    game_id = "order99-escape-reroll-7" if with_reroll else "order99-escape-fnp-0"
     lifecycle, status, target_unit_id = _advance_voluntary_desperate_escape_to_delirium_fnp(
         game_id=game_id,
         with_reroll=with_reroll,

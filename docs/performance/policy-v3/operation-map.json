@@ -3734,6 +3734,121 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order121-generated-semantic-evidence": {
+      "paths": [
+        "data/generated/ability_coverage/cross_source_semantic_equivalence.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order121-command-abilities-timing": {
+      "paths": [
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/engine/ability_catalog.py",
+        "src/warhammer40k_core/engine/boundary_rule_authority.py",
+        "src/warhammer40k_core/engine/catalog_command_point_runtime.py",
+        "src/warhammer40k_core/engine/catalog_command_point_support.py",
+        "src/warhammer40k_core/engine/command_abilities.py",
+        "src/warhammer40k_core/engine/lifecycle.py",
+        "src/warhammer40k_core/engine/phases/command.py",
+        "src/warhammer40k_core/engine/sequencing_submission_authority.py"
+      ],
+      "owners": [
+        "@module",
+        "CatalogCommandPointRuntime._phase_gain_sources",
+        "CommandPhaseHandler",
+        "CommandPhaseHandler.__post_init__",
+        "CommandPhaseHandler.begin_phase",
+        "GameLifecycle._refresh_runtime_content_bundle_if_armies_mustered",
+        "_catalog_phase_timing_descriptor_for_clause",
+        "_phase_gain_trigger_kind",
+        "clause_is_supported_phase_command_point_gain",
+        "command_abilities_window",
+        "resolve_command_abilities",
+        "validate_boundary_order_candidates",
+        "validate_loaded_timing_batch_authority"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order121-regressions": {
+      "paths": [
+        "tests/order101_failed_setup_helpers.py",
+        "tests/stratagem_retention_helpers.py",
+        "tests/unit/test_order121_command_abilities.py",
+        "tests/unit/test_order97_facade_evidence.py",
+        "tests/unit/test_phase10o_fall_back.py",
+        "tests/unit/test_phase9b_lifecycle.py"
+      ],
+      "owners": [
+        "@module",
+        "_events",
+        "_session",
+        "failed_setup_automatic_record_session",
+        "offered_stratagem_reaction",
+        "test_category07_facade_round_turn_phase_order_and_restore",
+        "test_command_abilities_sequence_resumes_then_finishes_before_end_effect",
+        "test_command_body_audits_after_manager_creation_preserve_native_dice_and_restore",
+        "test_command_body_rejects_entry_before_core_steps",
+        "test_command_body_repeats_only_on_owners_turn_through_full_phase_cycles",
+        "test_command_gain_executes_in_its_distinct_source_window",
+        "test_failed_roll_or_lost_bearer_cannot_gain_cp",
+        "test_other_unqualified_phase_does_not_gain_command_consumer",
+        "test_placeholder_phase_handler_emits_explicit_noop_and_advances_boundary",
+        "test_qualified_command_trigger_does_not_gain_body_consumer",
+        "test_real_battle_shock_finishes_before_command_ability",
+        "test_voluntary_desperate_escape_waits_for_delirium_fnp_before_embark"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order121-source-evidence": {
+      "paths": [
+        "data/source_audits/order121/baseline/tests/order101_failed_setup_helpers.py.txt",
+        "data/source_audits/order121/baseline/tests/stratagem_retention_helpers.py.txt",
+        "data/source_audits/order121/baseline/tests/unit/test_order97_facade_evidence.py.txt",
+        "data/source_audits/order121/baseline/tests/unit/test_phase10o_fall_back.py.txt",
+        "data/source_audits/order121/baseline/tests/unit/test_phase9b_lifecycle.py.txt",
+        "data/source_audits/order121/historical-inputs.json",
+        "data/source_audits/order121/source.audit.json",
+        "tools/core_rules_order97_history.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "historical_evidence_path"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order121-contract-publication": {
+      "paths": [
+        "conformance/typescript/src/contract.ts",
+        "contracts/README.md",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

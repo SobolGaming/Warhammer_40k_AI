@@ -7631,3 +7631,12 @@ and allocation, rejecting reachable choices before mutation. No new request,
 proposal or schema family is introduced. Generated runtime/contract identities
 are refreshed; previous histories remain on their matching engine. Classification
 does not grant named faction activation or broaden load-only support.
+
+## Order121 Command-abilities timing
+
+Unqualified supported Command rules resolve in the public DURING_PHASE window
+whose source step is `command_abilities`, after Core CP/Battle-shock and before
+end-phase rules. Existing `resolve_sequencing_order` and modifier choices retain
+their finite payload, validation, visibility and replay contracts. Body source
+occurrences and window completion are public timing events; start/end windows
+remain distinct. No decision family, submission schema or proposal kind is added.

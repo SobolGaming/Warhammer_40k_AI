@@ -1,0 +1,49 @@
+{
+  "reviewed_commit": "09a8c5949e48ae199ce5f31332edeba47dad5420",
+  "also_present_at_base": "09a8c5949e48ae199ce5f31332edeba47dad5420",
+  "purpose": "Retain exact original Order97 boundary assertions and the existing failed-Battle-shock/FNP lifecycle fixture before the new Command-abilities public audit window. Current deterministic game IDs preserve the latter failed branch; these archived bytes are historical evidence, not current Order121 gameplay claims.",
+  "current_evidence": "docs/ORDER_121_SCOPE_PLAN.md",
+  "files": [
+    {
+      "path": "tests/unit/test_order97_facade_evidence.py",
+      "historical_path": "data/source_audits/order121/baseline/tests/unit/test_order97_facade_evidence.py.txt",
+      "git_revision": "09a8c5949e48ae199ce5f31332edeba47dad5420",
+      "git_path": "tests/unit/test_order97_facade_evidence.py",
+      "sha256": "5a3ecb69a0f86b8e3eb2f6fab906826b3e54f49e92353a1b00e9c2205e188071",
+      "bytes": 17351,
+      "order97_file_pin": "5a3ecb69a0f86b8e3eb2f6fab906826b3e54f49e92353a1b00e9c2205e188071"
+    },
+    {
+      "path": "tests/unit/test_phase10o_fall_back.py",
+      "historical_path": "data/source_audits/order121/baseline/tests/unit/test_phase10o_fall_back.py.txt",
+      "git_revision": "09a8c5949e48ae199ce5f31332edeba47dad5420",
+      "git_path": "tests/unit/test_phase10o_fall_back.py",
+      "sha256": "38ffe1064600b38aa32fdf11f717d100ed0fd3e1d4e4fee5d2dd711a9f20b4aa",
+      "bytes": 133102
+    },
+    {
+      "path": "tests/stratagem_retention_helpers.py",
+      "historical_path": "data/source_audits/order121/baseline/tests/stratagem_retention_helpers.py.txt",
+      "git_revision": "09a8c5949e48ae199ce5f31332edeba47dad5420",
+      "git_path": "tests/stratagem_retention_helpers.py",
+      "sha256": "f010eff6c9b8279161781ce5733e1870da96d2fe0250dde6314403ddd2138e21",
+      "bytes": 8342
+    },
+    {
+      "path": "tests/unit/test_phase9b_lifecycle.py",
+      "historical_path": "data/source_audits/order121/baseline/tests/unit/test_phase9b_lifecycle.py.txt",
+      "git_revision": "09a8c5949e48ae199ce5f31332edeba47dad5420",
+      "git_path": "tests/unit/test_phase9b_lifecycle.py",
+      "sha256": "c0b09bef659ffcb2d1dd4cb1992ba874f305cf289161cf532f019719f3126114",
+      "bytes": 65642
+    },
+    {
+      "path": "tests/order101_failed_setup_helpers.py",
+      "historical_path": "data/source_audits/order121/baseline/tests/order101_failed_setup_helpers.py.txt",
+      "git_revision": "09a8c5949e48ae199ce5f31332edeba47dad5420",
+      "git_path": "tests/order101_failed_setup_helpers.py",
+      "sha256": "b2cd265675f44c8aa6ec5f02c400089b676f1cb2cd7a4cae700190aa208b5660",
+      "bytes": 43057
+    }
+  ]
+}

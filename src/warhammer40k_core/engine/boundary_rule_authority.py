@@ -8,6 +8,10 @@ from warhammer40k_core.engine.battle_round_hooks import (
 )
 from warhammer40k_core.engine.boundary_rule_flow import compose_core_end_rule_registry
 from warhammer40k_core.engine.boundary_sequencing import boundary_context, start_turn_context
+from warhammer40k_core.engine.command_abilities import (
+    COMMAND_ABILITIES_SOURCE_STEP,
+    command_abilities_window,
+)
 from warhammer40k_core.engine.command_phase_start_hooks import CommandPhaseStartEffectContext
 from warhammer40k_core.engine.command_phase_start_sequencing import (
     command_start_candidates,
@@ -50,14 +54,35 @@ def validate_boundary_order_candidates(
     reaction_queue: ReactionQueue,
 ) -> None:
     kind = batch.context.timing_window.descriptor.trigger_kind
-    if kind not in BOUNDARY_ORDER_TRIGGERS:
+    is_command_abilities = (
+        kind is TimingTriggerKind.DURING_PHASE
+        and batch.context.timing_window.descriptor.source_step == COMMAND_ABILITIES_SOURCE_STEP
+    )
+    if kind not in BOUNDARY_ORDER_TRIGGERS and not is_command_abilities:
         raise GameLifecycleError("Boundary source authority requires a boundary trigger.")
     active, phase = state.active_player_id, state.current_battle_phase
     if active is None or phase is None:
         raise GameLifecycleError("Boundary source authority requires the current player turn.")
     candidates: tuple[TimingRuleCandidate, ...]
     authority: SequencingConflictContext
-    if kind is TimingTriggerKind.START_BATTLE_ROUND:
+    if is_command_abilities:
+        authority = SequencingConflictContext(
+            conflict_id=command_abilities_window(state).window_id,
+            game_id=state.game_id,
+            player_ids=state.player_ids,
+            active_player_id=active,
+            timing_window=command_abilities_window(state),
+        )
+        candidates = runtime_timing_candidates(
+            state=state,
+            decisions=decisions,
+            window=authority.timing_window,
+            index=bundle.event_index,
+            runtime_modifier_registry=bundle.runtime_modifier_registry,
+            ruleset_descriptor=config.ruleset_descriptor,
+            army_catalog=config.army_catalog,
+        )
+    elif kind is TimingTriggerKind.START_BATTLE_ROUND:
         context = BattleRoundStartRequestContext(state=state, decisions=decisions)
         authority = _battle_round_sequencing_context(context)
         candidates = bundle.battle_round_start_hook_registry.candidates_for(context)

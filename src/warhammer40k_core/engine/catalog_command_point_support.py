@@ -99,7 +99,11 @@ def clause_is_supported_phase_command_point_gain(clause: RuleClause) -> bool:
         return False
     trigger_parameters = parameter_payload(trigger.parameters)
     if (
-        trigger_parameters.get("edge") not in {"start", "end"}
+        not (
+            trigger_parameters.get("edge") in {"start", "end"}
+            or trigger_parameters
+            == {"edge": "during", "owner": "active_player", "phase": "command"}
+        )
         or trigger_parameters.get("owner") != "active_player"
         or trigger_parameters.get("phase")
         not in {"command", "movement", "shooting", "charge", "fight"}
