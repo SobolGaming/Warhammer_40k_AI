@@ -23,6 +23,7 @@ from warhammer40k_core.geometry.movement_envelope import (
     MovementEnvelope,
     MovementEnvelopePayload,
 )
+from warhammer40k_core.geometry.path_initial_constraints import initial_path_constraint_result
 from warhammer40k_core.geometry.path_measurement import (
     horizontal_section_transit_permitted,
 )
@@ -177,6 +178,7 @@ class PathValidationContextPayload(TypedDict):
     sample_interval_inches: float
     movement_distance_budget_inches: float | None
     ignores_vertical_distance: bool
+    pose_is_fixed: bool
 
 
 class TerrainPathSegmentPayload(TypedDict):
@@ -242,6 +244,7 @@ class PathValidationContext:
     sample_interval_inches: float = 0.5
     movement_distance_budget_inches: float | None = None
     ignores_vertical_distance: bool = False
+    pose_is_fixed: bool = False
 
     def __post_init__(self) -> None:
         if type(self.moving_model) is not Model:
@@ -353,6 +356,8 @@ class PathValidationContext:
             self.ignores_vertical_distance,
         )
 
+        _validate_bool("PathValidationContext pose_is_fixed", self.pose_is_fixed)
+
     def validate(self) -> PathValidationResult:
         path = self.witness.poses_for_model(self.moving_model.model_id)
         measurement_path = (
@@ -363,23 +368,14 @@ class PathValidationContext:
             poses=measurement_path,
             max_distance_inches=self.movement_distance_budget_inches,
         )
-        if path[0] != self.moving_model.pose:
-            return _invalid_path_validation(
-                "starting_pose_mismatch",
-                "Path witness must start at the moving model pose.",
-                model_id=self.moving_model.model_id,
-                metrics=_PathValidationMetricCounts(sampled_pose_count=len(path)),
-                movement_distance_witness=movement_distance_witness,
-            )
-
-        if not movement_distance_witness.is_within_budget:
-            return _invalid_path_validation(
-                "movement_distance_exceeded",
-                "Path witness exceeds the movement distance budget.",
-                model_id=self.moving_model.model_id,
-                metrics=_PathValidationMetricCounts(sampled_pose_count=len(path)),
-                movement_distance_witness=movement_distance_witness,
-            )
+        initial_result = initial_path_constraint_result(
+            model=self.moving_model,
+            path=path,
+            distance=movement_distance_witness,
+            pose_is_fixed=self.pose_is_fixed,
+        )
+        if initial_result is not None:
+            return initial_result
         metrics = _PathValidationMetricCounts()
         sampled_path = _sampled_pose_path(path, sample_interval_inches=self.sample_interval_inches)
         metrics.sampled_pose_count = len(sampled_path)
@@ -582,6 +578,7 @@ class PathValidationContext:
             "sample_interval_inches": self.sample_interval_inches,
             "movement_distance_budget_inches": self.movement_distance_budget_inches,
             "ignores_vertical_distance": self.ignores_vertical_distance,
+            "pose_is_fixed": self.pose_is_fixed,
         }
 
     @classmethod
@@ -609,6 +606,7 @@ class PathValidationContext:
             sample_interval_inches=payload["sample_interval_inches"],
             movement_distance_budget_inches=payload["movement_distance_budget_inches"],
             ignores_vertical_distance=payload["ignores_vertical_distance"],
+            pose_is_fixed=payload["pose_is_fixed"],
         )
 
 

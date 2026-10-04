@@ -28,6 +28,7 @@ from warhammer40k_core.engine.charge_movement_source import (
     charge_placement_id,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.model_movement_permission import model_movement_path_context
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.normal_move_history import NormalMoveState
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -220,62 +221,66 @@ def resolve_triggered_movement(
                     may_end_in_enemy_engagement=True,
                 ),
             )
-        path_context = legality_context.to_path_validation_context(
-            moving_model=moving_model,
-            witness=model_witness,
-            battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
-            battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
-            friendly_models=_friendly_geometry_models_for_path(
-                scenario=scenario,
-                unit_placement=unit_placement,
-                attempted_placement=attempted_placement,
-                moving_model_instance_id=placement.model_instance_id,
+        path_context = model_movement_path_context(
+            model=model,
+            context=legality_context.to_path_validation_context(
+                moving_model=moving_model,
+                witness=model_witness,
+                battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
+                battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
+                friendly_models=_friendly_geometry_models_for_path(
+                    scenario=scenario,
+                    unit_placement=unit_placement,
+                    attempted_placement=attempted_placement,
+                    moving_model_instance_id=placement.model_instance_id,
+                ),
+                enemy_models=_enemy_geometry_models_for_player(
+                    scenario=scenario,
+                    player_id=unit_placement.player_id,
+                ),
+                terrain=(),
+                friendly_vehicle_monster_model_ids=_friendly_vehicle_monster_model_ids(
+                    scenario=scenario,
+                    player_id=unit_placement.player_id,
+                    moving_model_instance_id=placement.model_instance_id,
+                ),
+                enemy_vehicle_monster_model_ids=_enemy_vehicle_monster_model_ids_for_player(
+                    scenario=scenario,
+                    player_id=unit_placement.player_id,
+                ),
+                friendly_model_transit_blocker_ids=tuple(
+                    sorted(
+                        {
+                            *friendly_retained_ids,
+                            *_friendly_model_ids_with_keyword_any(
+                                scenario=scenario,
+                                player_id=unit_placement.player_id,
+                                moving_model_instance_id=placement.model_instance_id,
+                                keyword_any=legality_context.capabilities.friendly_model_transit_blocker_keywords,
+                            ),
+                        }
+                    )
+                ),
+                enemy_model_transit_blocker_ids=tuple(
+                    sorted(
+                        {
+                            *enemy_retained_ids,
+                            *_enemy_model_ids_with_keyword_any_for_player(
+                                scenario=scenario,
+                                player_id=unit_placement.player_id,
+                                keyword_any=legality_context.capabilities.enemy_model_transit_blocker_keywords,
+                            ),
+                        }
+                    )
+                ),
+                aircraft_model_ids=tuple(
+                    model_id
+                    for model_id in aircraft_model_ids
+                    if model_id != placement.model_instance_id
+                    and model_id not in retained_model_ids
+                ),
+                movement_distance_budget_inches=maximum_distance,
             ),
-            enemy_models=_enemy_geometry_models_for_player(
-                scenario=scenario,
-                player_id=unit_placement.player_id,
-            ),
-            terrain=(),
-            friendly_vehicle_monster_model_ids=_friendly_vehicle_monster_model_ids(
-                scenario=scenario,
-                player_id=unit_placement.player_id,
-                moving_model_instance_id=placement.model_instance_id,
-            ),
-            enemy_vehicle_monster_model_ids=_enemy_vehicle_monster_model_ids_for_player(
-                scenario=scenario,
-                player_id=unit_placement.player_id,
-            ),
-            friendly_model_transit_blocker_ids=tuple(
-                sorted(
-                    {
-                        *friendly_retained_ids,
-                        *_friendly_model_ids_with_keyword_any(
-                            scenario=scenario,
-                            player_id=unit_placement.player_id,
-                            moving_model_instance_id=placement.model_instance_id,
-                            keyword_any=legality_context.capabilities.friendly_model_transit_blocker_keywords,
-                        ),
-                    }
-                )
-            ),
-            enemy_model_transit_blocker_ids=tuple(
-                sorted(
-                    {
-                        *enemy_retained_ids,
-                        *_enemy_model_ids_with_keyword_any_for_player(
-                            scenario=scenario,
-                            player_id=unit_placement.player_id,
-                            keyword_any=legality_context.capabilities.enemy_model_transit_blocker_keywords,
-                        ),
-                    }
-                )
-            ),
-            aircraft_model_ids=tuple(
-                model_id
-                for model_id in aircraft_model_ids
-                if model_id != placement.model_instance_id and model_id not in retained_model_ids
-            ),
-            movement_distance_budget_inches=maximum_distance,
         )
         path_result = path_context.validate()
         terrain_context = legality_context.to_terrain_path_legality_context(

@@ -11,6 +11,7 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.fight_rules_unit_movement_types import (
     FightRulesUnitPlacement,
 )
+from warhammer40k_core.engine.model_movement_permission import model_movement_path_context
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView
@@ -153,13 +154,16 @@ def retained_fight_movement_source_path_violations(
             movement_phase_action=None,
             displacement_kind=displacement_kind,
         )
-        result = legality_context.to_path_validation_context(
-            moving_model=moving_model,
-            witness=model_witness,
-            battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
-            battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
-            friendly_models=fixed_models,
-            movement_distance_budget_inches=maximum_distance_inches,
+        result = model_movement_path_context(
+            model=scenario.model_instance_for_placement(placement),
+            context=legality_context.to_path_validation_context(
+                moving_model=moving_model,
+                witness=model_witness,
+                battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
+                battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
+                friendly_models=fixed_models,
+                movement_distance_budget_inches=maximum_distance_inches,
+            ),
         ).validate()
         if not result.is_valid:
             invalid_results.append(result)

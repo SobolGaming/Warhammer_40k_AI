@@ -3075,6 +3075,106 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order115-movement-permission": {
+      "paths": [
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/engine/base_contact_fight_history.py",
+        "src/warhammer40k_core/engine/charge_path_contexts.py",
+        "src/warhammer40k_core/engine/consolidation_model_constraints.py",
+        "src/warhammer40k_core/engine/fight_movement_paths.py",
+        "src/warhammer40k_core/engine/fight_movement_source.py",
+        "src/warhammer40k_core/engine/model_movement_permission.py",
+        "src/warhammer40k_core/engine/phases/movement_resolvers.py",
+        "src/warhammer40k_core/engine/phases/movement_validation.py",
+        "src/warhammer40k_core/engine/scout_movement_paths.py",
+        "src/warhammer40k_core/engine/triggered_movement_resolution.py",
+        "src/warhammer40k_core/geometry/movement_reachability.py",
+        "src/warhammer40k_core/geometry/path_initial_constraints.py",
+        "src/warhammer40k_core/geometry/pathing.py"
+      ],
+      "owners": [
+        "@module",
+        "PathValidationContext",
+        "PathValidationContext.__post_init__",
+        "PathValidationContext.from_payload",
+        "PathValidationContext.to_payload",
+        "PathValidationContext.validate",
+        "PathValidationContextPayload",
+        "_cached_reachability",
+        "_model_movement_budget_inches",
+        "_query",
+        "_resolve_unit_move",
+        "append_scout_path_violations",
+        "charge_model_path_contexts",
+        "initial_path_constraint_result",
+        "model_movement_path_context",
+        "resolve_triggered_movement",
+        "retained_fight_movement_source_path_violations",
+        "validate_fight_contact_permissions",
+        "validate_fight_paths",
+        "validate_triggered_contact_permissions"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order115-regressions": {
+      "paths": [
+        "tests/absent_movement_helpers.py",
+        "tests/unit/test_order115_absent_movement.py"
+      ],
+      "owners": [
+        "@module",
+        "movement_catalog",
+        "movement_session",
+        "movement_witness",
+        "test_absent_movement_cannot_advance_or_use_a_normal_move_bonus",
+        "test_attached_movement_keeps_dash_bodyguard_fixed_and_numeric_leader_mobile",
+        "test_dash_fighter_completes_lethal_attacks_and_post_destruction_continuation",
+        "test_dash_reactive_hold_is_an_engine_created_restorable_completion",
+        "test_facade_advance_retry_completion_restore_fork_and_replay",
+        "test_fixed_distance_reaction_preserves_per_model_absence",
+        "test_shared_permission_serializes_and_proves_fixed_pose_reachability"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order115-source-evidence": {
+      "paths": [
+        "data/source_audits/order115/source.audit.json",
+        "tools/performance_policy.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_order115_smoke_operations",
+        "validate_assessment"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order115-contract-publication": {
+      "paths": [
+        "contracts/README.md",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

@@ -7525,3 +7525,15 @@ wound-stage effects remain possible. Existing finite/proposal requests and
 viewer-scoped event/persistence/replay shapes cover this correction; no new
 decision or field is introduced. Old histories require their original runtime.
 See [source and complete consumer validation](V963_SNAP_SCOPE_PLAN.md).
+
+## Order115 / Contract 44.3.2: absent Movement authority
+
+Existing finite choices and movement proposals retain their submission shapes
+and viewer policy. Attempted translation, rotation or intermediate movement of
+a dash-M model returns typed `model_pose_fixed` through the existing invalid
+proposal/retry contract. Numeric-zero models retain source-backed Advance and
+fixed move-distance permissions; setup remains a separate placement operation.
+Internal serialized path/reachability context now carries explicit `pose_is_fixed`
+authority. All engine producers and historical reconstructors derive it from the
+physical model's Movement descriptor. Runtime identity governs saves/replay; old
+histories stay on their original engine, with no conversion.

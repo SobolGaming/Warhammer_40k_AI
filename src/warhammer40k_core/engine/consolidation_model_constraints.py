@@ -18,6 +18,7 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.consolidation_objectives import consolidation_objective_by_id
 from warhammer40k_core.engine.fight_geometry import geometry_models_for_fight_unit
+from warhammer40k_core.engine.model_movement_permission import model_movement_path_context
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import MovementProposalRequest, ProposalKind
 from warhammer40k_core.engine.objective_geometry import (
@@ -237,25 +238,30 @@ def _query(
     ):
         raise GameLifecycleError("Fight movement requires complete neighbor coherency policy.")
     return MovementReachabilityQuery(
-        path_context=legality.to_path_validation_context(
-            moving_model=start,
-            witness=witness,
-            battlefield_width_inches=battlefield.battlefield_width_inches,
-            battlefield_depth_inches=battlefield.battlefield_depth_inches,
-            friendly_models=tuple(friends),
-            enemy_models=tuple(model for models in enemies.values() for model in models),
-            terrain=(),
-            aircraft_model_ids=tuple(
-                mid for mid in aircraft_model_ids_for_scenario(scenario) if mid != start.model_id
-            ),
-            movement_distance_budget_inches=(
-                3.0
-                if state is None
-                else rules_unit_fight_movement_maximum_distance_inches(
-                    state=state,
-                    unit_instance_id=proposal.unit_instance_id,
-                    proposal_kind=proposal.proposal_kind,
-                )
+        path_context=model_movement_path_context(
+            model=scenario.model_instance_for_placement(placement),
+            context=legality.to_path_validation_context(
+                moving_model=start,
+                witness=witness,
+                battlefield_width_inches=battlefield.battlefield_width_inches,
+                battlefield_depth_inches=battlefield.battlefield_depth_inches,
+                friendly_models=tuple(friends),
+                enemy_models=tuple(model for models in enemies.values() for model in models),
+                terrain=(),
+                aircraft_model_ids=tuple(
+                    mid
+                    for mid in aircraft_model_ids_for_scenario(scenario)
+                    if mid != start.model_id
+                ),
+                movement_distance_budget_inches=(
+                    3.0
+                    if state is None
+                    else rules_unit_fight_movement_maximum_distance_inches(
+                        state=state,
+                        unit_instance_id=proposal.unit_instance_id,
+                        proposal_kind=proposal.proposal_kind,
+                    )
+                ),
             ),
         ),
         terrain_context=legality.to_terrain_path_legality_context(

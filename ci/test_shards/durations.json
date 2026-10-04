@@ -88,6 +88,7 @@
     "tests/unit/test_order108_terrain_semantics.py": 193.473,
     "tests/unit/test_order109_unit_control.py": 292.778,
     "tests/unit/test_order111_friendly_transit.py": 79.791,
+    "tests/unit/test_order115_absent_movement.py": 293.862,
     "tests/unit/test_order36_sequencing.py": 246.854,
     "tests/unit/test_order36_timing_authority.py": 215.613,
     "tests/unit/test_order51_flight.py": 173.321,
@@ -304,76 +305,77 @@
     {
       "junit_sha256": [
         "46daf08706a5446358f48d9536fc0c037a36a4d88b81dd0e7b704ce4dacbb050",
+        "775a59f44a5306461ab02833f7595be23223c1f66ac2fb8bda55fe05b2bb55ab",
         "e43c85ef9e39e8c14d3844ea4ec0c78be5aa928141e3526063a8cd56756128ff"
       ],
-      "source": "V963-SNAP PR555 implementation 264538421b1b8ae897fed11a0f5e550c8b3184c7; exact base d6989dd266abc0e5d8e8f7de90020f9eddace1a7; Windows Python3.14.5; complete branch-covered inventory; 16 polygon cases serial plus exact disjoint32-worker remainder; partially overlapped independent review probes (narrow3-case coding cohort and separate parent audit); no changed Hypothesis settings; both cohorts passed",
-      "test_cases": 10656,
-      "test_files": 299
+      "source": "Approved Order114 Snap-base complete successful JUnit profile plus complete successful Order115 regression module; representative initial timings, not final exact-head validation",
+      "test_cases": 10678,
+      "test_files": 300
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 4336.689,
+      "duration_seconds": 4361.168,
       "shard_id": 1,
       "test_file_count": 23
     },
     {
-      "duration_seconds": 4336.657,
+      "duration_seconds": 4361.14,
       "shard_id": 2,
-      "test_file_count": 24
+      "test_file_count": 25
     },
     {
-      "duration_seconds": 4336.648,
+      "duration_seconds": 4361.163,
       "shard_id": 3,
-      "test_file_count": 26
+      "test_file_count": 25
     },
     {
-      "duration_seconds": 4336.66,
+      "duration_seconds": 4361.17,
       "shard_id": 4,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4336.657,
+      "duration_seconds": 4361.142,
       "shard_id": 5,
-      "test_file_count": 25
-    },
-    {
-      "duration_seconds": 4336.654,
-      "shard_id": 6,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4336.658,
+      "duration_seconds": 4361.163,
+      "shard_id": 6,
+      "test_file_count": 24
+    },
+    {
+      "duration_seconds": 4361.142,
       "shard_id": 7,
-      "test_file_count": 25
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 4336.65,
+      "duration_seconds": 4361.17,
       "shard_id": 8,
-      "test_file_count": 25
+      "test_file_count": 24
     },
     {
-      "duration_seconds": 4336.662,
+      "duration_seconds": 4361.133,
       "shard_id": 9,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4336.658,
+      "duration_seconds": 4361.136,
       "shard_id": 10,
-      "test_file_count": 25
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 4336.692,
+      "duration_seconds": 4361.179,
       "shard_id": 11,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4336.699,
+      "duration_seconds": 4361.14,
       "shard_id": 12,
-      "test_file_count": 25
+      "test_file_count": 26
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 52039.984
+  "total_test_duration_seconds": 52333.846
 }

@@ -1,0 +1,78 @@
+{
+  "base": "7c4765c9e95232c3343abb5130d60c98fe18348c",
+  "changes": {
+    "src/warhammer40k_core/geometry/movement_reachability.py": {
+      "before_sha256": "d106d14bb1f018a34e920fa4e36569f9a800395b33d491361cbe57cc30345a4b",
+      "after_sha256": "d90edd91ae16dc6e3e17f2dff61e33ec68db175fd11ccefdd71faa8e2011e878",
+      "owners": {
+        "_cached_reachability": {
+          "before": "4bd8ea917629161ccf3a01c37a4bc3e18beae78a0ec1fc27f84479bcf35d2702",
+          "after": "c75706d0fa1425775c8f5a04ba6204ee02a2fb154e7488014d9402c5336726f3"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/path_initial_constraints.py": {
+      "before_sha256": null,
+      "after_sha256": "47653ee9c1034ffab95d8ca67f62edf6dfa060e1813a5205574a690d0d0c7cb5",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "85f6fec32278db63404b86635a0757f53255b2a8f418235ed1d95e5d62178a3e"
+        },
+        "initial_path_constraint_result": {
+          "before": null,
+          "after": "009857a4aeb1b9bd4fcb28b06bc03f09dd2dc26af304573319d375c041ef2554"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/pathing.py": {
+      "before_sha256": "a182a92a0464232848c808c76f12652eb41fd8cc441a6f120d2a4f8ed097b759",
+      "after_sha256": "20ce2138f32c5cd70c580f37dd18ea5bc2f09dbc7a109c1b609ae30115e79e21",
+      "owners": {
+        "@module": {
+          "before": "4c896366acb1912dd361a5f166e12b62472bacd68e781fb85ba1eeee9953f3dd",
+          "after": "9f563c0513c1e7d5280be62ea3fcfcbf97405cfac377384c24353e79c3397850"
+        },
+        "PathValidationContext": {
+          "before": "f76e378b0cec6fcafc4808cf2f9645484bba29efe7008e2a48d9227524be1dfd",
+          "after": "d29ff0996036b84a466d96ace30280c21f46bffa404503976a4e22453bbde4a2"
+        },
+        "PathValidationContext.__post_init__": {
+          "before": "990497ef5d76c26399ef6df95b926e1ecb0e719bef0287aa081564b1037d2971",
+          "after": "aa71b215f0f4f870b5d76896032f9d48f89235b16e0e6e1bfe87cc69fefc2fc3"
+        },
+        "PathValidationContext.from_payload": {
+          "before": "eca5254df3bd36d1c556dd6cd772f3ac53cf46c99216e9c9983f08dac7355107",
+          "after": "2427c7d8d6398494b049f2baa596d09b022b33643c3ae046225cdfad108f9b0e"
+        },
+        "PathValidationContext.to_payload": {
+          "before": "9c04bbed8c8112fbc98acc47b858b8655a7189ad59e6c07d9b4dbaaf712808aa",
+          "after": "92085d4325eb651da4fe2d8abbe2ee22113813901ca6950d9e01bb6ce3fcc8f1"
+        },
+        "PathValidationContext.validate": {
+          "before": "efe8f301ffb6f7b026ab9b2733bf5c3b2fe4b6e9f9f161d421164d31a6285ac9",
+          "after": "463ce7e09dff3f5fe558f21ed8cfed54b1c4061fde052d4d4ebce68f412f1b5a"
+        },
+        "PathValidationContextPayload": {
+          "before": "3d7abd61b36f717037461390b81c1680b0b71babfff043c2d5ee0d969d19ee7e",
+          "after": "d7ba6ee7ce528409f6f65a26e2c45ad63f03982b1ddcff7c664338d831a7b30c"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "src/warhammer40k_core/geometry/movement_reachability.py": [
+      "cache-policy",
+      "geometry-search"
+    ],
+    "src/warhammer40k_core/geometry/path_initial_constraints.py": [
+      "geometry-search"
+    ],
+    "src/warhammer40k_core/geometry/pathing.py": [
+      "geometry-search"
+    ]
+  },
+  "authority": "User-authorized Order115: default quiet serial smoke for bounded rule repairs; detailed benchmarks only for deliberate performance changes or demonstrated serious regression. Exact-base and changed-owner-byte binding retain mandatory mappings and every historical/live gate.",
+  "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+  "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+}
