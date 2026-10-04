@@ -284,6 +284,16 @@
         }
       }
     },
+    "docs/DECISION_SUBMISSION_CATALOG.md": {
+      "before_sha256": "9e60e94adec6c6d2b069a597c2e3e2bbc925629fe9ef616839a6fe6ee81ce3a4",
+      "after_sha256": "279a0072dea5b407aa6c59d87921b282a4e66e1fdc9e7f9bb4183fd144fe990c",
+      "owners": {
+        "@document": {
+          "before": "9e60e94adec6c6d2b069a597c2e3e2bbc925629fe9ef616839a6fe6ee81ce3a4",
+          "after": "279a0072dea5b407aa6c59d87921b282a4e66e1fdc9e7f9bb4183fd144fe990c"
+        }
+      }
+    },
     "docs/ORDER_119_SCOPE_PLAN.md": {
       "before_sha256": null,
       "after_sha256": "8d76224bd8be8b3afb6c8e740f82b073cbf6909d5bfef28942b3bf9fcf792cb4",
@@ -813,6 +823,14 @@
       "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
+      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+    },
+    "docs/DECISION_SUBMISSION_CATALOG.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
