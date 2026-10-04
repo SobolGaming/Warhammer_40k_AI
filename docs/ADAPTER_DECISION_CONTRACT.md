@@ -1,5 +1,20 @@
 # Adapter Decision Contract
 
+## Order119: source-authorized Movement-phase reposition
+
+`select_source_reposition` is a public finite opportunity request. Its options
+are `decline_source_reposition` and `enter_strategic_reserves`; adapters submit
+the engine-enumerated option ID through the existing finite submission contract.
+The engine payload carries a typed source/permission/occasion context and the
+current physical-context hash. The granting provider owns timing,targeting and
+Stratagem activation; this Core request consumes an already-issued permission.
+Changed or expired permission and physical context are rejected before queue pop.
+Acceptance records source/provider/departure events through the shared reserve
+owner;decline consumes the occasion. Prior witnessed movement remains recorded.
+Both ordinary persistence and exact replay reconstruct this decision handler.
+The existing viewer-scoped projections and event-stream policy remain applicable.
+Named Grey Knights activation and source-package admission are not added.
+
 ## Orders 26, 27 and 29: ordered modifiers and terminal limits
 
 External contract 11.5.0 adds optional source-linked `skill_modifiers` to runtime

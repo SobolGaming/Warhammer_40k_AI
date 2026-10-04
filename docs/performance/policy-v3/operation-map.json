@@ -3535,6 +3535,111 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order119-immutable-inventory": {
+      "paths": [
+        "tools/core_rules_order97_history.py"
+      ],
+      "owners": [
+        "@module",
+        "historical_evidence_path"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order119-movement-source-permission": {
+      "paths": [
+        "src/warhammer40k_core/engine/interaction_metadata.py",
+        "src/warhammer40k_core/engine/lifecycle.py",
+        "src/warhammer40k_core/engine/movement_reposition_context.py",
+        "src/warhammer40k_core/engine/movement_source_reposition.py",
+        "src/warhammer40k_core/engine/primary_battlefield_departure_integrity.py",
+        "src/warhammer40k_core/engine/primary_reserve_entry_lifecycle_integrity.py",
+        "src/warhammer40k_core/engine/primary_reserve_entry_provider.py",
+        "src/warhammer40k_core/engine/primary_reserve_entry_source_integrity.py",
+        "src/warhammer40k_core/engine/triggered_movement_handler_impl.py"
+      ],
+      "owners": [
+        "@module",
+        "GameLifecycle._build_decision_dispatch_registry",
+        "MovementRepositionContext",
+        "MovementRepositionContext.__post_init__",
+        "MovementRepositionContext.from_payload",
+        "MovementRepositionContext.to_payload",
+        "MovementRepositionContextPayload",
+        "PrimaryReserveEntryProvider.__post_init__",
+        "PrimaryReserveEntryProviderKind",
+        "_options",
+        "_source_terminal_bindings",
+        "_validate_reserve_provider_decision",
+        "_validate_source_provider_authority",
+        "apply_decision",
+        "apply_proposal_decision",
+        "context_from_value",
+        "current_source_reposition_context",
+        "movement_reposition_permission_effect",
+        "primary_reserve_entry_requirements",
+        "primary_reserve_entry_requirements_from_evidence",
+        "request_current_source_reposition",
+        "request_source_reposition",
+        "source_reposition_dispatch_handler",
+        "validate_accepted_primary_reserve_entry_provider",
+        "validate_primary_reserve_entry_lifecycle_integrity",
+        "validate_primary_reserve_entry_source_terminal_semantics",
+        "validate_source_reposition_provider",
+        "validate_source_reposition_terminal"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order119-regressions": {
+      "paths": [
+        "tests/unit/test_order80_normal_move.py"
+      ],
+      "owners": [
+        "test_order119_decline_source_reposition_preserves_movement_and_continuation",
+        "test_order119_prior_reactive_move_then_source_reposition_restores_and_replays",
+        "test_order119_source_permission_expires_at_actual_movement_phase_boundary",
+        "test_order119_stale_permission_rejected_before_source_queue_pop"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order119-source-evidence": {
+      "paths": [
+        "data/source_audits/order119/baseline/tests/unit/test_order80_normal_move.py.txt",
+        "data/source_audits/order119/historical-inputs.json",
+        "data/source_audits/order119/user-supplied-shadow-of-anarch.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order119-contract-publication": {
+      "paths": [
+        "contracts/examples/decisions/family-coverage.json",
+        "contracts/examples/decisions/interaction-conformance.json",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

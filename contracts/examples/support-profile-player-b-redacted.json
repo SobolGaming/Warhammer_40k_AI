@@ -505,6 +505,13 @@
         "submission_kind": "finite"
       },
       {
+        "decision_type": "select_source_reposition",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
         "decision_type": "select_stratagem_cost_modifier_option",
         "interaction_kinds": [
           "confirmation"
@@ -795,8 +802,8 @@
         "identity_id": "https://warhammer40k-core.local/contracts/v5/capability-manifest.schema.json"
       },
       "engine_build": {
-        "identity_hash": "cf5c77405bf8c62d1944e78afffde2b9f34d3fbb9da6257a2da4f014e2bdec65",
-        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7040c8da5dd46340ff71634e74aae0a50504b7378bfe4b935fdf546ddc39cefb"
+        "identity_hash": "cd8d49aee62d1aa1f319eb542e9691adaf07f79d2e7e374f20b3a58961c98e60",
+        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:076c31c4709ef3ee60c7c234e40c0c75070772d5d6312cba2f8a44378a21a088"
       },
       "mission_pack": {
         "identity_hash": "486eb3726e50b8188081381c97d2ff073bdd8d3bb5c7593c79b1d9b581b92a62",
@@ -2462,6 +2469,13 @@
     },
     {
       "decision_type": "select_shooting_unit_grant",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_source_reposition",
       "interaction_kinds": [
         "opportunity_window"
       ],

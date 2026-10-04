@@ -515,7 +515,13 @@ def _validate_reserve_provider_decision(
         event_index_by_id=event_index_by_id,
         authority_name="Reserve-entry provider",
     )
-    if provider.provider_kind is PrimaryReserveEntryProviderKind.TURN_END_ABILITY:
+    if provider.provider_kind is PrimaryReserveEntryProviderKind.SOURCE_STRATAGEM_PERMISSION:
+        from warhammer40k_core.engine.movement_source_reposition import (
+            validate_source_reposition_provider,
+        )
+
+        validate_source_reposition_provider(provider=provider, record=decision)
+    elif provider.provider_kind is PrimaryReserveEntryProviderKind.TURN_END_ABILITY:
         _validate_ability_provider_decision(
             state=state,
             provider=provider,

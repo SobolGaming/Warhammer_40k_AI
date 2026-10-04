@@ -1,0 +1,34 @@
+Source evidence for the bounded Order119 Core consumer
+
+Provider URL supplied by the repository owner:
+https://www.40k.app/factions/grey-knights/detachments/banishers
+Source thread:01a0efa7-1ce0-70b0-a637-75c1615f80ef
+URL message:Sentinel_ffc34d8e84208191a0739ccf1017aa1d
+Transcription message:Sentinel_25afe7cbf5a481918a2b6bab0bbd51c9
+Faction:Grey Knights; detachment:Banishers; Stratagem:Shadow of Anarch.
+Stable retained row:stratagem:grey-knights:banishers:000010357007
+
+This is a user-supplied transcription, separately retained and reviewed for this
+conditional Core consumer. It is not an admitted faction source package,
+independently verified complete rendered page, successful direct fetch,
+official App capture, selected App-data version or official-primary evidence.
+Direct lookup previously returned403/429; those observations are not relabeled.
+No Wahapedia evidence or provider-policy extension is used.
+
+Exact pasted body:
+Shadow of Anarch
+Movement Phase - Epic Deed
+Target
+One GREY KNIGHTS PSYKER unit from your army that is within 8" of that enemy unit and is not within Engagement Range of one or more enemy units.
+
+When
+Your opponent’s Movement phase, just after an enemy unit ends a Normal, Advance or Fall Back move.
+
+Effect
+Your unit can make a Normal move of up to 6" or, if it has the Deep Strike ability, it can be placed into Strategic Reserves.
+
+Separate owner statement:It's a 1CP stratagem
+
+The retained July22 official Grey Knights PDF page9 authenticates only the
+9-to-8-inch correction. Its historical identity and bytes remain unchanged.
+Core20.02 blocks1-2 are retained in data/source_audits/order97/selected-sources.json.

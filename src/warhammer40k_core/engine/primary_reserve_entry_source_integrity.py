@@ -51,7 +51,10 @@ def validate_primary_reserve_entry_source_terminal_semantics(
         reserve_entry.get("entered_reserves_phase"),
         field_name="Reserve-entry phase",
     )
-    if provider.provider_kind is PrimaryReserveEntryProviderKind.TURN_END_ABILITY:
+    if provider.provider_kind in {
+        PrimaryReserveEntryProviderKind.TURN_END_ABILITY,
+        PrimaryReserveEntryProviderKind.SOURCE_STRATAGEM_PERMISSION,
+    }:
         request_payload = _json_object(
             decision.request.payload,
             field_name="Ability reserve request",
@@ -112,6 +115,17 @@ def validate_primary_reserve_entry_source_terminal_semantics(
         payload=payload,
         reserve_entry=reserve_entry,
     )
+    if provider.provider_kind is PrimaryReserveEntryProviderKind.SOURCE_STRATAGEM_PERMISSION:
+        from warhammer40k_core.engine.movement_source_reposition import (
+            validate_source_reposition_terminal,
+        )
+
+        validate_source_reposition_terminal(
+            provider=provider,
+            record=decision,
+            terminal=source_terminal,
+        )
+        return
     if provider.provider_kind is not PrimaryReserveEntryProviderKind.TURN_END_ABILITY:
         return
     expected_binding: JsonValue = {
