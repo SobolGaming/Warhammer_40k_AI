@@ -24,6 +24,10 @@ all consume the same permission. The pure geometry context carries the fixed-pos
 constraint through path validation and serialized reachability queries. Mandatory
 endpoint proofs recognize a fixed pose as their complete feasible set. Live and
 historical Charge/Fight/reactive context reconstruction use the same owner.
+Surge maximum-approach evidence uses the actual stationary distance as its exact
+bound, including oval bases, and its history validator authenticates that bound
+from the owning model's absent-M characteristic and unchanged pose. Numeric M
+retains the existing translation and rotation bound.
 Starting-pose, distance, terrain, collision, coherency and engagement checks remain
 active. Explicit deployment, reserve ingress, disembark and other setup placement
 retain their separate source permissions.

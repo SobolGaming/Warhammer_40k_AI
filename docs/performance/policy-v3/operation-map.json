@@ -3088,6 +3088,8 @@
         "src/warhammer40k_core/engine/phases/movement_resolvers.py",
         "src/warhammer40k_core/engine/phases/movement_validation.py",
         "src/warhammer40k_core/engine/scout_movement_paths.py",
+        "src/warhammer40k_core/engine/surge_history.py",
+        "src/warhammer40k_core/engine/surge_movement.py",
         "src/warhammer40k_core/engine/triggered_movement_resolution.py",
         "src/warhammer40k_core/geometry/movement_reachability.py",
         "src/warhammer40k_core/geometry/path_initial_constraints.py",
@@ -3111,8 +3113,10 @@
         "model_movement_path_context",
         "resolve_triggered_movement",
         "retained_fight_movement_source_path_violations",
+        "surge_endpoint_evidence",
         "validate_fight_contact_permissions",
         "validate_fight_paths",
+        "validate_surge_history",
         "validate_triggered_contact_permissions"
       ],
       "families": [],
@@ -3135,6 +3139,7 @@
         "test_dash_reactive_hold_is_an_engine_created_restorable_completion",
         "test_facade_advance_retry_completion_restore_fork_and_replay",
         "test_fixed_distance_reaction_preserves_per_model_absence",
+        "test_fixed_oval_surge_certifies_maximum_approach_and_restores",
         "test_shared_permission_serializes_and_proves_fixed_pose_reachability"
       ],
       "families": [],

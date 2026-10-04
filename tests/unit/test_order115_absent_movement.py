@@ -9,9 +9,11 @@ from tests.core_clause_evidence_helpers import assert_persistence_viewers_replay
 from tests.lethal_hits_helpers import complete_attack, reach_lethal_choice
 from tests.phase15c_fight_order_helpers import fight_lifecycle
 from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
+from tests.surge_helpers import surge_descriptor
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.datasheet import BaseSizeDefinition
 from warhammer40k_core.core.dice import DiceRollResult, DiceRollState
 from warhammer40k_core.core.ruleset_descriptor import MovementMode
 from warhammer40k_core.core.weapon_profiles import (
@@ -439,5 +441,99 @@ def test_dash_fighter_completes_lethal_attacks_and_post_destruction_continuation
         submit_fixture_request(session, request)
     else:
         raise AssertionError("Post-destruction Fight movement did not complete.")
+    assert_persistence_viewers_replay(session)
+    assert session.fork().to_persistence_payload() == session.to_persistence_payload()
+
+
+@pytest.mark.parametrize("movement_kind", ["source_dash", "replacement_dash", "numeric_zero"])
+def test_fixed_oval_surge_certifies_maximum_approach_and_restores(movement_kind: str) -> None:
+    from tests.phase15a_charge_test_support import _charge_lifecycle, _compact_test_unit_poses
+
+    movement = {
+        "source_dash": CharacteristicValue.source_dash(Characteristic.MOVEMENT),
+        "replacement_dash": CharacteristicValue.replacement_dash(Characteristic.MOVEMENT),
+        "numeric_zero": CharacteristicValue.from_raw(Characteristic.MOVEMENT, 0),
+    }[movement_kind]
+    catalog = movement_catalog(movement, datasheet_id="core-character-leader")
+    catalog = replace(
+        catalog,
+        datasheets=tuple(
+            replace(
+                sheet,
+                model_profiles=tuple(
+                    replace(
+                        profile,
+                        base_size=BaseSizeDefinition.oval(length_mm=38.1, width_mm=12.7),
+                    )
+                    for profile in sheet.model_profiles
+                ),
+            )
+            if sheet.datasheet_id == "core-character-leader"
+            else sheet
+            for sheet in catalog.datasheets
+        ),
+    )
+    lifecycle, _ = _charge_lifecycle(
+        alpha_unit_ids=("mover",),
+        alpha_datasheet_ids_by_selection_id={"mover": "core-character-leader"},
+        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(10, 40), model_count=5),
+        game_id=f"order115-oval-surge:{movement_kind}",
+        catalog=catalog,
+    )
+    state = lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    before = state.battlefield_state
+    session = LocalGameSession(lifecycle)
+    descriptor = surge_descriptor(lifecycle=lifecycle)
+    witness = movement_witness(session, kind="hold")
+    resolution = resolve_triggered_movement(
+        scenario=BattlefieldScenario(
+            armies=tuple(state.army_definitions), battlefield_state=before
+        ),
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        unit_placement=before.unit_placement_by_id("army-alpha:mover"),
+        descriptor=descriptor,
+        path_witness=witness,
+        battle_round=1,
+        turn_player_id="player-a",
+    )
+    assert all(row.is_valid for row in resolution.path_validation_results)
+    assert all(row.is_valid for row in resolution.terrain_path_legality_results)
+    assert resolution.coherency_result.is_coherent
+    if movement_kind == "numeric_zero":
+        assert not resolution.is_valid  # Numeric M can approach, so holding is not maximal.
+        assert state.battlefield_state == before
+        return
+    assert resolution.is_valid
+    endpoints = resolution.movement_payload["surge_model_endpoints"]
+    assert isinstance(endpoints, list)
+    assert len(endpoints) == 1
+    row = endpoints[0]
+    assert isinstance(row, dict)
+    assert row["approach_status"] == "optimal_bound"
+    assert row["distance_lower_bound_inches"] == row["distance_before_inches"]
+    request = TriggeredMovementHandler(
+        ruleset_descriptor=state.runtime_ruleset_descriptor()
+    ).request_from_state(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        unit_instance_id="army-alpha:mover",
+        descriptor=descriptor,
+        candidate_witnesses=(witness,),
+    )
+    lifecycle.decision_controller.request_decision(request)
+    session.advance_until_decision_or_terminal()
+    assert_persistence_viewers_replay(session)
+    option = next(
+        item for item in request.options if item.option_id != "decline_triggered_movement"
+    )
+    status = session.submit_option(
+        request_id=request.request_id, result_id="fixed-oval-surge", option_id=option.option_id
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert state.battlefield_state == before
+    assert state.phase_movement_history[-1].is_surge
     assert_persistence_viewers_replay(session)
     assert session.fork().to_persistence_payload() == session.to_persistence_payload()

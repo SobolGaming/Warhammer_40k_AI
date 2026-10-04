@@ -1,146 +1,146 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "7c4765c9e95232c3343abb5130d60c98fe18348c",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7eca337e1d7d48ea725cd689bb0486e42a8ed19610a8a393cc1467eb185b9bcd",
-  "operation_map_sha256": "99ce5a448e044e564c4d765304b4f6431e1ed1694159d807db08615197c10a4e",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:79eb79750a7d25df4da8668ec61ed50c65880990318a9e8b665a2b9a3f0333bd",
+  "operation_map_sha256": "c7d8a08920c7cb8c6cca191220f75c1a0e85c1101fc9eb87b986b61d664c1c74",
   "changes": {
     "README.md": {
       "before_sha256": "737c8e84109ecbd146d5606bd53493172a2ae3893c4450a06d3778f486f80722",
-      "after_sha256": "88abe79dd709e443315e0f6e1635b339c1208e25d9f91649e74f39794ddfc70e",
+      "after_sha256": "ed5309fd8c22933f3aa8ade4ad4c08e653ea271d7fa304a5fda96d3925e552cb",
       "owners": {
         "@document": {
           "before": "737c8e84109ecbd146d5606bd53493172a2ae3893c4450a06d3778f486f80722",
-          "after": "88abe79dd709e443315e0f6e1635b339c1208e25d9f91649e74f39794ddfc70e"
+          "after": "ed5309fd8c22933f3aa8ade4ad4c08e653ea271d7fa304a5fda96d3925e552cb"
         }
       }
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "42b580ed44da90840a34e09181daf0af955e7272f71d14b080cdf432e4b798b0",
-      "after_sha256": "fbc5e48ab8830da044f6124b3111c5353626bb4256c087d76dfab3d019b3fb65",
+      "after_sha256": "7f48bb80c2715a1a692e5c1040c941394010eda15c00d89561c39d8427d2a008",
       "owners": {
         "@document": {
           "before": "42b580ed44da90840a34e09181daf0af955e7272f71d14b080cdf432e4b798b0",
-          "after": "fbc5e48ab8830da044f6124b3111c5353626bb4256c087d76dfab3d019b3fb65"
+          "after": "7f48bb80c2715a1a692e5c1040c941394010eda15c00d89561c39d8427d2a008"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "db08dfc889d072a065406c15664fefa470db3db6c38c22530ed96eb160e14c6d",
-      "after_sha256": "e22cc97be5b8cecb0a3753716c6ff33b345865d6c81ee534995546a522a7d193",
+      "after_sha256": "a54ab756e1c7893d7760bdc60ac03b190b62e4ed4ce1d76ea7e183ac098149e6",
       "owners": {
         "@document": {
           "before": "db08dfc889d072a065406c15664fefa470db3db6c38c22530ed96eb160e14c6d",
-          "after": "e22cc97be5b8cecb0a3753716c6ff33b345865d6c81ee534995546a522a7d193"
+          "after": "a54ab756e1c7893d7760bdc60ac03b190b62e4ed4ce1d76ea7e183ac098149e6"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "4fdcf1ecb3cd1dd9ed25a4e6db1bbdaa264ba07b92f2ce49bd2b841a4aaf5f7a",
-      "after_sha256": "ad57aa10977aa044ecf640ac2173c354c66d8e7054849bc61ba1eb4ad9418757",
+      "after_sha256": "42ab1868b219ed9e114c9a7643d9f43f08e63202012575fd12bd9a1bebc08964",
       "owners": {
         "@document": {
           "before": "4fdcf1ecb3cd1dd9ed25a4e6db1bbdaa264ba07b92f2ce49bd2b841a4aaf5f7a",
-          "after": "ad57aa10977aa044ecf640ac2173c354c66d8e7054849bc61ba1eb4ad9418757"
+          "after": "42ab1868b219ed9e114c9a7643d9f43f08e63202012575fd12bd9a1bebc08964"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "5bf40d966b0e3b629848501e151124a8ad998bae5880fcf46fd51e539b11c0f1",
-      "after_sha256": "125c00ad7033eeaf141982c7ddd918d7fc7da38d061bc92cd560b73c31700e2d",
+      "after_sha256": "f8924b5eef69cb474d2ca646746142da663dfddad5325ee3f6ff0392ee08b466",
       "owners": {
         "@document": {
           "before": "5bf40d966b0e3b629848501e151124a8ad998bae5880fcf46fd51e539b11c0f1",
-          "after": "125c00ad7033eeaf141982c7ddd918d7fc7da38d061bc92cd560b73c31700e2d"
+          "after": "f8924b5eef69cb474d2ca646746142da663dfddad5325ee3f6ff0392ee08b466"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "a73916264edbf8987ca85ca409bb5bf625996650a09f3e4bc63eddebd7613acd",
-      "after_sha256": "b683d71a659e0208d3e7acc5bf5a35d2bafea6af64b448ceba130ca8d15ce0a2",
+      "after_sha256": "87734aff8802707ee24e271e7e4e82e928388cd793247a6fda65134ce7d60693",
       "owners": {
         "@document": {
           "before": "a73916264edbf8987ca85ca409bb5bf625996650a09f3e4bc63eddebd7613acd",
-          "after": "b683d71a659e0208d3e7acc5bf5a35d2bafea6af64b448ceba130ca8d15ce0a2"
+          "after": "87734aff8802707ee24e271e7e4e82e928388cd793247a6fda65134ce7d60693"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "d773d359faedb7e71b65a8ec90426d32dcf09044054c587c42256f730e9f0745",
-      "after_sha256": "ee6b82a32cccc3062e9f7eb2251a4d17ae9c02675b95201115a09c84adb602a6",
+      "after_sha256": "1083fbcbf6736b403292d946c4075f9cf8a7325d4de5a8adb9c0b9857b76e150",
       "owners": {
         "@document": {
           "before": "d773d359faedb7e71b65a8ec90426d32dcf09044054c587c42256f730e9f0745",
-          "after": "ee6b82a32cccc3062e9f7eb2251a4d17ae9c02675b95201115a09c84adb602a6"
+          "after": "1083fbcbf6736b403292d946c4075f9cf8a7325d4de5a8adb9c0b9857b76e150"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "1c3b2d4c4149f850e92013807be5921b6e673ee5d9413e64e795e2eea5bfe271",
-      "after_sha256": "374f1e31bbdfb110342897092191a5a238a45f826e6bcccf18e25d3ef3a121bb",
+      "after_sha256": "647cf6957cbeb3e8c66e5894d985c1caa506d3ab388b10a8e7adc36294d0d5ff",
       "owners": {
         "@document": {
           "before": "1c3b2d4c4149f850e92013807be5921b6e673ee5d9413e64e795e2eea5bfe271",
-          "after": "374f1e31bbdfb110342897092191a5a238a45f826e6bcccf18e25d3ef3a121bb"
+          "after": "647cf6957cbeb3e8c66e5894d985c1caa506d3ab388b10a8e7adc36294d0d5ff"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "4eeb172756743eaf096229eeaa93a387697be5147d04c21da7af410ba1bd71d3",
-      "after_sha256": "6c80b12956e59829ed0b6ad7b06ded45117f73a72ead987997d8e79102094c39",
+      "after_sha256": "997da52164c87e8a85ac4eedb0cd4648da51965796960ac603d549dbf78feba6",
       "owners": {
         "@document": {
           "before": "4eeb172756743eaf096229eeaa93a387697be5147d04c21da7af410ba1bd71d3",
-          "after": "6c80b12956e59829ed0b6ad7b06ded45117f73a72ead987997d8e79102094c39"
+          "after": "997da52164c87e8a85ac4eedb0cd4648da51965796960ac603d549dbf78feba6"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "bd032c0449a66ee00db05fedf1bb4d00a81ef3d4ae46da2728b8365af38222d8",
-      "after_sha256": "70cfd6033ca761de88ff5e341fcdbb7f68bf09a30bb3c8be8536821b9bfd689f",
+      "after_sha256": "3bb518442cbbe7857b924b0bee42a59ffd6d320b185298c36ef0fa273b9048d9",
       "owners": {
         "@document": {
           "before": "bd032c0449a66ee00db05fedf1bb4d00a81ef3d4ae46da2728b8365af38222d8",
-          "after": "70cfd6033ca761de88ff5e341fcdbb7f68bf09a30bb3c8be8536821b9bfd689f"
+          "after": "3bb518442cbbe7857b924b0bee42a59ffd6d320b185298c36ef0fa273b9048d9"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "448489645a9127793992d35bcb7f7afe6b23657ef6331f6cd6c63f18cfa3b58c",
-      "after_sha256": "a395c977f7358c44b1ddae6fd3c58e93e2a2369a841a0166869f9331b31025f6",
+      "after_sha256": "ec733046274b19ec4863aa7c7e0f6f5ffd9a99aac7fd97c481c01ca016351a21",
       "owners": {
         "@document": {
           "before": "448489645a9127793992d35bcb7f7afe6b23657ef6331f6cd6c63f18cfa3b58c",
-          "after": "a395c977f7358c44b1ddae6fd3c58e93e2a2369a841a0166869f9331b31025f6"
+          "after": "ec733046274b19ec4863aa7c7e0f6f5ffd9a99aac7fd97c481c01ca016351a21"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "f1188f1dd464ff756fb59773f7838ba27822fd81d353107c8589efcd3f67c0c7",
-      "after_sha256": "41e5ba95803ea62e50882977e9f6c92503df3b39d2bb7b32c3fdd247405edd59",
+      "after_sha256": "4c38afbe064db419ae89187f9c5edab381253ac2e6cbe19d914a772f84c31a98",
       "owners": {
         "@document": {
           "before": "f1188f1dd464ff756fb59773f7838ba27822fd81d353107c8589efcd3f67c0c7",
-          "after": "41e5ba95803ea62e50882977e9f6c92503df3b39d2bb7b32c3fdd247405edd59"
+          "after": "4c38afbe064db419ae89187f9c5edab381253ac2e6cbe19d914a772f84c31a98"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "0bf0c9a75b276c44b3a67ce46bf83097e7708791f3071a157f02913350d52e4a",
-      "after_sha256": "655f7a045e9ea32583d6358596afed814c9463a0d20b7225d47e8290ecff46a0",
+      "after_sha256": "f4f3301a7b0fa2db2204fd43bd1fda664138cc7fb2efec8367439baeb5a1f018",
       "owners": {
         "@document": {
           "before": "0bf0c9a75b276c44b3a67ce46bf83097e7708791f3071a157f02913350d52e4a",
-          "after": "655f7a045e9ea32583d6358596afed814c9463a0d20b7225d47e8290ecff46a0"
+          "after": "f4f3301a7b0fa2db2204fd43bd1fda664138cc7fb2efec8367439baeb5a1f018"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "e37c22d95ab101344dfb070abf89d03f2599fe5ea157a94c2995543da0de18ff",
-      "after_sha256": "14ee580a704e2574064a0d260dbad125b094414850c236cf0cd818ea98b58e64",
+      "after_sha256": "ecdf1427a19a262736ced9169a6f9094dca1528c959d81405b90ff36c44ba032",
       "owners": {
         "@document": {
           "before": "e37c22d95ab101344dfb070abf89d03f2599fe5ea157a94c2995543da0de18ff",
-          "after": "14ee580a704e2574064a0d260dbad125b094414850c236cf0cd818ea98b58e64"
+          "after": "ecdf1427a19a262736ced9169a6f9094dca1528c959d81405b90ff36c44ba032"
         }
       }
     },
@@ -166,81 +166,81 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "fe0cc0743b034e9ea1b387a5c6f245a0c54e57dec7f72d3d001e81f9452abefe",
-      "after_sha256": "7db1c901e0743bb9cf43dcbbd3f4d677be2ab4947cad8704f02a0007703445b6",
+      "after_sha256": "5cf33e70f060217147637766a5de424e45c344f846198623fec60d1cf0def571",
       "owners": {
         "@document": {
           "before": "fe0cc0743b034e9ea1b387a5c6f245a0c54e57dec7f72d3d001e81f9452abefe",
-          "after": "7db1c901e0743bb9cf43dcbbd3f4d677be2ab4947cad8704f02a0007703445b6"
+          "after": "5cf33e70f060217147637766a5de424e45c344f846198623fec60d1cf0def571"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "1efd87d753b6c98a45ed06e7c009476f865ecd229f623d88bf17611fc3605b8e",
-      "after_sha256": "13865dd832ab854f7bc6901e6685192044e9ce9f71dc470a5f3b694c882fb70e",
+      "after_sha256": "40d823628972a157ee1c613c322258cddd6fda107ad971607d465754d1405930",
       "owners": {
         "@document": {
           "before": "1efd87d753b6c98a45ed06e7c009476f865ecd229f623d88bf17611fc3605b8e",
-          "after": "13865dd832ab854f7bc6901e6685192044e9ce9f71dc470a5f3b694c882fb70e"
+          "after": "40d823628972a157ee1c613c322258cddd6fda107ad971607d465754d1405930"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "4c848b01bf5ca25d489228dd8a0dedc7a85b0ec722ec5cd604a7ebc11ba53457",
-      "after_sha256": "3fd10c1e572c538a7972f6c2749a5d59b11bedfd26d37e22f481ef62860e8b4b",
+      "after_sha256": "af95ffd8ca11a327e1e2843b9c2cd45d813406776a0f23fa21159034a6eea908",
       "owners": {
         "@document": {
           "before": "4c848b01bf5ca25d489228dd8a0dedc7a85b0ec722ec5cd604a7ebc11ba53457",
-          "after": "3fd10c1e572c538a7972f6c2749a5d59b11bedfd26d37e22f481ef62860e8b4b"
+          "after": "af95ffd8ca11a327e1e2843b9c2cd45d813406776a0f23fa21159034a6eea908"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "96546853b4112f3c5e991614ac69110491f363314e3fa2f09319120ff86c0e9a",
-      "after_sha256": "83003a2e58c2f4fc18649de8baecd80758b55627666f53200490158dbc24a707",
+      "after_sha256": "246d7e07341ad75be44b60f561c2e045e7f63928fd0ba7d29a08ae6436f835bd",
       "owners": {
         "@document": {
           "before": "96546853b4112f3c5e991614ac69110491f363314e3fa2f09319120ff86c0e9a",
-          "after": "83003a2e58c2f4fc18649de8baecd80758b55627666f53200490158dbc24a707"
+          "after": "246d7e07341ad75be44b60f561c2e045e7f63928fd0ba7d29a08ae6436f835bd"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "8855cc4c01c2be90db22d77fcde43ae4d25fe47abc719de5418f17c7afd9f857",
-      "after_sha256": "75a58366eeed07ff029fb4dfd4c48226fb2ea96fd2db04ca4bb2ac05eedff9c9",
+      "after_sha256": "400f16a7176089213920098099449ff0f31b326cb637e61b06212e9215668f2e",
       "owners": {
         "@document": {
           "before": "8855cc4c01c2be90db22d77fcde43ae4d25fe47abc719de5418f17c7afd9f857",
-          "after": "75a58366eeed07ff029fb4dfd4c48226fb2ea96fd2db04ca4bb2ac05eedff9c9"
+          "after": "400f16a7176089213920098099449ff0f31b326cb637e61b06212e9215668f2e"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "f5d6b671c6440d0d359f9186f7a126c246d688c7097816f8ee38c5b78a29dcc6",
-      "after_sha256": "61f1bb3dbf5ea045689b5b01b68070c95ef41af16cbe7d894500c5357405056a",
+      "after_sha256": "24468d309eeeca15649844a5621296a6060b260b656d43baf69b1c0b145edfaf",
       "owners": {
         "@document": {
           "before": "f5d6b671c6440d0d359f9186f7a126c246d688c7097816f8ee38c5b78a29dcc6",
-          "after": "61f1bb3dbf5ea045689b5b01b68070c95ef41af16cbe7d894500c5357405056a"
+          "after": "24468d309eeeca15649844a5621296a6060b260b656d43baf69b1c0b145edfaf"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "c20914ed561b8d1566befa7f579edb2a17b2eee0ec7f244726d592a93efbf760",
-      "after_sha256": "70f91bfe0cbec3d99fe29c315ea04842f460735166f9d1cbdbe6523589b46cb5",
+      "after_sha256": "4f1a30dc8f4d984d25e1b857fcb0159c6fe36616415616ef77f72324086cbb97",
       "owners": {
         "@document": {
           "before": "c20914ed561b8d1566befa7f579edb2a17b2eee0ec7f244726d592a93efbf760",
-          "after": "70f91bfe0cbec3d99fe29c315ea04842f460735166f9d1cbdbe6523589b46cb5"
+          "after": "4f1a30dc8f4d984d25e1b857fcb0159c6fe36616415616ef77f72324086cbb97"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "5cee3fc858814f09f2107d0d782fb7d5a0ab783a80e1067ce14aa737a0028d1b",
-      "after_sha256": "e977e060aeab6a5165d21c1726794734fb49e2d7afe0be2ec2ea972f75da8db7",
+      "after_sha256": "072b1e30702da042625636faae9510092251f727b6345aaf6b8df161165504e2",
       "owners": {
         "@document": {
           "before": "5cee3fc858814f09f2107d0d782fb7d5a0ab783a80e1067ce14aa737a0028d1b",
-          "after": "e977e060aeab6a5165d21c1726794734fb49e2d7afe0be2ec2ea972f75da8db7"
+          "after": "072b1e30702da042625636faae9510092251f727b6345aaf6b8df161165504e2"
         }
       }
     },
@@ -276,31 +276,31 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "f91d16b3a26a889ce88234a457f08043c1f37c090b0fea4b58246a04e09042bd",
-      "after_sha256": "b8236614443ba17f76e6189ca0852618043efaafccc087bed2399f982fe7a3f1",
+      "after_sha256": "28fda7a7d722e072474e8f723841b72b5b57969a019939dba7b401a8ce33cfb1",
       "owners": {
         "@document": {
           "before": "f91d16b3a26a889ce88234a457f08043c1f37c090b0fea4b58246a04e09042bd",
-          "after": "b8236614443ba17f76e6189ca0852618043efaafccc087bed2399f982fe7a3f1"
+          "after": "28fda7a7d722e072474e8f723841b72b5b57969a019939dba7b401a8ce33cfb1"
         }
       }
     },
     "docs/ORDER_115_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "6032e63d011937bab12eef5b0d96a37d023886e839c0dfa5b9616c90bff37b32",
+      "after_sha256": "9e3e0eb07d026fed034b170904ca6b6c01e4a22dc9a06bbd9842caff67019c0c",
       "owners": {
         "@document": {
           "before": null,
-          "after": "6032e63d011937bab12eef5b0d96a37d023886e839c0dfa5b9616c90bff37b32"
+          "after": "9e3e0eb07d026fed034b170904ca6b6c01e4a22dc9a06bbd9842caff67019c0c"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "6a8135274fc34672bc61f6b40065cc5f419b57be203f4533913984b501d55577",
-      "after_sha256": "0680bb5623379fb987cad158d622581903f5ea927e59e15f4fc07234e26040d9",
+      "after_sha256": "ddea332559046832d51568ae4def4e96ed1c92f9d72aac4a6a6ed4a464a6aee9",
       "owners": {
         "@document": {
           "before": "6a8135274fc34672bc61f6b40065cc5f419b57be203f4533913984b501d55577",
-          "after": "0680bb5623379fb987cad158d622581903f5ea927e59e15f4fc07234e26040d9"
+          "after": "ddea332559046832d51568ae4def4e96ed1c92f9d72aac4a6a6ed4a464a6aee9"
         }
       }
     },
@@ -316,11 +316,11 @@
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "6b7b0f7f0b3307dea9b85826db50a15a50fa26fd22525d4bcda2bf248bacd303",
-      "after_sha256": "6dd3341041583cf719ee5326a8844765cd1b9617af0c6e9cd70098ffee143e24",
+      "after_sha256": "f933f16f644ba1619e903d882f037f8b70e6f2bcd712a0028e3a7a67720be955",
       "owners": {
         "@document": {
           "before": "6b7b0f7f0b3307dea9b85826db50a15a50fa26fd22525d4bcda2bf248bacd303",
-          "after": "6dd3341041583cf719ee5326a8844765cd1b9617af0c6e9cd70098ffee143e24"
+          "after": "f933f16f644ba1619e903d882f037f8b70e6f2bcd712a0028e3a7a67720be955"
         }
       }
     },
@@ -460,6 +460,30 @@
         }
       }
     },
+    "src/warhammer40k_core/engine/surge_history.py": {
+      "before_sha256": "4b006e9d778c2c4db9469d7e556ec01ef9d786dce6bb7e55ddf218836959528c",
+      "after_sha256": "1c6fc5943e7ee23c015da93561aee9be9e52e64263c6c64bf191f44ba28f9bcb",
+      "owners": {
+        "@module": {
+          "before": "bc785ed57a6c8799cc268b70ca551cf66b74cd4ceaa8156778303e6c8453989f",
+          "after": "ba04693a77eeb071858fa4a402872036ca88c1f158c37b5a3a035700556b6988"
+        },
+        "validate_surge_history": {
+          "before": "15301bcb8a3425d702064db0111854a3bc3beccd76acf10a73fd9d954d7d796f",
+          "after": "d566e770d8d097851ecc5865a151ca4eb24b2a3d109b38ae79a1316009be443c"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/surge_movement.py": {
+      "before_sha256": "a9d1684d106e07bfe6c6f3f4960a80a7b8d8f6d129850f9ce4b7096ddabe77b3",
+      "after_sha256": "ec0d0703caa81b4d19b285bac33eb80b0402ceaa454ed69c77536afd5cc74489",
+      "owners": {
+        "surge_endpoint_evidence": {
+          "before": "0343e6d9728a27a914e74ba0691e5392217adf24b69c223eeb2dff0ac475f656",
+          "after": "38c0da9e2c73ef21809106de39e3afeede86f6bf0bcac8b758bd177c7632746e"
+        }
+      }
+    },
     "src/warhammer40k_core/engine/triggered_movement_resolution.py": {
       "before_sha256": "91f02a3e778021529976806feae9728e16b4dfe84f2797b2fc85b0f2bcab9fe9",
       "after_sha256": "ec54c7df2de1b8e1830cab8b9b7042e4955072d51fe5154d9704bde905b8a909",
@@ -570,11 +594,11 @@
     },
     "tests/unit/test_order115_absent_movement.py": {
       "before_sha256": null,
-      "after_sha256": "eedbe480e27cffacaba82f97c5dbdf006dc9522e5e96a61a7e17be8121e166a3",
+      "after_sha256": "698a9ab16eb87966ff1b9c8c2a2d04477146d9c231482efce15c5f53ba71bd41",
       "owners": {
         "@module": {
           "before": null,
-          "after": "84b3ea734a8ec62e08477696fb8a48857818af4019984761073bf02581bcbd2c"
+          "after": "a3185a0f6d9bb0c008e06432943df2729f4feae41d910d85ab95c6e7f35e15d1"
         },
         "test_absent_movement_cannot_advance_or_use_a_normal_move_bonus": {
           "before": null,
@@ -599,6 +623,10 @@
         "test_fixed_distance_reaction_preserves_per_model_absence": {
           "before": null,
           "after": "97bb0cdab12919a7ba9ab2257052e74585cd4e9c82d526638929b294d870806a"
+        },
+        "test_fixed_oval_surge_certifies_maximum_approach_and_restores": {
+          "before": null,
+          "after": "3312bf46f808c6b2ef0478a9e8c501309d24f99874d5e4cac4f339107931834b"
         },
         "test_shared_permission_serializes_and_proves_fixed_pose_reachability": {
           "before": null,
@@ -1025,6 +1053,26 @@
       "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "src/warhammer40k_core/engine/scout_movement_paths.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order115-movement-permission"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+    },
+    "src/warhammer40k_core/engine/surge_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order115-movement-permission"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+    },
+    "src/warhammer40k_core/engine/surge_movement.py": {
       "category": "rule_semantics",
       "operations": [
         "order115-movement-permission"
