@@ -18,6 +18,7 @@ POLICY = "rules-engine-performance-v3"
 ASSESSMENT = "docs/performance/change-assessment.json"
 MAP = "docs/performance/policy-v3/operation-map.json"
 ORDER108_SCOPE = "docs/performance/policy-v3/order108-rule-semantics.json"
+ORDER115_SCOPE = "docs/performance/policy-v3/order115-rule-semantics.json"
 CATEGORIES = frozenset(
     {
         "governance",
@@ -198,6 +199,18 @@ def _order108_smoke_operations(
     return frozenset({"geometry-search", "visibility-query"})
 
 
+def _order115_smoke_operations(
+    *, base: str, path: str, category: str, change: object
+) -> frozenset[str]:
+    """Bind the authorized absent-M rule repair to its exact changed owner bytes."""
+    if base != "7c4765c9e95232c3343abb5130d60c98fe18348c" or category != "rule_semantics":
+        return frozenset()
+    scope = read_object(Path(__file__).resolve().parents[1] / ORDER115_SCOPE)
+    if scope["base"] != base or object_value(scope["changes"]).get(path) != change:
+        return frozenset()
+    return frozenset(_strings(object_value(scope["smoke_operations"])[path]))
+
+
 def validate_assessment(
     assessment: dict[str, object],
     *,
@@ -288,6 +301,8 @@ def validate_assessment(
         if not chosen_families <= candidates or not chosen_families <= families.keys():
             raise ValueError(f"Unmapped detailed family: {path}")
         smoke_operations = _order108_smoke_operations(
+            base=base, path=path, category=category, change=changes[path]
+        ) | _order115_smoke_operations(
             base=base, path=path, category=category, change=changes[path]
         )
         required = {

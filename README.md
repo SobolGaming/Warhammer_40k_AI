@@ -2,6 +2,12 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 115 / P02K preserves dash-M immobility throughout every witnessed path,
+including rotations and fixed-distance reactions. Numeric zero retains Advance
+and explicit distance; Surge certifies fixed-pose maximum approach, including
+oval bases. Setup, persistence and replay keep shared authority. See
+[source and scope](docs/ORDER_115_SCOPE_PLAN.md).
+
 Order 110 / P16C immediately interrupts Actions on newly applied Battle-shock.
 Explicit source permission allows shocked starts and continuation; original
 restrictions and movement interruption remain. See [scope and evidence](docs/ORDER_110_SCOPE_PLAN.md).

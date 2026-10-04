@@ -59,7 +59,7 @@ from HealingEffect and requires source-bound engagement evidence on battlefield
 revival events. See [35 to 36 migration](migrations/35-to-36.md).
 
 
-Contract version: `44.3.1`
+Contract version: `44.3.2`
 
 V963-SNAP applies complete current Core 15.09: Snap hits are ordinary hits,
 so critical-hit effects never trigger; Critical Wounds remain possible.

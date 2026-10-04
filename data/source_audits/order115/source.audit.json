@@ -1,0 +1,150 @@
+{
+  "order": 115,
+  "base": "7c4765c9e95232c3343abb5130d60c98fe18348c",
+  "requirement": "02.02-obligation-01",
+  "source": "data/source_audits/order97/selected-sources.json",
+  "source_sha256": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+  "selected_rows": [
+    {
+      "row_id": "rule:02:02.02:1",
+      "category": "02",
+      "locator": "02.02",
+      "title": "Profiles",
+      "occurrence": 1,
+      "source_sha256": "63d7331e78c7d66b7f451704da49555f992ed4128eea23eabb6941d199709588",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "f914bf47a22eb251158564e246b33a9cce9ac0d2a8c9c53b5c220f3e248f1ed2",
+          "value": "These contain the following characteristics that tell you how mighty the models in the unit are:"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "b1f2f844b4cb7c3e67c6756b2026df35937d0588d41ba75456cb65f69b475313",
+          "value": "\u0005Move (M)\u0006: The speed at which a model traverses the battlefield. If a model has an \u0005M\u0006 characteristic of ‘-’, it can be set up on the battlefield but otherwise cannot be moved."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "50fd6ebc100a7d6c4b1bd408a08e541a07f404288dd237be69d25df034e562d9",
+          "value": "\u0005Toughness (T)\u0006: The model’s resilience against harm."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "686f321decc81baccbb4a6212854e5563b52f1c1ce8f4c749c2a877d2db48d48",
+          "value": "\u0005Save (Sv)\u0006: Presented as a dice result (e.g. 4+), this indicates the protection a model’s armour gives it."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "3d2712873295af82af21a160b1d563813cc7df19798a2e64083d1b6a42a4f2b5",
+          "value": "\u0005Invulnerable Save (InSv)\u0006: Presented as a dice result (e.g. 4+). Some models are protected by esoteric means in addition to physical armour, such as force fields or preternatural reflexes. Not all models have an \u0005InSv\u0006 characteristic, but if they do, it will be listed here."
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "d576ea4fddaec77271e71d73b961f9dd8142e9eea8cfd8246ef82c7ce131246c",
+          "value": "\u0005Wounds (W)\u0006: Wounds represent how much damage a model can sustain before it is \u0005destroyed\u0006. If a model’s wounds are reduced to 0 or fewer, that model is \u0005destroyed\u0006."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "b384a7d6965b13c2ab266d2c6d24771a14d0812a1bc7f57336aa8083cdf504a3",
+          "value": "\u0005Leadership (Ld)\u0006: Presented as a dice result (e.g. 7+), this reveals how courageous, determined or self‑controlled a model is."
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "c4762ddec801ac0c25d8ccad25caf7fbaa2c5655b00ae00117b8a6ed9620f349",
+          "value": "\u0005Objective Control (OC)\u0006: How effectively a model can control an \u0005objective\u0006 on the battlefield. If a model has an \u0005OC\u0006 characteristic of ‘-’ it is unable to control \u0005objectives\u0006 at all."
+        }
+      ],
+      "selected_provider": "Game Datamissions",
+      "historical_source_row_sha256": "0a85b09cb3a9c4feed9d0c3a475e7860422237a1cf0783d30b7840b43f1a1dca",
+      "review_category": "02"
+    },
+    {
+      "row_id": "rule:09:09.06:1",
+      "category": "09",
+      "locator": "09.06",
+      "title": "Advance Move",
+      "occurrence": 1,
+      "source_sha256": "fd8a01c12ea60d0492b3338384169d144a99cb3f5f9f91d50f6cfb029b5714d7",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+          "value": "\u000eEligible If"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "51c8711cdf10b02197b143fc1b78f0d6383d79a4be75a8dd5a464a95d138a1b8",
+          "value": "Your unit is on the battlefield and \u0005unengaged\u0006."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "71b6143d5f310205f6d72379853a67a7f27f18983ba7f07ef42b7255d7fca1ee",
+          "value": "\u000eBefore Moving"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "a63907a6feccf00dd8db11829c1405d9359defce68726ec69b0160eab6847289",
+          "value": "Make an \u0005advance roll\u0006 by rolling one D6."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+          "value": "\u000eEffect"
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "eeebc152a13fd04424a97836281189fec301c368951c216599430a84fc1bd1ab",
+          "value": "Your unit moves as described in Moving (03)."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "93f7fc4c73f4450e9f798302b2574b0462ae4f1e7e6ad9d40f4c7e9d6026a315",
+          "value": "\u000eAfter Moving"
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "7ea44889c11182e5c1b5faa26f13f400d8ae6f5ea372a9efca05e54701bb363a",
+          "value": "• Your unit must be \u0005unengaged\u0006."
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "5bfe1020a7dcb4edcf0922df26cee7fec567379f3156d32da4235e481336b672",
+          "value": "• Until the end of the turn, unless otherwise stated, your unit is \u0001not\u0002 \u0005eligible to declare a charge\u0006 or \u0005start an action\u0006."
+        },
+        {
+          "ordinal": 10,
+          "kind": "text",
+          "sha256": "5b373b35b06069cf8f69cd7cdd16704f27a930c2ec5ddc52acffa212c01f32a4",
+          "value": "\u000eMaximum Distance"
+        },
+        {
+          "ordinal": 11,
+          "kind": "text",
+          "sha256": "57fd50e215e6570855d0062b08033907d6482aa19f45219298d0e93fa1c765de",
+          "value": "Advance roll + your unit’s \u0005M\u0006 characteristic."
+        }
+      ],
+      "selected_provider": "Game Datamissions",
+      "historical_source_row_sha256": "0ceabc78f151f447b5e024a64a8e7d4d7c1be7ed0b09b6590ea88a243cde1137",
+      "review_category": "09"
+    }
+  ],
+  "authority": "Retained selected Order97 source; implementation repair, no new live version observation."
+}

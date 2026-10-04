@@ -1,634 +1,676 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "d6989dd266abc0e5d8e8f7de90020f9eddace1a7",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bec83611f049ab4ccee35d81f6f88526dd1b198357c0f24e2e0dfba9b0f4b988",
-  "operation_map_sha256": "0ee64917313b1969f2da1ed10311a86b2a6eebfa70d3e6e688fc1392e3555804",
+  "base": "7c4765c9e95232c3343abb5130d60c98fe18348c",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:79eb79750a7d25df4da8668ec61ed50c65880990318a9e8b665a2b9a3f0333bd",
+  "operation_map_sha256": "c7d8a08920c7cb8c6cca191220f75c1a0e85c1101fc9eb87b986b61d664c1c74",
   "changes": {
-    "ci/test_shards/durations.json": {
-      "before_sha256": "e54501609ebbc77988bc1f0c0e92eb93b7037174b1213904c4324caadca871ad",
-      "after_sha256": "42b580ed44da90840a34e09181daf0af955e7272f71d14b080cdf432e4b798b0",
+    "README.md": {
+      "before_sha256": "737c8e84109ecbd146d5606bd53493172a2ae3893c4450a06d3778f486f80722",
+      "after_sha256": "ed5309fd8c22933f3aa8ade4ad4c08e653ea271d7fa304a5fda96d3925e552cb",
       "owners": {
         "@document": {
-          "before": "e54501609ebbc77988bc1f0c0e92eb93b7037174b1213904c4324caadca871ad",
-          "after": "42b580ed44da90840a34e09181daf0af955e7272f71d14b080cdf432e4b798b0"
+          "before": "737c8e84109ecbd146d5606bd53493172a2ae3893c4450a06d3778f486f80722",
+          "after": "ed5309fd8c22933f3aa8ade4ad4c08e653ea271d7fa304a5fda96d3925e552cb"
+        }
+      }
+    },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "42b580ed44da90840a34e09181daf0af955e7272f71d14b080cdf432e4b798b0",
+      "after_sha256": "4bfcf46e0c7431c5debb36b2bfbaa35b6649a6e20fe52ca1fb9e746224a9c14e",
+      "owners": {
+        "@document": {
+          "before": "42b580ed44da90840a34e09181daf0af955e7272f71d14b080cdf432e4b798b0",
+          "after": "4bfcf46e0c7431c5debb36b2bfbaa35b6649a6e20fe52ca1fb9e746224a9c14e"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "fb3fc5be7774a3cb5af80bc2f499e9beed382063614cf05793b5795db8ed0eee",
-      "after_sha256": "db08dfc889d072a065406c15664fefa470db3db6c38c22530ed96eb160e14c6d",
+      "before_sha256": "db08dfc889d072a065406c15664fefa470db3db6c38c22530ed96eb160e14c6d",
+      "after_sha256": "ceeb312c2acb5b0bdba5d222a6488e38c60dce3cd7b9d1298f3de9101a4e3084",
       "owners": {
         "@document": {
-          "before": "fb3fc5be7774a3cb5af80bc2f499e9beed382063614cf05793b5795db8ed0eee",
-          "after": "db08dfc889d072a065406c15664fefa470db3db6c38c22530ed96eb160e14c6d"
+          "before": "db08dfc889d072a065406c15664fefa470db3db6c38c22530ed96eb160e14c6d",
+          "after": "ceeb312c2acb5b0bdba5d222a6488e38c60dce3cd7b9d1298f3de9101a4e3084"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "d5a75d47e5fc5d59624f04385104f39422f3f0bc3d095ed9c0f0b63d91d85721",
-      "after_sha256": "4fdcf1ecb3cd1dd9ed25a4e6db1bbdaa264ba07b92f2ce49bd2b841a4aaf5f7a",
+      "before_sha256": "4fdcf1ecb3cd1dd9ed25a4e6db1bbdaa264ba07b92f2ce49bd2b841a4aaf5f7a",
+      "after_sha256": "e09f77053c4db31e61e8c81179f08821349443c89eb3f799402bffb32b700c2c",
       "owners": {
         "@document": {
-          "before": "d5a75d47e5fc5d59624f04385104f39422f3f0bc3d095ed9c0f0b63d91d85721",
-          "after": "4fdcf1ecb3cd1dd9ed25a4e6db1bbdaa264ba07b92f2ce49bd2b841a4aaf5f7a"
+          "before": "4fdcf1ecb3cd1dd9ed25a4e6db1bbdaa264ba07b92f2ce49bd2b841a4aaf5f7a",
+          "after": "e09f77053c4db31e61e8c81179f08821349443c89eb3f799402bffb32b700c2c"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "e27749225b4580fce393adf454beea63c4304cbc4e4af3e0c9d8828c657d5215",
-      "after_sha256": "5bf40d966b0e3b629848501e151124a8ad998bae5880fcf46fd51e539b11c0f1",
+      "before_sha256": "5bf40d966b0e3b629848501e151124a8ad998bae5880fcf46fd51e539b11c0f1",
+      "after_sha256": "14055fdad792e65201a55b5aea28ddfde0850fd685ba869a026ce05f3e1679a9",
       "owners": {
         "@document": {
-          "before": "e27749225b4580fce393adf454beea63c4304cbc4e4af3e0c9d8828c657d5215",
-          "after": "5bf40d966b0e3b629848501e151124a8ad998bae5880fcf46fd51e539b11c0f1"
+          "before": "5bf40d966b0e3b629848501e151124a8ad998bae5880fcf46fd51e539b11c0f1",
+          "after": "14055fdad792e65201a55b5aea28ddfde0850fd685ba869a026ce05f3e1679a9"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "83d545d3df43bd401148af497bb43a8ae84110bad8b1be4de297546de3cfee3d",
-      "after_sha256": "a73916264edbf8987ca85ca409bb5bf625996650a09f3e4bc63eddebd7613acd",
+      "before_sha256": "a73916264edbf8987ca85ca409bb5bf625996650a09f3e4bc63eddebd7613acd",
+      "after_sha256": "19b406eb9b994386f107c582f86eefa9364ce0e40f7d928065ee8bf922d5125f",
       "owners": {
         "@document": {
-          "before": "83d545d3df43bd401148af497bb43a8ae84110bad8b1be4de297546de3cfee3d",
-          "after": "a73916264edbf8987ca85ca409bb5bf625996650a09f3e4bc63eddebd7613acd"
+          "before": "a73916264edbf8987ca85ca409bb5bf625996650a09f3e4bc63eddebd7613acd",
+          "after": "19b406eb9b994386f107c582f86eefa9364ce0e40f7d928065ee8bf922d5125f"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "2a74f1cb0fb42b35dc0def3f7e53b7569dae65769b3398998a5b677605c2fed1",
-      "after_sha256": "d773d359faedb7e71b65a8ec90426d32dcf09044054c587c42256f730e9f0745",
+      "before_sha256": "d773d359faedb7e71b65a8ec90426d32dcf09044054c587c42256f730e9f0745",
+      "after_sha256": "d7bc3792d67cabb5af726f2bb9a8217ca656ed778ad56f2a88458b36693a7441",
       "owners": {
         "@document": {
-          "before": "2a74f1cb0fb42b35dc0def3f7e53b7569dae65769b3398998a5b677605c2fed1",
-          "after": "d773d359faedb7e71b65a8ec90426d32dcf09044054c587c42256f730e9f0745"
+          "before": "d773d359faedb7e71b65a8ec90426d32dcf09044054c587c42256f730e9f0745",
+          "after": "d7bc3792d67cabb5af726f2bb9a8217ca656ed778ad56f2a88458b36693a7441"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "94ddf205acca90abd035394f110589360a61f80931a59562af4dcb6723059361",
-      "after_sha256": "1c3b2d4c4149f850e92013807be5921b6e673ee5d9413e64e795e2eea5bfe271",
+      "before_sha256": "1c3b2d4c4149f850e92013807be5921b6e673ee5d9413e64e795e2eea5bfe271",
+      "after_sha256": "bfd379a2fc3283cda4cf6b14cae8b9f8ee8aa8fd0915a8b7cb4f78e796f92f8c",
       "owners": {
         "@document": {
-          "before": "94ddf205acca90abd035394f110589360a61f80931a59562af4dcb6723059361",
-          "after": "1c3b2d4c4149f850e92013807be5921b6e673ee5d9413e64e795e2eea5bfe271"
+          "before": "1c3b2d4c4149f850e92013807be5921b6e673ee5d9413e64e795e2eea5bfe271",
+          "after": "bfd379a2fc3283cda4cf6b14cae8b9f8ee8aa8fd0915a8b7cb4f78e796f92f8c"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "d1ad9f6a5e6bcadbe4d2c48bc36ae33fa158bd4aa22bc642e85beafbff367da2",
-      "after_sha256": "4eeb172756743eaf096229eeaa93a387697be5147d04c21da7af410ba1bd71d3",
+      "before_sha256": "4eeb172756743eaf096229eeaa93a387697be5147d04c21da7af410ba1bd71d3",
+      "after_sha256": "3974f0ab59d6aa370832e3c84a1a9c39c6851880ec8547b6c9b43e44fec6c3f4",
       "owners": {
         "@document": {
-          "before": "d1ad9f6a5e6bcadbe4d2c48bc36ae33fa158bd4aa22bc642e85beafbff367da2",
-          "after": "4eeb172756743eaf096229eeaa93a387697be5147d04c21da7af410ba1bd71d3"
+          "before": "4eeb172756743eaf096229eeaa93a387697be5147d04c21da7af410ba1bd71d3",
+          "after": "3974f0ab59d6aa370832e3c84a1a9c39c6851880ec8547b6c9b43e44fec6c3f4"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "05764b563e14c127f9e189b41d56f725b1fe19d2051c8c2ae8b8b5f64e2d1065",
-      "after_sha256": "bd032c0449a66ee00db05fedf1bb4d00a81ef3d4ae46da2728b8365af38222d8",
+      "before_sha256": "bd032c0449a66ee00db05fedf1bb4d00a81ef3d4ae46da2728b8365af38222d8",
+      "after_sha256": "5f5f29bd626cb1186c5e11596aaf1c2a487805fd6286a18e86c9dfa64e3a4ac3",
       "owners": {
         "@document": {
-          "before": "05764b563e14c127f9e189b41d56f725b1fe19d2051c8c2ae8b8b5f64e2d1065",
-          "after": "bd032c0449a66ee00db05fedf1bb4d00a81ef3d4ae46da2728b8365af38222d8"
+          "before": "bd032c0449a66ee00db05fedf1bb4d00a81ef3d4ae46da2728b8365af38222d8",
+          "after": "5f5f29bd626cb1186c5e11596aaf1c2a487805fd6286a18e86c9dfa64e3a4ac3"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "b3903f60e947b85a7cdf5a2fefd6819cb4682707b38cc8dd0cbb07165af5a93e",
-      "after_sha256": "448489645a9127793992d35bcb7f7afe6b23657ef6331f6cd6c63f18cfa3b58c",
+      "before_sha256": "448489645a9127793992d35bcb7f7afe6b23657ef6331f6cd6c63f18cfa3b58c",
+      "after_sha256": "f335d4e76fd96a71cc0200ab5853063f15a72cd81b94141e07cfd03e3e44e0fe",
       "owners": {
         "@document": {
-          "before": "b3903f60e947b85a7cdf5a2fefd6819cb4682707b38cc8dd0cbb07165af5a93e",
-          "after": "448489645a9127793992d35bcb7f7afe6b23657ef6331f6cd6c63f18cfa3b58c"
+          "before": "448489645a9127793992d35bcb7f7afe6b23657ef6331f6cd6c63f18cfa3b58c",
+          "after": "f335d4e76fd96a71cc0200ab5853063f15a72cd81b94141e07cfd03e3e44e0fe"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "d1db7904e198ab4890d48e45e10b3f531deb01867e516531d3d5acb4c341c3d3",
-      "after_sha256": "f1188f1dd464ff756fb59773f7838ba27822fd81d353107c8589efcd3f67c0c7",
+      "before_sha256": "f1188f1dd464ff756fb59773f7838ba27822fd81d353107c8589efcd3f67c0c7",
+      "after_sha256": "08618638de45c55c3ce12a33a43defef2eb2fb383d5820745340e40b0967640f",
       "owners": {
         "@document": {
-          "before": "d1db7904e198ab4890d48e45e10b3f531deb01867e516531d3d5acb4c341c3d3",
-          "after": "f1188f1dd464ff756fb59773f7838ba27822fd81d353107c8589efcd3f67c0c7"
+          "before": "f1188f1dd464ff756fb59773f7838ba27822fd81d353107c8589efcd3f67c0c7",
+          "after": "08618638de45c55c3ce12a33a43defef2eb2fb383d5820745340e40b0967640f"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "2abb268f4310efd335717061f4f2aa5529a49f443a30f9de6ad24e1cafec736d",
-      "after_sha256": "0bf0c9a75b276c44b3a67ce46bf83097e7708791f3071a157f02913350d52e4a",
+      "before_sha256": "0bf0c9a75b276c44b3a67ce46bf83097e7708791f3071a157f02913350d52e4a",
+      "after_sha256": "3b5da69c2a7451a6f08999a32471901c514bf94a9949f190a50110f8e9a394b6",
       "owners": {
         "@document": {
-          "before": "2abb268f4310efd335717061f4f2aa5529a49f443a30f9de6ad24e1cafec736d",
-          "after": "0bf0c9a75b276c44b3a67ce46bf83097e7708791f3071a157f02913350d52e4a"
+          "before": "0bf0c9a75b276c44b3a67ce46bf83097e7708791f3071a157f02913350d52e4a",
+          "after": "3b5da69c2a7451a6f08999a32471901c514bf94a9949f190a50110f8e9a394b6"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "563eb9cf86d12a89d3ad70c8eb2aab3ce2dd58625ba8edc8143195556bb70325",
-      "after_sha256": "e37c22d95ab101344dfb070abf89d03f2599fe5ea157a94c2995543da0de18ff",
+      "before_sha256": "e37c22d95ab101344dfb070abf89d03f2599fe5ea157a94c2995543da0de18ff",
+      "after_sha256": "63a1c81f1b53867ac83461933d905713476b43c6d1d7e2fb94125427f3c646db",
       "owners": {
         "@document": {
-          "before": "563eb9cf86d12a89d3ad70c8eb2aab3ce2dd58625ba8edc8143195556bb70325",
-          "after": "e37c22d95ab101344dfb070abf89d03f2599fe5ea157a94c2995543da0de18ff"
+          "before": "e37c22d95ab101344dfb070abf89d03f2599fe5ea157a94c2995543da0de18ff",
+          "after": "63a1c81f1b53867ac83461933d905713476b43c6d1d7e2fb94125427f3c646db"
         }
       }
     },
     "conformance/typescript/src/contract.ts": {
-      "before_sha256": "cdedfc659cd0107211da63559121e9381e329285cfea6a8dac94a8518ec3beaa",
-      "after_sha256": "fc6a021b9216f55ff8817fb0f514490255d3ca65e257de60df24404bd308006c",
+      "before_sha256": "fc6a021b9216f55ff8817fb0f514490255d3ca65e257de60df24404bd308006c",
+      "after_sha256": "2d77c881af85a4ba689c4c3237bb16deb573cee21bb9f22205ee546f59301911",
       "owners": {
         "@document": {
-          "before": "cdedfc659cd0107211da63559121e9381e329285cfea6a8dac94a8518ec3beaa",
-          "after": "fc6a021b9216f55ff8817fb0f514490255d3ca65e257de60df24404bd308006c"
+          "before": "fc6a021b9216f55ff8817fb0f514490255d3ca65e257de60df24404bd308006c",
+          "after": "2d77c881af85a4ba689c4c3237bb16deb573cee21bb9f22205ee546f59301911"
         }
       }
     },
     "contracts/README.md": {
-      "before_sha256": "a51c587465b97dfb41b8dbfbd582ded0fef37a76a32b8c3a7b5af3a8a2076e4e",
-      "after_sha256": "3bcbef38edafcd0e78e28c603b893ce49c804ce76a43b03b18993dfca5a6b4cb",
+      "before_sha256": "3bcbef38edafcd0e78e28c603b893ce49c804ce76a43b03b18993dfca5a6b4cb",
+      "after_sha256": "f94eca95153787bb43617d2ccc3d2f108e52ad2acb9e2b32fedb75f80f552762",
       "owners": {
         "@document": {
-          "before": "a51c587465b97dfb41b8dbfbd582ded0fef37a76a32b8c3a7b5af3a8a2076e4e",
-          "after": "3bcbef38edafcd0e78e28c603b893ce49c804ce76a43b03b18993dfca5a6b4cb"
+          "before": "3bcbef38edafcd0e78e28c603b893ce49c804ce76a43b03b18993dfca5a6b4cb",
+          "after": "f94eca95153787bb43617d2ccc3d2f108e52ad2acb9e2b32fedb75f80f552762"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "d8355e0fc34be8a48833bb2bf942d7fd2dfddb0fe989b1228e87071ffcc7e7ba",
-      "after_sha256": "fe0cc0743b034e9ea1b387a5c6f245a0c54e57dec7f72d3d001e81f9452abefe",
+      "before_sha256": "fe0cc0743b034e9ea1b387a5c6f245a0c54e57dec7f72d3d001e81f9452abefe",
+      "after_sha256": "5cf33e70f060217147637766a5de424e45c344f846198623fec60d1cf0def571",
       "owners": {
         "@document": {
-          "before": "d8355e0fc34be8a48833bb2bf942d7fd2dfddb0fe989b1228e87071ffcc7e7ba",
-          "after": "fe0cc0743b034e9ea1b387a5c6f245a0c54e57dec7f72d3d001e81f9452abefe"
+          "before": "fe0cc0743b034e9ea1b387a5c6f245a0c54e57dec7f72d3d001e81f9452abefe",
+          "after": "5cf33e70f060217147637766a5de424e45c344f846198623fec60d1cf0def571"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "88f521adb11d8a01181e47a6c448a59e9bb8d3f20c86bde69f8dcc655f23d7c6",
-      "after_sha256": "1efd87d753b6c98a45ed06e7c009476f865ecd229f623d88bf17611fc3605b8e",
+      "before_sha256": "1efd87d753b6c98a45ed06e7c009476f865ecd229f623d88bf17611fc3605b8e",
+      "after_sha256": "40d823628972a157ee1c613c322258cddd6fda107ad971607d465754d1405930",
       "owners": {
         "@document": {
-          "before": "88f521adb11d8a01181e47a6c448a59e9bb8d3f20c86bde69f8dcc655f23d7c6",
-          "after": "1efd87d753b6c98a45ed06e7c009476f865ecd229f623d88bf17611fc3605b8e"
+          "before": "1efd87d753b6c98a45ed06e7c009476f865ecd229f623d88bf17611fc3605b8e",
+          "after": "40d823628972a157ee1c613c322258cddd6fda107ad971607d465754d1405930"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "4fead325329c1b03f570c2c2e6d478f076bdc6278146ab3c229a12f21e77a0b2",
-      "after_sha256": "4c848b01bf5ca25d489228dd8a0dedc7a85b0ec722ec5cd604a7ebc11ba53457",
+      "before_sha256": "4c848b01bf5ca25d489228dd8a0dedc7a85b0ec722ec5cd604a7ebc11ba53457",
+      "after_sha256": "af95ffd8ca11a327e1e2843b9c2cd45d813406776a0f23fa21159034a6eea908",
       "owners": {
         "@document": {
-          "before": "4fead325329c1b03f570c2c2e6d478f076bdc6278146ab3c229a12f21e77a0b2",
-          "after": "4c848b01bf5ca25d489228dd8a0dedc7a85b0ec722ec5cd604a7ebc11ba53457"
+          "before": "4c848b01bf5ca25d489228dd8a0dedc7a85b0ec722ec5cd604a7ebc11ba53457",
+          "after": "af95ffd8ca11a327e1e2843b9c2cd45d813406776a0f23fa21159034a6eea908"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "14672d8adb6ebe073ff2a0f3c442ae7981ba5a77ff65f0f51784d65dc2b199c9",
-      "after_sha256": "96546853b4112f3c5e991614ac69110491f363314e3fa2f09319120ff86c0e9a",
+      "before_sha256": "96546853b4112f3c5e991614ac69110491f363314e3fa2f09319120ff86c0e9a",
+      "after_sha256": "246d7e07341ad75be44b60f561c2e045e7f63928fd0ba7d29a08ae6436f835bd",
       "owners": {
         "@document": {
-          "before": "14672d8adb6ebe073ff2a0f3c442ae7981ba5a77ff65f0f51784d65dc2b199c9",
-          "after": "96546853b4112f3c5e991614ac69110491f363314e3fa2f09319120ff86c0e9a"
+          "before": "96546853b4112f3c5e991614ac69110491f363314e3fa2f09319120ff86c0e9a",
+          "after": "246d7e07341ad75be44b60f561c2e045e7f63928fd0ba7d29a08ae6436f835bd"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "7d4defc303ac8cc23c6b4dc63a16ca2ad6bb54fd265f0cdcd4c9f1f5adb1f070",
-      "after_sha256": "8855cc4c01c2be90db22d77fcde43ae4d25fe47abc719de5418f17c7afd9f857",
+      "before_sha256": "8855cc4c01c2be90db22d77fcde43ae4d25fe47abc719de5418f17c7afd9f857",
+      "after_sha256": "400f16a7176089213920098099449ff0f31b326cb637e61b06212e9215668f2e",
       "owners": {
         "@document": {
-          "before": "7d4defc303ac8cc23c6b4dc63a16ca2ad6bb54fd265f0cdcd4c9f1f5adb1f070",
-          "after": "8855cc4c01c2be90db22d77fcde43ae4d25fe47abc719de5418f17c7afd9f857"
+          "before": "8855cc4c01c2be90db22d77fcde43ae4d25fe47abc719de5418f17c7afd9f857",
+          "after": "400f16a7176089213920098099449ff0f31b326cb637e61b06212e9215668f2e"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "57463f358b6d134a19bcd5cb1d665a587a48c5dcf38db3476b51013b50e769f6",
-      "after_sha256": "f5d6b671c6440d0d359f9186f7a126c246d688c7097816f8ee38c5b78a29dcc6",
+      "before_sha256": "f5d6b671c6440d0d359f9186f7a126c246d688c7097816f8ee38c5b78a29dcc6",
+      "after_sha256": "24468d309eeeca15649844a5621296a6060b260b656d43baf69b1c0b145edfaf",
       "owners": {
         "@document": {
-          "before": "57463f358b6d134a19bcd5cb1d665a587a48c5dcf38db3476b51013b50e769f6",
-          "after": "f5d6b671c6440d0d359f9186f7a126c246d688c7097816f8ee38c5b78a29dcc6"
+          "before": "f5d6b671c6440d0d359f9186f7a126c246d688c7097816f8ee38c5b78a29dcc6",
+          "after": "24468d309eeeca15649844a5621296a6060b260b656d43baf69b1c0b145edfaf"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "7b3022bd6c6507957e8a28cdb903b836e9d20ed5bf58505b14ea0c694bb3eec0",
-      "after_sha256": "c20914ed561b8d1566befa7f579edb2a17b2eee0ec7f244726d592a93efbf760",
+      "before_sha256": "c20914ed561b8d1566befa7f579edb2a17b2eee0ec7f244726d592a93efbf760",
+      "after_sha256": "4f1a30dc8f4d984d25e1b857fcb0159c6fe36616415616ef77f72324086cbb97",
       "owners": {
         "@document": {
-          "before": "7b3022bd6c6507957e8a28cdb903b836e9d20ed5bf58505b14ea0c694bb3eec0",
-          "after": "c20914ed561b8d1566befa7f579edb2a17b2eee0ec7f244726d592a93efbf760"
+          "before": "c20914ed561b8d1566befa7f579edb2a17b2eee0ec7f244726d592a93efbf760",
+          "after": "4f1a30dc8f4d984d25e1b857fcb0159c6fe36616415616ef77f72324086cbb97"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "5321c5e598d9ac9cd811363d2f6f4bfe30e2028c0df638cda2c06e0969cb84a0",
-      "after_sha256": "5cee3fc858814f09f2107d0d782fb7d5a0ab783a80e1067ce14aa737a0028d1b",
+      "before_sha256": "5cee3fc858814f09f2107d0d782fb7d5a0ab783a80e1067ce14aa737a0028d1b",
+      "after_sha256": "072b1e30702da042625636faae9510092251f727b6345aaf6b8df161165504e2",
       "owners": {
         "@document": {
-          "before": "5321c5e598d9ac9cd811363d2f6f4bfe30e2028c0df638cda2c06e0969cb84a0",
-          "after": "5cee3fc858814f09f2107d0d782fb7d5a0ab783a80e1067ce14aa737a0028d1b"
+          "before": "5cee3fc858814f09f2107d0d782fb7d5a0ab783a80e1067ce14aa737a0028d1b",
+          "after": "072b1e30702da042625636faae9510092251f727b6345aaf6b8df161165504e2"
         }
       }
     },
     "contracts/openapi.yaml": {
-      "before_sha256": "e2640cdc7e9676c40b69c96736ca8ca47295921049886f9633c24e6ccb099b89",
-      "after_sha256": "7d00e510c07293c3002f05ac6ad64965a16f584cad72953b714b91542ced9a0b",
+      "before_sha256": "7d00e510c07293c3002f05ac6ad64965a16f584cad72953b714b91542ced9a0b",
+      "after_sha256": "f25dbed377aaedac96625fee7a498a2e20ce6209b957dcb83a870639c71e879c",
       "owners": {
         "@document": {
-          "before": "e2640cdc7e9676c40b69c96736ca8ca47295921049886f9633c24e6ccb099b89",
-          "after": "7d00e510c07293c3002f05ac6ad64965a16f584cad72953b714b91542ced9a0b"
+          "before": "7d00e510c07293c3002f05ac6ad64965a16f584cad72953b714b91542ced9a0b",
+          "after": "f25dbed377aaedac96625fee7a498a2e20ce6209b957dcb83a870639c71e879c"
         }
       }
     },
-    "data/source_audits/v963_snap/baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_critical_hits_2026_09/artifacts/package.json.txt": {
+    "data/source_audits/order115/source.audit.json": {
       "before_sha256": null,
-      "after_sha256": "d4e25297d34f21a9f3b504b78eb010f9c667914a87d6332a4c9a72bb4ca3badb",
+      "after_sha256": "c66778e64c2c540e498d3f8b1af0cef647e0917d5812fabe63d8ba99242b6634",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d4e25297d34f21a9f3b504b78eb010f9c667914a87d6332a4c9a72bb4ca3badb"
-        }
-      }
-    },
-    "data/source_audits/v963_snap/baseline/tests/fire_overwatch_helpers.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "c1ebdfd064847148314f460855e344971b15f106fab48301ed6bf5712686c727",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "c1ebdfd064847148314f460855e344971b15f106fab48301ed6bf5712686c727"
-        }
-      }
-    },
-    "data/source_audits/v963_snap/baseline/tests/unit/test_critical_hits.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "bd7ebe4e8384476ff252f4c5b14d58ef8aadba25d2d6a60655c488c6767759b7",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "bd7ebe4e8384476ff252f4c5b14d58ef8aadba25d2d6a60655c488c6767759b7"
-        }
-      }
-    },
-    "data/source_audits/v963_snap/baseline/tests/unit/test_lethal_hits.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "e1420132cd93943381e99b7f3ffd789ac834ba3a78e1ebbc61f4c1193b3b2ca5",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "e1420132cd93943381e99b7f3ffd789ac834ba3a78e1ebbc61f4c1193b3b2ca5"
-        }
-      }
-    },
-    "data/source_audits/v963_snap/historical-inputs.json": {
-      "before_sha256": null,
-      "after_sha256": "aed57834c1788dd3bce03ef27338c9896e6ed642bbec335a24e40c602de52e78",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "aed57834c1788dd3bce03ef27338c9896e6ed642bbec335a24e40c602de52e78"
-        }
-      }
-    },
-    "data/source_audits/v963_snap/source.audit.json": {
-      "before_sha256": null,
-      "after_sha256": "1ca5962a5916087c43941cfbbab859221ee5b00bfb946ed4f776d54381b948b0",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "1ca5962a5916087c43941cfbbab859221ee5b00bfb946ed4f776d54381b948b0"
+          "after": "c66778e64c2c540e498d3f8b1af0cef647e0917d5812fabe63d8ba99242b6634"
         }
       }
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "da32bc72c7e152941982b6b4d3fa02bc9ec27242aa3ac389a860a54118c3f0ec",
-      "after_sha256": "b37bc14fd9a85023d3d39a85819a72a4e12b3d7feb33dc51672a7f6f9d89b2e2",
+      "before_sha256": "b37bc14fd9a85023d3d39a85819a72a4e12b3d7feb33dc51672a7f6f9d89b2e2",
+      "after_sha256": "108707aa0c2e9d56005e9e6fbac470bcc40bedd8c7d8d055b3642a45c3fd7a7e",
       "owners": {
         "@document": {
-          "before": "da32bc72c7e152941982b6b4d3fa02bc9ec27242aa3ac389a860a54118c3f0ec",
-          "after": "b37bc14fd9a85023d3d39a85819a72a4e12b3d7feb33dc51672a7f6f9d89b2e2"
+          "before": "b37bc14fd9a85023d3d39a85819a72a4e12b3d7feb33dc51672a7f6f9d89b2e2",
+          "after": "108707aa0c2e9d56005e9e6fbac470bcc40bedd8c7d8d055b3642a45c3fd7a7e"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "454b829fa3cd79852bb9cdc2b770fbc8a2dc18c617a4ce45157969bc04243d0e",
-      "after_sha256": "f91d16b3a26a889ce88234a457f08043c1f37c090b0fea4b58246a04e09042bd",
+      "before_sha256": "f91d16b3a26a889ce88234a457f08043c1f37c090b0fea4b58246a04e09042bd",
+      "after_sha256": "28fda7a7d722e072474e8f723841b72b5b57969a019939dba7b401a8ce33cfb1",
       "owners": {
         "@document": {
-          "before": "454b829fa3cd79852bb9cdc2b770fbc8a2dc18c617a4ce45157969bc04243d0e",
-          "after": "f91d16b3a26a889ce88234a457f08043c1f37c090b0fea4b58246a04e09042bd"
+          "before": "f91d16b3a26a889ce88234a457f08043c1f37c090b0fea4b58246a04e09042bd",
+          "after": "28fda7a7d722e072474e8f723841b72b5b57969a019939dba7b401a8ce33cfb1"
         }
       }
     },
-    "docs/PR_BACKLOG_2026_09_30.md": {
-      "before_sha256": "7f6b9cd98cd0ecc2fd9c770a3859760cb2dc57cbaec0103c98e2edf52b1e923b",
-      "after_sha256": "5e19c1ca0aeef4049a7175e75e7592e18567d6faaf35c3c51db57397ce5ba01e",
-      "owners": {
-        "@document": {
-          "before": "7f6b9cd98cd0ecc2fd9c770a3859760cb2dc57cbaec0103c98e2edf52b1e923b",
-          "after": "5e19c1ca0aeef4049a7175e75e7592e18567d6faaf35c3c51db57397ce5ba01e"
-        }
-      }
-    },
-    "docs/V963_SNAP_SCOPE_PLAN.md": {
+    "docs/ORDER_115_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "ee33ec88f26043032e0115428fd1c60ecf65055282f0fd1cf044e008dce56d81",
+      "after_sha256": "9e3e0eb07d026fed034b170904ca6b6c01e4a22dc9a06bbd9842caff67019c0c",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ee33ec88f26043032e0115428fd1c60ecf65055282f0fd1cf044e008dce56d81"
+          "after": "9e3e0eb07d026fed034b170904ca6b6c01e4a22dc9a06bbd9842caff67019c0c"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "1821ef48f87dd596909b3553f231ed3f887d614c3fdbb96f310115b4ee06b99a",
-      "after_sha256": "6a8135274fc34672bc61f6b40065cc5f419b57be203f4533913984b501d55577",
+      "before_sha256": "6a8135274fc34672bc61f6b40065cc5f419b57be203f4533913984b501d55577",
+      "after_sha256": "ddea332559046832d51568ae4def4e96ed1c92f9d72aac4a6a6ed4a464a6aee9",
       "owners": {
         "@document": {
-          "before": "1821ef48f87dd596909b3553f231ed3f887d614c3fdbb96f310115b4ee06b99a",
-          "after": "6a8135274fc34672bc61f6b40065cc5f419b57be203f4533913984b501d55577"
+          "before": "6a8135274fc34672bc61f6b40065cc5f419b57be203f4533913984b501d55577",
+          "after": "ddea332559046832d51568ae4def4e96ed1c92f9d72aac4a6a6ed4a464a6aee9"
+        }
+      }
+    },
+    "docs/performance/policy-v3/order115-rule-semantics.json": {
+      "before_sha256": null,
+      "after_sha256": "a2c59e0df5ec72da4b161b16338f99117ad9aa0eb37d983fd48be1c820b29e81",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "a2c59e0df5ec72da4b161b16338f99117ad9aa0eb37d983fd48be1c820b29e81"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "cbb24560c604c7943c5a421378490377202deef972888cf27e5ea9225396f001",
-      "after_sha256": "6b7b0f7f0b3307dea9b85826db50a15a50fa26fd22525d4bcda2bf248bacd303",
+      "before_sha256": "6b7b0f7f0b3307dea9b85826db50a15a50fa26fd22525d4bcda2bf248bacd303",
+      "after_sha256": "f933f16f644ba1619e903d882f037f8b70e6f2bcd712a0028e3a7a67720be955",
       "owners": {
         "@document": {
-          "before": "cbb24560c604c7943c5a421378490377202deef972888cf27e5ea9225396f001",
-          "after": "6b7b0f7f0b3307dea9b85826db50a15a50fa26fd22525d4bcda2bf248bacd303"
+          "before": "6b7b0f7f0b3307dea9b85826db50a15a50fa26fd22525d4bcda2bf248bacd303",
+          "after": "f933f16f644ba1619e903d882f037f8b70e6f2bcd712a0028e3a7a67720be955"
         }
       }
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
-      "before_sha256": "807dda874ea3c25f7cb1f0a32d51ac041a943efc60d1e7e551dcddfbbbe9b125",
-      "after_sha256": "b5367c6cc5d71d27580acd7c1f1c919703fa70b70cf2ae849acc3ae01c8fc07a",
+      "before_sha256": "b5367c6cc5d71d27580acd7c1f1c919703fa70b70cf2ae849acc3ae01c8fc07a",
+      "after_sha256": "629e4ecc1dcee157c9833f76b0790e179cf55748d7a363d3eea660698a9c2b57",
       "owners": {
         "@module": {
-          "before": "8214ffef5c817d25a9dc4d689e396ec1aff44affe4b892e9f05696a32178bc8a",
-          "after": "89aefc37779cff4b3617abe3ca13730226738c1122dcc7cc91fd9c353a99ab1b"
+          "before": "89aefc37779cff4b3617abe3ca13730226738c1122dcc7cc91fd9c353a99ab1b",
+          "after": "d340a4e996ea669d76f612f55925ab4e944c8a5cc96e1df1ae418fc66c1fa6c3"
         }
       }
     },
-    "src/warhammer40k_core/engine/attack_sequence_hit_wound.py": {
-      "before_sha256": "1ba49af41455a94e0bd7dd54c28fa41fa793633f1fed0bfa8ede86477cd0e257",
-      "after_sha256": "3f7be70ca4fc6671eef72c4e760faa042bf2b7dd44e85cc113609c9756697f23",
-      "owners": {
-        "_roll_hit": {
-          "before": "9429d05acc0ddd4f83be5267c0478f489062fbf571c1351c1165cabec757a42a",
-          "after": "36b4bc1f909522d0e935322fb9761e613c0b5a3d6c1ae8196c9d6d4569b44549"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/attack_sequence_model.py": {
-      "before_sha256": "735a8adcc917f529452febda383c9b8808c6c76a0cec8c685adb64d3aa9bc21a",
-      "after_sha256": "ff87e6341dc5c2eecd462bc8373117a62fbbf6596ea5f6eb6a31dc6207f1fb6d",
-      "owners": {
-        "HitRoll.__post_init__": {
-          "before": "c5ff1cd1007bae03f0d75f68402593c333a51a1635f13c512b7709889fcdbe39",
-          "after": "0d21cb3c10cae371ee93d35b0960711d981701f67c0fb41b728161a6b4921a45"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/hit_thresholds.py": {
-      "before_sha256": "31619d67280a4c65e7bc0191587d50201ea004d25a225f3e1383eec8e9f76ea1",
-      "after_sha256": "9726ca4e77ede3524d00666d365338dfd7b74f68abe1fa5259ff212338472258",
+    "src/warhammer40k_core/engine/base_contact_fight_history.py": {
+      "before_sha256": "32358233de0981fc13bbdcbf1c3cfc3d44fd5d88b5010712d8d93d2ffdedd4a6",
+      "after_sha256": "06e3db01fa216064ef3e20a6558a9f03255eee6549f0019e2fd6aaefe49896f3",
       "owners": {
         "@module": {
-          "before": "fe303cb2f5e294e00576e6ce565f27b34b8809b64ec30b8c4ef912f19743769b",
-          "after": "196cffaa0bde812fb5a7124755b0acf776fb0f02937d17a39c742dc234caa23c"
+          "before": "bb8ce4e2743435d4459196bd42c811f845bd016dba39686910057d7e22c54cbd",
+          "after": "a17e22db43f22e33d1341d0cccc9e96ed0b62c8c0590aabb62eff16394d58eae"
         },
-        "classify_hit_roll": {
-          "before": null,
-          "after": "d29645cebcf674eb435df6d550774d73bb019614ee96240480491fe5011639c9"
+        "validate_fight_contact_permissions": {
+          "before": "2bedcb0aaa870cd428b725a99a911fdff8e78a29726ac0355cd139b15684c685",
+          "after": "74e7cadb377199abf986654c540676a1a1d144b4ecdf0092f574905b5ce2c107"
         },
-        "resolve_hit_thresholds": {
-          "before": "39d3a2d690a6a2f099bc1985c5ccb159a69bff67e7c58fd32a047870aaa057f7",
-          "after": "c6c9d1a1e6062a291c2023b8a0ad8394dbbd894ac431619fd4cd610d3d2d08a4"
+        "validate_triggered_contact_permissions": {
+          "before": "404ea564f0608ef3a4f2f16d7b7818e6a9816e705a3152ee871e9438cedf6943",
+          "after": "0bc5f5d49736a9a08147ea4555c8dee5dd604b0ede7506562f062a783215c450"
         }
       }
     },
-    "src/warhammer40k_core/rules/source_authority_registry.json": {
-      "before_sha256": "d501fabab0914b80a26bf88d0b2e520a2c12b46aaedfcf0c43fada87b0716dff",
-      "after_sha256": "282ad568ffb6a749351ef98d67c7f9a3c155ce0ed5326dcba3cb4855d997d7ec",
-      "owners": {
-        "@document": {
-          "before": "d501fabab0914b80a26bf88d0b2e520a2c12b46aaedfcf0c43fada87b0716dff",
-          "after": "282ad568ffb6a749351ef98d67c7f9a3c155ce0ed5326dcba3cb4855d997d7ec"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_authority_registry.py": {
-      "before_sha256": "a1b5a229b3699ae45d2ca2b99e9ad074f4c46dfd287d7c971b236f1cfdeb77b7",
-      "after_sha256": "0f7c062ee32f6388e98f8043d15dc15f77a0c1e8ebc61cc92875119d0241acc8",
+    "src/warhammer40k_core/engine/charge_path_contexts.py": {
+      "before_sha256": "0beb91e4835c0cbfeb1ec06dd8339298e2aea66c50e594dce845ca3e08d251e3",
+      "after_sha256": "3cab3426df682ea8ae07a580b8aaea8d1b01000d0701462d323e3f521a14e867",
       "owners": {
         "@module": {
-          "before": "f2f6514cf0b7aa8c7616f732c87c1bae06e8d6be1be9719d6cab3abda220c3c8",
-          "after": "60a96b28b4a7766e26e470a97634cbb99b6d316968fc400eb2bd5083c7843a4c"
+          "before": "a8a51decfdad586155fd59ecc212c8e673fd5bd47f1ca986d85138dfb6b3655d",
+          "after": "9905c67613e559680d8242abc5f645fd7c4a41e43a77f224fa26e0b65327b09f"
+        },
+        "charge_model_path_contexts": {
+          "before": "1a999c7a106db2352bbc1788bbd5c54bdab1abbb0977e532074f1b6f85030ad4",
+          "after": "e5bb8cd378ac970df8953e05f0f4678508f44632b07cf114cd432a40295305e7"
         }
       }
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_critical_hits_2026_09/__init__.py": {
-      "before_sha256": "724ce1000279bb43f5f11c2b04c6df67a66045a9947ba461696adb7ae7c405b8",
-      "after_sha256": "d9309ecbf5fb853a6e8aeb4897f1312f4759ac2aa69972e9e7d9b2df1b4e2efd",
+    "src/warhammer40k_core/engine/consolidation_model_constraints.py": {
+      "before_sha256": "745dee697613138750cd2df2013ba08178f977759de64061267e06a7e73e37e8",
+      "after_sha256": "3a029bd1b4605d97b603b68725212d48fb46e19d8e185461b35ea653f289f293",
       "owners": {
         "@module": {
-          "before": "a75a38f4f9b2ff5d0dc58645f775f6f5354f1f259e283ca01378a21e189d4805",
-          "after": "ce9a315eec5b1f53a7d5af5f8f5c7cfc17f50823928a3f885de456845c4a5cb6"
+          "before": "45196a6d5765c7b6444f8c3f22168c58dbeed567b48545913c08d50385ad45f0",
+          "after": "b8ade5f4fe55185656d65271fe8266feef20efce5eb2df1966c35b24f74a2bad"
         },
-        "_build_source_package": {
-          "before": "0baa8930c55da3982289f22e433226c42e449d41cf45c656eb4c9e5594b7c6ca",
-          "after": "e48d92dccb90f5b4faf113f1253b3adfde8a6bb104431fbddd2267e5a57a0cdf"
-        },
-        "validate_source_artifact_bytes": {
-          "before": "6e050f9af3fbf2ea4a042b8654dec494efce936f9a22e815fc4dde0f1d32bf3d",
-          "after": "67158862c5e35c4aeeffb965e36dae7b5cde0269b9f4e2df7a84e6ffec1b7634"
+        "_query": {
+          "before": "e9dafd9744958a5b540f43be401bb34047c2a217821e449ee494d159d5d37a3e",
+          "after": "271d80db752bf71e66616cec21c1a123f155cce602d8c78ff1e19acf1dcfa908"
         }
       }
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_critical_hits_2026_09/artifacts/package.json": {
-      "before_sha256": "d4e25297d34f21a9f3b504b78eb010f9c667914a87d6332a4c9a72bb4ca3badb",
-      "after_sha256": "5422bd3564432cb008756895208bdb536aaa88b846576a3f13352e99d72fc1ed",
-      "owners": {
-        "@document": {
-          "before": "d4e25297d34f21a9f3b504b78eb010f9c667914a87d6332a4c9a72bb4ca3badb",
-          "after": "5422bd3564432cb008756895208bdb536aaa88b846576a3f13352e99d72fc1ed"
-        }
-      }
-    },
-    "tests/code_quality/test_order43_critical_hits.py": {
-      "before_sha256": "a39b22a7af41d21a217a83831854cb9cb5668a61faf38b02699d840d66ccdd2d",
-      "after_sha256": "95394b9ce08e45b3b92b36e4d597d2fc29385cad3dc381f2cc9ebf2936999260",
-      "owners": {
-        "test_v963_execution_and_hit_restore_share_classification_and_keep_wound_owner": {
-          "before": null,
-          "after": "e0a80f7aa2cae0e4ef7c6a6199fc6a86494f94458c9b3a499a210993c3cc0eca"
-        },
-        "test_v963_source_is_complete_and_historical_observations_remain_immutable": {
-          "before": null,
-          "after": "938189b804d706d4bbcf9841804968fe8fc5ecd42eda2934918ced8e8ca82b45"
-        }
-      }
-    },
-    "tests/fire_overwatch_helpers.py": {
-      "before_sha256": "35a93ee1470bd1e9a1a9caf1319fcaad1b30e2a5b14fffbb0b87fea4a3388362",
-      "after_sha256": "1be0a2f51560fb55ba9d7c922b6f1c1f3fe598014f5a3764aa43e33f4076294a",
+    "src/warhammer40k_core/engine/fight_movement_paths.py": {
+      "before_sha256": "4591d11d6b89f23b8ef16258a2eefa3bd2c3af5c57b7bb1d3407474d6802f21a",
+      "after_sha256": "0624fb6ac3b5b5119856420d4877747d6b5dae915e51bdb990cd9143404c857b",
       "owners": {
         "@module": {
-          "before": "b4de160a787248f055c4abf8b4657878dd6a9561639d80a2b9945db93cd2f4a1",
-          "after": "74d319f6319e090a4f186f6d578849de9e53f1984cf50b557641b141b129b0bf"
+          "before": "fb518d02a47804ae0d57328ad3f96bb76d957281b8a4321a43fa9c1200c0fe93",
+          "after": "08c0ddfa14dd1fe56f19db96daae17095465c2a1ded691d6fdccd65efa80f512"
         },
-        "overwatch_session": {
-          "before": "2cddbf27d4520f211b892c0115398ce728583c88d842a74d6514ec06bcf1e7f1",
-          "after": "170b6ed4e77f27bad06c9b6b09024803b4bb02e15d9406387a4232433ae5ab7f"
+        "validate_fight_paths": {
+          "before": "9e2534e264306c5e9e6c9c6daaf6da5046a1b3bcf5221bc0d3e45c9b1b4dc075",
+          "after": "e4a6b479bbb20550825493de2d08031438a3ae6bd7bc8f0ffbc642eaf3a34d86"
         }
       }
     },
-    "tests/unit/test_critical_hits.py": {
-      "before_sha256": "bd7ebe4e8384476ff252f4c5b14d58ef8aadba25d2d6a60655c488c6767759b7",
-      "after_sha256": "f1eae156f928ea3853167ffe7f258e620124f6e0320a0cd5277fd16a4775d241",
+    "src/warhammer40k_core/engine/fight_movement_source.py": {
+      "before_sha256": "9a6345e5b6cb1a96432b22a8cfd918a2b55baab92b71d24bf2fdd3638f51a246",
+      "after_sha256": "f8024c2864defbf0060a5ee90edbe1599b77a16fa8a7fd3edd9213ffa40a7f07",
       "owners": {
-        "test_critical_hits_respect_raw_faces_and_mode_floors": {
-          "before": "f379ab04ff2ec36f8800f17fe63ec83a92763e8abe290f8f35bd01179b1a6b67",
-          "after": "9dbb84dd8ceb24b3316aa9131a924ee6d471c64d4ad8e4578d15e375cc2f7fcc"
+        "@module": {
+          "before": "6f1c4d8c8439d08180daed6414fd3b4f4215db6b7e5a2e4ce6a91ae7f7cc3a1b",
+          "after": "834af0c500676f5e31d318fbf19259917cfb4c3d84f1314e57cf1627108914d9"
         },
-        "test_critical_sources_are_pinned_loaded_and_executable": {
-          "before": "6cbb9309b2e0f4aab60bef2d6ad43347f54f61c4825cbb926f74b2c90e43ace1",
-          "after": "d21c2a568cba84a29887eed425595265865e6f7b230dc7d019cd07f384beb131"
-        },
-        "test_order84_default_critical_and_snap_require_exact_six": {
-          "before": "228e0f7bc9ca2718237efa21d61f8a9cd6a8ca46239a9d52fb32b4df8f4e87c6",
-          "after": "d0092fbf476e7c4c91bf390ff15d77569a622e2484f1f23275af1dbe5c8c3606"
-        },
-        "test_order84_explicit_snap_threshold_accepts_assigned_seven": {
-          "before": "a603646bf75b35945dd9ce537b522cc9c2a8a985be4badf0de8b6f37df0dd3e2",
-          "after": null
-        },
-        "test_snap_ignores_generic_threshold_but_accepts_explicit_permission": {
-          "before": "323023c289d53f7cef079bbf3ca1e4ed2f0bd9ddfda81f6ec439bd4c3786a180",
-          "after": "ae92dc7d327a5f0397f540bd3dce38b5694327782250728edd2767622cfcf654"
-        },
-        "test_v963_critical_only_snap_threshold_cannot_grant_hits": {
-          "before": null,
-          "after": "40f29547917c58dd144c01a093eae3282c4c883beb3b0d70318246d23e38538e"
-        },
-        "test_v963_full_resolution_preserves_critical_wounds_restore_fork_and_replay": {
-          "before": null,
-          "after": "9750897c89934f0bf02fb7c93781133dbdcc362622a0f88ddf7c5ab14ec44308"
-        },
-        "test_v963_snap_six_is_an_ordinary_hit_without_sustained_triggers": {
-          "before": null,
-          "after": "09459c87002abd602531ddf1b5c8d59172708d4ff591c21b227f1823630a159b"
+        "retained_fight_movement_source_path_violations": {
+          "before": "63fcc3cf38e49a44c5b3665caf3cbca17f8c8000c7de1eddf90fe67335729f49",
+          "after": "81892f0205926fb6b1b60aac7fe116e5b5bb24021e1e90fc1eabd6b109e36f56"
         }
       }
     },
-    "tests/unit/test_lethal_hits.py": {
-      "before_sha256": "eb7bf4e7bee38f38aac63b70c4dd5ffd92d3435ce4bdea40ee9c59ae3d06e334",
-      "after_sha256": "e7bbf50a21d4b447b1b9b97753fee0af55c6d92ebe09b677c2262193f7dc9257",
-      "owners": {
-        "test_out_of_phase_snap_shooting_choice_uses_attacking_owner_and_replays": {
-          "before": "324a3fc7ed42744a1d93330fd375b8886c2d237efd508ae27c9f3ccf1ad4775c",
-          "after": null
-        },
-        "test_v963_out_of_phase_snap_has_no_lethal_choice_and_replays": {
-          "before": null,
-          "after": "7a1d7b3ea2ae56e84c0623969cb7e802f67530ee5cc5628e7d558446cd36dbe9"
-        }
-      }
-    },
-    "tests/unit/test_phase13b_shooting_declarations.py": {
-      "before_sha256": "2e42180c0ef129b19fd0fd95a995e5cce04ab45ab601e882d397375031bde8dc",
-      "after_sha256": "b3d88280274432f740c2c920976d2f4f225f0b6e670252da37e0ce57b2c0ba3c",
-      "owners": {
-        "test_phase18b_command_reroll_window_opens_after_shooting_damage_roll": {
-          "before": "aa566dacf8d2a725aef6ddf037880801bf2427ca8926a23419d09160b5f13753",
-          "after": "d767e8e90ad6e38b5310980ffaa44b4e9b190887552ba3be78f837329d798488"
-        }
-      }
-    },
-    "tests/v963_snap_helpers.py": {
+    "src/warhammer40k_core/engine/model_movement_permission.py": {
       "before_sha256": null,
-      "after_sha256": "f28a3fd8a7b6c4099309bb0ebdcc65f323e4e4e5584ea45beafcb1a2d168b3a1",
+      "after_sha256": "cb7bcbfc9d48f1657581edd2caf199abed39638019b170b282214b3d9702e1e8",
       "owners": {
         "@module": {
           "before": null,
-          "after": "46bf324de7d35b8cd55ce2e1e55c117d551abc0b0a71052600fd5bad3b164a01"
+          "after": "3fa47c7bc4dbbdadd967e4ca4179739f72113eab528e0369991e04c475f58abb"
         },
-        "snap_consumer_session": {
+        "model_movement_path_context": {
           "before": null,
-          "after": "2c1efbc0b0ae010ddcfef32ba1d40cf5c40096f8f1f22cbe25918245084e88a0"
+          "after": "1a7715902f4a2c4564704f4462678e21fc9c68db7f6ff33e2e498a1498a81bf9"
         }
       }
     },
-    "tools/build_core_critical_hits_source.py": {
-      "before_sha256": "8687c8aed4ee295f8085b40fa83ef3e21ab2aa1dc48b791f9df96eda648d87d2",
-      "after_sha256": "423b8e447e54310d037949294d746351bd976966fbe36f39cc1c06cb2700289a",
+    "src/warhammer40k_core/engine/phases/movement_resolvers.py": {
+      "before_sha256": "0133814c03726db41d553924651af3c34cb57d75848fba3918c9b47efc1bdf8c",
+      "after_sha256": "276bad687be9437215a86ff366b824c04a373ff3ad7372551ca860d10a861d91",
       "owners": {
         "@module": {
-          "before": "58fa691e7031c74712df305ac3ae8656933fd466d5b6d76d9b42212a14016164",
-          "after": "bc1a7fad61340d41c81db2bf63e6bcde98112734924270cd28dbbff23607fc4c"
+          "before": "e77673fa1d7708003fc244a186576427f4e5a5ac5ea59b03ab357dbfd050e637",
+          "after": "d857b9fe8ba117c0929b72d1a7c9e2715578c01b49ca80cb377153860541a5b3"
         },
-        "build_payloads": {
-          "before": "0f46cd2b5981a135ab160b8e3975269e838297688a44cdf339668f912d108933",
-          "after": "e7c4c7e9e49d7d68016cc271803a4390cc83577aa8eac94d5f167402dd36b3fd"
-        },
-        "main": {
-          "before": "4537c5793c5a22cec81970996a44367cbefb276fb90dc810cfcbdfdfabd2665d",
-          "after": "60e99628ef82256d78b957dfecb23c57ec77b6c7c08a8e2dd8ed6a968e7e7d2c"
+        "_resolve_unit_move": {
+          "before": "16cb1b875255c872041d6daa28a6c4a0fa9d57bfc5ae52e5f4fd2f4d2f4efd14",
+          "after": "5655b4ae5a7a49532d83cd851f64683dd6d856bbc2b903bbaee766e78b529e8c"
         }
       }
     },
-    "tools/core_rules_order97_history.py": {
-      "before_sha256": "b43275eae52269ab401f33bea1f2a946f0aa686f3299a132cab4e0c2624d4ce5",
-      "after_sha256": "371e54d69e585c661132de57d603c3861e75c69c4daf0048a98177aa5657eb6b",
+    "src/warhammer40k_core/engine/phases/movement_validation.py": {
+      "before_sha256": "f0eb87a7c5f6352679c19e48d969758e1314faf39ee1d7edc6b5316684ca36c3",
+      "after_sha256": "99603f8f706e2b7a63a3e4c68e37ac0c185a4a2bfa8da56a18abfad14b41b8d3",
+      "owners": {
+        "_model_movement_budget_inches": {
+          "before": "b0926ffb91b91075f18c06d6f36f1171c1fc1842c878e8797ddd42503709ba5f",
+          "after": "a39fc1e8d70a38cd40f98ef66b250d23ea1eacc7e76da1c4fd5a26307a127443"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/scout_movement_paths.py": {
+      "before_sha256": "88b4cc4a69b0712f4836dbcf58decabbfecb10864bca3031f435e7b47864b0c9",
+      "after_sha256": "3843db3765b20a45fc4fc04f0b77a59e95d1bd00a30160ce09b7f145ebf3e8fb",
       "owners": {
         "@module": {
-          "before": "510de5b46724e2ca1315964952387a7aba1ed743022d07ea34003587c161bf00",
-          "after": "65fb8d5a2a9820f46e769f55f2050e1a56301fda777ef169eeeb4747fd45f0ab"
+          "before": "8b41201786fd21f018e6727845cda4b79d18257088fd24a051b72537f802e034",
+          "after": "fde4590d74a74a8a076b4fe4ce3083713cd5f85e4f1513264f6b632beefbf86c"
         },
-        "historical_evidence_path": {
-          "before": "09144f01cb780f70490f39b088174fd1ee5c6ddd2310f275c25b4b7e07cfda00",
-          "after": "d058432760b2e913f0b7a5191abf7a23a6dcc8b489e08bc98edc515841fc736b"
+        "append_scout_path_violations": {
+          "before": "800b6b6bd889ac2bd43349b659d7ecdb887b70c778665c5553f311f129e726c4",
+          "after": "61979529d3e220834df55554c335440f2be03b8475d3c4a249b9526dbac25e8a"
         }
       }
     },
-    "tools/v963_snap_source.py": {
+    "src/warhammer40k_core/engine/surge_history.py": {
+      "before_sha256": "4b006e9d778c2c4db9469d7e556ec01ef9d786dce6bb7e55ddf218836959528c",
+      "after_sha256": "1c6fc5943e7ee23c015da93561aee9be9e52e64263c6c64bf191f44ba28f9bcb",
+      "owners": {
+        "@module": {
+          "before": "bc785ed57a6c8799cc268b70ca551cf66b74cd4ceaa8156778303e6c8453989f",
+          "after": "ba04693a77eeb071858fa4a402872036ca88c1f158c37b5a3a035700556b6988"
+        },
+        "validate_surge_history": {
+          "before": "15301bcb8a3425d702064db0111854a3bc3beccd76acf10a73fd9d954d7d796f",
+          "after": "d566e770d8d097851ecc5865a151ca4eb24b2a3d109b38ae79a1316009be443c"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/surge_movement.py": {
+      "before_sha256": "a9d1684d106e07bfe6c6f3f4960a80a7b8d8f6d129850f9ce4b7096ddabe77b3",
+      "after_sha256": "ec0d0703caa81b4d19b285bac33eb80b0402ceaa454ed69c77536afd5cc74489",
+      "owners": {
+        "surge_endpoint_evidence": {
+          "before": "0343e6d9728a27a914e74ba0691e5392217adf24b69c223eeb2dff0ac475f656",
+          "after": "38c0da9e2c73ef21809106de39e3afeede86f6bf0bcac8b758bd177c7632746e"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/triggered_movement_resolution.py": {
+      "before_sha256": "91f02a3e778021529976806feae9728e16b4dfe84f2797b2fc85b0f2bcab9fe9",
+      "after_sha256": "ec54c7df2de1b8e1830cab8b9b7042e4955072d51fe5154d9704bde905b8a909",
+      "owners": {
+        "@module": {
+          "before": "ce6921e3d129a11bd945e89342c7e3b016d99ad80a1420fc41de85f5ac5c5356",
+          "after": "c5db3411923af2e45b9c98ca4e39230a1e6767aebb1255c275b47302bb12f4a8"
+        },
+        "resolve_triggered_movement": {
+          "before": "105e47f806855d3b5120bd502937d37d47950c5bf1ca0414c63292161521ee03",
+          "after": "4096544102d500c161016d685777b9b03c2f50f0566a0dbe97549feae0b2dd82"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/movement_reachability.py": {
+      "before_sha256": "d106d14bb1f018a34e920fa4e36569f9a800395b33d491361cbe57cc30345a4b",
+      "after_sha256": "d90edd91ae16dc6e3e17f2dff61e33ec68db175fd11ccefdd71faa8e2011e878",
+      "owners": {
+        "_cached_reachability": {
+          "before": "93b6f7d42ba0664c21a636f8d898c8a23f0d70113cadfb939c0c23a1313cca0d",
+          "after": "23588c0ac6ff4a5c97627254f8b33b384cee0f9d6163adbc0682307c8fe063c2"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/path_initial_constraints.py": {
       "before_sha256": null,
-      "after_sha256": "e8316574bf8071b1e3238cc7f7f440f5e37c86ecb7f37d279f7986503f2127e5",
+      "after_sha256": "47653ee9c1034ffab95d8ca67f62edf6dfa060e1813a5205574a690d0d0c7cb5",
       "owners": {
         "@module": {
           "before": null,
-          "after": "d65882adc96f162d4cc2b774ad56503a6bf7c7812271cb87b882d10d7b82c515"
+          "after": "aeb639c9cc9637319fb344d917c44b6704ce04da8c8dbbcf8dae80b7d057454d"
         },
-        "audit_row": {
+        "initial_path_constraint_result": {
           "before": null,
-          "after": "efe53c78b3c2f07e9dd6e618e4db943606bd73f5f22a61f98bc5ef96859b9f44"
+          "after": "4535f11dc05de440ae650006a611b8ba1a46985fd1e08727ee3defb5c91a0fd9"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/pathing.py": {
+      "before_sha256": "a182a92a0464232848c808c76f12652eb41fd8cc441a6f120d2a4f8ed097b759",
+      "after_sha256": "20ce2138f32c5cd70c580f37dd18ea5bc2f09dbc7a109c1b609ae30115e79e21",
+      "owners": {
+        "@module": {
+          "before": "f1762c79176397c270f43aa389b7eedb830b936a8d8cc3848e6cac43926f7cca",
+          "after": "4502dc42b58cfe7a1b8c3cec9833806f4298b595960585108ab0423e84a63830"
         },
-        "selected_record": {
-          "before": null,
-          "after": "438d602c001c796728a9c32c6a8fa5f2acb7bfefec05cb2af3519b7c1c75c4dd"
+        "PathValidationContext": {
+          "before": "bba28820d04e925851a0bbd2af142c8931e73ee44c45a078b14c3edaa740de4b",
+          "after": "1d6ef0d15c4fef081bd6d55d863c2d4497e272f76a19bfc8ea4acf0f190f894d"
         },
-        "source_text": {
+        "PathValidationContext.__post_init__": {
+          "before": "dec04fb7770ba988b98e3d7e6202fb56642d8c1f76455b9392e89e4f9a158e64",
+          "after": "eab1d007c67238cb108299ffe661ab35faedcfb91f810680b46597736ae998ff"
+        },
+        "PathValidationContext.from_payload": {
+          "before": "2c85ad4aa23942689743f2f5a8c2c2573c3a5bff5c2a90470c0f9b0ad6c4d023",
+          "after": "aca7ad85aa5621388efd3c83700776857cb1c2c8f6b436a97b896276fe1765e8"
+        },
+        "PathValidationContext.to_payload": {
+          "before": "44ca2d480312f4bd49c8af360b25c9716daa281ba865d29b96a127790ef16274",
+          "after": "ea29cf99ef2a261f610185418c3c479f200be9324571fd717f6c136b6c70f1fb"
+        },
+        "PathValidationContext.validate": {
+          "before": "72ee3d76108b604f3c16ae80264870a850527fc352f576a0ce8261832308ef61",
+          "after": "0801573a47dd8b1664e148f7fc06c00b0cd2f3e4979dd115596b35e0db6d6b51"
+        },
+        "PathValidationContextPayload": {
+          "before": "59d384b10d08c99230513aca58954416b681ea22483c9271406f81f0fb470c2f",
+          "after": "9b55da2e36c4180fb589d9ed069289ed474471da4570096761aa3fb7a5924b5e"
+        }
+      }
+    },
+    "tests/absent_movement_helpers.py": {
+      "before_sha256": null,
+      "after_sha256": "adc299d615b72ebe858407d84b5252afc0b78e1259f57937b72a77fe2213492e",
+      "owners": {
+        "@module": {
           "before": null,
-          "after": "521c7f9d9bc2ee90f7cc31702e8e34c31f2e9d27584c33244d85e01b310571d7"
+          "after": "d713bde52b42c1a1f2fe8613ebe220e8e3efec1f8da8a36bb4914158ff229efa"
+        },
+        "movement_catalog": {
+          "before": null,
+          "after": "38d282c4f50606290ab13e3f68bd1049786df237ee274c6533db3e9b953a7db7"
+        },
+        "movement_session": {
+          "before": null,
+          "after": "9aa7aaf42cceb06ecd4725f5afaffa671fa8c2a77d43828d847ee4b94a3ef0e9"
+        },
+        "movement_witness": {
+          "before": null,
+          "after": "3995c585982e4396798cf187af1b9eb0011dc0d7c4e15f63c8788c1f35d94058"
+        }
+      }
+    },
+    "tests/code_quality/test_order115_movement_permission.py": {
+      "before_sha256": null,
+      "after_sha256": "cb14aa1dcb30cbea219b98b81184c036e9e22a5c81144148a844be5aef6f5ed1",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "ebef77e93e53bb88f6ff5d01fc8204faae3f0e50d8ea9660876ce3e96b2a9cab"
+        },
+        "test_all_engine_movement_path_contexts_apply_model_permission": {
+          "before": null,
+          "after": "df865d4c370393fb73dcd4c5e2bb8e8676252a4c08f4008d6e41bfed28d4940a"
+        }
+      }
+    },
+    "tests/unit/test_order115_absent_movement.py": {
+      "before_sha256": null,
+      "after_sha256": "698a9ab16eb87966ff1b9c8c2a2d04477146d9c231482efce15c5f53ba71bd41",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "a3185a0f6d9bb0c008e06432943df2729f4feae41d910d85ab95c6e7f35e15d1"
+        },
+        "test_absent_movement_cannot_advance_or_use_a_normal_move_bonus": {
+          "before": null,
+          "after": "eef4ccd607c96f8b393edbb3abf4892a0a74680fe1748ea07758e83efc30b538"
+        },
+        "test_attached_movement_keeps_dash_bodyguard_fixed_and_numeric_leader_mobile": {
+          "before": null,
+          "after": "bbb85c10bfd5741385fb1502b552e33021b63c3149b259fa42b1ef3b8398a3e9"
+        },
+        "test_dash_fighter_completes_lethal_attacks_and_post_destruction_continuation": {
+          "before": null,
+          "after": "5606bb7544296effd70fb29592593d116dba2ad07a7b469d88811143f1cec2ee"
+        },
+        "test_dash_reactive_hold_is_an_engine_created_restorable_completion": {
+          "before": null,
+          "after": "c457f0c539e2f64282c2ab4a78ed19124046246dd51d4c4498b3b9d178908284"
+        },
+        "test_facade_advance_retry_completion_restore_fork_and_replay": {
+          "before": null,
+          "after": "c6ef54e4b4fb6aff7e2d5336a49e1dd737c44ac6352116dca9021fe7052877dd"
+        },
+        "test_fixed_distance_reaction_preserves_per_model_absence": {
+          "before": null,
+          "after": "97bb0cdab12919a7ba9ab2257052e74585cd4e9c82d526638929b294d870806a"
+        },
+        "test_fixed_oval_surge_certifies_maximum_approach_and_restores": {
+          "before": null,
+          "after": "3312bf46f808c6b2ef0478a9e8c501309d24f99874d5e4cac4f339107931834b"
+        },
+        "test_shared_permission_serializes_and_proves_fixed_pose_reachability": {
+          "before": null,
+          "after": "2d27a41c26889df5de139951f7cfc39a0b8563c02703bbdae18844fda8e143d0"
+        }
+      }
+    },
+    "tools/performance_policy.py": {
+      "before_sha256": "16073ea4598f5761138d954843fc3bed19c015ab3d64cfa4847fc51801db677f",
+      "after_sha256": "a4d74a129cf203ca055cf5433c8e5aae3b46d28a0073fd821631bfc7c88ffa45",
+      "owners": {
+        "@module": {
+          "before": "519450c30ea07090f3518111e4187c2c45a59c9d51ef206298b667d4b8d203ab",
+          "after": "4501a71ac9a2c14b7ac7e5a8f58050ad4522f0fe17e91f03eea2a1cfdf267471"
+        },
+        "_order115_smoke_operations": {
+          "before": null,
+          "after": "68b47524f70f85d983d7662820bea31664c33857c189d297b16ad05f52ea12cf"
+        },
+        "validate_assessment": {
+          "before": "3df8de54ba443b6b9e6f42bf52648c0faf4eadfaa83ab8b930c8f9e896208b2d",
+          "after": "d99f2e14682256e6fcc7fca417e874dd0a82954b514c6727daa57a50a6255b54"
         }
       }
     }
   },
   "rows": {
+    "README.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+    },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -636,9 +678,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -646,9 +688,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -656,9 +698,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -666,9 +708,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -676,9 +718,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -686,9 +728,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -696,9 +738,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -706,9 +748,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -716,9 +758,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -726,9 +768,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -736,9 +778,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -746,219 +788,169 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "conformance/typescript/src/contract.ts": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-contract-publication"
+        "order115-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/README.md": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-contract-publication"
+        "order115-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-contract-publication"
+        "order115-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-contract-publication"
+        "order115-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-contract-publication"
+        "order115-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-contract-publication"
+        "order115-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-contract-publication"
+        "order115-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-contract-publication"
+        "order115-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-contract-publication"
+        "order115-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-contract-publication"
+        "order115-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/openapi.yaml": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-contract-publication"
+        "order115-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
-    "data/source_audits/v963_snap/baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_critical_hits_2026_09/artifacts/package.json.txt": {
+    "data/source_audits/order115/source.audit.json": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-source-evidence"
+        "order115-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
-    },
-    "data/source_audits/v963_snap/baseline/tests/fire_overwatch_helpers.py.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "v963-snap-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
-    },
-    "data/source_audits/v963_snap/baseline/tests/unit/test_critical_hits.py.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "v963-snap-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
-    },
-    "data/source_audits/v963_snap/baseline/tests/unit/test_lethal_hits.py.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "v963-snap-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
-    },
-    "data/source_audits/v963_snap/historical-inputs.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "v963-snap-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
-    },
-    "data/source_audits/v963_snap/source.audit.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "v963-snap-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
-    "docs/PR_BACKLOG_2026_09_30.md": {
+    "docs/ORDER_115_SCOPE_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
-    },
-    "docs/V963_SNAP_SCOPE_PLAN.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+    },
+    "docs/performance/policy-v3/order115-rule-semantics.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -966,177 +958,211 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-hit-semantics"
+        "order115-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/engine/attack_sequence_hit_wound.py": {
+    "src/warhammer40k_core/engine/base_contact_fight_history.py": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-hit-semantics"
+        "order115-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/engine/attack_sequence_model.py": {
+    "src/warhammer40k_core/engine/charge_path_contexts.py": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-hit-semantics"
+        "order115-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/engine/hit_thresholds.py": {
+    "src/warhammer40k_core/engine/consolidation_model_constraints.py": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-hit-semantics"
+        "order115-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/rules/source_authority_registry.json": {
+    "src/warhammer40k_core/engine/fight_movement_paths.py": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-source-evidence"
+        "order115-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/rules/source_authority_registry.py": {
+    "src/warhammer40k_core/engine/fight_movement_source.py": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-hit-semantics"
+        "order115-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_critical_hits_2026_09/__init__.py": {
+    "src/warhammer40k_core/engine/model_movement_permission.py": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-hit-semantics"
+        "order115-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_critical_hits_2026_09/artifacts/package.json": {
+    "src/warhammer40k_core/engine/phases/movement_resolvers.py": {
       "category": "rule_semantics",
       "operations": [
-        "source-record"
+        "order115-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
-    "tests/code_quality/test_order43_critical_hits.py": {
+    "src/warhammer40k_core/engine/phases/movement_validation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order115-movement-permission"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+    },
+    "src/warhammer40k_core/engine/scout_movement_paths.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order115-movement-permission"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+    },
+    "src/warhammer40k_core/engine/surge_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order115-movement-permission"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+    },
+    "src/warhammer40k_core/engine/surge_movement.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order115-movement-permission"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+    },
+    "src/warhammer40k_core/engine/triggered_movement_resolution.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order115-movement-permission"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+    },
+    "src/warhammer40k_core/geometry/movement_reachability.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "cache-policy",
+        "geometry-search",
+        "order115-movement-permission"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+    },
+    "src/warhammer40k_core/geometry/path_initial_constraints.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "geometry-search",
+        "order115-movement-permission"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+    },
+    "src/warhammer40k_core/geometry/pathing.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "geometry-search",
+        "order115-movement-permission"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+    },
+    "tests/absent_movement_helpers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order115-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+    },
+    "tests/code_quality/test_order115_movement_permission.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
-    "tests/fire_overwatch_helpers.py": {
+    "tests/unit/test_order115_absent_movement.py": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-regressions"
+        "order115-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     },
-    "tests/unit/test_critical_hits.py": {
+    "tools/performance_policy.py": {
       "category": "rule_semantics",
       "operations": [
-        "v963-snap-regressions"
+        "order115-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
-    },
-    "tests/unit/test_lethal_hits.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "v963-snap-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
-    },
-    "tests/unit/test_phase13b_shooting_declarations.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "v963-snap-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
-    },
-    "tests/v963_snap_helpers.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "v963-snap-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
-    },
-    "tools/build_core_critical_hits_source.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "v963-snap-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
-    },
-    "tools/core_rules_order97_history.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "v963-snap-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
-    },
-    "tools/v963_snap_source.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "v963-snap-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
-      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
-      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
+      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
+      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
     }
   },
   "milestone": "ordinary",

@@ -777,6 +777,8 @@ def _model_movement_budget_inches(
 ) -> float | None:
     if type(movement_phase_action) is not MovementPhaseActionKind:
         raise GameLifecycleError("movement_phase_action must be a MovementPhaseActionKind.")
+    if model_movement_characteristic(model).is_dash:
+        return 0.0
     movement_budget = (
         _model_base_movement_inches(
             model=model,

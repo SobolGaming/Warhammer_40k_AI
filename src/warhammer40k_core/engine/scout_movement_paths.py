@@ -14,6 +14,7 @@ from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
 )
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.model_movement_permission import model_movement_path_context
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
@@ -67,35 +68,38 @@ def append_scout_path_violations(
             movement_phase_action=None,
             displacement_kind=ModelDisplacementKind.SCOUT_MOVE,
         )
-        path_result = legality_context.to_path_validation_context(
-            moving_model=moving_model,
-            witness=model_witness,
-            battlefield_width_inches=battlefield_state.battlefield_width_inches,
-            battlefield_depth_inches=battlefield_state.battlefield_depth_inches,
-            friendly_models=_friendly_geometry_models_for_path(
-                scenario=scenario,
-                unit_placement=current,
-                attempted_placement=attempted,
-                moving_model_instance_id=placement.model_instance_id,
+        path_result = model_movement_path_context(
+            model=model,
+            context=legality_context.to_path_validation_context(
+                moving_model=moving_model,
+                witness=model_witness,
+                battlefield_width_inches=battlefield_state.battlefield_width_inches,
+                battlefield_depth_inches=battlefield_state.battlefield_depth_inches,
+                friendly_models=_friendly_geometry_models_for_path(
+                    scenario=scenario,
+                    unit_placement=current,
+                    attempted_placement=attempted,
+                    moving_model_instance_id=placement.model_instance_id,
+                ),
+                enemy_models=enemy_geometry_models_for_player(
+                    scenario=scenario,
+                    player_id=current.player_id,
+                ),
+                terrain=terrain_volumes,
+                friendly_vehicle_monster_model_ids=_friendly_vehicle_monster_model_ids(
+                    scenario=scenario,
+                    player_id=current.player_id,
+                    moving_model_instance_id=placement.model_instance_id,
+                ),
+                enemy_vehicle_monster_model_ids=_enemy_vehicle_monster_model_ids_for_player(
+                    scenario=scenario,
+                    player_id=current.player_id,
+                ),
+                aircraft_model_ids=tuple(
+                    mid for mid in aircraft_model_ids if mid != placement.model_instance_id
+                ),
+                movement_distance_budget_inches=scout_distance_inches,
             ),
-            enemy_models=enemy_geometry_models_for_player(
-                scenario=scenario,
-                player_id=current.player_id,
-            ),
-            terrain=terrain_volumes,
-            friendly_vehicle_monster_model_ids=_friendly_vehicle_monster_model_ids(
-                scenario=scenario,
-                player_id=current.player_id,
-                moving_model_instance_id=placement.model_instance_id,
-            ),
-            enemy_vehicle_monster_model_ids=_enemy_vehicle_monster_model_ids_for_player(
-                scenario=scenario,
-                player_id=current.player_id,
-            ),
-            aircraft_model_ids=tuple(
-                mid for mid in aircraft_model_ids if mid != placement.model_instance_id
-            ),
-            movement_distance_budget_inches=scout_distance_inches,
         ).validate()
         if not path_result.is_valid:
             first_violation = path_result.violations[0]

@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.core.ruleset_descriptor import MovementMode
 from warhammer40k_core.engine.battlefield_state import ModelDisplacementKind
 from warhammer40k_core.engine.charge_endpoint_history import charge_component_at_physical_boundary
+from warhammer40k_core.engine.model_movement_permission import model_movement_path_context
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.phase import GameLifecycleError
 
@@ -55,16 +56,23 @@ def validate_fight_contact_permissions(
             and m.model_instance_id != context.moving_model.model_id
         )
     )
-    expected_path = legality.to_path_validation_context(
-        moving_model=context.moving_model,
-        witness=context.witness,
-        battlefield_width_inches=context.battlefield_width_inches,
-        battlefield_depth_inches=context.battlefield_depth_inches,
-        friendly_models=context.friendly_models,
-        enemy_models=context.enemy_models,
-        terrain=(),
-        aircraft_model_ids=aircraft,
-        movement_distance_budget_inches=context.movement_distance_budget_inches,
+    expected_path = model_movement_path_context(
+        model=next(
+            model
+            for model in unit.own_models
+            if model.model_instance_id == context.moving_model.model_id
+        ),
+        context=legality.to_path_validation_context(
+            moving_model=context.moving_model,
+            witness=context.witness,
+            battlefield_width_inches=context.battlefield_width_inches,
+            battlefield_depth_inches=context.battlefield_depth_inches,
+            friendly_models=context.friendly_models,
+            enemy_models=context.enemy_models,
+            terrain=(),
+            aircraft_model_ids=aircraft,
+            movement_distance_budget_inches=context.movement_distance_budget_inches,
+        ),
     )
     expected_terrain = legality.to_terrain_path_legality_context(
         moving_model=context.moving_model,
@@ -194,30 +202,37 @@ def validate_triggered_contact_permissions(
             )
         )
 
-    expected = legality.to_path_validation_context(
-        moving_model=context.moving_model,
-        witness=context.witness,
-        battlefield_width_inches=context.battlefield_width_inches,
-        battlefield_depth_inches=context.battlefield_depth_inches,
-        friendly_models=context.friendly_models,
-        enemy_models=context.enemy_models,
-        terrain=(),
-        friendly_vehicle_monster_model_ids=matching(True, ("VEHICLE", "MONSTER")),
-        enemy_vehicle_monster_model_ids=matching(False, ("VEHICLE", "MONSTER")),
-        friendly_model_transit_blocker_ids=blockers(
-            True, legality.capabilities.friendly_model_transit_blocker_keywords
+    expected = model_movement_path_context(
+        model=next(
+            model
+            for model in unit.own_models
+            if model.model_instance_id == context.moving_model.model_id
         ),
-        enemy_model_transit_blocker_ids=blockers(
-            False, legality.capabilities.enemy_model_transit_blocker_keywords
+        context=legality.to_path_validation_context(
+            moving_model=context.moving_model,
+            witness=context.witness,
+            battlefield_width_inches=context.battlefield_width_inches,
+            battlefield_depth_inches=context.battlefield_depth_inches,
+            friendly_models=context.friendly_models,
+            enemy_models=context.enemy_models,
+            terrain=(),
+            friendly_vehicle_monster_model_ids=matching(True, ("VEHICLE", "MONSTER")),
+            enemy_vehicle_monster_model_ids=matching(False, ("VEHICLE", "MONSTER")),
+            friendly_model_transit_blocker_ids=blockers(
+                True, legality.capabilities.friendly_model_transit_blocker_keywords
+            ),
+            enemy_model_transit_blocker_ids=blockers(
+                False, legality.capabilities.enemy_model_transit_blocker_keywords
+            ),
+            aircraft_model_ids=tuple(
+                sorted(
+                    mid
+                    for mid in (*matching(True, ("AIRCRAFT",)), *matching(False, ("AIRCRAFT",)))
+                    if mid not in retained
+                )
+            ),
+            movement_distance_budget_inches=context.movement_distance_budget_inches,
         ),
-        aircraft_model_ids=tuple(
-            sorted(
-                mid
-                for mid in (*matching(True, ("AIRCRAFT",)), *matching(False, ("AIRCRAFT",)))
-                if mid not in retained
-            )
-        ),
-        movement_distance_budget_inches=context.movement_distance_budget_inches,
     )
     terrain = legality.to_terrain_path_legality_context(
         moving_model=context.moving_model,

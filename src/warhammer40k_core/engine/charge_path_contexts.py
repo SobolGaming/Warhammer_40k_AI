@@ -12,6 +12,7 @@ from warhammer40k_core.engine.charge_rule_effects import (
     charge_path_context_with_rule_effect_permissions,
 )
 from warhammer40k_core.engine.effects import PersistingEffect
+from warhammer40k_core.engine.model_movement_permission import model_movement_path_context
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pathing import (
@@ -81,36 +82,41 @@ def charge_model_path_contexts(
         )
 
     enemies_vm = matching(enemy_models, ("VEHICLE", "MONSTER"))
-    path = legality.to_path_validation_context(
-        moving_model=moving_model,
-        witness=witness,
-        battlefield_width_inches=battlefield_width_inches,
-        battlefield_depth_inches=battlefield_depth_inches,
-        friendly_models=friendly_models,
-        enemy_models=enemy_models,
-        terrain=(),
-        friendly_vehicle_monster_model_ids=matching(friendly_models, ("VEHICLE", "MONSTER")),
-        enemy_vehicle_monster_model_ids=enemies_vm,
-        friendly_model_transit_blocker_ids=blockers(
-            friendly_models, legality.capabilities.friendly_model_transit_blocker_keywords
+    path = model_movement_path_context(
+        model=next(
+            model for model in unit.own_models if model.model_instance_id == moving_model.model_id
         ),
-        enemy_model_transit_blocker_ids=blockers(
-            enemy_models, legality.capabilities.enemy_model_transit_blocker_keywords
-        ),
-        aircraft_model_ids=tuple(
-            sorted(
-                m.model_id
-                for m in (*friendly_models, *enemy_models)
-                if m.model_id not in retained_model_ids
-                and "AIRCRAFT"
-                in next(
-                    model.keywords
-                    for model in units_by_model_id[m.model_id].own_models
-                    if model.model_instance_id == m.model_id
+        context=legality.to_path_validation_context(
+            moving_model=moving_model,
+            witness=witness,
+            battlefield_width_inches=battlefield_width_inches,
+            battlefield_depth_inches=battlefield_depth_inches,
+            friendly_models=friendly_models,
+            enemy_models=enemy_models,
+            terrain=(),
+            friendly_vehicle_monster_model_ids=matching(friendly_models, ("VEHICLE", "MONSTER")),
+            enemy_vehicle_monster_model_ids=enemies_vm,
+            friendly_model_transit_blocker_ids=blockers(
+                friendly_models, legality.capabilities.friendly_model_transit_blocker_keywords
+            ),
+            enemy_model_transit_blocker_ids=blockers(
+                enemy_models, legality.capabilities.enemy_model_transit_blocker_keywords
+            ),
+            aircraft_model_ids=tuple(
+                sorted(
+                    m.model_id
+                    for m in (*friendly_models, *enemy_models)
+                    if m.model_id not in retained_model_ids
+                    and "AIRCRAFT"
+                    in next(
+                        model.keywords
+                        for model in units_by_model_id[m.model_id].own_models
+                        if model.model_instance_id == m.model_id
+                    )
                 )
-            )
+            ),
+            movement_distance_budget_inches=maximum_distance_inches,
         ),
-        movement_distance_budget_inches=maximum_distance_inches,
     )
     path = charge_path_context_with_rule_effect_permissions(
         path,

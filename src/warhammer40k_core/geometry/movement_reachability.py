@@ -458,6 +458,8 @@ def _cached_reachability(query: MovementReachabilityQuery) -> MovementReachabili
         stationary = _validated_witness(query, (source.pose, source.pose))
         if stationary is not None:
             return MovementReachabilityResult(stationary, 0, MovementReachabilityStatus.REACHABLE)
+    if query.path_context.pose_is_fixed:
+        return MovementReachabilityResult(None, 0, MovementReachabilityStatus.UNREACHABLE)
     if (
         query.goal.distance_lower_bound(
             source, ignores_vertical_distance=query.path_context.ignores_vertical_distance

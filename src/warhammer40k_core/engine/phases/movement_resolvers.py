@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.model_movement_permission import model_movement_path_context
+
 from warhammer40k_core.core.attributes import CharacteristicValue
 from warhammer40k_core.engine.aircraft import AircraftMovementViolationCode
 from warhammer40k_core.engine.base_contact_authority import (
@@ -458,48 +460,51 @@ def _resolve_unit_move(
             owner_player_id=unit_placement.player_id,
             ignores_vertical_distance_override=ignores_vertical_distance,
         )
-        path_context = legality_context.to_path_validation_context(
-            moving_model=moving_model,
-            witness=model_witness,
-            battlefield_width_inches=battlefield_width_inches,
-            battlefield_depth_inches=battlefield_depth_inches,
-            friendly_models=_friendly_geometry_models_for_path(
-                scenario=scenario,
-                unit_placement=unit_placement,
-                attempted_placement=attempted_placement,
-                moving_model_instance_id=placement.model_instance_id,
+        path_context = model_movement_path_context(
+            model=model,
+            context=legality_context.to_path_validation_context(
+                moving_model=moving_model,
+                witness=model_witness,
+                battlefield_width_inches=battlefield_width_inches,
+                battlefield_depth_inches=battlefield_depth_inches,
+                friendly_models=_friendly_geometry_models_for_path(
+                    scenario=scenario,
+                    unit_placement=unit_placement,
+                    attempted_placement=attempted_placement,
+                    moving_model_instance_id=placement.model_instance_id,
+                ),
+                enemy_models=_enemy_geometry_models_for_player(
+                    scenario=scenario,
+                    player_id=unit_placement.player_id,
+                ),
+                terrain=(),
+                friendly_vehicle_monster_model_ids=_friendly_vehicle_monster_model_ids(
+                    scenario=scenario,
+                    player_id=unit_placement.player_id,
+                    moving_model_instance_id=placement.model_instance_id,
+                ),
+                enemy_vehicle_monster_model_ids=_enemy_vehicle_monster_model_ids_for_player(
+                    scenario=scenario,
+                    player_id=unit_placement.player_id,
+                ),
+                friendly_model_transit_blocker_ids=_friendly_model_ids_with_keyword_any(
+                    scenario=scenario,
+                    player_id=unit_placement.player_id,
+                    moving_model_instance_id=placement.model_instance_id,
+                    keyword_any=legality_context.capabilities.friendly_model_transit_blocker_keywords,
+                ),
+                enemy_model_transit_blocker_ids=_enemy_model_ids_with_keyword_any_for_player(
+                    scenario=scenario,
+                    player_id=unit_placement.player_id,
+                    keyword_any=legality_context.capabilities.enemy_model_transit_blocker_keywords,
+                ),
+                aircraft_model_ids=tuple(
+                    model_id
+                    for model_id in aircraft_model_ids
+                    if model_id != placement.model_instance_id
+                ),
+                movement_distance_budget_inches=movement_distance_budget_inches,
             ),
-            enemy_models=_enemy_geometry_models_for_player(
-                scenario=scenario,
-                player_id=unit_placement.player_id,
-            ),
-            terrain=(),
-            friendly_vehicle_monster_model_ids=_friendly_vehicle_monster_model_ids(
-                scenario=scenario,
-                player_id=unit_placement.player_id,
-                moving_model_instance_id=placement.model_instance_id,
-            ),
-            enemy_vehicle_monster_model_ids=_enemy_vehicle_monster_model_ids_for_player(
-                scenario=scenario,
-                player_id=unit_placement.player_id,
-            ),
-            friendly_model_transit_blocker_ids=_friendly_model_ids_with_keyword_any(
-                scenario=scenario,
-                player_id=unit_placement.player_id,
-                moving_model_instance_id=placement.model_instance_id,
-                keyword_any=legality_context.capabilities.friendly_model_transit_blocker_keywords,
-            ),
-            enemy_model_transit_blocker_ids=_enemy_model_ids_with_keyword_any_for_player(
-                scenario=scenario,
-                player_id=unit_placement.player_id,
-                keyword_any=legality_context.capabilities.enemy_model_transit_blocker_keywords,
-            ),
-            aircraft_model_ids=tuple(
-                model_id
-                for model_id in aircraft_model_ids
-                if model_id != placement.model_instance_id
-            ),
-            movement_distance_budget_inches=movement_distance_budget_inches,
         )
         path_result = path_context.validate()
         if legality_context.capabilities.desperate_escape_tests_auto_passed:

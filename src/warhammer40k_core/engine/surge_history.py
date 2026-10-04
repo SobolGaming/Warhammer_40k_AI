@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, geometry_model_for_placement
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.fight_model_authority_history import historical_rules_unit_model_ids
+from warhammer40k_core.engine.movement_budget_modifiers import model_movement_characteristic
 from warhammer40k_core.engine.movement_proposals import MovementProposalRequest
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_mission_boundary_physical_authority import (
@@ -235,15 +236,21 @@ def validate_surge_history(*, state: GameState, decisions: DecisionController) -
                 ):
                     raise GameLifecycleError("Surge engagement proof drifted.")
             else:
-                budget = descriptor.max_distance_inches
-                lower = max(
-                    0.0,
-                    MovementGoal(models=targets, range_inches=0.0).distance_lower_bound(start)
-                    - budget,
+                fixed_pose = model_movement_characteristic(identities[model_id][2]).is_dash
+                budget = 0.0 if fixed_pose else descriptor.max_distance_inches
+                lower = (
+                    min(start.range_to(enemy) for enemy in targets)
+                    if fixed_pose
+                    else max(
+                        0.0,
+                        MovementGoal(models=targets, range_inches=0.0).distance_lower_bound(start)
+                        - budget,
+                    )
                 )
-                engagement_proved = (
-                    row.get("engagement_status") == "unreachable"
-                    and goal.distance_lower_bound(start) > budget + 1e-8
+                engagement_proved = row.get("engagement_status") == "unreachable" and (
+                    end.pose == start.pose and not goal.contains(start)
+                    if fixed_pose
+                    else goal.distance_lower_bound(start) > budget + 1e-8
                 )
                 if row.get("engagement_status") == "endpoint_unreachable":
                     if state.battlefield_state is None:
