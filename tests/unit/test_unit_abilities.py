@@ -263,19 +263,14 @@ def test_retained_model_aura_keeps_attached_ability_without_external_geometry() 
     from tests.order118_source_helpers import (
         reach_source_casualty,
         source_retention_session,
+        source_stealth_granted_model_ids,
         submit_source_choice,
     )
     from tests.psychic_modifier_helpers import pending_request
     from tests.support.ability_presence_fixtures import compiled_ability_rule
 
     from warhammer40k_core.adapters.local_session import LocalGameSession
-    from warhammer40k_core.engine.abilities import AbilityCatalogIndex
-    from warhammer40k_core.engine.ability_catalog import catalog_ability_records_from_catalog
-    from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
-    from warhammer40k_core.engine.game_state import GameConfig
-    from warhammer40k_core.engine.model_ability_grants import ModelAbilityGrantContext
     from warhammer40k_core.engine.phase import BattlePhase
-    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
     from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleEffectSpec, RuleParameter
 
     text = (
@@ -308,27 +303,7 @@ def test_retained_model_aura_keeps_attached_ability_without_external_geometry() 
     )
 
     def granted(current: LocalGameSession, target_id: str) -> tuple[str, ...]:
-        state = current.lifecycle.state
-        assert state is not None
-        config_payload = current.lifecycle.to_payload()["config"]
-        assert config_payload is not None
-        config = GameConfig.from_payload(config_payload)
-        records = catalog_ability_records_from_catalog(config.army_catalog)
-        runtime = CatalogDatasheetRuleRuntime(
-            {player: AbilityCatalogIndex.from_records(records) for player in state.player_ids},
-            tuple(state.army_definitions),
-        )
-        binding = next(
-            binding
-            for binding in runtime.model_ability_grant_bindings()
-            if ":army-beta:enemy:" in binding.modifier_id
-        )
-        return binding.model_ids(
-            ModelAbilityGrantContext(
-                state=state,
-                target=rules_unit_view_by_id(state=state, unit_instance_id=target_id),
-            )
-        )
+        return source_stealth_granted_model_ids(current, target_unit_instance_id=target_id)
 
     assert granted(session, "army-beta:enemy")
     assert granted(session, "army-beta:other")
@@ -345,6 +320,95 @@ def test_retained_model_aura_keeps_attached_ability_without_external_geometry() 
     assert attack_completed(session)
     assert granted(session, "army-beta:enemy") == ()
     assert granted(session, "army-beta:other") == ()
+
+
+def test_retained_passive_stealth_source_grants_only_living_attached_recipients() -> None:
+    from tests.lethal_hits_helpers import attack_completed
+    from tests.order118_source_helpers import (
+        reach_source_casualty,
+        source_retention_session,
+        source_stealth_granted_model_ids,
+        submit_source_choice,
+    )
+    from tests.psychic_modifier_helpers import pending_request
+    from tests.support.ability_presence_fixtures import compiled_ability_rule
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.phase import BattlePhase
+    from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+    from warhammer40k_core.rules.rule_ir import (
+        RuleDuration,
+        RuleDurationKind,
+        RuleEffectKind,
+        RuleEffectSpec,
+        RuleParameter,
+        RuleTargetKind,
+        RuleTargetSpec,
+    )
+
+    text = "Ranged weapons equipped by models in this unit have the [LETHAL HITS] ability."
+    ir = compiled_ability_rule(text, source_id="test:order118:passive-stealth")
+    # Supply the same typed passive-self grant used by the catalog provider.
+    ir = replace(
+        ir,
+        clauses=tuple(
+            replace(
+                clause,
+                template_id="phase17p:passive-self-ability-grant",
+                trigger=None,
+                conditions=(),
+                target=RuleTargetSpec(
+                    kind=RuleTargetKind.THIS_UNIT, source_span=clause.source_span
+                ),
+                duration=RuleDuration(
+                    kind=RuleDurationKind.WHILE_CONDITION_TRUE, source_span=clause.source_span
+                ),
+                effects=(
+                    RuleEffectSpec(
+                        kind=RuleEffectKind.GRANT_ABILITY,
+                        source_span=clause.source_span,
+                        parameters=(
+                            RuleParameter("ability", "stealth"),
+                            RuleParameter("target_scope", "this_unit"),
+                        ),
+                    ),
+                ),
+            )
+            for clause in ir.clauses
+        ),
+    )
+    session, model_id = source_retention_session(BattlePhase.FIGHT, ability_rule_ir=ir)
+
+    def granted(current: LocalGameSession) -> tuple[str, ...]:
+        return source_stealth_granted_model_ids(current, target_unit_instance_id="army-beta:enemy")
+
+    before = granted(session)
+    assert model_id in before
+    assert len(before) == 3
+    reach_source_casualty(session, source_model_id=model_id)
+    assert set(granted(session)) == set(before) - {model_id}
+    saved = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(saved)
+    assert restored.to_persistence_payload() == saved
+    assert granted(restored) == granted(session)
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="order118:passive-mid"))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )
+    for _ in range(150):
+        if attack_completed(session):
+            break
+        submit_source_choice(session, pending_request(session), source_model_id=model_id)
+    assert attack_completed(session)
+    assert granted(session) == ()
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="order118:passive-done"))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )
 
 
 def test_core_keyword_ability_descriptors_enable_boolean_families_without_keywords() -> None:

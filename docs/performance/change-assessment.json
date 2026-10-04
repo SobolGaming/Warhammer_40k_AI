@@ -1,8 +1,8 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "ae452b60dd37b2ee262eb5e830ecf6405cf80516",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8314acdacbe81baf6dfaea3e71b6eaaf21a498d19c26bd906e982ce360bd29e2",
-  "operation_map_sha256": "52d0a777425081dbd86f78ae9e7a9c5a2fcaf23fd2f200cb15c26369fbc56eb3",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:26830a46b61a3a2a039dd59cf4e13a5e3efc75bbecabbe054c3082587e48d2a8",
+  "operation_map_sha256": "d123776e142f903e8e40a29461f0d483001a1aca07a160342abf3a788bbca892",
   "changes": {
     "conformance/typescript/src/contract.ts": {
       "before_sha256": "f64e12c869a0730e70a9f074ab42adfe8ff2ee4431232c6f56ee29d5c1b510c1",
@@ -16,81 +16,81 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "86b34f4d64cbc974931abe1bd6c7c2d8a412e5f308b8f054075596d684230fcd",
-      "after_sha256": "faba7fe1ac2f76c0d2957fa88e59da7ade9b122d69bd455af0081c1552a6366c",
+      "after_sha256": "fe8b8ae462dbb3698fa38b5beb6e4e556522d3a17449e646dea76fce8bf43859",
       "owners": {
         "@document": {
           "before": "86b34f4d64cbc974931abe1bd6c7c2d8a412e5f308b8f054075596d684230fcd",
-          "after": "faba7fe1ac2f76c0d2957fa88e59da7ade9b122d69bd455af0081c1552a6366c"
+          "after": "fe8b8ae462dbb3698fa38b5beb6e4e556522d3a17449e646dea76fce8bf43859"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "a33bf3be26c5633ac052f3e144909720481e8b4e071cad09eb988b881b8efc8e",
-      "after_sha256": "adb3a8e8a914ad5ab15ebb5805aac6849e0a6b11a8b249dc137925221c6afd56",
+      "after_sha256": "ddf05780e485502e2e412aa16eb2e85d85108fbfead54260379f87395c59303a",
       "owners": {
         "@document": {
           "before": "a33bf3be26c5633ac052f3e144909720481e8b4e071cad09eb988b881b8efc8e",
-          "after": "adb3a8e8a914ad5ab15ebb5805aac6849e0a6b11a8b249dc137925221c6afd56"
+          "after": "ddf05780e485502e2e412aa16eb2e85d85108fbfead54260379f87395c59303a"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "7a7bf7f36781f02c2d0820949aa92b4995828fa41a35c9c54c73533f70297e42",
-      "after_sha256": "af05b873693bf12a449a33220383a6db3ed578b76ddeea2fbf57d3a48bf1b4f6",
+      "after_sha256": "06d7d71f5454e6de1a69355b0c170c33b514234059342b0513e36c5ac49c3f73",
       "owners": {
         "@document": {
           "before": "7a7bf7f36781f02c2d0820949aa92b4995828fa41a35c9c54c73533f70297e42",
-          "after": "af05b873693bf12a449a33220383a6db3ed578b76ddeea2fbf57d3a48bf1b4f6"
+          "after": "06d7d71f5454e6de1a69355b0c170c33b514234059342b0513e36c5ac49c3f73"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "e1d82b40ca7322f2cb71236e7fdb18daebc75d9d79d7c9aafc54ead26e2d02ce",
-      "after_sha256": "c4ced278b8730e7ec2f7dd2d8771322bae46c39c881ade3a56f4f91aa1534c3d",
+      "after_sha256": "d76209c3c92a1bc9dee90432bccbbf253712887c86692673b34285280aa3a752",
       "owners": {
         "@document": {
           "before": "e1d82b40ca7322f2cb71236e7fdb18daebc75d9d79d7c9aafc54ead26e2d02ce",
-          "after": "c4ced278b8730e7ec2f7dd2d8771322bae46c39c881ade3a56f4f91aa1534c3d"
+          "after": "d76209c3c92a1bc9dee90432bccbbf253712887c86692673b34285280aa3a752"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "9f26478f04e5447460341f9a94741ae7a98eeabd12f897e0d5e94aceec0494eb",
-      "after_sha256": "e4a285e74e7211f1c2f2ba3cf709e4be1955ba6b34bb214040364f15df6e6209",
+      "after_sha256": "750a8c2b8f7f27221e9df71fc97e6ffe3537f69c3366b7689bc18e32b80fa18b",
       "owners": {
         "@document": {
           "before": "9f26478f04e5447460341f9a94741ae7a98eeabd12f897e0d5e94aceec0494eb",
-          "after": "e4a285e74e7211f1c2f2ba3cf709e4be1955ba6b34bb214040364f15df6e6209"
+          "after": "750a8c2b8f7f27221e9df71fc97e6ffe3537f69c3366b7689bc18e32b80fa18b"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "6c43adc7415f22434b6a8a0196981f2e38b4861df60a308716bb55328cd7e335",
-      "after_sha256": "53c0c83b0587cce83b91633ffea37a99f142caec7942c7a6399d45baa68a7b65",
+      "after_sha256": "93e749c2cd57cba7b1de4584277d1a0f0047791829f95b090ab887bc24c3875f",
       "owners": {
         "@document": {
           "before": "6c43adc7415f22434b6a8a0196981f2e38b4861df60a308716bb55328cd7e335",
-          "after": "53c0c83b0587cce83b91633ffea37a99f142caec7942c7a6399d45baa68a7b65"
+          "after": "93e749c2cd57cba7b1de4584277d1a0f0047791829f95b090ab887bc24c3875f"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "43c7a1dad6a25c8ab6f3135f54eded39cd4ac0c2a824d7542c528135ac5316a0",
-      "after_sha256": "87b46fdc7b902e88621bfd2e700b07c4eece13c70d5baec94cd4e12f1db16182",
+      "after_sha256": "0473e5da958514a7f34f2bedcf28776e8d3eadac7d0da572d1fe6f46b4c67a51",
       "owners": {
         "@document": {
           "before": "43c7a1dad6a25c8ab6f3135f54eded39cd4ac0c2a824d7542c528135ac5316a0",
-          "after": "87b46fdc7b902e88621bfd2e700b07c4eece13c70d5baec94cd4e12f1db16182"
+          "after": "0473e5da958514a7f34f2bedcf28776e8d3eadac7d0da572d1fe6f46b4c67a51"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "e79c9baafccfc0e22e2fe2d37e6f946db19efe0d227718a73fd1255cb6864ac1",
-      "after_sha256": "5b59310ff66cbf9080ae39a477406bd3ed644b5040d256cf12b7a8fcd5f07c5c",
+      "after_sha256": "2cb6865c053cd1c7872a3cf2ad54bcc7724e17b8525f211956d2a9354a8ee27d",
       "owners": {
         "@document": {
           "before": "e79c9baafccfc0e22e2fe2d37e6f946db19efe0d227718a73fd1255cb6864ac1",
-          "after": "5b59310ff66cbf9080ae39a477406bd3ed644b5040d256cf12b7a8fcd5f07c5c"
+          "after": "2cb6865c053cd1c7872a3cf2ad54bcc7724e17b8525f211956d2a9354a8ee27d"
         }
       }
     },
@@ -146,41 +146,41 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "7edcf117231ee74328fd02f410a084c62a9617d5a9de0a69183367caafe7453e",
-      "after_sha256": "c79e341a783ceef0f37e1cc9968d5823e786355b34a7b3e4e51e1ff941b0ac85",
+      "after_sha256": "a7e57b2a220966b4b12ae7daafc12ee770f8b79977c54a5ced5e30e90e4dc0b7",
       "owners": {
         "@document": {
           "before": "7edcf117231ee74328fd02f410a084c62a9617d5a9de0a69183367caafe7453e",
-          "after": "c79e341a783ceef0f37e1cc9968d5823e786355b34a7b3e4e51e1ff941b0ac85"
+          "after": "a7e57b2a220966b4b12ae7daafc12ee770f8b79977c54a5ced5e30e90e4dc0b7"
         }
       }
     },
     "docs/ORDER_118_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "a6f0b8ca88d6ef3b5933dd4c217bd77e7e0bc4ce3947654f16dce29382a5fe4a",
+      "after_sha256": "3ebbe8c308782f33b2788011959e65299129583372c6a159893103180124ed56",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a6f0b8ca88d6ef3b5933dd4c217bd77e7e0bc4ce3947654f16dce29382a5fe4a"
+          "after": "3ebbe8c308782f33b2788011959e65299129583372c6a159893103180124ed56"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "8f1b4c0538eea261858ce887c8c4803252e2a1381bceab0f5c429299cc99634a",
-      "after_sha256": "03c1aea271117baa355624447ad030be025fae19e1a8297dc913228123c47fb9",
+      "after_sha256": "c73e8629dc3011889a3258d1943d5f45567175ee86cff6a5f148c03b86f8033b",
       "owners": {
         "@document": {
           "before": "8f1b4c0538eea261858ce887c8c4803252e2a1381bceab0f5c429299cc99634a",
-          "after": "03c1aea271117baa355624447ad030be025fae19e1a8297dc913228123c47fb9"
+          "after": "c73e8629dc3011889a3258d1943d5f45567175ee86cff6a5f148c03b86f8033b"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "24c6bffe147b1685d137e511df468cc7aa8d1dcf79fe4fb622c3dd05d8e11b6e",
-      "after_sha256": "24fdc92b09243f0eafee283d3a24c7c170db68912ea5d6abdce46f282735c97b",
+      "after_sha256": "943a26c527375b36030f22b61b0c4c57039cccf6483496508f9bfb94accbb562",
       "owners": {
         "@document": {
           "before": "24c6bffe147b1685d137e511df468cc7aa8d1dcf79fe4fb622c3dd05d8e11b6e",
-          "after": "24fdc92b09243f0eafee283d3a24c7c170db68912ea5d6abdce46f282735c97b"
+          "after": "943a26c527375b36030f22b61b0c4c57039cccf6483496508f9bfb94accbb562"
         }
       }
     },
@@ -276,6 +276,16 @@
         }
       }
     },
+    "src/warhammer40k_core/engine/catalog_attack_context_rule_runtime.py": {
+      "before_sha256": "4191a089796ff23465f1bfff43ad2f61fa6d4b62c42c5d782a4487d754f8fbbc",
+      "after_sha256": "551cf6db548a4c195b00cc792fc7ccf1dac976226b52b7a67987f5abb6712bed",
+      "owners": {
+        "current_effect_target_model_ids": {
+          "before": "1f1d13742f95a2d78c6c5ef2ad25c305213919cf417c2ade159351ae818b706b",
+          "after": "005a7c2475c9915e06ee1526442a7932517cfa04c02927f8e11c974a9e9bff34"
+        }
+      }
+    },
     "src/warhammer40k_core/engine/catalog_conditional_leader_queries.py": {
       "before_sha256": "5586dab5aa96b77d2e73ad180612bd11582c3d21437ae737d877929878bc2d2f",
       "after_sha256": "e2d08cceb0cc675873517a6154ce19c3f68ff969784dd5dd70091a6323e7c1e1",
@@ -356,11 +366,11 @@
     },
     "tests/order118_source_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "6200b3cc5df3a8532bb3ff5def46090d055023e2785c06e7e6618b000c98f4cb",
+      "after_sha256": "036832ba26670692489f3b6d3afba173f375fc7196f3ed5e7354f57b664f37cb",
       "owners": {
         "@module": {
           "before": null,
-          "after": "c51a758980dc7982e2e7ee9e553cda39ca1c351664a25b1a9001a3678ea7b36e"
+          "after": "8c4335c4aab9cf08c6a1ed31325fccb2621fe748efab5ed5d1fc250ee63f16cf"
         },
         "reach_source_casualty": {
           "before": null,
@@ -372,17 +382,21 @@
         },
         "source_retention_session": {
           "before": null,
-          "after": "5c7db267f1903330ca6db2228e7fdbc9b3a4017f494779e0b96f675d8a1e6e77"
+          "after": "bb81ad9ab76a294ed3069bb805fd028205512a61f7bd8e476ba55ac83e53deab"
+        },
+        "source_stealth_granted_model_ids": {
+          "before": null,
+          "after": "2328e77021d55500190bc6e3dceae2cffaa428f3870c6c9a469e43aff88ac1ba"
         },
         "submit_source_choice": {
           "before": null,
-          "after": "cb9e09c1abc24771a677ac592886fa6f61bf9e01a803a4b95bd24e7ed5397d84"
+          "after": "1c15c87795d1b74b3147a22e552a9d56539e3c85218a52b77233c72fa11a160e"
         }
       }
     },
     "tests/unit/test_unit_abilities.py": {
       "before_sha256": "135ebd8f548ac093023d987a2d9cf12de8e9dc081f3b58c84ca8cdeb48a3123e",
-      "after_sha256": "84fc7900be5a267c5ec05ffe3fdb127e881adfcbee100cfb9f8e7d4d20ae8246",
+      "after_sha256": "be21f4f8d872ab6d01b225aacc38422043a083c0a233811b0fa68203ae29b243",
       "owners": {
         "@module": {
           "before": "9bf30868c9aaf8d2329fe396d671052b5a5ae64bee2fa2c4e8a3fa16826e6d88",
@@ -406,7 +420,11 @@
         },
         "test_retained_model_aura_keeps_attached_ability_without_external_geometry": {
           "before": null,
-          "after": "62494213a896e09db9a7c71c7d6e3d83ebc45513e86c3d344b568aa603c0e55e"
+          "after": "63ea1a1ac7ba857ab36b039c5918c3d043664fd22e96479ae53beffb7beb9f79"
+        },
+        "test_retained_passive_stealth_source_grants_only_living_attached_recipients": {
+          "before": null,
+          "after": "b2fadff7447a1c689c8cc239af8b052d36e7c4442eedeb659258d35263a772c9"
         }
       }
     },
@@ -649,6 +667,16 @@
       "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/engine/attack_sequence_dispatch.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order118-attack-source-lifetime"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+    },
+    "src/warhammer40k_core/engine/catalog_attack_context_rule_runtime.py": {
       "category": "rule_semantics",
       "operations": [
         "order118-attack-source-lifetime"

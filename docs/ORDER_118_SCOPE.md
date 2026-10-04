@@ -16,6 +16,9 @@ use battlefield IDs; model-only action consumers continue to require living mode
 Model-anchored auras keep the attached unit's own ability without looking up a
 removed bearer's placement or granting range to another unit. The regression uses
 the catalog's structured Stealth grant, not a claim of raw-text provider support.
+Shared catalog effect recipients remain living or specially physically retained
+models. A destroyed conferring source keeps unit-wide passive Stealth active for
+surviving attached recipients, without becoming a grant recipient itself.
 
 The added source-lifetime responsibility is extracted into a small module. Frozen
 large damage/catalog owners only route the boundary to extracted helpers. No new

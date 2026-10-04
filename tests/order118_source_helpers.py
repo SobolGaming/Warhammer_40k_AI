@@ -25,6 +25,7 @@ from warhammer40k_core.core.datasheet import (
 from warhammer40k_core.core.weapon_profiles import AttackProfile, DamageProfile, WeaponKeyword
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.ability_catalog import catalog_ability_records_from_catalog
+from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_rule_consumption import CatalogWeaponKeywordGrantRuntime
 from warhammer40k_core.engine.damage_allocation import FeelNoPainSource, model_by_id
 from warhammer40k_core.engine.decision_request import DecisionRequest
@@ -33,6 +34,7 @@ from warhammer40k_core.engine.fight_resolution import MeleeDeclarationProposalRe
 from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import AttachmentDeclaration
+from warhammer40k_core.engine.model_ability_grants import ModelAbilityGrantContext
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import WeaponProfileModifierContext
@@ -179,7 +181,7 @@ def source_retention_session(
                 "attacker": Pose.at(10, 10),
                 "enemy": Pose.at(11.65, 10),
                 "leader": Pose.at(11.65, 11.65),
-                "support": Pose.at(11.65, 13.3),
+                "support": Pose.at(11.65, 8.35),
                 "other": Pose.at(8.35, 11.65),
             },
             game_id="order118-fight",
@@ -195,7 +197,7 @@ def source_retention_session(
                 "attacker": (Pose.at(10, 10), Pose.at(10, 11.65)),
                 "enemy": (Pose.at(11.65, 10),),
                 "leader": (Pose.at(11.65, 11.65),),
-                "support": (Pose.at(11.65, 13.3),),
+                "support": (Pose.at(11.65, 8.35),),
                 "other": (Pose.at(8.35, 11.65),),
             },
         )
@@ -266,9 +268,41 @@ def source_grant_active(session: LocalGameSession) -> bool:
     return WeaponKeyword.LETHAL_HITS in runtime.weapon_profile_modifier(context).keywords
 
 
+def source_stealth_granted_model_ids(
+    session: LocalGameSession, *, target_unit_instance_id: str
+) -> tuple[str, ...]:
+    state = session.lifecycle.state
+    assert state is not None
+    config_payload = session.lifecycle.to_payload()["config"]
+    assert config_payload is not None
+    config = GameConfig.from_payload(config_payload)
+    records = catalog_ability_records_from_catalog(config.army_catalog)
+    runtime = CatalogDatasheetRuleRuntime(
+        {player: AbilityCatalogIndex.from_records(records) for player in state.player_ids},
+        tuple(state.army_definitions),
+    )
+    binding = next(
+        binding
+        for binding in runtime.model_ability_grant_bindings()
+        if ":army-beta:enemy:" in binding.modifier_id
+    )
+    return binding.model_ids(
+        ModelAbilityGrantContext(
+            state=state,
+            target=rules_unit_view_by_id(state=state, unit_instance_id=target_unit_instance_id),
+        )
+    )
+
+
 def submit_source_choice(
     session: LocalGameSession, request: DecisionRequest, *, source_model_id: str
 ) -> None:
+    if request.actor_id != "player-a" and request.decision_type in {
+        "submit_shooting_declaration",
+        "submit_melee_declaration",
+    }:
+        submit_fixture_request(session, request)
+        return
     if request.decision_type == "submit_shooting_declaration":
         proposal = _proposal_from_request(
             request=request, target_unit_id="attached-unit:army-beta:enemy"
