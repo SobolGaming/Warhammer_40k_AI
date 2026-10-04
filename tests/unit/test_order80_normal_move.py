@@ -669,3 +669,206 @@ def test_normal_move_state_restore_rejects_duplicate_attached_component_alias() 
     lifecycle_payload["state"]["normal_move_states"] = forged["normal_move_states"]
     with pytest.raises(GameLifecycleError, match=r"Normal Move.*lineage"):
         GameLifecycle.from_payload(lifecycle_payload)
+
+
+@pytest.mark.parametrize("parameterized", [False, True])
+@pytest.mark.parametrize("attached", [False, True])
+def test_order119_prior_reactive_move_then_source_reposition_restores_and_replays(
+    parameterized: bool,
+    attached: bool,
+) -> None:
+    from warhammer40k_core.engine.movement_reposition_context import MovementRepositionContext
+    from warhammer40k_core.engine.movement_source_reposition import (
+        SELECT_SOURCE_REPOSITION_DECISION_TYPE,
+        movement_reposition_permission_effect,
+    )
+    from warhammer40k_core.engine.reserves import ReserveStatus
+
+    # Independent provider permissions are canonical fixture inputs, as in Order114.
+    # The prior move's source is test:order80:reactive-normal, not either branch
+    # of this reserve permission. No Grey Knights activation/payment is claimed.
+    session, unit_id = reaction_session(attached=attached, parameterized=parameterized)
+    state = session.lifecycle.state
+    assert state is not None
+    context = MovementRepositionContext(
+        source_rule_id="stratagem:grey-knights:banishers:000010357007",
+        permission_effect_id="order119:permission",
+        occasion_id="order119:source-occasion",
+        battle_round=state.battle_round,
+        turn_player_id="player-a",
+        phase=BattlePhase.MOVEMENT,
+        unit_instance_id=unit_id,
+    )
+    state.record_persisting_effect(
+        movement_reposition_permission_effect(context=context, owner_player_id="player-b")
+    )
+    session = LocalGameSession(session.lifecycle)
+    initial_checkpoint = session.to_persistence_payload()
+    assert LocalGameSession.from_persistence_payload(
+        initial_checkpoint
+    ).to_persistence_payload() == (initial_checkpoint)
+    status = accept_reaction(session, parameterized=parameterized)
+    request = request_from(status)
+    assert request.decision_type == SELECT_SOURCE_REPOSITION_DECISION_TYPE
+    assert state.active_player_id == "player-a"
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
+    original_moves = tuple(state.normal_move_states)
+    assert len(original_moves) == 1
+    assert original_moves[0].player_id == "player-b"
+    assert original_moves[0].turn_player_id == "player-a"
+    assert original_moves[0].unit_instance_id == unit_id
+    for viewer in ("player-a", "player-b"):
+        projected = session.view(viewer_player_id=viewer)["pending_decision"]
+        assert projected is not None
+        assert projected["decision_type"] == SELECT_SOURCE_REPOSITION_DECISION_TYPE
+        assert {option["option_id"] for option in projected["options"]} == {
+            "decline_source_reposition",
+            "enter_strategic_reserves",
+        }
+    pending_checkpoint = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(pending_checkpoint)
+    assert restored.to_persistence_payload() == pending_checkpoint
+    for candidate in (session, restored):
+        candidate.submit_option(
+            request_id=request.request_id,
+            result_id="order119:enter-reserves",
+            option_id="enter_strategic_reserves",
+        )
+        candidate_state = candidate.lifecycle.state
+        assert candidate_state is not None
+        reserve = candidate_state.reserve_state_for_unit(unit_id)
+        assert reserve is not None
+        assert reserve.status is ReserveStatus.IN_RESERVES
+        assert reserve.entered_reserves_phase == BattlePhase.MOVEMENT.value
+        assert tuple(candidate_state.normal_move_states) == original_moves
+        assert candidate_state.battlefield_state is not None
+        assert all(
+            candidate_state.battlefield_state.unit_placement_or_none(component_id) is None
+            for component_id in {"army-beta:reactor", "army-beta:leader"}
+        )
+        checkpoint = candidate.to_persistence_payload()
+        assert LocalGameSession.from_persistence_payload(checkpoint).to_persistence_payload() == (
+            checkpoint
+        )
+        assert (
+            ReplayRunner.from_payload(
+                candidate.replay_artifact(artifact_id="order119:post-move-reposition")
+            )
+            .run()
+            .reproduced_exactly
+        )
+    assert session.to_persistence_payload() == restored.to_persistence_payload()
+
+
+def test_order119_decline_source_reposition_preserves_movement_and_continuation() -> None:
+    from warhammer40k_core.engine.movement_reposition_context import MovementRepositionContext
+    from warhammer40k_core.engine.movement_source_reposition import (
+        movement_reposition_permission_effect,
+    )
+
+    session, unit_id = reaction_session()
+    state = session.lifecycle.state
+    assert state is not None
+    context = MovementRepositionContext(
+        source_rule_id="stratagem:grey-knights:banishers:000010357007",
+        permission_effect_id="order119:permission",
+        occasion_id="order119:source-occasion",
+        battle_round=state.battle_round,
+        turn_player_id="player-a",
+        phase=BattlePhase.MOVEMENT,
+        unit_instance_id=unit_id,
+    )
+    state.record_persisting_effect(
+        movement_reposition_permission_effect(context=context, owner_player_id="player-b")
+    )
+    session = LocalGameSession(session.lifecycle)
+    request = request_from(accept_reaction(session, parameterized=False))
+    move_rows = tuple(state.normal_move_states)
+    status = session.submit_option(
+        request_id=request.request_id,
+        result_id="order119:decline",
+        option_id="decline_source_reposition",
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert tuple(state.normal_move_states) == move_rows
+    assert state.reserve_state_for_unit(unit_id) is None
+    assert not state.persisting_effects
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="order119:decline"))
+        .run()
+        .reproduced_exactly
+    )
+
+
+def test_order119_stale_permission_rejected_before_source_queue_pop() -> None:
+    from warhammer40k_core.engine.movement_reposition_context import MovementRepositionContext
+    from warhammer40k_core.engine.movement_source_reposition import (
+        movement_reposition_permission_effect,
+    )
+
+    session, unit_id = reaction_session()
+    state = session.lifecycle.state
+    assert state is not None
+    context = MovementRepositionContext(
+        source_rule_id="stratagem:grey-knights:banishers:000010357007",
+        permission_effect_id="order119:permission",
+        occasion_id="order119:source-occasion",
+        battle_round=state.battle_round,
+        turn_player_id="player-a",
+        phase=BattlePhase.MOVEMENT,
+        unit_instance_id=unit_id,
+    )
+    state.record_persisting_effect(
+        movement_reposition_permission_effect(context=context, owner_player_id="player-b")
+    )
+    session = LocalGameSession(session.lifecycle)
+    request = request_from(accept_reaction(session, parameterized=False))
+    state.remove_persisting_effects_by_id(effect_ids=(context.permission_effect_id,))
+    before = state.to_payload()
+    status = session.submit_option(
+        request_id=request.request_id,
+        result_id="order119:stale",
+        option_id="enter_strategic_reserves",
+    )
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert state.to_payload() == before
+    assert session.lifecycle.decision_controller.queue.peek_next() == request
+
+
+def test_order119_source_permission_expires_at_actual_movement_phase_boundary() -> None:
+    from warhammer40k_core.engine.movement_reposition_context import MovementRepositionContext
+    from warhammer40k_core.engine.movement_source_reposition import (
+        current_source_reposition_context,
+        movement_reposition_permission_effect,
+    )
+
+    session, unit_id = reaction_session(enqueue_reaction=False)
+    state = session.lifecycle.state
+    assert state is not None
+    context = MovementRepositionContext(
+        source_rule_id="stratagem:grey-knights:banishers:000010357007",
+        permission_effect_id="order119:permission",
+        occasion_id="order119:source-occasion",
+        battle_round=state.battle_round,
+        turn_player_id="player-a",
+        phase=BattlePhase.MOVEMENT,
+        unit_instance_id=unit_id,
+    )
+    state.record_persisting_effect(
+        movement_reposition_permission_effect(context=context, owner_player_id="player-b")
+    )
+    session = LocalGameSession(session.lifecycle)
+    status = session.advance_until_decision_or_terminal()
+    next_player_action(session, status, unit_id)
+    assert state.active_player_id == "player-b"
+    assert not any(e.effect_id == context.permission_effect_id for e in state.persisting_effects)
+    assert current_source_reposition_context(state=state, unit_instance_id=unit_id) is None
+    checkpoint = session.to_persistence_payload()
+    assert (
+        LocalGameSession.from_persistence_payload(checkpoint).to_persistence_payload() == checkpoint
+    )
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="order119:expiry"))
+        .run()
+        .reproduced_exactly
+    )

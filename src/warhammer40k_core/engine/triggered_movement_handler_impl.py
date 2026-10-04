@@ -328,7 +328,15 @@ def apply_decision(
         source_rule_id=descriptor.source_rule_id,
         result=result,
     )
-    return None
+    from warhammer40k_core.engine.movement_source_reposition import (
+        request_current_source_reposition,
+    )
+
+    return request_current_source_reposition(
+        state=state,
+        decisions=decisions,
+        unit_instance_id=unit_instance_id,
+    )
 
 
 def apply_proposal_decision(
@@ -433,4 +441,12 @@ def apply_proposal_decision(
         source_rule_id=descriptor.source_rule_id,
         result=result,
     )
-    return None
+    from warhammer40k_core.engine.movement_source_reposition import (
+        request_current_source_reposition,
+    )
+
+    return request_current_source_reposition(
+        state=state,
+        decisions=decisions,
+        unit_instance_id=proposal_request.unit_instance_id,
+    )

@@ -27,6 +27,7 @@ from warhammer40k_core.engine.movement_proposals import (
     PlacementProposalPayloadPayload,
     ProposalKind,
 )
+from warhammer40k_core.engine.movement_source_reposition import SOURCE_REPOSITION_RESOLVED_EVENT
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.primary_destruction_evidence import (
     PrimaryUnattributedDestructionCause,
@@ -175,6 +176,7 @@ def validate_primary_reserve_entry_lifecycle_integrity(
         raise GameLifecycleError("Reserve-entry ability source terminal types are duplicated.")
     registered_terminal_types = {
         GENERIC_STRATAGEM_RESERVE_REMOVAL_RESOLVED_EVENT,
+        SOURCE_REPOSITION_RESOLVED_EVENT,
         *ability_terminal_types,
     }
     event_index_by_id = {record.event_id: index for index, record in enumerate(event_records)}
@@ -407,7 +409,10 @@ def _validate_source_provider_authority(
         reserve_entry=binding.reserve_entry_state,
         source_terminal=source_terminal,
     )
-    if provider.provider_kind is PrimaryReserveEntryProviderKind.TURN_END_ABILITY:
+    if provider.provider_kind in {
+        PrimaryReserveEntryProviderKind.TURN_END_ABILITY,
+        PrimaryReserveEntryProviderKind.SOURCE_STRATAGEM_PERMISSION,
+    }:
         return
     if provider.stratagem_use_id is None:
         raise GameLifecycleError("Generic reserve-entry provider use identity is missing.")
@@ -969,7 +974,11 @@ def _source_terminal_bindings(
     expected_kind = (
         PrimaryReserveEntryProviderKind.GENERIC_RULE_IR_STRATAGEM
         if generic
-        else PrimaryReserveEntryProviderKind.TURN_END_ABILITY
+        else (
+            PrimaryReserveEntryProviderKind.SOURCE_STRATAGEM_PERMISSION
+            if source_terminal.event_type == SOURCE_REPOSITION_RESOLVED_EVENT
+            else PrimaryReserveEntryProviderKind.TURN_END_ABILITY
+        )
     )
     for raw_binding in raw_bindings:
         binding_payload = _closed_json_object(

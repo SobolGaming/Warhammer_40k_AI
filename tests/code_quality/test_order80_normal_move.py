@@ -50,6 +50,38 @@ def test_normal_move_recording_is_owned_by_shared_completion() -> None:
     assert all(any(keyword.arg == "turn_player_id" for keyword in node.keywords) for node in calls)
 
 
+def test_order119_reposition_uses_shared_source_and_movement_owners() -> None:
+    engine = ROOT / "src/warhammer40k_core/engine"
+    tree = ast.parse((engine / "movement_source_reposition.py").read_text())
+    mutation_calls = [
+        node.func.attr
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr
+        in {
+            "reposition_unit_to_strategic_reserves",
+            "record_normal_move_state",
+            "replace_battlefield_state",
+            "record_reserve_state",
+        }
+    ]
+    assert mutation_calls == ["reposition_unit_to_strategic_reserves"]
+    handler = ast.parse((engine / "triggered_movement_handler_impl.py").read_text())
+    consumers = [
+        node.name
+        for node in handler.body
+        if isinstance(node, ast.FunctionDef)
+        and any(
+            isinstance(call, ast.Call)
+            and isinstance(call.func, ast.Name)
+            and call.func.id == "request_current_source_reposition"
+            for call in ast.walk(node)
+        )
+    ]
+    assert consumers == ["apply_decision", "apply_proposal_decision"]
+
+
 def test_order80_matched_occurrence_performance() -> None:
     folder = ROOT / "docs/performance/order80"
     base, head = (json.loads((folder / name).read_bytes()) for name in ("base.json", "head.json"))

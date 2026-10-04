@@ -191,6 +191,7 @@ from warhammer40k_core.engine.movement_proposals import (
     MovementProposalRequest,
     required_movement_proposal_context_string,
 )
+from warhammer40k_core.engine.movement_source_reposition import source_reposition_dispatch_handler
 from warhammer40k_core.engine.opportunity_windows import (
     OPPORTUNITY_REQUEST_FAMILY,
     opportunity_boundary_game_state_payload,
@@ -1161,6 +1162,11 @@ class GameLifecycle:
                     advance=self.advance_until_decision_or_terminal,
                     ordinary_validator=self._pre_validate_movement_phase_decision,
                     ordinary_applier=self._apply_movement_phase_decision,
+                ),
+                source_reposition_dispatch_handler(
+                    state_provider=self._require_state,
+                    decisions=self.decision_controller,
+                    advance=self.advance_until_decision_or_terminal,
                 ),
                 *(
                     DecisionDispatchHandler(

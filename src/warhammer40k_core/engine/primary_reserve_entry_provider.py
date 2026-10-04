@@ -44,6 +44,7 @@ _PROVIDER_PAYLOAD_KEYS = frozenset(
 class PrimaryReserveEntryProviderKind(StrEnum):
     TURN_END_ABILITY = "turn_end_ability"
     GENERIC_RULE_IR_STRATAGEM = "generic_rule_ir_stratagem"
+    SOURCE_STRATAGEM_PERMISSION = "source_stratagem_permission"
 
 
 class PrimaryReserveEntryAbilityAuthorityKind(StrEnum):
@@ -223,7 +224,10 @@ class PrimaryReserveEntryProvider:
             "stratagem_use_id",
             _validate_optional_identifier("stratagem_use_id", self.stratagem_use_id),
         )
-        if self.provider_kind is PrimaryReserveEntryProviderKind.TURN_END_ABILITY:
+        if self.provider_kind in {
+            PrimaryReserveEntryProviderKind.TURN_END_ABILITY,
+            PrimaryReserveEntryProviderKind.SOURCE_STRATAGEM_PERMISSION,
+        }:
             if self.stratagem_use_id is not None:
                 raise GameLifecycleError(
                     "Turn-end ability reserve provider cannot name a Stratagem use."
@@ -237,6 +241,17 @@ class PrimaryReserveEntryProvider:
             or self.source_terminal_event_type != GENERIC_STRATAGEM_RESERVE_REMOVAL_RESOLVED_EVENT
         ):
             raise GameLifecycleError("Generic RuleIR Stratagem reserve provider identity drift.")
+        if self.provider_kind is PrimaryReserveEntryProviderKind.SOURCE_STRATAGEM_PERMISSION:
+            from warhammer40k_core.engine.movement_source_reposition import (
+                SOURCE_REPOSITION_PROVIDER_ID,
+                SOURCE_REPOSITION_RESOLVED_EVENT,
+            )
+
+            if (
+                self.provider_id != SOURCE_REPOSITION_PROVIDER_ID
+                or self.source_terminal_event_type != SOURCE_REPOSITION_RESOLVED_EVENT
+            ):
+                raise GameLifecycleError("Source reposition provider identity drift.")
 
     @property
     def reserve_origin(self) -> ReserveOrigin:
@@ -451,6 +466,13 @@ def validate_accepted_primary_reserve_entry_provider(
         raise GameLifecycleError("Reserve-entry mutation requires typed provider authority.")
     record = _accepted_decision_record_for_provider(decisions=decisions, provider=provider)
     validate_primary_reserve_entry_provider_registration(state=state, provider=provider)
+    if provider.provider_kind is PrimaryReserveEntryProviderKind.SOURCE_STRATAGEM_PERMISSION:
+        from warhammer40k_core.engine.movement_source_reposition import (
+            validate_source_reposition_provider,
+        )
+
+        validate_source_reposition_provider(provider=provider, record=record)
+        return
     if provider.provider_kind is PrimaryReserveEntryProviderKind.TURN_END_ABILITY:
         request_payload = _payload_object(record.request.payload, field_name="ability request")
         result_payload = _payload_object(record.result.payload, field_name="ability result")
@@ -507,6 +529,8 @@ def primary_reserve_entry_requirements(
 
     if type(state) is not GameState or type(decisions) is not DecisionController:
         raise GameLifecycleError("Reserve-entry requirements require typed authority.")
+    if provider.provider_kind is PrimaryReserveEntryProviderKind.SOURCE_STRATAGEM_PERMISSION:
+        return PrimaryReserveEntryRequirements()
     if provider.provider_kind is PrimaryReserveEntryProviderKind.TURN_END_ABILITY:
         return primary_reserve_entry_requirements_from_evidence(
             state=state,
@@ -550,6 +574,8 @@ def primary_reserve_entry_requirements_from_evidence(
 
     if type(state) is not GameState or type(provider) is not PrimaryReserveEntryProvider:
         raise GameLifecycleError("Reserve-entry evidence requirements require typed authority.")
+    if provider.provider_kind is PrimaryReserveEntryProviderKind.SOURCE_STRATAGEM_PERMISSION:
+        return PrimaryReserveEntryRequirements()
     if provider.provider_kind is PrimaryReserveEntryProviderKind.TURN_END_ABILITY:
         if executed_effect_payload is not None:
             raise GameLifecycleError("Ability reserve-entry requirements cannot name RuleIR.")
