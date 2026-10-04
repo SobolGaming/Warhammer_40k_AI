@@ -416,6 +416,138 @@ def test_retained_passive_stealth_source_grants_only_living_attached_recipients(
     )
 
 
+@pytest.mark.parametrize("phase_token", ["shooting", "fight"])
+def test_queued_source_destruction_survives_native_deferred_mortal_checkpoint(
+    phase_token: str,
+) -> None:
+    from tests.order118_source_helpers import (
+        reach_source_casualty,
+        source_grant_active,
+        source_retention_session,
+        submit_source_choice,
+    )
+    from tests.psychic_modifier_helpers import pending_request
+
+    from warhammer40k_core.adapters.event_stream import EventStreamCursor
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.attack_ability_source_retention import (
+        ATTACK_ABILITY_SOURCE_EXPIRED_EVENT,
+        ATTACK_ABILITY_SOURCE_KIND,
+    )
+    from warhammer40k_core.engine.decision import DecisionError
+    from warhammer40k_core.engine.lifecycle_state_queries import active_attack_sequence_for_state
+    from warhammer40k_core.engine.phase import BattlePhase
+    from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+
+    session, model_id = source_retention_session(
+        BattlePhase(phase_token),
+        source_role="leader",
+        native_deferred_mortals=True,
+        death_reaction=True,
+    )
+    reach_source_casualty(session, source_model_id=model_id)
+    state = session.lifecycle.state
+    assert state is not None
+    sequence = active_attack_sequence_for_state(state)
+    assert sequence is not None
+    assert sequence.pending_attack_destructions
+    sequence_id = sequence.sequence_id
+
+    def original_attack_completed(current: LocalGameSession) -> bool:
+        return any(
+            event.event_type == "attack_sequence_completed"
+            and isinstance(event.payload, dict)
+            and event.payload.get("sequence_id") == sequence_id
+            for event in current.lifecycle.decision_controller.event_log.records
+        )
+
+    assert source_grant_active(session)
+    for _ in range(180):
+        request = pending_request(session)
+        payload = request.payload
+        assert isinstance(payload, dict)
+        lost_wound = payload.get("lost_wound_context")
+        source_context = lost_wound.get("source_context") if isinstance(lost_wound, dict) else None
+        if (
+            isinstance(source_context, dict)
+            and source_context.get("source_kind") == "devastating_wounds"
+        ):
+            assert request.decision_type == "select_feel_no_pain"
+            break
+        submit_source_choice(session, request, source_model_id=model_id)
+    else:
+        raise AssertionError("Native deferred mortal checkpoint was not reached.")
+    sequence = active_attack_sequence_for_state(state)
+    assert sequence is not None
+    assert sequence.pending_attack_destructions
+    assert source_grant_active(session)
+    saved = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(saved)
+    assert restored.to_persistence_payload() == saved
+    assert source_grant_active(restored)
+    fork = session.fork()
+    assert fork.to_persistence_payload() == saved
+    for viewer in ("player-a", "player-b"):
+        assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
+        assert restored.events_since(
+            EventStreamCursor(), viewer_player_id=viewer
+        ) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)
+    with pytest.raises(DecisionError, match="finite action space"):
+        restored.submit_option(
+            request_id=request.request_id,
+            result_id="order118:native-malformed",
+            option_id="order118:nonexistent-native-option",
+        )
+    assert restored.to_persistence_payload() == saved
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="order118:native-mid"))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )
+    for current in (session, restored):
+        for _ in range(250):
+            if original_attack_completed(current):
+                break
+            submit_source_choice(current, pending_request(current), source_model_id=model_id)
+        assert original_attack_completed(current)
+        current_state = current.lifecycle.state
+        assert current_state is not None
+        assert not any(
+            isinstance(effect.effect_payload, dict)
+            and effect.effect_payload.get("effect_kind") == ATTACK_ABILITY_SOURCE_KIND
+            for effect in current_state.persisting_effects
+        )
+        events = current.lifecycle.decision_controller.event_log.records
+        expired = next(
+            index
+            for index, event in enumerate(events)
+            if event.event_type == ATTACK_ABILITY_SOURCE_EXPIRED_EVENT
+            and isinstance(event.payload, dict)
+            and event.payload.get("sequence_id") == sequence_id
+        )
+        completed = next(
+            index
+            for index, event in enumerate(events)
+            if event.event_type == "attack_sequence_completed"
+            and isinstance(event.payload, dict)
+            and event.payload.get("sequence_id") == sequence_id
+        )
+        assert expired < completed
+        complete = current.to_persistence_payload()
+        assert (
+            LocalGameSession.from_persistence_payload(complete).to_persistence_payload() == complete
+        )
+        assert (
+            ReplayRunner.from_payload(current.replay_artifact(artifact_id="order118:native-done"))
+            .run()
+            .status
+            is ReplayRunStatus.REPRODUCED
+        )
+    assert restored.to_persistence_payload() == session.to_persistence_payload()
+    assert fork.to_persistence_payload() == saved
+
+
 def test_core_keyword_ability_descriptors_enable_boolean_families_without_keywords() -> None:
     unit = _unit_with_abilities(
         _ability(ability_id="source-deep-strike", name="Core Deep Strike"),

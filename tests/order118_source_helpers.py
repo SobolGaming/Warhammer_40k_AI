@@ -22,12 +22,22 @@ from warhammer40k_core.core.datasheet import (
     CatalogJsonObject,
     DatasheetAbilityDescriptor,
 )
-from warhammer40k_core.core.weapon_profiles import AttackProfile, DamageProfile, WeaponKeyword
+from warhammer40k_core.core.weapon_profiles import (
+    AbilityDescriptor,
+    AttackProfile,
+    DamageProfile,
+    WeaponKeyword,
+)
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.ability_catalog import catalog_ability_records_from_catalog
 from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_rule_consumption import CatalogWeaponKeywordGrantRuntime
-from warhammer40k_core.engine.damage_allocation import FeelNoPainSource, model_by_id
+from warhammer40k_core.engine.damage_allocation import (
+    DestructionReactionKind,
+    DestructionReactionSource,
+    FeelNoPainSource,
+    model_by_id,
+)
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import canonical_json, validate_json_value
 from warhammer40k_core.engine.fight_resolution import MeleeDeclarationProposalRequest
@@ -48,6 +58,8 @@ def source_retention_session(
     source_role: str = "bodyguard",
     source_wargear: bool = False,
     optional_fnp: bool = True,
+    native_deferred_mortals: bool = False,
+    death_reaction: bool = False,
     ability_text: str = (
         "Ranged weapons equipped by models in this unit have the [LETHAL HITS] ability."
     ),
@@ -105,8 +117,12 @@ def source_retention_session(
                 weapon_profiles=tuple(
                     replace(
                         weapon,
-                        keywords=(WeaponKeyword.PRECISION,),
-                        abilities=(),
+                        keywords=(WeaponKeyword.PRECISION, WeaponKeyword.DEVASTATING_WOUNDS)
+                        if native_deferred_mortals
+                        else (WeaponKeyword.PRECISION,),
+                        abilities=(AbilityDescriptor.devastating_wounds(),)
+                        if native_deferred_mortals
+                        else (),
                         attack_profile=AttackProfile.fixed(6),
                         damage_profile=DamageProfile.fixed(1),
                         strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 20),
@@ -214,6 +230,19 @@ def source_retention_session(
             decline_allowed=True,
         )
     source = units["enemy" if source_role == "bodyguard" else source_role].own_models[0]
+    if death_reaction:
+        state.record_model_destruction_reaction_sources(
+            model_instance_id=source.model_instance_id,
+            sources=(
+                DestructionReactionSource(
+                    source_id="order118:death-reaction",
+                    source_rule_id="test:order118:death-reaction",
+                    reaction_kind=DestructionReactionKind.SHOOT_ON_DEATH
+                    if phase is BattlePhase.SHOOTING
+                    else DestructionReactionKind.FIGHT_ON_DEATH,
+                ),
+            ),
+        )
     # Begin with an ordinarily wounded source, so its death leaves attacks and
     # living teammates for the source-lifetime assertion in every component case.
     state.army_definitions = [

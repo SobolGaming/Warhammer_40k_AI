@@ -22,6 +22,11 @@ surviving attached recipients, without becoming a grant recipient itself.
 The declared THIS_UNIT or THIS_MODEL target governs recipients for equipped
 sources as well; equipment authenticates the conferring bearer, not the grant's
 target scope.
+Grouped ordinary Feel No Pain resumption preserves the returned queued
+destruction state in the original grouped frame. This matches synchronous
+allocation and keeps a queued Shoot/Fight-on-death cause reachable through later
+native Devastating Wounds and untouched save/restore checkpoints. The grouped
+cursor and other interruption owners remain authoritative.
 
 The added source-lifetime responsibility is extracted into a small module. Frozen
 large damage/catalog owners only route the boundary to extracted helpers. No new

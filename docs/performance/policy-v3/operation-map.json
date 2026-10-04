@@ -3430,6 +3430,7 @@
         "src/warhammer40k_core/engine/attack_ability_source_retention.py",
         "src/warhammer40k_core/engine/attack_sequence_destruction_authority.py",
         "src/warhammer40k_core/engine/attack_sequence_dispatch.py",
+        "src/warhammer40k_core/engine/attack_sequence_group_selection.py",
         "src/warhammer40k_core/engine/catalog_attack_context_rule_runtime.py",
         "src/warhammer40k_core/engine/catalog_conditional_leader_queries.py",
         "src/warhammer40k_core/engine/catalog_rule_consumption.py",
@@ -3449,6 +3450,7 @@
         "ability_presence_from_model_ids",
         "ability_spatial_relationship_from_presence",
         "apply_direct_mortal_wounds_to_unit",
+        "apply_feel_no_pain_decision",
         "attack_ability_source_model_ids",
         "conditional_leading_source_unit_applies",
         "current_effect_target_model_ids",
@@ -3490,6 +3492,7 @@
         "test_attached_source_lifetime_facade_restore_replay",
         "test_equipped_attached_source_lifetime_uses_shared_catalog_consumer",
         "test_mortal_application_routes_retain_only_attack_conferring_sources",
+        "test_queued_source_destruction_survives_native_deferred_mortal_checkpoint",
         "test_retained_model_aura_keeps_attached_ability_without_external_geometry",
         "test_retained_passive_stealth_source_grants_only_living_attached_recipients"
       ],
