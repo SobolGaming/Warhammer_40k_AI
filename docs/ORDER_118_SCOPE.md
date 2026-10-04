@@ -31,6 +31,9 @@ Conditional leading queries preserve existing living/specially retained componen
 membership before deployment and augment it with attack-retained source IDs.
 Declare Battle Formations split grants follow the successor containing their
 Leader models; unplaced models do not become globally spatially active.
+Expiry uses the existing GameState removal method. Source queries select only
+attack-retention effects before the existing lineage and target-membership
+resolver, preserving its semantics and the established retained-effect work budget.
 
 The added source-lifetime responsibility is extracted into a small module. Frozen
 large damage/catalog owners only route the boundary to extracted helpers. No new

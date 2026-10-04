@@ -115,9 +115,7 @@ def expire_attack_ability_sources(
     if not expired:
         return
     expired_ids = {effect.effect_id for effect in expired}
-    state.persisting_effects = [
-        effect for effect in state.persisting_effects if effect.effect_id not in expired_ids
-    ]
+    state.remove_persisting_effects_by_id(tuple(sorted(expired_ids)))
     decisions.event_log.append(
         ATTACK_ABILITY_SOURCE_EXPIRED_EVENT,
         {
@@ -132,8 +130,24 @@ def attack_ability_source_model_ids(
     *, state: GameState, rules_unit_instance_id: str
 ) -> tuple[str, ...]:
     view = rules_unit_view_by_id(state=state, unit_instance_id=rules_unit_instance_id)
+    candidates = [
+        effect
+        for effect in state.persisting_effects
+        if isinstance(effect.effect_payload, dict)
+        and effect.effect_payload.get("effect_kind") == ATTACK_ABILITY_SOURCE_KIND
+    ]
+    if not candidates:
+        return ()
+    from warhammer40k_core.engine.aura_applications import persisting_effects_for_lineage
+    from warhammer40k_core.engine.unit_split_views import split_effect_predecessor_ids
+
     model_ids: set[str] = set()
-    for effect in state.persisting_effects_for_unit(view.unit_instance_id):
+    for effect in persisting_effects_for_lineage(
+        candidates,
+        split_effect_predecessor_ids(
+            armies=tuple(state.army_definitions), unit_instance_id=view.unit_instance_id
+        ),
+    ):
         payload = _source_payload(effect)
         if payload is None:
             continue
