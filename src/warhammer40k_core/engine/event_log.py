@@ -66,6 +66,12 @@ class EventLog:
     def records(self) -> tuple[EventRecord, ...]:
         return tuple(self._records)
 
+    def records_since(self, start_index: int) -> tuple[EventRecord, ...]:
+        """Return a validated append suffix for engine-owned history consumers."""
+        if type(start_index) is not int or start_index < 0 or start_index > len(self._records):
+            raise EventLogError("Event suffix start index is invalid or stale.")
+        return tuple(self._records[start_index:])
+
     def append(self, event_type: str, payload: object) -> EventRecord:
         record = EventRecord(
             event_id=f"event-{len(self._records) + 1:06d}",

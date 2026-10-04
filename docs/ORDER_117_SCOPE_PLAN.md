@@ -26,6 +26,15 @@ The shared boundary validates required automatic prevention dice authority befor
 recording an allocation, so a typed failure leaves the selection retryable.
 Allocation and execution audit events use the existing RNG-neutral classification;
 player decisions and prevention dice still retain their normal RNG history.
+The dice history owner tracks a validated append suffix and counts externally
+appended neutral audit records before its next event token. The shared fix applies
+to every neutral event type, preventing live and reconstructed neutral histories
+from using different event offsets. Existing externally appended nonneutral
+history folding is unchanged and is not newly certified by this order.
+The prior and new direct allocation owners, using the corrected shared dice owner,
+produce identical native prevention dice in the retained real-owner diagnostic.
+The corrected offset also fixes older externally appended neutral packet-start
+records; previous broken-manager dice values are not retained as correctness oracles.
 The complete audit history changes absolute event references carried by later
 decisions. Two deterministic fixture game IDs are reseeded to reach their existing
 failed Battle-shock and positive source-mortal branches; their gameplay assertions

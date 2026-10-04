@@ -3296,7 +3296,6 @@
       "paths": [
         "src/warhammer40k_core/adapters/external_contract.py",
         "src/warhammer40k_core/adapters/redaction.py",
-        "src/warhammer40k_core/engine/decision.py",
         "src/warhammer40k_core/engine/direct_mortal_wound_application.py",
         "src/warhammer40k_core/engine/mortal_wound_allocation_permissions.py",
         "src/warhammer40k_core/engine/mortal_wound_allocation_triggers.py",
@@ -3324,9 +3323,27 @@
       "sensitive": false,
       "mandatory": false
     },
+    "order117-live-neutral-audit-accounting": {
+      "paths": [
+        "src/warhammer40k_core/engine/decision.py",
+        "src/warhammer40k_core/engine/event_log.py"
+      ],
+      "owners": [
+        "@module",
+        "DiceRollManager",
+        "DiceRollManager.__init__",
+        "DiceRollManager._append_event_history",
+        "DiceRollManager._seed_existing_event_history",
+        "EventLog.records_since"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
     "order117-regressions": {
       "paths": [
         "tests/order117_allocation_helpers.py",
+        "tests/unit/test_dice.py",
         "tests/unit/test_order117_mortal_allocation.py",
         "tests/unit/test_phase10o_fall_back.py",
         "tests/unit/test_phase17g_chaos_knights_army_rule.py"
@@ -3343,6 +3360,10 @@
         "test_allocation_trigger_executes_source_backed_prevention_before_wound_loss",
         "test_allocation_trigger_pending_choice_retry_fork_and_lethal_continuation",
         "test_direct_route_executes_the_same_prevention_or_rejects_choice_before_mutation",
+        "test_direct_unconditional_allocation_keeps_existing_prevention_dice_sequence",
+        "test_event_suffix_query_preserves_typed_order_after_json_restore_and_rollback",
+        "test_event_suffix_query_rejects_invalid_or_stale_index",
+        "test_external_neutral_audits_do_not_change_live_or_restored_dice",
         "test_missing_prevention_dice_authority_fails_before_allocation_and_allows_retry",
         "test_selected_target_remaining_effect_request_requires_retained_ancestry",
         "test_source_permission_survives_real_save_reroll_and_lethal_continuation",

@@ -18,7 +18,10 @@ from tests.psychic_modifier_helpers import pending_request, submit_fixture_reque
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
-from warhammer40k_core.engine.damage_allocation import MortalWoundApplicationProgress
+from warhammer40k_core.engine.damage_allocation import (
+    FeelNoPainSource,
+    MortalWoundApplicationProgress,
+)
 from warhammer40k_core.engine.decision_request import DecisionError
 from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.dice import DiceRollManager
@@ -404,4 +407,56 @@ def test_missing_prevention_dice_authority_fails_before_allocation_and_allows_re
     assert (
         sum(e.event_type == "mortal_wound_model_allocated" for e in decisions.event_log.records)
         == 1
+    )
+
+
+def test_direct_unconditional_allocation_keeps_existing_prevention_dice_sequence() -> None:
+    session = additional_mortal_session(BattlePhase.SHOOTING, enemy_models=1)
+    state = session.lifecycle.state
+    assert state is not None
+    target = state.army_definitions[1].units[0]
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=target.own_models[0].model_instance_id,
+        sources=(FeelNoPainSource(source_id="review:existing-automatic-fnp", threshold=4),),
+        decline_allowed=False,
+    )
+    lifecycle = session.lifecycle.from_payload(
+        json.loads(json.dumps(session.lifecycle.to_payload()))
+    )
+    state = lifecycle.state
+    assert state is not None
+    source, target = (army.units[0] for army in state.army_definitions)
+    decisions = lifecycle.decision_controller
+    evidence = MortalWoundDestructionEvidence.for_non_attack_state(
+        state=state,
+        destroying_player_id="player-a",
+        source_rules_unit_instance_id=source.unit_instance_id,
+        source_model_instance_id=source.own_models[0].model_instance_id,
+        destruction_source_kind=DestructionSourceKind.ABILITY,
+        action_phase=BattlePhase.SHOOTING,
+        source_step="review-direct-neutrality",
+    )
+    application = apply_direct_mortal_wounds_to_unit(
+        state=state,
+        decisions=decisions,
+        application_id="review:direct-neutrality",
+        source_rule_id="review:direct-source",
+        source_context={"source_kind": "ability"},
+        destruction_evidence=evidence,
+        target_unit_instance_id=target.unit_instance_id,
+        mortal_wounds=2,
+        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        defender_player_id="player-b",
+    )
+    # Correct neutral packet-start accounting gives the same sequence with or
+    # without allocation audits, independently checked against the prior owner.
+    assert [r.rolls[0].roll_state.current_values for r in application.feel_no_pain_resolutions] == [
+        (5,),
+        (4,),
+    ]
+    assert application.ignored_mortal_wounds == 2
+    assert state.army_definitions[1].units[0].own_models[0].wounds_remaining == 2
+    assert (
+        sum(e.event_type == "mortal_wound_model_allocated" for e in decisions.event_log.records)
+        == 2
     )
