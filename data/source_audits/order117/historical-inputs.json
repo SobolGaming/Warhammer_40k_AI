@@ -1,0 +1,26 @@
+{
+  "reviewed_commit": "4b59ded9d7dfd1af4170adaa50462bcf6cf32c0d",
+  "also_present_at_base": "4b59ded9d7dfd1af4170adaa50462bcf6cf32c0d",
+  "purpose": "Retain immutable Order97 original fixture and assertions before Order117 legal gameplay seed repairs. Historical bytes are not current Order117 gameplay evidence.",
+  "current_evidence": "docs/ORDER_117_SCOPE_PLAN.md",
+  "files": [
+    {
+      "path": "tests/target_replacement_reaction_helpers.py",
+      "historical_path": "data/source_audits/order117/baseline/tests/target_replacement_reaction_helpers.py.txt",
+      "git_revision": "4b59ded9d7dfd1af4170adaa50462bcf6cf32c0d",
+      "git_path": "tests/target_replacement_reaction_helpers.py",
+      "sha256": "d5a36008a235ca45c2f6f7f0b5c678b2edd24c2bd4b128187683673551d3ae6b",
+      "bytes": 17026,
+      "order97_file_pin": "d5a36008a235ca45c2f6f7f0b5c678b2edd24c2bd4b128187683673551d3ae6b"
+    },
+    {
+      "path": "tests/unit/test_phase10o_fall_back.py",
+      "historical_path": "data/source_audits/order117/baseline/tests/unit/test_phase10o_fall_back.py.txt",
+      "git_revision": "4b59ded9d7dfd1af4170adaa50462bcf6cf32c0d",
+      "git_path": "tests/unit/test_phase10o_fall_back.py",
+      "sha256": "6e6c89c60eb243aeef416434094143ba419c77c423661cc2572b0e68fa759e34",
+      "bytes": 133014,
+      "order97_file_pin": "6e6c89c60eb243aeef416434094143ba419c77c423661cc2572b0e68fa759e34"
+    }
+  ]
+}

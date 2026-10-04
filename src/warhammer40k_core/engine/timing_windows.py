@@ -46,6 +46,7 @@ class TimingTriggerKind(StrEnum):
     JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT = "just_after_friendly_unit_selected_to_fight"
     AFTER_UNIT_ATTACKS_RESOLVED = "after_unit_attacks_resolved"
     AFTER_DICE_ROLL = "after_dice_roll"
+    MORTAL_WOUND_ALLOCATED = "mortal_wound_allocated"
 
 
 class TimingWindowDescriptorPayload(TypedDict):

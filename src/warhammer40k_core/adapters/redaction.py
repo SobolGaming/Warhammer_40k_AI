@@ -23,6 +23,9 @@ from warhammer40k_core.engine.mission_decisions import (
 from warhammer40k_core.engine.model_logical_death import (
     MODEL_LOGICAL_DEATH_RECORDED_EVENT,
 )
+from warhammer40k_core.engine.mortal_wound_allocation_permissions import (
+    MORTAL_WOUND_ALLOCATION_RULE_APPLIED_EVENT_TYPE,
+)
 from warhammer40k_core.engine.mortal_wound_application_authority import (
     MORTAL_WOUND_APPLICATION_STARTED_EVENT,
 )
@@ -516,6 +519,7 @@ def _event_record_hidden_from_context(
         MODEL_LOGICAL_DEATH_RECORDED_EVENT,
         MORTAL_WOUND_APPLICATION_STARTED_EVENT,
         MORTAL_WOUND_MODEL_ALLOCATED_EVENT_TYPE,
+        MORTAL_WOUND_ALLOCATION_RULE_APPLIED_EVENT_TYPE,
         "fight_on_death_retention_opened",
         "fight_on_death_retention_trigger_resolved",
         "fight_on_death_destruction_suspended",

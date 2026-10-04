@@ -1391,7 +1391,9 @@ def test_hazardous_and_dark_pacts_offer_the_owner_a_shared_mandatory_order(
     from warhammer40k_core.engine.rule_trigger_state import rule_trigger_history
     from warhammer40k_core.engine.sequencing import sequencing_decision_event_from_request
 
-    state, decisions, handler = _dark_pact_completion_handler(hazardous=True)
+    state, decisions, handler = _dark_pact_completion_handler(
+        hazardous=True, game_id="order117-csm-continuation-0"
+    )
 
     status = handler.begin_phase(state=state, decisions=decisions)
 
@@ -1483,9 +1485,9 @@ def test_hazardous_and_dark_pacts_offer_the_owner_a_shared_mandatory_order(
 
 
 def _dark_pact_completion_handler(
-    *, hazardous: bool = False
+    *, hazardous: bool = False, game_id: str = "phase11c-game"
 ) -> tuple[GameState, DecisionController, ShootingPhaseHandler]:
-    state = _csm_battle_state()
+    state = _csm_battle_state(game_id=game_id)
     unit = _unit_for_player(state, player_id="player-a")
     target = _unit_for_player(state, player_id="player-b")
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
@@ -1831,8 +1833,8 @@ def _runtime_content_bundle(lifecycle: object) -> RuntimeContentBundle:
     return require_bundle()
 
 
-def _csm_battle_state() -> GameState:
-    state = battle_state()
+def _csm_battle_state(*, game_id: str = "phase11c-game") -> GameState:
+    state = battle_state(game_id=game_id)
     _mark_player_as_chaos_space_marines(state, player_id="player-a")
     return state
 

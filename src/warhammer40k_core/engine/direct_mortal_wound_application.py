@@ -19,6 +19,9 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.model_destruction_cause_authority import (
     ModelDestructionCauseKind,
 )
+from warhammer40k_core.engine.mortal_wound_allocation_triggers import (
+    record_mortal_wound_allocation_occurrence,
+)
 from warhammer40k_core.engine.mortal_wound_application_authority import (
     append_direct_mortal_wound_application_started,
 )
@@ -34,6 +37,7 @@ from warhammer40k_core.engine.mortal_wound_model_allocation import (
     mortal_wound_feel_no_pain_decline_allowed,
     mortal_wound_feel_no_pain_sources,
     mortal_wound_priority_model_ids,
+    mortal_wound_priority_selection,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
@@ -99,7 +103,7 @@ def apply_direct_mortal_wounds_to_unit(
         if rules_unit is None:
             remaining_lost = remaining
             break
-        legal_model_ids = mortal_wound_priority_model_ids(
+        legal_model_ids, priority_tier = mortal_wound_priority_selection(
             state=state,
             target_unit_instance_id=rules_unit.unit_instance_id,
         )
@@ -109,13 +113,16 @@ def apply_direct_mortal_wounds_to_unit(
         if len(legal_model_ids) > 1:
             raise GameLifecycleError("Mortal wound model choices require lifecycle routing.")
         model_id = next(iter(legal_model_ids))
-        sources = mortal_wound_feel_no_pain_sources(
+        _, sources, decline_allowed = record_mortal_wound_allocation_occurrence(
             state=state,
-            model_instance_id=model_id,
-        )
-        decline_allowed = mortal_wound_feel_no_pain_decline_allowed(
-            state=state,
-            model_instance_id=model_id,
+            decisions=decisions,
+            application_id=application_id,
+            wound_index=mortal_wounds - remaining + 1,
+            target_unit_instance_id=target_unit_instance_id,
+            legal_model_ids=legal_model_ids,
+            priority_tier=priority_tier,
+            selected_model_id=model_id,
+            dice_manager=dice_manager,
         )
         if len(sources) > 0:
             if len(sources) > 1 or decline_allowed:

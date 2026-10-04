@@ -52,6 +52,57 @@ from warhammer40k_core.engine.unit_resources import (
 )
 
 
+@pytest.mark.parametrize(
+    "event_type",
+    [
+        "mortal_wound_model_allocated",
+        "mortal_wound_allocation_rule_applied",
+        "model_logical_death_recorded",
+    ],
+)
+def test_external_neutral_audits_do_not_change_live_or_restored_dice(event_type: str) -> None:
+    plain = DiceRollManager("order117:live-neutral-audits")
+    audited = DiceRollManager("order117:live-neutral-audits")
+    spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=100_000),
+        reason="Live neutral event classification",
+        roll_type="order117.neutral_audit",
+        actor_id="player-a",
+    )
+    assert plain.roll(spec) == audited.roll(spec)
+    audited.event_log.append(event_type, {"source_rule_id": "order117:test:neutral-audit"})
+    for _ in range(2):
+        assert plain.roll(spec) == audited.roll(spec)
+    assert plain.rng.to_payload() == audited.rng.to_payload()
+    restored = DiceRollManager(
+        "order117:live-neutral-audits",
+        event_log=EventLog.from_payload(json.loads(json.dumps(audited.event_log.to_payload()))),
+    )
+    assert restored.rng.to_payload() == audited.rng.to_payload()
+    assert restored.roll(spec) == audited.roll(spec)
+
+
+def test_event_suffix_query_preserves_typed_order_after_json_restore_and_rollback() -> None:
+    log = EventLog()
+    first = log.append("test-first", {"value": 1})
+    second = log.append("test-second", {"value": 2})
+    assert log.records_since(0) == (first, second)
+    assert log.records_since(1) == (second,)
+    assert log.records_since(2) == ()
+    restored = EventLog.from_payload(json.loads(json.dumps(log.to_payload())))
+    assert restored.records_since(1) == (second,)
+    restored.replace_records((first,))
+    assert restored.records_since(1) == ()
+    with pytest.raises(EventLogError, match="invalid or stale"):
+        restored.records_since(2)
+
+
+@pytest.mark.parametrize("index", [True, -1, 1, "0"])
+def test_event_suffix_query_rejects_invalid_or_stale_index(index: object) -> None:
+    with pytest.raises(EventLogError, match="invalid or stale"):
+        EventLog().records_since(cast(int, index))
+
+
 def _select_unit_request(request_id: str = "decision-request-branch") -> DecisionRequest:
     return DecisionRequest(
         request_id=request_id,

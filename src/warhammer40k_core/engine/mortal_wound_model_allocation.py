@@ -189,10 +189,6 @@ class MortalWoundAllocationOccurrence:
             raise GameLifecycleError(
                 "Mortal-wound allocation Feel No Pain decline policy must be a bool."
             )
-        if len(sources) < 2 and not self.feel_no_pain_decline_allowed:
-            raise GameLifecycleError(
-                "Mortal-wound allocation occurrence must authorize a Feel No Pain choice."
-            )
 
     def to_payload(self) -> MortalWoundAllocationOccurrencePayload:
         return {
@@ -743,26 +739,25 @@ def _continue_mortal_wound_application_for_model(
     remove_destroyed_models: bool,
     logical_death_recorder: MortalWoundLogicalDeathRecorder | None,
 ) -> MortalWoundRoutingResult:
-    sources = mortal_wound_feel_no_pain_sources(
+    from warhammer40k_core.engine.mortal_wound_allocation_triggers import (
+        record_mortal_wound_allocation_occurrence,
+    )
+
+    occurrence, sources, decline_allowed = record_mortal_wound_allocation_occurrence(
         state=state,
-        model_instance_id=model_instance_id,
+        decisions=decisions,
+        application_id=progress.application_id,
+        wound_index=progress.mortal_wounds - progress.remaining_mortal_wounds + 1,
+        target_unit_instance_id=progress.target_unit_instance_id,
+        legal_model_ids=legal_model_ids,
+        priority_tier=priority_tier,
+        selected_model_id=model_instance_id,
+        dice_manager=dice_manager,
+        parent_request_id=None if model_decision is None else model_decision.request_id,
+        parent_result_id=None if model_decision is None else model_decision.result_id,
         destruction_evidence=progress.destruction_evidence,
     )
-    decline_allowed = mortal_wound_feel_no_pain_decline_allowed(
-        state=state,
-        model_instance_id=model_instance_id,
-    )
     if len(sources) > 1 or (sources and decline_allowed):
-        occurrence = _record_mortal_wound_allocation_occurrence(
-            decisions=decisions,
-            progress=progress,
-            legal_model_ids=legal_model_ids,
-            priority_tier=priority_tier,
-            selected_model_id=model_instance_id,
-            model_decision=model_decision,
-            sources=sources,
-            decline_allowed=decline_allowed,
-        )
         request = build_feel_no_pain_request(
             request_id=request_id,
             defender_player_id=progress.defender_player_id,
@@ -805,55 +800,6 @@ def _continue_mortal_wound_application_for_model(
         remove_destroyed_models=remove_destroyed_models,
         logical_death_recorder=logical_death_recorder,
     )
-
-
-def _record_mortal_wound_allocation_occurrence(
-    *,
-    decisions: DecisionController,
-    progress: MortalWoundApplicationProgress,
-    legal_model_ids: tuple[str, ...],
-    priority_tier: MortalWoundAllocationPriority,
-    selected_model_id: str,
-    model_decision: MortalWoundModelDecision | None,
-    sources: tuple[FeelNoPainSource, ...],
-    decline_allowed: bool,
-) -> MortalWoundAllocationOccurrence:
-    wound_index = progress.mortal_wounds - progress.remaining_mortal_wounds + 1
-    occurrence = MortalWoundAllocationOccurrence(
-        occurrence_id=_mortal_wound_allocation_occurrence_id(
-            application_id=progress.application_id,
-            wound_index=wound_index,
-        ),
-        application_id=progress.application_id,
-        wound_index=wound_index,
-        target_unit_instance_id=progress.target_unit_instance_id,
-        priority_tier=priority_tier,
-        legal_model_ids=legal_model_ids,
-        selected_model_id=selected_model_id,
-        selection_disposition=(
-            MortalWoundSelectionDisposition.SOLE_LEGAL_MODEL
-            if model_decision is None
-            else MortalWoundSelectionDisposition.PLAYER_DECISION
-        ),
-        parent_request_id=None if model_decision is None else model_decision.request_id,
-        parent_result_id=None if model_decision is None else model_decision.result_id,
-        feel_no_pain_sources=sources,
-        feel_no_pain_decline_allowed=decline_allowed,
-    )
-    existing = tuple(
-        event
-        for event in decisions.event_log.records
-        if event.event_type == MORTAL_WOUND_MODEL_ALLOCATED_EVENT_TYPE
-        and isinstance(event.payload, dict)
-        and event.payload.get("occurrence_id") == occurrence.occurrence_id
-    )
-    if existing:
-        raise GameLifecycleError("Mortal-wound allocation occurrence already exists.")
-    decisions.event_log.append(
-        MORTAL_WOUND_MODEL_ALLOCATED_EVENT_TYPE,
-        occurrence.to_payload(),
-    )
-    return occurrence
 
 
 def resolve_mortal_wound_model_decision(
@@ -1187,12 +1133,28 @@ def mortal_wound_feel_no_pain_sources(
     state: GameState,
     model_instance_id: str,
     destruction_evidence: MortalWoundDestructionEvidence | None = None,
+    include_allocation_permissions: bool = True,
 ) -> tuple[FeelNoPainSource, ...]:
     from warhammer40k_core.engine.feel_no_pain_conditions import (
         feel_no_pain_source_applies_to_mortal_wounds,
     )
+    from warhammer40k_core.engine.mortal_wound_allocation_permissions import (
+        mortal_wound_allocation_preventions,
+    )
 
     sources = state.feel_no_pain_sources_for_model(model_instance_id=model_instance_id)
+    if type(include_allocation_permissions) is not bool:
+        raise GameLifecycleError("Mortal wound allocation query policy must be a bool.")
+    if include_allocation_permissions:
+        sources = (
+            *sources,
+            *(
+                b.source
+                for b in mortal_wound_allocation_preventions(
+                    state=state, model_instance_id=model_instance_id
+                )
+            ),
+        )
     typed_sources = validate_unique_sorted_exact_type_tuple(
         sources,
         item_type=FeelNoPainSource,
@@ -1214,10 +1176,19 @@ def mortal_wound_feel_no_pain_decline_allowed(
     state: GameState,
     model_instance_id: str,
 ) -> bool:
+    from warhammer40k_core.engine.mortal_wound_allocation_permissions import (
+        mortal_wound_allocation_preventions,
+    )
+
     value = state.feel_no_pain_decline_allowed_for_model(model_instance_id=model_instance_id)
     if type(value) is not bool:
         raise GameLifecycleError("Feel No Pain decline state must be a bool.")
-    return value
+    return value or any(
+        b.decline_allowed
+        for b in mortal_wound_allocation_preventions(
+            state=state, model_instance_id=model_instance_id
+        )
+    )
 
 
 def _progress_with_target_lineage(

@@ -84,6 +84,8 @@ _RNG_HISTORY_NEUTRAL_EVENT_TYPES = frozenset(
         "command_phase_start_rule_completed",
         "command_phase_start_order_requested",
         "mortal_wound_model_destructions_finalized",
+        "mortal_wound_model_allocated",
+        "mortal_wound_allocation_rule_applied",
         "model_logical_death_recorded",
         MORTAL_WOUND_APPLICATION_STARTED_EVENT,
     }
@@ -220,6 +222,7 @@ class DiceRollManager:
     _roll_counter: int = 0
     _decision_request_counter: int = 0
     _rng_history_neutral_event_count: int = 0
+    _rng_history_scanned_event_count: int = 0
 
     def __init__(
         self,
@@ -239,6 +242,7 @@ class DiceRollManager:
         self._roll_counter = 0
         self._decision_request_counter = 0
         self._rng_history_neutral_event_count = 0
+        self._rng_history_scanned_event_count = 0
         self._seed_existing_event_history()
 
     @property
@@ -638,8 +642,14 @@ class DiceRollManager:
         return f"roll-{self._roll_counter:06d}"
 
     def _append_event_history(self, event: EventRecord) -> None:
+        suffix = self.event_log.records_since(self._rng_history_scanned_event_count)
+        if not suffix or suffix[-1] is not event:
+            raise DecisionError("Dice history event must be the current appended event.")
+        self._rng_history_neutral_event_count += sum(
+            record.event_type in _RNG_HISTORY_NEUTRAL_EVENT_TYPES for record in suffix
+        )
+        self._rng_history_scanned_event_count += len(suffix)
         if event.event_type in _RNG_HISTORY_NEUTRAL_EVENT_TYPES:
-            self._rng_history_neutral_event_count += 1
             return
         self.rng.append_history(
             _rng_history_token(
@@ -650,7 +660,8 @@ class DiceRollManager:
 
     def _seed_existing_event_history(self) -> None:
         neutral_event_count = 0
-        for event in self.event_log.records:
+        records = self.event_log.records
+        for event in records:
             if event.event_type in _RNG_HISTORY_NEUTRAL_EVENT_TYPES:
                 neutral_event_count += 1
                 continue
@@ -685,6 +696,7 @@ class DiceRollManager:
                 self._roll_counter += 1
                 self.rng.draw_count += _restored_rng_draw_count(event.payload)
         self._rng_history_neutral_event_count = neutral_event_count
+        self._rng_history_scanned_event_count = len(records)
 
     def _validate_reroll_decision(
         self,

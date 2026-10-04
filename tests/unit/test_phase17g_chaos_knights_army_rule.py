@@ -1549,7 +1549,7 @@ def test_selected_target_rerolled_battle_shock_waits_for_delirium_outcome_via_fa
 
 
 def test_selected_target_later_battle_shock_reroll_retains_parent_via_facade() -> None:
-    game_id = "phase17g-selected-target-later-battle-shock-reroll"
+    game_id = "order117-later-reroll-continuation-0"
     selected_target_record = _selected_target_two_battle_shocks_then_modifier_record()
 
     def reroll_permission(
@@ -1795,7 +1795,7 @@ def test_deferred_outcome_rejects_missing_parent_batch_completion() -> None:
 def test_selected_target_remaining_effect_request_requires_retained_ancestry() -> None:
     selected_target_record = _selected_target_battle_shock_then_mortal_record()
     lifecycle, bundle, _provider_request = _selected_target_delirium_provider_checkpoint(
-        game_id="order65-source-internal-mortal-1",
+        game_id="order65-source-internal-mortal-0",
         selected_target_record=selected_target_record,
     )
     state = lifecycle.state
@@ -1835,7 +1835,7 @@ def test_selected_target_remaining_effect_request_requires_retained_ancestry() -
         forged_request
     )
     result = DecisionResult.for_request(
-        result_id=("order65-source-internal-mortal-1:forged-result"),
+        result_id=("order65-source-internal-mortal-0:forged-result"),
         request=forged_request,
         selected_option_id="decline",
     )
@@ -1867,7 +1867,7 @@ def test_selected_target_remaining_effect_request_requires_retained_ancestry() -
         restored_session.submit_option(
             request_id=current_request.request_id,
             option_id="decline",
-            result_id=(f"order65-source-internal-mortal-1:nested:{nested_decision_index}"),
+            result_id=(f"order65-source-internal-mortal-0:nested:{nested_decision_index}"),
         )
     else:
         raise AssertionError("selected-target remaining effects did not complete")
@@ -2501,7 +2501,11 @@ def _record_real_harbingers_selection(
 
 
 def _assert_selected_target_delirium_continuation(*, reroll: bool) -> None:
-    game_id = "order99-delirium-reroll-1" if reroll else "order65-complete-boundary-direct-0"
+    game_id = (
+        "order117-delirium-reroll-continuation-1"
+        if reroll
+        else "order65-complete-boundary-direct-0"
+    )
     selected_target_record = _selected_target_battle_shock_then_modifier_record()
     extra_contributions: tuple[RuntimeContentContribution, ...] = ()
     if reroll:

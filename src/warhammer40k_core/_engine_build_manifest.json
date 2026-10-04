@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d8048300549f37aa10c0bcaaf964f8dc0edda094b96adaa3c31cb3d96aa91732",
-  "fingerprint": "d8048300549f37aa10c0bcaaf964f8dc0edda094b96adaa3c31cb3d96aa91732",
-  "resource_count": 3062,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:cfcb331fb3801ae0ba15c21a669165d86b8f283ac9a2ed5d6fb90d46aeaa5fa8",
+  "fingerprint": "cfcb331fb3801ae0ba15c21a669165d86b8f283ac9a2ed5d6fb90d46aeaa5fa8",
+  "resource_count": 3064,
   "resources": [
     {
       "byte_length": 113,
@@ -62,7 +62,7 @@
     {
       "byte_length": 6284,
       "path": "warhammer40k_core/adapters/external_contract.py",
-      "sha256": "3af3b8da852166d13206259560990200089ffb3f3b2db20f3fbb6bedfc012822"
+      "sha256": "a88fb0e45668c30847cfe88c17c95f099e956e7b73addcf2d903293b88442380"
     },
     {
       "byte_length": 2445,
@@ -90,9 +90,9 @@
       "sha256": "90300e5d649559d9b8a0acc4878a221df0fddb30faab613f1a69f71440c650ee"
     },
     {
-      "byte_length": 41890,
+      "byte_length": 42077,
       "path": "warhammer40k_core/adapters/redaction.py",
-      "sha256": "82ba30c1235f5a229fd54c1b87cc26d24a61f9b9ab2a3f56c7839b9776a9c9cf"
+      "sha256": "88d281635457abd9d142baec1bff864a967519ce50b4de2272977fd901fc3768"
     },
     {
       "byte_length": 1598,
@@ -2085,9 +2085,9 @@
       "sha256": "fef1b39dc738c27b863c642b17c6d35e0029cbf504857543110de1101efcdf76"
     },
     {
-      "byte_length": 42738,
+      "byte_length": 43391,
       "path": "warhammer40k_core/engine/decision.py",
-      "sha256": "f5ab638ec1766e603f5c16dc18ec5b963c4e88a06573cc80f4cffcfd8a52d51b"
+      "sha256": "d6ac812cce6baf8a0b2826c363f8e046a903be320d39de08b05ec77822a3c3a4"
     },
     {
       "byte_length": 3459,
@@ -2225,9 +2225,9 @@
       "sha256": "4db7ca33b1ee8159f23889cdd2ff29b70f7d8fd60d5f21aff222084d4b08636c"
     },
     {
-      "byte_length": 9801,
+      "byte_length": 10175,
       "path": "warhammer40k_core/engine/direct_mortal_wound_application.py",
-      "sha256": "916b66df7728716bbf8e494305b90df92fdaee5ea1923c2c3b98e9dbe981c8e2"
+      "sha256": "aa19e4f3045cd5084baad02d266f32ed52172d0155509d862ab4d4de51bc4eb7"
     },
     {
       "byte_length": 16297,
@@ -2265,9 +2265,9 @@
       "sha256": "f9d57d77e23986663afd819c2c02dad4efa9d968df84f2049e13ee78125351fe"
     },
     {
-      "byte_length": 7299,
+      "byte_length": 7684,
       "path": "warhammer40k_core/engine/event_log.py",
-      "sha256": "2cb46b75399b4014c07df631e8dd5e22696f126ec6518776c70b63a1f79d110c"
+      "sha256": "2060961ba0ae8b05fee864c88cced5d5bf5ad2f1854581037891bddc37db578c"
     },
     {
       "byte_length": 3756,
@@ -10825,6 +10825,16 @@
       "sha256": "513e273576bdb6e9aeb4744660fc72a93563d2cc3a57277965a7f67f029709b1"
     },
     {
+      "byte_length": 7588,
+      "path": "warhammer40k_core/engine/mortal_wound_allocation_permissions.py",
+      "sha256": "5150a0930ac75f4a569b1027e3489295c09e54a1edd13ef2a2ec2f68bba80558"
+    },
+    {
+      "byte_length": 4943,
+      "path": "warhammer40k_core/engine/mortal_wound_allocation_triggers.py",
+      "sha256": "a39868bd6d99a4f927caf164ad1602bb1538bc3c695c5f19dbe7bca6f5ef47ec"
+    },
+    {
       "byte_length": 59036,
       "path": "warhammer40k_core/engine/mortal_wound_application_authority.py",
       "sha256": "0ba3e36b905953ff44b46767edaf86992a32c13d1124401020651d93d348ad62"
@@ -10865,9 +10875,9 @@
       "sha256": "2f2530e58be3c2daa7d7de8e15a3a897ececdc77a07d7a5920b661c55a39d39e"
     },
     {
-      "byte_length": 54460,
+      "byte_length": 53335,
       "path": "warhammer40k_core/engine/mortal_wound_model_allocation.py",
-      "sha256": "30a330a8901a40606be629417e5a2354ba5a927e8affa9f95e6c75b29fdc330b"
+      "sha256": "4a8b3faa6345681f603cd3415219547edf7ec3362d3fd91aa2c8dabef498d602"
     },
     {
       "byte_length": 6476,
@@ -12890,9 +12900,9 @@
       "sha256": "6deca8a65c9334b0d88f87bdf9c5e5d6d3e7a633859135930bc9c848f349140b"
     },
     {
-      "byte_length": 14411,
+      "byte_length": 14465,
       "path": "warhammer40k_core/engine/timing_windows.py",
-      "sha256": "e566661d70cd6eacf182ef275f74bde7ec39b899db7c49a2e48b0dc21a29cefd"
+      "sha256": "230355d1612dd48fc8f503a027e0303560d9c9cce635a9c1dd135deecf34299b"
     },
     {
       "byte_length": 5624,
