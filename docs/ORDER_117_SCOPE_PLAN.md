@@ -63,6 +63,12 @@ permission/source identity and the exact prevention descriptor used by the engin
 The source audit pins retained Core rows, current official example PDF bytes and
 the retained activation profile without claiming a fresh live observation.
 Original evidence, source pins, golden metadata and failed receipts are preserved.
+The existing Order97 historical resolver retains the exact original target-replacement
+fixture and Fall Back assertion file from verified base4b59ded9 under a hash-pinned
+Order117 archive mapping.
+Current gameplay uses the independently reviewed legal seed13 fixture; historical
+assertion evidence continues to use immutable original bytes. Missing or corrupted
+mapping/archive bytes fail closed, and the Order97 inventory identity is unchanged.
 Order116 once-only deferred production, Psychic conditional FNP, physical gathered
 provenance and source-kind application namespaces remain mandatory regressions.
 

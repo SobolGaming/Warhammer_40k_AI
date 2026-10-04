@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "4b59ded9d7dfd1af4170adaa50462bcf6cf32c0d",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:cfcb331fb3801ae0ba15c21a669165d86b8f283ac9a2ed5d6fb90d46aeaa5fa8",
-  "operation_map_sha256": "ea2650d7fe1f7db7e552dba20c0853c3b61a632f2523db23e9bfb7a07c870ab9",
+  "operation_map_sha256": "5ffe8e845302a4878dd6c98741ca7a5ecb69a8a39b9eb7a210f05e067274e310",
   "changes": {
     "README.md": {
       "before_sha256": "13f8f69455fc83fad672886c0368bd1003759c285cd46c98a3c6366119b2311c",
@@ -244,6 +244,36 @@
         }
       }
     },
+    "data/source_audits/order117/baseline/tests/target_replacement_reaction_helpers.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "d5a36008a235ca45c2f6f7f0b5c678b2edd24c2bd4b128187683673551d3ae6b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "d5a36008a235ca45c2f6f7f0b5c678b2edd24c2bd4b128187683673551d3ae6b"
+        }
+      }
+    },
+    "data/source_audits/order117/baseline/tests/unit/test_phase10o_fall_back.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "6e6c89c60eb243aeef416434094143ba419c77c423661cc2572b0e68fa759e34",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "6e6c89c60eb243aeef416434094143ba419c77c423661cc2572b0e68fa759e34"
+        }
+      }
+    },
+    "data/source_audits/order117/historical-inputs.json": {
+      "before_sha256": null,
+      "after_sha256": "5e95332bb27eb2ce984013ac4c796da5ac91413dc7fe6f9d94975c75db5225fc",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "5e95332bb27eb2ce984013ac4c796da5ac91413dc7fe6f9d94975c75db5225fc"
+        }
+      }
+    },
     "data/source_audits/order117/source.audit.json": {
       "before_sha256": null,
       "after_sha256": "439ece07670dafad58b15da513b45c4ec2e4178d09c1718056f12c513e18cdaa",
@@ -276,21 +306,21 @@
     },
     "docs/ORDER_117_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "a7c4d1873c02117d044bca7f06816f97b0e3ef8b9a892edf4c07394319d7e112",
+      "after_sha256": "9013768ac925a15093200a0a870c3d0e3f9a7fd48bb3ea4142b6afc8840ab10e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a7c4d1873c02117d044bca7f06816f97b0e3ef8b9a892edf4c07394319d7e112"
+          "after": "9013768ac925a15093200a0a870c3d0e3f9a7fd48bb3ea4142b6afc8840ab10e"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "c9cd5a6ba23a6d6e3c06b2802da6dea31b8c65b8a5af067d8e079751be5239ec",
-      "after_sha256": "73a133d7c2f4a3cc2b8f96694ee87e58ff3ce687992d012c5f96685c670a427b",
+      "after_sha256": "8f1b4c0538eea261858ce887c8c4803252e2a1381bceab0f5c429299cc99634a",
       "owners": {
         "@document": {
           "before": "c9cd5a6ba23a6d6e3c06b2802da6dea31b8c65b8a5af067d8e079751be5239ec",
-          "after": "73a133d7c2f4a3cc2b8f96694ee87e58ff3ce687992d012c5f96685c670a427b"
+          "after": "8f1b4c0538eea261858ce887c8c4803252e2a1381bceab0f5c429299cc99634a"
         }
       }
     },
@@ -476,6 +506,20 @@
         }
       }
     },
+    "tests/code_quality/test_order97_inventory.py": {
+      "before_sha256": "b3b766714a2704c41d073a282d556ab1ec2a53063ed00fc68242235f501cbf01",
+      "after_sha256": "78697c357cf227480a58cf22d2f1d201e621d1cb3e7c0e1631151613bacf3955",
+      "owners": {
+        "@module": {
+          "before": "58d8c1f3c2291ea21ad31cbd883fd8440f73f3dc66fdfc33d5a5e7f55bfb249d",
+          "after": "4a2974dcb3577a53f93e5e9adfbf4366431e7174307bf62182cbedf737b75824"
+        },
+        "test_original_assertions_remain_exact_and_fail_closed": {
+          "before": "1276b434a6f1e7ce0d4820877fbab5b0514c79052207a0b0066280901cccf95f",
+          "after": "a128cb4f75eeff6f131efdc2510942ed2ebc6f544dc51c8cc59562adb0b8fd7e"
+        }
+      }
+    },
     "tests/integration/test_retained_shooting.py": {
       "before_sha256": "01b0ae41c5cc85b342352a61932ea962e281a750ea258a2c1cee579bb73f8dac",
       "after_sha256": "518bcd57d83e4ebce07064ffc7660e34c8117fe88c8d803289d7b91fdac65deb",
@@ -639,6 +683,20 @@
         "test_code_chivalric_tally_uses_updated_threshold_and_returned_destroyed_units": {
           "before": "1c5201bd665db1395af13e0578358cdcd9745ae24f0173caec4bfc0c28cae6a8",
           "after": "cf24874af45eb13602349dca0db4a1a258dc944793323412f889d6790d74ac9c"
+        }
+      }
+    },
+    "tools/core_rules_order97_history.py": {
+      "before_sha256": "371e54d69e585c661132de57d603c3861e75c69c4daf0048a98177aa5657eb6b",
+      "after_sha256": "be1cf9676884f2854015e63c602391ec7b11c54918185e5c0a731cdcc41c60a4",
+      "owners": {
+        "@module": {
+          "before": "65fb8d5a2a9820f46e769f55f2050e1a56301fda777ef169eeeb4747fd45f0ab",
+          "after": "7575619f8c52a7ec0827d33505777b444a552490c57c3d1aa871620a7db907ca"
+        },
+        "historical_evidence_path": {
+          "before": "d058432760b2e913f0b7a5191abf7a23a6dcc8b489e08bc98edc515841fc736b",
+          "after": "e904fb0b19390a76f3e44f55a5f7d9d553b4c0485e4d23192d6a3fb1d108c680"
         }
       }
     }
@@ -882,6 +940,36 @@
       "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
       "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
     },
+    "data/source_audits/order117/baseline/tests/target_replacement_reaction_helpers.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order117-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
+      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
+      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+    },
+    "data/source_audits/order117/baseline/tests/unit/test_phase10o_fall_back.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order117-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
+      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
+      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+    },
+    "data/source_audits/order117/historical-inputs.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order117-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
+      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
+      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+    },
     "data/source_audits/order117/source.audit.json": {
       "category": "rule_semantics",
       "operations": [
@@ -1032,6 +1120,14 @@
       "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
       "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
     },
+    "tests/code_quality/test_order97_inventory.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
+      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
+      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+    },
     "tests/integration/test_retained_shooting.py": {
       "category": "rule_semantics",
       "operations": [
@@ -1116,6 +1212,16 @@
       "category": "rule_semantics",
       "operations": [
         "order117-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
+      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
+      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+    },
+    "tools/core_rules_order97_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order117-source-evidence"
       ],
       "selected_families": [],
       "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",

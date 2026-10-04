@@ -3387,10 +3387,16 @@
     },
     "order117-source-evidence": {
       "paths": [
-        "data/source_audits/order117/source.audit.json"
+        "data/source_audits/order117/baseline/tests/target_replacement_reaction_helpers.py.txt",
+        "data/source_audits/order117/baseline/tests/unit/test_phase10o_fall_back.py.txt",
+        "data/source_audits/order117/historical-inputs.json",
+        "data/source_audits/order117/source.audit.json",
+        "tools/core_rules_order97_history.py"
       ],
       "owners": [
-        "@document"
+        "@document",
+        "@module",
+        "historical_evidence_path"
       ],
       "families": [],
       "sensitive": false,
