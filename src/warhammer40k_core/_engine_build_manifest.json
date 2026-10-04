@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0c8e87a4cc09ad9e058be6afee09cad2c0ded405813a8c613b5f6745bb7ce2f0",
-  "fingerprint": "0c8e87a4cc09ad9e058be6afee09cad2c0ded405813a8c613b5f6745bb7ce2f0",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d8048300549f37aa10c0bcaaf964f8dc0edda094b96adaa3c31cb3d96aa91732",
+  "fingerprint": "d8048300549f37aa10c0bcaaf964f8dc0edda094b96adaa3c31cb3d96aa91732",
   "resource_count": 3062,
   "resources": [
     {
@@ -2120,9 +2120,9 @@
       "sha256": "e36b64119f38de3d4a66fd1b600e721dc7665712abd4ddd14aea8e12e96423ac"
     },
     {
-      "byte_length": 6223,
+      "byte_length": 6247,
       "path": "warhammer40k_core/engine/deferred_mortal_wounds.py",
-      "sha256": "ce64d1d6ce03467fc63852f4cc3f3746b904df7efc1461531ed99afac07bce7c"
+      "sha256": "7b333feef95d12aecee6f21f0a8bcc01c65e269b21536f09e897ca92b45c033c"
     },
     {
       "byte_length": 58291,

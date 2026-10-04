@@ -54,6 +54,12 @@ identity/source records, pending JSON save/load, isolated continuation, typed
 rejected finite options, lethal completion, viewer projections/events and exact
 replay. Both deferred producers query the retained attack/source occurrence before resuming random-damage or save choice windows, so completed entries and events are produced once while distinct permissions remain separate. Command Re-roll acceptance and decline, pending restore and exact replay cover these continuations. Source scope and malformed permission controls fail closed.
 
+Additional application IDs namespace the permission effect ID by source kind,
+so a valid factory grant named `devastating-wounds` cannot alias a native packet.
+Native application IDs retain their existing shape. A real facade regression
+covers the reserved ID, pending and completed JSON restore, rejected retry,
+lethal continuation and replay; packet authority still rejects identity drift.
+
 ## Delivery and remaining support
 
 Apply `docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md`: block reproduced incorrect

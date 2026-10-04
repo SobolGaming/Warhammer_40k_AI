@@ -50,6 +50,8 @@ def test_attack_mortal_identity_and_fnp_share_source_aware_owners() -> None:
     native = (ENGINE / "attack_sequence_post_roll.py").read_text(encoding="utf-8")
     normal = (ENGINE / "attack_sequence_validation.py").read_text(encoding="utf-8")
     mortal = (ENGINE / "mortal_wound_model_allocation.py").read_text(encoding="utf-8")
+    deferred = (ENGINE / "deferred_mortal_wounds.py").read_text(encoding="utf-8")
+    consumer = (ENGINE / "attack_sequence_deferred_mortals.py").read_text(encoding="utf-8")
     assert "attack_mortal_origin(" in producer
     assert "attack_mortal_origin(" in native
     assert "has_deferred_mortal_occurrence(" in producer
@@ -57,3 +59,5 @@ def test_attack_mortal_identity_and_fnp_share_source_aware_owners() -> None:
     assert "feel_no_pain_source_applies_to_attack(" in normal
     assert "feel_no_pain_source_applies_to_mortal_wounds(" in mortal
     assert mortal.count("destruction_evidence=progress.destruction_evidence") == 2
+    assert 'f"{self.source_kind}:{self.source_permission.effect_id}"' in deferred
+    assert "deferred.application_suffix" in consumer

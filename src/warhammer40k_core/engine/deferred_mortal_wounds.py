@@ -127,7 +127,7 @@ class DeferredMortalWounds:
         return (
             "devastating-wounds"
             if self.source_permission is None
-            else self.source_permission.effect_id
+            else f"{self.source_kind}:{self.source_permission.effect_id}"
         )
 
     def to_payload(self) -> DeferredMortalWoundsPayload:

@@ -3246,6 +3246,7 @@
         "test_additional_mortal_permission_validates_schema_and_occurrence",
         "test_additional_mortal_weapon_scope_is_source_owned",
         "test_additional_mortals_coexist_with_native_devastating_wounds",
+        "test_additional_permission_id_cannot_alias_native_mortal_application",
         "test_attack_mortal_fnp_keeps_psychic_weapon_classification",
         "test_attack_mortal_producers_resume_once_after_command_reroll_windows",
         "test_gathered_additional_mortals_keep_each_physical_weapon_through_lethal_restore",

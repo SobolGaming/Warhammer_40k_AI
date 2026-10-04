@@ -7566,5 +7566,7 @@ decision family or Psychic ability classification is introduced.
 Both deferred producers retain attack/source occurrence identity across random
 Damage and saving-throw choice windows. Accepting or declining Command Re-roll
 and restoring its pending request must not duplicate entries or emitted events;
-independent permission effect IDs remain distinct occurrences. Existing reroll
-submission families and validation apply.
+independent permission effect IDs remain distinct occurrences. Additional mortal
+application IDs namespace the permission effect ID by source kind; an accepted
+effect ID `devastating-wounds` cannot alias a native application. Native IDs keep
+their existing shape. Existing reroll submission families and validation apply.

@@ -209,6 +209,72 @@ def test_successful_wounds_generate_additional_mortals_even_after_successful_sav
     )
 
 
+def test_additional_permission_id_cannot_alias_native_mortal_application() -> None:
+    session = additional_mortal_session(
+        BattlePhase.SHOOTING,
+        devastating=True,
+        random_devastating_damage=True,
+        enemy_models=5,
+        optional_fnp=True,
+        permission_effect_id="devastating-wounds",
+    )
+    session = LocalGameSession.from_persistence_payload(
+        json.loads(json.dumps(session.to_persistence_payload()))
+    )
+    restored_pending = False
+    for _ in range(150):
+        if attack_completed(session):
+            break
+        request = pending_request(session)
+        if request.decision_type == "select_feel_no_pain" and isinstance(request.payload, dict):
+            lost = request.payload["lost_wound_context"]
+            assert isinstance(lost, dict)
+            source = lost.get("source_context")
+            if (
+                not restored_pending
+                and isinstance(source, dict)
+                and source.get("source_kind") == "additional_attack_mortal_wounds"
+            ):
+                checkpoint = json.loads(json.dumps(session.to_persistence_payload()))
+                session = LocalGameSession.from_persistence_payload(checkpoint)
+                with pytest.raises(DecisionError, match="finite action space"):
+                    session.submit_option(
+                        request_id=request.request_id,
+                        result_id=f"{request.request_id}:invalid",
+                        option_id="absent-option",
+                    )
+                assert session.to_persistence_payload() == checkpoint
+                restored_pending = True
+        submit_fixture_request(session, request)
+    else:
+        raise AssertionError("Native and additional mortal applications did not finish.")
+    assert restored_pending
+    started = [
+        cast(dict[str, JsonValue], event.payload)
+        for event in session.lifecycle.decision_controller.event_log.records
+        if event.event_type == "mortal_wound_application_started"
+    ]
+    ids = [cast(str, payload["application_id"]) for payload in started]
+    assert len(ids) == len(set(ids))
+    kinds = {
+        cast(dict[str, JsonValue], payload["source_context"])["source_kind"] for payload in started
+    }
+    assert kinds == {"devastating_wounds", "additional_attack_mortal_wounds"}
+    assert any(":additional_attack_mortal_wounds:devastating-wounds:" in value for value in ids)
+    assert any(
+        ":devastating-wounds:" in value and ":additional_attack_mortal_wounds:" not in value
+        for value in ids
+    )
+    restored = LocalGameSession.from_persistence_payload(
+        json.loads(json.dumps(session.to_persistence_payload()))
+    )
+    assert restored.to_persistence_payload() == session.to_persistence_payload()
+    replay = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id="order116-native-permission-id")
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED, replay
+
+
 def test_additional_mortals_coexist_with_native_devastating_wounds() -> None:
     session = additional_mortal_session(BattlePhase.SHOOTING, devastating=True, attacks=12)
     complete_attack(session)

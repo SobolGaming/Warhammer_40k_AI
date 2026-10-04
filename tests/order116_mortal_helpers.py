@@ -49,6 +49,7 @@ def additional_mortal_session(
     random_devastating_damage: bool = False,
     command_reroll_player_id: str | None = None,
     second_permission: bool = False,
+    permission_effect_id: str = "order116:source-permission",
 ) -> LocalGameSession:
     catalog = _compact_intercessor_catalog(_canonical_catalog())
     catalog = replace(
@@ -110,7 +111,7 @@ def additional_mortal_session(
     state.record_persisting_effect(
         additional_attack_mortal_permission_effect(
             state=state,
-            effect_id="order116:source-permission",
+            effect_id=permission_effect_id,
             source_rule_id=SOURCE_ID,
             source_model_instance_id=attacker.own_models[0].model_instance_id,
             occasion_id="order116:source-occasion",
