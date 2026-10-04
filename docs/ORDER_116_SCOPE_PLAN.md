@@ -52,7 +52,7 @@ recognizes both source kinds before the attacks-resolved boundary.
 Consumer-path regressions cover real facade submissions, actual damage, ordered
 identity/source records, pending JSON save/load, isolated continuation, typed
 rejected finite options, lethal completion, viewer projections/events and exact
-replay. Source scope and malformed permission controls fail closed.
+replay. Both deferred producers query the retained attack/source occurrence before resuming random-damage or save choice windows, so completed entries and events are produced once while distinct permissions remain separate. Command Re-roll acceptance and decline, pending restore and exact replay cover these continuations. Source scope and malformed permission controls fail closed.
 
 ## Delivery and remaining support
 

@@ -52,6 +52,8 @@ def test_attack_mortal_identity_and_fnp_share_source_aware_owners() -> None:
     mortal = (ENGINE / "mortal_wound_model_allocation.py").read_text(encoding="utf-8")
     assert "attack_mortal_origin(" in producer
     assert "attack_mortal_origin(" in native
+    assert "has_deferred_mortal_occurrence(" in producer
+    assert "has_deferred_mortal_occurrence(" in native
     assert "feel_no_pain_source_applies_to_attack(" in normal
     assert "feel_no_pain_source_applies_to_mortal_wounds(" in mortal
     assert mortal.count("destruction_evidence=progress.destruction_evidence") == 2

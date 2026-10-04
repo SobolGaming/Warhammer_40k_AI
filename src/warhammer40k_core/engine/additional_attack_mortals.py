@@ -11,7 +11,10 @@ from warhammer40k_core.engine.attack_mortal_origins import attack_mortal_origin
 from warhammer40k_core.engine.attack_sequence_model import AttackResolutionContextPayload
 from warhammer40k_core.engine.attack_sequence_state import AttackSequence
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.deferred_mortal_wounds import DeferredMortalWounds
+from warhammer40k_core.engine.deferred_mortal_wounds import (
+    DeferredMortalWounds,
+    has_deferred_mortal_occurrence,
+)
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -44,6 +47,13 @@ def defer_additional_attack_mortals(
             source_phase=current.source_phase,
             weapon_profile=origin.weapon_profile,
         ):
+            if has_deferred_mortal_occurrence(
+                current.deferred_mortal_wounds,
+                attack_context_id=context["attack_context_id"],
+                source_rule_id=permission.source_rule_id,
+                source_permission_id=permission.effect_id,
+            ):
+                continue
             payload = permission.effect_payload
             if not isinstance(payload, dict):
                 raise GameLifecycleError("Additional attack mortal permission must be an object.")

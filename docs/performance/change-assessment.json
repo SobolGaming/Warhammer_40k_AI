@@ -1,8 +1,8 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "3b8a29a8fa5a0ddb24e87e0e7a7a76be34c361a2",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f515245871c70971f3471d7c71cedcada8340f9d57e0ac6855a3762e3c0f080f",
-  "operation_map_sha256": "bb650ee9befe6cfb4774dd879e838f1cf5ca53b17027d2513e264066fa06ba76",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0c8e87a4cc09ad9e058be6afee09cad2c0ded405813a8c613b5f6745bb7ce2f0",
+  "operation_map_sha256": "641021b50507809d4de4cbfbb9da72fcc1c31fe69ca15580abc97471ba7cc1fb",
   "changes": {
     "README.md": {
       "before_sha256": "ed5309fd8c22933f3aa8ade4ad4c08e653ea271d7fa304a5fda96d3925e552cb",
@@ -16,131 +16,131 @@
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "4bfcf46e0c7431c5debb36b2bfbaa35b6649a6e20fe52ca1fb9e746224a9c14e",
-      "after_sha256": "6ceee343888f3fba98d8bdcd01901cfced3da1203640d61acf04353bfca684fc",
+      "after_sha256": "f05d7ea400383b6bef6919b37d644200ddee45272a4155dca5b89aac8b3b5e00",
       "owners": {
         "@document": {
           "before": "4bfcf46e0c7431c5debb36b2bfbaa35b6649a6e20fe52ca1fb9e746224a9c14e",
-          "after": "6ceee343888f3fba98d8bdcd01901cfced3da1203640d61acf04353bfca684fc"
+          "after": "f05d7ea400383b6bef6919b37d644200ddee45272a4155dca5b89aac8b3b5e00"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "ceeb312c2acb5b0bdba5d222a6488e38c60dce3cd7b9d1298f3de9101a4e3084",
-      "after_sha256": "220b083d4017aa5614a99ff61fc7f590a88f3cdb22bceff94175e2efd61db13b",
+      "after_sha256": "15df40de548468c63bb48ccfea0d01e7485a10d5751b2a4cb3cc888157439cf1",
       "owners": {
         "@document": {
           "before": "ceeb312c2acb5b0bdba5d222a6488e38c60dce3cd7b9d1298f3de9101a4e3084",
-          "after": "220b083d4017aa5614a99ff61fc7f590a88f3cdb22bceff94175e2efd61db13b"
+          "after": "15df40de548468c63bb48ccfea0d01e7485a10d5751b2a4cb3cc888157439cf1"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "e09f77053c4db31e61e8c81179f08821349443c89eb3f799402bffb32b700c2c",
-      "after_sha256": "ea0308b5df11dd7aa45944876d8fefb8b76495b0ff11988c8a0d6050365981f4",
+      "after_sha256": "067801579f142f6d6211c6a03421d4062e4a1831de5746cc6bd4f26ffe1589ca",
       "owners": {
         "@document": {
           "before": "e09f77053c4db31e61e8c81179f08821349443c89eb3f799402bffb32b700c2c",
-          "after": "ea0308b5df11dd7aa45944876d8fefb8b76495b0ff11988c8a0d6050365981f4"
+          "after": "067801579f142f6d6211c6a03421d4062e4a1831de5746cc6bd4f26ffe1589ca"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "14055fdad792e65201a55b5aea28ddfde0850fd685ba869a026ce05f3e1679a9",
-      "after_sha256": "ad7f3dc9592bfcbe7e5cd51b9ebdfb2397c1ca9c79c3c27f1cd9cc8c94c21c7d",
+      "after_sha256": "028879ef9e9828b9b1d038d58e9cfa93f39f6e7721b9d7dd81bd4d5e671c5787",
       "owners": {
         "@document": {
           "before": "14055fdad792e65201a55b5aea28ddfde0850fd685ba869a026ce05f3e1679a9",
-          "after": "ad7f3dc9592bfcbe7e5cd51b9ebdfb2397c1ca9c79c3c27f1cd9cc8c94c21c7d"
+          "after": "028879ef9e9828b9b1d038d58e9cfa93f39f6e7721b9d7dd81bd4d5e671c5787"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "19b406eb9b994386f107c582f86eefa9364ce0e40f7d928065ee8bf922d5125f",
-      "after_sha256": "555ca4c3e8be13317f78a02af20348ff46a269e6c29ed3d722e884b98e04e6a5",
+      "after_sha256": "a27f741ec3cc8d9a10fe0349b765f6d9554a83546044810587f394c8eac3d7d1",
       "owners": {
         "@document": {
           "before": "19b406eb9b994386f107c582f86eefa9364ce0e40f7d928065ee8bf922d5125f",
-          "after": "555ca4c3e8be13317f78a02af20348ff46a269e6c29ed3d722e884b98e04e6a5"
+          "after": "a27f741ec3cc8d9a10fe0349b765f6d9554a83546044810587f394c8eac3d7d1"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "d7bc3792d67cabb5af726f2bb9a8217ca656ed778ad56f2a88458b36693a7441",
-      "after_sha256": "78f47eb3312ddc8e7f36af2a0591c23e6e27a272ee2930311bf43de2e9f6ea69",
+      "after_sha256": "b265d960de21b9de072dcb3658c77cfabe12500bb3b6a7c23f6a0ea18f671cb0",
       "owners": {
         "@document": {
           "before": "d7bc3792d67cabb5af726f2bb9a8217ca656ed778ad56f2a88458b36693a7441",
-          "after": "78f47eb3312ddc8e7f36af2a0591c23e6e27a272ee2930311bf43de2e9f6ea69"
+          "after": "b265d960de21b9de072dcb3658c77cfabe12500bb3b6a7c23f6a0ea18f671cb0"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "bfd379a2fc3283cda4cf6b14cae8b9f8ee8aa8fd0915a8b7cb4f78e796f92f8c",
-      "after_sha256": "b47749d15f8b96d3bccd6621467ed0a67c42e2b6ecd6ba840882712efabcfd69",
+      "after_sha256": "8af33d731f6f9baf416fd224f8fc4092393eba1ad3599bb8a6791b44fc7da883",
       "owners": {
         "@document": {
           "before": "bfd379a2fc3283cda4cf6b14cae8b9f8ee8aa8fd0915a8b7cb4f78e796f92f8c",
-          "after": "b47749d15f8b96d3bccd6621467ed0a67c42e2b6ecd6ba840882712efabcfd69"
+          "after": "8af33d731f6f9baf416fd224f8fc4092393eba1ad3599bb8a6791b44fc7da883"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "3974f0ab59d6aa370832e3c84a1a9c39c6851880ec8547b6c9b43e44fec6c3f4",
-      "after_sha256": "5f345dd5f1c6353fb532fa31aa516c1a20ac6fc0f54bdfc37add9381f7bf169b",
+      "after_sha256": "7b73f9599682d25f88fd47bbab79eb99e5d75e0bbfdf51b05255c200a294fccf",
       "owners": {
         "@document": {
           "before": "3974f0ab59d6aa370832e3c84a1a9c39c6851880ec8547b6c9b43e44fec6c3f4",
-          "after": "5f345dd5f1c6353fb532fa31aa516c1a20ac6fc0f54bdfc37add9381f7bf169b"
+          "after": "7b73f9599682d25f88fd47bbab79eb99e5d75e0bbfdf51b05255c200a294fccf"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "5f5f29bd626cb1186c5e11596aaf1c2a487805fd6286a18e86c9dfa64e3a4ac3",
-      "after_sha256": "a0d31c7a35d83b2fa097e43483b6aae9146f9c8099b8c2373cf6313f03093b99",
+      "after_sha256": "d5e321a2ac13fc64c84039af6601c441b6afd6513ca98f6155aac706d544e91b",
       "owners": {
         "@document": {
           "before": "5f5f29bd626cb1186c5e11596aaf1c2a487805fd6286a18e86c9dfa64e3a4ac3",
-          "after": "a0d31c7a35d83b2fa097e43483b6aae9146f9c8099b8c2373cf6313f03093b99"
+          "after": "d5e321a2ac13fc64c84039af6601c441b6afd6513ca98f6155aac706d544e91b"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "f335d4e76fd96a71cc0200ab5853063f15a72cd81b94141e07cfd03e3e44e0fe",
-      "after_sha256": "73e899d7f2d4f92be0b8150e50693a69647fcc6bc6c1ac367b3018dbaf165758",
+      "after_sha256": "4c5a66ae3b1505eafce07981341739b8115bd541f026d6fdb187165564ba1d4b",
       "owners": {
         "@document": {
           "before": "f335d4e76fd96a71cc0200ab5853063f15a72cd81b94141e07cfd03e3e44e0fe",
-          "after": "73e899d7f2d4f92be0b8150e50693a69647fcc6bc6c1ac367b3018dbaf165758"
+          "after": "4c5a66ae3b1505eafce07981341739b8115bd541f026d6fdb187165564ba1d4b"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "08618638de45c55c3ce12a33a43defef2eb2fb383d5820745340e40b0967640f",
-      "after_sha256": "07105da38023067c1ff59ca03a4e0c2e87f84c57e5f6c8397cc4883368b74786",
+      "after_sha256": "8c4f3faca1e4af2aebd9bfbff6fd1605f938b0d0f9a3d0f3d2f9d5074540b9e8",
       "owners": {
         "@document": {
           "before": "08618638de45c55c3ce12a33a43defef2eb2fb383d5820745340e40b0967640f",
-          "after": "07105da38023067c1ff59ca03a4e0c2e87f84c57e5f6c8397cc4883368b74786"
+          "after": "8c4f3faca1e4af2aebd9bfbff6fd1605f938b0d0f9a3d0f3d2f9d5074540b9e8"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "3b5da69c2a7451a6f08999a32471901c514bf94a9949f190a50110f8e9a394b6",
-      "after_sha256": "4416d6e3939240528746a00385af934e9a4c73637370f95aef9cddae4ad2e9e3",
+      "after_sha256": "dc05864747d0b6acc65fcc29a5fd55a249d2ffb92066b3da14d918722338a532",
       "owners": {
         "@document": {
           "before": "3b5da69c2a7451a6f08999a32471901c514bf94a9949f190a50110f8e9a394b6",
-          "after": "4416d6e3939240528746a00385af934e9a4c73637370f95aef9cddae4ad2e9e3"
+          "after": "dc05864747d0b6acc65fcc29a5fd55a249d2ffb92066b3da14d918722338a532"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "63a1c81f1b53867ac83461933d905713476b43c6d1d7e2fb94125427f3c646db",
-      "after_sha256": "0a1c6a63925d441f8bbf9e4c40bebd9856456a183c27d59cc73327e70250d752",
+      "after_sha256": "4b6b826736d630e34f631abbfd4fbec4ca5951debe019cc69e97d789e2590e1b",
       "owners": {
         "@document": {
           "before": "63a1c81f1b53867ac83461933d905713476b43c6d1d7e2fb94125427f3c646db",
-          "after": "0a1c6a63925d441f8bbf9e4c40bebd9856456a183c27d59cc73327e70250d752"
+          "after": "4b6b826736d630e34f631abbfd4fbec4ca5951debe019cc69e97d789e2590e1b"
         }
       }
     },
@@ -156,81 +156,81 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "5cf33e70f060217147637766a5de424e45c344f846198623fec60d1cf0def571",
-      "after_sha256": "e400c749bdb236e8b37fb29f3937770acea8d064a220c8df1b0fd1c6d6db7622",
+      "after_sha256": "08c75e878c0ed4ebf7c36135ce66df78cc58ee10ffaf67f23e58b109c7943eb8",
       "owners": {
         "@document": {
           "before": "5cf33e70f060217147637766a5de424e45c344f846198623fec60d1cf0def571",
-          "after": "e400c749bdb236e8b37fb29f3937770acea8d064a220c8df1b0fd1c6d6db7622"
+          "after": "08c75e878c0ed4ebf7c36135ce66df78cc58ee10ffaf67f23e58b109c7943eb8"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "40d823628972a157ee1c613c322258cddd6fda107ad971607d465754d1405930",
-      "after_sha256": "ce8488aa20a041262b3d84cdfe91de5d6d6fbdff65958b6b111e0d40e0cdb93c",
+      "after_sha256": "db2bb46a7439a1e47b91f4767f6ad548555935b4d7e806ca9883fc02051d6532",
       "owners": {
         "@document": {
           "before": "40d823628972a157ee1c613c322258cddd6fda107ad971607d465754d1405930",
-          "after": "ce8488aa20a041262b3d84cdfe91de5d6d6fbdff65958b6b111e0d40e0cdb93c"
+          "after": "db2bb46a7439a1e47b91f4767f6ad548555935b4d7e806ca9883fc02051d6532"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "af95ffd8ca11a327e1e2843b9c2cd45d813406776a0f23fa21159034a6eea908",
-      "after_sha256": "7ed9aee765cea9faddb80b75ed36cb562b187ca61fee81d58b8c37ff1dee59cf",
+      "after_sha256": "ccc60561acd42be93e52f7faa4d6a7eb919ad0951db4d440716db1cd8908d95c",
       "owners": {
         "@document": {
           "before": "af95ffd8ca11a327e1e2843b9c2cd45d813406776a0f23fa21159034a6eea908",
-          "after": "7ed9aee765cea9faddb80b75ed36cb562b187ca61fee81d58b8c37ff1dee59cf"
+          "after": "ccc60561acd42be93e52f7faa4d6a7eb919ad0951db4d440716db1cd8908d95c"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "246d7e07341ad75be44b60f561c2e045e7f63928fd0ba7d29a08ae6436f835bd",
-      "after_sha256": "2d0d59ddb4e977036fd5e5809160254d072ab4837ef2659c9a39d4a94f985111",
+      "after_sha256": "2d1ac3a77b24abf672522b1647780dc68524d9281c3728071a198b124e673010",
       "owners": {
         "@document": {
           "before": "246d7e07341ad75be44b60f561c2e045e7f63928fd0ba7d29a08ae6436f835bd",
-          "after": "2d0d59ddb4e977036fd5e5809160254d072ab4837ef2659c9a39d4a94f985111"
+          "after": "2d1ac3a77b24abf672522b1647780dc68524d9281c3728071a198b124e673010"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "400f16a7176089213920098099449ff0f31b326cb637e61b06212e9215668f2e",
-      "after_sha256": "d2ce2bc5ff0dde91acfa65304b21545ccd49cbc1cef5ac6b931863c38971cd14",
+      "after_sha256": "7672bd4f2ae69f41757f0ee0601fad534780e06b31a1f16b7aebee5e2745b774",
       "owners": {
         "@document": {
           "before": "400f16a7176089213920098099449ff0f31b326cb637e61b06212e9215668f2e",
-          "after": "d2ce2bc5ff0dde91acfa65304b21545ccd49cbc1cef5ac6b931863c38971cd14"
+          "after": "7672bd4f2ae69f41757f0ee0601fad534780e06b31a1f16b7aebee5e2745b774"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "24468d309eeeca15649844a5621296a6060b260b656d43baf69b1c0b145edfaf",
-      "after_sha256": "6ffe5ea8971879227976ce70a156c72a66a19ee647eaa7e20293a088b4be865f",
+      "after_sha256": "d8a801e240301123d8db6dab56ecbb5907d5f0add56ee98769464bfbd7ed997c",
       "owners": {
         "@document": {
           "before": "24468d309eeeca15649844a5621296a6060b260b656d43baf69b1c0b145edfaf",
-          "after": "6ffe5ea8971879227976ce70a156c72a66a19ee647eaa7e20293a088b4be865f"
+          "after": "d8a801e240301123d8db6dab56ecbb5907d5f0add56ee98769464bfbd7ed997c"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "4f1a30dc8f4d984d25e1b857fcb0159c6fe36616415616ef77f72324086cbb97",
-      "after_sha256": "b7b0ca7ab08dfa2d7ed668eec2db02611507dcbaa56a9d4d8b9f0c76afe98135",
+      "after_sha256": "77fe8d23c7644b2e89c6e506efbb063aa6457883aa545be0309bf1196699cbe5",
       "owners": {
         "@document": {
           "before": "4f1a30dc8f4d984d25e1b857fcb0159c6fe36616415616ef77f72324086cbb97",
-          "after": "b7b0ca7ab08dfa2d7ed668eec2db02611507dcbaa56a9d4d8b9f0c76afe98135"
+          "after": "77fe8d23c7644b2e89c6e506efbb063aa6457883aa545be0309bf1196699cbe5"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "072b1e30702da042625636faae9510092251f727b6345aaf6b8df161165504e2",
-      "after_sha256": "4c71a48296dee0777e389ab473df1476e32297bbc7a004cca03078878b33855c",
+      "after_sha256": "155db6769c2486c844e2df59c689bc2d2b80ad931e7847d127d9f017241db4f0",
       "owners": {
         "@document": {
           "before": "072b1e30702da042625636faae9510092251f727b6345aaf6b8df161165504e2",
-          "after": "4c71a48296dee0777e389ab473df1476e32297bbc7a004cca03078878b33855c"
+          "after": "155db6769c2486c844e2df59c689bc2d2b80ad931e7847d127d9f017241db4f0"
         }
       }
     },
@@ -256,61 +256,61 @@
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "before_sha256": "108707aa0c2e9d56005e9e6fbac470bcc40bedd8c7d8d055b3642a45c3fd7a7e",
-      "after_sha256": "a57f1f94fd3167002c6d6e4e9df89cde49e9e11bdd3de816de13cdbf9f923d62",
+      "after_sha256": "34c177027c3efb743453d0205bfa3ebd950c2cd51dd29c25a41af2854b438b0d",
       "owners": {
         "@document": {
           "before": "108707aa0c2e9d56005e9e6fbac470bcc40bedd8c7d8d055b3642a45c3fd7a7e",
-          "after": "a57f1f94fd3167002c6d6e4e9df89cde49e9e11bdd3de816de13cdbf9f923d62"
+          "after": "34c177027c3efb743453d0205bfa3ebd950c2cd51dd29c25a41af2854b438b0d"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "28fda7a7d722e072474e8f723841b72b5b57969a019939dba7b401a8ce33cfb1",
-      "after_sha256": "2801ba96f7e02118b0f56162da3dec8c577ad1f8f14765a138b3eaefa5aa6228",
+      "after_sha256": "1496f5a4ab3c3a9159d42861c1a6cb384069c35457455832c00e4535a30aa508",
       "owners": {
         "@document": {
           "before": "28fda7a7d722e072474e8f723841b72b5b57969a019939dba7b401a8ce33cfb1",
-          "after": "2801ba96f7e02118b0f56162da3dec8c577ad1f8f14765a138b3eaefa5aa6228"
+          "after": "1496f5a4ab3c3a9159d42861c1a6cb384069c35457455832c00e4535a30aa508"
         }
       }
     },
     "docs/ORDER_116_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "ba824c9a04f95a2e95b8b43a1c2d08f98161879455ea10750b06b94f75d06488",
+      "after_sha256": "a44182b66e1ea51d486993051f90475ffe7ee3fe1a9d0d95390040e48c6c4d18",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ba824c9a04f95a2e95b8b43a1c2d08f98161879455ea10750b06b94f75d06488"
+          "after": "a44182b66e1ea51d486993051f90475ffe7ee3fe1a9d0d95390040e48c6c4d18"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "ddea332559046832d51568ae4def4e96ed1c92f9d72aac4a6a6ed4a464a6aee9",
-      "after_sha256": "a40968b8987b450c76e5fc33796db2d349c9df767124128f06fe666078e38527",
+      "after_sha256": "beec6dfcc3def92e2d3d5990ecdb7cfd53622bf51af26b9d4c104541e1f45771",
       "owners": {
         "@document": {
           "before": "ddea332559046832d51568ae4def4e96ed1c92f9d72aac4a6a6ed4a464a6aee9",
-          "after": "a40968b8987b450c76e5fc33796db2d349c9df767124128f06fe666078e38527"
+          "after": "beec6dfcc3def92e2d3d5990ecdb7cfd53622bf51af26b9d4c104541e1f45771"
         }
       }
     },
     "docs/performance/policy-v3/order116-rule-semantics.json": {
       "before_sha256": null,
-      "after_sha256": "7a575bfa4e320210e004ff08254c5f93126cbdf4d6202e7944a293c8a085464f",
+      "after_sha256": "d8bb28eb4d4fdff9ec9a69ae8b5f494a860960736e166b9faaf5ba525eb2d444",
       "owners": {
         "@document": {
           "before": null,
-          "after": "7a575bfa4e320210e004ff08254c5f93126cbdf4d6202e7944a293c8a085464f"
+          "after": "d8bb28eb4d4fdff9ec9a69ae8b5f494a860960736e166b9faaf5ba525eb2d444"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "f933f16f644ba1619e903d882f037f8b70e6f2bcd712a0028e3a7a67720be955",
-      "after_sha256": "e435c72f43f5d1b0eb1bf4a8daa58ad75791176effd9b4c5b6df91442fa1e8ed",
+      "after_sha256": "9e7a2c8cc9c810b8945ceaa8df6d39901919703bc73f4f136536d5649cfc5362",
       "owners": {
         "@document": {
           "before": "f933f16f644ba1619e903d882f037f8b70e6f2bcd712a0028e3a7a67720be955",
-          "after": "e435c72f43f5d1b0eb1bf4a8daa58ad75791176effd9b4c5b6df91442fa1e8ed"
+          "after": "9e7a2c8cc9c810b8945ceaa8df6d39901919703bc73f4f136536d5649cfc5362"
         }
       }
     },
@@ -348,15 +348,15 @@
     },
     "src/warhammer40k_core/engine/additional_attack_mortals.py": {
       "before_sha256": null,
-      "after_sha256": "04fa924b82f8c6791f229cb829286018670a3878b3974d48593792e1e38e236b",
+      "after_sha256": "4b70812a5b2d557c58402122312a57a6d778808f03a0ed1a3d99f309da931851",
       "owners": {
         "@module": {
           "before": null,
-          "after": "1b5678786f259996b2a98d1534412c759504cbffd4698930483524a41af1d7f7"
+          "after": "a4f57343358ac292a885e1b6916c0c617cb2ace34bbbb5c633795a48bcaf6171"
         },
         "defer_additional_attack_mortals": {
           "before": null,
-          "after": "cbc7b1c15c9f1919df22e408e6983bae5c32c46e6335ed8d4b5233e76f31ec3f"
+          "after": "03b895679f18ccdfdebfc9793d0163036ccedbabedeb58109110b2979494f244"
         }
       }
     },
@@ -426,11 +426,15 @@
     },
     "src/warhammer40k_core/engine/attack_sequence_post_roll.py": {
       "before_sha256": "f4807958b15432ac06923c3b89a73fca7ed97a84e121e6279dde2609f554df10",
-      "after_sha256": "3f0080e582e5d5e6d0fd99faf2a618608e4fe5380e45120b4d148173722ad0e4",
+      "after_sha256": "45a1c425890e27a48d405b4364df1b72da62e3d9fcc06645a7a0d465245de365",
       "owners": {
+        "@module": {
+          "before": "cd899ae5fbc2969ecd5ed01e82a397596edc824fcef903282e4c998af45de036",
+          "after": "0d9f1d68163fdb9564404b15c852ed4952d1132909cf683f9a5a3f24ae20175a"
+        },
         "defer_grouped_devastating_wounds": {
           "before": "1d7b003dce5fd8bcb6d73fec75c7aa4fc972e500f87b13e1fb7cf0596e3c1d8e",
-          "after": "2eadf7cfc2a1b35bc531ead6e4c69fce0aa4088a6d1aa6336befc7fe0860553f"
+          "after": "a5b0ed50a4ea895968946302c4b1e0a1303a1ccbd5dee556657c12f48087ce73"
         }
       }
     },
@@ -446,7 +450,7 @@
     },
     "src/warhammer40k_core/engine/deferred_mortal_wounds.py": {
       "before_sha256": "7ef982391d738417e4737da7165cc9399f233ba98bc9ad89cbe5845a24c55b30",
-      "after_sha256": "3ed414ef9ec76c7064eaebc2167f83b781517d856689a95c7fbc79b466d2fca2",
+      "after_sha256": "ce64d1d6ce03467fc63852f4cc3f3746b904df7efc1461531ed99afac07bce7c",
       "owners": {
         "@module": {
           "before": "93f4387aa65582ed5b649759c35491879b4629c748e782dbe719986b075f742e",
@@ -479,6 +483,10 @@
         "DeferredMortalWoundsPayload": {
           "before": "a5bbe3dde3e8d413351533673fed3df78a362a20f9e5fac0802577d485dd0de5",
           "after": "70187a989405ce731c65b12d2d520b92ff7ededd1a12e4b5da93c74ce54fb75f"
+        },
+        "has_deferred_mortal_occurrence": {
+          "before": null,
+          "after": "5a52e9e2d17dbc1944ef8db0bd86de2d57a019b9831fa1c1d5bab0bcd28bac45"
         }
       }
     },
@@ -542,7 +550,7 @@
     },
     "tests/code_quality/test_order116_additional_mortals.py": {
       "before_sha256": null,
-      "after_sha256": "b3d6f982b486cf10e7a6a4536ebcf5aceaa1e552d4d7c0d0a9902c18f4c3a005",
+      "after_sha256": "03e7b744ce3ba8ec7ce321fcc95f9f1c591e45d8ea000f5f864cb45da91ce0ec",
       "owners": {
         "@module": {
           "before": null,
@@ -558,21 +566,21 @@
         },
         "test_attack_mortal_identity_and_fnp_share_source_aware_owners": {
           "before": null,
-          "after": "7412f4a4c0ee88af291cf9ab20c68b912928d45a594427e809ecfc0ec904f888"
+          "after": "5790ec3f1906e344e1a5cb66e2cfab759f48f6904727240471df4bcd239795f9"
         }
       }
     },
     "tests/order116_mortal_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "95f8309461cf3c94e8a66d7e1e5470faf6b02aa9c06690c5a0f4df1316b0040d",
+      "after_sha256": "26d22a7fe07499c98963bbda88be215da6240049ab3bfb22676e6c2e29f65115",
       "owners": {
         "@module": {
           "before": null,
-          "after": "b9a638a7727d9bcd490271c3c9417b1d2f9350b57f107c10fa6a8951d6c19a10"
+          "after": "e7b4b902f0801c59d97eba7770a39d11ca8c49611743ee15526905d7306dd755"
         },
         "additional_mortal_session": {
           "before": null,
-          "after": "fccff55d858a5bc091691958ea92e9c6c5b23e0c58a2f1710ae9ae908b3e9c4f"
+          "after": "7b8e9f1435fe4b00cd1e0d4e421ccbff2bac46ed5cc2209441d4f8953875d295"
         },
         "gathered_additional_mortal_session": {
           "before": null,
@@ -582,7 +590,7 @@
     },
     "tests/unit/test_order116_additional_mortals.py": {
       "before_sha256": null,
-      "after_sha256": "a4f627bd9c2645d852b73f3d7d286ea36f1f42deaa2b84e969fa00d1dbae4fb6",
+      "after_sha256": "eff2d0ef42963f50678f502dce9b64251f37cfb4ae099cb61dad6e4b865f8e5e",
       "owners": {
         "@module": {
           "before": null,
@@ -607,6 +615,10 @@
         "test_attack_mortal_fnp_keeps_psychic_weapon_classification": {
           "before": null,
           "after": "971ede384ccd10f21e7d831502cc53bcb94ecfa25058a48d1b5becc70e5487a1"
+        },
+        "test_attack_mortal_producers_resume_once_after_command_reroll_windows": {
+          "before": null,
+          "after": "b05bc789cf71a073c3e3fb58830250d3598b128cbac2a05865062f2e03ca1fd9"
         },
         "test_gathered_additional_mortals_keep_each_physical_weapon_through_lethal_restore": {
           "before": null,
@@ -648,7 +660,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
@@ -658,7 +670,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -668,7 +680,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -678,7 +690,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -688,7 +700,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -698,7 +710,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -708,7 +720,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -718,7 +730,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -728,7 +740,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -738,7 +750,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -748,7 +760,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -758,7 +770,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -768,7 +780,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -778,7 +790,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "conformance/typescript/src/contract.ts": {
       "category": "rule_semantics",
@@ -788,7 +800,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -798,7 +810,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -808,7 +820,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -818,7 +830,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -828,7 +840,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -838,7 +850,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -848,7 +860,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -858,7 +870,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -868,7 +880,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/openapi.yaml": {
       "category": "rule_semantics",
@@ -878,7 +890,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "data/source_audits/order116/source.audit.json": {
       "category": "rule_semantics",
@@ -888,7 +900,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
@@ -896,7 +908,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
@@ -904,7 +916,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "docs/ORDER_116_SCOPE_PLAN.md": {
       "category": "governance",
@@ -912,7 +924,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
@@ -920,7 +932,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "docs/performance/policy-v3/order116-rule-semantics.json": {
       "category": "governance",
@@ -928,7 +940,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -938,7 +950,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
@@ -948,7 +960,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "src/warhammer40k_core/engine/additional_attack_mortal_permissions.py": {
       "category": "rule_semantics",
@@ -958,7 +970,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "src/warhammer40k_core/engine/additional_attack_mortals.py": {
       "category": "rule_semantics",
@@ -968,7 +980,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "src/warhammer40k_core/engine/attack_mortal_origins.py": {
       "category": "rule_semantics",
@@ -978,7 +990,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "src/warhammer40k_core/engine/attack_sequence_damage_helpers.py": {
       "category": "rule_semantics",
@@ -988,7 +1000,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "src/warhammer40k_core/engine/attack_sequence_deferred_mortals.py": {
       "category": "rule_semantics",
@@ -998,7 +1010,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
       "category": "rule_semantics",
@@ -1009,7 +1021,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "src/warhammer40k_core/engine/attack_sequence_post_roll.py": {
       "category": "rule_semantics",
@@ -1019,7 +1031,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "src/warhammer40k_core/engine/attack_sequence_validation.py": {
       "category": "rule_semantics",
@@ -1029,7 +1041,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "src/warhammer40k_core/engine/deferred_mortal_wounds.py": {
       "category": "rule_semantics",
@@ -1039,7 +1051,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "src/warhammer40k_core/engine/feel_no_pain_conditions.py": {
       "category": "rule_semantics",
@@ -1049,7 +1061,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "src/warhammer40k_core/engine/model_destruction_cause_attack_restore.py": {
       "category": "rule_semantics",
@@ -1059,7 +1071,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "src/warhammer40k_core/engine/mortal_wound_model_allocation.py": {
       "category": "rule_semantics",
@@ -1069,7 +1081,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "tests/code_quality/test_order116_additional_mortals.py": {
       "category": "governance",
@@ -1077,7 +1089,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "tests/order116_mortal_helpers.py": {
       "category": "rule_semantics",
@@ -1087,7 +1099,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "tests/unit/test_order116_additional_mortals.py": {
       "category": "rule_semantics",
@@ -1097,7 +1109,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "tools/performance_policy.py": {
       "category": "rule_semantics",
@@ -1107,7 +1119,7 @@
       "selected_families": [],
       "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
       "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
-      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, and share existing Psychic weapon classification for Feel No Pain. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, and query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     }
   },
   "milestone": "ordinary",

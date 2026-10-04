@@ -23,6 +23,23 @@ class DeferredMortalWoundsPayload(TypedDict):
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
+def has_deferred_mortal_occurrence(
+    entries: tuple[DeferredMortalWounds, ...],
+    *,
+    attack_context_id: str,
+    source_rule_id: str,
+    source_permission_id: str | None,
+) -> bool:
+    """Query the retained producer occurrence before resuming a choice window."""
+    return any(
+        entry.attack_context_id == attack_context_id
+        and entry.source_rule_id == source_rule_id
+        and (None if entry.source_permission is None else entry.source_permission.effect_id)
+        == source_permission_id
+        for entry in entries
+    )
+
+
 @dataclass(frozen=True, slots=True)
 class DeferredMortalWounds:
     source_rule_id: str

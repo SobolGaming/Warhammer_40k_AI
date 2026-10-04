@@ -23,7 +23,10 @@ from warhammer40k_core.engine.attack_sequence_state import AttackSequence
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.deferred_mortal_wounds import DeferredMortalWounds
+from warhammer40k_core.engine.deferred_mortal_wounds import (
+    DeferredMortalWounds,
+    has_deferred_mortal_occurrence,
+)
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage, LifecycleStatus
@@ -355,6 +358,13 @@ def defer_grouped_devastating_wounds(
         )
         if resolution is not DevastatingWoundsResolution.MORTAL_WOUNDS:
             normal_contexts.append((wounded_sequence, attack_context))
+            continue
+        if has_deferred_mortal_occurrence(
+            current.deferred_mortal_wounds,
+            attack_context_id=attack_context["attack_context_id"],
+            source_rule_id=DEVASTATING_WOUNDS_RULE_ID,
+            source_permission_id=None,
+        ):
             continue
         damage_value, status = _damage_value(
             state=state,

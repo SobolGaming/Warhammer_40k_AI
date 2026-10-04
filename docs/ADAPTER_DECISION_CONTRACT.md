@@ -7562,3 +7562,9 @@ profile, with the existing post-roll modifier service, rather than the synthetic
 gathered carrier. Psychic weapon attack evidence remains available to the shared
 Feel No Pain selector during mortal allocation and restored retries; no new
 decision family or Psychic ability classification is introduced.
+
+Both deferred producers retain attack/source occurrence identity across random
+Damage and saving-throw choice windows. Accepting or declining Command Re-roll
+and restoring its pending request must not duplicate entries or emitted events;
+independent permission effect IDs remain distinct occurrences. Existing reroll
+submission families and validation apply.

@@ -8,10 +8,12 @@ from tests.phase13b_shooting_declaration_helpers import (
     _canonical_catalog,
     _compact_intercessor_catalog,
     _compact_shooting_lifecycle,
+    _grant_command_reroll_cp,
 )
 from tests.phase15c_fight_order_helpers import fight_lifecycle
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.dice import DiceExpression
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AttackProfile,
@@ -44,6 +46,9 @@ def additional_mortal_session(
     armor_penetration: int = -6,
     psychic: bool = False,
     psychic_fnp: bool = False,
+    random_devastating_damage: bool = False,
+    command_reroll_player_id: str | None = None,
+    second_permission: bool = False,
 ) -> LocalGameSession:
     catalog = _compact_intercessor_catalog(_canonical_catalog())
     catalog = replace(
@@ -57,11 +62,18 @@ def additional_mortal_session(
                         keywords=((WeaponKeyword.TORRENT,) if phase is BattlePhase.SHOOTING else ())
                         + ((WeaponKeyword.DEVASTATING_WOUNDS,) if devastating else ())
                         + ((WeaponKeyword.PSYCHIC,) if psychic else ()),
-                        abilities=(
-                            (AbilityDescriptor.devastating_wounds(),) if devastating else ()
+                        abilities=((AbilityDescriptor.devastating_wounds(),) if devastating else ())
+                        + (
+                            (AbilityDescriptor.anti_keyword("INFANTRY", 2),)
+                            if random_devastating_damage
+                            else ()
                         ),
                         attack_profile=AttackProfile.fixed(attacks),
-                        damage_profile=DamageProfile.fixed(1),
+                        damage_profile=(
+                            DamageProfile.dice(DiceExpression(quantity=1, sides=3))
+                            if random_devastating_damage
+                            else DamageProfile.fixed(1)
+                        ),
                         armor_penetration=CharacteristicValue.from_raw(
                             Characteristic.ARMOR_PENETRATION, armor_penetration
                         ),
@@ -93,6 +105,8 @@ def additional_mortal_session(
     state = lifecycle.state
     assert state is not None
     attacker, target = units["intercessor-1"], units["enemy"]
+    if command_reroll_player_id is not None:
+        _grant_command_reroll_cp(state, player_id=command_reroll_player_id)
     state.record_persisting_effect(
         additional_attack_mortal_permission_effect(
             state=state,
@@ -104,6 +118,18 @@ def additional_mortal_session(
             mortal_wounds=mortal_wounds,
         )
     )
+    if second_permission:
+        state.record_persisting_effect(
+            additional_attack_mortal_permission_effect(
+                state=state,
+                effect_id="order116:second-permission",
+                source_rule_id=SOURCE_ID,
+                source_model_instance_id=attacker.own_models[0].model_instance_id,
+                occasion_id="order116:second-occasion",
+                weapon_scope=scope,
+                mortal_wounds=mortal_wounds,
+            )
+        )
     if optional_fnp or psychic_fnp:
         for model in target.own_models:
             state.record_model_feel_no_pain_sources(

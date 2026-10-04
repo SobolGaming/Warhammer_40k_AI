@@ -236,6 +236,94 @@ def test_additional_mortals_coexist_with_native_devastating_wounds() -> None:
     )
 
 
+@pytest.mark.parametrize("random_devastating_damage", [True, False])
+@pytest.mark.parametrize("use_reroll", [True, False])
+def test_attack_mortal_producers_resume_once_after_command_reroll_windows(
+    random_devastating_damage: bool,
+    use_reroll: bool,
+) -> None:
+    session = additional_mortal_session(
+        BattlePhase.SHOOTING,
+        devastating=random_devastating_damage,
+        random_devastating_damage=random_devastating_damage,
+        command_reroll_player_id="player-a" if random_devastating_damage else "player-b",
+        second_permission=True,
+        armor_penetration=0,
+        enemy_models=5,
+    )
+    reached_window = False
+    restored_window = False
+    expected = (
+        "random_characteristic.damage." if random_devastating_damage else "attack_sequence.save"
+    )
+    for _ in range(150):
+        if attack_completed(session):
+            break
+        request = pending_request(session)
+        if "decline_stratagem_window" in {option.option_id for option in request.options}:
+            assert isinstance(request.payload, dict)
+            context = request.payload["stratagem_context"]
+            assert isinstance(context, dict)
+            trigger = context["trigger_payload"]
+            assert isinstance(trigger, dict)
+            roll_type = trigger["roll_type"]
+            assert isinstance(roll_type, str)
+            selected_option_id = "decline_stratagem_window"
+            if roll_type.startswith(expected):
+                reached_window = True
+                if not restored_window:
+                    session = LocalGameSession.from_persistence_payload(
+                        json.loads(json.dumps(session.to_persistence_payload()))
+                    )
+                    restored_window = True
+                    if use_reroll:
+                        selected_option_id = next(
+                            option.option_id
+                            for option in request.options
+                            if option.option_id.startswith("use-stratagem:command-reroll:")
+                        )
+            session.submit_option(
+                request_id=request.request_id,
+                result_id=f"{request.request_id}:decline",
+                option_id=selected_option_id,
+            )
+        else:
+            submit_fixture_request(session, request)
+    else:
+        raise AssertionError("Attack mortal reroll continuation did not finish.")
+    assert reached_window
+    events = session.lifecycle.decision_controller.event_log.records
+    extra = [e for e in events if e.event_type == "additional_attack_mortal_wounds_deferred"]
+    assert len(extra) >= 2
+    ids = [
+        (
+            cast(dict[str, JsonValue], e.payload)["attack_context_id"],
+            cast(dict[str, JsonValue], cast(dict[str, JsonValue], e.payload)["source_permission"])[
+                "effect_id"
+            ],
+        )
+        for e in extra
+    ]
+    assert len(ids) == len(set(ids))
+    assert {permission_id for _, permission_id in ids} == {
+        "order116:source-permission",
+        "order116:second-permission",
+    }
+    native = [e for e in events if e.event_type == "devastating_wounds_deferred"]
+    native_ids = [cast(dict[str, JsonValue], e.payload)["attack_context_id"] for e in native]
+    assert len(native_ids) == len(set(native_ids))
+    if random_devastating_damage:
+        assert 2 * len(native) == len(extra)
+    restored = LocalGameSession.from_persistence_payload(
+        json.loads(json.dumps(session.to_persistence_payload()))
+    )
+    assert restored.to_persistence_payload() == session.to_persistence_payload()
+    replay = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id="order116-reroll-resume")
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED, replay
+
+
 def test_gathered_additional_mortals_keep_each_physical_weapon_through_lethal_restore() -> None:
     session = gathered_additional_mortal_session()
     restored_pending = False
