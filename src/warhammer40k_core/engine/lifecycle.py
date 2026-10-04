@@ -2789,6 +2789,7 @@ class GameLifecycle:
             stratagem_cost_modifier_registry=bundle.stratagem_cost_modifier_registry,
             battle_shock_hooks=bundle.battle_shock_hook_registry,
             command_phase_start_hooks=bundle.command_phase_start_hook_registry,
+            runtime_event_index=bundle.event_index,
             ability_indexes_by_player_id=bundle.ability_indexes_by_player_id,
             runtime_modifier_registry=bundle.runtime_modifier_registry,
         )

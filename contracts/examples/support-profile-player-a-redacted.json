@@ -1017,13 +1017,13 @@
         "identity_id": "phase9a-canonical"
       },
       "contract_schema": {
-        "contract_version": "44.3.6",
+        "contract_version": "44.3.7",
         "identity_hash": "906ac27ffc6c6fa969dfa48b99b1d7b56fa514122cde358f2a4ba4741c8a853d",
         "identity_id": "https://warhammer40k-core.local/contracts/v5/capability-manifest.schema.json"
       },
       "engine_build": {
-        "identity_hash": "de0a74df0487fc181e78a04597338a28487090c5829238d3f034a14927ae0fde",
-        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a0eada4a8f596f343cc89c3562c79669736977c5d0fb6a6ebc9db08d34669e86"
+        "identity_hash": "5ee87d69a8d778833cd6e632c3f11108d5a52ca2291b317d5bb16bdc4f17d2f5",
+        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5175c89c65de68f5228d58e8ba79b7a675447c3ec9c6fb83b0903ae4a0c1d057"
       },
       "mission_pack": {
         "identity_hash": "486eb3726e50b8188081381c97d2ff073bdd8d3bb5c7593c79b1d9b581b92a62",

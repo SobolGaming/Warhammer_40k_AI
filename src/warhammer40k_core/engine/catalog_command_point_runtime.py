@@ -709,7 +709,11 @@ class CatalogCommandPointRuntime:
     def _phase_gain_sources(self) -> tuple[_PhaseGainSource, ...]:
         sources: list[_PhaseGainSource] = []
         for player_id, index in self.ability_indexes_by_player_id.items():
-            for trigger_kind in (TimingTriggerKind.START_PHASE, TimingTriggerKind.END_PHASE):
+            for trigger_kind in (
+                TimingTriggerKind.START_PHASE,
+                TimingTriggerKind.DURING_PHASE,
+                TimingTriggerKind.END_PHASE,
+            ):
                 for record in index.records_for(trigger_kind):
                     if record.definition.handler_id != GENERIC_RULE_IR_ABILITY_HANDLER_ID:
                         continue
@@ -1129,6 +1133,11 @@ def _phase_gain_trigger_kind(clause: RuleClause) -> TimingTriggerKind:
         return TimingTriggerKind.START_PHASE
     if edge == "end":
         return TimingTriggerKind.END_PHASE
+    if (
+        edge == "during"
+        and parameter_payload(_required_trigger(clause).parameters).get("phase") == "command"
+    ):
+        return TimingTriggerKind.DURING_PHASE
     raise GameLifecycleError("Catalog CP phase gain trigger edge is malformed.")
 
 

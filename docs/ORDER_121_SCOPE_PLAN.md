@@ -1,0 +1,46 @@
+# Order121 / P08C / C08-04: Command abilities
+
+The selected Order97 Core clauses `08.00-step-6` and `08.04-ability-window`
+put Command abilities after Core CP and Battle-shock, excluding start/end,
+Core CP gain, and Battle-shock roll triggers. The exact selected rows and their
+existing source identities are retained in [the source audit](../data/source_audits/order121/source.audit.json).
+This order uses those existing Core permissions. Canonical source-linked CP
+fixtures exercise conditional provider outcomes; they do not certify an official
+faction CP grant, F00 admission, or a playable named ability. Existing named
+faction scaffolds remain deferred/load-only. No authority registry, observation,
+Wahapedia permission or faction activation is extended.
+
+Previously, an unqualified Command clause compiled but had no CP consumer;
+the catalog assigned its fallback ANY_PHASE timing and the phase skipped it.
+The shared catalog now assigns typed DURING_PHASE timing for unqualified Command
+clauses, and the CP provider registers the supported Command-only gain shape.
+Other unqualified phases retain their existing unsupported consumer status.
+
+The Command handler loads the existing bundle event index and resolves a distinct
+source-linked `command_abilities` timing window after completed Battle-shock and
+its deferred outcomes, before tactical end replacement and end-phase effects.
+The existing runtime timing resolver owns pure discovery, source occurrences,
+mandatory ordering, finite decisions, modifier preflight, pending continuation
+and exactly-once completion. Body order requests use the shared boundary source
+candidate validation on submission and valid-state restoration. State mutations,
+CP cap/recipient ownership, bearer availability, dice and replay retain their
+existing owners. Start/end triggers use separate windows and never join the body.
+
+No decision family, schema or proposal kind is added. The existing sequencing
+and modifier decision contracts cover body continuations; the adapter contract
+records the additional public body timing event. Historical Order97 timing
+assertions remain exact Git bytes in the bounded Order121 mapping while live
+phase-order tests require the new body boundary.
+
+Acceptance covers actual effects and recipients, distinct timing, real
+Battle-shock completion, overlapping source order, invalid atomicity, pending
+JSON restore, fork isolation, both viewer projections/event streams, exact
+replay, repeated full phase cycles and failed-roll/lost-bearer/other-phase
+negative controls. Final delivery requires the full disjoint correctness
+inventory with 16 serial polygon cases plus all remaining parallel tests and
+appended branch coverage at least85%; complete quality after quiet current
+runtime smoke; lint, both types, imports, shards, generated contracts, installed
+wheel and TypeScript checks; two distinct exact-head CLEAN reviews; all hosted
+CI jobs; and protected merge without bypass. No Order122 or test reorganization
+is included. This is an ordinary rules repair with no intended performance
+change or full-game performance certification.

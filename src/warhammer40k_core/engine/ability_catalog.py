@@ -485,6 +485,8 @@ def _catalog_phase_timing_descriptor_for_clause(
         trigger_kind = TimingTriggerKind.START_PHASE
     elif edge == "end":
         trigger_kind = TimingTriggerKind.END_PHASE
+    elif edge == "during" and phase == "command":
+        trigger_kind = TimingTriggerKind.DURING_PHASE
     else:
         return None
     return AbilityTimingDescriptor(

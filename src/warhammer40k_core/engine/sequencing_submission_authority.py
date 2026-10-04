@@ -65,13 +65,18 @@ def validate_loaded_timing_batch_authority(
         BOUNDARY_ORDER_TRIGGERS,
         validate_boundary_order_candidates,
     )
+    from warhammer40k_core.engine.command_abilities import COMMAND_ABILITIES_SOURCE_STEP
     from warhammer40k_core.engine.movement_start_sequencing import (
         validate_move_start_order_candidates,
     )
     from warhammer40k_core.engine.rule_trigger_runtime import validate_trigger_order_candidates
     from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 
-    if batch.context.timing_window.descriptor.trigger_kind in BOUNDARY_ORDER_TRIGGERS:
+    descriptor = batch.context.timing_window.descriptor
+    if descriptor.trigger_kind in BOUNDARY_ORDER_TRIGGERS or (
+        descriptor.trigger_kind is TimingTriggerKind.DURING_PHASE
+        and descriptor.source_step == COMMAND_ABILITIES_SOURCE_STEP
+    ):
         validate_boundary_order_candidates(
             state=state,
             decisions=decisions,

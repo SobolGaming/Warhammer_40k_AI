@@ -1,0 +1,87 @@
+{
+  "order": 121,
+  "base": "09a8c5949e48ae199ce5f31332edeba47dad5420",
+  "requirements": [
+    "08.00-step-6",
+    "08.04-ability-window"
+  ],
+  "selected_sources_path": "data/source_audits/order97/selected-sources.json",
+  "selected_sources_sha256": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+  "selected_core_rows": [
+    {
+      "row_id": "rule:08:08.00:1",
+      "category": "08",
+      "locator": "08.00",
+      "title": "Command Phase",
+      "occurrence": 1,
+      "source_sha256": "ab35da8e04cf531bd84f14b996916652032e39ec06d97f116d21103c5880f7f9",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "c3262c3724d9041ccd2aa56040494cae995f7a93759eedbbf1d7aba24b06b2a6",
+          "value": "In the Command phase, both players gain Core CP, then you check the combat readiness of your forces and use any strategic-level abilities you may have."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "7227559cf3f81a1e6f252b325b1a4618e93434d852907ec82de665ce929a4d7c",
+          "value": "The Command phase is resolved by following these steps:"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "7348bd432ae4311f4087b2fe4029a42e561de9f165d30883a51f8c07232db7e5",
+          "value": "1. START OF COMMAND PHASE"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "e8b4ce73ddec54e0c36eb20cbdc994521b5f3bfadd34b3a806c49693af239b24",
+          "value": "2. GAIN CORE CP"
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "88ab0d752c40fd3e958dfa7627873d29c5d6e8b4625f91a9ab880e5f0c14d9ef",
+          "value": "3. BATTLE-SHOCK"
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "b127709cf891f9fb76dd1f3e68d412acc12985d0c43bf708fca6a7a832050135",
+          "value": "4. COMMAND ABILITIES"
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "f13ef0bf3f4bcb371a608872b5beb86db3f3130f50be46fb82c9c1d54ea2ee8b",
+          "value": "5. END OF COMMAND PHASE"
+        }
+      ],
+      "selected_provider": "Game Datamissions",
+      "historical_source_row_sha256": "7683d16f4f6ce3db0e8ea01b1a5e84ff3f7951ce10b847e125b62a913ff362d6",
+      "review_category": "08"
+    },
+    {
+      "row_id": "rule:08:08.04:1",
+      "category": "08",
+      "locator": "08.04",
+      "title": "Command Abilities",
+      "occurrence": 1,
+      "source_sha256": "25170c06b4590dca580a82ac677a82d9d1f47a31480692db67138540a12b212a",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "2acea44182950f156926183480a98cda0d66a7d0391b7b6d164b84495398779c",
+          "value": "Rules that are triggered in the Command phase (excluding those that are triggered at the start or end of this phase, when gaining Core CP, or by \u0005battle-shock rolls\u0006) are resolved now."
+        }
+      ],
+      "selected_provider": "Game Datamissions",
+      "historical_source_row_sha256": "3f3e4aac1405d2f1d7cc39433bbb27e0d445d652eb122b5a75f62029298f68c3",
+      "review_category": "08"
+    }
+  ],
+  "authority_limits": "Existing selected Core timing evidence only. No new network observation, authority registry extension, Wahapedia extension, F00 faction admission or named Command ability activation. Canonical source-linked CP fixtures are conditional provider outcomes, not an official faction grant or complete named faction sequence."
+}

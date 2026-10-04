@@ -1,0 +1,17 @@
+{
+  "reviewed_commit": "09a8c5949e48ae199ce5f31332edeba47dad5420",
+  "also_present_at_base": "09a8c5949e48ae199ce5f31332edeba47dad5420",
+  "purpose": "Retain exact original Order97 phase-boundary assertions before adding the selected Command-abilities body boundary. These historical bytes are not current Order121 gameplay evidence.",
+  "current_evidence": "docs/ORDER_121_SCOPE_PLAN.md",
+  "files": [
+    {
+      "path": "tests/unit/test_order97_facade_evidence.py",
+      "historical_path": "data/source_audits/order121/baseline/tests/unit/test_order97_facade_evidence.py.txt",
+      "git_revision": "09a8c5949e48ae199ce5f31332edeba47dad5420",
+      "git_path": "tests/unit/test_order97_facade_evidence.py",
+      "sha256": "5a3ecb69a0f86b8e3eb2f6fab906826b3e54f49e92353a1b00e9c2205e188071",
+      "bytes": 17351,
+      "order97_file_pin": "5a3ecb69a0f86b8e3eb2f6fab906826b3e54f49e92353a1b00e9c2205e188071"
+    }
+  ]
+}
