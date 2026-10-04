@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine import mortal_wound_application_authority as _mwaa
+from warhammer40k_core.engine.ability_damage_context import ability_damage_is_psychic_attack
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, ModelPlacementPayload
 from warhammer40k_core.engine.damage_allocation import (
     DamageApplication,
@@ -653,6 +654,9 @@ def continue_mortal_wound_application(
     remove_destroyed_models: bool = True,
     logical_death_recorder: MortalWoundLogicalDeathRecorder | None = None,
 ) -> MortalWoundRoutingResult:
+    ability_damage_is_psychic_attack(
+        progress.source_context, source_rule_id=progress.source_rule_id
+    )
     if type(remove_destroyed_models) is not bool:
         raise GameLifecycleError("remove_destroyed_models must be a bool.")
     validate_mortal_wound_destruction_evidence_mode(
@@ -756,6 +760,7 @@ def _continue_mortal_wound_application_for_model(
         parent_request_id=None if model_decision is None else model_decision.request_id,
         parent_result_id=None if model_decision is None else model_decision.result_id,
         destruction_evidence=progress.destruction_evidence,
+        source_context=progress.source_context,
     )
     if len(sources) > 1 or (sources and decline_allowed):
         request = build_feel_no_pain_request(
@@ -953,6 +958,7 @@ def validate_mortal_wound_feel_no_pain_request_authority(
         state=state,
         model_instance_id=occurrence.selected_model_id,
         destruction_evidence=progress.destruction_evidence,
+        source_context=progress.source_context,
     )
     loaded_decline_allowed = mortal_wound_feel_no_pain_decline_allowed(
         state=state,
@@ -1133,8 +1139,10 @@ def mortal_wound_feel_no_pain_sources(
     state: GameState,
     model_instance_id: str,
     destruction_evidence: MortalWoundDestructionEvidence | None = None,
+    source_context: JsonValue = None,
     include_allocation_permissions: bool = True,
 ) -> tuple[FeelNoPainSource, ...]:
+    ability_damage_is_psychic_attack(source_context)
     from warhammer40k_core.engine.feel_no_pain_conditions import (
         feel_no_pain_source_applies_to_mortal_wounds,
     )
@@ -1166,7 +1174,7 @@ def mortal_wound_feel_no_pain_sources(
         source
         for source in typed_sources
         if feel_no_pain_source_applies_to_mortal_wounds(
-            source=source, destruction_evidence=destruction_evidence
+            source=source, destruction_evidence=destruction_evidence, source_context=source_context
         )
     )
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.ability_damage_context import source_permission_damage_context
 from warhammer40k_core.engine.attack_sequence_damage_helpers import (
     emit_deferred_mortal_wounds_applied,
 )
@@ -45,18 +46,21 @@ def apply_deferred_attack_mortals(
             ),
             source_rule_id=deferred.source_rule_id,
             source_context=validate_json_value(
-                {
-                    "source_kind": deferred.source_kind,
-                    "source_permission": (
-                        None
-                        if deferred.source_permission is None
-                        else deferred.source_permission.to_payload()
-                    ),
-                    "sequence_id": attack_sequence.sequence_id,
-                    "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
-                    "target_unit_instance_id": deferred.target_unit_instance_id,
-                    "attack_context_ids": [deferred.attack_context_id],
-                }
+                source_permission_damage_context(
+                    permission=deferred.source_permission,
+                    source_context={
+                        "source_kind": deferred.source_kind,
+                        "source_permission": validate_json_value(
+                            None
+                            if deferred.source_permission is None
+                            else deferred.source_permission.to_payload()
+                        ),
+                        "sequence_id": attack_sequence.sequence_id,
+                        "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
+                        "target_unit_instance_id": deferred.target_unit_instance_id,
+                        "attack_context_ids": [deferred.attack_context_id],
+                    },
+                )
             ),
             target_unit_instance_id=deferred.target_unit_instance_id,
             defender_player_id=unit_owner_player_id(

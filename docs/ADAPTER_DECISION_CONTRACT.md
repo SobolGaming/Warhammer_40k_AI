@@ -7617,3 +7617,17 @@ The internal `attack_ability_source_retained` and
 `attack_ability_sources_expired` events follow the existing private-event policy
 and neutral audit-event RNG accounting. Clients continue submitting existing
 engine-enumerated choices; saves and replays require the regenerated build ID.
+
+## Order120 / Contract 44.3.6: Psychic ability damage Core seam
+
+Existing mortal-recipient and Feel No Pain finite submissions remain the shared
+consumer. Provider-authorized damage may carry a typed `ability_damage_source`
+snapshot with source rule ID, normalized source hash and classification. This
+classifies Psychic ability wounds as Psychic attacks alongside existing Psychic
+weapon provenance; destruction cause and physical weapon identity remain intact.
+Pending lost-wound contexts, persistence and replay preserve that same snapshot.
+Direct mortal application forwards it and destruction evidence through preflight
+and allocation, rejecting reachable choices before mutation. No new request,
+proposal or schema family is introduced. Generated runtime/contract identities
+are refreshed; previous histories remain on their matching engine. Classification
+does not grant named faction activation or broaden load-only support.

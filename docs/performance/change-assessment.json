@@ -1,858 +1,568 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "4820063fe586417b4cc590f46978009b9932a87f",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:076c31c4709ef3ee60c7c234e40c0c75070772d5d6312cba2f8a44378a21a088",
-  "operation_map_sha256": "b0ae0ca742744cd2941fe3c5ad9f0a2a9e1fbd35e901c7e6756ed4718f298a31",
+  "base": "8f2c6723645a10c571915e915e3da5dbfedd0586",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a0eada4a8f596f343cc89c3562c79669736977c5d0fb6a6ebc9db08d34669e86",
+  "operation_map_sha256": "d8f30eee1019c97ef6afbc850c77b5901023de4789b2600e42031460cb6f80f4",
   "changes": {
-    "ci/test_shards/durations.json": {
-      "before_sha256": "19460acf43988ab413836b51bde7fd25920bf0d9dfe81dc02f469854c38e319b",
-      "after_sha256": "bcc4370ed97905ab9c92f2e2187e304a6c5ec47705d6af535caf496dc4abcbbf",
+    "conformance/typescript/src/contract.ts": {
+      "before_sha256": "294172c51fd9a50dd385a9828ab12f354e264d9982fff71a5830b7d229d60963",
+      "after_sha256": "e9ea644e89a7937289edfcf4881cabfeed5adf357b78b4a9e2f1e8ddd8ac9de1",
       "owners": {
         "@document": {
-          "before": "19460acf43988ab413836b51bde7fd25920bf0d9dfe81dc02f469854c38e319b",
-          "after": "bcc4370ed97905ab9c92f2e2187e304a6c5ec47705d6af535caf496dc4abcbbf"
-        }
-      }
-    },
-    "ci/test_shards/shard-1.txt": {
-      "before_sha256": "7ee1ecd93ab135f5cdbc9fff58e37ed299f28dee4fe4ed015ba7a02a82827f94",
-      "after_sha256": "60d9efddbe02b354d9ca9f3b39c11804ba013aa50e2720daf3cd4c270ae9e5dc",
-      "owners": {
-        "@document": {
-          "before": "7ee1ecd93ab135f5cdbc9fff58e37ed299f28dee4fe4ed015ba7a02a82827f94",
-          "after": "60d9efddbe02b354d9ca9f3b39c11804ba013aa50e2720daf3cd4c270ae9e5dc"
-        }
-      }
-    },
-    "ci/test_shards/shard-10.txt": {
-      "before_sha256": "80b6a15141631315a58c46861168631b1247cba63a949d11a6510a525a6adc5f",
-      "after_sha256": "5bbdeac88daf3fa0d9958814a29c490a76c2b485a0c7b76d10e6e012578d2543",
-      "owners": {
-        "@document": {
-          "before": "80b6a15141631315a58c46861168631b1247cba63a949d11a6510a525a6adc5f",
-          "after": "5bbdeac88daf3fa0d9958814a29c490a76c2b485a0c7b76d10e6e012578d2543"
-        }
-      }
-    },
-    "ci/test_shards/shard-11.txt": {
-      "before_sha256": "1b25637c6019d7a443b19809ee78b753e39f124f254ec45e9b3b538251d982e5",
-      "after_sha256": "1b32d3b82106d35fb8da552a9e87a67d29619001af819b9ab8dc55324b3d1526",
-      "owners": {
-        "@document": {
-          "before": "1b25637c6019d7a443b19809ee78b753e39f124f254ec45e9b3b538251d982e5",
-          "after": "1b32d3b82106d35fb8da552a9e87a67d29619001af819b9ab8dc55324b3d1526"
-        }
-      }
-    },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "ad6801001050fc745fed6c58bd20b86dc60a89a97fd5c4f8c583e5cbea7b4a72",
-      "after_sha256": "b4ee415496f31b9324d181354bfdf54f3d3475296d89586574f97645ab684dd1",
-      "owners": {
-        "@document": {
-          "before": "ad6801001050fc745fed6c58bd20b86dc60a89a97fd5c4f8c583e5cbea7b4a72",
-          "after": "b4ee415496f31b9324d181354bfdf54f3d3475296d89586574f97645ab684dd1"
-        }
-      }
-    },
-    "ci/test_shards/shard-2.txt": {
-      "before_sha256": "f694167be7b50ee835896ce451495046c89417e637ce9f301da0616374a8bc86",
-      "after_sha256": "b331ac54c6a614526a81688dd4bf10fb0fd92ec686d28218c66083903fe0944e",
-      "owners": {
-        "@document": {
-          "before": "f694167be7b50ee835896ce451495046c89417e637ce9f301da0616374a8bc86",
-          "after": "b331ac54c6a614526a81688dd4bf10fb0fd92ec686d28218c66083903fe0944e"
-        }
-      }
-    },
-    "ci/test_shards/shard-3.txt": {
-      "before_sha256": "51c0012b82bf555eb4daa57a0e434050fc833a2cc31b00760bac469bf4f931ce",
-      "after_sha256": "44d9779cc3668752e522ce6e89ad7997904779249601aa07e5fca1e397da9bd5",
-      "owners": {
-        "@document": {
-          "before": "51c0012b82bf555eb4daa57a0e434050fc833a2cc31b00760bac469bf4f931ce",
-          "after": "44d9779cc3668752e522ce6e89ad7997904779249601aa07e5fca1e397da9bd5"
-        }
-      }
-    },
-    "ci/test_shards/shard-4.txt": {
-      "before_sha256": "601cf3c9d310060f174099d206e0e646bbde20fbc780aaa29061cce76891b3c1",
-      "after_sha256": "eb680a6c6ab6cec17b95173a67d8ed5ef178f708b83471769ed316df682cb784",
-      "owners": {
-        "@document": {
-          "before": "601cf3c9d310060f174099d206e0e646bbde20fbc780aaa29061cce76891b3c1",
-          "after": "eb680a6c6ab6cec17b95173a67d8ed5ef178f708b83471769ed316df682cb784"
-        }
-      }
-    },
-    "ci/test_shards/shard-5.txt": {
-      "before_sha256": "8a060740b00a34a91505894e94ed7dea1d5a406b3b015da9bf078227ccd5fb3f",
-      "after_sha256": "a0fd43eff7fcd332a8cb077e45ca03ce52a0b537e728a96cbddcea3a4bda5eef",
-      "owners": {
-        "@document": {
-          "before": "8a060740b00a34a91505894e94ed7dea1d5a406b3b015da9bf078227ccd5fb3f",
-          "after": "a0fd43eff7fcd332a8cb077e45ca03ce52a0b537e728a96cbddcea3a4bda5eef"
-        }
-      }
-    },
-    "ci/test_shards/shard-6.txt": {
-      "before_sha256": "5f139187dba9a1240bbb6e2876be695aefd4672a0b784ba2aeb2c4919f995427",
-      "after_sha256": "adf74e7307bd87db12f20aa51568a2feb868f1da6f5d6d4ac90aeb82ab18a424",
-      "owners": {
-        "@document": {
-          "before": "5f139187dba9a1240bbb6e2876be695aefd4672a0b784ba2aeb2c4919f995427",
-          "after": "adf74e7307bd87db12f20aa51568a2feb868f1da6f5d6d4ac90aeb82ab18a424"
-        }
-      }
-    },
-    "ci/test_shards/shard-7.txt": {
-      "before_sha256": "091a5ef7385fc0eb828521a102bb8659f0ebf4139590d1af311fd1af9514d0d5",
-      "after_sha256": "fd691f11e4b28f6ebf16bc9d7d869f85a9ede32062ba1b59371b5b0838f6afdb",
-      "owners": {
-        "@document": {
-          "before": "091a5ef7385fc0eb828521a102bb8659f0ebf4139590d1af311fd1af9514d0d5",
-          "after": "fd691f11e4b28f6ebf16bc9d7d869f85a9ede32062ba1b59371b5b0838f6afdb"
-        }
-      }
-    },
-    "ci/test_shards/shard-8.txt": {
-      "before_sha256": "71906ed8e10ab793f33110b1bbb49a921f9b01d2b3cb3014a4c75c4c28e21afd",
-      "after_sha256": "8a8a91565dd498e330781dadd656277cfaffe1662139f56cd18a10c316f5eb3c",
-      "owners": {
-        "@document": {
-          "before": "71906ed8e10ab793f33110b1bbb49a921f9b01d2b3cb3014a4c75c4c28e21afd",
-          "after": "8a8a91565dd498e330781dadd656277cfaffe1662139f56cd18a10c316f5eb3c"
-        }
-      }
-    },
-    "ci/test_shards/shard-9.txt": {
-      "before_sha256": "9cb06d4743d642610ade00f771a27beac9fd5c02e3574084df03cd278669d0db",
-      "after_sha256": "12c0dbae7302ab93f4fec1e00f2e3339071272c7e084a49e906f466fcebd56d2",
-      "owners": {
-        "@document": {
-          "before": "9cb06d4743d642610ade00f771a27beac9fd5c02e3574084df03cd278669d0db",
-          "after": "12c0dbae7302ab93f4fec1e00f2e3339071272c7e084a49e906f466fcebd56d2"
-        }
-      }
-    },
-    "contracts/examples/decisions/family-coverage.json": {
-      "before_sha256": "850642fd644e66627ccf8a35573012ec87fec0b28a2a1c509e2953905b1fc87c",
-      "after_sha256": "419be9dbfe9035a6365f135be88d34dd82771d0d7d96f3ee09c67a708ce41107",
-      "owners": {
-        "@document": {
-          "before": "850642fd644e66627ccf8a35573012ec87fec0b28a2a1c509e2953905b1fc87c",
-          "after": "419be9dbfe9035a6365f135be88d34dd82771d0d7d96f3ee09c67a708ce41107"
-        }
-      }
-    },
-    "contracts/examples/decisions/interaction-conformance.json": {
-      "before_sha256": "e1016c80268832448010184a4c320f7c92d81dd6a58a901a0c9f14171572cfa0",
-      "after_sha256": "bfb23cdaa4cc181afedc70e41de6bbc7b3a375410dd075cd65010a22b3399031",
-      "owners": {
-        "@document": {
-          "before": "e1016c80268832448010184a4c320f7c92d81dd6a58a901a0c9f14171572cfa0",
-          "after": "bfb23cdaa4cc181afedc70e41de6bbc7b3a375410dd075cd65010a22b3399031"
+          "before": "294172c51fd9a50dd385a9828ab12f354e264d9982fff71a5830b7d229d60963",
+          "after": "e9ea644e89a7937289edfcf4881cabfeed5adf357b78b4a9e2f1e8ddd8ac9de1"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "9432a882d066f9aaadf7fefed6e9e6f239580ddaeb277bc3203b8d9121d7c846",
-      "after_sha256": "5879e1764e024b61017fe2156271439196e37c40c5fc96f99d24c001159f2950",
+      "before_sha256": "5879e1764e024b61017fe2156271439196e37c40c5fc96f99d24c001159f2950",
+      "after_sha256": "147c33dc9263d3928fa3d0bc7a88fd75d566269ecb20f84a11249a725a5c644d",
       "owners": {
         "@document": {
-          "before": "9432a882d066f9aaadf7fefed6e9e6f239580ddaeb277bc3203b8d9121d7c846",
-          "after": "5879e1764e024b61017fe2156271439196e37c40c5fc96f99d24c001159f2950"
+          "before": "5879e1764e024b61017fe2156271439196e37c40c5fc96f99d24c001159f2950",
+          "after": "147c33dc9263d3928fa3d0bc7a88fd75d566269ecb20f84a11249a725a5c644d"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "a1fb757763f4236186ba638e2de6cbc06b6a167e5293e82463eded2c6dcb2bd6",
-      "after_sha256": "32364200184d6815c8b3d40e53022325aceb698a7cc70c01bd9d17f533039224",
+      "before_sha256": "32364200184d6815c8b3d40e53022325aceb698a7cc70c01bd9d17f533039224",
+      "after_sha256": "528eaa626b45d41e12efd01bf1585723cf1fda966c9db199ee02da61901a646c",
       "owners": {
         "@document": {
-          "before": "a1fb757763f4236186ba638e2de6cbc06b6a167e5293e82463eded2c6dcb2bd6",
-          "after": "32364200184d6815c8b3d40e53022325aceb698a7cc70c01bd9d17f533039224"
+          "before": "32364200184d6815c8b3d40e53022325aceb698a7cc70c01bd9d17f533039224",
+          "after": "528eaa626b45d41e12efd01bf1585723cf1fda966c9db199ee02da61901a646c"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "d27467a10696d70258a98f5999a52e4c665acf4503b2ae66def5da01012b87dd",
-      "after_sha256": "d9499d2416cba41df58e5cee7f9bd03de9a6f6a37463b57206b275404bbf53e6",
+      "before_sha256": "d9499d2416cba41df58e5cee7f9bd03de9a6f6a37463b57206b275404bbf53e6",
+      "after_sha256": "b6409ae01996e8a975a3837160086f0fd678776705886da23c727c03b6c94dd5",
       "owners": {
         "@document": {
-          "before": "d27467a10696d70258a98f5999a52e4c665acf4503b2ae66def5da01012b87dd",
-          "after": "d9499d2416cba41df58e5cee7f9bd03de9a6f6a37463b57206b275404bbf53e6"
+          "before": "d9499d2416cba41df58e5cee7f9bd03de9a6f6a37463b57206b275404bbf53e6",
+          "after": "b6409ae01996e8a975a3837160086f0fd678776705886da23c727c03b6c94dd5"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "51fa89794a61e40c01281fd330ead2acb3522eddfa4f12d9159c7702f4e786a5",
-      "after_sha256": "eda729c064e2c7cf9981ccd81ab44d6b8aae97dd9f1feb2f78d95c322bab53da",
+      "before_sha256": "eda729c064e2c7cf9981ccd81ab44d6b8aae97dd9f1feb2f78d95c322bab53da",
+      "after_sha256": "0d1edd831fbfc4cc87f74dd40d304f5260e5e860f559ee8816b7c6f74ce4b1be",
       "owners": {
         "@document": {
-          "before": "51fa89794a61e40c01281fd330ead2acb3522eddfa4f12d9159c7702f4e786a5",
-          "after": "eda729c064e2c7cf9981ccd81ab44d6b8aae97dd9f1feb2f78d95c322bab53da"
+          "before": "eda729c064e2c7cf9981ccd81ab44d6b8aae97dd9f1feb2f78d95c322bab53da",
+          "after": "0d1edd831fbfc4cc87f74dd40d304f5260e5e860f559ee8816b7c6f74ce4b1be"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "1b61c5659472e9eb94103a5b1a04cf1e7c2d8afac863dfe79d877df256a10299",
-      "after_sha256": "eb3f5fe289266ea42f1f7e067f6dc6f3c5448e9ea11ed899ac857c7be0648116",
+      "before_sha256": "eb3f5fe289266ea42f1f7e067f6dc6f3c5448e9ea11ed899ac857c7be0648116",
+      "after_sha256": "7bf0d0a30c144f44fbe6960169ec489d4999c69d619a9418f40d17e7b16cf27b",
       "owners": {
         "@document": {
-          "before": "1b61c5659472e9eb94103a5b1a04cf1e7c2d8afac863dfe79d877df256a10299",
-          "after": "eb3f5fe289266ea42f1f7e067f6dc6f3c5448e9ea11ed899ac857c7be0648116"
+          "before": "eb3f5fe289266ea42f1f7e067f6dc6f3c5448e9ea11ed899ac857c7be0648116",
+          "after": "7bf0d0a30c144f44fbe6960169ec489d4999c69d619a9418f40d17e7b16cf27b"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "19058f6c0f139efd96c110d01f2c4e604f2fc8e4f364197ea3639bcabda89e09",
-      "after_sha256": "c5e6b4d2999b46efbdcc2788d4bd9e448c01556cfd8f6893950d363895781f87",
+      "before_sha256": "c5e6b4d2999b46efbdcc2788d4bd9e448c01556cfd8f6893950d363895781f87",
+      "after_sha256": "fa922b87ba460b318bd983871ba247df28cdeebed5875512129688b746d5db3e",
       "owners": {
         "@document": {
-          "before": "19058f6c0f139efd96c110d01f2c4e604f2fc8e4f364197ea3639bcabda89e09",
-          "after": "c5e6b4d2999b46efbdcc2788d4bd9e448c01556cfd8f6893950d363895781f87"
+          "before": "c5e6b4d2999b46efbdcc2788d4bd9e448c01556cfd8f6893950d363895781f87",
+          "after": "fa922b87ba460b318bd983871ba247df28cdeebed5875512129688b746d5db3e"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "90e6ea49c1c373de4a358785bb13d52bdf68b2480ea9f5fa890c675b30a4e977",
-      "after_sha256": "15ffcd4f2ccb2f2cc55de2a4f9c8a21045147bcd5b3a4b45f41169f821ed43d1",
+      "before_sha256": "15ffcd4f2ccb2f2cc55de2a4f9c8a21045147bcd5b3a4b45f41169f821ed43d1",
+      "after_sha256": "859f5260fb0881b48f259078c83b1ecc63e2769abbe78d41993883e7ba4c969f",
       "owners": {
         "@document": {
-          "before": "90e6ea49c1c373de4a358785bb13d52bdf68b2480ea9f5fa890c675b30a4e977",
-          "after": "15ffcd4f2ccb2f2cc55de2a4f9c8a21045147bcd5b3a4b45f41169f821ed43d1"
+          "before": "15ffcd4f2ccb2f2cc55de2a4f9c8a21045147bcd5b3a4b45f41169f821ed43d1",
+          "after": "859f5260fb0881b48f259078c83b1ecc63e2769abbe78d41993883e7ba4c969f"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "6288ad824a26c15ea4c5faf3445bcdd2b09d7338f55e60416f22cd9f7bf1dd4d",
-      "after_sha256": "2c6a082aad927435afbeaa26559f79399a149e6fda90d633d9056a2eab76fbe7",
+      "before_sha256": "2c6a082aad927435afbeaa26559f79399a149e6fda90d633d9056a2eab76fbe7",
+      "after_sha256": "bcbe4a975fe48f74a35f80bcea7b4258e8c907a0f0f72f96527886e3057abaf6",
       "owners": {
         "@document": {
-          "before": "6288ad824a26c15ea4c5faf3445bcdd2b09d7338f55e60416f22cd9f7bf1dd4d",
-          "after": "2c6a082aad927435afbeaa26559f79399a149e6fda90d633d9056a2eab76fbe7"
+          "before": "2c6a082aad927435afbeaa26559f79399a149e6fda90d633d9056a2eab76fbe7",
+          "after": "bcbe4a975fe48f74a35f80bcea7b4258e8c907a0f0f72f96527886e3057abaf6"
         }
       }
     },
-    "data/source_audits/order119/baseline/tests/unit/test_order80_normal_move.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "942a47b4e5ab17b7ee68353d37d08dfa24f8b75222fcf402ff78a2737fbed6d4",
+    "contracts/openapi.yaml": {
+      "before_sha256": "86517e0160fb6dd7fa65ff36d4a0ccfc7ca67230b576be50af8ecd086a44b52f",
+      "after_sha256": "0c2b12059becc773ac80c7f67ea28fa165c00f91fcaf52c1f7648e9a0893e1fc",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "942a47b4e5ab17b7ee68353d37d08dfa24f8b75222fcf402ff78a2737fbed6d4"
+          "before": "86517e0160fb6dd7fa65ff36d4a0ccfc7ca67230b576be50af8ecd086a44b52f",
+          "after": "0c2b12059becc773ac80c7f67ea28fa165c00f91fcaf52c1f7648e9a0893e1fc"
         }
       }
     },
-    "data/source_audits/order119/historical-inputs.json": {
+    "data/source_audits/order120/source.audit.json": {
       "before_sha256": null,
-      "after_sha256": "7a4f2b4a274e8973e2f924a3ec1ea03bfcead9240218f0313c5299f4798184a4",
+      "after_sha256": "cea13c43df083e445041ce11ab5172636cee121a199be52106cc0be40ec6f36d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "7a4f2b4a274e8973e2f924a3ec1ea03bfcead9240218f0313c5299f4798184a4"
-        }
-      }
-    },
-    "data/source_audits/order119/user-supplied-shadow-of-anarch.txt": {
-      "before_sha256": null,
-      "after_sha256": "eca25e085fb8791f419a6c8983a61ca61d29a04e36ddfd60e7178aa049624226",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "eca25e085fb8791f419a6c8983a61ca61d29a04e36ddfd60e7178aa049624226"
+          "after": "cea13c43df083e445041ce11ab5172636cee121a199be52106cc0be40ec6f36d"
         }
       }
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "67ac1c149fff5b61ed81619cf4ba00c8f5b40da9d7892b5b180893133cc2c801",
-      "after_sha256": "6db839c072ccaec41ce94d3f79772c097d260c705800f3cdf16997bef7ceb39b",
+      "before_sha256": "6db839c072ccaec41ce94d3f79772c097d260c705800f3cdf16997bef7ceb39b",
+      "after_sha256": "f90f541930050457703aef4be4a257b1edaf86ad6466593a62b3832200bf7f5b",
       "owners": {
         "@document": {
-          "before": "67ac1c149fff5b61ed81619cf4ba00c8f5b40da9d7892b5b180893133cc2c801",
-          "after": "6db839c072ccaec41ce94d3f79772c097d260c705800f3cdf16997bef7ceb39b"
+          "before": "6db839c072ccaec41ce94d3f79772c097d260c705800f3cdf16997bef7ceb39b",
+          "after": "f90f541930050457703aef4be4a257b1edaf86ad6466593a62b3832200bf7f5b"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "668ce9c9026b1d42c4435a299d444ed42c85f261f64007d7b6c538436894230d",
-      "after_sha256": "ef3cba6d1481174829c578f66cd7a8cb9b7203152be4682583f6cb5837b922c6",
+      "before_sha256": "ef3cba6d1481174829c578f66cd7a8cb9b7203152be4682583f6cb5837b922c6",
+      "after_sha256": "84658f91de062057310eb0c4e2ae82320cc524a68d1fd07ce245c05db6d3ba5f",
       "owners": {
         "@document": {
-          "before": "668ce9c9026b1d42c4435a299d444ed42c85f261f64007d7b6c538436894230d",
-          "after": "ef3cba6d1481174829c578f66cd7a8cb9b7203152be4682583f6cb5837b922c6"
+          "before": "ef3cba6d1481174829c578f66cd7a8cb9b7203152be4682583f6cb5837b922c6",
+          "after": "84658f91de062057310eb0c4e2ae82320cc524a68d1fd07ce245c05db6d3ba5f"
         }
       }
     },
-    "docs/DECISION_SUBMISSION_CATALOG.md": {
-      "before_sha256": "9e60e94adec6c6d2b069a597c2e3e2bbc925629fe9ef616839a6fe6ee81ce3a4",
-      "after_sha256": "279a0072dea5b407aa6c59d87921b282a4e66e1fdc9e7f9bb4183fd144fe990c",
-      "owners": {
-        "@document": {
-          "before": "9e60e94adec6c6d2b069a597c2e3e2bbc925629fe9ef616839a6fe6ee81ce3a4",
-          "after": "279a0072dea5b407aa6c59d87921b282a4e66e1fdc9e7f9bb4183fd144fe990c"
-        }
-      }
-    },
-    "docs/ORDER_119_SCOPE_PLAN.md": {
+    "docs/ORDER_120_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "8d76224bd8be8b3afb6c8e740f82b073cbf6909d5bfef28942b3bf9fcf792cb4",
+      "after_sha256": "6d0b88323d2715e8909c794fe9e792b72b16377dae2eb7b60e152b9d7e6d1ac1",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8d76224bd8be8b3afb6c8e740f82b073cbf6909d5bfef28942b3bf9fcf792cb4"
+          "after": "6d0b88323d2715e8909c794fe9e792b72b16377dae2eb7b60e152b9d7e6d1ac1"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "eb94ab1cb4225a8fa6b82eb4577af326e424508ba1fb49ac2d06b8a9061f685f",
-      "after_sha256": "66af4e9d97d6de3af61529a3b307f30e16069178b5faf86e71030a5dc9c4dda6",
+      "before_sha256": "66af4e9d97d6de3af61529a3b307f30e16069178b5faf86e71030a5dc9c4dda6",
+      "after_sha256": "629a76fada587ae7ace544c469253b5a3ce96bc89fa62d4008cc48f7c0098f69",
       "owners": {
         "@document": {
-          "before": "eb94ab1cb4225a8fa6b82eb4577af326e424508ba1fb49ac2d06b8a9061f685f",
-          "after": "66af4e9d97d6de3af61529a3b307f30e16069178b5faf86e71030a5dc9c4dda6"
+          "before": "66af4e9d97d6de3af61529a3b307f30e16069178b5faf86e71030a5dc9c4dda6",
+          "after": "629a76fada587ae7ace544c469253b5a3ce96bc89fa62d4008cc48f7c0098f69"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "2d414523c6d29b6378a1564031ee115f62bbbb178bc39e8d2439e65ca4dbdaaf",
-      "after_sha256": "6e2eb01f15b191320aa0dc9ed8355c037decaf82bb05bd9084299555d8fefdde",
+      "before_sha256": "6e2eb01f15b191320aa0dc9ed8355c037decaf82bb05bd9084299555d8fefdde",
+      "after_sha256": "9535176282fd3a16a808f2897afd8550003b1809b52cc2bb7b91bbc4e2f21254",
       "owners": {
         "@document": {
-          "before": "2d414523c6d29b6378a1564031ee115f62bbbb178bc39e8d2439e65ca4dbdaaf",
-          "after": "6e2eb01f15b191320aa0dc9ed8355c037decaf82bb05bd9084299555d8fefdde"
+          "before": "6e2eb01f15b191320aa0dc9ed8355c037decaf82bb05bd9084299555d8fefdde",
+          "after": "9535176282fd3a16a808f2897afd8550003b1809b52cc2bb7b91bbc4e2f21254"
         }
       }
     },
-    "src/warhammer40k_core/engine/interaction_metadata.py": {
-      "before_sha256": "576ad6543f2d9f3528bc9edafeb5d2587bd1cd7d952048dce4edb556606fb91f",
-      "after_sha256": "f6f5296857980b8ff7caa8ff05927f5751a4d87bf445142b6e2723fcd8b39852",
+    "src/warhammer40k_core/adapters/external_contract.py": {
+      "before_sha256": "b03a0061c0faf80848fb64766d59ad23631696ce524259793a7fc7ebae584ade",
+      "after_sha256": "8b37b3b8bad861c656c18d9a50280312bae09531f0bcd45e71ad79a6a6c4f26f",
       "owners": {
         "@module": {
-          "before": "1af562bd69d85f46f719ff7adf2840024f15c6a7e582a7dc418f57151c846c2f",
-          "after": "4fe037f6d3ea3f0f2f80ccd0e6e0e16a65cfb46df68bbaf4cc3f378fa94f8338"
+          "before": "9d19d71552d080fcaf156eb204206e9bf69a7624433623ab1fd8e68af21de561",
+          "after": "3ffe9c39710da5dae9d24e3973a9133a469c29a42ff200bf250e9d3c76688fe0"
         }
       }
     },
-    "src/warhammer40k_core/engine/lifecycle.py": {
-      "before_sha256": "befd6d40414d246dcacadfd717ee3cdbd5d1ca39c1497ce434aef11aadcb52ee",
-      "after_sha256": "d25a14e8df4053cbe8f31ee9222968b407884fbb127b877d75bb4e159c3683e7",
-      "owners": {
-        "@module": {
-          "before": "33de26d23f780169813b2aaccc6f70b71343e7390edab603fd57e3580062e9d6",
-          "after": "10756b23b2aedf075ebdda6e2cf238709399951d72b0189d7347d7b0043a475d"
-        },
-        "GameLifecycle._build_decision_dispatch_registry": {
-          "before": "1e37068bd9aa93da2cd9a80de2493bc434eb633ccf956185ead6080cac4439d1",
-          "after": "a128199842d094ea974c83b12f7c2ebcc72741117c14690a24ff76fc7fccc1ce"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/movement_reposition_context.py": {
+    "src/warhammer40k_core/engine/ability_damage_context.py": {
       "before_sha256": null,
-      "after_sha256": "d61dda4c135b034d0a4ce20bbbcd1e1c2e41f82568becf0666b766e95b22c616",
+      "after_sha256": "1ad6c22f11cf318890fbc5877deedee2a7186364df027e734e1ec4d80ed97931",
       "owners": {
         "@module": {
           "before": null,
-          "after": "093666feb6e5c17ad50a0dc7e1e460f71d355b803c1c7e8df6af597549ab2c82"
+          "after": "153a434fdae3e2bb8fa38569d354e7151e531e6055304b808d2640a99e61252a"
         },
-        "MovementRepositionContext": {
+        "ability_damage_is_psychic_attack": {
           "before": null,
-          "after": "afbde03c5b4c2871636cc5fa50cfca0a8c44927ac4ca80041751a2111501cc9e"
+          "after": "5ea1aac63bb992efff2c208f40da5cab3407952861cf2b38dbca00fb70254f9a"
         },
-        "MovementRepositionContext.__post_init__": {
+        "ability_damage_source_context": {
           "before": null,
-          "after": "6e7eccba9f09e340555e341e68c2e90d4bcbab78f7f88c5f5d747f5a0f941bf6"
+          "after": "099f72a2af5c7fc918557bdbfc0d9b613792f27586f7fc017e7c91b569bfc950"
         },
-        "MovementRepositionContext.from_payload": {
+        "source_permission_damage_context": {
           "before": null,
-          "after": "44fb471c9df3f3f269ab50bf8782969adb2c22a6437bfdceb74dfb5ef9cc6d50"
-        },
-        "MovementRepositionContext.to_payload": {
-          "before": null,
-          "after": "22f9db02d885fee10b3856ec95edd71c0e5e0f620498a507a8157a5112c682e7"
-        },
-        "MovementRepositionContextPayload": {
-          "before": null,
-          "after": "558f213bd933415a39fa70f15fff71d6356f3f71bf2f38b272c5866a97745347"
+          "after": "c4c36d0034b9cd214d9f9c9ad2d18b94ebb76036a77b6e835bc59024ee2eedd2"
         }
       }
     },
-    "src/warhammer40k_core/engine/movement_source_reposition.py": {
+    "src/warhammer40k_core/engine/additional_attack_mortal_permissions.py": {
+      "before_sha256": "16aa781ddfb695ba4d06416ebacf71346f0af1f24ce06c7c6329962ca6dc70c6",
+      "after_sha256": "f37c7edfa8e50eb18b95675921da5a6d81d94e479d10354b8351a5ce99e2f644",
+      "owners": {
+        "@module": {
+          "before": "7b582958b875d94367ba779bcb2e923d8ded575e3e4f75f8839aac443761689a",
+          "after": "dbbf6b216fcd20765acc036b1ba00658244590847367a017a45775404a9b1ea5"
+        },
+        "additional_attack_mortal_permission_effect": {
+          "before": "15b6f67dee51739816201c71c2668eaab7b6215b1e71e2ecc415232014ed10df",
+          "after": "70816b822d77ccc8d8b2682123ec1cb2bd50417f86a42b36f07b49ed07be7907"
+        },
+        "validate_additional_attack_mortal_permission": {
+          "before": "4b8297ced7b877c9d5f2c54907cb6ecbbfe4ef3843381702eac0a3034b4f04ac",
+          "after": "3092ccadced8ae270c6f9d1b7ddfc84be18f46dcf788d2a0ef37d04f7c532f35"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_deferred_mortals.py": {
+      "before_sha256": "a711e3bc886a5eaa61384fe298e977291fb5875a281606e5f13b4daacea4a252",
+      "after_sha256": "64eb33eab0a0bd74fe71e55978fd7f530a18b3c25a2e18e550b8b3c3f1dd885f",
+      "owners": {
+        "@module": {
+          "before": "9115ccf96f87b5cc7102fdae32f71bcc9efb7bd05f73481e1f1f9e686ce8edc2",
+          "after": "f3d5e84df9038f9db29ec470984200296d9dc7700d33c59a0c7bdc9ae7f053a7"
+        },
+        "apply_deferred_attack_mortals": {
+          "before": "45d85ef32b6dbf4648f43603ebe1b39e1c0f1fbb720ec81cd454b87d456f2aaf",
+          "after": "3d9cd262f152676a2c940e8028506f051e9770be4857b8387352ed22ccf1f54f"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/direct_mortal_wound_application.py": {
+      "before_sha256": "aa0e1e8f589156334a936787883b5237a90118108b0528bc46e7854a7597f484",
+      "after_sha256": "2752dc9b8b57f59f66d2db59bf019f9298f72aa25d69d072ca48afebdf237a9b",
+      "owners": {
+        "@module": {
+          "before": "13ee0bfd26c693ef3de31fbd7db024e1be160d8592fd8bb1dd8c393b424689c6",
+          "after": "cde23f888ac85ded1aede22f665dfd1b44dcf090341be336c27dd5b6adfa67a2"
+        },
+        "_prevalidate_direct_mortal_wound_route": {
+          "before": "b6759a981cadfd6ea47b6f6b463b21b925e0dd61c614eeb1daeeef2b3ab8914b",
+          "after": "2b76184fde8b3063349af0ac708365cb0e385dd540aa512f4326c3b5de2a2705"
+        },
+        "apply_direct_mortal_wounds_to_unit": {
+          "before": "a202b8c24f20accb5ee2dd529c1473d6600df107a897ed35d52c39d714b5a938",
+          "after": "5ebcf7c483d16e1de6a6273790c1fc2ea6f30ff1489f02f6e134b9edd5a679b2"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/feel_no_pain_conditions.py": {
+      "before_sha256": "5896c47a7b7e3232bfab1e669ae186cb2bbd9047e5ec9ca28b59e38378318aa6",
+      "after_sha256": "9f2fff10a2a55eff1371dad7edc0a5cc69e64b0756f69070cacb14ae59323f66",
+      "owners": {
+        "@module": {
+          "before": "8b9236610ed373a1a582065505eda0f66b43765be53f5bdf0f8ade6113e23050",
+          "after": "9da8cdf4825c0a2fbf69554bbf4c2027277da5fe170a4848bb3c73c169889e42"
+        },
+        "feel_no_pain_source_applies_to_mortal_wounds": {
+          "before": "7668ef7e0e1a34a33983793354ee321bb266189f67495aa6e6b6d8d97b46395b",
+          "after": "1d3167a5ee6a062ed88689d70787dda056fa7d557e5cc4f399ade361bc0e8cd3"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/mortal_wound_allocation_triggers.py": {
+      "before_sha256": "a39868bd6d99a4f927caf164ad1602bb1538bc3c695c5f19dbe7bca6f5ef47ec",
+      "after_sha256": "97561654d1d97872666675813db4543d815fdd9cea9a1451f98c347a87c5bdfb",
+      "owners": {
+        "@module": {
+          "before": "8dcad34206c6a6e9adcc4bc0752dd162c4e59ff80b1816201c2b110f29209485",
+          "after": "4337cdf52a04e6b5bf888f89c83787ba136be4e5602db05b87adc441fe9ef523"
+        },
+        "record_mortal_wound_allocation_occurrence": {
+          "before": "308fe6f37decd98e80409f0f017984100d7ebaadcaad02cedbec666dfc0d2e86",
+          "after": "4b21c72c53fad44ba764628f9d83897318f134a7ff7518b0dfeaf9b722ff8320"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/mortal_wound_model_allocation.py": {
+      "before_sha256": "4a8b3faa6345681f603cd3415219547edf7ec3362d3fd91aa2c8dabef498d602",
+      "after_sha256": "e9b19cc20ca6aeceb4789c8ecbcad6ddafbf1a0280a501360d955f31fb722137",
+      "owners": {
+        "@module": {
+          "before": "1d9f28803b7902520d910c2529bf05dbcaa1e31cd7742fdfac95e4d768eec083",
+          "after": "8decf0f409b0f50d72323ffbd3de4ceb878fba77bc0c00664d7531a121088e90"
+        },
+        "_continue_mortal_wound_application_for_model": {
+          "before": "24d040cf3726371a2939cfbf292bad9fc40a98289224bd180cef10df22736f3d",
+          "after": "71184b32942013fffca2dd54231da5423a3c3f21f4bf79bf22cb796a6185a64b"
+        },
+        "continue_mortal_wound_application": {
+          "before": "6746d0da12db39a838e66a4491ba9d932ca2a3ce8a368187a273d96d0674cf23",
+          "after": "5ccad363545f968ea2137d7243668286bb3a1afe9c3f6528ba7f9ce4c1277643"
+        },
+        "mortal_wound_feel_no_pain_sources": {
+          "before": "03ac4ccc6a9aed59d11057d8a898e660efd14e84867fb98f9142de0456ca6139",
+          "after": "9e149cae4d10f28502ead0b636f0beaece095c40030250e3a34e8db5ebb87d45"
+        },
+        "validate_mortal_wound_feel_no_pain_request_authority": {
+          "before": "31c4abc0a9eb5c32379a1a719baed91b24c6e45a9c4e4649d82ade7d6867228f",
+          "after": "569d0228506890364a6c51ea5feccce04e530240fdc2eb3af4adad312a143c96"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/ability_damage_source.py": {
       "before_sha256": null,
-      "after_sha256": "480dff368fab58b7258c85ca2a27cee11a4fc622ed303420a11cc12156bbec7f",
+      "after_sha256": "d9f4d4303567d62275b9e51e8c9a0dcfb3908ea77efbab42476f8b8b9882e679",
       "owners": {
         "@module": {
           "before": null,
-          "after": "584aeb06423ca6a06f74fb9efbf6f723d72781e1463896e49d7de9e02125d2ad"
+          "after": "a6871416400badce0098e430153451154cc34d0889e6fb4ba92ee5e989a5c9b7"
         },
-        "_options": {
+        "AbilityDamageClassification": {
           "before": null,
-          "after": "4c8021e9ee1eed15b8a92d58874fd84f07b40dd27ebe3d714e69eaf89ae8960e"
+          "after": "349a821f6d161ee83c415d7d62da13e0a9452c3575ece578550c1ee91641dacd"
         },
-        "context_from_value": {
+        "AbilityDamageSource": {
           "before": null,
-          "after": "5c94400c7aa3127612d1b2a02bb1c11b5da1f5c5ab11da9615f3ab6839af1746"
+          "after": "be191481ad19921e5fd6fb8f5980eafdbbadfc1b384c73739b3b8d16daa0efc4"
         },
-        "current_source_reposition_context": {
+        "AbilityDamageSource.__post_init__": {
           "before": null,
-          "after": "9c7f45beb7e6569a5cc9a80454b772b7a482dabd7d31610ca719ea0b41ce5d61"
+          "after": "76c5c390911418b1b97085c1c51d993077ec0f00898819a5a057fd93616b9c9e"
         },
-        "movement_reposition_permission_effect": {
+        "AbilityDamageSource.from_payload": {
           "before": null,
-          "after": "62377866b44b56c987e4936da9de23883535b16d7968ddad585c77ef9811d7ae"
+          "after": "9878aba9a24f3b951010516a2d4b2427038b17bff77314a377863255fa3f6fe1"
         },
-        "request_current_source_reposition": {
+        "AbilityDamageSource.to_payload": {
           "before": null,
-          "after": "f6766b22405eaaa4dcb79c82bba30dbdd4aad4ee5d0a74758fbb8b3b49577ca9"
+          "after": "d9459b4b4d89bf4fd5c9d3c43569005f3a52f9998440b01695acad0843a1f9e2"
         },
-        "request_source_reposition": {
+        "AbilityDamageSourceError": {
           "before": null,
-          "after": "34353a54be7321230ffeec2fc4b301436c6bb82f46d3388e0a6750c8f83dc2c9"
+          "after": "c6d55a7d5f7a6396805f3c9275912b5c6fdcc39e2257dac3fafa7045635ad18f"
         },
-        "source_reposition_dispatch_handler": {
+        "AbilityDamageSourcePayload": {
           "before": null,
-          "after": "033083d7b26a85ec6b1d9080d36c0b4c29a3d7b1c41083d1092119731173cd06"
+          "after": "cc72675bd7078f8fc47816b85f3276dcc07cec3da694ad6fb5eca400ee98b9c5"
         },
-        "validate_source_reposition_provider": {
+        "ability_damage_source_at_data_boundary": {
           "before": null,
-          "after": "0420513487bcde242aa59d247d37b9358938671de6329cc0cfd64c7e4b127d18"
-        },
-        "validate_source_reposition_terminal": {
-          "before": null,
-          "after": "18e012b1dcd385d19d24d36e8773fdd363f50c871f615ac4e861a06d8e64b9a6"
+          "after": "098e1451078f82a9e17df1d907f39799b3a09bfc263be350eee1cde0f6964cd7"
         }
       }
     },
-    "src/warhammer40k_core/engine/primary_battlefield_departure_integrity.py": {
-      "before_sha256": "0808600ebab9edc5170c579bd1ad730f48d7ffdec3c2c334bf4fea05389722f0",
-      "after_sha256": "d793d7145d9324fe242fcec118072eb116418609601f8eae9b173ba7640c36dc",
-      "owners": {
-        "_validate_reserve_provider_decision": {
-          "before": "7a3e82cd9b35a87f42517b68da3c108b15e3bb6fc36942428f228fd8665a0844",
-          "after": "91d31f30b2ce4184a1d15afc09bed8cd39e83c91bf6d53a6c19e7cbd46355806"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/primary_reserve_entry_lifecycle_integrity.py": {
-      "before_sha256": "a404cf0f818f82d80fd703012ac730f8c9766b2b0ecc5ff3aa1756ccd33832e9",
-      "after_sha256": "ba9877b1cd2c0c0de4b3710bbe4744c8bada77c11c21cefc4dcc885c17228c11",
+    "tests/code_quality/test_order120_psychic_damage.py": {
+      "before_sha256": null,
+      "after_sha256": "2a249a7006d7c6e60e97c9470e232e333cb3371d8dcf2ddbe4bd526abf881995",
       "owners": {
         "@module": {
-          "before": "6d2ed697f6eb9a97d2411f59a31be9bb8ee4c8e4dba371a85fe78c229c20b300",
-          "after": "4c5c332e79e11f3d959e28f302b435bde2e3ad081f3347a0aa677e8e01c9ac1b"
-        },
-        "_source_terminal_bindings": {
-          "before": "7d1f8ae9347fc1990b16bc46874e8687e3328f16d126636fcc12e58840ff5f31",
-          "after": "9828dfa85df6866e4348f9a00e2c4418014faeab76c30307e20fe381119a1113"
-        },
-        "_validate_source_provider_authority": {
-          "before": "f164678545b0cc33128a9d046305224ee82bf9f574b71b28ea43872d18540c2f",
-          "after": "75fa2383046401c77370521e6f3a2cac93c9cc1a5b868c1bf484b82ce45c22ce"
-        },
-        "validate_primary_reserve_entry_lifecycle_integrity": {
-          "before": "5a470b8658a15a6b258f0f373abd4b5d94615fd415430a37aaf5065cad81c1d8",
-          "after": "08baa90d393c084f69ec9e8f317c624c93d401dcd133dc4770bdad1eeb45672a"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/primary_reserve_entry_provider.py": {
-      "before_sha256": "b6acf983cdd20c69a5bde9e1e131619f49f6c42c183120ca206f54e9bbd766d7",
-      "after_sha256": "d354b8f48d62a4e847e2b0497bfb88be825a4bc5f6869a8c79567d2c9996de3c",
-      "owners": {
-        "PrimaryReserveEntryProvider.__post_init__": {
-          "before": "f5cef9f8a8fbdbb02bd9b7aed479340a14a39db9f4655572295343cfac2fe65b",
-          "after": "a5238f937ffa09fad4ee4783989d8078221750caa8f241877464b3549c09c608"
-        },
-        "PrimaryReserveEntryProviderKind": {
-          "before": "45f47f94e0d026c958db6d1e0159eb9bb2fa871f1800ae0480cbb65e9dc86625",
-          "after": "748b782dbaab914877e4a89aca7d66fc7bab1d562ecdf82c0fe74487a132fe38"
-        },
-        "primary_reserve_entry_requirements": {
-          "before": "ea929fc203d5bd7877f9ddb05b07305717ae2423360eaf5af360d19718dc399c",
-          "after": "4e669aca3b2ea78efd54fe6964a3214317be41c0ca1aa9cac05d2ac9f005d0d3"
-        },
-        "primary_reserve_entry_requirements_from_evidence": {
-          "before": "53d096c0f9db274e803fdd97e69da625e9d4f053cddd38e3934e9beff7dfc821",
-          "after": "19ea4c0f8df05be2135ffb3bc26b91eba7a238efcb83c7f4ec646bf3dc20c922"
-        },
-        "validate_accepted_primary_reserve_entry_provider": {
-          "before": "ef76fe5d11807b7cff7f2aa387ec617c3efb5043b6f4c4a7d47f765b7ce24ec1",
-          "after": "7c3a627ffed391753ab4376c9ff89e5911394d97ad23eed78663e3c874724590"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/primary_reserve_entry_source_integrity.py": {
-      "before_sha256": "8df7855302cfb575b6758bae557a9b69ed3365a280f0127fbab347d7dc798be7",
-      "after_sha256": "8418b8373be666ef7bb8196721cc771fb2c5dc63e11b30258ea1482010a0efd5",
-      "owners": {
-        "validate_primary_reserve_entry_source_terminal_semantics": {
-          "before": "788403da76411b725bd04b7b0ea01acaad1eb30494049fed4ba8a4d044cfe644",
-          "after": "e60fa2e9ec6bdc6cdc40aacc1ce9772595847364d3e81db0d7a41ff951c99785"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/triggered_movement_handler_impl.py": {
-      "before_sha256": "77e5d416cd344a3fd52edcb27cf628d78e3cbf33361ce9752e916646ab56bd3c",
-      "after_sha256": "28dcd4aa8051b3c7b10fcbba348735e506a09206c8593ae1b5b593ec26f4bb1c",
-      "owners": {
-        "apply_decision": {
-          "before": "45e14013e4cdbee5a636d69adb95c6a2c134316795c481dd3437b56f5148bf22",
-          "after": "820651b3f58ea0b045d2977e9a6137cbbd846147d2ff5ba7a51a40cd4dac1003"
-        },
-        "apply_proposal_decision": {
-          "before": "2fa3ec55da445f3b959714da6cb112c38377369285face107d111d44d7f62cde",
-          "after": "0427ef0c385b5f37bfaf4ebf5757e092b249d95cb9fe3b4a8b9410ab9c46339c"
-        }
-      }
-    },
-    "tests/code_quality/test_order80_normal_move.py": {
-      "before_sha256": "6cd69c6f03fbf162a3ab0a71a83bf05d7d1bc7a3ef13a4bd283b86c4e33b4a1f",
-      "after_sha256": "a5160061d4f023cbb09985c4d5367b966622efc61fe76196ca8330c79431a147",
-      "owners": {
-        "test_order119_reposition_uses_shared_source_and_movement_owners": {
           "before": null,
-          "after": "dbd98879f81bfcbd65a05f8f6259c3c746f679126a909a81aa6e6e88a26f374a"
+          "after": "eb792abdc2db6fe503fbc80b0f852c78a4e88ff7e12fcb3782eabd55874de0c1"
+        },
+        "test_direct_and_pending_mortal_owners_forward_both_damage_contexts": {
+          "before": null,
+          "after": "10696d17f370d23a22f3fe52c9d46945509ae0fa32e7c3b756da0e42e48f718f"
+        },
+        "test_psychic_ability_damage_runtime_uses_structured_source_evidence": {
+          "before": null,
+          "after": "6c69af989c09f1cffdc87614d665468d3b375e102bfd5930307a9f8bb2312067"
         }
       }
     },
-    "tests/unit/test_order80_normal_move.py": {
-      "before_sha256": "942a47b4e5ab17b7ee68353d37d08dfa24f8b75222fcf402ff78a2737fbed6d4",
-      "after_sha256": "8360a79eac5ef7684f2fb4f27e3b0e6f1a96d623bcaebc44c371be1dc9e520b2",
-      "owners": {
-        "test_order119_decline_source_reposition_preserves_movement_and_continuation": {
-          "before": null,
-          "after": "b1052146fe9d2bb304ab86d6c845d421e8e4587ee243e19c2bcac8cce71cc831"
-        },
-        "test_order119_prior_reactive_move_then_source_reposition_restores_and_replays": {
-          "before": null,
-          "after": "7386f8d1dfcac6b3427cef94ad23bfc5fc330ab579e5ea5f123666304713b55c"
-        },
-        "test_order119_source_permission_expires_at_actual_movement_phase_boundary": {
-          "before": null,
-          "after": "2b9e0d4366c129c18f22cdf9fba5aa13bf2ca36745a901bf3390d2a09d70e343"
-        },
-        "test_order119_stale_permission_rejected_before_source_queue_pop": {
-          "before": null,
-          "after": "3dbdb8e75d3a437d2767787d5a6432291981be3e089870e7a928812108d0cb37"
-        }
-      }
-    },
-    "tools/core_rules_order97_history.py": {
-      "before_sha256": "03f80ead5206769e4eca3716cd269f79a0dfbb1c009aa9bb260ae7f438a6bb8c",
-      "after_sha256": "c702ed274f675efe6b396db5ef2a31b14af4a2ef0f1248af6adcea12595b3d73",
+    "tests/order120_psychic_damage_helpers.py": {
+      "before_sha256": null,
+      "after_sha256": "9147ebd9a21458d0ddd83e2644fed691f5656f9d699c845bde0e836bd424750e",
       "owners": {
         "@module": {
-          "before": "e06e1da9e27312c85bf53b817720c72f9490708dc66b82a786c954f3bb0490fd",
-          "after": "b39f01a09afe76102fa2c56d8a929d599e6d2ed8547d79075d96d2b47dbaf825"
+          "before": null,
+          "after": "c83f8e76b7cce60c412ae6a8d96fcbb93a72396df603a3898ebaafcc8879ddcc"
         },
-        "historical_evidence_path": {
-          "before": "44c4769de3cb6d528fdf8dbe1b6e4b02d2af9ba11026f0b94ccf82b43fff8da9",
-          "after": "65a97d12ddaa3062f3bfe858ea26ecac43d6101eda043edcb2c4a2bc3522d8c0"
+        "official_psychic_damage_source": {
+          "before": null,
+          "after": "46e4ff4e95311844b398c35692fc0d237a99065bea763d851d73132c8228425f"
+        },
+        "psychic_ability_damage_session": {
+          "before": null,
+          "after": "2f32df75e4e9cbe2fa5a663ecb0f6c2f346ecb07800b49e452c97b07bcd0e5e1"
+        }
+      }
+    },
+    "tests/unit/test_order117_mortal_allocation.py": {
+      "before_sha256": "1851b394297b8f266c0282e2033002f3a34ab1bc8f216c6e7cfc0f29dcd4a185",
+      "after_sha256": "1a9b0692e1eb77e4c4ae1507370e0ea83f08702b1d19f883cb7a51119bec59f3",
+      "owners": {
+        "@module": {
+          "before": "e6d0d35fe4bf0f4bd2b13c76ed963b22cd964cb63d31be2e769bbf5a966935d8",
+          "after": "97aa475104d309740d0680e55ff77d4ee75fb0d07161718298808a96bd358676"
+        },
+        "test_order120_ability_classification_survives_real_pending_fork_viewers_and_replay": {
+          "before": null,
+          "after": "5575c940df08efe3e99302f266143825196eba9bcc43236ce46f981907d4633c"
+        },
+        "test_order120_classifies_explicit_source_title_once": {
+          "before": null,
+          "after": "ce6b41cf68c7205925526d378fa2563013ffea1f9ddcd0d4e072193033fb13c5"
+        },
+        "test_order120_invalid_descriptor_rejects_before_zero_prevention_mutation": {
+          "before": null,
+          "after": "53a20cd98f7c17b05cc84bc99bead6f7a6c52e3d4e8162315b48a743063ee651"
+        },
+        "test_order120_malformed_or_wrong_source_descriptor_fails_closed": {
+          "before": null,
+          "after": "afaaee964534d6d1b8d221af0669c9b2c4d6f2733f6754ed17e1bd462905517d"
+        },
+        "test_order120_non_attack_direct_ability_damage_preserves_classification_before_mutation": {
+          "before": null,
+          "after": "b7cd4451b0e209858e215260219472a04279665c8f04bea7b336d58ace8f635c"
+        },
+        "test_order120_non_psychic_ability_never_uses_psychic_only_protection": {
+          "before": null,
+          "after": "1144bda15bd7a4d6a70f7aefe6d1706bb2dfea759c7390a424ccdf3e5ab7d154"
+        },
+        "test_order120_ordinary_extra_mortals_keep_the_originating_psychic_weapon": {
+          "before": null,
+          "after": "7b8bcc75f199095f02edabfc8c0a3e3516a1ccfeb0dd682357b1f4478107d08a"
+        },
+        "test_order120_real_psychic_damage_source_and_historical_core_pins": {
+          "before": null,
+          "after": "1fc7e03059db99fbce223f1e0ea73f31d500ceaabccc03d224d97c90cf58bebc"
         }
       }
     }
   },
   "rows": {
-    "ci/test_shards/durations.json": {
+    "conformance/typescript/src/contract.ts": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory"
+        "order120-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
-    },
-    "ci/test_shards/shard-1.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
-    },
-    "ci/test_shards/shard-10.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
-    },
-    "ci/test_shards/shard-11.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
-    },
-    "ci/test_shards/shard-12.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
-    },
-    "ci/test_shards/shard-2.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
-    },
-    "ci/test_shards/shard-3.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
-    },
-    "ci/test_shards/shard-4.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
-    },
-    "ci/test_shards/shard-5.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
-    },
-    "ci/test_shards/shard-6.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
-    },
-    "ci/test_shards/shard-7.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
-    },
-    "ci/test_shards/shard-8.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
-    },
-    "ci/test_shards/shard-9.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
-    },
-    "contracts/examples/decisions/family-coverage.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "order119-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
-    },
-    "contracts/examples/decisions/interaction-conformance.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "order119-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
-        "order119-contract-publication"
+        "order120-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
-        "order119-contract-publication"
+        "order120-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
-        "order119-contract-publication"
+        "order120-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
-        "order119-contract-publication"
+        "order120-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "order119-contract-publication"
+        "order120-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "order119-contract-publication"
+        "order120-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
-        "order119-contract-publication"
+        "order120-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "order119-contract-publication"
+        "order120-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
-    "data/source_audits/order119/baseline/tests/unit/test_order80_normal_move.py.txt": {
+    "contracts/openapi.yaml": {
       "category": "rule_semantics",
       "operations": [
-        "order119-source-evidence"
+        "order120-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
-    "data/source_audits/order119/historical-inputs.json": {
+    "data/source_audits/order120/source.audit.json": {
       "category": "rule_semantics",
       "operations": [
-        "order119-source-evidence"
+        "order120-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
-    },
-    "data/source_audits/order119/user-supplied-shadow-of-anarch.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "order119-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
-    "docs/DECISION_SUBMISSION_CATALOG.md": {
+    "docs/ORDER_120_SCOPE_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
-    },
-    "docs/ORDER_119_SCOPE_PLAN.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -860,127 +570,127 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
-    "src/warhammer40k_core/engine/interaction_metadata.py": {
+    "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
       "operations": [
-        "order119-movement-source-permission"
+        "order120-ability-damage-classification"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
-    "src/warhammer40k_core/engine/lifecycle.py": {
+    "src/warhammer40k_core/engine/ability_damage_context.py": {
       "category": "rule_semantics",
       "operations": [
-        "order119-movement-source-permission"
+        "order120-ability-damage-classification"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
-    "src/warhammer40k_core/engine/movement_reposition_context.py": {
+    "src/warhammer40k_core/engine/additional_attack_mortal_permissions.py": {
       "category": "rule_semantics",
       "operations": [
-        "order119-movement-source-permission"
+        "order120-ability-damage-classification"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
-    "src/warhammer40k_core/engine/movement_source_reposition.py": {
+    "src/warhammer40k_core/engine/attack_sequence_deferred_mortals.py": {
       "category": "rule_semantics",
       "operations": [
-        "order119-movement-source-permission"
+        "order120-ability-damage-classification"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
-    "src/warhammer40k_core/engine/primary_battlefield_departure_integrity.py": {
+    "src/warhammer40k_core/engine/direct_mortal_wound_application.py": {
       "category": "rule_semantics",
       "operations": [
-        "order119-movement-source-permission"
+        "order120-ability-damage-classification"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
-    "src/warhammer40k_core/engine/primary_reserve_entry_lifecycle_integrity.py": {
+    "src/warhammer40k_core/engine/feel_no_pain_conditions.py": {
       "category": "rule_semantics",
       "operations": [
-        "order119-movement-source-permission"
+        "order120-ability-damage-classification"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
-    "src/warhammer40k_core/engine/primary_reserve_entry_provider.py": {
+    "src/warhammer40k_core/engine/mortal_wound_allocation_triggers.py": {
       "category": "rule_semantics",
       "operations": [
-        "order119-movement-source-permission"
+        "order120-ability-damage-classification"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
-    "src/warhammer40k_core/engine/primary_reserve_entry_source_integrity.py": {
+    "src/warhammer40k_core/engine/mortal_wound_model_allocation.py": {
       "category": "rule_semantics",
       "operations": [
-        "order119-movement-source-permission"
+        "order120-ability-damage-classification"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
-    "src/warhammer40k_core/engine/triggered_movement_handler_impl.py": {
+    "src/warhammer40k_core/rules/ability_damage_source.py": {
       "category": "rule_semantics",
       "operations": [
-        "order119-movement-source-permission"
+        "order120-ability-damage-classification"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
-    "tests/code_quality/test_order80_normal_move.py": {
+    "tests/code_quality/test_order120_psychic_damage.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
-    "tests/unit/test_order80_normal_move.py": {
+    "tests/order120_psychic_damage_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "order119-regressions"
+        "order120-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     },
-    "tools/core_rules_order97_history.py": {
+    "tests/unit/test_order117_mortal_allocation.py": {
       "category": "rule_semantics",
       "operations": [
-        "order119-immutable-inventory"
+        "order120-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
-      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+      "rationale": "Bounded conditional Core Psychic ability damage classification, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:22:22.03:1 block1: each wound caused by a Psychic ability is inflicted by a Psychic attack. Retained official July22 Chaos Daemons PDF p48 authenticates a real Psychic damage title without admitting named faction activation. Existing 06.02.01 same-attack classification for additional weapon mortals remains additive.",
+      "unchanged_work": "A source-bound immutable classification descriptor is carried through existing provider-authorized deferred/direct mortal outcomes and shared FNP selection. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, allocation priority, dice work or lifetime owners. The descriptor is parsed only for supplied ability context; existing unclassified snapshots retain their current shape. No deliberate performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and all live semantic/ownership/work controls apply; no full-game certification or inherited numerical budget refresh."
     }
   },
   "milestone": "ordinary",
