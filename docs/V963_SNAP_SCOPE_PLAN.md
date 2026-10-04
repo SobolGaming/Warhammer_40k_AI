@@ -71,7 +71,10 @@ Anti/generic Critical Wounds and Devastating Wounds. Legal pending/completed JSO
 persistence, both viewer projections/event deltas, isolated fork continuation,
 and exact replay use the same engine authority. The old Snap Lethal-choice
 regression now requires its absence. Static audits protect shared classification
-and complete source selection. Failures and command receipts are retained in
+and complete source selection. The existing Damage Command Re-roll fixture now
+rolls the Snap hit's real wound, declines the distinct wound reroll through the
+lifecycle, and proves the failed save and subsequent Damage reroll window.
+Failures and command receipts are retained in
 the task's `v963-snap-state` directory.
 
 This is a bounded source-backed rule correction, with no deliberate performance

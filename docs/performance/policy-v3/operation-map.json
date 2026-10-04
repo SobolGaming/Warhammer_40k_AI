@@ -3005,6 +3005,7 @@
         "tests/fire_overwatch_helpers.py",
         "tests/unit/test_critical_hits.py",
         "tests/unit/test_lethal_hits.py",
+        "tests/unit/test_phase13b_shooting_declarations.py",
         "tests/v963_snap_helpers.py"
       ],
       "owners": [
@@ -3016,6 +3017,7 @@
         "test_order84_default_critical_and_snap_require_exact_six",
         "test_order84_explicit_snap_threshold_accepts_assigned_seven",
         "test_out_of_phase_snap_shooting_choice_uses_attacking_owner_and_replays",
+        "test_phase18b_command_reroll_window_opens_after_shooting_damage_roll",
         "test_snap_ignores_generic_threshold_but_accepts_explicit_permission",
         "test_v963_critical_only_snap_threshold_cannot_grant_hits",
         "test_v963_full_resolution_preserves_critical_wounds_restore_fork_and_replay",

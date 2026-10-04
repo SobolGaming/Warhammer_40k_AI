@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "d6989dd266abc0e5d8e8f7de90020f9eddace1a7",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bec83611f049ab4ccee35d81f6f88526dd1b198357c0f24e2e0dfba9b0f4b988",
-  "operation_map_sha256": "903b8414119ea7ba1611d6754b92cc0178fc9076e5b3431c02ff5fabb5ae3ecc",
+  "operation_map_sha256": "0ee64917313b1969f2da1ed10311a86b2a6eebfa70d3e6e688fc1392e3555804",
   "changes": {
     "conformance/typescript/src/contract.ts": {
       "before_sha256": "cdedfc659cd0107211da63559121e9381e329285cfea6a8dac94a8518ec3beaa",
@@ -206,21 +206,21 @@
     },
     "docs/V963_SNAP_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "e56c8ecf3b4a3acf1e8bead84dd240d26bc9000af19f730afb4f5060e622fdad",
+      "after_sha256": "ee33ec88f26043032e0115428fd1c60ecf65055282f0fd1cf044e008dce56d81",
       "owners": {
         "@document": {
           "before": null,
-          "after": "e56c8ecf3b4a3acf1e8bead84dd240d26bc9000af19f730afb4f5060e622fdad"
+          "after": "ee33ec88f26043032e0115428fd1c60ecf65055282f0fd1cf044e008dce56d81"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "1821ef48f87dd596909b3553f231ed3f887d614c3fdbb96f310115b4ee06b99a",
-      "after_sha256": "48a3a6a651206897f9274f401ddea566827fcb6e62bfb3771684e5940d4b3d4d",
+      "after_sha256": "6a8135274fc34672bc61f6b40065cc5f419b57be203f4533913984b501d55577",
       "owners": {
         "@document": {
           "before": "1821ef48f87dd596909b3553f231ed3f887d614c3fdbb96f310115b4ee06b99a",
-          "after": "48a3a6a651206897f9274f401ddea566827fcb6e62bfb3771684e5940d4b3d4d"
+          "after": "6a8135274fc34672bc61f6b40065cc5f419b57be203f4533913984b501d55577"
         }
       }
     },
@@ -407,6 +407,16 @@
         "test_v963_out_of_phase_snap_has_no_lethal_choice_and_replays": {
           "before": null,
           "after": "7a1d7b3ea2ae56e84c0623969cb7e802f67530ee5cc5628e7d558446cd36dbe9"
+        }
+      }
+    },
+    "tests/unit/test_phase13b_shooting_declarations.py": {
+      "before_sha256": "2e42180c0ef129b19fd0fd95a995e5cce04ab45ab601e882d397375031bde8dc",
+      "after_sha256": "b3d88280274432f740c2c920976d2f4f225f0b6e670252da37e0ce57b2c0ba3c",
+      "owners": {
+        "test_phase18b_command_reroll_window_opens_after_shooting_damage_roll": {
+          "before": "aa566dacf8d2a725aef6ddf037880801bf2427ca8926a23419d09160b5f13753",
+          "after": "d767e8e90ad6e38b5310980ffaa44b4e9b190887552ba3be78f837329d798488"
         }
       }
     },
@@ -809,6 +819,16 @@
       "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
     },
     "tests/unit/test_lethal_hits.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "v963-snap-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
+      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
+      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+    },
+    "tests/unit/test_phase13b_shooting_declarations.py": {
       "category": "rule_semantics",
       "operations": [
         "v963-snap-regressions"
