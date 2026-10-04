@@ -3735,6 +3735,17 @@
       "sensitive": false,
       "mandatory": false
     },
+    "order121-generated-semantic-evidence": {
+      "paths": [
+        "data/generated/ability_coverage/cross_source_semantic_equivalence.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
     "order121-command-abilities-timing": {
       "paths": [
         "src/warhammer40k_core/adapters/external_contract.py",
