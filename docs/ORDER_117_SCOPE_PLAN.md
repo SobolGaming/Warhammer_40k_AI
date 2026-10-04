@@ -36,9 +36,13 @@ produce identical native prevention dice in the retained real-owner diagnostic.
 The corrected offset also fixes older externally appended neutral packet-start
 records; previous broken-manager dice values are not retained as correctness oracles.
 The complete audit history changes absolute event references carried by later
-decisions. Two deterministic fixture game IDs are reseeded to reach their existing
-failed Battle-shock and positive source-mortal branches; their gameplay assertions
-remain unchanged. Bounded legal seed probes are retained with the delivery receipts.
+decisions. Deterministic fixtures use bounded legal GameConfig seed choices to
+retain their existing failed Battle-shock, source-mortal, required sequencing,
+returned-destroyed-unit, reroll, own-Hazardous and nested-death branches. Every
+original behavioral assertion and required branch remains unchanged. Complete
+failed-cohort receipts and read-only seed probes are retained for review; no dice,
+history, handler or authoritative domain object is substituted. These test-only
+repairs follow the independently verified shared neutral-history correction.
 
 Canonical facade tests arm a real source-backed permission and prove prevention,
 recipient priority, optional choice, rejected retry, lethal continuation, JSON

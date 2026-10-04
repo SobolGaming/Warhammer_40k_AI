@@ -1549,7 +1549,7 @@ def test_selected_target_rerolled_battle_shock_waits_for_delirium_outcome_via_fa
 
 
 def test_selected_target_later_battle_shock_reroll_retains_parent_via_facade() -> None:
-    game_id = "phase17g-selected-target-later-battle-shock-reroll"
+    game_id = "order117-later-reroll-continuation-0"
     selected_target_record = _selected_target_two_battle_shocks_then_modifier_record()
 
     def reroll_permission(
@@ -2501,7 +2501,11 @@ def _record_real_harbingers_selection(
 
 
 def _assert_selected_target_delirium_continuation(*, reroll: bool) -> None:
-    game_id = "order99-delirium-reroll-1" if reroll else "order65-complete-boundary-direct-0"
+    game_id = (
+        "order117-delirium-reroll-continuation-1"
+        if reroll
+        else "order65-complete-boundary-direct-0"
+    )
     selected_target_record = _selected_target_battle_shock_then_modifier_record()
     extra_contributions: tuple[RuntimeContentContribution, ...] = ()
     if reroll:

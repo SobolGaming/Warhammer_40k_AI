@@ -135,9 +135,9 @@ def test_order_30_retained_shooter_keeps_range_restriction_and_ability_geometry(
 def test_order_30_for_the_chapter_shoots_after_own_hazardous_death(with_feel_no_pain: bool) -> None:
     lifecycle, units = _compact_shooting_lifecycle(
         catalog=for_the_chapter_catalog(hazardous=True),
-        # Order104's complete range/visibility evidence changes recorded RNG history.
+        # Order117 synchronizes live neutral-audit offsets in recorded RNG history.
         # Keep real own-Hazardous destruction, including the optional FNP branch.
-        game_id="order104-own-hazardous-04-1"
+        game_id="order117-own-hazard-continuation-4"
         if with_feel_no_pain
         else "order104-own-hazardous-00-0",
         enemy_model_count=5,

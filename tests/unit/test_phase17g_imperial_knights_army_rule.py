@@ -599,8 +599,9 @@ def test_code_chivalric_reclaim_honours_army_at_opponent_turn_end() -> None:
 def test_code_chivalric_tally_uses_updated_threshold_and_returned_destroyed_units(
     sequenced: bool,
 ) -> None:
-    config = phase11c_config()
-    state = battle_state()
+    game_id = "order117-knights-continuation-0"
+    config = phase11c_config(game_id=game_id)
+    state = battle_state(game_id=game_id)
     _mark_player_as_imperial_knights(state, player_id="player-a")
     _record_oath(
         state,

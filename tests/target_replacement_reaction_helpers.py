@@ -147,7 +147,7 @@ def fidelity_replacement_catalog(
 
 
 def fidelity_retained_replacement_scene(
-    *, game_id: str = "order93-retarget-retention-2"
+    *, game_id: str = "order117-retarget-continuation-13"
 ) -> tuple[GameLifecycle, dict[str, UnitInstance], DecisionRequest]:
     """Fight-phase Unending Fidelity shooting, paused before target revalidation."""
     from tests.phase15c_fight_order_helpers import fight_lifecycle
@@ -158,8 +158,8 @@ def fidelity_retained_replacement_scene(
     catalog, rifle, second = fidelity_replacement_catalog()
     lifecycle, units = fight_lifecycle(
         catalog=catalog,
-        # Contract 41 authenticates new SaveOption evidence in retention hashes;
-        # this fixture ID preserves both required nested casualty branches.
+        # Order117 synchronizes externally appended neutral audit offsets;
+        # this legal fixture ID preserves both required nested casualty branches.
         game_id=game_id,
         alpha_unit_ids=("old", "new", "unchanged"),
         enemy_unit_ids=("source",),
