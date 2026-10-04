@@ -58,7 +58,10 @@ unexpired effects retain their existing owners; no movement history is synthesiz
 Appended regressions in `tests/unit/test_order80_normal_move.py` cover finite and
 parameterized witnessed prior moves,ordinary and attached rules units,accepted
 reserve removal,decline,stale permission before queue pop,checkpoint continuation
-and exact replay, both viewer projections and actual Movement-end permission expiry. Original gameplay assertions and branches are preserved. The exact original movement test Git blob is retained in a bounded Order119 historical-input mapping for the immutable Order97 inventory.
+and exact replay, both viewer projections and actual Movement-end permission
+expiry. Original gameplay assertions and branches are preserved. The exact
+original movement test Git blob is retained in a bounded Order119 historical-input
+mapping for the immutable Order97 inventory.
 
 Final covered behavior,complete quality,types,lint,contracts,shards,package checks,
 serial current-runtime smoke,two distinct exact-head reviews,full hosted CI and

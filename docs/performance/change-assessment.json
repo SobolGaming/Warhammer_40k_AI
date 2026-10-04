@@ -4,6 +4,136 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:076c31c4709ef3ee60c7c234e40c0c75070772d5d6312cba2f8a44378a21a088",
   "operation_map_sha256": "b0ae0ca742744cd2941fe3c5ad9f0a2a9e1fbd35e901c7e6756ed4718f298a31",
   "changes": {
+    "ci/test_shards/durations.json": {
+      "before_sha256": "19460acf43988ab413836b51bde7fd25920bf0d9dfe81dc02f469854c38e319b",
+      "after_sha256": "bcc4370ed97905ab9c92f2e2187e304a6c5ec47705d6af535caf496dc4abcbbf",
+      "owners": {
+        "@document": {
+          "before": "19460acf43988ab413836b51bde7fd25920bf0d9dfe81dc02f469854c38e319b",
+          "after": "bcc4370ed97905ab9c92f2e2187e304a6c5ec47705d6af535caf496dc4abcbbf"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "7ee1ecd93ab135f5cdbc9fff58e37ed299f28dee4fe4ed015ba7a02a82827f94",
+      "after_sha256": "60d9efddbe02b354d9ca9f3b39c11804ba013aa50e2720daf3cd4c270ae9e5dc",
+      "owners": {
+        "@document": {
+          "before": "7ee1ecd93ab135f5cdbc9fff58e37ed299f28dee4fe4ed015ba7a02a82827f94",
+          "after": "60d9efddbe02b354d9ca9f3b39c11804ba013aa50e2720daf3cd4c270ae9e5dc"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "80b6a15141631315a58c46861168631b1247cba63a949d11a6510a525a6adc5f",
+      "after_sha256": "5bbdeac88daf3fa0d9958814a29c490a76c2b485a0c7b76d10e6e012578d2543",
+      "owners": {
+        "@document": {
+          "before": "80b6a15141631315a58c46861168631b1247cba63a949d11a6510a525a6adc5f",
+          "after": "5bbdeac88daf3fa0d9958814a29c490a76c2b485a0c7b76d10e6e012578d2543"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "1b25637c6019d7a443b19809ee78b753e39f124f254ec45e9b3b538251d982e5",
+      "after_sha256": "1b32d3b82106d35fb8da552a9e87a67d29619001af819b9ab8dc55324b3d1526",
+      "owners": {
+        "@document": {
+          "before": "1b25637c6019d7a443b19809ee78b753e39f124f254ec45e9b3b538251d982e5",
+          "after": "1b32d3b82106d35fb8da552a9e87a67d29619001af819b9ab8dc55324b3d1526"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "ad6801001050fc745fed6c58bd20b86dc60a89a97fd5c4f8c583e5cbea7b4a72",
+      "after_sha256": "b4ee415496f31b9324d181354bfdf54f3d3475296d89586574f97645ab684dd1",
+      "owners": {
+        "@document": {
+          "before": "ad6801001050fc745fed6c58bd20b86dc60a89a97fd5c4f8c583e5cbea7b4a72",
+          "after": "b4ee415496f31b9324d181354bfdf54f3d3475296d89586574f97645ab684dd1"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "f694167be7b50ee835896ce451495046c89417e637ce9f301da0616374a8bc86",
+      "after_sha256": "b331ac54c6a614526a81688dd4bf10fb0fd92ec686d28218c66083903fe0944e",
+      "owners": {
+        "@document": {
+          "before": "f694167be7b50ee835896ce451495046c89417e637ce9f301da0616374a8bc86",
+          "after": "b331ac54c6a614526a81688dd4bf10fb0fd92ec686d28218c66083903fe0944e"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "51c0012b82bf555eb4daa57a0e434050fc833a2cc31b00760bac469bf4f931ce",
+      "after_sha256": "44d9779cc3668752e522ce6e89ad7997904779249601aa07e5fca1e397da9bd5",
+      "owners": {
+        "@document": {
+          "before": "51c0012b82bf555eb4daa57a0e434050fc833a2cc31b00760bac469bf4f931ce",
+          "after": "44d9779cc3668752e522ce6e89ad7997904779249601aa07e5fca1e397da9bd5"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "601cf3c9d310060f174099d206e0e646bbde20fbc780aaa29061cce76891b3c1",
+      "after_sha256": "eb680a6c6ab6cec17b95173a67d8ed5ef178f708b83471769ed316df682cb784",
+      "owners": {
+        "@document": {
+          "before": "601cf3c9d310060f174099d206e0e646bbde20fbc780aaa29061cce76891b3c1",
+          "after": "eb680a6c6ab6cec17b95173a67d8ed5ef178f708b83471769ed316df682cb784"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "8a060740b00a34a91505894e94ed7dea1d5a406b3b015da9bf078227ccd5fb3f",
+      "after_sha256": "a0fd43eff7fcd332a8cb077e45ca03ce52a0b537e728a96cbddcea3a4bda5eef",
+      "owners": {
+        "@document": {
+          "before": "8a060740b00a34a91505894e94ed7dea1d5a406b3b015da9bf078227ccd5fb3f",
+          "after": "a0fd43eff7fcd332a8cb077e45ca03ce52a0b537e728a96cbddcea3a4bda5eef"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "5f139187dba9a1240bbb6e2876be695aefd4672a0b784ba2aeb2c4919f995427",
+      "after_sha256": "adf74e7307bd87db12f20aa51568a2feb868f1da6f5d6d4ac90aeb82ab18a424",
+      "owners": {
+        "@document": {
+          "before": "5f139187dba9a1240bbb6e2876be695aefd4672a0b784ba2aeb2c4919f995427",
+          "after": "adf74e7307bd87db12f20aa51568a2feb868f1da6f5d6d4ac90aeb82ab18a424"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "091a5ef7385fc0eb828521a102bb8659f0ebf4139590d1af311fd1af9514d0d5",
+      "after_sha256": "fd691f11e4b28f6ebf16bc9d7d869f85a9ede32062ba1b59371b5b0838f6afdb",
+      "owners": {
+        "@document": {
+          "before": "091a5ef7385fc0eb828521a102bb8659f0ebf4139590d1af311fd1af9514d0d5",
+          "after": "fd691f11e4b28f6ebf16bc9d7d869f85a9ede32062ba1b59371b5b0838f6afdb"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "71906ed8e10ab793f33110b1bbb49a921f9b01d2b3cb3014a4c75c4c28e21afd",
+      "after_sha256": "8a8a91565dd498e330781dadd656277cfaffe1662139f56cd18a10c316f5eb3c",
+      "owners": {
+        "@document": {
+          "before": "71906ed8e10ab793f33110b1bbb49a921f9b01d2b3cb3014a4c75c4c28e21afd",
+          "after": "8a8a91565dd498e330781dadd656277cfaffe1662139f56cd18a10c316f5eb3c"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "9cb06d4743d642610ade00f771a27beac9fd5c02e3574084df03cd278669d0db",
+      "after_sha256": "12c0dbae7302ab93f4fec1e00f2e3339071272c7e084a49e906f466fcebd56d2",
+      "owners": {
+        "@document": {
+          "before": "9cb06d4743d642610ade00f771a27beac9fd5c02e3574084df03cd278669d0db",
+          "after": "12c0dbae7302ab93f4fec1e00f2e3339071272c7e084a49e906f466fcebd56d2"
+        }
+      }
+    },
     "contracts/examples/decisions/family-coverage.json": {
       "before_sha256": "850642fd644e66627ccf8a35573012ec87fec0b28a2a1c509e2953905b1fc87c",
       "after_sha256": "419be9dbfe9035a6365f135be88d34dd82771d0d7d96f3ee09c67a708ce41107",
@@ -146,21 +276,21 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "668ce9c9026b1d42c4435a299d444ed42c85f261f64007d7b6c538436894230d",
-      "after_sha256": "09d05b688b8aeee55fba6c3d4a8c5d8f00fff574a04e05d26db9b2758b527013",
+      "after_sha256": "ef3cba6d1481174829c578f66cd7a8cb9b7203152be4682583f6cb5837b922c6",
       "owners": {
         "@document": {
           "before": "668ce9c9026b1d42c4435a299d444ed42c85f261f64007d7b6c538436894230d",
-          "after": "09d05b688b8aeee55fba6c3d4a8c5d8f00fff574a04e05d26db9b2758b527013"
+          "after": "ef3cba6d1481174829c578f66cd7a8cb9b7203152be4682583f6cb5837b922c6"
         }
       }
     },
     "docs/ORDER_119_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "2f1c013bd13bd8b545b8146de6ff97a4554c7d0252d65be495b54fd07c7b5285",
+      "after_sha256": "8d76224bd8be8b3afb6c8e740f82b073cbf6909d5bfef28942b3bf9fcf792cb4",
       "owners": {
         "@document": {
           "before": null,
-          "after": "2f1c013bd13bd8b545b8146de6ff97a4554c7d0252d65be495b54fd07c7b5285"
+          "after": "8d76224bd8be8b3afb6c8e740f82b073cbf6909d5bfef28942b3bf9fcf792cb4"
         }
       }
     },
@@ -414,6 +544,136 @@
     }
   },
   "rows": {
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
+      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
+      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
+      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
+      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
+      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
+      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
+      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
+      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
+      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
+      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
+      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
+      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
+      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+    },
     "contracts/examples/decisions/family-coverage.json": {
       "category": "rule_semantics",
       "operations": [
