@@ -1,1016 +1,624 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "4b59ded9d7dfd1af4170adaa50462bcf6cf32c0d",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:cfcb331fb3801ae0ba15c21a669165d86b8f283ac9a2ed5d6fb90d46aeaa5fa8",
-  "operation_map_sha256": "5ffe8e845302a4878dd6c98741ca7a5ecb69a8a39b9eb7a210f05e067274e310",
+  "base": "ae452b60dd37b2ee262eb5e830ecf6405cf80516",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7040c8da5dd46340ff71634e74aae0a50504b7378bfe4b935fdf546ddc39cefb",
+  "operation_map_sha256": "390030ebd1cd90ec81aaa2eec9b89932238e823f8176e062f75b953575843490",
   "changes": {
-    "README.md": {
-      "before_sha256": "13f8f69455fc83fad672886c0368bd1003759c285cd46c98a3c6366119b2311c",
-      "after_sha256": "ef179dd6f1712ad1a8a4179f18b20a7dea75c6095c8227936168daf3f645a9b8",
-      "owners": {
-        "@document": {
-          "before": "13f8f69455fc83fad672886c0368bd1003759c285cd46c98a3c6366119b2311c",
-          "after": "ef179dd6f1712ad1a8a4179f18b20a7dea75c6095c8227936168daf3f645a9b8"
-        }
-      }
-    },
-    "ci/test_shards/durations.json": {
-      "before_sha256": "927a3e432c23a606c8fc8a5cdb54fc4d2a856712a0964e2875b173b134e846e9",
-      "after_sha256": "19460acf43988ab413836b51bde7fd25920bf0d9dfe81dc02f469854c38e319b",
-      "owners": {
-        "@document": {
-          "before": "927a3e432c23a606c8fc8a5cdb54fc4d2a856712a0964e2875b173b134e846e9",
-          "after": "19460acf43988ab413836b51bde7fd25920bf0d9dfe81dc02f469854c38e319b"
-        }
-      }
-    },
-    "ci/test_shards/shard-1.txt": {
-      "before_sha256": "b0065f664db758e46a084c6ec1d57c31fa5c9cd8785646e71d10bac4182eec60",
-      "after_sha256": "7ee1ecd93ab135f5cdbc9fff58e37ed299f28dee4fe4ed015ba7a02a82827f94",
-      "owners": {
-        "@document": {
-          "before": "b0065f664db758e46a084c6ec1d57c31fa5c9cd8785646e71d10bac4182eec60",
-          "after": "7ee1ecd93ab135f5cdbc9fff58e37ed299f28dee4fe4ed015ba7a02a82827f94"
-        }
-      }
-    },
-    "ci/test_shards/shard-10.txt": {
-      "before_sha256": "90a86283e9bbe44b2ec1c2714d00148757f45cded831cf0b764c26c474d2d8fe",
-      "after_sha256": "80b6a15141631315a58c46861168631b1247cba63a949d11a6510a525a6adc5f",
-      "owners": {
-        "@document": {
-          "before": "90a86283e9bbe44b2ec1c2714d00148757f45cded831cf0b764c26c474d2d8fe",
-          "after": "80b6a15141631315a58c46861168631b1247cba63a949d11a6510a525a6adc5f"
-        }
-      }
-    },
-    "ci/test_shards/shard-11.txt": {
-      "before_sha256": "0e6662d5e643c0cee84a599c4acaef6a5f8f15e9e5e77d85c7c162bdc0f25356",
-      "after_sha256": "1b25637c6019d7a443b19809ee78b753e39f124f254ec45e9b3b538251d982e5",
-      "owners": {
-        "@document": {
-          "before": "0e6662d5e643c0cee84a599c4acaef6a5f8f15e9e5e77d85c7c162bdc0f25356",
-          "after": "1b25637c6019d7a443b19809ee78b753e39f124f254ec45e9b3b538251d982e5"
-        }
-      }
-    },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "a38a604151adeb776b8b914e874b3601d45a3f1148b04534d7d0d8e0996101b5",
-      "after_sha256": "ad6801001050fc745fed6c58bd20b86dc60a89a97fd5c4f8c583e5cbea7b4a72",
-      "owners": {
-        "@document": {
-          "before": "a38a604151adeb776b8b914e874b3601d45a3f1148b04534d7d0d8e0996101b5",
-          "after": "ad6801001050fc745fed6c58bd20b86dc60a89a97fd5c4f8c583e5cbea7b4a72"
-        }
-      }
-    },
-    "ci/test_shards/shard-2.txt": {
-      "before_sha256": "953f2926e3c26e0194cde1627c200ed188b7bfd5e1c84db5bc6ef16aafe640fc",
-      "after_sha256": "f694167be7b50ee835896ce451495046c89417e637ce9f301da0616374a8bc86",
-      "owners": {
-        "@document": {
-          "before": "953f2926e3c26e0194cde1627c200ed188b7bfd5e1c84db5bc6ef16aafe640fc",
-          "after": "f694167be7b50ee835896ce451495046c89417e637ce9f301da0616374a8bc86"
-        }
-      }
-    },
-    "ci/test_shards/shard-3.txt": {
-      "before_sha256": "c8ce99c41b19ea9e997359c028e890732c2679e4a5024adb783ef8671d538a51",
-      "after_sha256": "51c0012b82bf555eb4daa57a0e434050fc833a2cc31b00760bac469bf4f931ce",
-      "owners": {
-        "@document": {
-          "before": "c8ce99c41b19ea9e997359c028e890732c2679e4a5024adb783ef8671d538a51",
-          "after": "51c0012b82bf555eb4daa57a0e434050fc833a2cc31b00760bac469bf4f931ce"
-        }
-      }
-    },
-    "ci/test_shards/shard-4.txt": {
-      "before_sha256": "403c81724f5a0bc83d73c370c2ed14d2a490adc21035e8ac36d6dfa1194eb3b3",
-      "after_sha256": "601cf3c9d310060f174099d206e0e646bbde20fbc780aaa29061cce76891b3c1",
-      "owners": {
-        "@document": {
-          "before": "403c81724f5a0bc83d73c370c2ed14d2a490adc21035e8ac36d6dfa1194eb3b3",
-          "after": "601cf3c9d310060f174099d206e0e646bbde20fbc780aaa29061cce76891b3c1"
-        }
-      }
-    },
-    "ci/test_shards/shard-5.txt": {
-      "before_sha256": "a35e995b683a081c261c6605a850592b373e78d2a73d54f04a994622d953a52c",
-      "after_sha256": "8a060740b00a34a91505894e94ed7dea1d5a406b3b015da9bf078227ccd5fb3f",
-      "owners": {
-        "@document": {
-          "before": "a35e995b683a081c261c6605a850592b373e78d2a73d54f04a994622d953a52c",
-          "after": "8a060740b00a34a91505894e94ed7dea1d5a406b3b015da9bf078227ccd5fb3f"
-        }
-      }
-    },
-    "ci/test_shards/shard-6.txt": {
-      "before_sha256": "d2de48f636f2313b5973884d788a9917f75721bdd31f10de63fb77e96fd5e402",
-      "after_sha256": "5f139187dba9a1240bbb6e2876be695aefd4672a0b784ba2aeb2c4919f995427",
-      "owners": {
-        "@document": {
-          "before": "d2de48f636f2313b5973884d788a9917f75721bdd31f10de63fb77e96fd5e402",
-          "after": "5f139187dba9a1240bbb6e2876be695aefd4672a0b784ba2aeb2c4919f995427"
-        }
-      }
-    },
-    "ci/test_shards/shard-7.txt": {
-      "before_sha256": "0ff82cdcd4d814556e15784d27e4a61f9a54a35bebac0f77fcc324bf02de4a41",
-      "after_sha256": "091a5ef7385fc0eb828521a102bb8659f0ebf4139590d1af311fd1af9514d0d5",
-      "owners": {
-        "@document": {
-          "before": "0ff82cdcd4d814556e15784d27e4a61f9a54a35bebac0f77fcc324bf02de4a41",
-          "after": "091a5ef7385fc0eb828521a102bb8659f0ebf4139590d1af311fd1af9514d0d5"
-        }
-      }
-    },
-    "ci/test_shards/shard-8.txt": {
-      "before_sha256": "ca1ae5415112fd247c073fc7b6c1f30804f9d32ef22cf649bfc7a0f8d112d455",
-      "after_sha256": "71906ed8e10ab793f33110b1bbb49a921f9b01d2b3cb3014a4c75c4c28e21afd",
-      "owners": {
-        "@document": {
-          "before": "ca1ae5415112fd247c073fc7b6c1f30804f9d32ef22cf649bfc7a0f8d112d455",
-          "after": "71906ed8e10ab793f33110b1bbb49a921f9b01d2b3cb3014a4c75c4c28e21afd"
-        }
-      }
-    },
-    "ci/test_shards/shard-9.txt": {
-      "before_sha256": "1a6cb35ae8e7ebf6d517977ca48d31c19da1205e95520fe30f37b1e81b13c1b6",
-      "after_sha256": "9cb06d4743d642610ade00f771a27beac9fd5c02e3574084df03cd278669d0db",
-      "owners": {
-        "@document": {
-          "before": "1a6cb35ae8e7ebf6d517977ca48d31c19da1205e95520fe30f37b1e81b13c1b6",
-          "after": "9cb06d4743d642610ade00f771a27beac9fd5c02e3574084df03cd278669d0db"
-        }
-      }
-    },
     "conformance/typescript/src/contract.ts": {
-      "before_sha256": "0605bbe3da1b307be3178970b1af63b3ab94aceac1f25157f99e03ab5ba460ca",
-      "after_sha256": "f64e12c869a0730e70a9f074ab42adfe8ff2ee4431232c6f56ee29d5c1b510c1",
+      "before_sha256": "f64e12c869a0730e70a9f074ab42adfe8ff2ee4431232c6f56ee29d5c1b510c1",
+      "after_sha256": "294172c51fd9a50dd385a9828ab12f354e264d9982fff71a5830b7d229d60963",
       "owners": {
         "@document": {
-          "before": "0605bbe3da1b307be3178970b1af63b3ab94aceac1f25157f99e03ab5ba460ca",
-          "after": "f64e12c869a0730e70a9f074ab42adfe8ff2ee4431232c6f56ee29d5c1b510c1"
+          "before": "f64e12c869a0730e70a9f074ab42adfe8ff2ee4431232c6f56ee29d5c1b510c1",
+          "after": "294172c51fd9a50dd385a9828ab12f354e264d9982fff71a5830b7d229d60963"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "7387b46926cfdaa5ca24b5fca966fb87c1c05261f8b36b47622e0a8dc7854e2c",
-      "after_sha256": "86b34f4d64cbc974931abe1bd6c7c2d8a412e5f308b8f054075596d684230fcd",
+      "before_sha256": "86b34f4d64cbc974931abe1bd6c7c2d8a412e5f308b8f054075596d684230fcd",
+      "after_sha256": "9432a882d066f9aaadf7fefed6e9e6f239580ddaeb277bc3203b8d9121d7c846",
       "owners": {
         "@document": {
-          "before": "7387b46926cfdaa5ca24b5fca966fb87c1c05261f8b36b47622e0a8dc7854e2c",
-          "after": "86b34f4d64cbc974931abe1bd6c7c2d8a412e5f308b8f054075596d684230fcd"
+          "before": "86b34f4d64cbc974931abe1bd6c7c2d8a412e5f308b8f054075596d684230fcd",
+          "after": "9432a882d066f9aaadf7fefed6e9e6f239580ddaeb277bc3203b8d9121d7c846"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "46e8d82cdff82043460ac7c70b3b57e4c27831698a2fce9f06896d135b749c4b",
-      "after_sha256": "a33bf3be26c5633ac052f3e144909720481e8b4e071cad09eb988b881b8efc8e",
+      "before_sha256": "a33bf3be26c5633ac052f3e144909720481e8b4e071cad09eb988b881b8efc8e",
+      "after_sha256": "a1fb757763f4236186ba638e2de6cbc06b6a167e5293e82463eded2c6dcb2bd6",
       "owners": {
         "@document": {
-          "before": "46e8d82cdff82043460ac7c70b3b57e4c27831698a2fce9f06896d135b749c4b",
-          "after": "a33bf3be26c5633ac052f3e144909720481e8b4e071cad09eb988b881b8efc8e"
+          "before": "a33bf3be26c5633ac052f3e144909720481e8b4e071cad09eb988b881b8efc8e",
+          "after": "a1fb757763f4236186ba638e2de6cbc06b6a167e5293e82463eded2c6dcb2bd6"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "7ac3dcd18ea0a04d1034e0bea24aca69f88e28dc6c1acc5f1ceb8b9ffba2ee8c",
-      "after_sha256": "7a7bf7f36781f02c2d0820949aa92b4995828fa41a35c9c54c73533f70297e42",
+      "before_sha256": "7a7bf7f36781f02c2d0820949aa92b4995828fa41a35c9c54c73533f70297e42",
+      "after_sha256": "d27467a10696d70258a98f5999a52e4c665acf4503b2ae66def5da01012b87dd",
       "owners": {
         "@document": {
-          "before": "7ac3dcd18ea0a04d1034e0bea24aca69f88e28dc6c1acc5f1ceb8b9ffba2ee8c",
-          "after": "7a7bf7f36781f02c2d0820949aa92b4995828fa41a35c9c54c73533f70297e42"
+          "before": "7a7bf7f36781f02c2d0820949aa92b4995828fa41a35c9c54c73533f70297e42",
+          "after": "d27467a10696d70258a98f5999a52e4c665acf4503b2ae66def5da01012b87dd"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "e022a9fb736c731d68cfee4390127b6b5415199c45ce04d02079da022564b3f7",
-      "after_sha256": "e1d82b40ca7322f2cb71236e7fdb18daebc75d9d79d7c9aafc54ead26e2d02ce",
+      "before_sha256": "e1d82b40ca7322f2cb71236e7fdb18daebc75d9d79d7c9aafc54ead26e2d02ce",
+      "after_sha256": "51fa89794a61e40c01281fd330ead2acb3522eddfa4f12d9159c7702f4e786a5",
       "owners": {
         "@document": {
-          "before": "e022a9fb736c731d68cfee4390127b6b5415199c45ce04d02079da022564b3f7",
-          "after": "e1d82b40ca7322f2cb71236e7fdb18daebc75d9d79d7c9aafc54ead26e2d02ce"
+          "before": "e1d82b40ca7322f2cb71236e7fdb18daebc75d9d79d7c9aafc54ead26e2d02ce",
+          "after": "51fa89794a61e40c01281fd330ead2acb3522eddfa4f12d9159c7702f4e786a5"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "6716c7b418d09edcc9eba9e8b9dad168d14ab5bdcceb24919aa5a541a61f9aee",
-      "after_sha256": "9f26478f04e5447460341f9a94741ae7a98eeabd12f897e0d5e94aceec0494eb",
+      "before_sha256": "9f26478f04e5447460341f9a94741ae7a98eeabd12f897e0d5e94aceec0494eb",
+      "after_sha256": "1b61c5659472e9eb94103a5b1a04cf1e7c2d8afac863dfe79d877df256a10299",
       "owners": {
         "@document": {
-          "before": "6716c7b418d09edcc9eba9e8b9dad168d14ab5bdcceb24919aa5a541a61f9aee",
-          "after": "9f26478f04e5447460341f9a94741ae7a98eeabd12f897e0d5e94aceec0494eb"
+          "before": "9f26478f04e5447460341f9a94741ae7a98eeabd12f897e0d5e94aceec0494eb",
+          "after": "1b61c5659472e9eb94103a5b1a04cf1e7c2d8afac863dfe79d877df256a10299"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "a2c81785a9a4616eca9e9f6f2c17b313d45bb720c2b775f276d0f911964bfee9",
-      "after_sha256": "6c43adc7415f22434b6a8a0196981f2e38b4861df60a308716bb55328cd7e335",
+      "before_sha256": "6c43adc7415f22434b6a8a0196981f2e38b4861df60a308716bb55328cd7e335",
+      "after_sha256": "19058f6c0f139efd96c110d01f2c4e604f2fc8e4f364197ea3639bcabda89e09",
       "owners": {
         "@document": {
-          "before": "a2c81785a9a4616eca9e9f6f2c17b313d45bb720c2b775f276d0f911964bfee9",
-          "after": "6c43adc7415f22434b6a8a0196981f2e38b4861df60a308716bb55328cd7e335"
+          "before": "6c43adc7415f22434b6a8a0196981f2e38b4861df60a308716bb55328cd7e335",
+          "after": "19058f6c0f139efd96c110d01f2c4e604f2fc8e4f364197ea3639bcabda89e09"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "f59abbbad5f65e784f9f75d41376709d7ed47623192b9b6d3e7980becac8135a",
-      "after_sha256": "43c7a1dad6a25c8ab6f3135f54eded39cd4ac0c2a824d7542c528135ac5316a0",
+      "before_sha256": "43c7a1dad6a25c8ab6f3135f54eded39cd4ac0c2a824d7542c528135ac5316a0",
+      "after_sha256": "90e6ea49c1c373de4a358785bb13d52bdf68b2480ea9f5fa890c675b30a4e977",
       "owners": {
         "@document": {
-          "before": "f59abbbad5f65e784f9f75d41376709d7ed47623192b9b6d3e7980becac8135a",
-          "after": "43c7a1dad6a25c8ab6f3135f54eded39cd4ac0c2a824d7542c528135ac5316a0"
+          "before": "43c7a1dad6a25c8ab6f3135f54eded39cd4ac0c2a824d7542c528135ac5316a0",
+          "after": "90e6ea49c1c373de4a358785bb13d52bdf68b2480ea9f5fa890c675b30a4e977"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "4ae19a63c4755513a4dbe2fbbd57e6585ee5d0975c4cfe2cb3e8427929d97074",
-      "after_sha256": "e79c9baafccfc0e22e2fe2d37e6f946db19efe0d227718a73fd1255cb6864ac1",
+      "before_sha256": "e79c9baafccfc0e22e2fe2d37e6f946db19efe0d227718a73fd1255cb6864ac1",
+      "after_sha256": "6288ad824a26c15ea4c5faf3445bcdd2b09d7338f55e60416f22cd9f7bf1dd4d",
       "owners": {
         "@document": {
-          "before": "4ae19a63c4755513a4dbe2fbbd57e6585ee5d0975c4cfe2cb3e8427929d97074",
-          "after": "e79c9baafccfc0e22e2fe2d37e6f946db19efe0d227718a73fd1255cb6864ac1"
+          "before": "e79c9baafccfc0e22e2fe2d37e6f946db19efe0d227718a73fd1255cb6864ac1",
+          "after": "6288ad824a26c15ea4c5faf3445bcdd2b09d7338f55e60416f22cd9f7bf1dd4d"
         }
       }
     },
     "contracts/openapi.yaml": {
-      "before_sha256": "7d3fbb8a6385fa73f7108a79025e2c25a5a05514139075a51a99ba140fe94573",
-      "after_sha256": "c758465aeef46afa12006aa1d2ff23ebba34984adfcc85ba85a5444bbc357441",
+      "before_sha256": "c758465aeef46afa12006aa1d2ff23ebba34984adfcc85ba85a5444bbc357441",
+      "after_sha256": "86517e0160fb6dd7fa65ff36d4a0ccfc7ca67230b576be50af8ecd086a44b52f",
       "owners": {
         "@document": {
-          "before": "7d3fbb8a6385fa73f7108a79025e2c25a5a05514139075a51a99ba140fe94573",
-          "after": "c758465aeef46afa12006aa1d2ff23ebba34984adfcc85ba85a5444bbc357441"
+          "before": "c758465aeef46afa12006aa1d2ff23ebba34984adfcc85ba85a5444bbc357441",
+          "after": "86517e0160fb6dd7fa65ff36d4a0ccfc7ca67230b576be50af8ecd086a44b52f"
         }
       }
     },
-    "data/source_audits/order117/baseline/tests/target_replacement_reaction_helpers.py.txt": {
+    "data/source_audits/order118/baseline/tests/unit/test_unit_abilities.py.txt": {
       "before_sha256": null,
-      "after_sha256": "d5a36008a235ca45c2f6f7f0b5c678b2edd24c2bd4b128187683673551d3ae6b",
+      "after_sha256": "135ebd8f548ac093023d987a2d9cf12de8e9dc081f3b58c84ca8cdeb48a3123e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d5a36008a235ca45c2f6f7f0b5c678b2edd24c2bd4b128187683673551d3ae6b"
+          "after": "135ebd8f548ac093023d987a2d9cf12de8e9dc081f3b58c84ca8cdeb48a3123e"
         }
       }
     },
-    "data/source_audits/order117/baseline/tests/unit/test_phase10o_fall_back.py.txt": {
+    "data/source_audits/order118/historical-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "6e6c89c60eb243aeef416434094143ba419c77c423661cc2572b0e68fa759e34",
+      "after_sha256": "f57a5b49be9a7d17e51768636cd5a5e1d2f7138af355da274ceec625e3d6ea07",
       "owners": {
         "@document": {
           "before": null,
-          "after": "6e6c89c60eb243aeef416434094143ba419c77c423661cc2572b0e68fa759e34"
+          "after": "f57a5b49be9a7d17e51768636cd5a5e1d2f7138af355da274ceec625e3d6ea07"
         }
       }
     },
-    "data/source_audits/order117/historical-inputs.json": {
+    "data/source_audits/order118/selected-source.json": {
       "before_sha256": null,
-      "after_sha256": "5e95332bb27eb2ce984013ac4c796da5ac91413dc7fe6f9d94975c75db5225fc",
+      "after_sha256": "c1e538ad4a95b2c1abfb486c546dac3772856351118f94b560f9216f83340f72",
       "owners": {
         "@document": {
           "before": null,
-          "after": "5e95332bb27eb2ce984013ac4c796da5ac91413dc7fe6f9d94975c75db5225fc"
-        }
-      }
-    },
-    "data/source_audits/order117/source.audit.json": {
-      "before_sha256": null,
-      "after_sha256": "439ece07670dafad58b15da513b45c4ec2e4178d09c1718056f12c513e18cdaa",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "439ece07670dafad58b15da513b45c4ec2e4178d09c1718056f12c513e18cdaa"
+          "after": "c1e538ad4a95b2c1abfb486c546dac3772856351118f94b560f9216f83340f72"
         }
       }
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "e8529e4bba03057d1b9a346b781216d1700ceac4d401f6bfa8e9a64afc334abe",
-      "after_sha256": "6b62970ba49c04d3cccc41ad13b5b35a7539aada2416d17db143fe0010e45976",
+      "before_sha256": "6b62970ba49c04d3cccc41ad13b5b35a7539aada2416d17db143fe0010e45976",
+      "after_sha256": "67ac1c149fff5b61ed81619cf4ba00c8f5b40da9d7892b5b180893133cc2c801",
       "owners": {
         "@document": {
-          "before": "e8529e4bba03057d1b9a346b781216d1700ceac4d401f6bfa8e9a64afc334abe",
-          "after": "6b62970ba49c04d3cccc41ad13b5b35a7539aada2416d17db143fe0010e45976"
+          "before": "6b62970ba49c04d3cccc41ad13b5b35a7539aada2416d17db143fe0010e45976",
+          "after": "67ac1c149fff5b61ed81619cf4ba00c8f5b40da9d7892b5b180893133cc2c801"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "d2e35ba5e3040fa2ab1c7be68b8533ee8766fc4d37acf03fcec2cb07d11ed7d8",
-      "after_sha256": "7edcf117231ee74328fd02f410a084c62a9617d5a9de0a69183367caafe7453e",
+      "before_sha256": "7edcf117231ee74328fd02f410a084c62a9617d5a9de0a69183367caafe7453e",
+      "after_sha256": "668ce9c9026b1d42c4435a299d444ed42c85f261f64007d7b6c538436894230d",
       "owners": {
         "@document": {
-          "before": "d2e35ba5e3040fa2ab1c7be68b8533ee8766fc4d37acf03fcec2cb07d11ed7d8",
-          "after": "7edcf117231ee74328fd02f410a084c62a9617d5a9de0a69183367caafe7453e"
+          "before": "7edcf117231ee74328fd02f410a084c62a9617d5a9de0a69183367caafe7453e",
+          "after": "668ce9c9026b1d42c4435a299d444ed42c85f261f64007d7b6c538436894230d"
         }
       }
     },
-    "docs/ORDER_117_SCOPE_PLAN.md": {
+    "docs/ORDER_118_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "9013768ac925a15093200a0a870c3d0e3f9a7fd48bb3ea4142b6afc8840ab10e",
+      "after_sha256": "06242cced5dc105527def7a16b94f3abc775da89609c7cacebab7cb359e13816",
       "owners": {
         "@document": {
           "before": null,
-          "after": "9013768ac925a15093200a0a870c3d0e3f9a7fd48bb3ea4142b6afc8840ab10e"
+          "after": "06242cced5dc105527def7a16b94f3abc775da89609c7cacebab7cb359e13816"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "c9cd5a6ba23a6d6e3c06b2802da6dea31b8c65b8a5af067d8e079751be5239ec",
-      "after_sha256": "8f1b4c0538eea261858ce887c8c4803252e2a1381bceab0f5c429299cc99634a",
+      "before_sha256": "8f1b4c0538eea261858ce887c8c4803252e2a1381bceab0f5c429299cc99634a",
+      "after_sha256": "eb94ab1cb4225a8fa6b82eb4577af326e424508ba1fb49ac2d06b8a9061f685f",
       "owners": {
         "@document": {
-          "before": "c9cd5a6ba23a6d6e3c06b2802da6dea31b8c65b8a5af067d8e079751be5239ec",
-          "after": "8f1b4c0538eea261858ce887c8c4803252e2a1381bceab0f5c429299cc99634a"
+          "before": "8f1b4c0538eea261858ce887c8c4803252e2a1381bceab0f5c429299cc99634a",
+          "after": "eb94ab1cb4225a8fa6b82eb4577af326e424508ba1fb49ac2d06b8a9061f685f"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "2fbdf741cebe1b71fa1d64ef73b0bf564add9ac4e115866ea3b430092ec6b605",
-      "after_sha256": "24c6bffe147b1685d137e511df468cc7aa8d1dcf79fe4fb622c3dd05d8e11b6e",
+      "before_sha256": "24c6bffe147b1685d137e511df468cc7aa8d1dcf79fe4fb622c3dd05d8e11b6e",
+      "after_sha256": "2d414523c6d29b6378a1564031ee115f62bbbb178bc39e8d2439e65ca4dbdaaf",
       "owners": {
         "@document": {
-          "before": "2fbdf741cebe1b71fa1d64ef73b0bf564add9ac4e115866ea3b430092ec6b605",
-          "after": "24c6bffe147b1685d137e511df468cc7aa8d1dcf79fe4fb622c3dd05d8e11b6e"
+          "before": "24c6bffe147b1685d137e511df468cc7aa8d1dcf79fe4fb622c3dd05d8e11b6e",
+          "after": "2d414523c6d29b6378a1564031ee115f62bbbb178bc39e8d2439e65ca4dbdaaf"
         }
       }
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
-      "before_sha256": "3af3b8da852166d13206259560990200089ffb3f3b2db20f3fbb6bedfc012822",
-      "after_sha256": "a88fb0e45668c30847cfe88c17c95f099e956e7b73addcf2d903293b88442380",
+      "before_sha256": "a88fb0e45668c30847cfe88c17c95f099e956e7b73addcf2d903293b88442380",
+      "after_sha256": "b03a0061c0faf80848fb64766d59ad23631696ce524259793a7fc7ebae584ade",
       "owners": {
         "@module": {
-          "before": "b6addeb2435d0f9d61560f6a29257131d52e9b85952198456969ac49e14d7dbd",
-          "after": "91b8be17c5af887717bdaef806b5c89dc26fde1d50768ea4a7017b74b1983039"
+          "before": "91b8be17c5af887717bdaef806b5c89dc26fde1d50768ea4a7017b74b1983039",
+          "after": "9d19d71552d080fcaf156eb204206e9bf69a7624433623ab1fd8e68af21de561"
         }
       }
     },
     "src/warhammer40k_core/adapters/redaction.py": {
-      "before_sha256": "82ba30c1235f5a229fd54c1b87cc26d24a61f9b9ab2a3f56c7839b9776a9c9cf",
-      "after_sha256": "88d281635457abd9d142baec1bff864a967519ce50b4de2272977fd901fc3768",
+      "before_sha256": "88d281635457abd9d142baec1bff864a967519ce50b4de2272977fd901fc3768",
+      "after_sha256": "ac51ec12c5cb289d89b67c9d2b9f603e07479fa933b8b4e4df48dc6799abcab3",
+      "owners": {
+        "_event_record_hidden_from_context": {
+          "before": "ce016bd62b4d9372e811621def74a43b166811bea9e2bd2cd48102dd08ef3ad7",
+          "after": "22257b126cf32873a8e9d4d8d9c00b444dbeb11a0e6fa0ae5addcd268b793bca"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/ability_presence.py": {
+      "before_sha256": "09dbbfd7064850356bf9733429bb0dcb6aa41b1e34e5887b7b0af453043f3165",
+      "after_sha256": "8961290a0336d5b53a3e0143a7d6e532e928add92f8b4a24ee783cb95ef6a03b",
       "owners": {
         "@module": {
-          "before": "4b50c1dd72d88701e508af6e4a46bd74e2c1bd40e8ba6d727276f33bbbc3e314",
-          "after": "e7bea0ef0545d99e3228b18101b33e294231e902df7c653c830f4e3903ae39b7"
+          "before": "2b5aacbce9d9c35f5af500df9c975bff657055b95e0d7ce4b7827023fe88c0b5",
+          "after": "447dc3ba715f8a5e2e67d1c768d5c5f7de0a8a63f1c6bfd9f0d129f1e1aa75da"
         },
-        "_event_record_hidden_from_context": {
-          "before": "e992d1375bb2603da62b35a19b9e5483f8105200caf08319bccdd72c602d678b",
-          "after": "ce016bd62b4d9372e811621def74a43b166811bea9e2bd2cd48102dd08ef3ad7"
+        "ability_presence": {
+          "before": "effe8c61f00c86da99823e84fd052fbc998e1f108970976dc87eb9b7e321a5ce",
+          "after": "1c158a3773c1d6f6bdaa42faa63eac1fd5b19c64a320255db8c87a42d6289c1c"
+        },
+        "ability_presence_from_model_ids": {
+          "before": "f3f50dcda27f1b3c4c64e29cfcfc0c423ee6a9d57a7158742f1fa96b10e4ddf0",
+          "after": "48c78d14571ce92825ad384e7681ceb6c26c495fd3cd01d682ec46621c021702"
+        },
+        "ability_spatial_relationship_from_presence": {
+          "before": "bdf0dee2ca064e4fc515f5b681062ea44e0a635b9b6277fa432418ec4f077974",
+          "after": "96b799c5e6b4fc8dd7f1c607b10c7c0d3d0cdb11910ce8775357873a19824f3c"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_ability_source_retention.py": {
+      "before_sha256": null,
+      "after_sha256": "3f7a4007383cdbc78b087200d8f4b952edfd3a9387ca56614a6a09aaa878ac52",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "a7b2a69242e3164ce55afddd83b6a52522d62841734b07da62a79665409a8636"
+        },
+        "_source_payload": {
+          "before": null,
+          "after": "d59852e11aa8b6beb42f305bb5f4d8ec2fd7c310802a6fdd92d9bff872d28464"
+        },
+        "attack_ability_source_model_ids": {
+          "before": null,
+          "after": "6ba271aeeb6196499f21a3fdddc0f98723955bc5dd61a53070c9ee9ac66fc252"
+        },
+        "expire_attack_ability_sources": {
+          "before": null,
+          "after": "4e1d603379a6bb2ecafe7db3baf39ab4a30c64a36346089765a061c96b6226f2"
+        },
+        "retain_attack_ability_source": {
+          "before": null,
+          "after": "4fea1ffa21f4cb57fc0aa45e5a9128347ff1c58c91c600170ef7e5c6a824ddc2"
+        },
+        "retain_attack_mortal_ability_source": {
+          "before": null,
+          "after": "168741b3caa80594ac160da837443cd3eea55bb2c6de807161579a845100ac6d"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_destruction_authority.py": {
+      "before_sha256": "a7dfa492c9faccaaad21a10b8fd39c582b3247c3b40c937f3d2a2c3eeaa6bcf9",
+      "after_sha256": "ed46e313880a89248868da33319d24174abb5309a9a3695ff7c185c395538c47",
+      "owners": {
+        "reserve_destroyed_attack_damage_authority": {
+          "before": "4be1711a6a4bc6bc1193b0a91bdd321b80f75ed2f033960149c209d82d6eef3e",
+          "after": "686d419d3b185bfdb8e9d6be61289fe648424eb0fce5a17cfb5cc49f327840f8"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_dispatch.py": {
+      "before_sha256": "a339be6d901d2fa8e4bf9cff38e3347b9b09aa871459c3c2927cc92600d26e81",
+      "after_sha256": "83d317bd332927fcad1c2195ed8bbdb16a3c3ff461328cd275725769f491c754",
+      "owners": {
+        "resolve_attack_sequence_until_blocked": {
+          "before": "2fcc12ae772baa6fe337aa4968291ad69277b0011dd355a23d83dfc4b2ff039c",
+          "after": "75d80e2e6f38a25e89577cb5ac5c1785571e182fe4241b1686737ab1d6e2a345"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
+      "before_sha256": "008fcfd921f2bc20a0a719b82a323080fd905fbe8c86f705371b8018073f471d",
+      "after_sha256": "1146390c40f76e4b6796735fc2d9ee1d0676deb3f3e9d832db0ec7cf71685307",
+      "owners": {
+        "apply_feel_no_pain_decision": {
+          "before": "69be60a765f72c19e46fee3ab71e070c03a8bb88a95e64a49404e0af14955bb8",
+          "after": "1562680f16b1cb87e20822cdd5aaad4c6ed1d2ef93f3d7c245529f8b06927a1e"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/catalog_attack_context_rule_runtime.py": {
+      "before_sha256": "4191a089796ff23465f1bfff43ad2f61fa6d4b62c42c5d782a4487d754f8fbbc",
+      "after_sha256": "aff635dd11b03f426c6d0a6da8c2ba9555c86e8b2cc642d44694e86751912f93",
+      "owners": {
+        "current_effect_target_model_ids": {
+          "before": "1f1d13742f95a2d78c6c5ef2ad25c305213919cf417c2ade159351ae818b706b",
+          "after": "0e6925d6dc1519adc2848db4c05db67f1111c5aea732e5aee773f26bad7b786d"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/catalog_conditional_leader_queries.py": {
+      "before_sha256": "5586dab5aa96b77d2e73ad180612bd11582c3d21437ae737d877929878bc2d2f",
+      "after_sha256": "0a156be0698ff4e0c4fa05794782bf199ede8ca59440dacda299b0bb8ba87dea",
+      "owners": {
+        "@module": {
+          "before": "fb11e1779e3dd4195d9a27deef8b96e286524c3a01dab2bac12ccce443892857",
+          "after": "f9d50f4b693b5982437a699296df2f52a790ec410ce6654d1697d0cb4c5ab8b0"
+        },
+        "conditional_leading_source_unit_applies": {
+          "before": "8b5e7227d1d7707d15b4e34bd520daf36230124c4d58433224ab9977649b998d",
+          "after": "c010ff493b47971d91d82317e9e358b84814f1ff398aaba007b5ea7c16041993"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/catalog_rule_consumption.py": {
+      "before_sha256": "8af26cbfbbd3eb8805f8040dcd77025ba234e56be2652f8030106ace883d772f",
+      "after_sha256": "b57cb9d2fdcd36630278672404e565ca17af575ed322b605ce3c1a9f593ef1b4",
+      "owners": {
+        "_current_wargear_bearer_model_ids": {
+          "before": "78cfb09403e11930eb760af634e6788e10773355dab88c8837b7ac7793a52fbc",
+          "after": "0f41a8b6b2b1af306682a59dceb35bfe71b4525296839f3382d3c78757b78630"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/catalog_source_model_presence.py": {
+      "before_sha256": null,
+      "after_sha256": "49547f4c8171f4383c8a538e5143662f0e920c9db2e457b4c97b80952e67f7ae",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "1d0584d6154dc265268df2c5eb0588c2619caf57c2b5b4e2c0823c21b1d2d667"
+        },
+        "current_wargear_bearer_model_ids": {
+          "before": null,
+          "after": "a07551b7944a8c3931b8471698a9ff73a08bcd730f238140d66944764011bb27"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/damage_allocation.py": {
+      "before_sha256": "0b9caf74072f6d44b3b7137059f2a28dd9d317df96b6bc806a32b50d1304be83",
+      "after_sha256": "ad90f81c802eb7571865a3a11a50ad95c811f1965a8aba8b13ea1ddab649250a",
+      "owners": {
+        "MortalWoundApplicationProgress.after_wound_resolution": {
+          "before": "00588a9b1d49d2e6d267eb433b6c84c1f107e98e09f49cc814f05467e53d7cc9",
+          "after": "83b71f1523df07e220affb241b137ed480a32f1ed65855d09332a1da27c29ae3"
         }
       }
     },
     "src/warhammer40k_core/engine/decision.py": {
-      "before_sha256": "f5ab638ec1766e603f5c16dc18ec5b963c4e88a06573cc80f4cffcfd8a52d51b",
-      "after_sha256": "d6ac812cce6baf8a0b2826c363f8e046a903be320d39de08b05ec77822a3c3a4",
+      "before_sha256": "d6ac812cce6baf8a0b2826c363f8e046a903be320d39de08b05ec77822a3c3a4",
+      "after_sha256": "e35d0695c3ce4a7a0b0aae8790f2107c6092c48f1741b983025f50545181f68e",
       "owners": {
         "@module": {
-          "before": "74efcd5c3c1a7bdec343eef8799291b3516f400c405932753312d2eff6948474",
-          "after": "280ab00cc4668c8727a42b7a87013fcad79582951fbbac4629a91fe61fa1916a"
-        },
-        "DiceRollManager": {
-          "before": "5ce0f75dc179f4972402979d25807155b5b6a329fb37a5cf27b2cf869270908f",
-          "after": "ed412f7bcb6ff00b9d44229af0cf3077a5f4ca1f4d6e678cbac2c347ba5943fe"
-        },
-        "DiceRollManager.__init__": {
-          "before": "8dd60fce48757765bb4cff40590f51b53d6e1bbe36c8237c1471441de08ef640",
-          "after": "7c6c98a33ac6fd67f440ee5b738ae0f8d1b0d3488f6f1c94ecfea5a95c378598"
-        },
-        "DiceRollManager._append_event_history": {
-          "before": "1da0760d4659a1ce51b1f53b1801c4b87c849b1ffd6984504d189b12450a5799",
-          "after": "00f3b477348e037a9be9f067d495ce86eb5c5063610f38060f40a12ee1881fef"
-        },
-        "DiceRollManager._seed_existing_event_history": {
-          "before": "d968e4cf558b93ccc7821e111d8864d32a61c3688ef99c4bc21a25ab4da69464",
-          "after": "738372b6a63f7105a3ab8ace714c273b6b37fa2b9cc5da61c4651b421d92fbe7"
+          "before": "280ab00cc4668c8727a42b7a87013fcad79582951fbbac4629a91fe61fa1916a",
+          "after": "6503c4f18f4f5b1dd474a461fe1eac4ce3fb158ce30c275fcd1be58c65a97736"
         }
       }
     },
     "src/warhammer40k_core/engine/direct_mortal_wound_application.py": {
-      "before_sha256": "916b66df7728716bbf8e494305b90df92fdaee5ea1923c2c3b98e9dbe981c8e2",
-      "after_sha256": "aa19e4f3045cd5084baad02d266f32ed52172d0155509d862ab4d4de51bc4eb7",
+      "before_sha256": "aa19e4f3045cd5084baad02d266f32ed52172d0155509d862ab4d4de51bc4eb7",
+      "after_sha256": "aa0e1e8f589156334a936787883b5237a90118108b0528bc46e7854a7597f484",
       "owners": {
-        "@module": {
-          "before": "0fe84d3846ed0715b0202e5ae17094e306de1174f003498737044265749b3180",
-          "after": "13ee0bfd26c693ef3de31fbd7db024e1be160d8592fd8bb1dd8c393b424689c6"
-        },
         "apply_direct_mortal_wounds_to_unit": {
-          "before": "a7c50b252978b4ca87174027d780db5aa077696af05fea6c30f3694f29950a44",
-          "after": "44c0f558e0ea494e6737f366018fbb536ad81eccaf493a306772e15fae718110"
+          "before": "44c0f558e0ea494e6737f366018fbb536ad81eccaf493a306772e15fae718110",
+          "after": "a202b8c24f20accb5ee2dd529c1473d6600df107a897ed35d52c39d714b5a938"
         }
       }
     },
-    "src/warhammer40k_core/engine/event_log.py": {
-      "before_sha256": "2cb46b75399b4014c07df631e8dd5e22696f126ec6518776c70b63a1f79d110c",
-      "after_sha256": "2060961ba0ae8b05fee864c88cced5d5bf5ad2f1854581037891bddc37db578c",
+    "src/warhammer40k_core/engine/rule_aura_resolution.py": {
+      "before_sha256": "ed19d0049140ac6fd421b6a0aceb24d08f419396bf5e3f50dc64c98f78d1b01a",
+      "after_sha256": "8f5cda9670d93e5e2be49eeaf2a0231c2b4075f40d14c857e337482e6105147b",
       "owners": {
-        "EventLog.records_since": {
-          "before": null,
-          "after": "ad9529dfe95d46a8b04e092eaf0b46b17a1e4c94d4c320e2646b20d5ec6801fe"
+        "_aura_source_geometries": {
+          "before": "0ca1cfcc54bbce063decdd2f31810bd4eb39acaa070e6ba9e86355a6926f763c",
+          "after": "738f04e222a0f797d5ce3ecd41de7b81313495482cac999ff394efe4dee02208"
         }
       }
     },
-    "src/warhammer40k_core/engine/mortal_wound_allocation_permissions.py": {
+    "tests/order118_source_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "5150a0930ac75f4a569b1027e3489295c09e54a1edd13ef2a2ec2f68bba80558",
+      "after_sha256": "5eb647a40fdad838d711cb13f3a351e8fe80c84368b50aae0acc471404f598db",
       "owners": {
         "@module": {
           "before": null,
-          "after": "b65195d759c19539137dddf444b9c8a8995a444c589e26308f1e9d48d2529760"
+          "after": "8ee0b6b4de281689b53c669d9b79dbc947ee75a6db9ee82eb412681a962fb0d1"
         },
-        "MortalWoundAllocationPrevention": {
+        "reach_source_casualty": {
           "before": null,
-          "after": "62d9221e823f4d636561ca5d869f216a3f1d0e01b8443facd883e466688c5f6d"
+          "after": "3641a2e26179e3635b970115c1e518ec4bfe8790672e0e25c7037ef6fb5e9603"
         },
-        "MortalWoundAllocationPrevention.__post_init__": {
+        "source_grant_active": {
           "before": null,
-          "after": "e54bf7c1ec46ee1897967c480a2200606b3d6d73a783fc92e189afc19137a1b8"
+          "after": "552c350b2af9f0beaeb4bf27d6c6d1b63b0b1d02663ca3c7daa9039827a7b91f"
         },
-        "mortal_wound_allocation_permission_effect": {
+        "source_retention_session": {
           "before": null,
-          "after": "d676164cbe487123c5ac3371d0e6c82d1b9825c916097e3b3279243878fa84cb"
+          "after": "325c739695be08f413bdcf4850eeb176625322644a05e11a68157d3cbb226073"
         },
-        "mortal_wound_allocation_preventions": {
+        "source_stealth_granted_model_ids": {
           "before": null,
-          "after": "3fffa5aa80ddd05ff2d995187aae5f63a4004fb2253d43158eb4b179c4deb643"
+          "after": "2328e77021d55500190bc6e3dceae2cffaa428f3870c6c9a469e43aff88ac1ba"
         },
-        "validate_mortal_wound_allocation_permission": {
+        "submit_source_choice": {
           "before": null,
-          "after": "f945f7c0dc0912653d0a4d6fd1f7ebbb8ae89a638a5a06d94d1889a9fe0f8ed2"
+          "after": "1c15c87795d1b74b3147a22e552a9d56539e3c85218a52b77233c72fa11a160e"
         }
       }
     },
-    "src/warhammer40k_core/engine/mortal_wound_allocation_triggers.py": {
-      "before_sha256": null,
-      "after_sha256": "a39868bd6d99a4f927caf164ad1602bb1538bc3c695c5f19dbe7bca6f5ef47ec",
+    "tests/unit/test_unit_abilities.py": {
+      "before_sha256": "135ebd8f548ac093023d987a2d9cf12de8e9dc081f3b58c84ca8cdeb48a3123e",
+      "after_sha256": "b1df5fa3527c5ce22df059575c5ec321f584e331ec034091e1fa2fa1782ddb43",
       "owners": {
         "@module": {
+          "before": "9bf30868c9aaf8d2329fe396d671052b5a5ae64bee2fa2c4e8a3fa16826e6d88",
+          "after": "e2acb8b10ecd852c1b08d986a466637ebcbb8fbb11badfd4b739d67592a38625"
+        },
+        "test_attached_conferring_bearer_survives_as_ability_source_until_attacks_finish": {
           "before": null,
-          "after": "8dcad34206c6a6e9adcc4bc0752dd162c4e59ff80b1816201c2b110f29209485"
+          "after": "5d68289b26c834f3ef01dbb73e7f084fee178f996df68855d67d3fe9620e1a99"
         },
-        "record_mortal_wound_allocation_occurrence": {
+        "test_attached_source_lifetime_facade_restore_replay": {
           "before": null,
-          "after": "308fe6f37decd98e80409f0f017984100d7ebaadcaad02cedbec666dfc0d2e86"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/mortal_wound_model_allocation.py": {
-      "before_sha256": "30a330a8901a40606be629417e5a2354ba5a927e8affa9f95e6c75b29fdc330b",
-      "after_sha256": "4a8b3faa6345681f603cd3415219547edf7ec3362d3fd91aa2c8dabef498d602",
-      "owners": {
-        "MortalWoundAllocationOccurrence.__post_init__": {
-          "before": "af39e44e0491e59b34f97706800719c4af65edf50c1be80bce8e2dbd6ee2ddbb",
-          "after": "d8b06bfd98c420fb203eaf33e21809e07fa158c91309304977b965fbc36baab4"
+          "after": "f1b94e6efe0f653c6c1257033260ddb953e6cd72d2b86af81c1f47e39e9b2649"
         },
-        "_continue_mortal_wound_application_for_model": {
-          "before": "fc0950bd85f55e59ce680bd24d30c0a0929175da67c009243e01d11630e023c0",
-          "after": "24d040cf3726371a2939cfbf292bad9fc40a98289224bd180cef10df22736f3d"
-        },
-        "_record_mortal_wound_allocation_occurrence": {
-          "before": "3cc8b9bbb4cfee76b0e6bd93227f7c8a12ee34acf525f87f1e4e190ff6450891",
-          "after": null
-        },
-        "mortal_wound_feel_no_pain_decline_allowed": {
-          "before": "560fbc89d99907a90ad42245dbf57e89d6194a79f109f46850a30bc9bb733ba0",
-          "after": "77244a846c90432d47761d32f7d88630104eff1e67dc59dc9e7f7b75e0dbb289"
-        },
-        "mortal_wound_feel_no_pain_sources": {
-          "before": "82e00f8c8a09d801851908061c6e6167050b795556e114b8f99ae1fb0c648856",
-          "after": "03ac4ccc6a9aed59d11057d8a898e660efd14e84867fb98f9142de0456ca6139"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/timing_windows.py": {
-      "before_sha256": "e566661d70cd6eacf182ef275f74bde7ec39b899db7c49a2e48b0dc21a29cefd",
-      "after_sha256": "230355d1612dd48fc8f503a027e0303560d9c9cce635a9c1dd135deecf34299b",
-      "owners": {
-        "TimingTriggerKind": {
-          "before": "4b5b2a7ee4284497d8dcb099a2b04b503b08bec8711c5654ded1edb4150ef888",
-          "after": "1ccbea1a2c62c5a956debdbf42de95c268bc352e9b84e297899b6db8e4934dbd"
-        }
-      }
-    },
-    "tests/code_quality/test_order117_mortal_allocation.py": {
-      "before_sha256": null,
-      "after_sha256": "9bebada6a7b96471568f29c43144114f9a10143a457542766003c7165b682f60",
-      "owners": {
-        "@module": {
+        "test_equipped_attached_source_lifetime_uses_shared_catalog_consumer": {
           "before": null,
-          "after": "2c6f033514e0ddea6de56bdb2ab2e494bda340efc28b01fcc6763e5fd0142049"
+          "after": "e9cc5d855bf626beadece3b1d87eadf109949cc5a7dfe71883b519e88573571b"
         },
-        "test_allocation_trigger_retains_selected_core_and_real_example_authority": {
+        "test_mortal_application_routes_retain_only_attack_conferring_sources": {
           "before": null,
-          "after": "80391664f84d373c7f5efa064b3592975e6754a5c1b65ef5e08a82926608d0e7"
+          "after": "8789c1bf794aa48431c92473436309e2ef75fb92b1cf1f780f91346a2ea75aa1"
         },
-        "test_every_mortal_select_model_owner_uses_the_shared_executable_boundary": {
+        "test_queued_source_destruction_survives_native_deferred_mortal_checkpoint": {
           "before": null,
-          "after": "41f0687d97a6abfacef46d2eb16578baa9ab6c9c989faecd96e994f2451ea66e"
-        }
-      }
-    },
-    "tests/code_quality/test_order97_inventory.py": {
-      "before_sha256": "b3b766714a2704c41d073a282d556ab1ec2a53063ed00fc68242235f501cbf01",
-      "after_sha256": "78697c357cf227480a58cf22d2f1d201e621d1cb3e7c0e1631151613bacf3955",
-      "owners": {
-        "@module": {
-          "before": "58d8c1f3c2291ea21ad31cbd883fd8440f73f3dc66fdfc33d5a5e7f55bfb249d",
-          "after": "4a2974dcb3577a53f93e5e9adfbf4366431e7174307bf62182cbedf737b75824"
+          "after": "32318c6d0496a231a49c5b09836bbd531f2d608a87ce65dc56419f261178d66b"
         },
-        "test_original_assertions_remain_exact_and_fail_closed": {
-          "before": "1276b434a6f1e7ce0d4820877fbab5b0514c79052207a0b0066280901cccf95f",
-          "after": "a128cb4f75eeff6f131efdc2510942ed2ebc6f544dc51c8cc59562adb0b8fd7e"
-        }
-      }
-    },
-    "tests/integration/test_retained_shooting.py": {
-      "before_sha256": "01b0ae41c5cc85b342352a61932ea962e281a750ea258a2c1cee579bb73f8dac",
-      "after_sha256": "518bcd57d83e4ebce07064ffc7660e34c8117fe88c8d803289d7b91fdac65deb",
-      "owners": {
-        "test_order_30_for_the_chapter_shoots_after_own_hazardous_death": {
-          "before": "c7590e3c9c7498df07b07bfedd25f7245004bac44e36651b2e7f7d7e9b7769a1",
-          "after": "a42240913c777cec85236df66da14d5378a83cd522650cb6a156179cc987f424"
-        }
-      }
-    },
-    "tests/order117_allocation_helpers.py": {
-      "before_sha256": null,
-      "after_sha256": "6b1c88f91e537750dfb1a05b4d451b904ec4f9948c0a777b07cfd1ab365297ce",
-      "owners": {
-        "@module": {
+        "test_retained_model_aura_keeps_attached_ability_without_external_geometry": {
           "before": null,
-          "after": "53cbfd4e83d242f11dca7ad600c1cd48db68818446b57eebd650b6effe6edef6"
+          "after": "63ea1a1ac7ba857ab36b039c5918c3d043664fd22e96479ae53beffb7beb9f79"
         },
-        "allocation_permission_session": {
+        "test_retained_passive_stealth_source_grants_only_living_attached_recipients": {
           "before": null,
-          "after": "bb74df1691c03238611addd62af9b797ad77c8fa09bac77cb2bdc937fa29e9a2"
-        },
-        "complete_allocation_attack": {
-          "before": null,
-          "after": "b9f9053586aac4504cf0e828edd5e7cd9410a1f57e89b50e0cd91f53b7caaede"
-        }
-      }
-    },
-    "tests/target_replacement_reaction_helpers.py": {
-      "before_sha256": "d5a36008a235ca45c2f6f7f0b5c678b2edd24c2bd4b128187683673551d3ae6b",
-      "after_sha256": "2d24025379feef7569bd290dab6f06f3147b30f623db48f1f34783599de38e78",
-      "owners": {
-        "fidelity_retained_replacement_scene": {
-          "before": "8f157bccf3227680cd03eb4de8d7089f0e1664c1486a2c2ea7d280377f9f201c",
-          "after": "c09677366f4523514460322ce2db669cdc91e9d43821ead56645ba6dc879de18"
-        }
-      }
-    },
-    "tests/unit/test_dice.py": {
-      "before_sha256": "f0ffe2aa48a436a8ac4b0fc5cde163791895a8bd06b68baff4e3038284dda772",
-      "after_sha256": "34508fb23fd542a9d91c05ae64fec179edf8cbebe920417cace313e175a4501e",
-      "owners": {
-        "test_event_suffix_query_preserves_typed_order_after_json_restore_and_rollback": {
-          "before": null,
-          "after": "eeb1430480a0e0b6651eb35802152f114873b2667dce026cea1cc13aa14ad13f"
-        },
-        "test_event_suffix_query_rejects_invalid_or_stale_index": {
-          "before": null,
-          "after": "71a13508328b10aaf868e390439e7a0dd8d1980a2ce8ad214bc88ea5e5370e8e"
-        },
-        "test_external_neutral_audits_do_not_change_live_or_restored_dice": {
-          "before": null,
-          "after": "2d977f2c683e0dd27191a0998c1fa4e329e0ea0fc22491baca46f26df93c85c0"
-        }
-      }
-    },
-    "tests/unit/test_order117_mortal_allocation.py": {
-      "before_sha256": null,
-      "after_sha256": "1851b394297b8f266c0282e2033002f3a34ab1bc8f216c6e7cfc0f29dcd4a185",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "e6d0d35fe4bf0f4bd2b13c76ed963b22cd964cb63d31be2e769bbf5a966935d8"
-        },
-        "_assert_restore_and_replay": {
-          "before": null,
-          "after": "fb9c6a0819751e83e26c5da3a8a08755b7f3e597bbba80438de3ece31cb6cda8"
-        },
-        "test_allocation_boundary_is_independent_of_prevention_configuration": {
-          "before": null,
-          "after": "f67bda1c65f91bb5834c4f705948dc7f8381fc52c9767eee4b784d1f282ad770"
-        },
-        "test_allocation_permission_does_not_protect_another_rules_unit": {
-          "before": null,
-          "after": "19ca29a11db3ac3a1bfce157ff974570166885cde47db9c218d3e2ff5dc46eff"
-        },
-        "test_allocation_permission_factory_and_schema_fail_closed": {
-          "before": null,
-          "after": "cfd754c4d9e498736a36494f2c2f6b4a143e5d4f9a0cbc8a6b45ebd4d3de22bc"
-        },
-        "test_allocation_permission_freezes_all_attached_physical_models": {
-          "before": null,
-          "after": "0241003315d30113999d6871f7d1d7bdd87bb255ad54288cb25aaf63a84ffa1e"
-        },
-        "test_allocation_trigger_executes_source_backed_prevention_before_wound_loss": {
-          "before": null,
-          "after": "f8a9cff25ff829e1a8fa33d654afe3bf94fa8d1d61b5a6a3fa37fc28cfcf5016"
-        },
-        "test_allocation_trigger_pending_choice_retry_fork_and_lethal_continuation": {
-          "before": null,
-          "after": "d7da75f8a14773c59e514f74148c9ec3f50936eb41e2b4a460e18a7e4d8f95da"
-        },
-        "test_direct_route_executes_the_same_prevention_or_rejects_choice_before_mutation": {
-          "before": null,
-          "after": "1f9e487b0a00f0f182116526bf79a9dc07f051dffdb4caa39b8ae7c6101c7e01"
-        },
-        "test_direct_unconditional_allocation_keeps_existing_prevention_dice_sequence": {
-          "before": null,
-          "after": "573fb1e6f4b74572c1efa18e11da659ecd0a2c567ad5d2ffac11e9630d17f629"
-        },
-        "test_missing_prevention_dice_authority_fails_before_allocation_and_allows_retry": {
-          "before": null,
-          "after": "4a9c2ce0be11c23e3761e414c0fd275a68fba8b03f31adcedd51350f46b2f87c"
-        },
-        "test_source_permission_survives_real_save_reroll_and_lethal_continuation": {
-          "before": null,
-          "after": "b5fbf1ee0d2a66da63b8d9a33ac51fa095337798f2caa348eb1f9bfe0db5471e"
-        }
-      }
-    },
-    "tests/unit/test_phase10o_fall_back.py": {
-      "before_sha256": "6e6c89c60eb243aeef416434094143ba419c77c423661cc2572b0e68fa759e34",
-      "after_sha256": "38ffe1064600b38aa32fdf11f717d100ed0fd3e1d4e4fee5d2dd711a9f20b4aa",
-      "owners": {
-        "test_voluntary_desperate_escape_waits_for_delirium_fnp_before_embark": {
-          "before": "d22aacadf3870324b70e0a867df9de472b1af96084bad8f3103aaf1703ff1a07",
-          "after": "ef2d266bd541f3d3c6a7fe85cf7a5e59b3381a9f84f57b57eac1e912a1172198"
-        }
-      }
-    },
-    "tests/unit/test_phase17g_chaos_knights_army_rule.py": {
-      "before_sha256": "0fc36289e7814c0e5915276d4d54e794cd2ce85f7da0bafa898f9aeaff9eaef3",
-      "after_sha256": "1e6f5ac2499f0e87506dbb69608e9632eaf77b6bbdfc4d9380e3635d5b52c05b",
-      "owners": {
-        "_assert_selected_target_delirium_continuation": {
-          "before": "516d6f45bade54faba6bbdc1bd38c518d63288e7a130e9d0b9cfa3dbecb9702d",
-          "after": "4faaca90e022c9f599360822c9245a346b84281c61ff46e331dcd29f78e0014f"
-        },
-        "test_selected_target_later_battle_shock_reroll_retains_parent_via_facade": {
-          "before": "9a1a5898b340cbdf0040952e6f5cc535f4fac59b14983578ccc6c2b4b9cfc15b",
-          "after": "7698cd1d7e2b7227b06cb0e1d97458d16422b4dceb3828314430197cd28b3c76"
-        },
-        "test_selected_target_remaining_effect_request_requires_retained_ancestry": {
-          "before": "ce92caf5f7ffec68a6bb26a7713af37afc87f8acf80bf0ac618ffdc4796a850d",
-          "after": "8c2410982da5ca22d990b223f7ea0c47d5d1a144e378870fc49a8117502b1c8a"
-        }
-      }
-    },
-    "tests/unit/test_phase17g_chaos_space_marines_army_rule.py": {
-      "before_sha256": "eeba246ce60a8ab58c687f6ce8fe9fadfe4196a32eeae3ba60cac389f6f63aff",
-      "after_sha256": "d66405605856342faa8983a10d658da097af60290b01bf74bc590e5f4234144c",
-      "owners": {
-        "_csm_battle_state": {
-          "before": "ea0d1920038194d91f1f8bcbf81b5e38b3ae45f53df8781ed7e8c3a91705ce59",
-          "after": "13c794917fea492a78c061887601eabc48dc0b22b7dbddaed3b2da7be8a9d8b3"
-        },
-        "_dark_pact_completion_handler": {
-          "before": "a8cfa4606abc6e0ddf5baa32083dbddb8ab575d789020e6ca854cc2d9928a1ae",
-          "after": "743385aa0fe39790b3b69401821d568f0d1d7c202ac4658c2551b1ad4fc7bb05"
-        },
-        "test_hazardous_and_dark_pacts_offer_the_owner_a_shared_mandatory_order": {
-          "before": "4ff206f9af5690d638dfbffd664e5e291bf4ae13d0e51a6cff0ccb18361622f3",
-          "after": "d66571af9d4325406d26b2669781de6d54b23a61cb0600aa49fd0d02e9aad64d"
-        }
-      }
-    },
-    "tests/unit/test_phase17g_imperial_knights_army_rule.py": {
-      "before_sha256": "398b3d6399b7e6d2224c650759212972deb50590c07b551471777d9add1d2cb6",
-      "after_sha256": "2d31ccb17744bd7c025a5cc1e72b6b7ac1ac5c94f1e29f85df40de9387829b3b",
-      "owners": {
-        "test_code_chivalric_tally_uses_updated_threshold_and_returned_destroyed_units": {
-          "before": "1c5201bd665db1395af13e0578358cdcd9745ae24f0173caec4bfc0c28cae6a8",
-          "after": "cf24874af45eb13602349dca0db4a1a258dc944793323412f889d6790d74ac9c"
+          "after": "63776c96c1f6e48d2536b265181c84d89169f4554925e2c145e91c1ac01ac5a0"
         }
       }
     },
     "tools/core_rules_order97_history.py": {
-      "before_sha256": "371e54d69e585c661132de57d603c3861e75c69c4daf0048a98177aa5657eb6b",
-      "after_sha256": "be1cf9676884f2854015e63c602391ec7b11c54918185e5c0a731cdcc41c60a4",
+      "before_sha256": "be1cf9676884f2854015e63c602391ec7b11c54918185e5c0a731cdcc41c60a4",
+      "after_sha256": "03f80ead5206769e4eca3716cd269f79a0dfbb1c009aa9bb260ae7f438a6bb8c",
       "owners": {
         "@module": {
-          "before": "65fb8d5a2a9820f46e769f55f2050e1a56301fda777ef169eeeb4747fd45f0ab",
-          "after": "7575619f8c52a7ec0827d33505777b444a552490c57c3d1aa871620a7db907ca"
+          "before": "7575619f8c52a7ec0827d33505777b444a552490c57c3d1aa871620a7db907ca",
+          "after": "e06e1da9e27312c85bf53b817720c72f9490708dc66b82a786c954f3bb0490fd"
         },
         "historical_evidence_path": {
-          "before": "d058432760b2e913f0b7a5191abf7a23a6dcc8b489e08bc98edc515841fc736b",
-          "after": "e904fb0b19390a76f3e44f55a5f7d9d553b4c0485e4d23192d6a3fb1d108c680"
+          "before": "e904fb0b19390a76f3e44f55a5f7d9d553b4c0485e4d23192d6a3fb1d108c680",
+          "after": "44c4769de3cb6d528fdf8dbe1b6e4b02d2af9ba11026f0b94ccf82b43fff8da9"
         }
       }
     }
   },
   "rows": {
-    "README.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "ci/test_shards/durations.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "ci/test_shards/shard-1.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "ci/test_shards/shard-10.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "ci/test_shards/shard-11.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "ci/test_shards/shard-12.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "ci/test_shards/shard-2.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "ci/test_shards/shard-3.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "ci/test_shards/shard-4.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "ci/test_shards/shard-5.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "ci/test_shards/shard-6.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "ci/test_shards/shard-7.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "ci/test_shards/shard-8.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "ci/test_shards/shard-9.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
     "conformance/typescript/src/contract.ts": {
       "category": "rule_semantics",
       "operations": [
-        "order117-contract-publication"
+        "order118-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
-        "order117-contract-publication"
+        "order118-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
-        "order117-contract-publication"
+        "order118-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
-        "order117-contract-publication"
+        "order118-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
-        "order117-contract-publication"
+        "order118-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "order117-contract-publication"
+        "order118-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "order117-contract-publication"
+        "order118-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
-        "order117-contract-publication"
+        "order118-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "order117-contract-publication"
+        "order118-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "contracts/openapi.yaml": {
       "category": "rule_semantics",
       "operations": [
-        "order117-contract-publication"
+        "order118-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
-    "data/source_audits/order117/baseline/tests/target_replacement_reaction_helpers.py.txt": {
+    "data/source_audits/order118/baseline/tests/unit/test_unit_abilities.py.txt": {
       "category": "rule_semantics",
       "operations": [
-        "order117-source-evidence"
+        "order118-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
-    "data/source_audits/order117/baseline/tests/unit/test_phase10o_fall_back.py.txt": {
+    "data/source_audits/order118/historical-inputs.json": {
       "category": "rule_semantics",
       "operations": [
-        "order117-source-evidence"
+        "order118-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
-    "data/source_audits/order117/historical-inputs.json": {
+    "data/source_audits/order118/selected-source.json": {
       "category": "rule_semantics",
       "operations": [
-        "order117-source-evidence"
+        "order118-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "data/source_audits/order117/source.audit.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "order117-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
-    "docs/ORDER_117_SCOPE_PLAN.md": {
+    "docs/ORDER_118_SCOPE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -1018,215 +626,189 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
       "operations": [
-        "order117-allocation-permission"
+        "order118-attack-source-lifetime"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/adapters/redaction.py": {
       "category": "rule_semantics",
       "operations": [
-        "order117-allocation-permission"
+        "order118-attack-source-lifetime"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+    },
+    "src/warhammer40k_core/engine/ability_presence.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order118-attack-source-lifetime"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+    },
+    "src/warhammer40k_core/engine/attack_ability_source_retention.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order118-attack-source-lifetime"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+    },
+    "src/warhammer40k_core/engine/attack_sequence_destruction_authority.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order118-attack-source-lifetime"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+    },
+    "src/warhammer40k_core/engine/attack_sequence_dispatch.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order118-attack-source-lifetime"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+    },
+    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order118-attack-source-lifetime"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+    },
+    "src/warhammer40k_core/engine/catalog_attack_context_rule_runtime.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order118-attack-source-lifetime"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+    },
+    "src/warhammer40k_core/engine/catalog_conditional_leader_queries.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order118-attack-source-lifetime"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+    },
+    "src/warhammer40k_core/engine/catalog_rule_consumption.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order118-attack-source-lifetime"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+    },
+    "src/warhammer40k_core/engine/catalog_source_model_presence.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order118-attack-source-lifetime"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+    },
+    "src/warhammer40k_core/engine/damage_allocation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order118-attack-source-lifetime"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/engine/decision.py": {
       "category": "rule_semantics",
       "operations": [
-        "order117-live-neutral-audit-accounting"
+        "order118-live-neutral-audit-accounting"
       ],
       "selected_families": [],
-      "rationale": "Required shared-owner correctness repair of live RNG-neutral audit offsets using a validated incremental event suffix; no allocation-specific compensation or broader nonneutral event folding. No performance optimization; default serial smoke under the authorized bounded-remediation policy.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/engine/direct_mortal_wound_application.py": {
       "category": "rule_semantics",
       "operations": [
-        "order117-allocation-permission"
+        "order118-attack-source-lifetime"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
-    "src/warhammer40k_core/engine/event_log.py": {
+    "src/warhammer40k_core/engine/rule_aura_resolution.py": {
       "category": "rule_semantics",
       "operations": [
-        "order117-live-neutral-audit-accounting"
+        "order118-attack-source-lifetime"
       ],
       "selected_families": [],
-      "rationale": "Required shared-owner correctness repair of live RNG-neutral audit offsets using a validated incremental event suffix; no allocation-specific compensation or broader nonneutral event folding. No performance optimization; default serial smoke under the authorized bounded-remediation policy.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
-    "src/warhammer40k_core/engine/mortal_wound_allocation_permissions.py": {
+    "tests/order118_source_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "order117-allocation-permission"
+        "order118-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
-    "src/warhammer40k_core/engine/mortal_wound_allocation_triggers.py": {
+    "tests/unit/test_unit_abilities.py": {
       "category": "rule_semantics",
       "operations": [
-        "order117-allocation-permission"
+        "order118-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "src/warhammer40k_core/engine/mortal_wound_model_allocation.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order117-allocation-permission"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "src/warhammer40k_core/engine/timing_windows.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order117-allocation-permission"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "tests/code_quality/test_order117_mortal_allocation.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "tests/code_quality/test_order97_inventory.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "tests/integration/test_retained_shooting.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order117-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "tests/order117_allocation_helpers.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order117-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "tests/target_replacement_reaction_helpers.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order117-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "tests/unit/test_dice.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order117-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "tests/unit/test_order117_mortal_allocation.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order117-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "tests/unit/test_phase10o_fall_back.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order117-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "tests/unit/test_phase17g_chaos_knights_army_rule.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order117-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "tests/unit/test_phase17g_chaos_space_marines_army_rule.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order117-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
-    },
-    "tests/unit/test_phase17g_imperial_knights_army_rule.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order117-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "tools/core_rules_order97_history.py": {
       "category": "rule_semantics",
       "operations": [
-        "order117-source-evidence"
+        "order118-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the permission uses existing prevention and allocation services.",
-      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
-      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Required live neutral-audit accounting synchronizes offsets through a validated incremental append suffix; all neutral types share the owner, nonneutral history processing is unchanged, and suffix work is proportional to new appended records. This is a correctness repair, with no deliberate performance optimization, search/cache policy, serializer envelope, workload or dependency change and no demonstrated serious performance regression. Under the owner-authorized bounded-remediation policy, use exact-base assessment, serial current-runtime smoke and live semantic controls. No named provider activation is implemented; no full-game performance claim."
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. Expiry uses the existing GameState mutator; attack-retention candidates use the existing lineage resolver without querying unrelated effects. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     }
   },
   "milestone": "ordinary",

@@ -158,6 +158,17 @@ def apply_direct_mortal_wounds_to_unit(
         )
         applications.append(damage_application)
         if damage_application.destroyed:
+            from warhammer40k_core.engine.attack_ability_source_retention import (
+                retain_attack_mortal_ability_source,
+            )
+
+            retain_attack_mortal_ability_source(
+                state=state,
+                decisions=decisions,
+                evidence=destruction_evidence,
+                source_context=source_context,
+                model_instance_id=model_id,
+            )
             destroyed_model_placements.append(pre_removal_placement)
             logical_death_events.append(
                 append_mortal_wound_damage_logical_death_event(

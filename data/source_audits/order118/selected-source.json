@@ -1,0 +1,71 @@
+{
+  "order": 118,
+  "scope": "P19B / C19-02 / 19.04-attack-sequence-source-retention",
+  "retained_source": {
+    "row_id": "rule:19:19.04:1",
+    "category": "19",
+    "locator": "19.04",
+    "title": "Abilities In Attached Units",
+    "occurrence": 1,
+    "source_sha256": "6ceb69296e3832bc6f1de9f5818faed68a805fce2fc3ff7e2c37811b25c9c7c5",
+    "blocks": [
+      {
+        "ordinal": 1,
+        "kind": "text",
+        "sha256": "2814b92cac76a5cf0c40983752ce0bde9b868f75ffbc3958db2172963bf3befc",
+        "value": "Abilities/rules that affect a single specified model (e.g. from an \u0005enhancement\u0006 or an item of wargear) only ever apply to that model, even while part of an \u0005attached\u0006 unit."
+      },
+      {
+        "ordinal": 2,
+        "kind": "text",
+        "sha256": "1060776957ac8b23903130143d43eb216069f8be9565977bd7791b313a56deb4",
+        "value": "Otherwise, abilities/rules that affect a unit (or models in it) apply to every model in an \u0005attached\u0006 unit, until the source of that ability/rule is \u0005destroyed\u0006, as shown below."
+      },
+      {
+        "ordinal": 3,
+        "kind": "text",
+        "sha256": "aa757690716dc562ae869c5afc9a959df207de0b5a4476b4f3488b325a28c4b9",
+        "value": "*\u0007This means \u0005leader/support\u0006 units continue to benefit from their own 'while this model is \u0005leading\u0006 a unit' abilities even after their \u0005bodyguard\u0006 unit is \u0005destroyed\u0006, provided they started the battle in an \u0005attached\u0006 unit.\b"
+      },
+      {
+        "ordinal": 4,
+        "kind": "text",
+        "sha256": "5a7d81af083e1852af871a96c8dc33143df2ab372f33cd1c5bb91e8f1a973197",
+        "value": "In all of the above cases, if that last model was \u0005destroyed\u0006 as the result of an attack, the ability it was conferring upon the \u0005attached\u0006 unit applies until the attacking unit has resolved all of its attacks."
+      },
+      {
+        "ordinal": 5,
+        "kind": "table",
+        "sha256": "fd13b9f900c0492db98883a461a2703ceb249cbb925c05e9c3df96d268ce2a1e",
+        "value": {
+          "rows": [
+            [
+              "SOURCE OF ABILITY/RULE",
+              "APPLIES TO THE ATTACHED UNIT UNTIL"
+            ],
+            [
+              "\u0005Leader/support unit\u0006",
+              "The last model in that \u0005leader/support\u0006 unit is \u0005destroyed\u0006.*"
+            ],
+            [
+              "\u0005Bodyguard unit\u0006(e.g. from a datasheet ability)",
+              "The last model in that \u0005bodyguard\u0006 unit is \u0005destroyed\u0006"
+            ],
+            [
+              "\u0005A specific model\u0006(e.g. the bearer of an \u0005enhancement\u0006 or an item of wargear)",
+              "That model is \u0005destroyed\u0006"
+            ]
+          ]
+        }
+      }
+    ],
+    "selected_provider": "Game Datamissions",
+    "historical_source_row_sha256": "fdc4c647b2d7123a776a757b79428f4b3570d9dfde9b7c2e97adfdbf26b3271f",
+    "review_category": "19"
+  },
+  "selected_block_ordinals": [
+    4
+  ],
+  "authority": "Retained Order97 selected source; preserve its provenance and literal source hashes.",
+  "implementation": "Generic Core source lifetime through the existing ability/catalog and attack execution seam; no faction provider activation."
+}

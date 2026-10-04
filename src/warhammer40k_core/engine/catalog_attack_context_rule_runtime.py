@@ -188,18 +188,24 @@ def current_effect_target_model_ids(
 ) -> tuple[str, ...]:
     if type(state) is not GameState:
         raise GameLifecycleError("Catalog datasheet effect target query requires GameState.")
-    source_model_ids = current_source_model_ids(state=state, source=source)
-    if source.record.source_kind is AbilitySourceKind.WARGEAR:
-        return source_model_ids
-    target = source.clause.target
-    if target is None or target.kind not in {RuleTargetKind.THIS_MODEL, RuleTargetKind.THIS_UNIT}:
-        raise GameLifecycleError("Catalog datasheet model effect requires a self target.")
-    if target.kind is RuleTargetKind.THIS_MODEL:
-        return source_model_ids
     rules_unit = rules_unit_view_by_id(
         state=state,
         unit_instance_id=source.unit.unit_instance_id,
     )
+    # Source lifetime and effect recipients have different membership rules.
+    # An ordinarily destroyed conferring bearer may keep the grant active, but
+    # only living or specially physically retained models can receive it.
+    recipient_ids = {
+        model.model_instance_id
+        for model in rules_unit.own_models
+        if model.is_alive or model.model_instance_id in rules_unit.retained_model_ids
+    }
+    source_model_ids = current_source_model_ids(state=state, source=source)
+    target = source.clause.target
+    if target is None or target.kind not in {RuleTargetKind.THIS_MODEL, RuleTargetKind.THIS_UNIT}:
+        raise GameLifecycleError("Catalog datasheet model effect requires a self target.")
+    if target.kind is RuleTargetKind.THIS_MODEL:
+        return tuple(model_id for model_id in source_model_ids if model_id in recipient_ids)
     return tuple(
         sorted(
             model_instance_id
@@ -208,6 +214,7 @@ def current_effect_target_model_ids(
                 state=state,
                 unit=component.unit,
             )
+            if model_instance_id in recipient_ids
         )
     )
 

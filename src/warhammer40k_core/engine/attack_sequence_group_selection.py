@@ -524,6 +524,11 @@ def apply_feel_no_pain_decision(
     )
     if attack_sequence.pending_grouped_damage is None:
         return updated_sequence, allocated_model_ids, status
+    if updated_sequence is not None:
+        attack_sequence = replace(
+            attack_sequence,
+            pending_attack_destructions=updated_sequence.pending_attack_destructions,
+        )
     return _continue_grouped_damage_after_interruption(
         state=state,
         decisions=decisions,

@@ -1585,6 +1585,17 @@ class MortalWoundApplicationProgress:
             )
             applications.append(application)
             if application.destroyed:
+                from warhammer40k_core.engine.attack_ability_source_retention import (
+                    retain_attack_mortal_ability_source,
+                )
+
+                retain_attack_mortal_ability_source(
+                    state=state,
+                    decisions=decisions,
+                    evidence=self.destruction_evidence,
+                    source_context=self.source_context,
+                    model_instance_id=model_instance_id,
+                )
                 if embedded_target:
                     battlefield = state.battlefield_state
                     if battlefield is None:

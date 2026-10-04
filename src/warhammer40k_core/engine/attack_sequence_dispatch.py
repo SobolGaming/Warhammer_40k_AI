@@ -162,6 +162,11 @@ def resolve_attack_sequence_until_blocked(
     )
     if status is not None:
         return current, allocated_model_ids, status
+    from warhammer40k_core.engine.attack_ability_source_retention import (
+        expire_attack_ability_sources,
+    )
+
+    expire_attack_ability_sources(state=state, decisions=decisions, sequence_id=current.sequence_id)
     if current.pending_attack_destructions and current.attacks_resolved_event_id is None:
         from warhammer40k_core.engine.attack_sequence_destruction_boundary import (
             CORE_DESTROYED_TIMING_RULE_ID,

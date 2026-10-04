@@ -6,6 +6,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.order97_gap_probes_18_25 import probe_attack_sequence_grant_retention
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
@@ -31,6 +32,520 @@ from warhammer40k_core.engine.unit_abilities import (
 )
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
 from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
+
+
+def test_attached_conferring_bearer_survives_as_ability_source_until_attacks_finish() -> None:
+    observation = probe_attack_sequence_grant_retention()
+    observed_value = observation["observed"]
+    assert isinstance(observed_value, dict)
+    observed = cast(dict[str, object], observed_value)
+    assert observed["grant_before_attack"] is True
+    assert observed["remaining_sequence"] is True
+    windows_value = observed["damage_window_observations"]
+    assert isinstance(windows_value, list)
+    windows = cast(list[dict[str, object]], windows_value)
+    assert windows
+    assert windows[0]["attack_index"] == 0
+    assert windows[0]["surviving_target_models"] == 5
+    assert windows[0]["grant_active"] is True
+
+
+@pytest.mark.parametrize("phase_token", ["shooting", "fight"])
+@pytest.mark.parametrize("source_role", ["bodyguard", "leader", "support"])
+def test_attached_source_lifetime_facade_restore_replay(phase_token: str, source_role: str) -> None:
+    import json
+
+    from tests.lethal_hits_helpers import attack_completed
+    from tests.order118_source_helpers import (
+        reach_source_casualty,
+        source_grant_active,
+        source_retention_session,
+        submit_source_choice,
+    )
+    from tests.psychic_modifier_helpers import pending_request
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.ability_presence import ability_presence
+    from warhammer40k_core.engine.damage_allocation import model_by_id
+    from warhammer40k_core.engine.phase import BattlePhase
+    from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+    from warhammer40k_core.engine.retained_destruction_state import retained_destructions
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    session, model_id = source_retention_session(BattlePhase(phase_token), source_role=source_role)
+    assert source_grant_active(session)
+    request = reach_source_casualty(session, source_model_id=model_id)
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    assert not model_by_id(state=state, model_instance_id=model_id).is_alive
+    assert state.battlefield_state.model_placement_or_none(model_id) is None
+    assert retained_destructions(state=state) == ()
+    assert source_grant_active(session)
+    view = rules_unit_view_by_id(state=state, unit_instance_id="army-beta:enemy")
+    presence = ability_presence(state=state, rules_unit=view)
+    assert model_id in presence.active_model_ids
+    assert model_id not in presence.battlefield_model_ids
+    saved = session.to_persistence_payload()
+    json.dumps(saved, allow_nan=False)
+    restored = LocalGameSession.from_persistence_payload(saved)
+    fork = session.fork()
+    assert restored.to_persistence_payload() == saved
+    assert source_grant_active(restored)
+    from warhammer40k_core.adapters.event_stream import EventStreamCursor
+
+    for viewer in ("player-a", "player-b"):
+        assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
+        delta = session.events_since(EventStreamCursor(), viewer_player_id=viewer)
+        assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == delta
+        assert "attack_ability_source_retained" not in str(delta)
+    from warhammer40k_core.engine.decision import DecisionError
+
+    with pytest.raises(DecisionError, match="finite action space"):
+        restored.submit_option(
+            request_id=request.request_id,
+            result_id="order118:malformed",
+            option_id="order118:nonexistent-option",
+        )
+    assert restored.to_persistence_payload() == saved
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="order118:mid")).run().status
+        is ReplayRunStatus.REPRODUCED
+    )
+    for current in (session, restored):
+        for _ in range(150):
+            if attack_completed(current):
+                break
+            submit_source_choice(current, pending_request(current), source_model_id=model_id)
+        assert attack_completed(current)
+        assert not source_grant_active(current)
+        assert (
+            ReplayRunner.from_payload(current.replay_artifact(artifact_id="order118:done"))
+            .run()
+            .status
+            is ReplayRunStatus.REPRODUCED
+        )
+        complete = current.to_persistence_payload()
+        assert (
+            LocalGameSession.from_persistence_payload(complete).to_persistence_payload() == complete
+        )
+    assert restored.to_persistence_payload() == session.to_persistence_payload()
+    assert fork.to_persistence_payload() == saved
+    assert source_grant_active(fork)
+
+
+@pytest.mark.parametrize("phase_token", ["shooting", "fight"])
+def test_equipped_attached_source_lifetime_uses_shared_catalog_consumer(phase_token: str) -> None:
+    from tests.order118_source_helpers import (
+        reach_source_casualty,
+        source_grant_active,
+        source_retention_session,
+    )
+
+    from warhammer40k_core.engine.phase import BattlePhase
+
+    session, model_id = source_retention_session(BattlePhase(phase_token), source_wargear=True)
+    assert source_grant_active(session)
+    reach_source_casualty(session, source_model_id=model_id)
+    assert source_grant_active(session)
+
+
+@pytest.mark.parametrize("direct", [True, False])
+@pytest.mark.parametrize("attack", [True, False])
+def test_mortal_application_routes_retain_only_attack_conferring_sources(
+    direct: bool, attack: bool
+) -> None:
+    from tests.order118_source_helpers import source_grant_active, source_retention_session
+
+    from warhammer40k_core.engine.attack_ability_source_retention import (
+        expire_attack_ability_sources,
+    )
+    from warhammer40k_core.engine.damage_allocation import (
+        MortalWoundApplicationProgress,
+        model_by_id,
+    )
+    from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
+    from warhammer40k_core.engine.direct_mortal_wound_application import (
+        apply_direct_mortal_wounds_to_unit,
+    )
+    from warhammer40k_core.engine.event_log import JsonValue
+    from warhammer40k_core.engine.game_state import GameConfig, GameState
+    from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+        MortalWoundDestructionEvidence,
+    )
+    from warhammer40k_core.engine.mortal_wound_model_allocation import (
+        continue_mortal_wound_application,
+    )
+    from warhammer40k_core.engine.phase import BattlePhase
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    session, model_id = source_retention_session(BattlePhase.SHOOTING, optional_fnp=False)
+    state = session.lifecycle.state
+    assert state is not None
+    decisions = session.lifecycle.decision_controller
+    target = rules_unit_view_by_id(state=state, unit_instance_id="army-beta:enemy")
+    attacker = rules_unit_view_by_id(state=state, unit_instance_id="army-alpha:attacker")
+    config_payload = session.lifecycle.to_payload()["config"]
+    assert config_payload is not None
+    config = GameConfig.from_payload(config_payload)
+    weapon = next(
+        row for row in config.army_catalog.wargear if row.wargear_id == "core-bolt-rifle"
+    ).weapon_profiles[0]
+    evidence = (
+        MortalWoundDestructionEvidence.for_attack_state(
+            state=state,
+            destroying_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attacking_model_instance_id=attacker.alive_models()[0].model_instance_id,
+            weapon_profile=weapon,
+            attack_context_id="order118:mortal-attack",
+            action_phase=BattlePhase.SHOOTING,
+            source_step="order118:mortal-consumer",
+        )
+        if attack
+        else MortalWoundDestructionEvidence.for_non_attack_state(
+            state=state,
+            destroying_player_id="player-a",
+            source_rules_unit_instance_id=attacker.unit_instance_id,
+            source_model_instance_id=attacker.alive_models()[0].model_instance_id,
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=BattlePhase.SHOOTING,
+            source_step="order118:mortal-consumer",
+        )
+    )
+    context: JsonValue = {
+        "sequence_id": "order118:mortal-sequence",
+        "source_kind": "attack" if attack else "ability",
+    }
+    if direct:
+        application = apply_direct_mortal_wounds_to_unit(
+            state=state,
+            decisions=decisions,
+            application_id="order118:mortal-application",
+            source_rule_id="order118:mortal-source",
+            source_context=context,
+            destruction_evidence=evidence,
+            target_unit_instance_id=target.unit_instance_id,
+            mortal_wounds=1,
+        )
+    else:
+        routed = continue_mortal_wound_application(
+            state=state,
+            decisions=decisions,
+            request_id="order118:mortal-request",
+            progress=MortalWoundApplicationProgress.start(
+                application_id="order118:mortal-application",
+                source_rule_id="order118:mortal-source",
+                source_context=context,
+                destruction_evidence=evidence,
+                target_unit_instance_id=target.unit_instance_id,
+                defender_player_id="player-b",
+                mortal_wounds=1,
+                spill_over=True,
+            ),
+        )
+        assert routed.request is None
+        assert routed.application is not None
+        application = routed.application
+    assert application.applications[0].model_instance_id == model_id
+    assert not model_by_id(state=state, model_instance_id=model_id).is_alive
+    assert source_grant_active(session) is attack
+    restored_state = GameState.from_payload(state.to_payload())
+    assert restored_state.to_payload() == state.to_payload()
+    expire_attack_ability_sources(
+        state=state, decisions=decisions, sequence_id="order118:mortal-sequence"
+    )
+    assert not source_grant_active(session)
+
+
+def test_retained_model_aura_keeps_attached_ability_without_external_geometry() -> None:
+    from tests.lethal_hits_helpers import attack_completed
+    from tests.order118_source_helpers import (
+        reach_source_casualty,
+        source_retention_session,
+        source_stealth_granted_model_ids,
+        submit_source_choice,
+    )
+    from tests.psychic_modifier_helpers import pending_request
+    from tests.support.ability_presence_fixtures import compiled_ability_rule
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.phase import BattlePhase
+    from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleEffectSpec, RuleParameter
+
+    text = (
+        'Aura: while a friendly unit is within 6" of this model, '
+        "that unit has the [STEALTH] ability."
+    )
+    ir = compiled_ability_rule(text, source_id="test:order118:stealth-aura")
+    # The canonical catalog provider supplies the supported structured grant;
+    # the rule-text compiler alone does not provide this ability-grant effect.
+    ir = replace(
+        ir,
+        clauses=tuple(
+            replace(
+                clause,
+                effects=(
+                    RuleEffectSpec(
+                        kind=RuleEffectKind.GRANT_ABILITY,
+                        source_span=clause.source_span,
+                        parameters=(RuleParameter("ability", "stealth"),),
+                    ),
+                ),
+            )
+            for clause in ir.clauses
+        ),
+    )
+    session, model_id = source_retention_session(
+        BattlePhase.SHOOTING,
+        ability_text=text,
+        ability_rule_ir=ir,
+    )
+
+    def granted(current: LocalGameSession, target_id: str) -> tuple[str, ...]:
+        return source_stealth_granted_model_ids(current, target_unit_instance_id=target_id)
+
+    assert granted(session, "army-beta:enemy")
+    assert granted(session, "army-beta:other")
+    reach_source_casualty(session, source_model_id=model_id)
+    assert granted(session, "army-beta:enemy")
+    assert granted(session, "army-beta:other") == ()
+    restored = LocalGameSession.from_persistence_payload(session.to_persistence_payload())
+    assert granted(restored, "army-beta:enemy") == granted(session, "army-beta:enemy")
+    assert granted(restored, "army-beta:other") == ()
+    for _ in range(150):
+        if attack_completed(session):
+            break
+        submit_source_choice(session, pending_request(session), source_model_id=model_id)
+    assert attack_completed(session)
+    assert granted(session, "army-beta:enemy") == ()
+    assert granted(session, "army-beta:other") == ()
+
+
+@pytest.mark.parametrize("source_wargear", [False, True])
+def test_retained_passive_stealth_source_grants_only_living_attached_recipients(
+    source_wargear: bool,
+) -> None:
+    from tests.lethal_hits_helpers import attack_completed
+    from tests.order118_source_helpers import (
+        reach_source_casualty,
+        source_retention_session,
+        source_stealth_granted_model_ids,
+        submit_source_choice,
+    )
+    from tests.psychic_modifier_helpers import pending_request
+    from tests.support.ability_presence_fixtures import compiled_ability_rule
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.phase import BattlePhase
+    from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+    from warhammer40k_core.rules.rule_ir import (
+        RuleDuration,
+        RuleDurationKind,
+        RuleEffectKind,
+        RuleEffectSpec,
+        RuleParameter,
+        RuleTargetKind,
+        RuleTargetSpec,
+    )
+
+    text = "Ranged weapons equipped by models in this unit have the [LETHAL HITS] ability."
+    ir = compiled_ability_rule(text, source_id="test:order118:passive-stealth")
+    # Supply the same typed passive-self grant used by the catalog provider.
+    ir = replace(
+        ir,
+        clauses=tuple(
+            replace(
+                clause,
+                template_id="phase17p:passive-self-ability-grant",
+                trigger=None,
+                conditions=(),
+                target=RuleTargetSpec(
+                    kind=RuleTargetKind.THIS_UNIT, source_span=clause.source_span
+                ),
+                duration=RuleDuration(
+                    kind=RuleDurationKind.WHILE_CONDITION_TRUE, source_span=clause.source_span
+                ),
+                effects=(
+                    RuleEffectSpec(
+                        kind=RuleEffectKind.GRANT_ABILITY,
+                        source_span=clause.source_span,
+                        parameters=(
+                            RuleParameter("ability", "stealth"),
+                            RuleParameter("target_scope", "this_unit"),
+                        ),
+                    ),
+                ),
+            )
+            for clause in ir.clauses
+        ),
+    )
+    session, model_id = source_retention_session(
+        BattlePhase.FIGHT, ability_rule_ir=ir, source_wargear=source_wargear
+    )
+
+    def granted(current: LocalGameSession) -> tuple[str, ...]:
+        return source_stealth_granted_model_ids(current, target_unit_instance_id="army-beta:enemy")
+
+    before = granted(session)
+    assert model_id in before
+    assert len(before) == 3
+    reach_source_casualty(session, source_model_id=model_id)
+    assert set(granted(session)) == set(before) - {model_id}
+    saved = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(saved)
+    assert restored.to_persistence_payload() == saved
+    assert granted(restored) == granted(session)
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="order118:passive-mid"))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )
+    for _ in range(150):
+        if attack_completed(session):
+            break
+        submit_source_choice(session, pending_request(session), source_model_id=model_id)
+    assert attack_completed(session)
+    assert granted(session) == ()
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="order118:passive-done"))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )
+
+
+@pytest.mark.parametrize("phase_token", ["shooting", "fight"])
+def test_queued_source_destruction_survives_native_deferred_mortal_checkpoint(
+    phase_token: str,
+) -> None:
+    from tests.order118_source_helpers import (
+        reach_source_casualty,
+        source_grant_active,
+        source_retention_session,
+        submit_source_choice,
+    )
+    from tests.psychic_modifier_helpers import pending_request
+
+    from warhammer40k_core.adapters.event_stream import EventStreamCursor
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.attack_ability_source_retention import (
+        ATTACK_ABILITY_SOURCE_EXPIRED_EVENT,
+        ATTACK_ABILITY_SOURCE_KIND,
+    )
+    from warhammer40k_core.engine.decision import DecisionError
+    from warhammer40k_core.engine.lifecycle_state_queries import active_attack_sequence_for_state
+    from warhammer40k_core.engine.phase import BattlePhase
+    from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+
+    session, model_id = source_retention_session(
+        BattlePhase(phase_token),
+        source_role="leader",
+        native_deferred_mortals=True,
+        death_reaction=True,
+    )
+    reach_source_casualty(session, source_model_id=model_id)
+    state = session.lifecycle.state
+    assert state is not None
+    sequence = active_attack_sequence_for_state(state)
+    assert sequence is not None
+    assert sequence.pending_attack_destructions
+    sequence_id = sequence.sequence_id
+
+    def original_attack_completed(current: LocalGameSession) -> bool:
+        return any(
+            event.event_type == "attack_sequence_completed"
+            and isinstance(event.payload, dict)
+            and event.payload.get("sequence_id") == sequence_id
+            for event in current.lifecycle.decision_controller.event_log.records
+        )
+
+    assert source_grant_active(session)
+    for _ in range(180):
+        request = pending_request(session)
+        payload = request.payload
+        assert isinstance(payload, dict)
+        lost_wound = payload.get("lost_wound_context")
+        source_context = lost_wound.get("source_context") if isinstance(lost_wound, dict) else None
+        if (
+            isinstance(source_context, dict)
+            and source_context.get("source_kind") == "devastating_wounds"
+        ):
+            assert request.decision_type == "select_feel_no_pain"
+            break
+        submit_source_choice(session, request, source_model_id=model_id)
+    else:
+        raise AssertionError("Native deferred mortal checkpoint was not reached.")
+    sequence = active_attack_sequence_for_state(state)
+    assert sequence is not None
+    assert sequence.pending_attack_destructions
+    assert source_grant_active(session)
+    saved = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(saved)
+    assert restored.to_persistence_payload() == saved
+    assert source_grant_active(restored)
+    fork = session.fork()
+    assert fork.to_persistence_payload() == saved
+    for viewer in ("player-a", "player-b"):
+        assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
+        assert restored.events_since(
+            EventStreamCursor(), viewer_player_id=viewer
+        ) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)
+    with pytest.raises(DecisionError, match="finite action space"):
+        restored.submit_option(
+            request_id=request.request_id,
+            result_id="order118:native-malformed",
+            option_id="order118:nonexistent-native-option",
+        )
+    assert restored.to_persistence_payload() == saved
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="order118:native-mid"))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )
+    for current in (session, restored):
+        for _ in range(250):
+            if original_attack_completed(current):
+                break
+            submit_source_choice(current, pending_request(current), source_model_id=model_id)
+        assert original_attack_completed(current)
+        current_state = current.lifecycle.state
+        assert current_state is not None
+        assert not any(
+            isinstance(effect.effect_payload, dict)
+            and effect.effect_payload.get("effect_kind") == ATTACK_ABILITY_SOURCE_KIND
+            for effect in current_state.persisting_effects
+        )
+        events = current.lifecycle.decision_controller.event_log.records
+        expired = next(
+            index
+            for index, event in enumerate(events)
+            if event.event_type == ATTACK_ABILITY_SOURCE_EXPIRED_EVENT
+            and isinstance(event.payload, dict)
+            and event.payload.get("sequence_id") == sequence_id
+        )
+        completed = next(
+            index
+            for index, event in enumerate(events)
+            if event.event_type == "attack_sequence_completed"
+            and isinstance(event.payload, dict)
+            and event.payload.get("sequence_id") == sequence_id
+        )
+        assert expired < completed
+        complete = current.to_persistence_payload()
+        assert (
+            LocalGameSession.from_persistence_payload(complete).to_persistence_payload() == complete
+        )
+        assert (
+            ReplayRunner.from_payload(current.replay_artifact(artifact_id="order118:native-done"))
+            .run()
+            .status
+            is ReplayRunStatus.REPRODUCED
+        )
+    assert restored.to_persistence_payload() == session.to_persistence_payload()
+    assert fork.to_persistence_payload() == saved
 
 
 def test_core_keyword_ability_descriptors_enable_boolean_families_without_keywords() -> None:

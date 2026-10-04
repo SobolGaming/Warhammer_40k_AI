@@ -520,6 +520,8 @@ def _event_record_hidden_from_context(
         MORTAL_WOUND_APPLICATION_STARTED_EVENT,
         MORTAL_WOUND_MODEL_ALLOCATED_EVENT_TYPE,
         MORTAL_WOUND_ALLOCATION_RULE_APPLIED_EVENT_TYPE,
+        "attack_ability_source_retained",
+        "attack_ability_sources_expired",
         "fight_on_death_retention_opened",
         "fight_on_death_retention_trigger_resolved",
         "fight_on_death_destruction_suspended",

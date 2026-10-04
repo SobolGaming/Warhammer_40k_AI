@@ -4417,19 +4417,12 @@ def _current_wargear_bearer_model_ids(
     current_model_instance_ids: tuple[str, ...],
     wargear_id: str,
 ) -> tuple[str, ...]:
-    current_ids = frozenset(current_model_instance_ids)
-    known_model_ids = {model.model_instance_id for model in unit.own_models}
-    unknown_ids = current_ids - known_model_ids
-    if unknown_ids:
-        raise GameLifecycleError("Catalog rule current model evidence contains unknown models.")
-    return tuple(
-        sorted(
-            model.model_instance_id
-            for model in unit.own_models
-            if model.model_instance_id in current_ids
-            and model.is_alive
-            and wargear_id in model.wargear_ids
-        )
+    from warhammer40k_core.engine.catalog_source_model_presence import (
+        current_wargear_bearer_model_ids,
+    )
+
+    return current_wargear_bearer_model_ids(
+        unit=unit, current_model_instance_ids=current_model_instance_ids, wargear_id=wargear_id
     )
 
 

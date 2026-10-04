@@ -137,11 +137,13 @@ def _aura_source_geometries(
         raise GameLifecycleError("Aura anchor kind is unsupported.")
     if source_model_instance_id is None:
         raise GameLifecycleError("Aura this_model anchor requires source_model_instance_id.")
-    if (
-        source_model_instance_id
-        not in ability_presence(state=state, rules_unit=source_rules_unit).active_model_ids
-    ):
+    presence = ability_presence(state=state, rules_unit=source_rules_unit)
+    if source_model_instance_id not in presence.active_model_ids:
         raise GameLifecycleError("Aura source model must have active ability presence.")
+    # Attack-scoped sources keep their attached unit's ability after ordinary
+    # removal, without supplying a model position for another unit's aura range.
+    if source_model_instance_id not in presence.battlefield_model_ids:
+        return ()
     if not source_geometries:
         return ()
     matching_geometries = tuple(

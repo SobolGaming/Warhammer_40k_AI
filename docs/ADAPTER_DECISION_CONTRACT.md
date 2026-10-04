@@ -7588,3 +7588,17 @@ same boundary and rejects any reachable player choice before mutation.
 Existing persistence/replay envelope versions stay runtime-bound; generated
 runtime identities and contract/client/golden metadata are refreshed. Named
 source eligibility and Stratagem activation are not implemented by this seam.
+
+## Order 118: attached ability sources during attacks
+
+Contract 44.3.5 keeps the existing finite decisions, proposals and schemas. An
+ordinary attached-unit attack casualty can remain an ability source through the
+attacking unit's sequence, including deferred attack mortal wounds. The engine
+records that semantic source lifetime in the existing persisting-effects payload,
+then removes it when the attacks finish. The source has no physical placement or
+right to act. Special Fight/Shoot-on-death retention remains separate.
+
+The internal `attack_ability_source_retained` and
+`attack_ability_sources_expired` events follow the existing private-event policy
+and neutral audit-event RNG accounting. Clients continue submitting existing
+engine-enumerated choices; saves and replays require the regenerated build ID.
