@@ -1,0 +1,17 @@
+{
+  "reviewed_commit": "4820063fe586417b4cc590f46978009b9932a87f",
+  "also_present_at_base": "4820063fe586417b4cc590f46978009b9932a87f",
+  "purpose": "Retain immutable original Order97 movement assertions before appending Order119 source reposition cases. Historical bytes are not current Order119 gameplay evidence.",
+  "current_evidence": "docs/ORDER_119_SCOPE_PLAN.md",
+  "files": [
+    {
+      "path": "tests/unit/test_order80_normal_move.py",
+      "historical_path": "data/source_audits/order119/baseline/tests/unit/test_order80_normal_move.py.txt",
+      "git_revision": "4820063fe586417b4cc590f46978009b9932a87f",
+      "git_path": "tests/unit/test_order80_normal_move.py",
+      "sha256": "942a47b4e5ab17b7ee68353d37d08dfa24f8b75222fcf402ff78a2737fbed6d4",
+      "bytes": 28352,
+      "order97_file_pin": "942a47b4e5ab17b7ee68353d37d08dfa24f8b75222fcf402ff78a2737fbed6d4"
+    }
+  ]
+}

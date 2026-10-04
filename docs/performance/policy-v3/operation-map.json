@@ -3598,6 +3598,8 @@
     },
     "order119-source-evidence": {
       "paths": [
+        "data/source_audits/order119/baseline/tests/unit/test_order80_normal_move.py.txt",
+        "data/source_audits/order119/historical-inputs.json",
         "data/source_audits/order119/user-supplied-shadow-of-anarch.txt"
       ],
       "owners": [
