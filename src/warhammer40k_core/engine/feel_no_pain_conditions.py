@@ -4,8 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.ability_damage_context import ability_damage_is_psychic_attack
 from warhammer40k_core.engine.damage_allocation import FeelNoPainAttackCondition, FeelNoPainSource
 from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
+from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.weapon_abilities import is_psychic_weapon_profile
 
@@ -35,7 +37,12 @@ def feel_no_pain_source_applies_to_mortal_wounds(
     *,
     source: FeelNoPainSource,
     destruction_evidence: MortalWoundDestructionEvidence | None,
+    source_context: JsonValue = None,
 ) -> bool:
+    if ability_damage_is_psychic_attack(source_context):
+        return source.mortal_wounds or feel_no_pain_source_applies_to_attack(
+            source=source, is_psychic_attack=True
+        )
     if destruction_evidence is None:
         return source.attack_condition is None or source.mortal_wounds
     provenance = destruction_evidence.destruction_attribution.destruction_provenance

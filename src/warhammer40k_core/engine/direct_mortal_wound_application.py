@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from warhammer40k_core.engine.ability_damage_context import ability_damage_is_psychic_attack
 from warhammer40k_core.engine.battlefield_state import ModelPlacement
 from warhammer40k_core.engine.damage_allocation import (
     DamageApplication,
@@ -60,6 +61,7 @@ def apply_direct_mortal_wounds_to_unit(
     dice_manager: DiceRollManager | None = None,
     defender_player_id: str | None = None,
 ) -> MortalWoundApplication:
+    ability_damage_is_psychic_attack(source_context, source_rule_id=source_rule_id)
     remaining = validate_positive_int("mortal_wounds", mortal_wounds)
     if type(spill_over) is not bool:
         raise GameLifecycleError("spill_over must be a bool.")
@@ -76,6 +78,8 @@ def apply_direct_mortal_wounds_to_unit(
         spill_over=spill_over,
         dice_manager=dice_manager,
         defender_player_id=defender_player_id,
+        destruction_evidence=destruction_evidence,
+        source_context=source_context,
     )
     append_direct_mortal_wound_application_started(
         state=state,
@@ -123,6 +127,8 @@ def apply_direct_mortal_wounds_to_unit(
             priority_tier=priority_tier,
             selected_model_id=model_id,
             dice_manager=dice_manager,
+            destruction_evidence=destruction_evidence,
+            source_context=source_context,
         )
         if len(sources) > 0:
             if len(sources) > 1 or decline_allowed:
@@ -216,6 +222,8 @@ def _prevalidate_direct_mortal_wound_route(
     spill_over: bool,
     dice_manager: DiceRollManager | None,
     defender_player_id: str | None,
+    destruction_evidence: MortalWoundDestructionEvidence,
+    source_context: JsonValue,
 ) -> None:
     """Reject every potentially reachable choice before direct routing mutates authority."""
 
@@ -240,6 +248,8 @@ def _prevalidate_direct_mortal_wound_route(
         sources = mortal_wound_feel_no_pain_sources(
             state=simulated_state,
             model_instance_id=model_id,
+            destruction_evidence=destruction_evidence,
+            source_context=source_context,
         )
         decline_allowed = mortal_wound_feel_no_pain_decline_allowed(
             state=simulated_state,

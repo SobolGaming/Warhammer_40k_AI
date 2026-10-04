@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:076c31c4709ef3ee60c7c234e40c0c75070772d5d6312cba2f8a44378a21a088",
-  "fingerprint": "076c31c4709ef3ee60c7c234e40c0c75070772d5d6312cba2f8a44378a21a088",
-  "resource_count": 3068,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a0eada4a8f596f343cc89c3562c79669736977c5d0fb6a6ebc9db08d34669e86",
+  "fingerprint": "a0eada4a8f596f343cc89c3562c79669736977c5d0fb6a6ebc9db08d34669e86",
+  "resource_count": 3070,
   "resources": [
     {
       "byte_length": 113,
@@ -62,7 +62,7 @@
     {
       "byte_length": 6284,
       "path": "warhammer40k_core/adapters/external_contract.py",
-      "sha256": "b03a0061c0faf80848fb64766d59ad23631696ce524259793a7fc7ebae584ade"
+      "sha256": "fef4e3fbae0056a56113b1c819f6fc45cdb19ebfafab7f3d20a501c357166c2e"
     },
     {
       "byte_length": 2445,
@@ -645,6 +645,11 @@
       "sha256": "01f751c83cfcc153547830ee37f304b0e1d9479bbd855f1d6ddbc313d35c216d"
     },
     {
+      "byte_length": 3043,
+      "path": "warhammer40k_core/engine/ability_damage_context.py",
+      "sha256": "1ad6c22f11cf318890fbc5877deedee2a7186364df027e734e1ec4d80ed97931"
+    },
+    {
       "byte_length": 7239,
       "path": "warhammer40k_core/engine/ability_instance_history.py",
       "sha256": "e3187be77a8560fc620c30ae9a4a2b59cc787d02b6fd04b68cedf5e8101af3d1"
@@ -700,9 +705,9 @@
       "sha256": "fae85805e5dcfad20bda3c0ab25574d33eaa370bcf775ae1735fc419a17c95d2"
     },
     {
-      "byte_length": 6216,
+      "byte_length": 7308,
       "path": "warhammer40k_core/engine/additional_attack_mortal_permissions.py",
-      "sha256": "16aa781ddfb695ba4d06416ebacf71346f0af1f24ce06c7c6329962ca6dc70c6"
+      "sha256": "84660460dbb5bdf27b244e11b1c5a10ce77fbf494bcd928b2a94f3f9b424e959"
     },
     {
       "byte_length": 4066,
@@ -900,9 +905,9 @@
       "sha256": "1b95c202eec35c059345f30afc9bdf0a30f8621dc2e4f7529c8b0e731b6912d9"
     },
     {
-      "byte_length": 5157,
+      "byte_length": 5460,
       "path": "warhammer40k_core/engine/attack_sequence_deferred_mortals.py",
-      "sha256": "a711e3bc886a5eaa61384fe298e977291fb5875a281606e5f13b4daacea4a252"
+      "sha256": "8e48f057ec07b80068c6b6239fb9b4885cbcdb8625f74e12c3d824480abeaee8"
     },
     {
       "byte_length": 73262,
@@ -2235,9 +2240,9 @@
       "sha256": "4db7ca33b1ee8159f23889cdd2ff29b70f7d8fd60d5f21aff222084d4b08636c"
     },
     {
-      "byte_length": 10593,
+      "byte_length": 11145,
       "path": "warhammer40k_core/engine/direct_mortal_wound_application.py",
-      "sha256": "aa0e1e8f589156334a936787883b5237a90118108b0528bc46e7854a7597f484"
+      "sha256": "9efcf26806fd7b62ed142bd35c6b15157deab97973a9d4845e640abe2916134f"
     },
     {
       "byte_length": 16297,
@@ -9940,9 +9945,9 @@
       "sha256": "9a81d523e00abb15783afc8d5154752ca241c7e9b18cc3dd2ab3bf4528ddfb33"
     },
     {
-      "byte_length": 2035,
+      "byte_length": 2418,
       "path": "warhammer40k_core/engine/feel_no_pain_conditions.py",
-      "sha256": "5896c47a7b7e3232bfab1e669ae186cb2bbd9047e5ec9ca28b59e38378318aa6"
+      "sha256": "faafa0b6ad658eca7d404ab7d30f1d55cb7643d1e43817f54d51ef2fc48529d2"
     },
     {
       "byte_length": 25905,
@@ -10840,9 +10845,9 @@
       "sha256": "5150a0930ac75f4a569b1027e3489295c09e54a1edd13ef2a2ec2f68bba80558"
     },
     {
-      "byte_length": 4943,
+      "byte_length": 5116,
       "path": "warhammer40k_core/engine/mortal_wound_allocation_triggers.py",
-      "sha256": "a39868bd6d99a4f927caf164ad1602bb1538bc3c695c5f19dbe7bca6f5ef47ec"
+      "sha256": "63aa024ceb0df50d2c66ced6065e63b6f03bd50cf63ee82860973dcc2df3f7f7"
     },
     {
       "byte_length": 59036,
@@ -10885,9 +10890,9 @@
       "sha256": "2f2530e58be3c2daa7d7de8e15a3a897ececdc77a07d7a5920b661c55a39d39e"
     },
     {
-      "byte_length": 53335,
+      "byte_length": 53762,
       "path": "warhammer40k_core/engine/mortal_wound_model_allocation.py",
-      "sha256": "4a8b3faa6345681f603cd3415219547edf7ec3362d3fd91aa2c8dabef498d602"
+      "sha256": "31f2092d5d96a7b6bfd3639a7a398486dc6495fe0c98c485f52b162a37ba1084"
     },
     {
       "byte_length": 6476,
@@ -13528,6 +13533,11 @@
       "byte_length": 0,
       "path": "warhammer40k_core/rules/__init__.py",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "byte_length": 3260,
+      "path": "warhammer40k_core/rules/ability_damage_source.py",
+      "sha256": "d9f4d4303567d62275b9e51e8c9a0dcfb3908ea77efbab42476f8b8b9882e679"
     },
     {
       "byte_length": 1650,

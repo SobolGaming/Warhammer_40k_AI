@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import replace
+from pathlib import Path
 from typing import cast
 
 import pytest
@@ -14,12 +16,25 @@ from tests.order117_allocation_helpers import (
     allocation_permission_session,
     complete_allocation_attack,
 )
+from tests.order120_psychic_damage_helpers import (
+    SOURCE_ID as PSYCHIC_DAMAGE_SOURCE_ID,
+)
+from tests.order120_psychic_damage_helpers import (
+    official_psychic_damage_source,
+    psychic_ability_damage_session,
+)
 from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.engine.ability_damage_context import (
+    ability_damage_is_psychic_attack,
+    ability_damage_source_context,
+)
 from warhammer40k_core.engine.damage_allocation import (
+    FeelNoPainAttackCondition,
     FeelNoPainSource,
+    MortalWoundApplication,
     MortalWoundApplicationProgress,
 )
 from warhammer40k_core.engine.decision_request import DecisionError
@@ -43,6 +58,308 @@ from warhammer40k_core.engine.mortal_wound_model_allocation import (
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.rules.ability_damage_source import (
+    AbilityDamageClassification,
+    AbilityDamageSource,
+    AbilityDamageSourceError,
+    AbilityDamageSourcePayload,
+    ability_damage_source_at_data_boundary,
+)
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
+from warhammer40k_core.rules.source_data import RuleSourceText
+
+
+def test_order120_real_psychic_damage_source_and_historical_core_pins() -> None:
+    root = Path(__file__).parents[2]
+    audit = json.loads((root / "data/source_audits/order120/source.audit.json").read_text())
+    example = audit["official_example"]
+    assert hashlib.sha256((root / example["path"]).read_bytes()).hexdigest() == example["sha256"]
+    assert (
+        hashlib.sha256(example["operative_text"].encode()).hexdigest()
+        == example["operative_text_sha256"]
+    )
+    selected = root / "data/source_audits/order97/selected-sources.json"
+    assert hashlib.sha256(selected.read_bytes()).hexdigest() == audit["selected_sources_sha256"]
+    assert audit["selected_core_row"] in json.loads(selected.read_bytes())
+    descriptor = official_psychic_damage_source()
+    assert descriptor.classification is AbilityDamageClassification.PSYCHIC_ATTACK
+    assert descriptor.source_rule_id == PSYCHIC_DAMAGE_SOURCE_ID
+    assert AbilityDamageSource.from_payload(descriptor.to_payload()) == descriptor
+
+
+@pytest.mark.parametrize(
+    ("title", "psychic"),
+    [
+        ("Gift (Psychic):", True),
+        ("Gift (Aura, Psychic):", True),
+        ("Gift (Psychic level 2):", True),
+        ("Psychic Gift:", False),
+        ("Gift (Aura):", False),
+        ("Gift: This is a Psychic test.", False),
+    ],
+)
+def test_order120_classifies_explicit_source_title_once(title: str, psychic: bool) -> None:
+    source = ability_damage_source_at_data_boundary(
+        RuleSourceText.from_raw(
+            source_id="order120:source",
+            raw_text=f"{title} The target suffers 1 mortal wound.",
+            objective_scope=ObjectiveRuleScope.NON_CORE_RULES,
+        )
+    )
+    assert (source.classification is AbilityDamageClassification.PSYCHIC_ATTACK) is psychic
+
+
+@pytest.mark.parametrize("phase", [BattlePhase.SHOOTING, BattlePhase.FIGHT])
+@pytest.mark.parametrize("decline", [False, True])
+def test_order120_ability_classification_survives_real_pending_fork_viewers_and_replay(
+    phase: BattlePhase,
+    decline: bool,
+) -> None:
+    session = psychic_ability_damage_session(phase)
+    for _ in range(100):
+        request = pending_request(session)
+        if request.decision_type == "select_feel_no_pain":
+            break
+        assert not attack_completed(session)
+        submit_fixture_request(session, request)
+    else:
+        raise AssertionError("Psychic ability mortal prevention was not offered.")
+    context = cast(
+        dict[str, JsonValue], cast(dict[str, JsonValue], request.payload)["lost_wound_context"]
+    )
+    source_context = cast(dict[str, JsonValue], context["source_context"])
+    assert ability_damage_is_psychic_attack(source_context)
+    evidence = cast(dict[str, JsonValue], context["destruction_evidence"])
+    attribution = cast(dict[str, JsonValue], evidence["destruction_attribution"])
+    provenance = cast(dict[str, JsonValue], attribution["destruction_provenance"])
+    assert provenance["destruction_source_kind"] == "attack"
+    assert '"psychic"' not in json.dumps(provenance["source_weapon_profile"])
+    checkpoint = json.loads(json.dumps(session.to_persistence_payload()))
+    restored = LocalGameSession.from_persistence_payload(checkpoint)
+    fork = LocalGameSession.from_persistence_payload(checkpoint)
+    with pytest.raises(DecisionError, match="finite action space"):
+        restored.submit_option(
+            request_id=request.request_id, result_id="order120:invalid", option_id="wrong-source"
+        )
+    assert restored.to_persistence_payload() == checkpoint
+    complete_allocation_attack(restored, decline=decline)
+    assert fork.to_persistence_payload() == checkpoint
+    complete_allocation_attack(fork, decline=decline)
+    assert fork.to_persistence_payload() == restored.to_persistence_payload()
+    applications = [
+        cast(dict[str, JsonValue], e.payload)["mortal_wound_application"]
+        for e in restored.lifecycle.decision_controller.event_log.records
+        if e.event_type == "additional_attack_mortal_wounds_applied"
+    ]
+    assert applications
+    resolutions = [
+        cast(dict[str, JsonValue], resolution)
+        for application in applications
+        for resolution in cast(
+            list[JsonValue], cast(dict[str, JsonValue], application)["feel_no_pain_resolutions"]
+        )
+    ]
+    assert resolutions
+    assert any(resolution["source"] is not None for resolution in resolutions) is (not decline)
+    if decline:
+        assert all(resolution["rolls"] == [] for resolution in resolutions)
+    _assert_restore_and_replay(restored, artifact_id=f"order120-{phase.value}-{decline}")
+
+
+@pytest.mark.parametrize("phase", [BattlePhase.SHOOTING, BattlePhase.FIGHT])
+def test_order120_non_psychic_ability_never_uses_psychic_only_protection(
+    phase: BattlePhase,
+) -> None:
+    session = psychic_ability_damage_session(phase, psychic=False)
+    complete_allocation_attack(session)
+    assert not any(
+        e.event_type == "dice_rolled" and "order120:psychic-only-fnp" in json.dumps(e.payload)
+        for e in session.lifecycle.decision_controller.event_log.records
+    )
+    _assert_restore_and_replay(session, artifact_id=f"order120-nonpsychic-{phase.value}")
+
+
+@pytest.mark.parametrize("phase", [BattlePhase.SHOOTING, BattlePhase.FIGHT])
+def test_order120_ordinary_extra_mortals_keep_the_originating_psychic_weapon(
+    phase: BattlePhase,
+) -> None:
+    session = psychic_ability_damage_session(phase, psychic=False, weapon_psychic=True)
+    complete_allocation_attack(session)
+    assert any(
+        e.event_type == "dice_rolled" and "order120:psychic-only-fnp" in json.dumps(e.payload)
+        for e in session.lifecycle.decision_controller.event_log.records
+    )
+    _assert_restore_and_replay(session, artifact_id=f"order120-psychic-weapon-{phase.value}")
+
+
+@pytest.mark.parametrize("psychic", [False, True])
+@pytest.mark.parametrize("optional", [False, True])
+def test_order120_non_attack_direct_ability_damage_preserves_classification_before_mutation(
+    psychic: bool,
+    optional: bool,
+) -> None:
+    session = additional_mortal_session(BattlePhase.SHOOTING, enemy_models=1)
+    state = session.lifecycle.state
+    assert state is not None
+    source, target = (army.units[0] for army in state.army_definitions)
+    descriptor = (
+        official_psychic_damage_source()
+        if psychic
+        else ability_damage_source_at_data_boundary(
+            RuleSourceText.from_raw(
+                source_id=PSYCHIC_DAMAGE_SOURCE_ID,
+                raw_text="Ordinary ability: Target loses wounds.",
+                objective_scope=ObjectiveRuleScope.NON_CORE_RULES,
+            )
+        )
+    )
+    for model in target.own_models:
+        state.record_model_feel_no_pain_sources(
+            model_instance_id=model.model_instance_id,
+            sources=(
+                FeelNoPainSource(
+                    source_id="order120:direct-fnp",
+                    threshold=2,
+                    attack_condition=FeelNoPainAttackCondition.PSYCHIC_ATTACK,
+                ),
+            ),
+            decline_allowed=optional,
+        )
+    decisions = session.lifecycle.decision_controller
+    source_context = ability_damage_source_context(
+        source=descriptor,
+        source_context={"source_kind": "ability", "source_rule_id": descriptor.source_rule_id},
+    )
+    evidence = MortalWoundDestructionEvidence.for_non_attack_state(
+        state=state,
+        destroying_player_id="player-a",
+        source_rules_unit_instance_id=source.unit_instance_id,
+        source_model_instance_id=source.own_models[0].model_instance_id,
+        destruction_source_kind=DestructionSourceKind.ABILITY,
+        action_phase=BattlePhase.SHOOTING,
+        source_step="order120:provider-authorized-outcome",
+    )
+    assert evidence.destruction_source_kind is DestructionSourceKind.ABILITY
+    before = session.to_persistence_payload()
+
+    def apply() -> MortalWoundApplication:
+        return apply_direct_mortal_wounds_to_unit(
+            state=state,
+            decisions=decisions,
+            application_id="order120:direct",
+            source_rule_id=descriptor.source_rule_id,
+            source_context=source_context,
+            destruction_evidence=evidence,
+            target_unit_instance_id=target.unit_instance_id,
+            mortal_wounds=1,
+            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+            defender_player_id="player-b",
+        )
+
+    if psychic and optional:
+        with pytest.raises(GameLifecycleError, match="choices require lifecycle routing"):
+            apply()
+        assert session.to_persistence_payload() == before
+    else:
+        result = apply()
+        assert bool(result.feel_no_pain_resolutions) is psychic
+        assert (
+            bool(
+                [
+                    e
+                    for e in decisions.event_log.records
+                    if e.event_type == "dice_rolled"
+                    and "order120:direct-fnp" in json.dumps(e.payload)
+                ]
+            )
+            is psychic
+        )
+        restored = LocalGameSession.from_persistence_payload(
+            json.loads(json.dumps(session.to_persistence_payload()))
+        )
+        assert restored.to_persistence_payload() == session.to_persistence_payload()
+
+
+def test_order120_malformed_or_wrong_source_descriptor_fails_closed() -> None:
+    descriptor = official_psychic_damage_source()
+    for change in ({"classification": "unknown"}, {"normalized_text_sha256": "x"}, {"extra": True}):
+        with pytest.raises(AbilityDamageSourceError):
+            AbilityDamageSource.from_payload(
+                cast(AbilityDamageSourcePayload, {**descriptor.to_payload(), **change})
+            )
+    context = ability_damage_source_context(
+        source=descriptor, source_context={"source_rule_id": descriptor.source_rule_id}
+    )
+    context_changes: tuple[dict[str, JsonValue], ...] = (
+        {"source_rule_id": "wrong-source"},
+        {"ability_damage_source": []},
+    )
+    for context_change in context_changes:
+        with pytest.raises(GameLifecycleError):
+            ability_damage_is_psychic_attack({**context, **context_change})
+    with pytest.raises(GameLifecycleError):
+        ability_damage_source_context(source=descriptor, source_context=context)
+    with pytest.raises(GameLifecycleError):
+        ability_damage_source_context(source=descriptor, source_context={"source_rule_id": "wrong"})
+    with pytest.raises(GameLifecycleError, match="application source identity"):
+        ability_damage_is_psychic_attack(context, source_rule_id="wrong-application-source")
+
+
+def test_order120_invalid_descriptor_rejects_before_zero_prevention_mutation() -> None:
+    session = additional_mortal_session(BattlePhase.SHOOTING, enemy_models=1)
+    state = session.lifecycle.state
+    assert state is not None
+    source, target = (army.units[0] for army in state.army_definitions)
+    decisions = session.lifecycle.decision_controller
+    descriptor = official_psychic_damage_source()
+    evidence = MortalWoundDestructionEvidence.for_non_attack_state(
+        state=state,
+        destroying_player_id="player-a",
+        source_rules_unit_instance_id=source.unit_instance_id,
+        source_model_instance_id=source.own_models[0].model_instance_id,
+        destruction_source_kind=DestructionSourceKind.ABILITY,
+        action_phase=BattlePhase.SHOOTING,
+        source_step="order120:invalid-provider-outcome",
+    )
+    context: dict[str, JsonValue] = {
+        "source_rule_id": descriptor.source_rule_id,
+        "ability_damage_source": {
+            "source_rule_id": descriptor.source_rule_id,
+            "normalized_text_sha256": descriptor.normalized_text_sha256,
+            "classification": "unknown",
+        },
+    }
+    before = session.to_persistence_payload()
+    with pytest.raises(GameLifecycleError, match="malformed"):
+        apply_direct_mortal_wounds_to_unit(
+            state=state,
+            decisions=decisions,
+            application_id="order120:invalid-direct",
+            source_rule_id=descriptor.source_rule_id,
+            source_context=context,
+            destruction_evidence=evidence,
+            target_unit_instance_id=target.unit_instance_id,
+            mortal_wounds=1,
+        )
+    assert session.to_persistence_payload() == before
+    progress = MortalWoundApplicationProgress.start(
+        application_id="order120:invalid-progress",
+        source_rule_id=descriptor.source_rule_id,
+        source_context=context,
+        target_unit_instance_id=target.unit_instance_id,
+        defender_player_id="player-b",
+        mortal_wounds=1,
+        spill_over=True,
+        destruction_evidence=evidence,
+    )
+    with pytest.raises(GameLifecycleError, match="malformed"):
+        continue_mortal_wound_application(
+            state=state,
+            decisions=decisions,
+            request_id="order120:invalid-progress-request",
+            progress=progress,
+        )
+    assert session.to_persistence_payload() == before
 
 
 @pytest.mark.parametrize("phase", [BattlePhase.SHOOTING, BattlePhase.FIGHT])

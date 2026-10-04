@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.damage_allocation import FeelNoPainSource
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.mortal_wound_allocation_permissions import (
     MORTAL_WOUND_ALLOCATION_RULE_APPLIED_EVENT_TYPE,
     mortal_wound_allocation_preventions,
@@ -39,6 +40,7 @@ def record_mortal_wound_allocation_occurrence(
     parent_request_id: str | None = None,
     parent_result_id: str | None = None,
     destruction_evidence: MortalWoundDestructionEvidence | None = None,
+    source_context: JsonValue = None,
 ) -> tuple[MortalWoundAllocationOccurrence, tuple[FeelNoPainSource, ...], bool]:
     from warhammer40k_core.engine.mortal_wound_model_allocation import (
         MORTAL_WOUND_MODEL_ALLOCATED_EVENT_TYPE,
@@ -53,6 +55,7 @@ def record_mortal_wound_allocation_occurrence(
         state=state,
         model_instance_id=selected_model_id,
         destruction_evidence=destruction_evidence,
+        source_context=source_context,
     )
     decline_allowed = mortal_wound_feel_no_pain_decline_allowed(
         state=state, model_instance_id=selected_model_id
@@ -104,6 +107,7 @@ def record_mortal_wound_allocation_occurrence(
         state=state,
         model_instance_id=selected_model_id,
         destruction_evidence=destruction_evidence,
+        source_context=source_context,
         include_allocation_permissions=False,
     )
     resolved_sources = tuple(sorted((*base_sources, *executed_sources), key=lambda s: s.source_id))

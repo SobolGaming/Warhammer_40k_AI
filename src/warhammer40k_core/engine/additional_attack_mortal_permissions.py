@@ -9,11 +9,16 @@ from __future__ import annotations
 from typing import cast
 
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponProfile
+from warhammer40k_core.engine.ability_damage_context import (
+    ABILITY_DAMAGE_SOURCE_KEY,
+    ability_damage_is_psychic_attack,
+)
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.rules.ability_damage_source import AbilityDamageSource
 
 ADDITIONAL_ATTACK_MORTAL_PERMISSION_KIND = "additional_attack_mortal_permission"
 ADDITIONAL_ATTACK_MORTAL_SOURCE_KIND = "additional_attack_mortal_wounds"
@@ -28,6 +33,7 @@ def additional_attack_mortal_permission_effect(
     occasion_id: str,
     mortal_wounds: int,
     weapon_scope: str,
+    ability_damage_source: AbilityDamageSource | None = None,
 ) -> PersistingEffect:
     """Build a phase-bound source grant; only the engine records the returned effect."""
     unit_id = state.unit_instance_id_for_model(source_model_instance_id)
@@ -38,6 +44,11 @@ def additional_attack_mortal_permission_effect(
         raise GameLifecycleError("Additional attack mortals require a current phase and turn.")
     if source_model_instance_id not in {m.model_instance_id for m in unit.alive_models()}:
         raise GameLifecycleError("Additional attack mortals require a living source model.")
+    if ability_damage_source is not None and (
+        type(ability_damage_source) is not AbilityDamageSource
+        or ability_damage_source.source_rule_id != source_rule_id
+    ):
+        raise GameLifecycleError("Additional attack ability damage source identity drifted.")
     effect = PersistingEffect(
         effect_id=effect_id,
         source_rule_id=source_rule_id,
@@ -55,6 +66,13 @@ def additional_attack_mortal_permission_effect(
             "weapon_scope": weapon_scope,
             "mortal_wounds": mortal_wounds,
             "turn_player_id": turn_player_id,
+            **(
+                {}
+                if ability_damage_source is None
+                else {
+                    ABILITY_DAMAGE_SOURCE_KEY: cast(JsonValue, ability_damage_source.to_payload())
+                }
+            ),
         },
     )
     validate_additional_attack_mortal_permission(effect)
@@ -75,7 +93,7 @@ def validate_additional_attack_mortal_permission(effect: PersistingEffect) -> di
     }
     if (
         not isinstance(payload, dict)
-        or set(payload) != keys
+        or set(payload) not in (keys, keys | {ABILITY_DAMAGE_SOURCE_KEY})
         or payload["effect_kind"] != ADDITIONAL_ATTACK_MORTAL_PERMISSION_KIND
         or type(payload["mortal_wounds"]) is not int
         or payload["mortal_wounds"] < 1
@@ -84,6 +102,13 @@ def validate_additional_attack_mortal_permission(effect: PersistingEffect) -> di
         or effect.started_phase is None
     ):
         raise GameLifecycleError("Additional attack mortal permission schema drift.")
+    if ABILITY_DAMAGE_SOURCE_KEY in payload:
+        ability_damage_is_psychic_attack(
+            {
+                "source_rule_id": effect.source_rule_id,
+                ABILITY_DAMAGE_SOURCE_KEY: payload[ABILITY_DAMAGE_SOURCE_KEY],
+            }
+        )
     for key in ("source_model_instance_id", "occasion_id", "turn_player_id"):
         value = payload[key]
         if type(value) is not str or not value.strip() or value != value.strip():

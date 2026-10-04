@@ -3640,6 +3640,100 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order120-ability-damage-classification": {
+      "paths": [
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/engine/ability_damage_context.py",
+        "src/warhammer40k_core/engine/additional_attack_mortal_permissions.py",
+        "src/warhammer40k_core/engine/attack_sequence_deferred_mortals.py",
+        "src/warhammer40k_core/engine/direct_mortal_wound_application.py",
+        "src/warhammer40k_core/engine/feel_no_pain_conditions.py",
+        "src/warhammer40k_core/engine/mortal_wound_allocation_triggers.py",
+        "src/warhammer40k_core/engine/mortal_wound_model_allocation.py",
+        "src/warhammer40k_core/rules/ability_damage_source.py"
+      ],
+      "owners": [
+        "@module",
+        "AbilityDamageClassification",
+        "AbilityDamageSource",
+        "AbilityDamageSource.__post_init__",
+        "AbilityDamageSource.from_payload",
+        "AbilityDamageSource.to_payload",
+        "AbilityDamageSourceError",
+        "AbilityDamageSourcePayload",
+        "_continue_mortal_wound_application_for_model",
+        "_prevalidate_direct_mortal_wound_route",
+        "ability_damage_is_psychic_attack",
+        "ability_damage_source_at_data_boundary",
+        "ability_damage_source_context",
+        "additional_attack_mortal_permission_effect",
+        "apply_deferred_attack_mortals",
+        "apply_direct_mortal_wounds_to_unit",
+        "continue_mortal_wound_application",
+        "feel_no_pain_source_applies_to_mortal_wounds",
+        "mortal_wound_feel_no_pain_sources",
+        "record_mortal_wound_allocation_occurrence",
+        "source_permission_damage_context",
+        "validate_additional_attack_mortal_permission",
+        "validate_mortal_wound_feel_no_pain_request_authority"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order120-regressions": {
+      "paths": [
+        "tests/order120_psychic_damage_helpers.py",
+        "tests/unit/test_order117_mortal_allocation.py"
+      ],
+      "owners": [
+        "@module",
+        "official_psychic_damage_source",
+        "psychic_ability_damage_session",
+        "test_order120_ability_classification_survives_real_pending_fork_viewers_and_replay",
+        "test_order120_classifies_explicit_source_title_once",
+        "test_order120_invalid_descriptor_rejects_before_zero_prevention_mutation",
+        "test_order120_malformed_or_wrong_source_descriptor_fails_closed",
+        "test_order120_non_attack_direct_ability_damage_preserves_classification_before_mutation",
+        "test_order120_non_psychic_ability_never_uses_psychic_only_protection",
+        "test_order120_ordinary_extra_mortals_keep_the_originating_psychic_weapon",
+        "test_order120_real_psychic_damage_source_and_historical_core_pins"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order120-source-evidence": {
+      "paths": [
+        "data/source_audits/order120/source.audit.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order120-contract-publication": {
+      "paths": [
+        "conformance/typescript/src/contract.ts",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

@@ -1,0 +1,38 @@
+{
+  "order": 120,
+  "base": "8f2c6723645a10c571915e915e3da5dbfedd0586",
+  "requirement": "22.03-psychic-damage-tag",
+  "selected_core_row": {
+    "row_id": "rule:22:22.03:1",
+    "category": "22",
+    "locator": "22.03",
+    "title": "Psychic Abilities",
+    "occurrence": 1,
+    "source_sha256": "45bd6cc928914d22b4b1acf3b613498c8e495e029c62c0f6651e6ec6d80c91e5",
+    "blocks": [
+      {
+        "ordinal": 1,
+        "kind": "text",
+        "sha256": "492bd2ced01ec6d882271a9a195a33c225f162f47af843004e731a986013eee8",
+        "value": "Abilities tagged with the word \u2018Psychic\u2019 are \u0005psychic abilities\u0006. If a \u0005psychic ability\u0006 causes a model to lose one or more wounds, each of those wounds is said to be inflicted by a \u0005psychic attack\u0006 (this can be important for the triggering of other rules)."
+      }
+    ],
+    "selected_provider": "Game Datamissions",
+    "historical_source_row_sha256": "c77d39e37f11e0650b732c1303db0517862cd7522e073ed65f12ce96dde1379d",
+    "review_category": "22"
+  },
+  "selected_sources_sha256": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+  "official_example": {
+    "path": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_chaos_daemons-lycqqrymwe-qogh4b5yly.pdf",
+    "sha256": "818f7ef144691b9eef6b3c5b5d0a39793690af5a958037b7055215e6675e6a2c",
+    "page": 48,
+    "source_rule_id": "gw-11e-2026-07-22-chaos-daemons:the-blue-scribes:xiratps-sorcerous-barrages",
+    "operative_text": "Xirat\u2019p\u2019s Sorcerous Barrages (Psychic): At the end of your  Movement phase, roll one D6 for each enemy unit within 6\"  of this model: on a 2-3, that unit suffers 1 mortal wound; on  a 4-5, that unit suffers D3 mortal wounds; on a 6, that unit  suffers D6 mortal wounds.",
+    "operative_text_sha256": "d8a485aa47437b315a6f1bd7afdbd014d82092d62a98adbb43ba97a189973499",
+    "scope_evidence": "Cover p1: legal matched play from22July2026; Contents places Index atp2, Legends Datasheets atp132. Example p48 is in the Index and has no Legends designation. Complete cover and ability page visually inspected.",
+    "official_url": "https://assets.warhammer-community.com/eng_22-07_warhammer_40,000_faction_pack_chaos_daemons-lycqqrymwe-qogh4b5yly.pdf",
+    "provenance_manifest": "data/source_manifests/gw_11e_faction_packs.yaml",
+    "observation_status": "Existing retained official artifact; no new network observation."
+  },
+  "authority_limits": "Retained official example authenticates Psychic title and damage classification as conditional Core permission evidence. No fresh source observation, F00 faction admission, named target/range/timing/activation, or playable Blue Scribes sequence is claimed. Generic provider fixtures do not claim that the example grants additional successful-wound mortals. Cabal Psychic title remains unqualified; named activation and existing faction scaffolds remain deferred/load-only."
+}
