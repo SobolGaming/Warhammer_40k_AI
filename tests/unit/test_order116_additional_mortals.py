@@ -257,7 +257,8 @@ def test_additional_permission_id_cannot_alias_native_mortal_application() -> No
     ids = [cast(str, payload["application_id"]) for payload in started]
     assert len(ids) == len(set(ids))
     kinds = {
-        cast(dict[str, JsonValue], payload["source_context"])["source_kind"] for payload in started
+        cast(str, cast(dict[str, JsonValue], payload["source_context"])["source_kind"])
+        for payload in started
     }
     assert kinds == {"devastating_wounds", "additional_attack_mortal_wounds"}
     assert any(":additional_attack_mortal_wounds:devastating-wounds:" in value for value in ids)
