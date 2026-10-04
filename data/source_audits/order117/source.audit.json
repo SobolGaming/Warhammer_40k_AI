@@ -1,0 +1,112 @@
+{
+  "order": 117,
+  "base": "4b59ded9d7dfd1af4170adaa50462bcf6cf32c0d",
+  "requirement": "faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01",
+  "source": "data/source_audits/order97/selected-sources.json",
+  "source_sha256": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+  "selected_rows": [
+    {
+      "row_id": "rule:06:06.02:1",
+      "category": "06",
+      "locator": "06.02",
+      "title": "Mortal Wounds",
+      "occurrence": 1,
+      "source_sha256": "039064052b2edb0a33276d6f02fc4a3bca671f87b3a3af9799c6d86c8211cbba",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "359a2e17a5c0e028c5db5adb7d5ca8ee119647a916768f9d16bace019a2f6898",
+          "value": "Some attacks or rules inflict \u0005mortal wounds\u0006 on units. Each time a unit suffers one or more \u0005mortal wounds\u0006, its controlling player must resolve the following sequence for each of those \u0005mortal wounds\u0006, until either all of them have been inflicted or that unit is \u0005destroyed\u0006:"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "42b52d754de77338b18994dfb82885b4cf2889de9d419be0dda5aca0f196c886",
+          "value": "\u00051. Select Model\u0006: Select one model in that unit by following the first instruction below that applies:"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "251f67ca200527381f3664b98e297a8e31fb8920cbb43f3cab974e03cae246f4",
+          "value": "\u2022 If a non\u2011\u0003CHARACTER\u0004 model in that unit has lost one or more wounds, you must select that model."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "170dd399b8e93994ad3668e40f048946432c068399195a46b528b31f9c9d1111",
+          "value": "\u2022 Otherwise, if that unit contains one or more non\u2011\u0003CHARACTER\u0004 models, you must select one of those models."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "287d5c94b43c121ab24214f9dfa512fdcf34617e7097ec3c5b4a18da3daa79ba",
+          "value": "\u2022 Otherwise, if one or more \u0003CHARACTER\u0004 models in that unit have lost one or more wounds, you must select one of those models."
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "e8f6627e74c012312b600ebb974ba9e6ca7f3b7cfa9fe938a0707a0e7053f445",
+          "value": "\u2022 Otherwise, you must select one \u0003CHARACTER\u0004 model in that unit."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "1d1077a1420904d164b7db440cd830105ee1e06cad5aeae07e78166f0293f46c",
+          "value": "\u00052. Resolve Damage\u0006: The selected model loses 1 wound. If this reduces that model\u2019s remaining wounds to 0, it is destroyed."
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "969c572dd7eff3bd29ca395c4adeb481894c26a66a25e493045e6e27aefc48c4",
+          "value": "\u0005MORTAL WOUNDS AND NORMAL DAMAGE\u0006"
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "4a041dbf4661e64ce5dd071f3ed4f987f5bf13e529bcab2474ab9e68af8bd9c9",
+          "value": "When resolving \u0005attack dice\u0006, if those attacks inflict a mixture of both \u0005mortal wounds\u0006 and normal damage, resolve all of the normal damage first, then resolve all of the \u0005mortal wounds\u0006."
+        }
+      ],
+      "selected_provider": "Game Datamissions",
+      "historical_source_row_sha256": "9bf54419a5f5116934de757c577ef035cc6eff4608de7ea33df267093dbe7c88",
+      "review_category": "06"
+    },
+    {
+      "row_id": "faq:e58d31bc-b6eb-4db1-b319-dc27dd60154f",
+      "category": "FAQ",
+      "locator": "e58d31bc-b6eb-4db1-b319-dc27dd60154f",
+      "title": "FAQ 08",
+      "occurrence": 1,
+      "source_sha256": "6cb474a554ba766f84b3bf678656f25876bec6fb41905666e7e3a0697b89e3fb",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "question",
+          "sha256": "f657b8d346a939f2b7b7b739b480f3b71d1033cfa9ef85647ed9b666cc73522a",
+          "value": "I have a rule that triggers when a mortal wound is allocated to a model, when does this happen?"
+        },
+        {
+          "ordinal": 2,
+          "kind": "answer",
+          "sha256": "b18080da8230450f96b5bd8258736bac58baa3d8752d35975572b17a13af74c0",
+          "value": "When you select a model in the Select Model step of Mortal Wounds (06.02)."
+        }
+      ],
+      "selected_provider": "Game Datamissions",
+      "historical_source_row_sha256": "cdc0c7973440f8719f26099a1787ef5f3896ad2bbb6033c5b64c3ca1f8574e45",
+      "review_category": "06"
+    }
+  ],
+  "official_exemplar": {
+    "path": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_adeptus_custodes-9ddgakd3ms-3azheaqd6y.pdf",
+    "sha256": "2bd44272dd4abb2c4e44b77ecb3bac55cb21d14f3be9312ee4ca2591b8112427",
+    "package_id": "gw-11e-adeptus-custodes-faction-pack-2026-07",
+    "retained_profile": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_stratagem_activation_2026_27.json",
+    "retained_profile_sha256": "c50e9b188744bff24359d8a0559556f1c47a59a48f32aae662822322ab58f67f",
+    "source_row_id": "stratagem:adeptus-custodes:shield-host:000008394002",
+    "semantic_status": "Core permission consumer only; named activation remains load-only"
+  },
+  "fresh_live_observation": false,
+  "authority": "Owner-authorized Core-only seam, following Orders114/116; providers own eligibility, choices and resource accounting."
+}

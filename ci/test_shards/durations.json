@@ -90,6 +90,7 @@
     "tests/unit/test_order111_friendly_transit.py": 79.541,
     "tests/unit/test_order115_absent_movement.py": 374.675,
     "tests/unit/test_order116_additional_mortals.py": 624.203,
+    "tests/unit/test_order117_mortal_allocation.py": 462.204,
     "tests/unit/test_order36_sequencing.py": 297.82,
     "tests/unit/test_order36_timing_authority.py": 170.898,
     "tests/unit/test_order51_flight.py": 171.187,
@@ -306,76 +307,77 @@
     {
       "junit_sha256": [
         "4ab6dd17cbe65631a80ffaec34c3be366d61257d33b4c99933b86a247d5dd8b6",
+        "4f697759a99a0d3e1c8456f7d8db10fa85755ca825daddb7c21cd18658f9dd61",
         "f798e389d35fb39af3a76982bd0a710c559214fb5fda8fdded5c32691f5be9d2"
       ],
-      "source": "Order116 complete successful covered cohort b817edc5e0bb211047973a58c8b48538923fe5f0; Windows Python3.14.5; 16 polygon cases serial with unchanged healthchecks plus disjoint10686 cases32-worker xdist worksteal; all10702 cases passed once; combined appended branch coverage; exact current runtimed8048300.",
-      "test_cases": 10702,
-      "test_files": 301
+      "source": "Representative bootstrap: immutable Order116 complete successful 10702-case base JUnit plus all18 current Order117 focused cases extracted from successful allocation-focused7.xml. Not a current full-suite certificate; replace with fresh complete current timing after runtime/test freeze.",
+      "test_cases": 10720,
+      "test_files": 302
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 4421.091,
+      "duration_seconds": 4459.622,
       "shard_id": 1,
-      "test_file_count": 24
+      "test_file_count": 23
     },
     {
-      "duration_seconds": 4421.126,
+      "duration_seconds": 4459.622,
       "shard_id": 2,
-      "test_file_count": 24
+      "test_file_count": 25
     },
     {
-      "duration_seconds": 4421.095,
+      "duration_seconds": 4459.624,
       "shard_id": 3,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4421.1,
+      "duration_seconds": 4459.619,
       "shard_id": 4,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4421.107,
+      "duration_seconds": 4459.621,
       "shard_id": 5,
-      "test_file_count": 24
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 4421.096,
+      "duration_seconds": 4459.628,
       "shard_id": 6,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4421.125,
+      "duration_seconds": 4459.618,
       "shard_id": 7,
-      "test_file_count": 24
-    },
-    {
-      "duration_seconds": 4421.128,
-      "shard_id": 8,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4421.091,
-      "shard_id": 9,
-      "test_file_count": 27
+      "duration_seconds": 4459.619,
+      "shard_id": 8,
+      "test_file_count": 24
     },
     {
-      "duration_seconds": 4421.098,
+      "duration_seconds": 4459.627,
+      "shard_id": 9,
+      "test_file_count": 25
+    },
+    {
+      "duration_seconds": 4459.622,
       "shard_id": 10,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4421.11,
+      "duration_seconds": 4459.618,
       "shard_id": 11,
-      "test_file_count": 25
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 4421.092,
+      "duration_seconds": 4459.623,
       "shard_id": 12,
       "test_file_count": 25
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 53053.259
+  "total_test_duration_seconds": 53515.463
 }

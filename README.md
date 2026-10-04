@@ -1182,3 +1182,7 @@ penalties, exempting CLOSE-QUARTERS attacks only against an engaged target.
 Third-party shooting, attached ownership, modifiers and replay share the engine
 path. See [scope and validation](docs/ORDER_71_SCOPE_PLAN.md). Verify source data
 with `uv run python tools/build_core_engaged_shooting_source.py --check`.
+
+Order117 records every mortal Select Model boundary and executes source-backed
+phase-bound prevention permissions through shared allocation. Named Stratagem
+activation remains load-only. See [scope and evidence](docs/ORDER_117_SCOPE_PLAN.md).

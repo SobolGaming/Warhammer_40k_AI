@@ -7570,3 +7570,21 @@ independent permission effect IDs remain distinct occurrences. Additional mortal
 application IDs namespace the permission effect ID by source kind; an accepted
 effect ID `devastating-wounds` cannot alias a native application. Native IDs keep
 their existing shape. Existing reroll submission families and validation apply.
+
+## Order117 / Contract 44.3.4: mortal allocation-trigger Core seam
+
+Existing finite mortal-recipient and Feel No Pain requests cover the new consumer;
+there is no new decision type, proposal kind or submission shape. The engine
+records `mortal_wound_model_allocated` for every Select Model, including no-FNP
+and automatic prevention. Applicable source permissions execute before prevention
+and wound loss; returned descriptors populate the existing finite FNP source
+options. Source IDs remain deterministic and JSON-safe. Pending authority queries
+the same phase-bound permission and rejects option/context drift before queue pop.
+The new private `mortal_wound_allocation_rule_applied` event carries allocation
+occurrence ID, source/permission identity, permission snapshot, selected physical
+model and the actual FNP descriptor. Shared redaction hides both allocation and
+execution records from viewer projections/event deltas. Direct routing uses the
+same boundary and rejects any reachable player choice before mutation.
+Existing persistence/replay envelope versions stay runtime-bound; generated
+runtime identities and contract/client/golden metadata are refreshed. Named
+source eligibility and Stratagem activation are not implemented by this seam.
