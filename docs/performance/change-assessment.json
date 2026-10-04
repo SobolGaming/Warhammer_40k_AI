@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "09a8c5949e48ae199ce5f31332edeba47dad5420",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5175c89c65de68f5228d58e8ba79b7a675447c3ec9c6fb83b0903ae4a0c1d057",
-  "operation_map_sha256": "0fab86bb15e488c634b29be5360f568bf2c5f986c8cbb2bc99020f8e86862dc8",
+  "operation_map_sha256": "7924d9762574499a217e0203c0bb7f9e4fd336c12655fe3144e6b769bfc76568",
   "changes": {
     "README.md": {
       "before_sha256": "ef179dd6f1712ad1a8a4179f18b20a7dea75c6095c8227936168daf3f645a9b8",
@@ -141,6 +141,16 @@
         "@document": {
           "before": "12c0dbae7302ab93f4fec1e00f2e3339071272c7e084a49e906f466fcebd56d2",
           "after": "eba6e2a6f7651ada8de1f3dc79fb9039ce59d5f922ea40a4bd4605f5c654bbcf"
+        }
+      }
+    },
+    "conformance/typescript/src/contract.ts": {
+      "before_sha256": "e9ea644e89a7937289edfcf4881cabfeed5adf357b78b4a9e2f1e8ddd8ac9de1",
+      "after_sha256": "89d688b3d8c5ad7cbe6a20483d2fd7d42baab619611daac903f4e39683817e31",
+      "owners": {
+        "@document": {
+          "before": "e9ea644e89a7937289edfcf4881cabfeed5adf357b78b4a9e2f1e8ddd8ac9de1",
+          "after": "89d688b3d8c5ad7cbe6a20483d2fd7d42baab619611daac903f4e39683817e31"
         }
       }
     },
@@ -306,11 +316,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "629a76fada587ae7ace544c469253b5a3ce96bc89fa62d4008cc48f7c0098f69",
-      "after_sha256": "c94131ec0738360f75452000b684b0f95306a292cca4e14e7bc8e586c62227d6",
+      "after_sha256": "065138ced963b320216dd941a95b66f3cab7c2e878b832dad071f5a653741dc0",
       "owners": {
         "@document": {
           "before": "629a76fada587ae7ace544c469253b5a3ce96bc89fa62d4008cc48f7c0098f69",
-          "after": "c94131ec0738360f75452000b684b0f95306a292cca4e14e7bc8e586c62227d6"
+          "after": "065138ced963b320216dd941a95b66f3cab7c2e878b832dad071f5a653741dc0"
         }
       }
     },
@@ -668,6 +678,16 @@
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core Command-abilities timing seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected Order97 Core rule:08:08.00:1 block6 and rule:08:08.04:1 block1: resolve unqualified Command abilities after Core CP and Battle-shock, excluding start/end, Core CP gain and Battle-shock-roll triggers. Synthetic source-linked canonical outcomes demonstrate the conditional consumer seam, not F00 admission.",
+      "unchanged_work": "The Command phase calls the existing runtime timing resolver once for a distinct body window. Catalog discovery adds the supported unqualified Command CP shape; source order, effects, modifier preflight, live bearer checks, decisions and continuations retain their shared owners. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads, dice work or lifetime owners. No intended performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and live semantic/ownership/work controls apply; no full-game certification or numerical budget refresh."
+    },
+    "conformance/typescript/src/contract.ts": {
+      "category": "rule_semantics",
+      "operations": [
+        "order121-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Bounded source-linked Core Command-abilities timing seam, canonical facade regressions and truthful separately retained source evidence.",

@@ -3807,6 +3807,7 @@
     },
     "order121-contract-publication": {
       "paths": [
+        "conformance/typescript/src/contract.ts",
         "contracts/README.md",
         "contracts/examples/persistence/session-persistence.json",
         "contracts/examples/sessions/session-command-outcome.json",
