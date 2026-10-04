@@ -49,13 +49,7 @@ def offered_stratagem_reaction(
             catalog=catalog,
             toughness=96,
             wounds=1,
-            game_id=(
-                "order49-retention-0"
-                if collateral_depth == 1
-                else "order121-retention-nested-0"
-                if collateral_depth == 2
-                else "order48-crushing-impact"
-            ),
+            game_id="order49-retention-0" if collateral_depth == 1 else "order48-crushing-impact",
         )
     else:
         lifecycle, _ = explosives_scene(catalog=catalog, extra_friendly=collateral_depth == 1)

@@ -3768,22 +3768,31 @@
     },
     "order121-regressions": {
       "paths": [
+        "tests/order101_failed_setup_helpers.py",
+        "tests/stratagem_retention_helpers.py",
         "tests/unit/test_order121_command_abilities.py",
-        "tests/unit/test_order97_facade_evidence.py"
+        "tests/unit/test_order97_facade_evidence.py",
+        "tests/unit/test_phase10o_fall_back.py",
+        "tests/unit/test_phase9b_lifecycle.py"
       ],
       "owners": [
         "@module",
         "_events",
         "_session",
+        "failed_setup_automatic_record_session",
+        "offered_stratagem_reaction",
         "test_category07_facade_round_turn_phase_order_and_restore",
         "test_command_abilities_sequence_resumes_then_finishes_before_end_effect",
+        "test_command_body_audits_after_manager_creation_preserve_native_dice_and_restore",
         "test_command_body_rejects_entry_before_core_steps",
         "test_command_body_repeats_only_on_owners_turn_through_full_phase_cycles",
         "test_command_gain_executes_in_its_distinct_source_window",
         "test_failed_roll_or_lost_bearer_cannot_gain_cp",
         "test_other_unqualified_phase_does_not_gain_command_consumer",
+        "test_placeholder_phase_handler_emits_explicit_noop_and_advances_boundary",
         "test_qualified_command_trigger_does_not_gain_body_consumer",
-        "test_real_battle_shock_finishes_before_command_ability"
+        "test_real_battle_shock_finishes_before_command_ability",
+        "test_voluntary_desperate_escape_waits_for_delirium_fnp_before_embark"
       ],
       "families": [],
       "sensitive": false,
@@ -3791,7 +3800,11 @@
     },
     "order121-source-evidence": {
       "paths": [
+        "data/source_audits/order121/baseline/tests/order101_failed_setup_helpers.py.txt",
+        "data/source_audits/order121/baseline/tests/stratagem_retention_helpers.py.txt",
         "data/source_audits/order121/baseline/tests/unit/test_order97_facade_evidence.py.txt",
+        "data/source_audits/order121/baseline/tests/unit/test_phase10o_fall_back.py.txt",
+        "data/source_audits/order121/baseline/tests/unit/test_phase9b_lifecycle.py.txt",
         "data/source_audits/order121/historical-inputs.json",
         "data/source_audits/order121/source.audit.json",
         "tools/core_rules_order97_history.py"

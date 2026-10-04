@@ -44,3 +44,25 @@ wheel and TypeScript checks; two distinct exact-head CLEAN reviews; all hosted
 CI jobs; and protected merge without bypass. No Order122 or test reorganization
 is included. This is an ordinary rules repair with no intended performance
 change or full-game performance certification.
+
+Two existing Desperate Escape/FNP fixtures use current deterministic game IDs
+to retain their failed Battle-shock branch after the new public body audit
+events shift nested source-event references in RNG history. Every original
+FNP-before-embark, pending, restore and replay assertion remains. The original
+fixture is retained as exact base Git bytes in the bounded historical map.
+Dice, Leadership, FNP ordering and RNG algorithms are unchanged.
+
+The placeholder phase assertion includes and source-checks the new body pair
+while retaining every other boundary. A current game ID restores the existing
+depth-two nested-destruction fixture, including accepted/declined reactions,
+ancestry, invalid ancestry controls, persistence and replay. Original fixture
+bytes remain in the same exact Git-blob archive map. Independent live/audited/
+restored dice checks exclude recurrence of the Order117 neutral-suffix bug
+before fixture changes; new body-audit regressions exercise the post-creation
+pair and sequencing suffix. Native dice and history algorithms remain unchanged.
+
+The failed-setup/automatic-attack fixture uses a current result-ID prefix to
+retain its complete native shooting decision sequence, two failed setup
+attempts, engine-generated automatic records, JSON restoration and exact
+replay. Its assertions and choices remain identical; original canonical
+Git bytes are archived. No dice or attack implementation changes apply.

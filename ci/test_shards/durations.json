@@ -91,7 +91,7 @@
     "tests/unit/test_order115_absent_movement.py": 377.345,
     "tests/unit/test_order116_additional_mortals.py": 650.817,
     "tests/unit/test_order117_mortal_allocation.py": 1017.99,
-    "tests/unit/test_order121_command_abilities.py": 326.589,
+    "tests/unit/test_order121_command_abilities.py": 314.718,
     "tests/unit/test_order36_sequencing.py": 306.046,
     "tests/unit/test_order36_timing_authority.py": 172.856,
     "tests/unit/test_order51_flight.py": 177.546,
@@ -307,78 +307,78 @@
   "profiles": [
     {
       "junit_sha256": [
+        "5a8049bf8a8a66845b5cbd47a5f6bc6b472eeb2f3ffe0119b3dd15ad8bc9a108",
         "8641ee1f2e274fe3b3e87e2ed88eb6a4f8c835b2903139bad7161344602b5b3c",
-        "af151688791a3afd55b0a7f87f93c49c51c94f79139a94f773c78ddb97ce53d6",
-        "ed3dfd7c12c9d2c1e24a24c07c6d3f733a13b784f3421dd9ffc5f3428097673e"
+        "af151688791a3afd55b0a7f87f93c49c51c94f79139a94f773c78ddb97ce53d6"
       ],
-      "source": "Order120 authenticated complete current-main profile 09a8c594 plus 15 new Order121 cases on current source, Python3.14.5 Windows; prior existing files retained, new file timed by focused4.",
-      "test_cases": 10791,
+      "source": "Order120 authenticated complete current-main profile 09a8c594 plus 17 new Order121 cases on current source, Python3.14.5 Windows; prior existing files retained, new file timed by focused-final3.",
+      "test_cases": 10793,
       "test_files": 303
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 4681.603,
+      "duration_seconds": 4680.615,
       "shard_id": 1,
       "test_file_count": 23
     },
     {
-      "duration_seconds": 4681.594,
+      "duration_seconds": 4680.602,
       "shard_id": 2,
-      "test_file_count": 24
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 4681.612,
+      "duration_seconds": 4680.605,
       "shard_id": 3,
-      "test_file_count": 25
-    },
-    {
-      "duration_seconds": 4681.593,
-      "shard_id": 4,
-      "test_file_count": 25
-    },
-    {
-      "duration_seconds": 4681.591,
-      "shard_id": 5,
-      "test_file_count": 27
-    },
-    {
-      "duration_seconds": 4681.596,
-      "shard_id": 6,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4681.596,
+      "duration_seconds": 4680.617,
+      "shard_id": 4,
+      "test_file_count": 26
+    },
+    {
+      "duration_seconds": 4680.596,
+      "shard_id": 5,
+      "test_file_count": 25
+    },
+    {
+      "duration_seconds": 4680.616,
+      "shard_id": 6,
+      "test_file_count": 25
+    },
+    {
+      "duration_seconds": 4680.617,
       "shard_id": 7,
+      "test_file_count": 25
+    },
+    {
+      "duration_seconds": 4680.61,
+      "shard_id": 8,
       "test_file_count": 24
     },
     {
-      "duration_seconds": 4681.598,
-      "shard_id": 8,
+      "duration_seconds": 4680.603,
+      "shard_id": 9,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4681.592,
-      "shard_id": 9,
-      "test_file_count": 26
-    },
-    {
-      "duration_seconds": 4681.591,
+      "duration_seconds": 4680.617,
       "shard_id": 10,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4681.594,
+      "duration_seconds": 4680.594,
       "shard_id": 11,
-      "test_file_count": 27
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 4681.598,
+      "duration_seconds": 4680.595,
       "shard_id": 12,
-      "test_file_count": 26
+      "test_file_count": 27
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 56179.158
+  "total_test_duration_seconds": 56167.287
 }

@@ -375,3 +375,46 @@ def test_qualified_command_trigger_does_not_gain_body_consumer(qualified_window:
         ),
     )
     assert not catalog_rule_ir_consumers_for_rule(replace(rule, clauses=(qualified,)))
+
+
+@pytest.mark.parametrize(
+    "event_types",
+    [
+        ("timing_window_opened", "timing_window_resolved"),
+        ("timing_window_opened", "timing_batch_transition", "timing_window_resolved"),
+    ],
+)
+def test_command_body_audits_after_manager_creation_preserve_native_dice_and_restore(
+    event_types: tuple[str, ...],
+) -> None:
+    from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
+    from warhammer40k_core.engine.command_abilities import COMMAND_ABILITIES_SOURCE_RULE_ID
+    from warhammer40k_core.engine.decision import DiceRollManager
+    from warhammer40k_core.engine.event_log import EventLog
+
+    plain = DiceRollManager("order121:command-body-neutral-history")
+    audited = DiceRollManager("order121:command-body-neutral-history")
+    spec = DiceRollSpec(
+        expression=DiceExpression(quantity=2, sides=100_000),
+        reason="Command body audit neutrality",
+        roll_type="order121.command_body_audit",
+        actor_id="p-a",
+    )
+    assert plain.roll(spec) == audited.roll(spec)
+    for event_type in event_types:
+        audited.event_log.append(
+            event_type,
+            {
+                "source_rule_id": COMMAND_ABILITIES_SOURCE_RULE_ID,
+                "source_step": "command_abilities",
+            },
+        )
+    for _ in range(2):
+        assert plain.roll(spec) == audited.roll(spec)
+    assert plain.rng.to_payload() == audited.rng.to_payload()
+    restored = DiceRollManager(
+        "order121:command-body-neutral-history",
+        event_log=EventLog.from_payload(json.loads(json.dumps(audited.event_log.to_payload()))),
+    )
+    assert restored.rng.to_payload() == audited.rng.to_payload()
+    assert restored.roll(spec) == audited.roll(spec) == plain.roll(spec)
