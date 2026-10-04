@@ -335,19 +335,28 @@ def conditional_leading_source_unit_applies(
     view = rules_unit_view_by_id(state=state, unit_instance_id=rules_unit_instance_id)
     if not view.is_attached_rules_unit:
         return False
+    present_component_ids = {
+        component.unit.unit_instance_id for component in view.rules_present_components
+    }
     source_components = tuple(
         component
         for component in view.components
         if source_unit_id
         in {component.unit.unit_instance_id, component.unit.source_unit_instance_id}
         and component.role in {"leader", "support"}
-        and active_ability_model_ids_for_unit(state=state, unit=component.unit)
+        and (
+            component.unit.unit_instance_id in present_component_ids
+            or active_ability_model_ids_for_unit(state=state, unit=component.unit)
+        )
     )
     if len(source_components) != 1:
         return False
     return any(
         component.role == "bodyguard"
-        and active_ability_model_ids_for_unit(state=state, unit=component.unit)
+        and (
+            component.unit.unit_instance_id in present_component_ids
+            or active_ability_model_ids_for_unit(state=state, unit=component.unit)
+        )
         for component in view.components
     )
 

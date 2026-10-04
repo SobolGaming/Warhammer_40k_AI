@@ -27,6 +27,10 @@ destruction state in the original grouped frame. This matches synchronous
 allocation and keeps a queued Shoot/Fight-on-death cause reachable through later
 native Devastating Wounds and untouched save/restore checkpoints. The grouped
 cursor and other interruption owners remain authoritative.
+Conditional leading queries preserve existing living/specially retained component
+membership before deployment and augment it with attack-retained source IDs.
+Declare Battle Formations split grants follow the successor containing their
+Leader models; unplaced models do not become globally spatially active.
 
 The added source-lifetime responsibility is extracted into a small module. Frozen
 large damage/catalog owners only route the boundary to extracted helpers. No new

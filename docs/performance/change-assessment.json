@@ -1,7 +1,7 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "ae452b60dd37b2ee262eb5e830ecf6405cf80516",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a23229b35f7a42a026c0cd963991872d38f26e8883c079a8ad5f8d9d016866e8",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5d898bcafcace662da9f25eacff70442615c4c8fe6224a8d10cc2cc421a5d9a",
   "operation_map_sha256": "390030ebd1cd90ec81aaa2eec9b89932238e823f8176e062f75b953575843490",
   "changes": {
     "conformance/typescript/src/contract.ts": {
@@ -16,81 +16,81 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "86b34f4d64cbc974931abe1bd6c7c2d8a412e5f308b8f054075596d684230fcd",
-      "after_sha256": "87aacf9087fdf27705cc5ce0b611550c732b0858396b753177544f90cdec95a9",
+      "after_sha256": "ce7d948119d6faafec4b1052c5bd3ad40b70c096462056560cd310cbcfc2730e",
       "owners": {
         "@document": {
           "before": "86b34f4d64cbc974931abe1bd6c7c2d8a412e5f308b8f054075596d684230fcd",
-          "after": "87aacf9087fdf27705cc5ce0b611550c732b0858396b753177544f90cdec95a9"
+          "after": "ce7d948119d6faafec4b1052c5bd3ad40b70c096462056560cd310cbcfc2730e"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "a33bf3be26c5633ac052f3e144909720481e8b4e071cad09eb988b881b8efc8e",
-      "after_sha256": "54f3fd5ffa60569dce8e2dc0f3114eb182b062c460c6f9e08446e7e8394ec2b4",
+      "after_sha256": "72d1eff8da8aba13db5b47f4107caa5ce9d803fe1259ffbddabacddba24de819",
       "owners": {
         "@document": {
           "before": "a33bf3be26c5633ac052f3e144909720481e8b4e071cad09eb988b881b8efc8e",
-          "after": "54f3fd5ffa60569dce8e2dc0f3114eb182b062c460c6f9e08446e7e8394ec2b4"
+          "after": "72d1eff8da8aba13db5b47f4107caa5ce9d803fe1259ffbddabacddba24de819"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "7a7bf7f36781f02c2d0820949aa92b4995828fa41a35c9c54c73533f70297e42",
-      "after_sha256": "11a6f0b727221b46e2de9d7c09f8194425d8397b81e47e6fc16512a955f48f8c",
+      "after_sha256": "3ef79a637e8a9e0c42e41adbde08bc4b5d5ed75a45a2b29cb045d5479edf2ec5",
       "owners": {
         "@document": {
           "before": "7a7bf7f36781f02c2d0820949aa92b4995828fa41a35c9c54c73533f70297e42",
-          "after": "11a6f0b727221b46e2de9d7c09f8194425d8397b81e47e6fc16512a955f48f8c"
+          "after": "3ef79a637e8a9e0c42e41adbde08bc4b5d5ed75a45a2b29cb045d5479edf2ec5"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "e1d82b40ca7322f2cb71236e7fdb18daebc75d9d79d7c9aafc54ead26e2d02ce",
-      "after_sha256": "bfe05b255290d435363425da80d986271c1160f44afd0f44eb19ab77c0af020c",
+      "after_sha256": "2180f75f3ac016fd820388f381099501a50133751e198fca51f5aa6938bc3c73",
       "owners": {
         "@document": {
           "before": "e1d82b40ca7322f2cb71236e7fdb18daebc75d9d79d7c9aafc54ead26e2d02ce",
-          "after": "bfe05b255290d435363425da80d986271c1160f44afd0f44eb19ab77c0af020c"
+          "after": "2180f75f3ac016fd820388f381099501a50133751e198fca51f5aa6938bc3c73"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "9f26478f04e5447460341f9a94741ae7a98eeabd12f897e0d5e94aceec0494eb",
-      "after_sha256": "01e97a47a417a80f3681db336887d4161955072c52525acc67b25bfe3375adf0",
+      "after_sha256": "83862ece5b0254b49d394b3b32dce734eaaaeaf18c54de42fbc4a762d324912d",
       "owners": {
         "@document": {
           "before": "9f26478f04e5447460341f9a94741ae7a98eeabd12f897e0d5e94aceec0494eb",
-          "after": "01e97a47a417a80f3681db336887d4161955072c52525acc67b25bfe3375adf0"
+          "after": "83862ece5b0254b49d394b3b32dce734eaaaeaf18c54de42fbc4a762d324912d"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "6c43adc7415f22434b6a8a0196981f2e38b4861df60a308716bb55328cd7e335",
-      "after_sha256": "a07a2f4f2ba15f9796bec54455478516f4b0cf5d6fecea118dced01a28abd827",
+      "after_sha256": "257ddb8f66e46d9fd8dfbb8ace3f09662e5a87d368b5a9f1a6fc54bf1826de5f",
       "owners": {
         "@document": {
           "before": "6c43adc7415f22434b6a8a0196981f2e38b4861df60a308716bb55328cd7e335",
-          "after": "a07a2f4f2ba15f9796bec54455478516f4b0cf5d6fecea118dced01a28abd827"
+          "after": "257ddb8f66e46d9fd8dfbb8ace3f09662e5a87d368b5a9f1a6fc54bf1826de5f"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "43c7a1dad6a25c8ab6f3135f54eded39cd4ac0c2a824d7542c528135ac5316a0",
-      "after_sha256": "7e375bafe5368e3f0e3b33c58ae60f99deaa8d65247d57500bfb0d3d3a584350",
+      "after_sha256": "63648f9aa8e40552c8452d9dd7edf76faa756f8804a04739be66a77f03956de4",
       "owners": {
         "@document": {
           "before": "43c7a1dad6a25c8ab6f3135f54eded39cd4ac0c2a824d7542c528135ac5316a0",
-          "after": "7e375bafe5368e3f0e3b33c58ae60f99deaa8d65247d57500bfb0d3d3a584350"
+          "after": "63648f9aa8e40552c8452d9dd7edf76faa756f8804a04739be66a77f03956de4"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "e79c9baafccfc0e22e2fe2d37e6f946db19efe0d227718a73fd1255cb6864ac1",
-      "after_sha256": "fcc5f0ed78dec50267b00b13cf503cc8dccf7fa8ce99a546b7705ed4913099f2",
+      "after_sha256": "3b7e580865c5c22d508beed3450c80712c41431c48295a22a62fa8edce3d84dd",
       "owners": {
         "@document": {
           "before": "e79c9baafccfc0e22e2fe2d37e6f946db19efe0d227718a73fd1255cb6864ac1",
-          "after": "fcc5f0ed78dec50267b00b13cf503cc8dccf7fa8ce99a546b7705ed4913099f2"
+          "after": "3b7e580865c5c22d508beed3450c80712c41431c48295a22a62fa8edce3d84dd"
         }
       }
     },
@@ -146,21 +146,21 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "7edcf117231ee74328fd02f410a084c62a9617d5a9de0a69183367caafe7453e",
-      "after_sha256": "01b33be2ecbc8428166422d6d8253fb0675c7bccaefe8c1b500654c584c4f158",
+      "after_sha256": "5e2acb0965a246cd5440764598559d8166b90a6b2f388b05b648f87ca648032b",
       "owners": {
         "@document": {
           "before": "7edcf117231ee74328fd02f410a084c62a9617d5a9de0a69183367caafe7453e",
-          "after": "01b33be2ecbc8428166422d6d8253fb0675c7bccaefe8c1b500654c584c4f158"
+          "after": "5e2acb0965a246cd5440764598559d8166b90a6b2f388b05b648f87ca648032b"
         }
       }
     },
     "docs/ORDER_118_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "bb6d0ae1db3e728c75382aa25ab70896cec327bfdb8894a640a73374127a392f",
+      "after_sha256": "7fe128ed2b130e9a08406c05e80b516b0a3a719d449fcc94422e3087448bb140",
       "owners": {
         "@document": {
           "before": null,
-          "after": "bb6d0ae1db3e728c75382aa25ab70896cec327bfdb8894a640a73374127a392f"
+          "after": "7fe128ed2b130e9a08406c05e80b516b0a3a719d449fcc94422e3087448bb140"
         }
       }
     },
@@ -176,11 +176,11 @@
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "24c6bffe147b1685d137e511df468cc7aa8d1dcf79fe4fb622c3dd05d8e11b6e",
-      "after_sha256": "187631347a55652b3c3aa0c08ee5ad706cb143966011ab29939ce8d074f27e8f",
+      "after_sha256": "b9c954a32330317e4e70e60ca799d50d9564c090c88e2adb382a8d275216f6df",
       "owners": {
         "@document": {
           "before": "24c6bffe147b1685d137e511df468cc7aa8d1dcf79fe4fb622c3dd05d8e11b6e",
-          "after": "187631347a55652b3c3aa0c08ee5ad706cb143966011ab29939ce8d074f27e8f"
+          "after": "b9c954a32330317e4e70e60ca799d50d9564c090c88e2adb382a8d275216f6df"
         }
       }
     },
@@ -298,7 +298,7 @@
     },
     "src/warhammer40k_core/engine/catalog_conditional_leader_queries.py": {
       "before_sha256": "5586dab5aa96b77d2e73ad180612bd11582c3d21437ae737d877929878bc2d2f",
-      "after_sha256": "e2d08cceb0cc675873517a6154ce19c3f68ff969784dd5dd70091a6323e7c1e1",
+      "after_sha256": "0a156be0698ff4e0c4fa05794782bf199ede8ca59440dacda299b0bb8ba87dea",
       "owners": {
         "@module": {
           "before": "fb11e1779e3dd4195d9a27deef8b96e286524c3a01dab2bac12ccce443892857",
@@ -306,7 +306,7 @@
         },
         "conditional_leading_source_unit_applies": {
           "before": "8b5e7227d1d7707d15b4e34bd520daf36230124c4d58433224ab9977649b998d",
-          "after": "4d0210d09c45965dfe578937aafde4e592f8edb5e90611cd5c21b72b5cadefdf"
+          "after": "c010ff493b47971d91d82317e9e358b84814f1ff398aaba007b5ea7c16041993"
         }
       }
     },
@@ -466,7 +466,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -476,7 +476,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -486,7 +486,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -496,7 +496,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -506,7 +506,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -516,7 +516,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -526,7 +526,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -536,7 +536,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -546,7 +546,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "contracts/openapi.yaml": {
       "category": "rule_semantics",
@@ -556,7 +556,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "data/source_audits/order118/baseline/tests/unit/test_unit_abilities.py.txt": {
       "category": "rule_semantics",
@@ -566,7 +566,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "data/source_audits/order118/historical-inputs.json": {
       "category": "rule_semantics",
@@ -576,7 +576,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "data/source_audits/order118/selected-source.json": {
       "category": "rule_semantics",
@@ -586,7 +586,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
@@ -594,7 +594,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
@@ -602,7 +602,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "docs/ORDER_118_SCOPE.md": {
       "category": "governance",
@@ -610,7 +610,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
@@ -618,7 +618,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -628,7 +628,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
@@ -638,7 +638,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/adapters/redaction.py": {
       "category": "rule_semantics",
@@ -648,7 +648,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/engine/ability_presence.py": {
       "category": "rule_semantics",
@@ -658,7 +658,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/engine/attack_ability_source_retention.py": {
       "category": "rule_semantics",
@@ -668,7 +668,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/engine/attack_sequence_destruction_authority.py": {
       "category": "rule_semantics",
@@ -678,7 +678,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/engine/attack_sequence_dispatch.py": {
       "category": "rule_semantics",
@@ -688,7 +688,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
       "category": "rule_semantics",
@@ -698,7 +698,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/engine/catalog_attack_context_rule_runtime.py": {
       "category": "rule_semantics",
@@ -708,7 +708,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/engine/catalog_conditional_leader_queries.py": {
       "category": "rule_semantics",
@@ -718,7 +718,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/engine/catalog_rule_consumption.py": {
       "category": "rule_semantics",
@@ -728,7 +728,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/engine/catalog_source_model_presence.py": {
       "category": "rule_semantics",
@@ -738,7 +738,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/engine/damage_allocation.py": {
       "category": "rule_semantics",
@@ -748,7 +748,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/engine/decision.py": {
       "category": "rule_semantics",
@@ -758,7 +758,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/engine/direct_mortal_wound_application.py": {
       "category": "rule_semantics",
@@ -768,7 +768,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "src/warhammer40k_core/engine/rule_aura_resolution.py": {
       "category": "rule_semantics",
@@ -778,7 +778,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "tests/order118_source_helpers.py": {
       "category": "rule_semantics",
@@ -788,7 +788,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "tests/unit/test_unit_abilities.py": {
       "category": "rule_semantics",
@@ -798,7 +798,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     },
     "tools/core_rules_order97_history.py": {
       "category": "rule_semantics",
@@ -808,7 +808,7 @@
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
       "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
-      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+      "unchanged_work": "Existing attack gathering, dice, grouped allocation cursor, prevention and special retained-destruction authority remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. Ordinary grouped FNP resumes preserve returned queued attack destructions. Conditional leading queries preserve living/specially retained predeployment component membership while adding attack-retained sources. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
     }
   },
   "milestone": "ordinary",
