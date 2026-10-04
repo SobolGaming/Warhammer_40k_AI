@@ -59,6 +59,9 @@ V963_SNAP_MAPPING_SHA256 = "aed57834c1788dd3bce03ef27338c9896e6ed642bbec335a24e4
 ORDER117_MAPPING = "data/source_audits/order117/historical-inputs.json"
 ORDER117_MAPPING_SHA256 = "5e95332bb27eb2ce984013ac4c796da5ac91413dc7fe6f9d94975c75db5225fc"
 
+ORDER118_MAPPING = "data/source_audits/order118/historical-inputs.json"
+ORDER118_MAPPING_SHA256 = "f57a5b49be9a7d17e51768636cd5a5e1d2f7138af355da274ceec625e3d6ea07"
+
 
 def historical_evidence_path(reference: str, *, root: Path) -> Path | None:
     """Resolve only the reviewed mapping; missing or corrupt history never falls back."""
@@ -77,6 +80,7 @@ def historical_evidence_path(reference: str, *, root: Path) -> Path | None:
         (ORDER114_MAPPING, ORDER114_MAPPING_SHA256),
         (V963_SNAP_MAPPING, V963_SNAP_MAPPING_SHA256),
         (ORDER117_MAPPING, ORDER117_MAPPING_SHA256),
+        (ORDER118_MAPPING, ORDER118_MAPPING_SHA256),
     ):
         raw = (root / mapping_name).read_bytes()
         if hashlib.sha256(raw).hexdigest() != expected_sha256:

@@ -22,6 +22,11 @@ large damage/catalog owners only route the boundary to extracted helpers. No new
 player choices, faction providers, speculative history hardening, or test-file
 reorganization. Existing persisting-effect serialization and private audit-event
 projection remain authoritative. The patch contract publishes the new build.
+The original Order97-pinned unit-ability test file is retained byte-for-byte from
+the base through the established historical-input mapping. Added regressions are
+current evidence; the retained original assertions and source audits stay intact.
+Shooting fixtures use a clear battlefield and unobstructed firing corridors so
+source lifetime validation does not depend on an unrelated model-occlusion solve.
 
 Performance: bounded ordinary-rule semantics; default quiet serial current-runtime
 smoke under the owner-authorized review policy, exact-base Git-blob input and

@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "ae452b60dd37b2ee262eb5e830ecf6405cf80516",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8314acdacbe81baf6dfaea3e71b6eaaf21a498d19c26bd906e982ce360bd29e2",
-  "operation_map_sha256": "bd0292dda34ad3b2fd7dea42e70b9d3037901390247276de8a4b3f9de7bb5932",
+  "operation_map_sha256": "52d0a777425081dbd86f78ae9e7a9c5a2fcaf23fd2f200cb15c26369fbc56eb3",
   "changes": {
     "conformance/typescript/src/contract.ts": {
       "before_sha256": "f64e12c869a0730e70a9f074ab42adfe8ff2ee4431232c6f56ee29d5c1b510c1",
@@ -104,6 +104,26 @@
         }
       }
     },
+    "data/source_audits/order118/baseline/tests/unit/test_unit_abilities.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "135ebd8f548ac093023d987a2d9cf12de8e9dc081f3b58c84ca8cdeb48a3123e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "135ebd8f548ac093023d987a2d9cf12de8e9dc081f3b58c84ca8cdeb48a3123e"
+        }
+      }
+    },
+    "data/source_audits/order118/historical-inputs.json": {
+      "before_sha256": null,
+      "after_sha256": "f57a5b49be9a7d17e51768636cd5a5e1d2f7138af355da274ceec625e3d6ea07",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f57a5b49be9a7d17e51768636cd5a5e1d2f7138af355da274ceec625e3d6ea07"
+        }
+      }
+    },
     "data/source_audits/order118/selected-source.json": {
       "before_sha256": null,
       "after_sha256": "c1e538ad4a95b2c1abfb486c546dac3772856351118f94b560f9216f83340f72",
@@ -136,21 +156,21 @@
     },
     "docs/ORDER_118_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "22233cf1f3d9fbe54bb31c6bd3e87f6df02cb4a978d56e01c00edeaa05728833",
+      "after_sha256": "a6f0b8ca88d6ef3b5933dd4c217bd77e7e0bc4ce3947654f16dce29382a5fe4a",
       "owners": {
         "@document": {
           "before": null,
-          "after": "22233cf1f3d9fbe54bb31c6bd3e87f6df02cb4a978d56e01c00edeaa05728833"
+          "after": "a6f0b8ca88d6ef3b5933dd4c217bd77e7e0bc4ce3947654f16dce29382a5fe4a"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "8f1b4c0538eea261858ce887c8c4803252e2a1381bceab0f5c429299cc99634a",
-      "after_sha256": "b40b928c893f982ec29c759bdcd75e26ee25073e4eb43c3cad217d31dc066d24",
+      "after_sha256": "03c1aea271117baa355624447ad030be025fae19e1a8297dc913228123c47fb9",
       "owners": {
         "@document": {
           "before": "8f1b4c0538eea261858ce887c8c4803252e2a1381bceab0f5c429299cc99634a",
-          "after": "b40b928c893f982ec29c759bdcd75e26ee25073e4eb43c3cad217d31dc066d24"
+          "after": "03c1aea271117baa355624447ad030be025fae19e1a8297dc913228123c47fb9"
         }
       }
     },
@@ -336,7 +356,7 @@
     },
     "tests/order118_source_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "689296272b932c2d4c60008151b209a843a4f4e5a7dbdb4e85315814b565b6f7",
+      "after_sha256": "6200b3cc5df3a8532bb3ff5def46090d055023e2785c06e7e6618b000c98f4cb",
       "owners": {
         "@module": {
           "before": null,
@@ -352,7 +372,7 @@
         },
         "source_retention_session": {
           "before": null,
-          "after": "a89bcef5fa7b9c08d1d2b19f2afffb85e26ab8b50059d53d9e14d6ea57531a37"
+          "after": "5c7db267f1903330ca6db2228e7fdbc9b3a4017f494779e0b96f675d8a1e6e77"
         },
         "submit_source_choice": {
           "before": null,
@@ -387,6 +407,20 @@
         "test_retained_model_aura_keeps_attached_ability_without_external_geometry": {
           "before": null,
           "after": "62494213a896e09db9a7c71c7d6e3d83ebc45513e86c3d344b568aa603c0e55e"
+        }
+      }
+    },
+    "tools/core_rules_order97_history.py": {
+      "before_sha256": "be1cf9676884f2854015e63c602391ec7b11c54918185e5c0a731cdcc41c60a4",
+      "after_sha256": "03f80ead5206769e4eca3716cd269f79a0dfbb1c009aa9bb260ae7f438a6bb8c",
+      "owners": {
+        "@module": {
+          "before": "7575619f8c52a7ec0827d33505777b444a552490c57c3d1aa871620a7db907ca",
+          "after": "e06e1da9e27312c85bf53b817720c72f9490708dc66b82a786c954f3bb0490fd"
+        },
+        "historical_evidence_path": {
+          "before": "e904fb0b19390a76f3e44f55a5f7d9d553b4c0485e4d23192d6a3fb1d108c680",
+          "after": "44c4769de3cb6d528fdf8dbe1b6e4b02d2af9ba11026f0b94ccf82b43fff8da9"
         }
       }
     }
@@ -486,6 +520,26 @@
       "category": "rule_semantics",
       "operations": [
         "order118-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+    },
+    "data/source_audits/order118/baseline/tests/unit/test_unit_abilities.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order118-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+    },
+    "data/source_audits/order118/historical-inputs.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order118-source-evidence"
       ],
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
@@ -688,6 +742,16 @@
       "category": "rule_semantics",
       "operations": [
         "order118-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",
+      "source_obligation": "Selected Order97 rule:19:19.04:1 block4: destroyed attached conferring sources persist until the attacking unit finishes all attacks.",
+      "unchanged_work": "Existing attack gathering, dice, allocation, prevention and special retained destruction remain. A bounded ordinary-rule source lifetime uses existing persisting effects and shared ability/catalog consumption, explicitly expires after attacks and deferred mortal wounds, and adds private RNG-neutral audit types through the existing owner. No deliberate algorithm/search/cache/serializer/workload/dependency change or demonstrated serious regression; default exact-base assessment and serial smoke under owner-approved remediation policy. No faction provider activation or full-game performance claim."
+    },
+    "tools/core_rules_order97_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order118-source-evidence"
       ],
       "selected_families": [],
       "rationale": "Bounded attached ability-source lifetime and extracted catalog equipment source query, real facade regressions, retained source evidence and generated contract publication; quiet serial smoke under the owner-approved bounded remediation policy.",

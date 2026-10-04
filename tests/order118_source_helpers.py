@@ -148,14 +148,26 @@ def source_retention_session(
         state = lifecycle.state
         assert state is not None
         assert state.battlefield_state is not None
-        battlefield = state.battlefield_state
+        # Source lifetime needs ordinary visible shots, not an unrelated ruin
+        # occlusion solve. Use the canonical clear-board fixture convention.
+        battlefield = replace(state.battlefield_state, terrain_features=())
+        battlefield = battlefield.with_unit_placement(
+            unit_placement_at(
+                units["attacker"],
+                army_id="army-alpha",
+                player_id="player-a",
+                poses=(Pose.at(10, 10), Pose.at(10, 11.65)),
+            )
+        )
         for index, key in enumerate(("enemy", "leader", "support", "other")):
             battlefield = battlefield.with_unit_placement(
                 unit_placement_at(
                     units[key],
                     army_id="army-beta",
                     player_id="player-b",
-                    poses=(Pose.at(30, 35 + index * 1.65),),
+                    # The other target lies below the attached components, so
+                    # neither firing corridor crosses a third unit's model.
+                    poses=(Pose.at(20, 5 if key == "other" else 10 + index * 1.65),),
                 )
             )
         state.replace_battlefield_state(battlefield)

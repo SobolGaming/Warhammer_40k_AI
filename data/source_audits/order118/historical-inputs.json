@@ -1,0 +1,17 @@
+{
+  "reviewed_commit": "ae452b60dd37b2ee262eb5e830ecf6405cf80516",
+  "also_present_at_base": "ae452b60dd37b2ee262eb5e830ecf6405cf80516",
+  "purpose": "Retain immutable Order97 original unit-ability fixtures and assertions before adding Order118 regressions. Historical bytes are not current Order118 gameplay evidence.",
+  "current_evidence": "docs/ORDER_118_SCOPE.md",
+  "files": [
+    {
+      "path": "tests/unit/test_unit_abilities.py",
+      "historical_path": "data/source_audits/order118/baseline/tests/unit/test_unit_abilities.py.txt",
+      "git_revision": "ae452b60dd37b2ee262eb5e830ecf6405cf80516",
+      "git_path": "tests/unit/test_unit_abilities.py",
+      "sha256": "135ebd8f548ac093023d987a2d9cf12de8e9dc081f3b58c84ca8cdeb48a3123e",
+      "bytes": 18568,
+      "order97_file_pin": "135ebd8f548ac093023d987a2d9cf12de8e9dc081f3b58c84ca8cdeb48a3123e"
+    }
+  ]
+}

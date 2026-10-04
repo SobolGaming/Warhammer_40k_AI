@@ -3495,10 +3495,15 @@
     },
     "order118-source-evidence": {
       "paths": [
-        "data/source_audits/order118/selected-source.json"
+        "data/source_audits/order118/baseline/tests/unit/test_unit_abilities.py.txt",
+        "data/source_audits/order118/historical-inputs.json",
+        "data/source_audits/order118/selected-source.json",
+        "tools/core_rules_order97_history.py"
       ],
       "owners": [
-        "@document"
+        "@document",
+        "@module",
+        "historical_evidence_path"
       ],
       "families": [],
       "sensitive": false,
