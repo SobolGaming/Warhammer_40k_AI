@@ -6,6 +6,10 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.attack_ability_source_retention import (
+    ATTACK_ABILITY_SOURCE_RULE_ID,
+    attack_ability_source_model_ids,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.retained_model_presence import retained_model_ids_for_rules_unit
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
@@ -77,6 +81,11 @@ def ability_presence(*, state: GameState, rules_unit: RulesUnitView) -> AbilityP
         retained_model_ids=retained,
         battlefield_model_ids=placed,
         off_battlefield_model_ids=off_board,
+        attack_source_model_ids=set(
+            attack_ability_source_model_ids(
+                state=state, rules_unit_instance_id=current.unit_instance_id
+            )
+        ),
     )
 
 
@@ -87,11 +96,13 @@ def ability_presence_from_model_ids(
     retained_model_ids: set[str],
     battlefield_model_ids: set[str],
     off_battlefield_model_ids: set[str],
+    attack_source_model_ids: set[str] | None = None,
 ) -> AbilityPresence:
     """Shared live/historical policy over explicitly authenticated model facts."""
     if alive_model_ids & retained_model_ids or not retained_model_ids <= battlefield_model_ids:
         raise GameLifecycleError("Retained ability presence authority is inconsistent.")
     alive = alive_model_ids | retained_model_ids
+    attack_sources = set[str]() if attack_source_model_ids is None else attack_source_model_ids
     placed = battlefield_model_ids & alive
     off_board = off_battlefield_model_ids & alive
     if placed & off_board or (placed and off_board):
@@ -101,12 +112,14 @@ def ability_presence_from_model_ids(
         raise GameLifecycleError("Ability source has incomplete off-battlefield membership.")
     return AbilityPresence(
         rules_unit_instance_id=rules_unit_instance_id,
-        active_model_ids=tuple(sorted(placed | off_board)),
+        active_model_ids=tuple(sorted(placed | off_board | attack_sources)),
         battlefield_model_ids=tuple(sorted(placed)),
         off_battlefield_model_ids=tuple(sorted(off_board)),
         unavailable_model_ids=tuple(sorted(unavailable)),
         source_rule_id=(
-            core_fight_on_death_2026_09.RETAINED_PRESENCE_SOURCE_ID
+            ATTACK_ABILITY_SOURCE_RULE_ID
+            if attack_sources
+            else core_fight_on_death_2026_09.RETAINED_PRESENCE_SOURCE_ID
             if retained_model_ids
             else EMBARKED_ABILITIES_SOURCE_ID
         ),
@@ -175,6 +188,11 @@ def ability_spatial_relationship_from_presence(
         return AbilitySpatialRelationship.OWN_ABILITY
     if source_presence.off_battlefield_model_ids or target_presence.off_battlefield_model_ids:
         return AbilitySpatialRelationship.OFF_BATTLEFIELD
+    if not source_presence.battlefield_model_ids or (
+        source_model_instance_id is not None
+        and source_model_instance_id not in source_presence.battlefield_model_ids
+    ):
+        return AbilitySpatialRelationship.UNAVAILABLE
     return AbilitySpatialRelationship.BATTLEFIELD
 
 

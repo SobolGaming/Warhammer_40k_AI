@@ -86,6 +86,8 @@ _RNG_HISTORY_NEUTRAL_EVENT_TYPES = frozenset(
         "mortal_wound_model_destructions_finalized",
         "mortal_wound_model_allocated",
         "mortal_wound_allocation_rule_applied",
+        "attack_ability_source_retained",
+        "attack_ability_sources_expired",
         "model_logical_death_recorded",
         MORTAL_WOUND_APPLICATION_STARTED_EVENT,
     }

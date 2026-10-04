@@ -34,6 +34,17 @@ def reserve_destroyed_attack_damage_authority(
 ) -> None:
     if damage is None or not damage.destroyed:
         return
+    if not parent_cause_ids and not attack_sequence.is_complete:
+        from warhammer40k_core.engine.attack_ability_source_retention import (
+            retain_attack_ability_source,
+        )
+
+        retain_attack_ability_source(
+            state=state,
+            decisions=decisions,
+            sequence_id=attack_sequence.sequence_id,
+            model_instance_id=damage.model_instance_id,
+        )
     reserve_attack_damage_model_destruction_cause(
         state=state,
         decisions=decisions,

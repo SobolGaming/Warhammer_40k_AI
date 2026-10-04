@@ -7,6 +7,7 @@ from warhammer40k_core.core.dice import (
     RerollPermission,
 )
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
+from warhammer40k_core.engine.ability_presence import active_ability_model_ids_for_unit
 from warhammer40k_core.engine.effects import EffectExpirationKind, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.generic_rule_effect_payloads import (
@@ -336,14 +337,19 @@ def conditional_leading_source_unit_applies(
         return False
     source_components = tuple(
         component
-        for component in view.rules_present_components
+        for component in view.components
         if source_unit_id
         in {component.unit.unit_instance_id, component.unit.source_unit_instance_id}
         and component.role in {"leader", "support"}
+        and active_ability_model_ids_for_unit(state=state, unit=component.unit)
     )
     if len(source_components) != 1:
         return False
-    return any(component.role == "bodyguard" for component in view.rules_present_components)
+    return any(
+        component.role == "bodyguard"
+        and active_ability_model_ids_for_unit(state=state, unit=component.unit)
+        for component in view.components
+    )
 
 
 def _source_unit_instance_id(payload: dict[str, JsonValue]) -> str:

@@ -3421,6 +3421,105 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order118-attack-source-lifetime": {
+      "paths": [
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/adapters/redaction.py",
+        "src/warhammer40k_core/engine/ability_presence.py",
+        "src/warhammer40k_core/engine/attack_ability_source_retention.py",
+        "src/warhammer40k_core/engine/attack_sequence_destruction_authority.py",
+        "src/warhammer40k_core/engine/attack_sequence_dispatch.py",
+        "src/warhammer40k_core/engine/catalog_conditional_leader_queries.py",
+        "src/warhammer40k_core/engine/catalog_rule_consumption.py",
+        "src/warhammer40k_core/engine/catalog_source_model_presence.py",
+        "src/warhammer40k_core/engine/damage_allocation.py",
+        "src/warhammer40k_core/engine/direct_mortal_wound_application.py"
+      ],
+      "owners": [
+        "@module",
+        "MortalWoundApplicationProgress.after_wound_resolution",
+        "_current_wargear_bearer_model_ids",
+        "_event_record_hidden_from_context",
+        "_source_payload",
+        "ability_presence",
+        "ability_presence_from_model_ids",
+        "ability_spatial_relationship_from_presence",
+        "apply_direct_mortal_wounds_to_unit",
+        "attack_ability_source_model_ids",
+        "conditional_leading_source_unit_applies",
+        "current_wargear_bearer_model_ids",
+        "expire_attack_ability_sources",
+        "reserve_destroyed_attack_damage_authority",
+        "resolve_attack_sequence_until_blocked",
+        "retain_attack_ability_source",
+        "retain_attack_mortal_ability_source"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order118-live-neutral-audit-accounting": {
+      "paths": [
+        "src/warhammer40k_core/engine/decision.py"
+      ],
+      "owners": [
+        "@module"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order118-regressions": {
+      "paths": [
+        "tests/order118_source_helpers.py",
+        "tests/unit/test_unit_abilities.py"
+      ],
+      "owners": [
+        "@module",
+        "reach_source_casualty",
+        "source_grant_active",
+        "source_retention_session",
+        "submit_source_choice",
+        "test_attached_conferring_bearer_survives_as_ability_source_until_attacks_finish",
+        "test_attached_source_lifetime_facade_restore_replay",
+        "test_equipped_attached_source_lifetime_uses_shared_catalog_consumer",
+        "test_mortal_application_routes_retain_only_attack_conferring_sources"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order118-source-evidence": {
+      "paths": [
+        "data/source_audits/order118/selected-source.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order118-contract-publication": {
+      "paths": [
+        "conformance/typescript/src/contract.ts",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
