@@ -23,7 +23,10 @@ from warhammer40k_core.engine.attack_sequence_state import AttackSequence
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.deferred_mortal_wounds import DeferredMortalWounds
+from warhammer40k_core.engine.deferred_mortal_wounds import (
+    DeferredMortalWounds,
+    has_deferred_mortal_occurrence,
+)
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage, LifecycleStatus
@@ -356,6 +359,13 @@ def defer_grouped_devastating_wounds(
         if resolution is not DevastatingWoundsResolution.MORTAL_WOUNDS:
             normal_contexts.append((wounded_sequence, attack_context))
             continue
+        if has_deferred_mortal_occurrence(
+            current.deferred_mortal_wounds,
+            attack_context_id=attack_context["attack_context_id"],
+            source_rule_id=DEVASTATING_WOUNDS_RULE_ID,
+            source_permission_id=None,
+        ):
+            continue
         damage_value, status = _damage_value(
             state=state,
             decisions=decisions,
@@ -381,10 +391,18 @@ def defer_grouped_devastating_wounds(
         if damage_value is None:
             raise GameLifecycleError("Damage roll did not resolve a value.")
         mortal_wounds = damage_value
+        from warhammer40k_core.engine.attack_mortal_origins import attack_mortal_origin
+
+        origin = attack_mortal_origin(
+            state=state,
+            attack_sequence=wounded_sequence,
+            attack_context=attack_context,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
         deferred = DeferredMortalWounds(
             source_rule_id=DEVASTATING_WOUNDS_RULE_ID,
-            source_model_instance_id=pool.attacker_model_instance_id,
-            source_weapon_profile=pool.weapon_profile,
+            source_model_instance_id=origin.source_model_instance_id,
+            source_weapon_profile=origin.weapon_profile,
             target_unit_instance_id=attack_context["target_unit_instance_id"],
             attack_context_id=attack_context["attack_context_id"],
             mortal_wounds=mortal_wounds,
@@ -424,4 +442,13 @@ def defer_grouped_devastating_wounds(
             },
         )
         current = current.with_deferred_mortal_wounds(deferred)
+    from warhammer40k_core.engine.additional_attack_mortals import defer_additional_attack_mortals
+
+    current = defer_additional_attack_mortals(
+        state=state,
+        decisions=decisions,
+        attack_sequence=current,
+        wounded_contexts=wounded_contexts,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
     return current, tuple(normal_contexts), None

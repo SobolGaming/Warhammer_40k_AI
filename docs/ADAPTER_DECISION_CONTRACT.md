@@ -7537,3 +7537,36 @@ Internal serialized path/reachability context now carries explicit `pose_is_fixe
 authority. All engine producers and historical reconstructors derive it from the
 physical model's Movement descriptor. Runtime identity governs saves/replay; old
 histories stay on their original engine, with no conversion.
+
+## Order116 / Contract 44.3.3: additional attack mortal Core seam
+
+Existing attack finite/proposal submissions and viewer policy are unchanged.
+An engine-owned, phase/turn/source-model-bound permission produces additional
+mortal wounds for each successful wound. Ordinary damage resolves before the
+shared deferred mortal queue. Each entry retains its originating attack ID,
+source rule, weapon and permission snapshot, and uses ordinary mortal allocation
+and spill across models; Devastating Wounds retains its separate replacement and
+no-spill policy. The existing mortal recipient and optional Feel No Pain requests
+carry the new `additional_attack_mortal_wounds` source kind and source permission.
+`DeferredMortalWoundsPayload` now requires `source_permission` (null for
+Devastating Wounds). Additional mortal completion events record source rule and
+originating attack IDs. Runtime identity governs persistence/replay; old histories
+remain on the matching runtime, without conversion. Core source providers own
+permission conditions. Radiant Champion/Hallowed Ground remain load-only faction
+scaffolds and are not claimed as implemented gameplay.
+
+Order116 deferral events also record `originating_pool_index`,
+`originating_attack_index` and `source_weapon_instance_id` from the physical
+gathered contribution. The deferred weapon snapshot preserves that source
+profile, with the existing post-roll modifier service, rather than the synthetic
+gathered carrier. Psychic weapon attack evidence remains available to the shared
+Feel No Pain selector during mortal allocation and restored retries; no new
+decision family or Psychic ability classification is introduced.
+
+Both deferred producers retain attack/source occurrence identity across random
+Damage and saving-throw choice windows. Accepting or declining Command Re-roll
+and restoring its pending request must not duplicate entries or emitted events;
+independent permission effect IDs remain distinct occurrences. Additional mortal
+application IDs namespace the permission effect ID by source kind; an accepted
+effect ID `devastating-wounds` cannot alias a native application. Native IDs keep
+their existing shape. Existing reroll submission families and validation apply.

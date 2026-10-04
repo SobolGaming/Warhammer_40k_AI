@@ -1,654 +1,658 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "7c4765c9e95232c3343abb5130d60c98fe18348c",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:79eb79750a7d25df4da8668ec61ed50c65880990318a9e8b665a2b9a3f0333bd",
-  "operation_map_sha256": "c7d8a08920c7cb8c6cca191220f75c1a0e85c1101fc9eb87b986b61d664c1c74",
+  "base": "3b8a29a8fa5a0ddb24e87e0e7a7a76be34c361a2",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d8048300549f37aa10c0bcaaf964f8dc0edda094b96adaa3c31cb3d96aa91732",
+  "operation_map_sha256": "cd2bc45cd90ec2aefcb14acc2574108dc18ae095cd46fa724995edacbed91ef7",
   "changes": {
     "README.md": {
-      "before_sha256": "737c8e84109ecbd146d5606bd53493172a2ae3893c4450a06d3778f486f80722",
-      "after_sha256": "ed5309fd8c22933f3aa8ade4ad4c08e653ea271d7fa304a5fda96d3925e552cb",
+      "before_sha256": "ed5309fd8c22933f3aa8ade4ad4c08e653ea271d7fa304a5fda96d3925e552cb",
+      "after_sha256": "13f8f69455fc83fad672886c0368bd1003759c285cd46c98a3c6366119b2311c",
       "owners": {
         "@document": {
-          "before": "737c8e84109ecbd146d5606bd53493172a2ae3893c4450a06d3778f486f80722",
-          "after": "ed5309fd8c22933f3aa8ade4ad4c08e653ea271d7fa304a5fda96d3925e552cb"
+          "before": "ed5309fd8c22933f3aa8ade4ad4c08e653ea271d7fa304a5fda96d3925e552cb",
+          "after": "13f8f69455fc83fad672886c0368bd1003759c285cd46c98a3c6366119b2311c"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "42b580ed44da90840a34e09181daf0af955e7272f71d14b080cdf432e4b798b0",
-      "after_sha256": "4bfcf46e0c7431c5debb36b2bfbaa35b6649a6e20fe52ca1fb9e746224a9c14e",
+      "before_sha256": "4bfcf46e0c7431c5debb36b2bfbaa35b6649a6e20fe52ca1fb9e746224a9c14e",
+      "after_sha256": "927a3e432c23a606c8fc8a5cdb54fc4d2a856712a0964e2875b173b134e846e9",
       "owners": {
         "@document": {
-          "before": "42b580ed44da90840a34e09181daf0af955e7272f71d14b080cdf432e4b798b0",
-          "after": "4bfcf46e0c7431c5debb36b2bfbaa35b6649a6e20fe52ca1fb9e746224a9c14e"
+          "before": "4bfcf46e0c7431c5debb36b2bfbaa35b6649a6e20fe52ca1fb9e746224a9c14e",
+          "after": "927a3e432c23a606c8fc8a5cdb54fc4d2a856712a0964e2875b173b134e846e9"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "db08dfc889d072a065406c15664fefa470db3db6c38c22530ed96eb160e14c6d",
-      "after_sha256": "ceeb312c2acb5b0bdba5d222a6488e38c60dce3cd7b9d1298f3de9101a4e3084",
+      "before_sha256": "ceeb312c2acb5b0bdba5d222a6488e38c60dce3cd7b9d1298f3de9101a4e3084",
+      "after_sha256": "b0065f664db758e46a084c6ec1d57c31fa5c9cd8785646e71d10bac4182eec60",
       "owners": {
         "@document": {
-          "before": "db08dfc889d072a065406c15664fefa470db3db6c38c22530ed96eb160e14c6d",
-          "after": "ceeb312c2acb5b0bdba5d222a6488e38c60dce3cd7b9d1298f3de9101a4e3084"
+          "before": "ceeb312c2acb5b0bdba5d222a6488e38c60dce3cd7b9d1298f3de9101a4e3084",
+          "after": "b0065f664db758e46a084c6ec1d57c31fa5c9cd8785646e71d10bac4182eec60"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "4fdcf1ecb3cd1dd9ed25a4e6db1bbdaa264ba07b92f2ce49bd2b841a4aaf5f7a",
-      "after_sha256": "e09f77053c4db31e61e8c81179f08821349443c89eb3f799402bffb32b700c2c",
+      "before_sha256": "e09f77053c4db31e61e8c81179f08821349443c89eb3f799402bffb32b700c2c",
+      "after_sha256": "90a86283e9bbe44b2ec1c2714d00148757f45cded831cf0b764c26c474d2d8fe",
       "owners": {
         "@document": {
-          "before": "4fdcf1ecb3cd1dd9ed25a4e6db1bbdaa264ba07b92f2ce49bd2b841a4aaf5f7a",
-          "after": "e09f77053c4db31e61e8c81179f08821349443c89eb3f799402bffb32b700c2c"
+          "before": "e09f77053c4db31e61e8c81179f08821349443c89eb3f799402bffb32b700c2c",
+          "after": "90a86283e9bbe44b2ec1c2714d00148757f45cded831cf0b764c26c474d2d8fe"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "5bf40d966b0e3b629848501e151124a8ad998bae5880fcf46fd51e539b11c0f1",
-      "after_sha256": "14055fdad792e65201a55b5aea28ddfde0850fd685ba869a026ce05f3e1679a9",
+      "before_sha256": "14055fdad792e65201a55b5aea28ddfde0850fd685ba869a026ce05f3e1679a9",
+      "after_sha256": "0e6662d5e643c0cee84a599c4acaef6a5f8f15e9e5e77d85c7c162bdc0f25356",
       "owners": {
         "@document": {
-          "before": "5bf40d966b0e3b629848501e151124a8ad998bae5880fcf46fd51e539b11c0f1",
-          "after": "14055fdad792e65201a55b5aea28ddfde0850fd685ba869a026ce05f3e1679a9"
+          "before": "14055fdad792e65201a55b5aea28ddfde0850fd685ba869a026ce05f3e1679a9",
+          "after": "0e6662d5e643c0cee84a599c4acaef6a5f8f15e9e5e77d85c7c162bdc0f25356"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "a73916264edbf8987ca85ca409bb5bf625996650a09f3e4bc63eddebd7613acd",
-      "after_sha256": "19b406eb9b994386f107c582f86eefa9364ce0e40f7d928065ee8bf922d5125f",
+      "before_sha256": "19b406eb9b994386f107c582f86eefa9364ce0e40f7d928065ee8bf922d5125f",
+      "after_sha256": "a38a604151adeb776b8b914e874b3601d45a3f1148b04534d7d0d8e0996101b5",
       "owners": {
         "@document": {
-          "before": "a73916264edbf8987ca85ca409bb5bf625996650a09f3e4bc63eddebd7613acd",
-          "after": "19b406eb9b994386f107c582f86eefa9364ce0e40f7d928065ee8bf922d5125f"
+          "before": "19b406eb9b994386f107c582f86eefa9364ce0e40f7d928065ee8bf922d5125f",
+          "after": "a38a604151adeb776b8b914e874b3601d45a3f1148b04534d7d0d8e0996101b5"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "d773d359faedb7e71b65a8ec90426d32dcf09044054c587c42256f730e9f0745",
-      "after_sha256": "d7bc3792d67cabb5af726f2bb9a8217ca656ed778ad56f2a88458b36693a7441",
+      "before_sha256": "d7bc3792d67cabb5af726f2bb9a8217ca656ed778ad56f2a88458b36693a7441",
+      "after_sha256": "953f2926e3c26e0194cde1627c200ed188b7bfd5e1c84db5bc6ef16aafe640fc",
       "owners": {
         "@document": {
-          "before": "d773d359faedb7e71b65a8ec90426d32dcf09044054c587c42256f730e9f0745",
-          "after": "d7bc3792d67cabb5af726f2bb9a8217ca656ed778ad56f2a88458b36693a7441"
+          "before": "d7bc3792d67cabb5af726f2bb9a8217ca656ed778ad56f2a88458b36693a7441",
+          "after": "953f2926e3c26e0194cde1627c200ed188b7bfd5e1c84db5bc6ef16aafe640fc"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "1c3b2d4c4149f850e92013807be5921b6e673ee5d9413e64e795e2eea5bfe271",
-      "after_sha256": "bfd379a2fc3283cda4cf6b14cae8b9f8ee8aa8fd0915a8b7cb4f78e796f92f8c",
+      "before_sha256": "bfd379a2fc3283cda4cf6b14cae8b9f8ee8aa8fd0915a8b7cb4f78e796f92f8c",
+      "after_sha256": "c8ce99c41b19ea9e997359c028e890732c2679e4a5024adb783ef8671d538a51",
       "owners": {
         "@document": {
-          "before": "1c3b2d4c4149f850e92013807be5921b6e673ee5d9413e64e795e2eea5bfe271",
-          "after": "bfd379a2fc3283cda4cf6b14cae8b9f8ee8aa8fd0915a8b7cb4f78e796f92f8c"
+          "before": "bfd379a2fc3283cda4cf6b14cae8b9f8ee8aa8fd0915a8b7cb4f78e796f92f8c",
+          "after": "c8ce99c41b19ea9e997359c028e890732c2679e4a5024adb783ef8671d538a51"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "4eeb172756743eaf096229eeaa93a387697be5147d04c21da7af410ba1bd71d3",
-      "after_sha256": "3974f0ab59d6aa370832e3c84a1a9c39c6851880ec8547b6c9b43e44fec6c3f4",
+      "before_sha256": "3974f0ab59d6aa370832e3c84a1a9c39c6851880ec8547b6c9b43e44fec6c3f4",
+      "after_sha256": "403c81724f5a0bc83d73c370c2ed14d2a490adc21035e8ac36d6dfa1194eb3b3",
       "owners": {
         "@document": {
-          "before": "4eeb172756743eaf096229eeaa93a387697be5147d04c21da7af410ba1bd71d3",
-          "after": "3974f0ab59d6aa370832e3c84a1a9c39c6851880ec8547b6c9b43e44fec6c3f4"
+          "before": "3974f0ab59d6aa370832e3c84a1a9c39c6851880ec8547b6c9b43e44fec6c3f4",
+          "after": "403c81724f5a0bc83d73c370c2ed14d2a490adc21035e8ac36d6dfa1194eb3b3"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "bd032c0449a66ee00db05fedf1bb4d00a81ef3d4ae46da2728b8365af38222d8",
-      "after_sha256": "5f5f29bd626cb1186c5e11596aaf1c2a487805fd6286a18e86c9dfa64e3a4ac3",
+      "before_sha256": "5f5f29bd626cb1186c5e11596aaf1c2a487805fd6286a18e86c9dfa64e3a4ac3",
+      "after_sha256": "a35e995b683a081c261c6605a850592b373e78d2a73d54f04a994622d953a52c",
       "owners": {
         "@document": {
-          "before": "bd032c0449a66ee00db05fedf1bb4d00a81ef3d4ae46da2728b8365af38222d8",
-          "after": "5f5f29bd626cb1186c5e11596aaf1c2a487805fd6286a18e86c9dfa64e3a4ac3"
+          "before": "5f5f29bd626cb1186c5e11596aaf1c2a487805fd6286a18e86c9dfa64e3a4ac3",
+          "after": "a35e995b683a081c261c6605a850592b373e78d2a73d54f04a994622d953a52c"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "448489645a9127793992d35bcb7f7afe6b23657ef6331f6cd6c63f18cfa3b58c",
-      "after_sha256": "f335d4e76fd96a71cc0200ab5853063f15a72cd81b94141e07cfd03e3e44e0fe",
+      "before_sha256": "f335d4e76fd96a71cc0200ab5853063f15a72cd81b94141e07cfd03e3e44e0fe",
+      "after_sha256": "d2de48f636f2313b5973884d788a9917f75721bdd31f10de63fb77e96fd5e402",
       "owners": {
         "@document": {
-          "before": "448489645a9127793992d35bcb7f7afe6b23657ef6331f6cd6c63f18cfa3b58c",
-          "after": "f335d4e76fd96a71cc0200ab5853063f15a72cd81b94141e07cfd03e3e44e0fe"
+          "before": "f335d4e76fd96a71cc0200ab5853063f15a72cd81b94141e07cfd03e3e44e0fe",
+          "after": "d2de48f636f2313b5973884d788a9917f75721bdd31f10de63fb77e96fd5e402"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "f1188f1dd464ff756fb59773f7838ba27822fd81d353107c8589efcd3f67c0c7",
-      "after_sha256": "08618638de45c55c3ce12a33a43defef2eb2fb383d5820745340e40b0967640f",
+      "before_sha256": "08618638de45c55c3ce12a33a43defef2eb2fb383d5820745340e40b0967640f",
+      "after_sha256": "0ff82cdcd4d814556e15784d27e4a61f9a54a35bebac0f77fcc324bf02de4a41",
       "owners": {
         "@document": {
-          "before": "f1188f1dd464ff756fb59773f7838ba27822fd81d353107c8589efcd3f67c0c7",
-          "after": "08618638de45c55c3ce12a33a43defef2eb2fb383d5820745340e40b0967640f"
+          "before": "08618638de45c55c3ce12a33a43defef2eb2fb383d5820745340e40b0967640f",
+          "after": "0ff82cdcd4d814556e15784d27e4a61f9a54a35bebac0f77fcc324bf02de4a41"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "0bf0c9a75b276c44b3a67ce46bf83097e7708791f3071a157f02913350d52e4a",
-      "after_sha256": "3b5da69c2a7451a6f08999a32471901c514bf94a9949f190a50110f8e9a394b6",
+      "before_sha256": "3b5da69c2a7451a6f08999a32471901c514bf94a9949f190a50110f8e9a394b6",
+      "after_sha256": "ca1ae5415112fd247c073fc7b6c1f30804f9d32ef22cf649bfc7a0f8d112d455",
       "owners": {
         "@document": {
-          "before": "0bf0c9a75b276c44b3a67ce46bf83097e7708791f3071a157f02913350d52e4a",
-          "after": "3b5da69c2a7451a6f08999a32471901c514bf94a9949f190a50110f8e9a394b6"
+          "before": "3b5da69c2a7451a6f08999a32471901c514bf94a9949f190a50110f8e9a394b6",
+          "after": "ca1ae5415112fd247c073fc7b6c1f30804f9d32ef22cf649bfc7a0f8d112d455"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "e37c22d95ab101344dfb070abf89d03f2599fe5ea157a94c2995543da0de18ff",
-      "after_sha256": "63a1c81f1b53867ac83461933d905713476b43c6d1d7e2fb94125427f3c646db",
+      "before_sha256": "63a1c81f1b53867ac83461933d905713476b43c6d1d7e2fb94125427f3c646db",
+      "after_sha256": "1a6cb35ae8e7ebf6d517977ca48d31c19da1205e95520fe30f37b1e81b13c1b6",
       "owners": {
         "@document": {
-          "before": "e37c22d95ab101344dfb070abf89d03f2599fe5ea157a94c2995543da0de18ff",
-          "after": "63a1c81f1b53867ac83461933d905713476b43c6d1d7e2fb94125427f3c646db"
+          "before": "63a1c81f1b53867ac83461933d905713476b43c6d1d7e2fb94125427f3c646db",
+          "after": "1a6cb35ae8e7ebf6d517977ca48d31c19da1205e95520fe30f37b1e81b13c1b6"
         }
       }
     },
     "conformance/typescript/src/contract.ts": {
-      "before_sha256": "fc6a021b9216f55ff8817fb0f514490255d3ca65e257de60df24404bd308006c",
-      "after_sha256": "2d77c881af85a4ba689c4c3237bb16deb573cee21bb9f22205ee546f59301911",
+      "before_sha256": "2d77c881af85a4ba689c4c3237bb16deb573cee21bb9f22205ee546f59301911",
+      "after_sha256": "0605bbe3da1b307be3178970b1af63b3ab94aceac1f25157f99e03ab5ba460ca",
       "owners": {
         "@document": {
-          "before": "fc6a021b9216f55ff8817fb0f514490255d3ca65e257de60df24404bd308006c",
-          "after": "2d77c881af85a4ba689c4c3237bb16deb573cee21bb9f22205ee546f59301911"
-        }
-      }
-    },
-    "contracts/README.md": {
-      "before_sha256": "3bcbef38edafcd0e78e28c603b893ce49c804ce76a43b03b18993dfca5a6b4cb",
-      "after_sha256": "f94eca95153787bb43617d2ccc3d2f108e52ad2acb9e2b32fedb75f80f552762",
-      "owners": {
-        "@document": {
-          "before": "3bcbef38edafcd0e78e28c603b893ce49c804ce76a43b03b18993dfca5a6b4cb",
-          "after": "f94eca95153787bb43617d2ccc3d2f108e52ad2acb9e2b32fedb75f80f552762"
+          "before": "2d77c881af85a4ba689c4c3237bb16deb573cee21bb9f22205ee546f59301911",
+          "after": "0605bbe3da1b307be3178970b1af63b3ab94aceac1f25157f99e03ab5ba460ca"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "fe0cc0743b034e9ea1b387a5c6f245a0c54e57dec7f72d3d001e81f9452abefe",
-      "after_sha256": "5cf33e70f060217147637766a5de424e45c344f846198623fec60d1cf0def571",
+      "before_sha256": "5cf33e70f060217147637766a5de424e45c344f846198623fec60d1cf0def571",
+      "after_sha256": "7387b46926cfdaa5ca24b5fca966fb87c1c05261f8b36b47622e0a8dc7854e2c",
       "owners": {
         "@document": {
-          "before": "fe0cc0743b034e9ea1b387a5c6f245a0c54e57dec7f72d3d001e81f9452abefe",
-          "after": "5cf33e70f060217147637766a5de424e45c344f846198623fec60d1cf0def571"
+          "before": "5cf33e70f060217147637766a5de424e45c344f846198623fec60d1cf0def571",
+          "after": "7387b46926cfdaa5ca24b5fca966fb87c1c05261f8b36b47622e0a8dc7854e2c"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "1efd87d753b6c98a45ed06e7c009476f865ecd229f623d88bf17611fc3605b8e",
-      "after_sha256": "40d823628972a157ee1c613c322258cddd6fda107ad971607d465754d1405930",
+      "before_sha256": "40d823628972a157ee1c613c322258cddd6fda107ad971607d465754d1405930",
+      "after_sha256": "46e8d82cdff82043460ac7c70b3b57e4c27831698a2fce9f06896d135b749c4b",
       "owners": {
         "@document": {
-          "before": "1efd87d753b6c98a45ed06e7c009476f865ecd229f623d88bf17611fc3605b8e",
-          "after": "40d823628972a157ee1c613c322258cddd6fda107ad971607d465754d1405930"
+          "before": "40d823628972a157ee1c613c322258cddd6fda107ad971607d465754d1405930",
+          "after": "46e8d82cdff82043460ac7c70b3b57e4c27831698a2fce9f06896d135b749c4b"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "4c848b01bf5ca25d489228dd8a0dedc7a85b0ec722ec5cd604a7ebc11ba53457",
-      "after_sha256": "af95ffd8ca11a327e1e2843b9c2cd45d813406776a0f23fa21159034a6eea908",
+      "before_sha256": "af95ffd8ca11a327e1e2843b9c2cd45d813406776a0f23fa21159034a6eea908",
+      "after_sha256": "7ac3dcd18ea0a04d1034e0bea24aca69f88e28dc6c1acc5f1ceb8b9ffba2ee8c",
       "owners": {
         "@document": {
-          "before": "4c848b01bf5ca25d489228dd8a0dedc7a85b0ec722ec5cd604a7ebc11ba53457",
-          "after": "af95ffd8ca11a327e1e2843b9c2cd45d813406776a0f23fa21159034a6eea908"
+          "before": "af95ffd8ca11a327e1e2843b9c2cd45d813406776a0f23fa21159034a6eea908",
+          "after": "7ac3dcd18ea0a04d1034e0bea24aca69f88e28dc6c1acc5f1ceb8b9ffba2ee8c"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "96546853b4112f3c5e991614ac69110491f363314e3fa2f09319120ff86c0e9a",
-      "after_sha256": "246d7e07341ad75be44b60f561c2e045e7f63928fd0ba7d29a08ae6436f835bd",
+      "before_sha256": "246d7e07341ad75be44b60f561c2e045e7f63928fd0ba7d29a08ae6436f835bd",
+      "after_sha256": "e022a9fb736c731d68cfee4390127b6b5415199c45ce04d02079da022564b3f7",
       "owners": {
         "@document": {
-          "before": "96546853b4112f3c5e991614ac69110491f363314e3fa2f09319120ff86c0e9a",
-          "after": "246d7e07341ad75be44b60f561c2e045e7f63928fd0ba7d29a08ae6436f835bd"
+          "before": "246d7e07341ad75be44b60f561c2e045e7f63928fd0ba7d29a08ae6436f835bd",
+          "after": "e022a9fb736c731d68cfee4390127b6b5415199c45ce04d02079da022564b3f7"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "8855cc4c01c2be90db22d77fcde43ae4d25fe47abc719de5418f17c7afd9f857",
-      "after_sha256": "400f16a7176089213920098099449ff0f31b326cb637e61b06212e9215668f2e",
+      "before_sha256": "400f16a7176089213920098099449ff0f31b326cb637e61b06212e9215668f2e",
+      "after_sha256": "6716c7b418d09edcc9eba9e8b9dad168d14ab5bdcceb24919aa5a541a61f9aee",
       "owners": {
         "@document": {
-          "before": "8855cc4c01c2be90db22d77fcde43ae4d25fe47abc719de5418f17c7afd9f857",
-          "after": "400f16a7176089213920098099449ff0f31b326cb637e61b06212e9215668f2e"
+          "before": "400f16a7176089213920098099449ff0f31b326cb637e61b06212e9215668f2e",
+          "after": "6716c7b418d09edcc9eba9e8b9dad168d14ab5bdcceb24919aa5a541a61f9aee"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "f5d6b671c6440d0d359f9186f7a126c246d688c7097816f8ee38c5b78a29dcc6",
-      "after_sha256": "24468d309eeeca15649844a5621296a6060b260b656d43baf69b1c0b145edfaf",
+      "before_sha256": "24468d309eeeca15649844a5621296a6060b260b656d43baf69b1c0b145edfaf",
+      "after_sha256": "a2c81785a9a4616eca9e9f6f2c17b313d45bb720c2b775f276d0f911964bfee9",
       "owners": {
         "@document": {
-          "before": "f5d6b671c6440d0d359f9186f7a126c246d688c7097816f8ee38c5b78a29dcc6",
-          "after": "24468d309eeeca15649844a5621296a6060b260b656d43baf69b1c0b145edfaf"
+          "before": "24468d309eeeca15649844a5621296a6060b260b656d43baf69b1c0b145edfaf",
+          "after": "a2c81785a9a4616eca9e9f6f2c17b313d45bb720c2b775f276d0f911964bfee9"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "c20914ed561b8d1566befa7f579edb2a17b2eee0ec7f244726d592a93efbf760",
-      "after_sha256": "4f1a30dc8f4d984d25e1b857fcb0159c6fe36616415616ef77f72324086cbb97",
+      "before_sha256": "4f1a30dc8f4d984d25e1b857fcb0159c6fe36616415616ef77f72324086cbb97",
+      "after_sha256": "f59abbbad5f65e784f9f75d41376709d7ed47623192b9b6d3e7980becac8135a",
       "owners": {
         "@document": {
-          "before": "c20914ed561b8d1566befa7f579edb2a17b2eee0ec7f244726d592a93efbf760",
-          "after": "4f1a30dc8f4d984d25e1b857fcb0159c6fe36616415616ef77f72324086cbb97"
+          "before": "4f1a30dc8f4d984d25e1b857fcb0159c6fe36616415616ef77f72324086cbb97",
+          "after": "f59abbbad5f65e784f9f75d41376709d7ed47623192b9b6d3e7980becac8135a"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "5cee3fc858814f09f2107d0d782fb7d5a0ab783a80e1067ce14aa737a0028d1b",
-      "after_sha256": "072b1e30702da042625636faae9510092251f727b6345aaf6b8df161165504e2",
+      "before_sha256": "072b1e30702da042625636faae9510092251f727b6345aaf6b8df161165504e2",
+      "after_sha256": "4ae19a63c4755513a4dbe2fbbd57e6585ee5d0975c4cfe2cb3e8427929d97074",
       "owners": {
         "@document": {
-          "before": "5cee3fc858814f09f2107d0d782fb7d5a0ab783a80e1067ce14aa737a0028d1b",
-          "after": "072b1e30702da042625636faae9510092251f727b6345aaf6b8df161165504e2"
+          "before": "072b1e30702da042625636faae9510092251f727b6345aaf6b8df161165504e2",
+          "after": "4ae19a63c4755513a4dbe2fbbd57e6585ee5d0975c4cfe2cb3e8427929d97074"
         }
       }
     },
     "contracts/openapi.yaml": {
-      "before_sha256": "7d00e510c07293c3002f05ac6ad64965a16f584cad72953b714b91542ced9a0b",
-      "after_sha256": "f25dbed377aaedac96625fee7a498a2e20ce6209b957dcb83a870639c71e879c",
+      "before_sha256": "f25dbed377aaedac96625fee7a498a2e20ce6209b957dcb83a870639c71e879c",
+      "after_sha256": "7d3fbb8a6385fa73f7108a79025e2c25a5a05514139075a51a99ba140fe94573",
       "owners": {
         "@document": {
-          "before": "7d00e510c07293c3002f05ac6ad64965a16f584cad72953b714b91542ced9a0b",
-          "after": "f25dbed377aaedac96625fee7a498a2e20ce6209b957dcb83a870639c71e879c"
+          "before": "f25dbed377aaedac96625fee7a498a2e20ce6209b957dcb83a870639c71e879c",
+          "after": "7d3fbb8a6385fa73f7108a79025e2c25a5a05514139075a51a99ba140fe94573"
         }
       }
     },
-    "data/source_audits/order115/source.audit.json": {
+    "data/source_audits/order116/source.audit.json": {
       "before_sha256": null,
-      "after_sha256": "c66778e64c2c540e498d3f8b1af0cef647e0917d5812fabe63d8ba99242b6634",
+      "after_sha256": "b22b7980b16b70696fd3955e051610100abc38f57f3b1f3eeea61b1d5dc382f8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "c66778e64c2c540e498d3f8b1af0cef647e0917d5812fabe63d8ba99242b6634"
+          "after": "b22b7980b16b70696fd3955e051610100abc38f57f3b1f3eeea61b1d5dc382f8"
         }
       }
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "b37bc14fd9a85023d3d39a85819a72a4e12b3d7feb33dc51672a7f6f9d89b2e2",
-      "after_sha256": "108707aa0c2e9d56005e9e6fbac470bcc40bedd8c7d8d055b3642a45c3fd7a7e",
+      "before_sha256": "108707aa0c2e9d56005e9e6fbac470bcc40bedd8c7d8d055b3642a45c3fd7a7e",
+      "after_sha256": "e8529e4bba03057d1b9a346b781216d1700ceac4d401f6bfa8e9a64afc334abe",
       "owners": {
         "@document": {
-          "before": "b37bc14fd9a85023d3d39a85819a72a4e12b3d7feb33dc51672a7f6f9d89b2e2",
-          "after": "108707aa0c2e9d56005e9e6fbac470bcc40bedd8c7d8d055b3642a45c3fd7a7e"
+          "before": "108707aa0c2e9d56005e9e6fbac470bcc40bedd8c7d8d055b3642a45c3fd7a7e",
+          "after": "e8529e4bba03057d1b9a346b781216d1700ceac4d401f6bfa8e9a64afc334abe"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "f91d16b3a26a889ce88234a457f08043c1f37c090b0fea4b58246a04e09042bd",
-      "after_sha256": "28fda7a7d722e072474e8f723841b72b5b57969a019939dba7b401a8ce33cfb1",
+      "before_sha256": "28fda7a7d722e072474e8f723841b72b5b57969a019939dba7b401a8ce33cfb1",
+      "after_sha256": "d2e35ba5e3040fa2ab1c7be68b8533ee8766fc4d37acf03fcec2cb07d11ed7d8",
       "owners": {
         "@document": {
-          "before": "f91d16b3a26a889ce88234a457f08043c1f37c090b0fea4b58246a04e09042bd",
-          "after": "28fda7a7d722e072474e8f723841b72b5b57969a019939dba7b401a8ce33cfb1"
+          "before": "28fda7a7d722e072474e8f723841b72b5b57969a019939dba7b401a8ce33cfb1",
+          "after": "d2e35ba5e3040fa2ab1c7be68b8533ee8766fc4d37acf03fcec2cb07d11ed7d8"
         }
       }
     },
-    "docs/ORDER_115_SCOPE_PLAN.md": {
+    "docs/ORDER_116_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "9e3e0eb07d026fed034b170904ca6b6c01e4a22dc9a06bbd9842caff67019c0c",
+      "after_sha256": "8feb9e4579681172a6914e83406734ac89a2debe8ec1205d8c1b549d33efffb2",
       "owners": {
         "@document": {
           "before": null,
-          "after": "9e3e0eb07d026fed034b170904ca6b6c01e4a22dc9a06bbd9842caff67019c0c"
+          "after": "8feb9e4579681172a6914e83406734ac89a2debe8ec1205d8c1b549d33efffb2"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "6a8135274fc34672bc61f6b40065cc5f419b57be203f4533913984b501d55577",
-      "after_sha256": "ddea332559046832d51568ae4def4e96ed1c92f9d72aac4a6a6ed4a464a6aee9",
+      "before_sha256": "ddea332559046832d51568ae4def4e96ed1c92f9d72aac4a6a6ed4a464a6aee9",
+      "after_sha256": "c9cd5a6ba23a6d6e3c06b2802da6dea31b8c65b8a5af067d8e079751be5239ec",
       "owners": {
         "@document": {
-          "before": "6a8135274fc34672bc61f6b40065cc5f419b57be203f4533913984b501d55577",
-          "after": "ddea332559046832d51568ae4def4e96ed1c92f9d72aac4a6a6ed4a464a6aee9"
+          "before": "ddea332559046832d51568ae4def4e96ed1c92f9d72aac4a6a6ed4a464a6aee9",
+          "after": "c9cd5a6ba23a6d6e3c06b2802da6dea31b8c65b8a5af067d8e079751be5239ec"
         }
       }
     },
-    "docs/performance/policy-v3/order115-rule-semantics.json": {
+    "docs/performance/policy-v3/order116-rule-semantics.json": {
       "before_sha256": null,
-      "after_sha256": "a2c59e0df5ec72da4b161b16338f99117ad9aa0eb37d983fd48be1c820b29e81",
+      "after_sha256": "eecc02be0b4e5f214139fca63eac02f0ea23020913ae3ec27125abe479234a7a",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a2c59e0df5ec72da4b161b16338f99117ad9aa0eb37d983fd48be1c820b29e81"
+          "after": "eecc02be0b4e5f214139fca63eac02f0ea23020913ae3ec27125abe479234a7a"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "6b7b0f7f0b3307dea9b85826db50a15a50fa26fd22525d4bcda2bf248bacd303",
-      "after_sha256": "f933f16f644ba1619e903d882f037f8b70e6f2bcd712a0028e3a7a67720be955",
+      "before_sha256": "f933f16f644ba1619e903d882f037f8b70e6f2bcd712a0028e3a7a67720be955",
+      "after_sha256": "2fbdf741cebe1b71fa1d64ef73b0bf564add9ac4e115866ea3b430092ec6b605",
       "owners": {
         "@document": {
-          "before": "6b7b0f7f0b3307dea9b85826db50a15a50fa26fd22525d4bcda2bf248bacd303",
-          "after": "f933f16f644ba1619e903d882f037f8b70e6f2bcd712a0028e3a7a67720be955"
+          "before": "f933f16f644ba1619e903d882f037f8b70e6f2bcd712a0028e3a7a67720be955",
+          "after": "2fbdf741cebe1b71fa1d64ef73b0bf564add9ac4e115866ea3b430092ec6b605"
         }
       }
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
-      "before_sha256": "b5367c6cc5d71d27580acd7c1f1c919703fa70b70cf2ae849acc3ae01c8fc07a",
-      "after_sha256": "629e4ecc1dcee157c9833f76b0790e179cf55748d7a363d3eea660698a9c2b57",
+      "before_sha256": "629e4ecc1dcee157c9833f76b0790e179cf55748d7a363d3eea660698a9c2b57",
+      "after_sha256": "3af3b8da852166d13206259560990200089ffb3f3b2db20f3fbb6bedfc012822",
       "owners": {
         "@module": {
-          "before": "89aefc37779cff4b3617abe3ca13730226738c1122dcc7cc91fd9c353a99ab1b",
-          "after": "d340a4e996ea669d76f612f55925ab4e944c8a5cc96e1df1ae418fc66c1fa6c3"
+          "before": "d340a4e996ea669d76f612f55925ab4e944c8a5cc96e1df1ae418fc66c1fa6c3",
+          "after": "b6addeb2435d0f9d61560f6a29257131d52e9b85952198456969ac49e14d7dbd"
         }
       }
     },
-    "src/warhammer40k_core/engine/base_contact_fight_history.py": {
-      "before_sha256": "32358233de0981fc13bbdcbf1c3cfc3d44fd5d88b5010712d8d93d2ffdedd4a6",
-      "after_sha256": "06e3db01fa216064ef3e20a6558a9f03255eee6549f0019e2fd6aaefe49896f3",
-      "owners": {
-        "@module": {
-          "before": "bb8ce4e2743435d4459196bd42c811f845bd016dba39686910057d7e22c54cbd",
-          "after": "a17e22db43f22e33d1341d0cccc9e96ed0b62c8c0590aabb62eff16394d58eae"
-        },
-        "validate_fight_contact_permissions": {
-          "before": "2bedcb0aaa870cd428b725a99a911fdff8e78a29726ac0355cd139b15684c685",
-          "after": "74e7cadb377199abf986654c540676a1a1d144b4ecdf0092f574905b5ce2c107"
-        },
-        "validate_triggered_contact_permissions": {
-          "before": "404ea564f0608ef3a4f2f16d7b7818e6a9816e705a3152ee871e9438cedf6943",
-          "after": "0bc5f5d49736a9a08147ea4555c8dee5dd604b0ede7506562f062a783215c450"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/charge_path_contexts.py": {
-      "before_sha256": "0beb91e4835c0cbfeb1ec06dd8339298e2aea66c50e594dce845ca3e08d251e3",
-      "after_sha256": "3cab3426df682ea8ae07a580b8aaea8d1b01000d0701462d323e3f521a14e867",
-      "owners": {
-        "@module": {
-          "before": "a8a51decfdad586155fd59ecc212c8e673fd5bd47f1ca986d85138dfb6b3655d",
-          "after": "9905c67613e559680d8242abc5f645fd7c4a41e43a77f224fa26e0b65327b09f"
-        },
-        "charge_model_path_contexts": {
-          "before": "1a999c7a106db2352bbc1788bbd5c54bdab1abbb0977e532074f1b6f85030ad4",
-          "after": "e5bb8cd378ac970df8953e05f0f4678508f44632b07cf114cd432a40295305e7"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/consolidation_model_constraints.py": {
-      "before_sha256": "745dee697613138750cd2df2013ba08178f977759de64061267e06a7e73e37e8",
-      "after_sha256": "3a029bd1b4605d97b603b68725212d48fb46e19d8e185461b35ea653f289f293",
-      "owners": {
-        "@module": {
-          "before": "45196a6d5765c7b6444f8c3f22168c58dbeed567b48545913c08d50385ad45f0",
-          "after": "b8ade5f4fe55185656d65271fe8266feef20efce5eb2df1966c35b24f74a2bad"
-        },
-        "_query": {
-          "before": "e9dafd9744958a5b540f43be401bb34047c2a217821e449ee494d159d5d37a3e",
-          "after": "271d80db752bf71e66616cec21c1a123f155cce602d8c78ff1e19acf1dcfa908"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/fight_movement_paths.py": {
-      "before_sha256": "4591d11d6b89f23b8ef16258a2eefa3bd2c3af5c57b7bb1d3407474d6802f21a",
-      "after_sha256": "0624fb6ac3b5b5119856420d4877747d6b5dae915e51bdb990cd9143404c857b",
-      "owners": {
-        "@module": {
-          "before": "fb518d02a47804ae0d57328ad3f96bb76d957281b8a4321a43fa9c1200c0fe93",
-          "after": "08c0ddfa14dd1fe56f19db96daae17095465c2a1ded691d6fdccd65efa80f512"
-        },
-        "validate_fight_paths": {
-          "before": "9e2534e264306c5e9e6c9c6daaf6da5046a1b3bcf5221bc0d3e45c9b1b4dc075",
-          "after": "e4a6b479bbb20550825493de2d08031438a3ae6bd7bc8f0ffbc642eaf3a34d86"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/fight_movement_source.py": {
-      "before_sha256": "9a6345e5b6cb1a96432b22a8cfd918a2b55baab92b71d24bf2fdd3638f51a246",
-      "after_sha256": "f8024c2864defbf0060a5ee90edbe1599b77a16fa8a7fd3edd9213ffa40a7f07",
-      "owners": {
-        "@module": {
-          "before": "6f1c4d8c8439d08180daed6414fd3b4f4215db6b7e5a2e4ce6a91ae7f7cc3a1b",
-          "after": "834af0c500676f5e31d318fbf19259917cfb4c3d84f1314e57cf1627108914d9"
-        },
-        "retained_fight_movement_source_path_violations": {
-          "before": "63fcc3cf38e49a44c5b3665caf3cbca17f8c8000c7de1eddf90fe67335729f49",
-          "after": "81892f0205926fb6b1b60aac7fe116e5b5bb24021e1e90fc1eabd6b109e36f56"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/model_movement_permission.py": {
+    "src/warhammer40k_core/engine/additional_attack_mortal_permissions.py": {
       "before_sha256": null,
-      "after_sha256": "cb7bcbfc9d48f1657581edd2caf199abed39638019b170b282214b3d9702e1e8",
+      "after_sha256": "16aa781ddfb695ba4d06416ebacf71346f0af1f24ce06c7c6329962ca6dc70c6",
       "owners": {
         "@module": {
           "before": null,
-          "after": "3fa47c7bc4dbbdadd967e4ca4179739f72113eab528e0369991e04c475f58abb"
+          "after": "7b582958b875d94367ba779bcb2e923d8ded575e3e4f75f8839aac443761689a"
         },
-        "model_movement_path_context": {
+        "additional_attack_mortal_permission_effect": {
           "before": null,
-          "after": "1a7715902f4a2c4564704f4462678e21fc9c68db7f6ff33e2e498a1498a81bf9"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/phases/movement_resolvers.py": {
-      "before_sha256": "0133814c03726db41d553924651af3c34cb57d75848fba3918c9b47efc1bdf8c",
-      "after_sha256": "276bad687be9437215a86ff366b824c04a373ff3ad7372551ca860d10a861d91",
-      "owners": {
-        "@module": {
-          "before": "e77673fa1d7708003fc244a186576427f4e5a5ac5ea59b03ab357dbfd050e637",
-          "after": "d857b9fe8ba117c0929b72d1a7c9e2715578c01b49ca80cb377153860541a5b3"
+          "after": "15b6f67dee51739816201c71c2668eaab7b6215b1e71e2ecc415232014ed10df"
         },
-        "_resolve_unit_move": {
-          "before": "16cb1b875255c872041d6daa28a6c4a0fa9d57bfc5ae52e5f4fd2f4d2f4efd14",
-          "after": "5655b4ae5a7a49532d83cd851f64683dd6d856bbc2b903bbaee766e78b529e8c"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/phases/movement_validation.py": {
-      "before_sha256": "f0eb87a7c5f6352679c19e48d969758e1314faf39ee1d7edc6b5316684ca36c3",
-      "after_sha256": "99603f8f706e2b7a63a3e4c68e37ac0c185a4a2bfa8da56a18abfad14b41b8d3",
-      "owners": {
-        "_model_movement_budget_inches": {
-          "before": "b0926ffb91b91075f18c06d6f36f1171c1fc1842c878e8797ddd42503709ba5f",
-          "after": "a39fc1e8d70a38cd40f98ef66b250d23ea1eacc7e76da1c4fd5a26307a127443"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/scout_movement_paths.py": {
-      "before_sha256": "88b4cc4a69b0712f4836dbcf58decabbfecb10864bca3031f435e7b47864b0c9",
-      "after_sha256": "3843db3765b20a45fc4fc04f0b77a59e95d1bd00a30160ce09b7f145ebf3e8fb",
-      "owners": {
-        "@module": {
-          "before": "8b41201786fd21f018e6727845cda4b79d18257088fd24a051b72537f802e034",
-          "after": "fde4590d74a74a8a076b4fe4ce3083713cd5f85e4f1513264f6b632beefbf86c"
+        "additional_attack_mortal_permissions": {
+          "before": null,
+          "after": "c83488074a9a76e32bf506d6abe58414a9abc8b3102a9adc3f8ba129808521a6"
         },
-        "append_scout_path_violations": {
-          "before": "800b6b6bd889ac2bd43349b659d7ecdb887b70c778665c5553f311f129e726c4",
-          "after": "61979529d3e220834df55554c335440f2be03b8475d3c4a249b9526dbac25e8a"
+        "validate_additional_attack_mortal_permission": {
+          "before": null,
+          "after": "4b8297ced7b877c9d5f2c54907cb6ecbbfe4ef3843381702eac0a3034b4f04ac"
         }
       }
     },
-    "src/warhammer40k_core/engine/surge_history.py": {
-      "before_sha256": "4b006e9d778c2c4db9469d7e556ec01ef9d786dce6bb7e55ddf218836959528c",
-      "after_sha256": "1c6fc5943e7ee23c015da93561aee9be9e52e64263c6c64bf191f44ba28f9bcb",
-      "owners": {
-        "@module": {
-          "before": "bc785ed57a6c8799cc268b70ca551cf66b74cd4ceaa8156778303e6c8453989f",
-          "after": "ba04693a77eeb071858fa4a402872036ca88c1f158c37b5a3a035700556b6988"
-        },
-        "validate_surge_history": {
-          "before": "15301bcb8a3425d702064db0111854a3bc3beccd76acf10a73fd9d954d7d796f",
-          "after": "d566e770d8d097851ecc5865a151ca4eb24b2a3d109b38ae79a1316009be443c"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/surge_movement.py": {
-      "before_sha256": "a9d1684d106e07bfe6c6f3f4960a80a7b8d8f6d129850f9ce4b7096ddabe77b3",
-      "after_sha256": "ec0d0703caa81b4d19b285bac33eb80b0402ceaa454ed69c77536afd5cc74489",
-      "owners": {
-        "surge_endpoint_evidence": {
-          "before": "0343e6d9728a27a914e74ba0691e5392217adf24b69c223eeb2dff0ac475f656",
-          "after": "38c0da9e2c73ef21809106de39e3afeede86f6bf0bcac8b758bd177c7632746e"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/triggered_movement_resolution.py": {
-      "before_sha256": "91f02a3e778021529976806feae9728e16b4dfe84f2797b2fc85b0f2bcab9fe9",
-      "after_sha256": "ec54c7df2de1b8e1830cab8b9b7042e4955072d51fe5154d9704bde905b8a909",
-      "owners": {
-        "@module": {
-          "before": "ce6921e3d129a11bd945e89342c7e3b016d99ad80a1420fc41de85f5ac5c5356",
-          "after": "c5db3411923af2e45b9c98ca4e39230a1e6767aebb1255c275b47302bb12f4a8"
-        },
-        "resolve_triggered_movement": {
-          "before": "105e47f806855d3b5120bd502937d37d47950c5bf1ca0414c63292161521ee03",
-          "after": "4096544102d500c161016d685777b9b03c2f50f0566a0dbe97549feae0b2dd82"
-        }
-      }
-    },
-    "src/warhammer40k_core/geometry/movement_reachability.py": {
-      "before_sha256": "d106d14bb1f018a34e920fa4e36569f9a800395b33d491361cbe57cc30345a4b",
-      "after_sha256": "d90edd91ae16dc6e3e17f2dff61e33ec68db175fd11ccefdd71faa8e2011e878",
-      "owners": {
-        "_cached_reachability": {
-          "before": "93b6f7d42ba0664c21a636f8d898c8a23f0d70113cadfb939c0c23a1313cca0d",
-          "after": "23588c0ac6ff4a5c97627254f8b33b384cee0f9d6163adbc0682307c8fe063c2"
-        }
-      }
-    },
-    "src/warhammer40k_core/geometry/path_initial_constraints.py": {
+    "src/warhammer40k_core/engine/additional_attack_mortals.py": {
       "before_sha256": null,
-      "after_sha256": "47653ee9c1034ffab95d8ca67f62edf6dfa060e1813a5205574a690d0d0c7cb5",
+      "after_sha256": "4b70812a5b2d557c58402122312a57a6d778808f03a0ed1a3d99f309da931851",
       "owners": {
         "@module": {
           "before": null,
-          "after": "aeb639c9cc9637319fb344d917c44b6704ce04da8c8dbbcf8dae80b7d057454d"
+          "after": "a4f57343358ac292a885e1b6916c0c617cb2ace34bbbb5c633795a48bcaf6171"
         },
-        "initial_path_constraint_result": {
+        "defer_additional_attack_mortals": {
           "before": null,
-          "after": "4535f11dc05de440ae650006a611b8ba1a46985fd1e08727ee3defb5c91a0fd9"
+          "after": "03b895679f18ccdfdebfc9793d0163036ccedbabedeb58109110b2979494f244"
         }
       }
     },
-    "src/warhammer40k_core/geometry/pathing.py": {
-      "before_sha256": "a182a92a0464232848c808c76f12652eb41fd8cc441a6f120d2a4f8ed097b759",
-      "after_sha256": "20ce2138f32c5cd70c580f37dd18ea5bc2f09dbc7a109c1b609ae30115e79e21",
-      "owners": {
-        "@module": {
-          "before": "f1762c79176397c270f43aa389b7eedb830b936a8d8cc3848e6cac43926f7cca",
-          "after": "4502dc42b58cfe7a1b8c3cec9833806f4298b595960585108ab0423e84a63830"
-        },
-        "PathValidationContext": {
-          "before": "bba28820d04e925851a0bbd2af142c8931e73ee44c45a078b14c3edaa740de4b",
-          "after": "1d6ef0d15c4fef081bd6d55d863c2d4497e272f76a19bfc8ea4acf0f190f894d"
-        },
-        "PathValidationContext.__post_init__": {
-          "before": "dec04fb7770ba988b98e3d7e6202fb56642d8c1f76455b9392e89e4f9a158e64",
-          "after": "eab1d007c67238cb108299ffe661ab35faedcfb91f810680b46597736ae998ff"
-        },
-        "PathValidationContext.from_payload": {
-          "before": "2c85ad4aa23942689743f2f5a8c2c2573c3a5bff5c2a90470c0f9b0ad6c4d023",
-          "after": "aca7ad85aa5621388efd3c83700776857cb1c2c8f6b436a97b896276fe1765e8"
-        },
-        "PathValidationContext.to_payload": {
-          "before": "44ca2d480312f4bd49c8af360b25c9716daa281ba865d29b96a127790ef16274",
-          "after": "ea29cf99ef2a261f610185418c3c479f200be9324571fd717f6c136b6c70f1fb"
-        },
-        "PathValidationContext.validate": {
-          "before": "72ee3d76108b604f3c16ae80264870a850527fc352f576a0ce8261832308ef61",
-          "after": "0801573a47dd8b1664e148f7fc06c00b0cd2f3e4979dd115596b35e0db6d6b51"
-        },
-        "PathValidationContextPayload": {
-          "before": "59d384b10d08c99230513aca58954416b681ea22483c9271406f81f0fb470c2f",
-          "after": "9b55da2e36c4180fb589d9ed069289ed474471da4570096761aa3fb7a5924b5e"
-        }
-      }
-    },
-    "tests/absent_movement_helpers.py": {
+    "src/warhammer40k_core/engine/attack_mortal_origins.py": {
       "before_sha256": null,
-      "after_sha256": "adc299d615b72ebe858407d84b5252afc0b78e1259f57937b72a77fe2213492e",
+      "after_sha256": "1f50f995e456db575bda1573277f8b36e67e617eb40aea54045099c0522fb8c6",
       "owners": {
         "@module": {
           "before": null,
-          "after": "d713bde52b42c1a1f2fe8613ebe220e8e3efec1f8da8a36bb4914158ff229efa"
+          "after": "516a91a0f98c2fd3720a0ebcc02b11ccdb625b411a81025072d7298996950ec7"
         },
-        "movement_catalog": {
+        "AttackMortalOrigin": {
           "before": null,
-          "after": "38d282c4f50606290ab13e3f68bd1049786df237ee274c6533db3e9b953a7db7"
+          "after": "2a219ea65820b932fb7b248b050f27ef7a7cd775d931350c6c2972a049a3943a"
         },
-        "movement_session": {
+        "attack_mortal_origin": {
           "before": null,
-          "after": "9aa7aaf42cceb06ecd4725f5afaffa671fa8c2a77d43828d847ee4b94a3ef0e9"
-        },
-        "movement_witness": {
-          "before": null,
-          "after": "3995c585982e4396798cf187af1b9eb0011dc0d7c4e15f63c8788c1f35d94058"
+          "after": "4cbbcdb2c1ea5d819ff55bece34f7bcad4ee29bb598914d2f1d2e57164af6144"
         }
       }
     },
-    "tests/code_quality/test_order115_movement_permission.py": {
-      "before_sha256": null,
-      "after_sha256": "cb14aa1dcb30cbea219b98b81184c036e9e22a5c81144148a844be5aef6f5ed1",
+    "src/warhammer40k_core/engine/attack_sequence_damage_helpers.py": {
+      "before_sha256": "da46f4add13d495f772ba59a0274494b866d52de609ca873446544917a0a68a0",
+      "after_sha256": "a473c72c4a86c46b4d16ee6303094d35c9385f7f12741e4a3a54c72f66c666b8",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "ebef77e93e53bb88f6ff5d01fc8204faae3f0e50d8ea9660876ce3e96b2a9cab"
+          "before": "0971530cfff2b226a9845176abffda71a8838c455a0ca128bd14aa603fa93b36",
+          "after": "812aa79cfca8ee511316238cb6851e48bf6aa8f89a02761386706bd788a1a5d9"
         },
-        "test_all_engine_movement_path_contexts_apply_model_permission": {
-          "before": null,
-          "after": "df865d4c370393fb73dcd4c5e2bb8e8676252a4c08f4008d6e41bfed28d4940a"
+        "emit_deferred_mortal_wounds_applied": {
+          "before": "98d2db618b71ee30a108da625b3dcef7b51539d76cef677ff407cef731c3bfe5",
+          "after": "08020914a9710db51227cbcc1b0d86d46a5ca32c709c9752bd3eca3696b28583"
         }
       }
     },
-    "tests/unit/test_order115_absent_movement.py": {
+    "src/warhammer40k_core/engine/attack_sequence_deferred_mortals.py": {
       "before_sha256": null,
-      "after_sha256": "698a9ab16eb87966ff1b9c8c2a2d04477146d9c231482efce15c5f53ba71bd41",
+      "after_sha256": "a711e3bc886a5eaa61384fe298e977291fb5875a281606e5f13b4daacea4a252",
       "owners": {
         "@module": {
           "before": null,
-          "after": "a3185a0f6d9bb0c008e06432943df2729f4feae41d910d85ab95c6e7f35e15d1"
+          "after": "9115ccf96f87b5cc7102fdae32f71bcc9efb7bd05f73481e1f1f9e686ce8edc2"
         },
-        "test_absent_movement_cannot_advance_or_use_a_normal_move_bonus": {
+        "apply_deferred_attack_mortals": {
           "before": null,
-          "after": "eef4ccd607c96f8b393edbb3abf4892a0a74680fe1748ea07758e83efc30b538"
+          "after": "45d85ef32b6dbf4648f43603ebe1b39e1c0f1fbb720ec81cd454b87d456f2aaf"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
+      "before_sha256": "2368de5eb9823e8e877ee6022fc2ad661fd8addaa91b7d7c0f60314858c6b0d9",
+      "after_sha256": "008fcfd921f2bc20a0a719b82a323080fd905fbe8c86f705371b8018073f471d",
+      "owners": {
+        "@module": {
+          "before": "0b45056cdaad9fc7f66cccb963fc3d8d47508abc6ca8106f995551fef1e8b72c",
+          "after": "bef3689657a253f83566f1f29d8ae43203b87b4155e110c9401add9d32fe2bc7"
         },
-        "test_attached_movement_keeps_dash_bodyguard_fixed_and_numeric_leader_mobile": {
-          "before": null,
-          "after": "bbb85c10bfd5741385fb1502b552e33021b63c3149b259fa42b1ef3b8398a3e9"
+        "_apply_deferred_mortal_wound_feel_no_pain_decision": {
+          "before": "88c6fd96c2c178386e6bdbfd1bf83a74d14b4ea432ad6bdaf66eea39284c574b",
+          "after": "bd5bca124e2f1e63e5f8d73e494dc3da019560c5c65ade8c08fdff10ad457876"
         },
-        "test_dash_fighter_completes_lethal_attacks_and_post_destruction_continuation": {
-          "before": null,
-          "after": "5606bb7544296effd70fb29592593d116dba2ad07a7b469d88811143f1cec2ee"
+        "_apply_deferred_mortal_wounds": {
+          "before": "dfdd6ec90d96e77ba32dcd14ea402d2a6171553cffeffa6151ae8255a599c7d9",
+          "after": null
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_post_roll.py": {
+      "before_sha256": "f4807958b15432ac06923c3b89a73fca7ed97a84e121e6279dde2609f554df10",
+      "after_sha256": "45a1c425890e27a48d405b4364df1b72da62e3d9fcc06645a7a0d465245de365",
+      "owners": {
+        "@module": {
+          "before": "cd899ae5fbc2969ecd5ed01e82a397596edc824fcef903282e4c998af45de036",
+          "after": "0d9f1d68163fdb9564404b15c852ed4952d1132909cf683f9a5a3f24ae20175a"
         },
-        "test_dash_reactive_hold_is_an_engine_created_restorable_completion": {
-          "before": null,
-          "after": "c457f0c539e2f64282c2ab4a78ed19124046246dd51d4c4498b3b9d178908284"
+        "defer_grouped_devastating_wounds": {
+          "before": "1d7b003dce5fd8bcb6d73fec75c7aa4fc972e500f87b13e1fb7cf0596e3c1d8e",
+          "after": "a5b0ed50a4ea895968946302c4b1e0a1303a1ccbd5dee556657c12f48087ce73"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_validation.py": {
+      "before_sha256": "3d428f29de45db9c0ed5e2362402a92ad8aa3cd2c76c12f3fed918f06cc3d164",
+      "after_sha256": "2ada4f0647df92707e71a664af76d6d4846b128d7a0413542e3c10b96b89f05e",
+      "owners": {
+        "_feel_no_pain_source_applies_to_attack": {
+          "before": "4a43972d4c9e64830bae0da852931aa55fc4e5e549f66c30e4b79863365ae37a",
+          "after": "8730a7dc9de77b7f6ea63c96b772ed1789b4c89b8a2c2797fb03e3c5ddc1310f"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/deferred_mortal_wounds.py": {
+      "before_sha256": "7ef982391d738417e4737da7165cc9399f233ba98bc9ad89cbe5845a24c55b30",
+      "after_sha256": "7b333feef95d12aecee6f21f0a8bcc01c65e269b21536f09e897ca92b45c033c",
+      "owners": {
+        "@module": {
+          "before": "93f4387aa65582ed5b649759c35491879b4629c748e782dbe719986b075f742e",
+          "after": "9763bb4208ee88af1bb8f8803444f72f630da052cfa006ebe2cd37d67f168235"
         },
-        "test_facade_advance_retry_completion_restore_fork_and_replay": {
-          "before": null,
-          "after": "c6ef54e4b4fb6aff7e2d5336a49e1dd737c44ac6352116dca9021fe7052877dd"
+        "DeferredMortalWounds": {
+          "before": "d94646e623622be40a951a43f2214bd89c3ca566104006a1d47496df65839f7f",
+          "after": "662bd6a40bae67f162aa10b55ff68517309d21b452f12ae1f04e74bfa394ad5d"
         },
-        "test_fixed_distance_reaction_preserves_per_model_absence": {
-          "before": null,
-          "after": "97bb0cdab12919a7ba9ab2257052e74585cd4e9c82d526638929b294d870806a"
+        "DeferredMortalWounds.__post_init__": {
+          "before": "6b7468052f464efb3634c7f99740d4c7113f033d2beef7b42dc89122362374ad",
+          "after": "865029cff72838dfa4feca6cf722f2a4928315c05b44c6a70b925fdf5142ee62"
         },
-        "test_fixed_oval_surge_certifies_maximum_approach_and_restores": {
+        "DeferredMortalWounds.application_suffix": {
           "before": null,
-          "after": "3312bf46f808c6b2ef0478a9e8c501309d24f99874d5e4cac4f339107931834b"
+          "after": "d7f32705773682cbcb24ff3252e0eda5fa4ffa9ead7a1f0f5ade548b4f26741a"
         },
-        "test_shared_permission_serializes_and_proves_fixed_pose_reachability": {
+        "DeferredMortalWounds.from_payload": {
+          "before": "0353b6ca674f1d8d2e375fb1a5dd6dd0ce0e0fd24e3e90fb782cae16f6ae2b0b",
+          "after": "a141acd71ce7f46380b36dc0678ba4f867072790352fe368f74529821f7e7467"
+        },
+        "DeferredMortalWounds.source_kind": {
           "before": null,
-          "after": "2d27a41c26889df5de139951f7cfc39a0b8563c02703bbdae18844fda8e143d0"
+          "after": "fdc29d989bef60e9c5bb4bf7b9da108a0718665acedda36623f51b1c5f4ebf95"
+        },
+        "DeferredMortalWounds.to_payload": {
+          "before": "7315bda18270f19ed5434253e2029683051c997faf09afec0091a98813357b42",
+          "after": "9db0a36bb985800a27b0a4aadd4c2d49b942086868afb5b0b39265ddb58166de"
+        },
+        "DeferredMortalWoundsPayload": {
+          "before": "a5bbe3dde3e8d413351533673fed3df78a362a20f9e5fac0802577d485dd0de5",
+          "after": "70187a989405ce731c65b12d2d520b92ff7ededd1a12e4b5da93c74ce54fb75f"
+        },
+        "has_deferred_mortal_occurrence": {
+          "before": null,
+          "after": "5a52e9e2d17dbc1944ef8db0bd86de2d57a019b9831fa1c1d5bab0bcd28bac45"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/feel_no_pain_conditions.py": {
+      "before_sha256": null,
+      "after_sha256": "5896c47a7b7e3232bfab1e669ae186cb2bbd9047e5ec9ca28b59e38378318aa6",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "8b9236610ed373a1a582065505eda0f66b43765be53f5bdf0f8ade6113e23050"
+        },
+        "feel_no_pain_source_applies_to_attack": {
+          "before": null,
+          "after": "44db59817ff7385a13517923cfd56da9b32c88fb4236c4a38090d5d9959e5fec"
+        },
+        "feel_no_pain_source_applies_to_mortal_wounds": {
+          "before": null,
+          "after": "7668ef7e0e1a34a33983793354ee321bb266189f67495aa6e6b6d8d97b46395b"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/model_destruction_cause_attack_restore.py": {
+      "before_sha256": "ae48b5d0d51b60539e78df718dd5812ba428abdf1dc32925aa2364898a7e0633",
+      "after_sha256": "46287a5b79b35bd2f4b1a696ce6965ac60a6699883a5ed69ed0cc407684a097c",
+      "owners": {
+        "_has_pending_attack_mortal_continuation": {
+          "before": null,
+          "after": "6c7005506d2fd190f8aa88fba89f290abb01cbd0582e8e8b08a5b3cca2a36a18"
+        },
+        "_has_pending_devastating_wounds_continuation": {
+          "before": "b345a718c24f350484d993abbf3e9ecde1a9a91db46155b0ff39fdf688785693",
+          "after": null
+        },
+        "validate_pending_attack_destruction_boundary": {
+          "before": "7a0f14903b1c9f81f27245c71dbf7f895a43bbf3259b52d17b2a74c0b36e630b",
+          "after": "e1319bec11f237edb87e5f8b994f282e5582ea9a855215a804922f32c45503d2"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/mortal_wound_model_allocation.py": {
+      "before_sha256": "5df7cb1ac1ca7a8d9807c8a3dd5f670d2fe7c07932fc31111bd3726f19aeb280",
+      "after_sha256": "30a330a8901a40606be629417e5a2354ba5a927e8affa9f95e6c75b29fdc330b",
+      "owners": {
+        "@module": {
+          "before": "5ddef98ef32d6f6c1366e6a23aff18b344670aed3e726c4cf77b2acbac009d2a",
+          "after": "1d9f28803b7902520d910c2529bf05dbcaa1e31cd7742fdfac95e4d768eec083"
+        },
+        "_continue_mortal_wound_application_for_model": {
+          "before": "afc4b56ccb7aee8688e90e99bac897f3349e69dcb850a294795dc59567a21684",
+          "after": "fc0950bd85f55e59ce680bd24d30c0a0929175da67c009243e01d11630e023c0"
+        },
+        "mortal_wound_feel_no_pain_sources": {
+          "before": "933059a95b5b58c720a56da911905c2123de7b8a09c75003c780961dcbda4d7c",
+          "after": "82e00f8c8a09d801851908061c6e6167050b795556e114b8f99ae1fb0c648856"
+        },
+        "validate_mortal_wound_feel_no_pain_request_authority": {
+          "before": "b7236cfdb5e7102a575cb4cc08f461ea98cc98f7e616efe17f0e70dd9f5ac5ba",
+          "after": "31c4abc0a9eb5c32379a1a719baed91b24c6e45a9c4e4649d82ade7d6867228f"
+        }
+      }
+    },
+    "tests/code_quality/test_order116_additional_mortals.py": {
+      "before_sha256": null,
+      "after_sha256": "2a42b55793b70055de9a2dab563a3991231b4069a18a120a657d72d0e2e8f2a4",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "57d2c664f205d297d97fe626562b04d1dfbfb28da3620c20e9694f38b946dbbf"
+        },
+        "test_additional_attack_mortal_producer_and_mutation_have_shared_owners": {
+          "before": null,
+          "after": "c735ad603f19c4724cbbf31c626b4ba7eee9bb17a85f076f2e8b6312bdee669d"
+        },
+        "test_additional_attack_mortal_source_rows_preserve_selected_authority": {
+          "before": null,
+          "after": "fd022ce659344dfd74513074061cad237fc5b4cf8c0697c2ca00edfa44a67783"
+        },
+        "test_attack_mortal_identity_and_fnp_share_source_aware_owners": {
+          "before": null,
+          "after": "b083e3bec759dc14f807c3d0e60436fc6dd5d4c5e9cd3738f3feb0489f12f7b1"
+        }
+      }
+    },
+    "tests/order116_mortal_helpers.py": {
+      "before_sha256": null,
+      "after_sha256": "643314c9c577ffb5cfe5fb6b1596fa203755daa6d679fda90860ea66662dce72",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "e7b4b902f0801c59d97eba7770a39d11ca8c49611743ee15526905d7306dd755"
+        },
+        "additional_mortal_session": {
+          "before": null,
+          "after": "0793f825d1eb7ae1b3266ead659bcd229e0993687df1f41be72b38da8ac9f619"
+        },
+        "gathered_additional_mortal_session": {
+          "before": null,
+          "after": "b8d2854568230897ac1095c0c79264bc48322363df256ade5e6055800afde36e"
+        }
+      }
+    },
+    "tests/unit/test_order116_additional_mortals.py": {
+      "before_sha256": null,
+      "after_sha256": "52e8fc3a3a2df49fefd39807a7ec072b8daa5bec8c7634402221da192304e027",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "58d1ff081f4205a563e7264351a7f8f5dbf34dfe08dcea5695f2dad475a11f8a"
+        },
+        "test_additional_mortal_pending_retry_restore_and_lethal_continuation": {
+          "before": null,
+          "after": "1f7ae57c1def5c73ee47d84d436675ffd3591cd53dfbc11f8afc9a104024d5aa"
+        },
+        "test_additional_mortal_permission_validates_schema_and_occurrence": {
+          "before": null,
+          "after": "f6901dd10153bf640b4e3af79765826396b4f7f1a1bfeaafb7a71b691155bef3"
+        },
+        "test_additional_mortal_weapon_scope_is_source_owned": {
+          "before": null,
+          "after": "be0438d842ac9d9ac0a62dafdea698a3f2838bf31482154b189921c97e7ff831"
+        },
+        "test_additional_mortals_coexist_with_native_devastating_wounds": {
+          "before": null,
+          "after": "48be1b6ba99e572bd17402a3280264f8da5cc2f60281bff80ade37b0031cd52d"
+        },
+        "test_additional_permission_id_cannot_alias_native_mortal_application": {
+          "before": null,
+          "after": "074f09a3e877745cf656b178dcbaa3105a48c72834d7103cfef55fe51ea460ef"
+        },
+        "test_attack_mortal_fnp_keeps_psychic_weapon_classification": {
+          "before": null,
+          "after": "971ede384ccd10f21e7d831502cc53bcb94ecfa25058a48d1b5becc70e5487a1"
+        },
+        "test_attack_mortal_producers_resume_once_after_command_reroll_windows": {
+          "before": null,
+          "after": "0ccfe5c41cae1a7a92d9a12659b47efe9cc661ddc8b35b25e18186dfe47144ff"
+        },
+        "test_gathered_additional_mortals_keep_each_physical_weapon_through_lethal_restore": {
+          "before": null,
+          "after": "10fe1d960099b6fe08aa6fe7daaba0d6dc8e263d4d727fedc808f1d0ead8db9b"
+        },
+        "test_source_backed_additional_mortals_preserve_attack_identity_and_damage_order": {
+          "before": null,
+          "after": "83a0fe785ca466487a170bcca69e0f54af2a979902c4aa81afbbc323e125a639"
+        },
+        "test_successful_wounds_generate_additional_mortals_even_after_successful_saves": {
+          "before": null,
+          "after": "1da81512a283050c1e6ec3ed6ac0aff5754efd4df963bb594e04079f89a12372"
         }
       }
     },
     "tools/performance_policy.py": {
-      "before_sha256": "16073ea4598f5761138d954843fc3bed19c015ab3d64cfa4847fc51801db677f",
-      "after_sha256": "a4d74a129cf203ca055cf5433c8e5aae3b46d28a0073fd821631bfc7c88ffa45",
+      "before_sha256": "a4d74a129cf203ca055cf5433c8e5aae3b46d28a0073fd821631bfc7c88ffa45",
+      "after_sha256": "d4a3b06f0d10ff1369496db1e8e7e2f39839f4f2e9c33b436b64d569759f8d2e",
       "owners": {
         "@module": {
-          "before": "519450c30ea07090f3518111e4187c2c45a59c9d51ef206298b667d4b8d203ab",
-          "after": "4501a71ac9a2c14b7ac7e5a8f58050ad4522f0fe17e91f03eea2a1cfdf267471"
+          "before": "4501a71ac9a2c14b7ac7e5a8f58050ad4522f0fe17e91f03eea2a1cfdf267471",
+          "after": "d1c0451b5944e4c1dbbdb43dd5ba8c972033c1f22738fd55abd891dab633b417"
         },
-        "_order115_smoke_operations": {
+        "_order116_smoke_operations": {
           "before": null,
-          "after": "68b47524f70f85d983d7662820bea31664c33857c189d297b16ad05f52ea12cf"
+          "after": "2531e54e0c7f7ca15e897cfa80c4e5ba01b9a4ab9614a4090137d06ceee99040"
         },
         "validate_assessment": {
-          "before": "3df8de54ba443b6b9e6f42bf52648c0faf4eadfaa83ab8b930c8f9e896208b2d",
-          "after": "d99f2e14682256e6fcc7fca417e874dd0a82954b514c6727daa57a50a6255b54"
+          "before": "d99f2e14682256e6fcc7fca417e874dd0a82954b514c6727daa57a50a6255b54",
+          "after": "4659b195edac6ea43aa6756a3fc788a11078f2291d3315611334ae9dd263f3c1"
         }
       }
     }
@@ -658,9 +662,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
@@ -668,9 +672,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -678,9 +682,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -688,9 +692,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -698,9 +702,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -708,9 +712,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -718,9 +722,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -728,9 +732,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -738,9 +742,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -748,9 +752,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -758,9 +762,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -768,9 +772,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -778,9 +782,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -788,169 +792,159 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "conformance/typescript/src/contract.ts": {
       "category": "rule_semantics",
       "operations": [
-        "order115-contract-publication"
+        "order116-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
-    },
-    "contracts/README.md": {
-      "category": "rule_semantics",
-      "operations": [
-        "order115-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
-        "order115-contract-publication"
+        "order116-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
-        "order115-contract-publication"
+        "order116-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
-        "order115-contract-publication"
+        "order116-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
-        "order115-contract-publication"
+        "order116-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "order115-contract-publication"
+        "order116-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "order115-contract-publication"
+        "order116-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
-        "order115-contract-publication"
+        "order116-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "order115-contract-publication"
+        "order116-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "contracts/openapi.yaml": {
       "category": "rule_semantics",
       "operations": [
-        "order115-contract-publication"
+        "order116-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
-    "data/source_audits/order115/source.audit.json": {
+    "data/source_audits/order116/source.audit.json": {
       "category": "rule_semantics",
       "operations": [
-        "order115-source-evidence"
+        "order116-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
-    "docs/ORDER_115_SCOPE_PLAN.md": {
+    "docs/ORDER_116_SCOPE_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
-    "docs/performance/policy-v3/order115-rule-semantics.json": {
+    "docs/performance/policy-v3/order116-rule-semantics.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -958,211 +952,178 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
       "operations": [
-        "order115-movement-permission"
+        "order116-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/engine/base_contact_fight_history.py": {
+    "src/warhammer40k_core/engine/additional_attack_mortal_permissions.py": {
       "category": "rule_semantics",
       "operations": [
-        "order115-movement-permission"
+        "order116-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/engine/charge_path_contexts.py": {
+    "src/warhammer40k_core/engine/additional_attack_mortals.py": {
       "category": "rule_semantics",
       "operations": [
-        "order115-movement-permission"
+        "order116-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/engine/consolidation_model_constraints.py": {
+    "src/warhammer40k_core/engine/attack_mortal_origins.py": {
       "category": "rule_semantics",
       "operations": [
-        "order115-movement-permission"
+        "order116-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/engine/fight_movement_paths.py": {
+    "src/warhammer40k_core/engine/attack_sequence_damage_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "order115-movement-permission"
+        "order116-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/engine/fight_movement_source.py": {
+    "src/warhammer40k_core/engine/attack_sequence_deferred_mortals.py": {
       "category": "rule_semantics",
       "operations": [
-        "order115-movement-permission"
+        "order116-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/engine/model_movement_permission.py": {
+    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
       "category": "rule_semantics",
       "operations": [
-        "order115-movement-permission"
+        "order103-src-warhammer40k_core-engine-attack_sequence_group_selection",
+        "order116-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/engine/phases/movement_resolvers.py": {
+    "src/warhammer40k_core/engine/attack_sequence_post_roll.py": {
       "category": "rule_semantics",
       "operations": [
-        "order115-movement-permission"
+        "order116-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/engine/phases/movement_validation.py": {
+    "src/warhammer40k_core/engine/attack_sequence_validation.py": {
       "category": "rule_semantics",
       "operations": [
-        "order115-movement-permission"
+        "order116-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/engine/scout_movement_paths.py": {
+    "src/warhammer40k_core/engine/deferred_mortal_wounds.py": {
       "category": "rule_semantics",
       "operations": [
-        "order115-movement-permission"
+        "order116-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/engine/surge_history.py": {
+    "src/warhammer40k_core/engine/feel_no_pain_conditions.py": {
       "category": "rule_semantics",
       "operations": [
-        "order115-movement-permission"
+        "order116-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/engine/surge_movement.py": {
+    "src/warhammer40k_core/engine/model_destruction_cause_attack_restore.py": {
       "category": "rule_semantics",
       "operations": [
-        "order115-movement-permission"
+        "order116-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/engine/triggered_movement_resolution.py": {
+    "src/warhammer40k_core/engine/mortal_wound_model_allocation.py": {
       "category": "rule_semantics",
       "operations": [
-        "order115-movement-permission"
+        "order116-movement-permission"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
-    "src/warhammer40k_core/geometry/movement_reachability.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "cache-policy",
-        "geometry-search",
-        "order115-movement-permission"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
-    },
-    "src/warhammer40k_core/geometry/path_initial_constraints.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "geometry-search",
-        "order115-movement-permission"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
-    },
-    "src/warhammer40k_core/geometry/pathing.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "geometry-search",
-        "order115-movement-permission"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
-    },
-    "tests/absent_movement_helpers.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order115-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
-    },
-    "tests/code_quality/test_order115_movement_permission.py": {
+    "tests/code_quality/test_order116_additional_mortals.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
-    "tests/unit/test_order115_absent_movement.py": {
+    "tests/order116_mortal_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "order115-regressions"
+        "order116-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+    },
+    "tests/unit/test_order116_additional_mortals.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order116-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "tools/performance_policy.py": {
       "category": "rule_semantics",
       "operations": [
-        "order115-source-evidence"
+        "order116-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Bounded absent-M permission, exact source authority, consumer/history constraint, focused regression or generated contract/publication owner; new internal boolean does not replace any algorithm.",
-      "source_obligation": "Selected Order97 02.02-obligation-01 and retained 09.06 Advance: absent M forbids movement but permits setup; numeric zero remains distinct.",
-      "unchanged_work": "Existing path measurements and collision/terrain/coherency/search/cache algorithms remain; add a fixed-pose domain constraint and recognize its singleton feasible set, serialize the boolean, and derive it at every live/historical engine producer. No serializer, cache, search strategy or workload optimization; no serious regression demonstrated."
+      "rationale": "Bounded additional-attack-mortal Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+      "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     }
   },
   "milestone": "ordinary",

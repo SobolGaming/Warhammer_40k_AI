@@ -677,16 +677,14 @@ def _feel_no_pain_source_applies_to_attack(
     source: FeelNoPainSource,
     attack_context: AttackResolutionContextPayload,
 ) -> bool:
-    if type(source) is not FeelNoPainSource:
-        raise GameLifecycleError("Feel No Pain source filtering requires a source.")
-    if source.attack_condition is None:
-        return True
-    if source.attack_condition is FeelNoPainAttackCondition.PSYCHIC_ATTACK:
-        is_psychic_attack = attack_context["is_psychic_attack"]
-        if type(is_psychic_attack) is not bool:
-            raise GameLifecycleError("Attack context is_psychic_attack must be a bool.")
-        return is_psychic_attack
-    raise GameLifecycleError("Unsupported Feel No Pain attack condition.")
+    from warhammer40k_core.engine.feel_no_pain_conditions import (
+        feel_no_pain_source_applies_to_attack,
+    )
+
+    return feel_no_pain_source_applies_to_attack(
+        source=source,
+        is_psychic_attack=attack_context["is_psychic_attack"],
+    )
 
 
 def _state_destruction_reaction_sources(

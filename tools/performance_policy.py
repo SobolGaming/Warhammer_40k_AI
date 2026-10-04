@@ -19,6 +19,7 @@ ASSESSMENT = "docs/performance/change-assessment.json"
 MAP = "docs/performance/policy-v3/operation-map.json"
 ORDER108_SCOPE = "docs/performance/policy-v3/order108-rule-semantics.json"
 ORDER115_SCOPE = "docs/performance/policy-v3/order115-rule-semantics.json"
+ORDER116_SCOPE = "docs/performance/policy-v3/order116-rule-semantics.json"
 CATEGORIES = frozenset(
     {
         "governance",
@@ -211,6 +212,18 @@ def _order115_smoke_operations(
     return frozenset(_strings(object_value(scope["smoke_operations"])[path]))
 
 
+def _order116_smoke_operations(
+    *, base: str, path: str, category: str, change: object
+) -> frozenset[str]:
+    """Bind the authorized additional-mortal Core seam to exact changed owner bytes."""
+    if base != "3b8a29a8fa5a0ddb24e87e0e7a7a76be34c361a2" or category != "rule_semantics":
+        return frozenset()
+    scope = read_object(Path(__file__).resolve().parents[1] / ORDER116_SCOPE)
+    if scope["base"] != base or object_value(scope["changes"]).get(path) != change:
+        return frozenset()
+    return frozenset(_strings(object_value(scope["smoke_operations"])[path]))
+
+
 def validate_assessment(
     assessment: dict[str, object],
     *,
@@ -300,10 +313,16 @@ def validate_assessment(
         }
         if not chosen_families <= candidates or not chosen_families <= families.keys():
             raise ValueError(f"Unmapped detailed family: {path}")
-        smoke_operations = _order108_smoke_operations(
-            base=base, path=path, category=category, change=changes[path]
-        ) | _order115_smoke_operations(
-            base=base, path=path, category=category, change=changes[path]
+        smoke_operations = (
+            _order108_smoke_operations(
+                base=base, path=path, category=category, change=changes[path]
+            )
+            | _order115_smoke_operations(
+                base=base, path=path, category=category, change=changes[path]
+            )
+            | _order116_smoke_operations(
+                base=base, path=path, category=category, change=changes[path]
+            )
         )
         required = {
             family

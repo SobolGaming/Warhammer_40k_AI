@@ -2,6 +2,11 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 116 / P06E adds the generic source-permission attack seam for additional
+mortal wounds, preserving ordinary damage first, attack identity and shared
+allocation, persistence and replay. Named faction providers remain outside this
+Core repair. See [source and scope](docs/ORDER_116_SCOPE_PLAN.md).
+
 Order 115 / P02K preserves dash-M immobility throughout every witnessed path,
 including rotations and fixed-distance reactions. Numeric zero retains Advance
 and explicit distance; Surge certifies fixed-pose maximum approach, including

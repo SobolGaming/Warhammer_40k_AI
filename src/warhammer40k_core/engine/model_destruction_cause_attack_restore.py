@@ -123,7 +123,7 @@ def validate_pending_attack_destruction_boundary(
                 indexes=indexes,
             )
             return
-        if not _has_pending_devastating_wounds_continuation(
+        if not _has_pending_attack_mortal_continuation(
             sequence_id=attack_sequence.sequence_id,
             pending_decision_requests=pending_decision_requests,
         ):
@@ -212,7 +212,7 @@ def _validate_pre_boundary_attack_destruction_evidence(
         raise GameLifecycleError("Pending attack destruction pre-boundary evidence drift.")
 
 
-def _has_pending_devastating_wounds_continuation(
+def _has_pending_attack_mortal_continuation(
     *,
     sequence_id: str,
     pending_decision_requests: tuple[DecisionRequest, ...],
@@ -228,7 +228,8 @@ def _has_pending_devastating_wounds_continuation(
         source_context = mortal_wound_resolution_source_context(request)
         if (
             isinstance(source_context, dict)
-            and source_context.get("source_kind") == "devastating_wounds"
+            and source_context.get("source_kind")
+            in ("devastating_wounds", "additional_attack_mortal_wounds")
             and source_context.get("sequence_id") == sequence_id
         ):
             return True

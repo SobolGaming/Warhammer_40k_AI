@@ -1,0 +1,31 @@
+{
+  "base": "3b8a29a8fa5a0ddb24e87e0e7a7a76be34c361a2",
+  "changes": {
+    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
+      "before_sha256": "2368de5eb9823e8e877ee6022fc2ad661fd8addaa91b7d7c0f60314858c6b0d9",
+      "after_sha256": "008fcfd921f2bc20a0a719b82a323080fd905fbe8c86f705371b8018073f471d",
+      "owners": {
+        "@module": {
+          "before": "0b45056cdaad9fc7f66cccb963fc3d8d47508abc6ca8106f995551fef1e8b72c",
+          "after": "bef3689657a253f83566f1f29d8ae43203b87b4155e110c9401add9d32fe2bc7"
+        },
+        "_apply_deferred_mortal_wound_feel_no_pain_decision": {
+          "before": "88c6fd96c2c178386e6bdbfd1bf83a74d14b4ea432ad6bdaf66eea39284c574b",
+          "after": "bd5bca124e2f1e63e5f8d73e494dc3da019560c5c65ade8c08fdff10ad457876"
+        },
+        "_apply_deferred_mortal_wounds": {
+          "before": "dfdd6ec90d96e77ba32dcd14ea402d2a6171553cffeffa6151ae8255a599c7d9",
+          "after": null
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": [
+      "order103-src-warhammer40k_core-engine-attack_sequence_group_selection"
+    ]
+  },
+  "authority": "User-authorized Order116: default quiet serial smoke for bounded rule repairs; detailed benchmarks only for deliberate performance changes or demonstrated serious regression. Exact-base and changed-owner-byte binding retain mandatory mappings and every historical/live gate.",
+  "source_obligation": "Selected Order97 06.02.01-obligation-02 and 06.02 mortal priority: additional mortals are part of the same attack; ordinary damage precedes mortal wounds; retained Core 24.29 classifies known Psychic weapon attacks.",
+  "unchanged_work": "Existing successful-wound, allocation, destruction and replay services remain. Add source permission snapshots to the deferred-mortal queue, resolve physical contributor offsets with the existing post-roll modifier service, share existing Psychic weapon classification for Feel No Pain, query retained attack/source occurrences before resuming damage or save choices to prevent duplicate production, and namespace additional application IDs by source kind so valid permission IDs cannot alias native packets. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+}
