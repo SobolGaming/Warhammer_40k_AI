@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "4820063fe586417b4cc590f46978009b9932a87f",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:076c31c4709ef3ee60c7c234e40c0c75070772d5d6312cba2f8a44378a21a088",
-  "operation_map_sha256": "e8ac6d212b6ec61dca289c710af5e5976bc4c0e5d38b15974f6fc8efab9a7328",
+  "operation_map_sha256": "b0ae0ca742744cd2941fe3c5ad9f0a2a9e1fbd35e901c7e6756ed4718f298a31",
   "changes": {
     "contracts/examples/decisions/family-coverage.json": {
       "before_sha256": "850642fd644e66627ccf8a35573012ec87fec0b28a2a1c509e2953905b1fc87c",
@@ -104,6 +104,26 @@
         }
       }
     },
+    "data/source_audits/order119/baseline/tests/unit/test_order80_normal_move.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "942a47b4e5ab17b7ee68353d37d08dfa24f8b75222fcf402ff78a2737fbed6d4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "942a47b4e5ab17b7ee68353d37d08dfa24f8b75222fcf402ff78a2737fbed6d4"
+        }
+      }
+    },
+    "data/source_audits/order119/historical-inputs.json": {
+      "before_sha256": null,
+      "after_sha256": "7a4f2b4a274e8973e2f924a3ec1ea03bfcead9240218f0313c5299f4798184a4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "7a4f2b4a274e8973e2f924a3ec1ea03bfcead9240218f0313c5299f4798184a4"
+        }
+      }
+    },
     "data/source_audits/order119/user-supplied-shadow-of-anarch.txt": {
       "before_sha256": null,
       "after_sha256": "eca25e085fb8791f419a6c8983a61ca61d29a04e36ddfd60e7178aa049624226",
@@ -136,21 +156,21 @@
     },
     "docs/ORDER_119_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "4cb731600afbc14b69a1974616b2c9b91fb3c2d6392305b6c6d833a1a05dd087",
+      "after_sha256": "2f1c013bd13bd8b545b8146de6ff97a4554c7d0252d65be495b54fd07c7b5285",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4cb731600afbc14b69a1974616b2c9b91fb3c2d6392305b6c6d833a1a05dd087"
+          "after": "2f1c013bd13bd8b545b8146de6ff97a4554c7d0252d65be495b54fd07c7b5285"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "eb94ab1cb4225a8fa6b82eb4577af326e424508ba1fb49ac2d06b8a9061f685f",
-      "after_sha256": "112ee3224585c5f4dcce41177f963d3ec22c64095d9996933f3cd876771b9bcd",
+      "after_sha256": "66af4e9d97d6de3af61529a3b307f30e16069178b5faf86e71030a5dc9c4dda6",
       "owners": {
         "@document": {
           "before": "eb94ab1cb4225a8fa6b82eb4577af326e424508ba1fb49ac2d06b8a9061f685f",
-          "after": "112ee3224585c5f4dcce41177f963d3ec22c64095d9996933f3cd876771b9bcd"
+          "after": "66af4e9d97d6de3af61529a3b307f30e16069178b5faf86e71030a5dc9c4dda6"
         }
       }
     },
@@ -377,6 +397,20 @@
           "after": "3dbdb8e75d3a437d2767787d5a6432291981be3e089870e7a928812108d0cb37"
         }
       }
+    },
+    "tools/core_rules_order97_history.py": {
+      "before_sha256": "03f80ead5206769e4eca3716cd269f79a0dfbb1c009aa9bb260ae7f438a6bb8c",
+      "after_sha256": "c702ed274f675efe6b396db5ef2a31b14af4a2ef0f1248af6adcea12595b3d73",
+      "owners": {
+        "@module": {
+          "before": "e06e1da9e27312c85bf53b817720c72f9490708dc66b82a786c954f3bb0490fd",
+          "after": "b39f01a09afe76102fa2c56d8a929d599e6d2ed8547d79075d96d2b47dbaf825"
+        },
+        "historical_evidence_path": {
+          "before": "44c4769de3cb6d528fdf8dbe1b6e4b02d2af9ba11026f0b94ccf82b43fff8da9",
+          "after": "65a97d12ddaa3062f3bfe858ea26ecac43d6101eda043edcb2c4a2bc3522d8c0"
+        }
+      }
     }
   },
   "rows": {
@@ -474,6 +508,26 @@
       "category": "rule_semantics",
       "operations": [
         "order119-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
+      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+    },
+    "data/source_audits/order119/baseline/tests/unit/test_order80_normal_move.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order119-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
+      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+    },
+    "data/source_audits/order119/historical-inputs.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order119-source-evidence"
       ],
       "selected_families": [],
       "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
@@ -634,6 +688,16 @@
       "category": "rule_semantics",
       "operations": [
         "order119-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Order97 rule:20:20.02:1 blocks1-2: source-authorized battle-time removal into Strategic Reserves is repositioning, permitted after actual earlier movement in the same Movement phase. Owner-supplied Shadow of Anarch operative transcription is separately retained without authoritative faction-package or successful direct-fetch claims.",
+      "unchanged_work": "Existing witnessed reactive movement, DecisionController and GameState group-aware reserve removal remain the owners. A bounded persisting source permission and finite consumer are added; accepted source/provider/departure bindings use the existing restore audits. No changes to algorithms, search, caching, serializers, dependencies or historical workloads. No deliberate performance optimization or demonstrated severe regression. User-authorized bounded remediation therefore uses quiet serial current-runtime smoke and unchanged live semantic/ownership/work controls; no full-game certification."
+    },
+    "tools/core_rules_order97_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order119-immutable-inventory"
       ],
       "selected_families": [],
       "rationale": "Bounded conditional Core movement/reposition consumer, canonical facade regressions and truthful separately retained source evidence.",

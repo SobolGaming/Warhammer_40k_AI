@@ -3536,6 +3536,18 @@
       "sensitive": false,
       "mandatory": false
     },
+    "order119-immutable-inventory": {
+      "paths": [
+        "tools/core_rules_order97_history.py"
+      ],
+      "owners": [
+        "@module",
+        "historical_evidence_path"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
     "order119-movement-source-permission": {
       "paths": [
         "src/warhammer40k_core/engine/interaction_metadata.py",
