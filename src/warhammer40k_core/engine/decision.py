@@ -84,6 +84,8 @@ _RNG_HISTORY_NEUTRAL_EVENT_TYPES = frozenset(
         "command_phase_start_rule_completed",
         "command_phase_start_order_requested",
         "mortal_wound_model_destructions_finalized",
+        "mortal_wound_model_allocated",
+        "mortal_wound_allocation_rule_applied",
         "model_logical_death_recorded",
         MORTAL_WOUND_APPLICATION_STARTED_EVENT,
     }

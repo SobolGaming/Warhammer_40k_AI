@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2a85ea48437ec9d10bae8f7f21a1f7643edd88a8eb6050b12f43409b1c732b44",
-  "fingerprint": "2a85ea48437ec9d10bae8f7f21a1f7643edd88a8eb6050b12f43409b1c732b44",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3abbd537128039f266dad17d00c784bb6ad77398827e067612ce556fc36a51ba",
+  "fingerprint": "3abbd537128039f266dad17d00c784bb6ad77398827e067612ce556fc36a51ba",
   "resource_count": 3064,
   "resources": [
     {
@@ -2085,9 +2085,9 @@
       "sha256": "fef1b39dc738c27b863c642b17c6d35e0029cbf504857543110de1101efcdf76"
     },
     {
-      "byte_length": 42738,
+      "byte_length": 42826,
       "path": "warhammer40k_core/engine/decision.py",
-      "sha256": "f5ab638ec1766e603f5c16dc18ec5b963c4e88a06573cc80f4cffcfd8a52d51b"
+      "sha256": "ae8d3748bd825d74d69322275a387608cf27d283d978e23010b843446774a19a"
     },
     {
       "byte_length": 3459,
@@ -2225,9 +2225,9 @@
       "sha256": "4db7ca33b1ee8159f23889cdd2ff29b70f7d8fd60d5f21aff222084d4b08636c"
     },
     {
-      "byte_length": 10136,
+      "byte_length": 10175,
       "path": "warhammer40k_core/engine/direct_mortal_wound_application.py",
-      "sha256": "c6ff6911d74933b318923c7506ecf088623258a813fcb49067bef1f33d4c6683"
+      "sha256": "aa19e4f3045cd5084baad02d266f32ed52172d0155509d862ab4d4de51bc4eb7"
     },
     {
       "byte_length": 16297,
@@ -10830,9 +10830,9 @@
       "sha256": "5150a0930ac75f4a569b1027e3489295c09e54a1edd13ef2a2ec2f68bba80558"
     },
     {
-      "byte_length": 4668,
+      "byte_length": 4943,
       "path": "warhammer40k_core/engine/mortal_wound_allocation_triggers.py",
-      "sha256": "89ccd2c39d94f55de36fd99e7626643eab69f4189fbce8675c3135f8e7ba6a9f"
+      "sha256": "a39868bd6d99a4f927caf164ad1602bb1538bc3c695c5f19dbe7bca6f5ef47ec"
     },
     {
       "byte_length": 59036,
@@ -10875,9 +10875,9 @@
       "sha256": "2f2530e58be3c2daa7d7de8e15a3a897ececdc77a07d7a5920b661c55a39d39e"
     },
     {
-      "byte_length": 53300,
+      "byte_length": 53335,
       "path": "warhammer40k_core/engine/mortal_wound_model_allocation.py",
-      "sha256": "5483013492ec98603f68e67b8a4935377483e8bb9dedba0271f838590c0646aa"
+      "sha256": "4a8b3faa6345681f603cd3415219547edf7ec3362d3fd91aa2c8dabef498d602"
     },
     {
       "byte_length": 6476,

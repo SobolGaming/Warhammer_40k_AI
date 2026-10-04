@@ -752,6 +752,7 @@ def _continue_mortal_wound_application_for_model(
         legal_model_ids=legal_model_ids,
         priority_tier=priority_tier,
         selected_model_id=model_instance_id,
+        dice_manager=dice_manager,
         parent_request_id=None if model_decision is None else model_decision.request_id,
         parent_result_id=None if model_decision is None else model_decision.result_id,
         destruction_evidence=progress.destruction_evidence,

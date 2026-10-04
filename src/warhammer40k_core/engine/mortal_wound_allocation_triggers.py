@@ -14,6 +14,7 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.dice import DiceRollManager
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
         MortalWoundDestructionEvidence,
@@ -34,6 +35,7 @@ def record_mortal_wound_allocation_occurrence(
     legal_model_ids: tuple[str, ...],
     priority_tier: MortalWoundAllocationPriority,
     selected_model_id: str,
+    dice_manager: DiceRollManager | None,
     parent_request_id: str | None = None,
     parent_result_id: str | None = None,
     destruction_evidence: MortalWoundDestructionEvidence | None = None,
@@ -55,6 +57,8 @@ def record_mortal_wound_allocation_occurrence(
     decline_allowed = mortal_wound_feel_no_pain_decline_allowed(
         state=state, model_instance_id=selected_model_id
     )
+    if len(sources) == 1 and not decline_allowed and dice_manager is None:
+        raise GameLifecycleError("Mortal wound Feel No Pain resolution requires dice manager.")
     occurrence = MortalWoundAllocationOccurrence(
         occurrence_id=f"{application_id}:allocation:{wound_index:06d}",
         application_id=application_id,

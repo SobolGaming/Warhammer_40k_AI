@@ -22,6 +22,14 @@ prevention resolver; this is an executable consumer, not an event-only hook.
 The ordinary attack prevention map is unchanged. Descriptor queries preview the
 same permission for finite choice construction and pending authority validation.
 Direct routing rejects reachable choices before events, dice or state mutation.
+The shared boundary validates required automatic prevention dice authority before
+recording an allocation, so a typed failure leaves the selection retryable.
+Allocation and execution audit events use the existing RNG-neutral classification;
+player decisions and prevention dice still retain their normal RNG history.
+The complete audit history changes absolute event references carried by later
+decisions. Two deterministic fixture game IDs are reseeded to reach their existing
+failed Battle-shock and positive source-mortal branches; their gameplay assertions
+remain unchanged. Bounded legal seed probes are retained with the delivery receipts.
 
 Canonical facade tests arm a real source-backed permission and prove prevention,
 recipient priority, optional choice, rejected retry, lethal continuation, JSON

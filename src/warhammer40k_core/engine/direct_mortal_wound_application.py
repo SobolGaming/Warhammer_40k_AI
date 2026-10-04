@@ -122,6 +122,7 @@ def apply_direct_mortal_wounds_to_unit(
             legal_model_ids=legal_model_ids,
             priority_tier=priority_tier,
             selected_model_id=model_id,
+            dice_manager=dice_manager,
         )
         if len(sources) > 0:
             if len(sources) > 1 or decline_allowed:

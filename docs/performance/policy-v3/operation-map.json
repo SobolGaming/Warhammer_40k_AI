@@ -3296,6 +3296,7 @@
       "paths": [
         "src/warhammer40k_core/adapters/external_contract.py",
         "src/warhammer40k_core/adapters/redaction.py",
+        "src/warhammer40k_core/engine/decision.py",
         "src/warhammer40k_core/engine/direct_mortal_wound_application.py",
         "src/warhammer40k_core/engine/mortal_wound_allocation_permissions.py",
         "src/warhammer40k_core/engine/mortal_wound_allocation_triggers.py",
@@ -3326,7 +3327,9 @@
     "order117-regressions": {
       "paths": [
         "tests/order117_allocation_helpers.py",
-        "tests/unit/test_order117_mortal_allocation.py"
+        "tests/unit/test_order117_mortal_allocation.py",
+        "tests/unit/test_phase10o_fall_back.py",
+        "tests/unit/test_phase17g_chaos_knights_army_rule.py"
       ],
       "owners": [
         "@module",
@@ -3340,7 +3343,10 @@
         "test_allocation_trigger_executes_source_backed_prevention_before_wound_loss",
         "test_allocation_trigger_pending_choice_retry_fork_and_lethal_continuation",
         "test_direct_route_executes_the_same_prevention_or_rejects_choice_before_mutation",
-        "test_source_permission_survives_real_save_reroll_and_lethal_continuation"
+        "test_missing_prevention_dice_authority_fails_before_allocation_and_allows_retry",
+        "test_selected_target_remaining_effect_request_requires_retained_ancestry",
+        "test_source_permission_survives_real_save_reroll_and_lethal_continuation",
+        "test_voluntary_desperate_escape_waits_for_delirium_fnp_before_embark"
       ],
       "families": [],
       "sensitive": false,

@@ -52,3 +52,22 @@ def test_every_mortal_select_model_owner_uses_the_shared_executable_boundary() -
         assert "adeptus-custodes" not in text
     redaction = (ROOT / "src/warhammer40k_core/adapters/redaction.py").read_text(encoding="utf-8")
     assert "MORTAL_WOUND_ALLOCATION_RULE_APPLIED_EVENT_TYPE," in redaction
+    decision = ast.parse((ENGINE / "decision.py").read_text(encoding="utf-8"))
+    neutral = next(
+        node.value
+        for node in decision.body
+        if isinstance(node, ast.Assign)
+        and any(
+            isinstance(target, ast.Name) and target.id == "_RNG_HISTORY_NEUTRAL_EVENT_TYPES"
+            for target in node.targets
+        )
+    )
+    neutral_events = {
+        node.value
+        for node in ast.walk(neutral)
+        if isinstance(node, ast.Constant) and isinstance(node.value, str)
+    }
+    assert {
+        "mortal_wound_model_allocated",
+        "mortal_wound_allocation_rule_applied",
+    } <= neutral_events

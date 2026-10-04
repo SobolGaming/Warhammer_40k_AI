@@ -18,6 +18,7 @@ from tests.psychic_modifier_helpers import pending_request, submit_fixture_reque
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.engine.damage_allocation import MortalWoundApplicationProgress
 from warhammer40k_core.engine.decision_request import DecisionError
 from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.dice import DiceRollManager
@@ -32,6 +33,9 @@ from warhammer40k_core.engine.mortal_wound_allocation_permissions import (
 )
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    continue_mortal_wound_application,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
@@ -341,3 +345,63 @@ def _assert_restore_and_replay(session: LocalGameSession, *, artifact_id: str) -
         assert "mortal_wound_allocation_rule_applied" not in json.dumps(delta)
     replay = ReplayRunner.from_payload(session.replay_artifact(artifact_id=artifact_id)).run()
     assert replay.status is ReplayRunStatus.REPRODUCED, replay
+
+
+def test_missing_prevention_dice_authority_fails_before_allocation_and_allows_retry() -> None:
+    session = allocation_permission_session(BattlePhase.SHOOTING, enemy_models=1)
+    state = session.lifecycle.state
+    assert state is not None
+    source, target = (army.units[0] for army in state.army_definitions)
+    decisions = session.lifecycle.decision_controller
+    evidence = MortalWoundDestructionEvidence.for_non_attack_state(
+        state=state,
+        destroying_player_id="player-a",
+        source_rules_unit_instance_id=source.unit_instance_id,
+        source_model_instance_id=source.own_models[0].model_instance_id,
+        destruction_source_kind=DestructionSourceKind.ABILITY,
+        action_phase=BattlePhase.SHOOTING,
+        source_step="order117-missing-dice-authority",
+    )
+    progress = MortalWoundApplicationProgress.start(
+        application_id="order117:missing-dice-authority",
+        source_rule_id=SOURCE_ID,
+        source_context={"source_kind": "ability"},
+        target_unit_instance_id=target.unit_instance_id,
+        defender_player_id="player-b",
+        mortal_wounds=1,
+        spill_over=True,
+        destruction_evidence=evidence,
+    )
+    state_before = state.to_payload()
+    records_before = decisions.records
+    with pytest.raises(GameLifecycleError, match="requires dice manager"):
+        continue_mortal_wound_application(
+            state=state,
+            decisions=decisions,
+            request_id="order117:missing-dice-request",
+            progress=progress,
+        )
+    assert state.to_payload() == state_before
+    assert decisions.records == records_before
+    assert not any(
+        e.event_type
+        in {
+            "mortal_wound_model_allocated",
+            "mortal_wound_allocation_rule_applied",
+            "dice_rolled",
+        }
+        for e in decisions.event_log.records
+    )
+    result = continue_mortal_wound_application(
+        state=state,
+        decisions=decisions,
+        request_id="order117:missing-dice-request",
+        progress=progress,
+        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+    )
+    assert result.application is not None
+    assert len(result.application.feel_no_pain_resolutions) == 1
+    assert (
+        sum(e.event_type == "mortal_wound_model_allocated" for e in decisions.event_log.records)
+        == 1
+    )

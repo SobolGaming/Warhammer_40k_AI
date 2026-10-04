@@ -1,8 +1,8 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "4b59ded9d7dfd1af4170adaa50462bcf6cf32c0d",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2a85ea48437ec9d10bae8f7f21a1f7643edd88a8eb6050b12f43409b1c732b44",
-  "operation_map_sha256": "6e2e11edef8af52888f7d73a4b8db88bd8e65484cb1fbe58ab0ad74016b3e729",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3abbd537128039f266dad17d00c784bb6ad77398827e067612ce556fc36a51ba",
+  "operation_map_sha256": "75d29cf2f37250012a038eb09b80ab6d5f2f4f316ab9057ca09c753a5b2f2088",
   "changes": {
     "README.md": {
       "before_sha256": "13f8f69455fc83fad672886c0368bd1003759c285cd46c98a3c6366119b2311c",
@@ -156,81 +156,81 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "7387b46926cfdaa5ca24b5fca966fb87c1c05261f8b36b47622e0a8dc7854e2c",
-      "after_sha256": "f354c41b9626820846a41823300d73dd64ecb38a2084357565ce33ad1b445c20",
+      "after_sha256": "51e5a8d560b7fd995086c86110b829ac18d310ac9aeeb0e9902d848476945a2f",
       "owners": {
         "@document": {
           "before": "7387b46926cfdaa5ca24b5fca966fb87c1c05261f8b36b47622e0a8dc7854e2c",
-          "after": "f354c41b9626820846a41823300d73dd64ecb38a2084357565ce33ad1b445c20"
+          "after": "51e5a8d560b7fd995086c86110b829ac18d310ac9aeeb0e9902d848476945a2f"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "46e8d82cdff82043460ac7c70b3b57e4c27831698a2fce9f06896d135b749c4b",
-      "after_sha256": "3e360ddf61fac5e06f0cf66ed9b48566eb2606fa3a7bb12634aa46306e7a9f1f",
+      "after_sha256": "8be5f54537481ad43468862d1cc381e6bb41139cb9f47a14e8d68fb4ccc0fc5a",
       "owners": {
         "@document": {
           "before": "46e8d82cdff82043460ac7c70b3b57e4c27831698a2fce9f06896d135b749c4b",
-          "after": "3e360ddf61fac5e06f0cf66ed9b48566eb2606fa3a7bb12634aa46306e7a9f1f"
+          "after": "8be5f54537481ad43468862d1cc381e6bb41139cb9f47a14e8d68fb4ccc0fc5a"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "7ac3dcd18ea0a04d1034e0bea24aca69f88e28dc6c1acc5f1ceb8b9ffba2ee8c",
-      "after_sha256": "05afd1a30f40adaf5ebc0510ecae0dded6c46d988c2f4a3299ac608639450f8b",
+      "after_sha256": "f88fb3eb9d4b909c7d61d5ef716ef0ef26976d0035038b815a23ad10a9fc98ac",
       "owners": {
         "@document": {
           "before": "7ac3dcd18ea0a04d1034e0bea24aca69f88e28dc6c1acc5f1ceb8b9ffba2ee8c",
-          "after": "05afd1a30f40adaf5ebc0510ecae0dded6c46d988c2f4a3299ac608639450f8b"
+          "after": "f88fb3eb9d4b909c7d61d5ef716ef0ef26976d0035038b815a23ad10a9fc98ac"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "e022a9fb736c731d68cfee4390127b6b5415199c45ce04d02079da022564b3f7",
-      "after_sha256": "752650a3149d297a3e786d740643414d497a0838ef3872314d66563690b97a93",
+      "after_sha256": "9914fa8f74edb8d3eb0ed28f0e9717a8a616a0178a46a43ad4b3356c024a55b8",
       "owners": {
         "@document": {
           "before": "e022a9fb736c731d68cfee4390127b6b5415199c45ce04d02079da022564b3f7",
-          "after": "752650a3149d297a3e786d740643414d497a0838ef3872314d66563690b97a93"
+          "after": "9914fa8f74edb8d3eb0ed28f0e9717a8a616a0178a46a43ad4b3356c024a55b8"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "6716c7b418d09edcc9eba9e8b9dad168d14ab5bdcceb24919aa5a541a61f9aee",
-      "after_sha256": "acc6edf9c7acfaf247a0b8ffa4e83947361c6f667569442b6492a8287b043673",
+      "after_sha256": "8437bc3ab52422e8d6d5de0d20c3d1b0efe19cf00e7a23191457e31cb8db84dd",
       "owners": {
         "@document": {
           "before": "6716c7b418d09edcc9eba9e8b9dad168d14ab5bdcceb24919aa5a541a61f9aee",
-          "after": "acc6edf9c7acfaf247a0b8ffa4e83947361c6f667569442b6492a8287b043673"
+          "after": "8437bc3ab52422e8d6d5de0d20c3d1b0efe19cf00e7a23191457e31cb8db84dd"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "a2c81785a9a4616eca9e9f6f2c17b313d45bb720c2b775f276d0f911964bfee9",
-      "after_sha256": "64e7ef0cb7e6e852108b684ebea2f351b28488ea561492b5513f984c0094fafc",
+      "after_sha256": "33b05c6a4ab94bca39a32b352256f54af17332f15b729f625dd30b8967159b83",
       "owners": {
         "@document": {
           "before": "a2c81785a9a4616eca9e9f6f2c17b313d45bb720c2b775f276d0f911964bfee9",
-          "after": "64e7ef0cb7e6e852108b684ebea2f351b28488ea561492b5513f984c0094fafc"
+          "after": "33b05c6a4ab94bca39a32b352256f54af17332f15b729f625dd30b8967159b83"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "f59abbbad5f65e784f9f75d41376709d7ed47623192b9b6d3e7980becac8135a",
-      "after_sha256": "f29bca33e363a5ed3c809dccf888902922993a88bb0a152b9ad1641d578866b2",
+      "after_sha256": "789acff308d6987ce4e5cf8c027798cbb17492f5290bc4d09e9add0c027c3d7c",
       "owners": {
         "@document": {
           "before": "f59abbbad5f65e784f9f75d41376709d7ed47623192b9b6d3e7980becac8135a",
-          "after": "f29bca33e363a5ed3c809dccf888902922993a88bb0a152b9ad1641d578866b2"
+          "after": "789acff308d6987ce4e5cf8c027798cbb17492f5290bc4d09e9add0c027c3d7c"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "4ae19a63c4755513a4dbe2fbbd57e6585ee5d0975c4cfe2cb3e8427929d97074",
-      "after_sha256": "e7675ffe6364d986e6b4468a5ade9e148b2fb2586115ee7e76d94f2cd205ab3e",
+      "after_sha256": "bc5959a5416d15355923c17a197174faee43ebea26d64164c4e043ae386f34e6",
       "owners": {
         "@document": {
           "before": "4ae19a63c4755513a4dbe2fbbd57e6585ee5d0975c4cfe2cb3e8427929d97074",
-          "after": "e7675ffe6364d986e6b4468a5ade9e148b2fb2586115ee7e76d94f2cd205ab3e"
+          "after": "bc5959a5416d15355923c17a197174faee43ebea26d64164c4e043ae386f34e6"
         }
       }
     },
@@ -276,31 +276,31 @@
     },
     "docs/ORDER_117_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "3bafccca502c4c4f7b5e7131680db04dfff2b91254617997a28bc4062c96f757",
+      "after_sha256": "6c77db85fac6ed6e3e54e6ae401fd4b0126e4996c53c0032e0117e084aa26ce6",
       "owners": {
         "@document": {
           "before": null,
-          "after": "3bafccca502c4c4f7b5e7131680db04dfff2b91254617997a28bc4062c96f757"
+          "after": "6c77db85fac6ed6e3e54e6ae401fd4b0126e4996c53c0032e0117e084aa26ce6"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "c9cd5a6ba23a6d6e3c06b2802da6dea31b8c65b8a5af067d8e079751be5239ec",
-      "after_sha256": "95e8edabfbc8af9eef90426d845f724a79cd56711e9502dd42922fab4155e934",
+      "after_sha256": "3a3edfb5758bacc46b19c812242a2ec997c81b45764299c3fffe32a03bc1cf9d",
       "owners": {
         "@document": {
           "before": "c9cd5a6ba23a6d6e3c06b2802da6dea31b8c65b8a5af067d8e079751be5239ec",
-          "after": "95e8edabfbc8af9eef90426d845f724a79cd56711e9502dd42922fab4155e934"
+          "after": "3a3edfb5758bacc46b19c812242a2ec997c81b45764299c3fffe32a03bc1cf9d"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "2fbdf741cebe1b71fa1d64ef73b0bf564add9ac4e115866ea3b430092ec6b605",
-      "after_sha256": "e719bee750ec8d53b145fcda7ac4fc5c5c54179b2a5dfdf98ea5f3a4a5f7f51c",
+      "after_sha256": "c5663d5bd0d84fe58a8e3f417c24870fd01fb65d212eeb1f5f695e0120fd8267",
       "owners": {
         "@document": {
           "before": "2fbdf741cebe1b71fa1d64ef73b0bf564add9ac4e115866ea3b430092ec6b605",
-          "after": "e719bee750ec8d53b145fcda7ac4fc5c5c54179b2a5dfdf98ea5f3a4a5f7f51c"
+          "after": "c5663d5bd0d84fe58a8e3f417c24870fd01fb65d212eeb1f5f695e0120fd8267"
         }
       }
     },
@@ -328,9 +328,19 @@
         }
       }
     },
+    "src/warhammer40k_core/engine/decision.py": {
+      "before_sha256": "f5ab638ec1766e603f5c16dc18ec5b963c4e88a06573cc80f4cffcfd8a52d51b",
+      "after_sha256": "ae8d3748bd825d74d69322275a387608cf27d283d978e23010b843446774a19a",
+      "owners": {
+        "@module": {
+          "before": "74efcd5c3c1a7bdec343eef8799291b3516f400c405932753312d2eff6948474",
+          "after": "280ab00cc4668c8727a42b7a87013fcad79582951fbbac4629a91fe61fa1916a"
+        }
+      }
+    },
     "src/warhammer40k_core/engine/direct_mortal_wound_application.py": {
       "before_sha256": "916b66df7728716bbf8e494305b90df92fdaee5ea1923c2c3b98e9dbe981c8e2",
-      "after_sha256": "c6ff6911d74933b318923c7506ecf088623258a813fcb49067bef1f33d4c6683",
+      "after_sha256": "aa19e4f3045cd5084baad02d266f32ed52172d0155509d862ab4d4de51bc4eb7",
       "owners": {
         "@module": {
           "before": "0fe84d3846ed0715b0202e5ae17094e306de1174f003498737044265749b3180",
@@ -338,7 +348,7 @@
         },
         "apply_direct_mortal_wounds_to_unit": {
           "before": "a7c50b252978b4ca87174027d780db5aa077696af05fea6c30f3694f29950a44",
-          "after": "601e7812e82c650b5cbf3c73e5659f4bd85bf35c6c123e4b13699e16ba29b1fc"
+          "after": "44c0f558e0ea494e6737f366018fbb536ad81eccaf493a306772e15fae718110"
         }
       }
     },
@@ -374,21 +384,21 @@
     },
     "src/warhammer40k_core/engine/mortal_wound_allocation_triggers.py": {
       "before_sha256": null,
-      "after_sha256": "89ccd2c39d94f55de36fd99e7626643eab69f4189fbce8675c3135f8e7ba6a9f",
+      "after_sha256": "a39868bd6d99a4f927caf164ad1602bb1538bc3c695c5f19dbe7bca6f5ef47ec",
       "owners": {
         "@module": {
           "before": null,
-          "after": "1ae50238ff073e62c6fa43af2aafddeaed1cf850d1708aa0a83221627469b619"
+          "after": "8dcad34206c6a6e9adcc4bc0752dd162c4e59ff80b1816201c2b110f29209485"
         },
         "record_mortal_wound_allocation_occurrence": {
           "before": null,
-          "after": "65242cdeebbc6b82c4ca4bc3995131ca01884fc067aacf88dbdc0ff4b38685e6"
+          "after": "308fe6f37decd98e80409f0f017984100d7ebaadcaad02cedbec666dfc0d2e86"
         }
       }
     },
     "src/warhammer40k_core/engine/mortal_wound_model_allocation.py": {
       "before_sha256": "30a330a8901a40606be629417e5a2354ba5a927e8affa9f95e6c75b29fdc330b",
-      "after_sha256": "5483013492ec98603f68e67b8a4935377483e8bb9dedba0271f838590c0646aa",
+      "after_sha256": "4a8b3faa6345681f603cd3415219547edf7ec3362d3fd91aa2c8dabef498d602",
       "owners": {
         "MortalWoundAllocationOccurrence.__post_init__": {
           "before": "af39e44e0491e59b34f97706800719c4af65edf50c1be80bce8e2dbd6ee2ddbb",
@@ -396,7 +406,7 @@
         },
         "_continue_mortal_wound_application_for_model": {
           "before": "fc0950bd85f55e59ce680bd24d30c0a0929175da67c009243e01d11630e023c0",
-          "after": "f473f3b802508c35834004d9c987cadb9579bdd549f80df2df4b94be4fabcd79"
+          "after": "24d040cf3726371a2939cfbf292bad9fc40a98289224bd180cef10df22736f3d"
         },
         "_record_mortal_wound_allocation_occurrence": {
           "before": "3cc8b9bbb4cfee76b0e6bd93227f7c8a12ee34acf525f87f1e4e190ff6450891",
@@ -424,7 +434,7 @@
     },
     "tests/code_quality/test_order117_mortal_allocation.py": {
       "before_sha256": null,
-      "after_sha256": "30a10f93915c59a2f44d7670fb6c3d4abe8c3d686dd06627f5179bda1fc03600",
+      "after_sha256": "9bebada6a7b96471568f29c43144114f9a10143a457542766003c7165b682f60",
       "owners": {
         "@module": {
           "before": null,
@@ -436,7 +446,7 @@
         },
         "test_every_mortal_select_model_owner_uses_the_shared_executable_boundary": {
           "before": null,
-          "after": "8a76fccf80a67f6a1c1bc2eb73d6d94402969c120350d2277df34d6834ef201a"
+          "after": "41f0687d97a6abfacef46d2eb16578baa9ab6c9c989faecd96e994f2451ea66e"
         }
       }
     },
@@ -460,11 +470,11 @@
     },
     "tests/unit/test_order117_mortal_allocation.py": {
       "before_sha256": null,
-      "after_sha256": "e195aa86df161d6b858ce8ebda452aa7c13bae352b6526484bed4541e1658ffe",
+      "after_sha256": "dd30a41532d04b04b63c637dbd2159dfbff7646a94d3a09e2b8dc642297c61de",
       "owners": {
         "@module": {
           "before": null,
-          "after": "fa5ed18b846d1f462de0ca2b96faef6d3704d1c4a606694bee104ac8ef2954e2"
+          "after": "5d8bb988cd8d17f2f925de2aa6c1f57131574b71062a66f58a75a03803b2959f"
         },
         "_assert_restore_and_replay": {
           "before": null,
@@ -498,9 +508,33 @@
           "before": null,
           "after": "1f9e487b0a00f0f182116526bf79a9dc07f051dffdb4caa39b8ae7c6101c7e01"
         },
+        "test_missing_prevention_dice_authority_fails_before_allocation_and_allows_retry": {
+          "before": null,
+          "after": "4a9c2ce0be11c23e3761e414c0fd275a68fba8b03f31adcedd51350f46b2f87c"
+        },
         "test_source_permission_survives_real_save_reroll_and_lethal_continuation": {
           "before": null,
           "after": "b5fbf1ee0d2a66da63b8d9a33ac51fa095337798f2caa348eb1f9bfe0db5471e"
+        }
+      }
+    },
+    "tests/unit/test_phase10o_fall_back.py": {
+      "before_sha256": "6e6c89c60eb243aeef416434094143ba419c77c423661cc2572b0e68fa759e34",
+      "after_sha256": "38ffe1064600b38aa32fdf11f717d100ed0fd3e1d4e4fee5d2dd711a9f20b4aa",
+      "owners": {
+        "test_voluntary_desperate_escape_waits_for_delirium_fnp_before_embark": {
+          "before": "d22aacadf3870324b70e0a867df9de472b1af96084bad8f3103aaf1703ff1a07",
+          "after": "ef2d266bd541f3d3c6a7fe85cf7a5e59b3381a9f84f57b57eac1e912a1172198"
+        }
+      }
+    },
+    "tests/unit/test_phase17g_chaos_knights_army_rule.py": {
+      "before_sha256": "0fc36289e7814c0e5915276d4d54e794cd2ce85f7da0bafa898f9aeaff9eaef3",
+      "after_sha256": "97893af88d8d338ac9c2add54edb4e9c49473119ec5ee17f29155ce1abde646e",
+      "owners": {
+        "test_selected_target_remaining_effect_request_requires_retained_ancestry": {
+          "before": "ce92caf5f7ffec68a6bb26a7713af37afc87f8acf80bf0ac618ffdc4796a850d",
+          "after": "8c2410982da5ca22d990b223f7ea0c47d5d1a144e378870fc49a8117502b1c8a"
         }
       }
     }
@@ -816,6 +850,16 @@
       "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
       "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Optional prevention continues through existing finite decisions. No named provider activation is implemented. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
+    "src/warhammer40k_core/engine/decision.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order117-allocation-permission"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
+      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Optional prevention continues through existing finite decisions. No named provider activation is implemented. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+    },
     "src/warhammer40k_core/engine/direct_mortal_wound_application.py": {
       "category": "rule_semantics",
       "operations": [
@@ -885,6 +929,26 @@
       "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Optional prevention continues through existing finite decisions. No named provider activation is implemented. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
     },
     "tests/unit/test_order117_mortal_allocation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order117-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
+      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Optional prevention continues through existing finite decisions. No named provider activation is implemented. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+    },
+    "tests/unit/test_phase10o_fall_back.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order117-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded Select Model allocation-trigger Core permission and routing, exact source authority, focused regression or generated contract/publication owner; the new permission does not replace any algorithm.",
+      "source_obligation": "Selected Order97 faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01: mortal-wound allocation triggers when Select Model selects the recipient, before Resolve Damage.",
+      "unchanged_work": "Existing allocation priority, finite choices, wound prevention, destruction and replay services remain. Record every Select Model occurrence and consume provider-authenticated phase-bound prevention permission through that shared boundary. Optional prevention continues through existing finite decisions. No named provider activation is implemented. No search/cache/serializer strategy or workload optimization; no serious regression demonstrated."
+    },
+    "tests/unit/test_phase17g_chaos_knights_army_rule.py": {
       "category": "rule_semantics",
       "operations": [
         "order117-regressions"
