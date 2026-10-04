@@ -13,6 +13,9 @@ The attack executor expires them after deferred attack mortal wounds and before
 destruction reactions. Catalog equipment queries accept that authenticated source
 set without reintroducing an independent living-only check. Geometry continues to
 use battlefield IDs; model-only action consumers continue to require living models.
+Model-anchored auras keep the attached unit's own ability without looking up a
+removed bearer's placement or granting range to another unit. The regression uses
+the catalog's structured Stealth grant, not a claim of raw-text provider support.
 
 The added source-lifetime responsibility is extracted into a small module. Frozen
 large damage/catalog owners only route the boundary to extracted helpers. No new

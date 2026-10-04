@@ -258,6 +258,95 @@ def test_mortal_application_routes_retain_only_attack_conferring_sources(
     assert not source_grant_active(session)
 
 
+def test_retained_model_aura_keeps_attached_ability_without_external_geometry() -> None:
+    from tests.lethal_hits_helpers import attack_completed
+    from tests.order118_source_helpers import (
+        reach_source_casualty,
+        source_retention_session,
+        submit_source_choice,
+    )
+    from tests.psychic_modifier_helpers import pending_request
+    from tests.support.ability_presence_fixtures import compiled_ability_rule
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.abilities import AbilityCatalogIndex
+    from warhammer40k_core.engine.ability_catalog import catalog_ability_records_from_catalog
+    from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
+    from warhammer40k_core.engine.game_state import GameConfig
+    from warhammer40k_core.engine.model_ability_grants import ModelAbilityGrantContext
+    from warhammer40k_core.engine.phase import BattlePhase
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+    from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleEffectSpec, RuleParameter
+
+    text = (
+        'Aura: while a friendly unit is within 6" of this model, '
+        "that unit has the [STEALTH] ability."
+    )
+    ir = compiled_ability_rule(text, source_id="test:order118:stealth-aura")
+    # The canonical catalog provider supplies the supported structured grant;
+    # the rule-text compiler alone does not provide this ability-grant effect.
+    ir = replace(
+        ir,
+        clauses=tuple(
+            replace(
+                clause,
+                effects=(
+                    RuleEffectSpec(
+                        kind=RuleEffectKind.GRANT_ABILITY,
+                        source_span=clause.source_span,
+                        parameters=(RuleParameter("ability", "stealth"),),
+                    ),
+                ),
+            )
+            for clause in ir.clauses
+        ),
+    )
+    session, model_id = source_retention_session(
+        BattlePhase.SHOOTING,
+        ability_text=text,
+        ability_rule_ir=ir,
+    )
+
+    def granted(current: LocalGameSession, target_id: str) -> tuple[str, ...]:
+        state = current.lifecycle.state
+        assert state is not None
+        config_payload = current.lifecycle.to_payload()["config"]
+        assert config_payload is not None
+        config = GameConfig.from_payload(config_payload)
+        records = catalog_ability_records_from_catalog(config.army_catalog)
+        runtime = CatalogDatasheetRuleRuntime(
+            {player: AbilityCatalogIndex.from_records(records) for player in state.player_ids},
+            tuple(state.army_definitions),
+        )
+        binding = next(
+            binding
+            for binding in runtime.model_ability_grant_bindings()
+            if ":army-beta:enemy:" in binding.modifier_id
+        )
+        return binding.model_ids(
+            ModelAbilityGrantContext(
+                state=state,
+                target=rules_unit_view_by_id(state=state, unit_instance_id=target_id),
+            )
+        )
+
+    assert granted(session, "army-beta:enemy")
+    assert granted(session, "army-beta:other")
+    reach_source_casualty(session, source_model_id=model_id)
+    assert granted(session, "army-beta:enemy")
+    assert granted(session, "army-beta:other") == ()
+    restored = LocalGameSession.from_persistence_payload(session.to_persistence_payload())
+    assert granted(restored, "army-beta:enemy") == granted(session, "army-beta:enemy")
+    assert granted(restored, "army-beta:other") == ()
+    for _ in range(150):
+        if attack_completed(session):
+            break
+        submit_source_choice(session, pending_request(session), source_model_id=model_id)
+    assert attack_completed(session)
+    assert granted(session, "army-beta:enemy") == ()
+    assert granted(session, "army-beta:other") == ()
+
+
 def test_core_keyword_ability_descriptors_enable_boolean_families_without_keywords() -> None:
     unit = _unit_with_abilities(
         _ability(ability_id="source-deep-strike", name="Core Deep Strike"),

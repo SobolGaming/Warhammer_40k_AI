@@ -37,6 +37,7 @@ from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import WeaponProfileModifierContext
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.rule_ir import RuleIR
 
 
 def source_retention_session(
@@ -45,6 +46,10 @@ def source_retention_session(
     source_role: str = "bodyguard",
     source_wargear: bool = False,
     optional_fnp: bool = True,
+    ability_text: str = (
+        "Ranged weapons equipped by models in this unit have the [LETHAL HITS] ability."
+    ),
+    ability_rule_ir: RuleIR | None = None,
 ) -> tuple[LocalGameSession, str]:
     catalog = _compact_intercessor_catalog(_canonical_catalog())
     source_sheet = {
@@ -52,8 +57,12 @@ def source_retention_session(
         "leader": "core-character-leader",
         "support": "core-character-support",
     }[source_role]
-    text = "Ranged weapons equipped by models in this unit have the [LETHAL HITS] ability."
-    ir = compiled_ability_rule(text, source_id="test:order118:unit-weapon-grant")
+    text = ability_text
+    ir = (
+        compiled_ability_rule(text, source_id="test:order118:unit-weapon-grant")
+        if ability_rule_ir is None
+        else ability_rule_ir
+    )
     descriptor = DatasheetAbilityDescriptor(
         ability_id="order118:grant",
         name="Source lifetime fixture",

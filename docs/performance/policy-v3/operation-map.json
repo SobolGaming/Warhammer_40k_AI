@@ -3434,11 +3434,13 @@
         "src/warhammer40k_core/engine/catalog_rule_consumption.py",
         "src/warhammer40k_core/engine/catalog_source_model_presence.py",
         "src/warhammer40k_core/engine/damage_allocation.py",
-        "src/warhammer40k_core/engine/direct_mortal_wound_application.py"
+        "src/warhammer40k_core/engine/direct_mortal_wound_application.py",
+        "src/warhammer40k_core/engine/rule_aura_resolution.py"
       ],
       "owners": [
         "@module",
         "MortalWoundApplicationProgress.after_wound_resolution",
+        "_aura_source_geometries",
         "_current_wargear_bearer_model_ids",
         "_event_record_hidden_from_context",
         "_source_payload",
@@ -3484,7 +3486,8 @@
         "test_attached_conferring_bearer_survives_as_ability_source_until_attacks_finish",
         "test_attached_source_lifetime_facade_restore_replay",
         "test_equipped_attached_source_lifetime_uses_shared_catalog_consumer",
-        "test_mortal_application_routes_retain_only_attack_conferring_sources"
+        "test_mortal_application_routes_retain_only_attack_conferring_sources",
+        "test_retained_model_aura_keeps_attached_ability_without_external_geometry"
       ],
       "families": [],
       "sensitive": false,
