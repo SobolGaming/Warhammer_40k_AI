@@ -19,6 +19,9 @@ the catalog's structured Stealth grant, not a claim of raw-text provider support
 Shared catalog effect recipients remain living or specially physically retained
 models. A destroyed conferring source keeps unit-wide passive Stealth active for
 surviving attached recipients, without becoming a grant recipient itself.
+The declared THIS_UNIT or THIS_MODEL target governs recipients for equipped
+sources as well; equipment authenticates the conferring bearer, not the grant's
+target scope.
 
 The added source-lifetime responsibility is extracted into a small module. Frozen
 large damage/catalog owners only route the boundary to extracted helpers. No new

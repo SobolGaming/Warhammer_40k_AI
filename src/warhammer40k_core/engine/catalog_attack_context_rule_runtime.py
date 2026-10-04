@@ -201,8 +201,6 @@ def current_effect_target_model_ids(
         if model.is_alive or model.model_instance_id in rules_unit.retained_model_ids
     }
     source_model_ids = current_source_model_ids(state=state, source=source)
-    if source.record.source_kind is AbilitySourceKind.WARGEAR:
-        return tuple(model_id for model_id in source_model_ids if model_id in recipient_ids)
     target = source.clause.target
     if target is None or target.kind not in {RuleTargetKind.THIS_MODEL, RuleTargetKind.THIS_UNIT}:
         raise GameLifecycleError("Catalog datasheet model effect requires a self target.")

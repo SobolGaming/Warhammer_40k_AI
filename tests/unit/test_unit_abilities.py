@@ -322,7 +322,10 @@ def test_retained_model_aura_keeps_attached_ability_without_external_geometry() 
     assert granted(session, "army-beta:other") == ()
 
 
-def test_retained_passive_stealth_source_grants_only_living_attached_recipients() -> None:
+@pytest.mark.parametrize("source_wargear", [False, True])
+def test_retained_passive_stealth_source_grants_only_living_attached_recipients(
+    source_wargear: bool,
+) -> None:
     from tests.lethal_hits_helpers import attack_completed
     from tests.order118_source_helpers import (
         reach_source_casualty,
@@ -377,7 +380,9 @@ def test_retained_passive_stealth_source_grants_only_living_attached_recipients(
             for clause in ir.clauses
         ),
     )
-    session, model_id = source_retention_session(BattlePhase.FIGHT, ability_rule_ir=ir)
+    session, model_id = source_retention_session(
+        BattlePhase.FIGHT, ability_rule_ir=ir, source_wargear=source_wargear
+    )
 
     def granted(current: LocalGameSession) -> tuple[str, ...]:
         return source_stealth_granted_model_ids(current, target_unit_instance_id="army-beta:enemy")

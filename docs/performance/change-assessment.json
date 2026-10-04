@@ -1,7 +1,7 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "ae452b60dd37b2ee262eb5e830ecf6405cf80516",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:26830a46b61a3a2a039dd59cf4e13a5e3efc75bbecabbe054c3082587e48d2a8",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:67b92d9ee709b3ab96c6b861b9f9788ee04a5bdf4a26f88a8220f71c370038d7",
   "operation_map_sha256": "d123776e142f903e8e40a29461f0d483001a1aca07a160342abf3a788bbca892",
   "changes": {
     "conformance/typescript/src/contract.ts": {
@@ -16,81 +16,81 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "86b34f4d64cbc974931abe1bd6c7c2d8a412e5f308b8f054075596d684230fcd",
-      "after_sha256": "fe8b8ae462dbb3698fa38b5beb6e4e556522d3a17449e646dea76fce8bf43859",
+      "after_sha256": "946dc48be2d7e285bc7a0f10f11796a403f5959150dda8028c0c12c568789b2c",
       "owners": {
         "@document": {
           "before": "86b34f4d64cbc974931abe1bd6c7c2d8a412e5f308b8f054075596d684230fcd",
-          "after": "fe8b8ae462dbb3698fa38b5beb6e4e556522d3a17449e646dea76fce8bf43859"
+          "after": "946dc48be2d7e285bc7a0f10f11796a403f5959150dda8028c0c12c568789b2c"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "a33bf3be26c5633ac052f3e144909720481e8b4e071cad09eb988b881b8efc8e",
-      "after_sha256": "ddf05780e485502e2e412aa16eb2e85d85108fbfead54260379f87395c59303a",
+      "after_sha256": "c94edecdd68c42713e082c14f745e467cfb9406555e98497998b1b8ab8f05d02",
       "owners": {
         "@document": {
           "before": "a33bf3be26c5633ac052f3e144909720481e8b4e071cad09eb988b881b8efc8e",
-          "after": "ddf05780e485502e2e412aa16eb2e85d85108fbfead54260379f87395c59303a"
+          "after": "c94edecdd68c42713e082c14f745e467cfb9406555e98497998b1b8ab8f05d02"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "7a7bf7f36781f02c2d0820949aa92b4995828fa41a35c9c54c73533f70297e42",
-      "after_sha256": "06d7d71f5454e6de1a69355b0c170c33b514234059342b0513e36c5ac49c3f73",
+      "after_sha256": "00cffeef4b497694b0e19822aa3152133fb06eba541981af587ebb8938fa4f5c",
       "owners": {
         "@document": {
           "before": "7a7bf7f36781f02c2d0820949aa92b4995828fa41a35c9c54c73533f70297e42",
-          "after": "06d7d71f5454e6de1a69355b0c170c33b514234059342b0513e36c5ac49c3f73"
+          "after": "00cffeef4b497694b0e19822aa3152133fb06eba541981af587ebb8938fa4f5c"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "e1d82b40ca7322f2cb71236e7fdb18daebc75d9d79d7c9aafc54ead26e2d02ce",
-      "after_sha256": "d76209c3c92a1bc9dee90432bccbbf253712887c86692673b34285280aa3a752",
+      "after_sha256": "88808921f8306a24d1728dabb29c388f42bb0d845252c4bf59f48bce3320dbf4",
       "owners": {
         "@document": {
           "before": "e1d82b40ca7322f2cb71236e7fdb18daebc75d9d79d7c9aafc54ead26e2d02ce",
-          "after": "d76209c3c92a1bc9dee90432bccbbf253712887c86692673b34285280aa3a752"
+          "after": "88808921f8306a24d1728dabb29c388f42bb0d845252c4bf59f48bce3320dbf4"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "9f26478f04e5447460341f9a94741ae7a98eeabd12f897e0d5e94aceec0494eb",
-      "after_sha256": "750a8c2b8f7f27221e9df71fc97e6ffe3537f69c3366b7689bc18e32b80fa18b",
+      "after_sha256": "1ce8d70d85f588aea8657aa09905e2035e765a5d41d010e7756d0316df143bfc",
       "owners": {
         "@document": {
           "before": "9f26478f04e5447460341f9a94741ae7a98eeabd12f897e0d5e94aceec0494eb",
-          "after": "750a8c2b8f7f27221e9df71fc97e6ffe3537f69c3366b7689bc18e32b80fa18b"
+          "after": "1ce8d70d85f588aea8657aa09905e2035e765a5d41d010e7756d0316df143bfc"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "6c43adc7415f22434b6a8a0196981f2e38b4861df60a308716bb55328cd7e335",
-      "after_sha256": "93e749c2cd57cba7b1de4584277d1a0f0047791829f95b090ab887bc24c3875f",
+      "after_sha256": "9e52e3d0abd427e1108e331b1762a4e6a80b81694d080c91bea754c545b4581b",
       "owners": {
         "@document": {
           "before": "6c43adc7415f22434b6a8a0196981f2e38b4861df60a308716bb55328cd7e335",
-          "after": "93e749c2cd57cba7b1de4584277d1a0f0047791829f95b090ab887bc24c3875f"
+          "after": "9e52e3d0abd427e1108e331b1762a4e6a80b81694d080c91bea754c545b4581b"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "43c7a1dad6a25c8ab6f3135f54eded39cd4ac0c2a824d7542c528135ac5316a0",
-      "after_sha256": "0473e5da958514a7f34f2bedcf28776e8d3eadac7d0da572d1fe6f46b4c67a51",
+      "after_sha256": "851d810d22be2d79afed9884e9672b79c5c93c1a1fbc5319f77519415d2dd06b",
       "owners": {
         "@document": {
           "before": "43c7a1dad6a25c8ab6f3135f54eded39cd4ac0c2a824d7542c528135ac5316a0",
-          "after": "0473e5da958514a7f34f2bedcf28776e8d3eadac7d0da572d1fe6f46b4c67a51"
+          "after": "851d810d22be2d79afed9884e9672b79c5c93c1a1fbc5319f77519415d2dd06b"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "e79c9baafccfc0e22e2fe2d37e6f946db19efe0d227718a73fd1255cb6864ac1",
-      "after_sha256": "2cb6865c053cd1c7872a3cf2ad54bcc7724e17b8525f211956d2a9354a8ee27d",
+      "after_sha256": "11a492959c01afb2d452f071fd1002deb87eaacede688ecb26ff0024b3538e7a",
       "owners": {
         "@document": {
           "before": "e79c9baafccfc0e22e2fe2d37e6f946db19efe0d227718a73fd1255cb6864ac1",
-          "after": "2cb6865c053cd1c7872a3cf2ad54bcc7724e17b8525f211956d2a9354a8ee27d"
+          "after": "11a492959c01afb2d452f071fd1002deb87eaacede688ecb26ff0024b3538e7a"
         }
       }
     },
@@ -156,11 +156,11 @@
     },
     "docs/ORDER_118_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "3ebbe8c308782f33b2788011959e65299129583372c6a159893103180124ed56",
+      "after_sha256": "be6a6996e3811d7820b16fd4b6d1b93712153345fb549c3c9443905daef6334c",
       "owners": {
         "@document": {
           "before": null,
-          "after": "3ebbe8c308782f33b2788011959e65299129583372c6a159893103180124ed56"
+          "after": "be6a6996e3811d7820b16fd4b6d1b93712153345fb549c3c9443905daef6334c"
         }
       }
     },
@@ -176,11 +176,11 @@
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "24c6bffe147b1685d137e511df468cc7aa8d1dcf79fe4fb622c3dd05d8e11b6e",
-      "after_sha256": "943a26c527375b36030f22b61b0c4c57039cccf6483496508f9bfb94accbb562",
+      "after_sha256": "d2f3034294954c081eb010ee45e2061a1212d06be110dc13746db6db37aaeaff",
       "owners": {
         "@document": {
           "before": "24c6bffe147b1685d137e511df468cc7aa8d1dcf79fe4fb622c3dd05d8e11b6e",
-          "after": "943a26c527375b36030f22b61b0c4c57039cccf6483496508f9bfb94accbb562"
+          "after": "d2f3034294954c081eb010ee45e2061a1212d06be110dc13746db6db37aaeaff"
         }
       }
     },
@@ -278,11 +278,11 @@
     },
     "src/warhammer40k_core/engine/catalog_attack_context_rule_runtime.py": {
       "before_sha256": "4191a089796ff23465f1bfff43ad2f61fa6d4b62c42c5d782a4487d754f8fbbc",
-      "after_sha256": "551cf6db548a4c195b00cc792fc7ccf1dac976226b52b7a67987f5abb6712bed",
+      "after_sha256": "aff635dd11b03f426c6d0a6da8c2ba9555c86e8b2cc642d44694e86751912f93",
       "owners": {
         "current_effect_target_model_ids": {
           "before": "1f1d13742f95a2d78c6c5ef2ad25c305213919cf417c2ade159351ae818b706b",
-          "after": "005a7c2475c9915e06ee1526442a7932517cfa04c02927f8e11c974a9e9bff34"
+          "after": "0e6925d6dc1519adc2848db4c05db67f1111c5aea732e5aee773f26bad7b786d"
         }
       }
     },
@@ -396,7 +396,7 @@
     },
     "tests/unit/test_unit_abilities.py": {
       "before_sha256": "135ebd8f548ac093023d987a2d9cf12de8e9dc081f3b58c84ca8cdeb48a3123e",
-      "after_sha256": "be21f4f8d872ab6d01b225aacc38422043a083c0a233811b0fa68203ae29b243",
+      "after_sha256": "2216a2040ade27b29da8f138257a26e52e8f76681a4f2c7b3e1a1e449cbdacfa",
       "owners": {
         "@module": {
           "before": "9bf30868c9aaf8d2329fe396d671052b5a5ae64bee2fa2c4e8a3fa16826e6d88",
@@ -424,7 +424,7 @@
         },
         "test_retained_passive_stealth_source_grants_only_living_attached_recipients": {
           "before": null,
-          "after": "b2fadff7447a1c689c8cc239af8b052d36e7c4442eedeb659258d35263a772c9"
+          "after": "63776c96c1f6e48d2536b265181c84d89169f4554925e2c145e91c1ac01ac5a0"
         }
       }
     },
