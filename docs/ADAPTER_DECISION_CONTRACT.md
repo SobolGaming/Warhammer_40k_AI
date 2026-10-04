@@ -7554,3 +7554,11 @@ originating attack IDs. Runtime identity governs persistence/replay; old histori
 remain on the matching runtime, without conversion. Core source providers own
 permission conditions. Radiant Champion/Hallowed Ground remain load-only faction
 scaffolds and are not claimed as implemented gameplay.
+
+Order116 deferral events also record `originating_pool_index`,
+`originating_attack_index` and `source_weapon_instance_id` from the physical
+gathered contribution. The deferred weapon snapshot preserves that source
+profile, with the existing post-roll modifier service, rather than the synthetic
+gathered carrier. Psychic weapon attack evidence remains available to the shared
+Feel No Pain selector during mortal allocation and restored retries; no new
+decision family or Psychic ability classification is introduced.

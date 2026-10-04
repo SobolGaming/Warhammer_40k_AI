@@ -6,7 +6,11 @@ from typing import cast
 
 import pytest
 from tests.lethal_hits_helpers import attack_completed, complete_attack
-from tests.order116_mortal_helpers import SOURCE_ID, additional_mortal_session
+from tests.order116_mortal_helpers import (
+    SOURCE_ID,
+    additional_mortal_session,
+    gathered_additional_mortal_session,
+)
 from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
@@ -225,6 +229,107 @@ def test_additional_mortals_coexist_with_native_devastating_wounds() -> None:
     assert (
         ReplayRunner.from_payload(
             session.replay_artifact(artifact_id="order116-devastating-coexist")
+        )
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )
+
+
+def test_gathered_additional_mortals_keep_each_physical_weapon_through_lethal_restore() -> None:
+    session = gathered_additional_mortal_session()
+    restored_pending = False
+    for _ in range(150):
+        if attack_completed(session):
+            break
+        request = pending_request(session)
+        source = None
+        if request.decision_type == "select_feel_no_pain" and isinstance(request.payload, dict):
+            lost = request.payload["lost_wound_context"]
+            assert isinstance(lost, dict)
+            source = lost.get("source_context")
+        if (
+            not restored_pending
+            and isinstance(source, dict)
+            and source.get("source_kind") == "additional_attack_mortal_wounds"
+        ):
+            session = LocalGameSession.from_persistence_payload(
+                json.loads(json.dumps(session.to_persistence_payload()))
+            )
+            restored_pending = True
+        submit_fixture_request(session, request)
+    else:
+        raise AssertionError("Gathered additional mortal sequence did not finish.")
+    assert restored_pending
+    deferred = [
+        e
+        for e in session.lifecycle.decision_controller.event_log.records
+        if e.event_type == "additional_attack_mortal_wounds_deferred"
+    ]
+    assert deferred
+    profiles: set[str] = set()
+    for event in deferred:
+        payload = cast(dict[str, JsonValue], event.payload)
+        origin_index = cast(int, payload["originating_pool_index"])
+        record = cast(dict[str, JsonValue], payload["deferred_mortal_wounds"])
+        profile = cast(dict[str, JsonValue], record["source_weapon_profile"])
+        profile_id = cast(str, profile["profile_id"])
+        assert profile_id == f"order116-physical-{origin_index}"
+        profiles.add(profile_id)
+        assert cast(int, payload["originating_attack_index"]) < 3
+        assert not cast(str, payload["source_weapon_instance_id"]).startswith("gathered-")
+    assert profiles == {"order116-physical-0", "order116-physical-1"}
+    restored = LocalGameSession.from_persistence_payload(
+        json.loads(json.dumps(session.to_persistence_payload()))
+    )
+    assert restored.to_persistence_payload() == session.to_persistence_payload()
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="order116-gathered-physical"))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )
+
+
+@pytest.mark.parametrize("phase", [BattlePhase.SHOOTING, BattlePhase.FIGHT])
+@pytest.mark.parametrize("devastating", [False, True])
+def test_attack_mortal_fnp_keeps_psychic_weapon_classification(
+    phase: BattlePhase,
+    devastating: bool,
+) -> None:
+    session = additional_mortal_session(
+        phase,
+        psychic=True,
+        psychic_fnp=True,
+        devastating=devastating,
+        mortal_wounds=3,
+    )
+    mortal_choices = 0
+    for _ in range(120):
+        if attack_completed(session):
+            break
+        request = pending_request(session)
+        if request.decision_type == "select_feel_no_pain" and isinstance(request.payload, dict):
+            lost = request.payload["lost_wound_context"]
+            assert isinstance(lost, dict)
+            source = lost.get("source_context")
+            if isinstance(source, dict) and source.get("source_kind") in (
+                "additional_attack_mortal_wounds",
+                "devastating_wounds",
+            ):
+                mortal_choices += 1
+                assert "order116:fnp" in {option.option_id for option in request.options}
+                if mortal_choices == 1:
+                    session = LocalGameSession.from_persistence_payload(
+                        json.loads(json.dumps(session.to_persistence_payload()))
+                    )
+        submit_fixture_request(session, request)
+    else:
+        raise AssertionError("Psychic attack mortals did not finish.")
+    assert mortal_choices > 0
+    assert (
+        ReplayRunner.from_payload(
+            session.replay_artifact(artifact_id="order116-psychic-mortal-fnp")
         )
         .run()
         .status

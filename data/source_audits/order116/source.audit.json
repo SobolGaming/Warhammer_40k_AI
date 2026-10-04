@@ -90,6 +90,25 @@
       "selected_provider": "Game Datamissions",
       "historical_source_row_sha256": "72c72c3146a212a254e677661dcf8098241d769f75702c6866986022d7ea18cd",
       "review_category": "06"
+    },
+    {
+      "row_id": "rule:24:24.29:1",
+      "category": "24",
+      "locator": "24.29",
+      "title": "[PSYCHIC]",
+      "occurrence": 1,
+      "source_sha256": "8fa80d1ed7bf755561ac148c79d605dff75c831134b1971b8b05a305cd496b40",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "9226caf5294395c58ae500c46b805054c54b5cd482daf601ca14280d83b67daa",
+          "value": "Each time an attack is made with a \u0003[PSYCHIC]\u0004 weapon, you can ignore any or all modifiers to that attack\u2019s \u0005BS\u0006 or \u0005WS\u0006 characteristic and any or all modifiers to the \u0005hit roll\u0006. Attacks made with \u0003[PSYCHIC]\u0004 weapons are known as \u0005psychic attacks\u0006 (this can be important for the triggering of other rules)."
+        }
+      ],
+      "selected_provider": "Game Datamissions",
+      "historical_source_row_sha256": "ca43be1ac1abb11e1219c1727790a238a44b0e5d645985a29b2038dec8532f64",
+      "review_category": "24"
     }
   ],
   "authority": "Retained selected Core source and pinned current official Grey Knights PDF page5; Core seam only, no fresh live-source claim or named faction execution claim.",
@@ -99,5 +118,6 @@
     "page": 5,
     "source_rule_id": "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000009777003",
     "interpretation": "Successful-wound additional mortal exemplar only; named Radiant Champion and Hallowed Ground eligibility remain load-only scaffolds. Canonical Core tests authenticate a provider-issued permission without claiming named rule loading."
-  }
+  },
+  "source_classification_limit": "The existing Core PSYCHIC weapon token classifies a known weapon attack; its additional mortals retain that same attack classification. No new Psychic ability-damage, faction provider, or Order120 execution support is claimed."
 }

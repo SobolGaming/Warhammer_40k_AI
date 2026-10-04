@@ -43,3 +43,15 @@ def test_additional_attack_mortal_producer_and_mutation_have_shared_owners() -> 
         assert "Radiant Champion" not in text
         assert "Hallowed Ground" not in text
         assert ".lose_wounds(" not in text
+
+
+def test_attack_mortal_identity_and_fnp_share_source_aware_owners() -> None:
+    producer = (ENGINE / "additional_attack_mortals.py").read_text(encoding="utf-8")
+    native = (ENGINE / "attack_sequence_post_roll.py").read_text(encoding="utf-8")
+    normal = (ENGINE / "attack_sequence_validation.py").read_text(encoding="utf-8")
+    mortal = (ENGINE / "mortal_wound_model_allocation.py").read_text(encoding="utf-8")
+    assert "attack_mortal_origin(" in producer
+    assert "attack_mortal_origin(" in native
+    assert "feel_no_pain_source_applies_to_attack(" in normal
+    assert "feel_no_pain_source_applies_to_mortal_wounds(" in mortal
+    assert mortal.count("destruction_evidence=progress.destruction_evidence") == 2

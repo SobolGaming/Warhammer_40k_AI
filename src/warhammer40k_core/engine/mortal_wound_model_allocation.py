@@ -43,6 +43,7 @@ from warhammer40k_core.engine.mortal_wound_context import (
     parse_mortal_wound_feel_no_pain_context,
 )
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
     evidence_from_json,
     evidence_to_json,
     record_finalized_mortal_wound_progress_destructions,
@@ -745,6 +746,7 @@ def _continue_mortal_wound_application_for_model(
     sources = mortal_wound_feel_no_pain_sources(
         state=state,
         model_instance_id=model_instance_id,
+        destruction_evidence=progress.destruction_evidence,
     )
     decline_allowed = mortal_wound_feel_no_pain_decline_allowed(
         state=state,
@@ -1004,6 +1006,7 @@ def validate_mortal_wound_feel_no_pain_request_authority(
     loaded_sources = mortal_wound_feel_no_pain_sources(
         state=state,
         model_instance_id=occurrence.selected_model_id,
+        destruction_evidence=progress.destruction_evidence,
     )
     loaded_decline_allowed = mortal_wound_feel_no_pain_decline_allowed(
         state=state,
@@ -1183,7 +1186,12 @@ def mortal_wound_feel_no_pain_sources(
     *,
     state: GameState,
     model_instance_id: str,
+    destruction_evidence: MortalWoundDestructionEvidence | None = None,
 ) -> tuple[FeelNoPainSource, ...]:
+    from warhammer40k_core.engine.feel_no_pain_conditions import (
+        feel_no_pain_source_applies_to_mortal_wounds,
+    )
+
     sources = state.feel_no_pain_sources_for_model(model_instance_id=model_instance_id)
     typed_sources = validate_unique_sorted_exact_type_tuple(
         sources,
@@ -1195,7 +1203,9 @@ def mortal_wound_feel_no_pain_sources(
     return tuple(
         source
         for source in typed_sources
-        if source.attack_condition is None or source.mortal_wounds
+        if feel_no_pain_source_applies_to_mortal_wounds(
+            source=source, destruction_evidence=destruction_evidence
+        )
     )
 
 

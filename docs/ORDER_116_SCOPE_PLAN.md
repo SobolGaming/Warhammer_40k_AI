@@ -39,7 +39,14 @@ ordinary saves/damage; deferred mortal entries retain source permission snapshot
 The extracted `attack_sequence_deferred_mortals` owner keeps the original queue
 order and resolves it only after normal damage, using shared finite recipient,
 Feel No Pain, allocation priority, attack-attributed destruction and spill routing.
-Devastating Wounds remains distinct. Restore's existing pending-attack boundary
+A shared physical-contribution resolver retains each original weapon profile and
+instance when equivalent weapons gather, and reuses the existing post-roll
+modifier service. Devastating Wounds uses the same provenance repair while its
+damage replacement and allocation semantics remain distinct. A shared Feel No
+Pain classifier uses typed attack evidence for Psychic-tagged weapon attacks,
+including their additional or replacement mortals; non-attack mortals retain
+their existing filtering. This does not implement the separate Order120 Psychic
+ability-damage classification work. Restore's existing pending-attack boundary
 recognizes both source kinds before the attacks-resolved boundary.
 
 Consumer-path regressions cover real facade submissions, actual damage, ordered
