@@ -4,6 +4,136 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bec83611f049ab4ccee35d81f6f88526dd1b198357c0f24e2e0dfba9b0f4b988",
   "operation_map_sha256": "0ee64917313b1969f2da1ed10311a86b2a6eebfa70d3e6e688fc1392e3555804",
   "changes": {
+    "ci/test_shards/durations.json": {
+      "before_sha256": "e54501609ebbc77988bc1f0c0e92eb93b7037174b1213904c4324caadca871ad",
+      "after_sha256": "42b580ed44da90840a34e09181daf0af955e7272f71d14b080cdf432e4b798b0",
+      "owners": {
+        "@document": {
+          "before": "e54501609ebbc77988bc1f0c0e92eb93b7037174b1213904c4324caadca871ad",
+          "after": "42b580ed44da90840a34e09181daf0af955e7272f71d14b080cdf432e4b798b0"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "fb3fc5be7774a3cb5af80bc2f499e9beed382063614cf05793b5795db8ed0eee",
+      "after_sha256": "db08dfc889d072a065406c15664fefa470db3db6c38c22530ed96eb160e14c6d",
+      "owners": {
+        "@document": {
+          "before": "fb3fc5be7774a3cb5af80bc2f499e9beed382063614cf05793b5795db8ed0eee",
+          "after": "db08dfc889d072a065406c15664fefa470db3db6c38c22530ed96eb160e14c6d"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "d5a75d47e5fc5d59624f04385104f39422f3f0bc3d095ed9c0f0b63d91d85721",
+      "after_sha256": "4fdcf1ecb3cd1dd9ed25a4e6db1bbdaa264ba07b92f2ce49bd2b841a4aaf5f7a",
+      "owners": {
+        "@document": {
+          "before": "d5a75d47e5fc5d59624f04385104f39422f3f0bc3d095ed9c0f0b63d91d85721",
+          "after": "4fdcf1ecb3cd1dd9ed25a4e6db1bbdaa264ba07b92f2ce49bd2b841a4aaf5f7a"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "e27749225b4580fce393adf454beea63c4304cbc4e4af3e0c9d8828c657d5215",
+      "after_sha256": "5bf40d966b0e3b629848501e151124a8ad998bae5880fcf46fd51e539b11c0f1",
+      "owners": {
+        "@document": {
+          "before": "e27749225b4580fce393adf454beea63c4304cbc4e4af3e0c9d8828c657d5215",
+          "after": "5bf40d966b0e3b629848501e151124a8ad998bae5880fcf46fd51e539b11c0f1"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "83d545d3df43bd401148af497bb43a8ae84110bad8b1be4de297546de3cfee3d",
+      "after_sha256": "a73916264edbf8987ca85ca409bb5bf625996650a09f3e4bc63eddebd7613acd",
+      "owners": {
+        "@document": {
+          "before": "83d545d3df43bd401148af497bb43a8ae84110bad8b1be4de297546de3cfee3d",
+          "after": "a73916264edbf8987ca85ca409bb5bf625996650a09f3e4bc63eddebd7613acd"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "2a74f1cb0fb42b35dc0def3f7e53b7569dae65769b3398998a5b677605c2fed1",
+      "after_sha256": "d773d359faedb7e71b65a8ec90426d32dcf09044054c587c42256f730e9f0745",
+      "owners": {
+        "@document": {
+          "before": "2a74f1cb0fb42b35dc0def3f7e53b7569dae65769b3398998a5b677605c2fed1",
+          "after": "d773d359faedb7e71b65a8ec90426d32dcf09044054c587c42256f730e9f0745"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "94ddf205acca90abd035394f110589360a61f80931a59562af4dcb6723059361",
+      "after_sha256": "1c3b2d4c4149f850e92013807be5921b6e673ee5d9413e64e795e2eea5bfe271",
+      "owners": {
+        "@document": {
+          "before": "94ddf205acca90abd035394f110589360a61f80931a59562af4dcb6723059361",
+          "after": "1c3b2d4c4149f850e92013807be5921b6e673ee5d9413e64e795e2eea5bfe271"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "d1ad9f6a5e6bcadbe4d2c48bc36ae33fa158bd4aa22bc642e85beafbff367da2",
+      "after_sha256": "4eeb172756743eaf096229eeaa93a387697be5147d04c21da7af410ba1bd71d3",
+      "owners": {
+        "@document": {
+          "before": "d1ad9f6a5e6bcadbe4d2c48bc36ae33fa158bd4aa22bc642e85beafbff367da2",
+          "after": "4eeb172756743eaf096229eeaa93a387697be5147d04c21da7af410ba1bd71d3"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "05764b563e14c127f9e189b41d56f725b1fe19d2051c8c2ae8b8b5f64e2d1065",
+      "after_sha256": "bd032c0449a66ee00db05fedf1bb4d00a81ef3d4ae46da2728b8365af38222d8",
+      "owners": {
+        "@document": {
+          "before": "05764b563e14c127f9e189b41d56f725b1fe19d2051c8c2ae8b8b5f64e2d1065",
+          "after": "bd032c0449a66ee00db05fedf1bb4d00a81ef3d4ae46da2728b8365af38222d8"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "b3903f60e947b85a7cdf5a2fefd6819cb4682707b38cc8dd0cbb07165af5a93e",
+      "after_sha256": "448489645a9127793992d35bcb7f7afe6b23657ef6331f6cd6c63f18cfa3b58c",
+      "owners": {
+        "@document": {
+          "before": "b3903f60e947b85a7cdf5a2fefd6819cb4682707b38cc8dd0cbb07165af5a93e",
+          "after": "448489645a9127793992d35bcb7f7afe6b23657ef6331f6cd6c63f18cfa3b58c"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "d1db7904e198ab4890d48e45e10b3f531deb01867e516531d3d5acb4c341c3d3",
+      "after_sha256": "f1188f1dd464ff756fb59773f7838ba27822fd81d353107c8589efcd3f67c0c7",
+      "owners": {
+        "@document": {
+          "before": "d1db7904e198ab4890d48e45e10b3f531deb01867e516531d3d5acb4c341c3d3",
+          "after": "f1188f1dd464ff756fb59773f7838ba27822fd81d353107c8589efcd3f67c0c7"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "2abb268f4310efd335717061f4f2aa5529a49f443a30f9de6ad24e1cafec736d",
+      "after_sha256": "0bf0c9a75b276c44b3a67ce46bf83097e7708791f3071a157f02913350d52e4a",
+      "owners": {
+        "@document": {
+          "before": "2abb268f4310efd335717061f4f2aa5529a49f443a30f9de6ad24e1cafec736d",
+          "after": "0bf0c9a75b276c44b3a67ce46bf83097e7708791f3071a157f02913350d52e4a"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "563eb9cf86d12a89d3ad70c8eb2aab3ce2dd58625ba8edc8143195556bb70325",
+      "after_sha256": "e37c22d95ab101344dfb070abf89d03f2599fe5ea157a94c2995543da0de18ff",
+      "owners": {
+        "@document": {
+          "before": "563eb9cf86d12a89d3ad70c8eb2aab3ce2dd58625ba8edc8143195556bb70325",
+          "after": "e37c22d95ab101344dfb070abf89d03f2599fe5ea157a94c2995543da0de18ff"
+        }
+      }
+    },
     "conformance/typescript/src/contract.ts": {
       "before_sha256": "cdedfc659cd0107211da63559121e9381e329285cfea6a8dac94a8518ec3beaa",
       "after_sha256": "fc6a021b9216f55ff8817fb0f514490255d3ca65e257de60df24404bd308006c",
@@ -490,6 +620,136 @@
     }
   },
   "rows": {
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
+      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
+      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
+      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
+      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
+      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
+      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
+      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
+      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
+      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
+      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
+      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
+      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
+      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
+      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
+      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
+      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
+      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
+      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
+      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
+      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
+      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
+      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
+      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
+      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded current-source Snap rule classification and its source/provenance, shared validation, regression, or publication owner. Existing critical-wound owners, full resolution and replay remain unchanged. No deliberately changed algorithm, cache or data structure.",
+      "source_obligation": "Complete retained Core15.09, timestamp2026-10-01T12:04:31.127429+00:00: unmodified6 hits irrespective of BS/modifiers; hits are not critical; hit rerolls forbidden. Suppress all critical-hit consumers and preserve independent Critical Wounds. Existing v931 and Order97 evidence remains historical.",
+      "unchanged_work": "Ordinary semantic branch repair under the owner subsequent-order direction, not performance optimization or a demonstrated serious regression. No changed search/cache/workload/dependency. Keep current serial smoke and all live semantic/work/cache and historical integrity checks; no detailed component or full-game certification claimed."
+    },
     "conformance/typescript/src/contract.ts": {
       "category": "rule_semantics",
       "operations": [
