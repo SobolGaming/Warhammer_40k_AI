@@ -6,6 +6,7 @@ from functools import partial
 from types import MappingProxyType
 from typing import TYPE_CHECKING, TypeVar, cast
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import (
     RerollComponentSelectionPolicy,
@@ -175,6 +176,7 @@ from warhammer40k_core.engine.source_backed_rerolls import (
 from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionContext,
     ShootingTargetRestrictionHookBinding,
+    ShootingTargetRestrictionHookRegistry,
     TargetRestriction,
 )
 from warhammer40k_core.engine.unit_proximity import (
@@ -395,6 +397,9 @@ class CatalogDatasheetRuleRuntime:
 
     def attack_reroll_permission_bindings(
         self,
+        *,
+        shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
+        army_catalog: ArmyCatalog | None = None,
     ) -> tuple[AttackRerollPermissionBinding, ...]:
         passive = tuple(
             AttackRerollPermissionBinding(
@@ -416,7 +421,24 @@ class CatalogDatasheetRuleRuntime:
                 conditional_attack_reroll_descriptor_for_clause
             )
         )
-        return (*passive, *conditional)
+        from warhammer40k_core.engine.catalog_nested_attack_reroll_runtime import (
+            nested_attack_reroll_handler,
+        )
+        from warhammer40k_core.engine.catalog_nested_attack_reroll_support import (
+            nested_attack_reroll_clause_is_supported,
+        )
+
+        nested = tuple(
+            AttackRerollPermissionBinding(
+                modifier_id=source.binding_id,
+                source_id=source.rule_ir.source_id,
+                handler=nested_attack_reroll_handler(
+                    source, shooting_target_restriction_hooks, army_catalog
+                ),
+            )
+            for source in self._sources(nested_attack_reroll_clause_is_supported)
+        )
+        return (*passive, *conditional, *nested)
 
     def failed_save_damage_replacement_bindings(
         self,

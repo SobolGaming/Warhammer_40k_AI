@@ -40,6 +40,10 @@ from warhammer40k_core.engine.catalog_model_materialization_support import (
 from warhammer40k_core.engine.catalog_model_materialization_support import (
     consumer_ids_for_effect_kind as model_materialization_consumer_ids_for_effect_kind,
 )
+from warhammer40k_core.engine.catalog_nested_attack_reroll_support import (
+    nested_attack_reroll_clause_has_invalid_shape,
+    nested_attack_reroll_clause_is_supported,
+)
 from warhammer40k_core.engine.catalog_sticky_objective_support import (
     CATALOG_IR_COMMAND_END_STICKY_OBJECTIVE_CONSUMER_ID,
 )
@@ -187,6 +191,7 @@ def clause_has_invalid_exact_datasheet_runtime_shape(clause: RuleClause) -> bool
         or clause_has_invalid_exact_tracked_target_weapon_grant_shape(clause)
         or clause_has_invalid_exact_tracked_target_selection_shape(clause)
         or sticky_objective_clause_has_invalid_exact_shape(clause)
+        or nested_attack_reroll_clause_has_invalid_shape(clause)
     )
 
 
@@ -194,6 +199,8 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Datasheet RuleIR support requires RuleClause.")
     consumer_ids: set[str] = set()
+    if nested_attack_reroll_clause_is_supported(clause):
+        consumer_ids.add(CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID)
     for effect in clause.effects:
         consumer_ids.update(consumer_ids_for_effect(effect))
     consumer_ids.update(sticky_objective_consumer_ids_for_clause(clause))

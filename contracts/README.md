@@ -1,5 +1,10 @@
 # CORE V2 external contract
 
+Contract44.3.10 carries the selected Core nested hit reroll through the existing
+finite reroll and source-linked attack-context envelopes, retaining both outer
+target eligibility and the inner opponent-controlled-objective condition. See
+[Order124](../docs/ORDER_124_SCOPE_PLAN.md). Exact current runtime identity remains required.
+
 Contract 44.3.9 publishes Core datasheet-name keywords through existing keyword,
 projection and persistence envelopes. Native catalog identity is derived once;
 exact runtime identity remains required. See [Order123](../docs/ORDER_123_SCOPE_PLAN.md).
