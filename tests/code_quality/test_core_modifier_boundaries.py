@@ -161,7 +161,7 @@ def test_historical_leadership_uses_authenticated_generic_inventory_and_shared_r
         isinstance(node, ast.Attribute) and node.attr == "persisting_effects"
         for node in ast.walk(tree)
     )
-    assert {"expiration_for_duration", "validated_generic_execution_effect_payload"} <= _calls(
+    assert {"expiration_for_clause_effect", "validated_generic_execution_effect_payload"} <= _calls(
         "engine/generic_effect_history.py", "_effect_from_execution"
     )
 

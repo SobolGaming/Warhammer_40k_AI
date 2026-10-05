@@ -406,6 +406,16 @@
         }
       }
     },
+    "tests/code_quality/test_core_modifier_boundaries.py": {
+      "before_sha256": "2420d8d3058bac58fd7199e8390f78d49df7f0507010e80065fcac0db3f48836",
+      "after_sha256": "1fbce34c088f6cd77447cdb25fcc6b3c011ba5bfc92976e13e5b8c167f0c923a",
+      "owners": {
+        "test_historical_leadership_uses_authenticated_generic_inventory_and_shared_resolution": {
+          "before": "449896e24bdc9a1308bbda0bf76e8406395efe39b684a845b6ac9db475060d47",
+          "after": "03b91ea53e7d120450fe832cbdea0f2c900d83452238bae5b4593bf520354dc0"
+        }
+      }
+    },
     "tests/code_quality/test_order122_effect_defaults.py": {
       "before_sha256": null,
       "after_sha256": "d43665a7a5873c92efc49647ea042ada454b59e8c1814f8ae7bb2cee8596351b",
@@ -875,6 +885,14 @@
       "operations": [
         "order122-default-effect-lifetimes"
       ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core default-effect lifetime seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Order97 Core rule:01:01.02.02:1 blocks3/4, obligations05/06: a lasting effect without explicit duration lasts through its triggering period or the phase in which it was given. Canonical source-linked fixtures exercise existing Core permissions; no current faction admission or source-policy extension.",
+      "unchanged_work": "The shared duration owner adds a constant-size lasting-effect/typed-period dispatch. Existing execution, historical effect reconstruction and Objective Control authority derive the same default expiration; existing modifier queries and lifecycle cleanup consume the resulting records. Explicit durations and instant mutation/continuation owners retain precedence. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads or dice work. No intended performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and live semantic/ownership/work controls apply; no full-game certification or numerical budget refresh."
+    },
+    "tests/code_quality/test_core_modifier_boundaries.py": {
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
       "rationale": "Bounded source-linked Core default-effect lifetime seam, canonical facade regressions and truthful separately retained source evidence.",
       "source_obligation": "Selected immutable Order97 Core rule:01:01.02.02:1 blocks3/4, obligations05/06: a lasting effect without explicit duration lasts through its triggering period or the phase in which it was given. Canonical source-linked fixtures exercise existing Core permissions; no current faction admission or source-policy extension.",
