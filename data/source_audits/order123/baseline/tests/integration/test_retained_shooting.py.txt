@@ -135,11 +135,11 @@ def test_order_30_retained_shooter_keeps_range_restriction_and_ability_geometry(
 def test_order_30_for_the_chapter_shoots_after_own_hazardous_death(with_feel_no_pain: bool) -> None:
     lifecycle, units = _compact_shooting_lifecycle(
         catalog=for_the_chapter_catalog(hazardous=True),
-        # Additional native keyword facts participate in recorded RNG history.
+        # Order117 synchronizes live neutral-audit offsets in recorded RNG history.
         # Keep real own-Hazardous destruction, including the optional FNP branch.
         game_id="order117-own-hazard-continuation-4"
         if with_feel_no_pain
-        else "order123-own-hazard-keyword-identity-0",
+        else "order104-own-hazardous-00-0",
         enemy_model_count=5,
     )
     state = lifecycle.state
@@ -1069,15 +1069,8 @@ def test_order_30_unending_fidelity_rejects_a_model_that_already_fought() -> Non
 
 @pytest.mark.parametrize(
     ("game_id", "child_before_parent"),
-    # Preserve original parameter IDs and the real nested casualty checkpoints.
-    [
-        pytest.param(
-            "order123-nested-retained-keyword-identity-1",
-            False,
-            id="order93-nested-retained-3-False",
-        ),
-        ("order103-fixture-07-00", True),
-    ],
+    # Rebind the child-first branch for Contract 43 group payload/ID RNG history.
+    [("order93-nested-retained-3", False), ("order103-fixture-07-00", True)],
 )
 def test_order_30_nested_retained_shooting_restores_each_parent_and_redacts_authority(
     game_id: str,
@@ -1422,11 +1415,9 @@ def test_r34_001_action_blocks_nested_retained_shooting_before_acceptance(titani
         )
     lifecycle, units = _compact_shooting_lifecycle(
         catalog=catalog,
-        # Additional native keyword facts change RNG history; re-anchor only
-        # the Titanic fixture to retain its nested casualty branch.
-        game_id="order123-nested-action-keyword-identity-0"
-        if titanic
-        else "order103-fixture-11-02",
+        # Contract 43 group payloads/IDs change RNG history; re-anchor only
+        # the non-Titanic fixture to retain the nested casualty branch.
+        game_id="order56-nested-action-10-order64-1" if titanic else "order103-fixture-11-02",
         alpha_unit_ids=("intercessor-1", "intercessor-2"),
         enemy_model_count=3,
     )

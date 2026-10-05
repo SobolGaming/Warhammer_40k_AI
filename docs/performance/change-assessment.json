@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2efc9e20db869f29162e8026123768d6233f2b2c05815c851b44a48e18499a98",
-  "operation_map_sha256": "0055e57af4b41049f0f3ea9ad3590ce04de212a0ee0a576f60ba5629137ab559",
+  "operation_map_sha256": "c40aed153ee44d5fb27a9774c8af86a68f214f957822dd0d18f1b088fa2f7937",
   "changes": {
     "README.md": {
       "before_sha256": "a9e5991323f77192ba0790950f411cc9a24ec3c36174c9595cf68cbc2b11be4e",
@@ -374,6 +374,36 @@
         }
       }
     },
+    "data/source_audits/order123/baseline/tests/fire_overwatch_helpers.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "1be0a2f51560fb55ba9d7c922b6f1c1f3fe598014f5a3764aa43e33f4076294a",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1be0a2f51560fb55ba9d7c922b6f1c1f3fe598014f5a3764aa43e33f4076294a"
+        }
+      }
+    },
+    "data/source_audits/order123/baseline/tests/integration/test_fight_on_death_presence.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "fbd82453fd824ba5284711d6d06718318d460e742628d6a18fb19b1296fb3fd9",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "fbd82453fd824ba5284711d6d06718318d460e742628d6a18fb19b1296fb3fd9"
+        }
+      }
+    },
+    "data/source_audits/order123/baseline/tests/integration/test_retained_shooting.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "518bcd57d83e4ebce07064ffc7660e34c8117fe88c8d803289d7b91fdac65deb",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "518bcd57d83e4ebce07064ffc7660e34c8117fe88c8d803289d7b91fdac65deb"
+        }
+      }
+    },
     "data/source_audits/order123/baseline/tests/model_keyword_helpers.py.txt": {
       "before_sha256": null,
       "after_sha256": "d1d5212fd3f9593d55f1b044b87b2cb8f25c358b3a6e2c840a368355bb542799",
@@ -381,6 +411,56 @@
         "@document": {
           "before": null,
           "after": "d1d5212fd3f9593d55f1b044b87b2cb8f25c358b3a6e2c840a368355bb542799"
+        }
+      }
+    },
+    "data/source_audits/order123/baseline/tests/order101_failed_setup_helpers.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "994f4ba3e13882d171a4ac14f3be9f980e8ecf900f79feb0c697da9837ff75fa",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "994f4ba3e13882d171a4ac14f3be9f980e8ecf900f79feb0c697da9837ff75fa"
+        }
+      }
+    },
+    "data/source_audits/order123/baseline/tests/order118_source_helpers.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "5eb647a40fdad838d711cb13f3a351e8fe80c84368b50aae0acc471404f598db",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "5eb647a40fdad838d711cb13f3a351e8fe80c84368b50aae0acc471404f598db"
+        }
+      }
+    },
+    "data/source_audits/order123/baseline/tests/order32_visibility_helpers.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "697825677aa89155d578c46b51b052dbecd8a83663bc2f8f2f80532d2d1e03cc",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "697825677aa89155d578c46b51b052dbecd8a83663bc2f8f2f80532d2d1e03cc"
+        }
+      }
+    },
+    "data/source_audits/order123/baseline/tests/random_melee_helpers.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "8fcf80415c3facc1f56312e627c7d0330754097873897645a82a2415d0c21839",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "8fcf80415c3facc1f56312e627c7d0330754097873897645a82a2415d0c21839"
+        }
+      }
+    },
+    "data/source_audits/order123/baseline/tests/unit/test_action_movement_interruption.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "bed1af7a8f389b5161a82da78361db9c7ffcbc89d3d9663ef2cd7af2a2affaff",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "bed1af7a8f389b5161a82da78361db9c7ffcbc89d3d9663ef2cd7af2a2affaff"
         }
       }
     },
@@ -394,6 +474,16 @@
         }
       }
     },
+    "data/source_audits/order123/baseline/tests/unit/test_fire_overwatch.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "e4c60c4f0a19dd3689f9e8740bcdd68be5e254ae26c2f6dda9cc6c8397c0d342",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e4c60c4f0a19dd3689f9e8740bcdd68be5e254ae26c2f6dda9cc6c8397c0d342"
+        }
+      }
+    },
     "data/source_audits/order123/baseline/tests/unit/test_model_keyword_authority.py.txt": {
       "before_sha256": null,
       "after_sha256": "10f59d7b55948ac58c070af08f85f7b2276c9e88e5aaeef5c07313f6053b6b46",
@@ -404,6 +494,56 @@
         }
       }
     },
+    "data/source_audits/order123/baseline/tests/unit/test_order105_hazard.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "1860d3d874d7bcce2dd6af6473519e0ed9d378a2e36629aa51d1c88a90b50e42",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1860d3d874d7bcce2dd6af6473519e0ed9d378a2e36629aa51d1c88a90b50e42"
+        }
+      }
+    },
+    "data/source_audits/order123/baseline/tests/unit/test_order92_random_melee.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "d7f160998f9f191f4c41694c49fa1fb1ebac4b628c518728f3b62f735e71484f",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "d7f160998f9f191f4c41694c49fa1fb1ebac4b628c518728f3b62f735e71484f"
+        }
+      }
+    },
+    "data/source_audits/order123/baseline/tests/unit/test_order95_optional_shooting.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "e747c37b56fd10f9c68cebc1d0b00361791001945e5b2c384b9fc8747218436e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e747c37b56fd10f9c68cebc1d0b00361791001945e5b2c384b9fc8747218436e"
+        }
+      }
+    },
+    "data/source_audits/order123/baseline/tests/unit/test_order97_attack_evidence.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "40182aa32ca5ae3a0946667baadfb60e78963b7e34d1f06e4a34c788e0b01120",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "40182aa32ca5ae3a0946667baadfb60e78963b7e34d1f06e4a34c788e0b01120"
+        }
+      }
+    },
+    "data/source_audits/order123/baseline/tests/unit/test_phase10o_fall_back.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "15a44de8036b59bf5c4f232c9353d15bce6df8011bd747b5a27c2af40964c0a7",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "15a44de8036b59bf5c4f232c9353d15bce6df8011bd747b5a27c2af40964c0a7"
+        }
+      }
+    },
     "data/source_audits/order123/baseline/tests/unit/test_phase13b_shooting_declarations.py.txt": {
       "before_sha256": null,
       "after_sha256": "b3d88280274432f740c2c920976d2f4f225f0b6e670252da37e0ce57b2c0ba3c",
@@ -411,6 +551,36 @@
         "@document": {
           "before": null,
           "after": "b3d88280274432f740c2c920976d2f4f225f0b6e670252da37e0ce57b2c0ba3c"
+        }
+      }
+    },
+    "data/source_audits/order123/baseline/tests/unit/test_phase17g_chaos_knights_army_rule.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "1e6f5ac2499f0e87506dbb69608e9632eaf77b6bbdfc4d9380e3635d5b52c05b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1e6f5ac2499f0e87506dbb69608e9632eaf77b6bbdfc4d9380e3635d5b52c05b"
+        }
+      }
+    },
+    "data/source_audits/order123/baseline/tests/unit/test_public_firing_deck_history.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "f963ed00df9f55415e8a77c5ef78e1efc3dcd347594e291eba133cffd1c2336f",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f963ed00df9f55415e8a77c5ef78e1efc3dcd347594e291eba133cffd1c2336f"
+        }
+      }
+    },
+    "data/source_audits/order123/baseline/tests/unit/test_unit_abilities.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "b1df5fa3527c5ce22df059575c5ec321f584e331ec034091e1fa2fa1782ddb43",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b1df5fa3527c5ce22df059575c5ec321f584e331ec034091e1fa2fa1782ddb43"
         }
       }
     },
@@ -426,11 +596,11 @@
     },
     "data/source_audits/order123/historical-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "d60a8f197276b829d830156a9fc902f2113074573d6bc8baa1204f3692978fff",
+      "after_sha256": "e6290494d9cfdf862bd4ea700bb26e957734d934812c9db54a8b3a301ff020f5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d60a8f197276b829d830156a9fc902f2113074573d6bc8baa1204f3692978fff"
+          "after": "e6290494d9cfdf862bd4ea700bb26e957734d934812c9db54a8b3a301ff020f5"
         }
       }
     },
@@ -466,21 +636,21 @@
     },
     "docs/ORDER_123_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "37904900ca00d3b9ab4b49342220c99bb81b913db0e85cad3f1aaea956d3ff11",
+      "after_sha256": "efdc7385b03441dee7a011dd0e150c49b486db9b7aba77ca1b88297b32420086",
       "owners": {
         "@document": {
           "before": null,
-          "after": "37904900ca00d3b9ab4b49342220c99bb81b913db0e85cad3f1aaea956d3ff11"
+          "after": "efdc7385b03441dee7a011dd0e150c49b486db9b7aba77ca1b88297b32420086"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "313efdf78e0483b1ec1e50846024c9a829a8b5630826bdad992ce1891bb29036",
-      "after_sha256": "51e00fee2e5a59df43a52ee147705f8691fdfdb2a76226b857c746ba7ebb3509",
+      "after_sha256": "5e1a23926b98a52a4246256cff27936748fc5d381ed72a3c697735621f0082a1",
       "owners": {
         "@document": {
           "before": "313efdf78e0483b1ec1e50846024c9a829a8b5630826bdad992ce1891bb29036",
-          "after": "51e00fee2e5a59df43a52ee147705f8691fdfdb2a76226b857c746ba7ebb3509"
+          "after": "5e1a23926b98a52a4246256cff27936748fc5d381ed72a3c697735621f0082a1"
         }
       }
     },
@@ -1594,6 +1764,16 @@
         }
       }
     },
+    "tests/fire_overwatch_helpers.py": {
+      "before_sha256": "1be0a2f51560fb55ba9d7c922b6f1c1f3fe598014f5a3764aa43e33f4076294a",
+      "after_sha256": "e21455a88aa51b20a6c4dbf031a0bdfca0120266d6fcb91fbb3992835c820ad4",
+      "owners": {
+        "overwatch_session": {
+          "before": "170b6ed4e77f27bad06c9b6b09024803b4bb02e15d9406387a4232433ae5ab7f",
+          "after": "9363ffd797545741a10bb7897a059944d2b843171de9051d6134013da82bff6d"
+        }
+      }
+    },
     "tests/fixtures/phase18a_projection_join_sample.json": {
       "before_sha256": "ae19ae56273b5f5c6c09e44e84dea683171c428ed7e26692e02b0c2334de7058",
       "after_sha256": "304d9e0de7571acb06c85bc6883774f058fd8f7e3c1b6230009c9b13287b43aa",
@@ -1604,6 +1784,38 @@
         }
       }
     },
+    "tests/integration/test_fight_on_death_presence.py": {
+      "before_sha256": "fbd82453fd824ba5284711d6d06718318d460e742628d6a18fb19b1296fb3fd9",
+      "after_sha256": "64092d65b4849ceabebe2575ba927cc4be092dff0ded5b50cc00da121c5bf190",
+      "owners": {
+        "test_order_30_retained_transport_defers_cargo_placement_and_restores_cleanup": {
+          "before": "780a7e6438d78c60c67bb6e17bbfc4d946b04e0b9467305a5af59cce7df3759c",
+          "after": "38f034db524971521d06dacd246002e04f6d1470da1e4d36ad5eb098011d6b26"
+        },
+        "test_r32_retained_only_observer_eligibility_restores_replays_and_cleans_up": {
+          "before": "8d86028f7fb051ea8e879a4439a87030ca3de7ba1de9367d4547a60801895106",
+          "after": "3d3fe27b760d53b64e6a442fe0c4dc9326a6d47a3ab4b4100152abe3739d66c7"
+        }
+      }
+    },
+    "tests/integration/test_retained_shooting.py": {
+      "before_sha256": "518bcd57d83e4ebce07064ffc7660e34c8117fe88c8d803289d7b91fdac65deb",
+      "after_sha256": "b8769a3c63305b07beb9493d1e33ed0deb3678b9cf01bfd414eab9567f548f87",
+      "owners": {
+        "test_order_30_for_the_chapter_shoots_after_own_hazardous_death": {
+          "before": "a42240913c777cec85236df66da14d5378a83cd522650cb6a156179cc987f424",
+          "after": "d04381660a2c7b26c79fefb54a66221169945cc0eb9fdd51363f43d13691c3ab"
+        },
+        "test_order_30_nested_retained_shooting_restores_each_parent_and_redacts_authority": {
+          "before": "7a576c91da913d2b5d0d2c3c439e004482a444188d53bc77887df320936dcd89",
+          "after": "2db131cb8c0182f2a31cae3d8913275a9f488bf0b4a36f403b4f0b33e925bc67"
+        },
+        "test_r34_001_action_blocks_nested_retained_shooting_before_acceptance": {
+          "before": "2519a3a8cf4f770df13862823043b520031028f94ec74924c744132f07d14e16",
+          "after": "0e1e20dd941861edb6dfb36d0b556ebe57b9cd49b3933ef81ca22816b1e0e532"
+        }
+      }
+    },
     "tests/model_keyword_helpers.py": {
       "before_sha256": "d1d5212fd3f9593d55f1b044b87b2cb8f25c358b3a6e2c840a368355bb542799",
       "after_sha256": "24c16d06b64c6e74a68ba44f7384334afd6c6779ffae8d9e570c15f34df54acc",
@@ -1611,6 +1823,56 @@
         "mixed_keyword_catalog": {
           "before": "eb298fd7b81c443397397cff6cfcac1826da8cddf2b33a9ec4cbeb30ad61bfbc",
           "after": "88e613f7b3b601da0a07f865bea6dc96da2a4364ad4cc8f305619191bb3a52f0"
+        }
+      }
+    },
+    "tests/order101_failed_setup_helpers.py": {
+      "before_sha256": "994f4ba3e13882d171a4ac14f3be9f980e8ecf900f79feb0c697da9837ff75fa",
+      "after_sha256": "78dbe1417ed34486eb73d270f933e5366222fea167d3eaa3f3558cb215b2072c",
+      "owners": {
+        "failed_setup_automatic_record_session": {
+          "before": "6359f40d89951dbdea6afc8dee2c4f7cfe9c68e78441f0d8e71568775cbc83e6",
+          "after": "662c7023485563835b1d23a5624e19092259ab2f1fc46831ffa06227cff32c14"
+        }
+      }
+    },
+    "tests/order118_source_helpers.py": {
+      "before_sha256": "5eb647a40fdad838d711cb13f3a351e8fe80c84368b50aae0acc471404f598db",
+      "after_sha256": "052bfd924868811cd6068d911c6393a8b2063d055cb64b780498683b83059b0d",
+      "owners": {
+        "source_retention_session": {
+          "before": "325c739695be08f413bdcf4850eeb176625322644a05e11a68157d3cbb226073",
+          "after": "b0daacfda1c25705161766580b379b251dffceb1f0bf152cbabe8b09ec5ace73"
+        }
+      }
+    },
+    "tests/order32_visibility_helpers.py": {
+      "before_sha256": "697825677aa89155d578c46b51b052dbecd8a83663bc2f8f2f80532d2d1e03cc",
+      "after_sha256": "d5436beda0787525210f776952d2437692a5023fafccdb9c986791cc635792d8",
+      "owners": {
+        "retained_observer_session": {
+          "before": "a4da1a16f094b13f47536bf0059d7efa2449c71e9b4e4d0debed6227e7652541",
+          "after": "78e117c26e51506d92319d51b42b8c64c03c30edaef9b184365e2180fa3fc094"
+        }
+      }
+    },
+    "tests/random_melee_helpers.py": {
+      "before_sha256": "8fcf80415c3facc1f56312e627c7d0330754097873897645a82a2415d0c21839",
+      "after_sha256": "78e0deece4c75076fb82d9e9730b81a5b367a2f4fdd0e07bc8ba9f16bd09226d",
+      "owners": {
+        "random_melee_session": {
+          "before": "3201ee1b9cd259fd44598859df8eae13ed49d29306dd6c64c5d0ab5a087e2731",
+          "after": "898067e7646ebfef4e9a1f89c799fecde36c87c6d5fc6f4f600897ddb314308b"
+        }
+      }
+    },
+    "tests/unit/test_action_movement_interruption.py": {
+      "before_sha256": "bed1af7a8f389b5161a82da78361db9c7ffcbc89d3d9663ef2cd7af2a2affaff",
+      "after_sha256": "559e3850487e6aaf7b17d3ca74ae31ac73e5b12d6444d3b379a37dd49f28594a",
+      "owners": {
+        "test_shocked_start_uses_explicit_catalog_permission_through_facade": {
+          "before": "d01652f703094c6a8077115fee9ca24d33c2625ef185b7330bcffd7aea86c11a",
+          "after": "036d5e0d2a01970fb5a303149bd048609d442332714f0debeb45632bffe78cd1"
         }
       }
     },
@@ -1632,6 +1894,16 @@
         }
       }
     },
+    "tests/unit/test_fire_overwatch.py": {
+      "before_sha256": "e4c60c4f0a19dd3689f9e8740bcdd68be5e254ae26c2f6dda9cc6c8397c0d342",
+      "after_sha256": "683c4f54e9a3ea3e219b42c520fdcc73f2cfadec8e3271a3851879d3d6197eb4",
+      "owners": {
+        "test_phase_end_snap_preserves_raw_six_no_hit_reroll_and_action_lock": {
+          "before": "40aa23a5f7fbb3bd022d0bf79dccd789c9eb75497ede8d6f1ad2ce1eb63ac980",
+          "after": "c09a1ff5a6c20cf1e971bd0e14cf5ac27f102ee09bdb31975a34440f53f1e74a"
+        }
+      }
+    },
     "tests/unit/test_model_keyword_authority.py": {
       "before_sha256": "10f59d7b55948ac58c070af08f85f7b2276c9e88e5aaeef5c07313f6053b6b46",
       "after_sha256": "f1bfa216865a0500c407d03c5e946cd44abe0fc738315be2830b1e3d37cb2141",
@@ -1639,6 +1911,16 @@
         "test_keyword_casualty_facade_restore_replay_and_both_viewers": {
           "before": "ba84ab53d2e16ed5cff3df1fef572a531498204c67118fe672c390a65a421828",
           "after": "5fdc757a9a7fbeb3b05a1892aa492bf55556a59fe3841c0503266f40cbd0e3ec"
+        }
+      }
+    },
+    "tests/unit/test_order105_hazard.py": {
+      "before_sha256": "1860d3d874d7bcce2dd6af6473519e0ed9d378a2e36629aa51d1c88a90b50e42",
+      "after_sha256": "77b2b5a52ffa614457e9af1538adbd0440ee07690be3f35e451a5fb5d6f69475",
+      "owners": {
+        "test_mixed_hazardous_facade_restore_and_replay": {
+          "before": "1440f430da5c0c33ef5bebbb12b530b14e618b94feee08e0c4b0063372d146f2",
+          "after": "cd0dc18ba246470bd7b774c203ae533feac1243cc8dff3ad1b8a9232ba1062e6"
         }
       }
     },
@@ -1736,9 +2018,49 @@
         }
       }
     },
+    "tests/unit/test_order92_random_melee.py": {
+      "before_sha256": "d7f160998f9f191f4c41694c49fa1fb1ebac4b628c518728f3b62f735e71484f",
+      "after_sha256": "e52b195f3afb82662e7b14a0accc17bdd9408729fd2fd26de6d5a5d5a499c1cf",
+      "owners": {
+        "test_random_cleave_is_a_single_target_bonus_never_a_splittable_budget": {
+          "before": "47b55cd8a49cd23e33b758cc7aa303c795201f8c527480e4a9d4e3b6476c95f8",
+          "after": "be758f9c73f4dccba0ec25d6825f1c2ef0c14d51209044b2f14f3084e5eb0b7c"
+        }
+      }
+    },
+    "tests/unit/test_order95_optional_shooting.py": {
+      "before_sha256": "e747c37b56fd10f9c68cebc1d0b00361791001945e5b2c384b9fc8747218436e",
+      "after_sha256": "3abeab4564d9d79906891a2d6a8f98b3b8082dbc753b53e9ee63eeaca5aed4c0",
+      "owners": {
+        "test_targetless_hazardous_wounds_resume_from_pending_allocation": {
+          "before": "301b6cfdac3d0484350d4f634956cf1dad30cbc81777b521b233e1ce610ed69b",
+          "after": "be80e31a62912eb1f02213470d6cc0c6ea500fd19707d64a45e7fce3306ea2c8"
+        }
+      }
+    },
+    "tests/unit/test_order97_attack_evidence.py": {
+      "before_sha256": "40182aa32ca5ae3a0946667baadfb60e78963b7e34d1f06e4a34c788e0b01120",
+      "after_sha256": "28232bb21f15d834ac57d3106bbc31f5e640f846e11ac3716aba3ae81340524e",
+      "owners": {
+        "test_mixed_damage_finishes_normal_attacks_before_deferred_mortal_wounds": {
+          "before": "959645f18ab1cdbf1fde531c69f71dd2b19cd6081d1a1f58027be426f6866bff",
+          "after": "bec550e293446178cd3432c4f3b773ceca36c8e03480d451fbfaa65a75411fdb"
+        }
+      }
+    },
+    "tests/unit/test_phase10o_fall_back.py": {
+      "before_sha256": "15a44de8036b59bf5c4f232c9353d15bce6df8011bd747b5a27c2af40964c0a7",
+      "after_sha256": "689c18ed21f224db11b8115be0fedee9f501488a37b439cf6510a382eef7e4bf",
+      "owners": {
+        "test_delirium_destruction_reconciles_identity_without_embark_request": {
+          "before": "4461d596cca896690dc8a9fae3c943d61a52240b3078bfcbf3375cb1c8dce5a8",
+          "after": "5d4e30335044758c7c607a3ec7b9dd60458a0037e06abdf8ea07ba19828f4569"
+        }
+      }
+    },
     "tests/unit/test_phase13b_shooting_declarations.py": {
       "before_sha256": "b3d88280274432f740c2c920976d2f4f225f0b6e670252da37e0ce57b2c0ba3c",
-      "after_sha256": "06bc621cd5433c2401d888a8cbb9b87e56c03592e0190bdc69ad4b354310e0bc",
+      "after_sha256": "ffaefb7cc80c51946f7125c0f8d5fb39d3f726ac31d87085ca09e8abcae5e8f0",
       "owners": {
         "@module": {
           "before": "6247939531bab3ecb3ce3eb593dabffce416b037659502a0c4eea7258eb519bd",
@@ -1747,6 +2069,48 @@
         "test_phase13d_hazardous_tests_resolve_after_all_attacks": {
           "before": "49037f99268102277e31751962416ff40f42990af108edcba81320966016ff59",
           "after": "b70ca8349156e46b1620fbb79f601b3d85b6d4c4c841922a5f4055c42a022edf"
+        },
+        "test_phase13d_lethal_and_sustained_hits_resolve_generated_hits": {
+          "before": "3ce2c822c77f8b6a967c59e13f7d11f5e186d8b609a0a9fc8a30e90ce15d0212",
+          "after": "87e1cfc3d1ce304a25443b076e40bab7ae1d491f584eb323a8dfaa92d8f9d46f"
+        }
+      }
+    },
+    "tests/unit/test_phase17g_chaos_knights_army_rule.py": {
+      "before_sha256": "1e6f5ac2499f0e87506dbb69608e9632eaf77b6bbdfc4d9380e3635d5b52c05b",
+      "after_sha256": "43b4b0d29dcc3fccda379bccc7c583b538222a117d00cb578f9f81b0a65de1e7",
+      "owners": {
+        "_assert_phase_start_selected_target_delirium_continuation": {
+          "before": "917682a10765d3e1272404f488d141c07a126c2e6b52c0897b5bc9649840e390",
+          "after": "b3efe0977cd7e6c0f571afe8865c90fbed28553d7725e08699290c80e6045a46"
+        },
+        "_assert_selected_target_delirium_continuation": {
+          "before": "4faaca90e022c9f599360822c9245a346b84281c61ff46e331dcd29f78e0014f",
+          "after": "94dfc3bc36ae639a6e82901b887078ba10fc46f33d8dcc05101ab61da18afc9e"
+        }
+      }
+    },
+    "tests/unit/test_public_firing_deck_history.py": {
+      "before_sha256": "f963ed00df9f55415e8a77c5ef78e1efc3dcd347594e291eba133cffd1c2336f",
+      "after_sha256": "14b47c877477f7dddb2edfda518097ef300cd7740d89ba92019e0c428b0f4a1c",
+      "owners": {
+        "_session": {
+          "before": "63044d8a3f4a7fc988c821ec26187a04548ab0f8ad2da97fce3dc64ae79f6177",
+          "after": "2f9a93563d1284911248ecd401aaa3cab3d889d35b2f62202e895237278c4da7"
+        },
+        "test_public_firing_deck_after_shot_history": {
+          "before": "f8ccf4bc1e7bdce2a4833f18143a4a78f65c51ae9dc53d4bcde47428c7a2a798",
+          "after": "9e7a692cb3984622ecf48f85bf9b19d7e6f23ddcdb94daf56afc88bff5edc057"
+        }
+      }
+    },
+    "tests/unit/test_unit_abilities.py": {
+      "before_sha256": "b1df5fa3527c5ce22df059575c5ec321f584e331ec034091e1fa2fa1782ddb43",
+      "after_sha256": "bd8ab844bf1350e3b30dcf738c59d994f4fb9a41f8c5ae809e5511ac129cccfc",
+      "owners": {
+        "test_queued_source_destruction_survives_native_deferred_mortal_checkpoint": {
+          "before": "32318c6d0496a231a49c5b09836bbd531f2d608a87ce65dc56419f261178d66b",
+          "after": "94fc8b172ce602a5bf44fdd2f98bb9e664d5b1d96b03b5483afc848db9abb44d"
         }
       }
     },
@@ -1770,11 +2134,11 @@
     },
     "tools/core_rules_order97_history.py": {
       "before_sha256": "993bbd6a9224c2412a4c224d026d83c8084a9b61086f9b5023a9a9aab985ed48",
-      "after_sha256": "b3153f78ecbb6722bce818074436218db7e41e973665482cb87206d091e94176",
+      "after_sha256": "b912fae3ef9d1b988c306ce27a22f5409295b311c0f5cbe42f348513a383b06b",
       "owners": {
         "@module": {
           "before": "bf658a7cc1a2214a67acbda56aca363b1477db217b3f7521f7a60b3f67caa2c0",
-          "after": "b7c8e00cec29851f34d265e593acbadd7a6fca1f566fedf553868e5f33253a28"
+          "after": "4985386ae00749ab612b2b48558ad068b5529e80f5d41ca9015a1efde11b9b64"
         },
         "historical_evidence_path": {
           "before": "5893fc40e533bf21056e100f923cce4a8149cc812a1d4ad4dc14364723773040",
@@ -2152,7 +2516,87 @@
       "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
       "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
     },
+    "data/source_audits/order123/baseline/tests/fire_overwatch_helpers.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "data/source_audits/order123/baseline/tests/integration/test_fight_on_death_presence.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "data/source_audits/order123/baseline/tests/integration/test_retained_shooting.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
     "data/source_audits/order123/baseline/tests/model_keyword_helpers.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "data/source_audits/order123/baseline/tests/order101_failed_setup_helpers.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "data/source_audits/order123/baseline/tests/order118_source_helpers.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "data/source_audits/order123/baseline/tests/order32_visibility_helpers.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "data/source_audits/order123/baseline/tests/random_melee_helpers.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "data/source_audits/order123/baseline/tests/unit/test_action_movement_interruption.py.txt": {
       "category": "rule_semantics",
       "operations": [
         "order123-source-evidence"
@@ -2172,6 +2616,16 @@
       "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
       "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
     },
+    "data/source_audits/order123/baseline/tests/unit/test_fire_overwatch.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
     "data/source_audits/order123/baseline/tests/unit/test_model_keyword_authority.py.txt": {
       "category": "rule_semantics",
       "operations": [
@@ -2182,7 +2636,87 @@
       "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
       "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
     },
+    "data/source_audits/order123/baseline/tests/unit/test_order105_hazard.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "data/source_audits/order123/baseline/tests/unit/test_order92_random_melee.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "data/source_audits/order123/baseline/tests/unit/test_order95_optional_shooting.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "data/source_audits/order123/baseline/tests/unit/test_order97_attack_evidence.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "data/source_audits/order123/baseline/tests/unit/test_phase10o_fall_back.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
     "data/source_audits/order123/baseline/tests/unit/test_phase13b_shooting_declarations.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "data/source_audits/order123/baseline/tests/unit/test_phase17g_chaos_knights_army_rule.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "data/source_audits/order123/baseline/tests/unit/test_public_firing_deck_history.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "data/source_audits/order123/baseline/tests/unit/test_unit_abilities.py.txt": {
       "category": "rule_semantics",
       "operations": [
         "order123-source-evidence"
@@ -2822,7 +3356,37 @@
       "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
       "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
     },
+    "tests/fire_overwatch_helpers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
     "tests/fixtures/phase18a_projection_join_sample.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "tests/integration/test_fight_on_death_presence.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "tests/integration/test_retained_shooting.py": {
       "category": "rule_semantics",
       "operations": [
         "order123-regressions"
@@ -2842,7 +3406,67 @@
       "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
       "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
     },
+    "tests/order101_failed_setup_helpers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "tests/order118_source_helpers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "tests/order32_visibility_helpers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "tests/random_melee_helpers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "tests/unit/test_action_movement_interruption.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
     "tests/unit/test_explosives.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "tests/unit/test_fire_overwatch.py": {
       "category": "rule_semantics",
       "operations": [
         "order123-regressions"
@@ -2862,6 +3486,16 @@
       "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
       "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
     },
+    "tests/unit/test_order105_hazard.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
     "tests/unit/test_order123_datasheet_identity.py": {
       "category": "rule_semantics",
       "operations": [
@@ -2872,7 +3506,77 @@
       "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
       "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
     },
+    "tests/unit/test_order92_random_melee.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "tests/unit/test_order95_optional_shooting.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "tests/unit/test_order97_attack_evidence.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "tests/unit/test_phase10o_fall_back.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
     "tests/unit/test_phase13b_shooting_declarations.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "tests/unit/test_phase17g_chaos_knights_army_rule.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "tests/unit/test_public_firing_deck_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "tests/unit/test_unit_abilities.py": {
       "category": "rule_semantics",
       "operations": [
         "order123-regressions"

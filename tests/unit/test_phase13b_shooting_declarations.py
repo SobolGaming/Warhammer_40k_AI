@@ -5876,6 +5876,7 @@ def test_phase14e_grouped_precision_promotes_character_then_returns_to_bodyguard
 def test_phase13d_lethal_and_sustained_hits_resolve_generated_hits() -> None:
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
+        game_id="order123-lethal-keyword-identity-1",
         enemy_datasheet=("core-intercessor-like-infantry", "core-intercessor-like", 1),
         catalog=_compact_intercessor_catalog(_canonical_catalog()),
     )

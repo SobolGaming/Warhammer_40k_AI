@@ -441,9 +441,6 @@ def test_queued_source_destruction_survives_native_deferred_mortal_checkpoint(
 
     session, model_id = source_retention_session(
         BattlePhase(phase_token),
-        game_id="order123-source-checkpoint-keyword-identity-0"
-        if phase_token == "shooting"
-        else None,
         source_role="leader",
         native_deferred_mortals=True,
         death_reaction=True,

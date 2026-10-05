@@ -490,7 +490,7 @@ def test_targetless_hazardous_wounds_resume_from_pending_allocation() -> None:
         spare=True,
         model_count=3,
         keywords=(WeaponKeyword.HAZARDOUS,),
-        game_id="order123-optional-keyword-identity-2",
+        game_id="order95-hazard-0",
     )
     request = select_optional_shooting(session)
     status = session.submit_parameterized_payload(

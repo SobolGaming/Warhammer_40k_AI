@@ -241,15 +241,6 @@ def test_mixed_damage_finishes_normal_attacks_before_deferred_mortal_wounds() ->
             strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
         ),
     )
-    # Keep measured helper defaults; renew this real first decision's source identity.
-    request = pending_request(session)
-    assert request.decision_type == "select_shooting_unit"
-    status = session.submit_option(
-        request_id=request.request_id,
-        option_id=request.options[0].option_id,
-        result_id="order123-mixed-damage-source-choice-4",
-    )
-    assert status.status_kind is not LifecycleStatusKind.INVALID
     for _ in range(150):
         if attack_completed(session):
             break

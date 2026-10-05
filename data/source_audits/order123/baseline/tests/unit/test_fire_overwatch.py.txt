@@ -824,11 +824,7 @@ def test_phase_end_snap_preserves_raw_six_no_hit_reroll_and_action_lock(attacks:
     )
     from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 
-    session = overwatch_session(
-        cp=2,
-        attacks=attacks,
-        game_id="order123-overwatch-keyword-identity-0" if attacks == 2 else "order45-overwatch",
-    )
+    session = overwatch_session(cp=2, attacks=attacks)
     request = _require_request(choose_shooter(session, pending_overwatch(session)))
     finish_overwatch(session, choose_enemy(session, request, ENEMIES[0]))
     hits: list[int] = []
