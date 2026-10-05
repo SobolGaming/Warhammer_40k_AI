@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b6866abc68d13d2d32c6bfe71bedff7fe9573b7f9204c451c901391e106a960a",
-  "operation_map_sha256": "3e01eae65c8042ca9154e07df483239ca3d223c6dac9a106e9dc21a3e862e248",
+  "operation_map_sha256": "cef01226561abd91e4745a5edf954b9a655a600f00994b0d1261c08d3af8a563",
   "changes": {
     "README.md": {
       "before_sha256": "3b4d88e8483627f0a6f6fb8d3b710912a91c60a7fc57e08810f7f4d6ff91eb37",
@@ -344,6 +344,16 @@
         }
       }
     },
+    "data/source_audits/order126/baseline/tests/unit/test_order97_facade_evidence.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "ad7315c58f339dd09866d9f4b4f2fa2f3fb7462bf233ea81e06ad5c5658d5eba",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "ad7315c58f339dd09866d9f4b4f2fa2f3fb7462bf233ea81e06ad5c5658d5eba"
+        }
+      }
+    },
     "data/source_audits/order126/baseline/tests/unit/test_phase10q_transports.py.txt": {
       "before_sha256": null,
       "after_sha256": "52a3659d356a2167e8c3a5ebea8d560b2bcac42d5e273445d186297d98e704da",
@@ -406,11 +416,11 @@
     },
     "data/source_audits/order126/historical-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "1415ae69dcd5b4e82ac463e13c9dedf18923fcc1374060b686b83da30f4fee4e",
+      "after_sha256": "4664ea3c444ce541d57e7c066dfa8a41a21890d65cddbc774bb39f4ad581a7a5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "1415ae69dcd5b4e82ac463e13c9dedf18923fcc1374060b686b83da30f4fee4e"
+          "after": "4664ea3c444ce541d57e7c066dfa8a41a21890d65cddbc774bb39f4ad581a7a5"
         }
       }
     },
@@ -466,11 +476,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "b20ec777768ef75012883c14012ed4e3df21b252dcd978df562ff4f41dc7caf2",
-      "after_sha256": "82a77130849b15ca1e5674d3525b89d79186feab0775c2039a29cd4f2463591e",
+      "after_sha256": "b7939bb663009b4f4be523e588ca661a7310e1eafdb288e864db2782b76c629b",
       "owners": {
         "@document": {
           "before": "b20ec777768ef75012883c14012ed4e3df21b252dcd978df562ff4f41dc7caf2",
-          "after": "82a77130849b15ca1e5674d3525b89d79186feab0775c2039a29cd4f2463591e"
+          "after": "b7939bb663009b4f4be523e588ca661a7310e1eafdb288e864db2782b76c629b"
         }
       }
     },
@@ -928,15 +938,37 @@
     },
     "tests/unit/test_order51_flight.py": {
       "before_sha256": "98c0643d79011eb48020fd3e2ae759e7dc847ed20e6aee94594e41bc419be4a2",
-      "after_sha256": "aadbed8d7fc78d73372743773dd2626b9041581fa36bafba51fe34e11b8ff621",
+      "after_sha256": "872b5607c76eace4544cf1afe23844cadeb124d9a36c3ab083ebdf2d41a61132",
       "owners": {
         "@module": {
           "before": "79ce06b2981cf11943fde53fd2efc174b3dd4aa1453ebbf5b1ade1b8607dec00",
           "after": "ffba976317608b10de247cd60fb8023a612c8d9bc9462516bd5b9b4bae53823b"
         },
+        "test_heavy_uses_each_models_accepted_vertical_distance": {
+          "before": "7aa0225fd4eb3d430e570c710bed804c15e5073b9302dbd5336ae784b042fa7b",
+          "after": "410840e5eae2497ecfd24afaeb68ad8b1f8b585c80482f8baf647963e4a1ee52"
+        },
         "test_movement_flight_choice_precedes_roll_and_history_survives_shooting": {
           "before": "972c43b3211e9e001317582cb9655fe1287db2bf0fb57f5b197500d9a689b51b",
           "after": "6243640e975819b9557d105cd17bcaa04e8ab3b20487b3630678eaadbb8e9480"
+        },
+        "test_reactive_flight_is_bound_through_retry_and_restore": {
+          "before": "af497c9803e887c84d6b30e96f9580d6cbb807b277671fec364a260c7c55df46",
+          "after": "3c5d19345e2f98822d543cf2b6e8400446496edf5e39fb1d6d25599895aa9e31"
+        }
+      }
+    },
+    "tests/unit/test_order97_facade_evidence.py": {
+      "before_sha256": "ad7315c58f339dd09866d9f4b4f2fa2f3fb7462bf233ea81e06ad5c5658d5eba",
+      "after_sha256": "4bca5a0e6d0275458cbf34971ff3f984def0db4bc65509b110039a9fe7c6a263",
+      "owners": {
+        "@module": {
+          "before": "59e21a7cd8c0b56bd07aeb822ff5e85680745c043f377975dc383df9344a5292",
+          "after": "913c88a8915b75ce9232968f0c158ad86dbd8487383df55b71d394b4f76a427e"
+        },
+        "test_heavy_accepted_vertical_movement_reaches_facade_attack": {
+          "before": "abd59744c8b6ba1926642820fa94fe46918845f7a8793b8a725755864df28b61",
+          "after": "75df119325e746dfff04354a47284444bf8d6ee56a685c182fe8f5dcab83dbc0"
         }
       }
     },
@@ -1038,11 +1070,11 @@
     },
     "tools/core_rules_order97_history.py": {
       "before_sha256": "0be8c1e6ed68a6f91980ffd379d3407aada4db6b81d2560df903d817c0841feb",
-      "after_sha256": "9f14d9c1ea18e75bfed52ef62c641f697259be072632509f92ce02341cbce5f5",
+      "after_sha256": "6d6d7f647bb1a72b9dbf06fdd14cba4c44450d0ae255d1830bd2d058872b44e2",
       "owners": {
         "@module": {
           "before": "e64023fadb4a8bb9aa0fcc0fd6a40943cef42edd7f33e4836cbe69f373e991ff",
-          "after": "f33ce1c2337e2db9bdf3a4c60c77eb0ed96b9df6b754c57e8659dafdd955955a"
+          "after": "861a3a726383a528578edf18e83d77d2edb906bcb00105f8e96f2b217b20507e"
         },
         "historical_evidence_path": {
           "before": "44e15dbe30348227b609a604856da325835c8cd39f8ed5237e5919a75927ffe0",
@@ -1399,6 +1431,16 @@
       "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches and RNG remain. Accepted overhang contact history reconstructs path occupancy through the same shared complete-witness owner; Charge coherent endpoint peers reconstruct whole-group final poses independently of sequential path occupancy. Finite triggered decisions authenticate offered order; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "data/source_audits/order126/baseline/tests/unit/test_order51_flight.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order126-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches and RNG remain. Accepted overhang contact history reconstructs path occupancy through the same shared complete-witness owner; Charge coherent endpoint peers reconstruct whole-group final poses independently of sequential path occupancy. Finite triggered decisions authenticate offered order; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "data/source_audits/order126/baseline/tests/unit/test_order97_facade_evidence.py.txt": {
       "category": "rule_semantics",
       "operations": [
         "order126-source-evidence"
@@ -1827,6 +1869,16 @@
       "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches and RNG remain. Accepted overhang contact history reconstructs path occupancy through the same shared complete-witness owner; Charge coherent endpoint peers reconstruct whole-group final poses independently of sequential path occupancy. Finite triggered decisions authenticate offered order; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "tests/unit/test_order51_flight.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order126-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches and RNG remain. Accepted overhang contact history reconstructs path occupancy through the same shared complete-witness owner; Charge coherent endpoint peers reconstruct whole-group final poses independently of sequential path occupancy. Finite triggered decisions authenticate offered order; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "tests/unit/test_order97_facade_evidence.py": {
       "category": "rule_semantics",
       "operations": [
         "order126-regressions"

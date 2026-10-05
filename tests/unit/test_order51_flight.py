@@ -421,16 +421,19 @@ def test_heavy_uses_each_models_accepted_vertical_distance(selected: bool, mixed
     )
     state.battlefield_state = replace(state.battlefield_state, terrain_features=(contact_wall,))
     witness = PathWitness.for_paths(
-        tuple(
-            (
-                model.model_instance_id,
+        leading_first_translation_paths(
+            tuple(
                 (
-                    model.pose,
-                    Pose.at(model.pose.position.x + 1, model.pose.position.y, 1.5),
-                    Pose.at(model.pose.position.x + 2, model.pose.position.y),
-                ),
-            )
-            for model in placement.model_placements
+                    model.model_instance_id,
+                    (
+                        model.pose,
+                        Pose.at(model.pose.position.x + 1, model.pose.position.y, 1.5),
+                        Pose.at(model.pose.position.x + 2, model.pose.position.y),
+                    ),
+                )
+                for model in placement.model_placements
+            ),
+            dx=2.0,
         )
     )
     resolution = resolve_normal_move(
@@ -651,14 +654,19 @@ def test_reactive_flight_is_bound_through_retry_and_restore(selected: bool, hove
         proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
         assert proposal.context is not None
         assert proposal.context["take_to_the_skies"] is selected
-        witness = PathWitness.for_straight_line_endpoints(
-            tuple(
-                (
-                    model.model_instance_id,
-                    model.pose,
-                    Pose.at(model.pose.position.x + distance, model.pose.position.y),
-                )
-                for model in placement.model_placements
+        witness = PathWitness.for_paths(
+            leading_first_translation_paths(
+                tuple(
+                    (
+                        model.model_instance_id,
+                        (
+                            model.pose,
+                            Pose.at(model.pose.position.x + distance, model.pose.position.y),
+                        ),
+                    )
+                    for model in placement.model_placements
+                ),
+                dx=distance,
             )
         )
         payload = MovementProposalPayload(

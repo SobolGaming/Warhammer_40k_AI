@@ -1,7 +1,7 @@
 {
   "reviewed_commit": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
   "also_present_at_base": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
-  "purpose": "Preserve every original assertion, branch and fixture byte. Uniform-translation fixtures now submit complete leading-first physical model moves, satisfying the scoped sequential source invariant while retaining their original targeted positive/negative controls. No assertion or branch is weakened.",
+  "purpose": "Preserve every original assertion, branch and exact base fixture byte. Complete model paths retain all original poses, including vertical legs, budgets, terrain and expected controls. Only witness order becomes physically leading-first under the scoped sequential source invariant; no assertion or branch is weakened.",
   "current_evidence": "docs/ORDER_126_SCOPE_PLAN.md",
   "files": [
     {
@@ -131,6 +131,14 @@
       "git_path": "tests/absent_movement_helpers.py",
       "sha256": "adc299d615b72ebe858407d84b5252afc0b78e1259f57937b72a77fe2213492e",
       "bytes": 2817
+    },
+    {
+      "path": "tests/unit/test_order97_facade_evidence.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/unit/test_order97_facade_evidence.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/unit/test_order97_facade_evidence.py",
+      "sha256": "ad7315c58f339dd09866d9f4b4f2fa2f3fb7462bf233ea81e06ad5c5658d5eba",
+      "bytes": 17538
     }
   ]
 }
