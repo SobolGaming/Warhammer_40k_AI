@@ -302,3 +302,65 @@ def test_legal_friendly_transit_and_multisegment_rotation_remain_playable() -> N
         0
     ].pose == witness.final_pose_for_model(first.model_instance_id)
     assert_session_roundtrips(session)
+
+
+@pytest.mark.parametrize("attached", [False, True])
+def test_native_sequential_move_against_overhanging_enemy_restores_and_replays(
+    attached: bool,
+) -> None:
+    from tests.order85_overhang_helpers import overhang_session
+    from tests.sequential_translation_helpers import leading_first_translation_paths
+
+    session = overhang_session(phase=BattlePhase.MOVEMENT, start_y=8.0, attached=attached)
+    assert_session_roundtrips(session)
+    request = pending_request(session)
+    unit_id = "attached-unit:army-alpha:bodyguard" if attached else "army-alpha:source"
+    selected = session.submit_option(
+        request_id=request.request_id, option_id=unit_id, result_id="order126-overhang-select"
+    )
+    assert selected.status_kind is not LifecycleStatusKind.INVALID
+    request = pending_request(session)
+    selected = session.submit_option(
+        request_id=request.request_id, option_id="normal_move", result_id="order126-overhang-normal"
+    )
+    assert selected.status_kind is not LifecycleStatusKind.INVALID
+    request = pending_request(session)
+    proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    placement = RulesUnitPlacement.from_battlefield(
+        view=rules_unit_view_from_armies(
+            armies=tuple(state.army_definitions), unit_instance_id=proposal.unit_instance_id
+        ),
+        battlefield_state=state.battlefield_state,
+    )
+    paths = tuple(
+        (
+            row.model_instance_id,
+            (
+                row.pose,
+                Pose.at(
+                    row.pose.position.x + 0.2,
+                    row.pose.position.y,
+                    facing_degrees=row.pose.facing.degrees,
+                ),
+            ),
+        )
+        for row in placement.model_placements
+    )
+    witness = PathWitness.for_paths(leading_first_translation_paths(paths, dx=0.2))
+    result = submit_path(session, request, witness, result_id="order126-overhang-legal")
+    assert result.status_kind is not LifecycleStatusKind.INVALID
+    assert_session_roundtrips(session)
+    assert state.battlefield_state is not None
+    moved = RulesUnitPlacement.from_battlefield(
+        view=rules_unit_view_from_armies(
+            armies=tuple(state.army_definitions), unit_instance_id=proposal.unit_instance_id
+        ),
+        battlefield_state=state.battlefield_state,
+    )
+    assert all(
+        row.pose == witness.final_pose_for_model(row.model_instance_id)
+        for row in moved.model_placements
+    )

@@ -61,7 +61,16 @@ def test_selected_source_pins_and_original_fixture_archives_remain_exact() -> No
 
 
 @pytest.mark.parametrize("mutation", ["base", "category", "owner", "path"])
-def test_order126_smoke_scope_rejects_unbound_inputs(mutation: str) -> None:
+@pytest.mark.parametrize(
+    "bound_path, operation",
+    [
+        ("src/warhammer40k_core/geometry/pathing.py", "geometry-search"),
+        ("tests/normal_move_occurrence_helpers.py", "fixture-movement"),
+    ],
+)
+def test_order126_smoke_scope_rejects_unbound_inputs(
+    mutation: str, bound_path: str, operation: str
+) -> None:
     from tools.performance_policy import (
         ORDER126_SCOPE,
         _order126_smoke_operations,  # pyright: ignore[reportPrivateUsage]
@@ -71,12 +80,12 @@ def test_order126_smoke_scope_rejects_unbound_inputs(mutation: str) -> None:
 
     scope = read_object(ROOT / ORDER126_SCOPE)
     base = str(scope["base"])
-    path = "src/warhammer40k_core/geometry/pathing.py"
+    path = bound_path
     change = object_value(scope["changes"])[path]
     category = "rule_semantics"
     assert _order126_smoke_operations(
         base=base, path=path, category=category, change=change
-    ) == frozenset({"geometry-search"})
+    ) == frozenset({operation})
     if mutation == "base":
         base = "0" * 40
     elif mutation == "category":

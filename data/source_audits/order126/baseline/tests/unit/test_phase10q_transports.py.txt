@@ -8,7 +8,6 @@ import pytest
 from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.movement_submission_helpers import core_movement_handler
 from tests.order60_emergency_disembark_helpers import emergency_disembark_poses_around
-from tests.sequential_translation_helpers import leading_first_translation_paths
 from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
@@ -8490,14 +8489,10 @@ def _submit_action_and_movement_payload(
         battlefield_state=state.battlefield_state,
     )
     witness = PathWitness.for_paths(
-        leading_first_translation_paths(
-            tuple(
-                model_path
-                for component in rules_unit_placement.component_unit_placements
-                for model_path in _shift_witness(component, dx=dx, dy=dy).model_paths
-            ),
-            dx=dx,
-            dy=dy,
+        tuple(
+            model_path
+            for component in rules_unit_placement.component_unit_placements
+            for model_path in _shift_witness(component, dx=dx, dy=dy).model_paths
         )
     )
     payload = MovementProposalPayload(
@@ -9247,7 +9242,7 @@ def _shift_witness(
             facing_degrees=start.facing.degrees,
         )
         model_paths.append((placement.model_instance_id, (start, midpoint, end)))
-    return PathWitness.for_paths(leading_first_translation_paths(tuple(model_paths), dx=dx, dy=dy))
+    return PathWitness.for_paths(tuple(model_paths))
 
 
 def _disembark_poses(*, z_inches: float = 0.0) -> tuple[Pose, ...]:

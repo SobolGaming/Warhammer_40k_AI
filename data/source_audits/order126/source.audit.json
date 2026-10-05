@@ -206,9 +206,11 @@
   "owner": "src/warhammer40k_core/engine/sequential_movement.py:sequential_friendly_models",
   "acceptance": "Complete physical paths in submitted model_paths order, completed-before/current-after occupancy, group final coherency, legal friendly transit, invalid atomicity and real catalog/facade persistence/viewers/events/fork/replay.",
   "excluded": [
-    "P03H/avoidable-body-overhang",
+    "Order127/P03H Infiltrators redeployment",
     "new placement semantics",
     "provider admission changes",
     "speculative coordinated hand-edited-history hardening"
-  ]
+  ],
+  "required_normal_history_repair": "Independent frozen1 review reproduced normal attached movement against an overhanging enemy: legal native submission succeeded, untouched completed checkpoint failed restore because retained contact history assumed all-final peers. Live and historical accepted complete witnesses now share sequential peer geometry; no hand-edited-history expansion.",
+  "fixture_preservation": "Uniform translation witness builders choose physical leading-first order across components; every original assertion, branch and pose remains, and exact base inputs are mapped/archived."
 }

@@ -26,7 +26,6 @@ from tests.phase17n_primary_mission_helpers import (
 from tests.phase17n_primary_mission_helpers import (
     phase17n_started_primary_action_fixture as shared_started_primary_action_fixture,
 )
-from tests.sequential_translation_helpers import leading_first_translation_paths
 from tests.setup_completion_helpers import record_completed_command_occurrences_for_fixture
 
 from warhammer40k_core.core.battlefield_regions import BattlefieldRegionKind
@@ -6039,29 +6038,26 @@ def test_phase17n_reconciliation_interrupts_post_start_triggered_move_once() -> 
     assert state.battlefield_state is not None
     unit_placement = state.battlefield_state.unit_placement_by_id(action.unit_instance_id)
     witness = PathWitness.for_paths(
-        leading_first_translation_paths(
-            tuple(
+        tuple(
+            (
+                model_placement.model_instance_id,
                 (
-                    model_placement.model_instance_id,
-                    (
-                        model_placement.pose,
-                        Pose.at(
-                            model_placement.pose.position.x + 0.125,
-                            model_placement.pose.position.y,
-                            model_placement.pose.position.z,
-                            facing_degrees=model_placement.pose.facing.degrees,
-                        ),
-                        Pose.at(
-                            model_placement.pose.position.x + 0.25,
-                            model_placement.pose.position.y,
-                            model_placement.pose.position.z,
-                            facing_degrees=model_placement.pose.facing.degrees,
-                        ),
+                    model_placement.pose,
+                    Pose.at(
+                        model_placement.pose.position.x + 0.125,
+                        model_placement.pose.position.y,
+                        model_placement.pose.position.z,
+                        facing_degrees=model_placement.pose.facing.degrees,
                     ),
-                )
-                for model_placement in unit_placement.model_placements
-            ),
-            dx=0.25,
+                    Pose.at(
+                        model_placement.pose.position.x + 0.25,
+                        model_placement.pose.position.y,
+                        model_placement.pose.position.z,
+                        facing_degrees=model_placement.pose.facing.degrees,
+                    ),
+                ),
+            )
+            for model_placement in unit_placement.model_placements
         )
     )
     handler = TriggeredMovementHandler(ruleset_descriptor=state.runtime_ruleset_descriptor())

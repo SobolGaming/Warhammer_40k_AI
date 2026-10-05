@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from tests.sequential_translation_helpers import leading_first_translation_paths
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -94,7 +93,7 @@ def straight_line_witness_for_state(
             model_paths.append((placement.model_instance_id, (start, midpoint, end)))
         else:
             model_paths.append((placement.model_instance_id, (start, end)))
-    return PathWitness.for_paths(leading_first_translation_paths(tuple(model_paths), dx=dx, dy=dy))
+    return PathWitness.for_paths(tuple(model_paths))
 
 
 def submit_action_and_movement_proposal(

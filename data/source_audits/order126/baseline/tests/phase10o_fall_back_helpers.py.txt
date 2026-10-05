@@ -7,7 +7,6 @@ from tests.deployment_submission_helpers import (
 from tests.movement_submission_helpers import (
     submit_default_movement_proposal_if_pending,
 )
-from tests.sequential_translation_helpers import leading_first_translation_paths
 from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
@@ -166,9 +165,7 @@ def fall_back_witness(
             facing_degrees=(start.facing.degrees + end.facing.degrees) / 2.0,
         )
         model_paths.append((placement.model_instance_id, (start, midpoint, end)))
-    return PathWitness.for_paths(
-        leading_first_translation_paths(tuple(model_paths), dx=0.0, dy=6.0)
-    )
+    return PathWitness.for_paths(tuple(model_paths))
 
 
 def fall_back_forward_pose(unit_placement: UnitPlacement) -> Pose:

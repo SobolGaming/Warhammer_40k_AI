@@ -7,7 +7,6 @@ from typing import Any, cast
 
 import pytest
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
-from tests.sequential_translation_helpers import leading_first_translation_paths
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
@@ -2076,7 +2075,7 @@ def _scout_move_witness(
                 end,
             )
         model_paths.append((placement.model_instance_id, poses))
-    return PathWitness.for_paths(leading_first_translation_paths(tuple(model_paths), dx=dx, dy=dy))
+    return PathWitness.for_paths(tuple(model_paths))
 
 
 def _witness_with_first_start_drift(witness: PathWitness) -> PathWitness:

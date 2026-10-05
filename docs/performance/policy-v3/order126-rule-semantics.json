@@ -14,14 +14,31 @@
           "after": "b951a6fbb779432aaea63df13d25e5df559ecf9feb350e834946ca7a74b66543"
         }
       }
+    },
+    "tests/normal_move_occurrence_helpers.py": {
+      "before_sha256": "4dd0d0bfff7f30e330421567a1e256b232dd43ac0aede66b30a33306a6b67928",
+      "after_sha256": "1fd2eed01572c889b3a5a85493709857198d23f652578023d787bb73c6dd6d5c",
+      "owners": {
+        "@module": {
+          "before": "731d08d602a8c421988079fc1e04187c1c8e941f132aabee21240e1574eb6bc8",
+          "after": "44320747e55ac4b74d9162ea6940c8968a1dee5d0f287b62537ab7ee05795ec1"
+        },
+        "move_witness": {
+          "before": "9feef801040192dcfc04c9c95cc586474a8a50e7a319eead2128207728093e71",
+          "after": "482a9414904037e31117b4e09e7affaa0aac40a29a9c2d0f05b5c6b405fbfa8f"
+        }
+      }
     }
   },
   "smoke_operations": {
     "src/warhammer40k_core/geometry/pathing.py": [
       "geometry-search"
+    ],
+    "tests/normal_move_occurrence_helpers.py": [
+      "fixture-movement"
     ]
   },
-  "authority": "Owner approved bounded repairs default to quiet serial current-runtime smoke and exact-base assessment; detailed benchmarks only for deliberate performance work or serious regression. This binds one rule-semantics repair to exact current owner bytes without weakening mandatory mappings.",
+  "authority": "Owner approved bounded repairs default to quiet serial current-runtime smoke and exact-base assessment; detailed benchmarks only for deliberate performance work or serious regression. This binds the rule-semantics PathWitness repair and the necessary leading-first positive-control input in the existing Normal Move fixture to exact current owner bytes without weakening mandatory mappings.",
   "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
-  "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+  "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches and RNG remain. Accepted overhang contact history reconstructs peer poses through the same shared complete-witness owner; finite triggered decisions authenticate offered order; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
 }

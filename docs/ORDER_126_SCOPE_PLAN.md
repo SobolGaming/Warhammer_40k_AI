@@ -22,7 +22,17 @@ every intermediate completed endpoint must be clear of other physical models.
 
 Ordinary Normal Move, Advance and Fall Back, attached component consumers,
 Scout, Charge, Pile In/Consolidate and catalog-triggered movement share this
-occupancy authority. Component validation retains the complete rules-unit witness
+occupancy authority. Accepted overhang-enemy contact queries reconstruct peer
+occupancy through the same shared owner and the accepted complete witness,
+including attached and stationary
+models. The independent frozen1 review reproduced a legal completed checkpoint
+that failed restore under the old all-final history reconstruction; the native
+regression covers save/load, forks, viewers/events and replay without history edits.
+Finite triggered decisions retain their required offered-witness boundary: a
+submitted model order must match the selected option's accepted order before
+physical mutation. Charge history recovers its complete order from the matched
+accepted decision, including stationary members.
+Component validation retains the complete rules-unit witness
 to preserve interleaved component order. Existing whole-group final coherency,
 terrain, engagement, movement budgets and invalid-proposal atomicity remain
 mandatory. Setup, ingress, disembark and teleport placement retain their distinct

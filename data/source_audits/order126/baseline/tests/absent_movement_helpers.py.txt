@@ -3,7 +3,6 @@
 from dataclasses import replace
 
 from tests.phase15a_charge_test_support import _charge_lifecycle, _compact_test_unit_poses
-from tests.sequential_translation_helpers import leading_first_translation_paths
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -71,6 +70,4 @@ def movement_witness(session: LocalGameSession, *, kind: str) -> PathWitness:
             "hold": (start, start),
         }[kind]
         paths.append((row.model_instance_id, poses))
-    return PathWitness.for_paths(
-        leading_first_translation_paths(tuple(paths), dx=1.0 if kind == "translate" else 0.0)
-    )
+    return PathWitness.for_paths(tuple(paths))

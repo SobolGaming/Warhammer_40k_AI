@@ -13,7 +13,6 @@ from tests.phase15a_charge_test_support import (
     _state,
     _submit_option,
 )
-from tests.sequential_translation_helpers import leading_first_translation_paths
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.engine.charge_declaration import ChargeRollResult, ChargeRollResultPayload
@@ -98,22 +97,19 @@ def test_movement_flight_choice_precedes_roll_and_history_survives_shooting(
     assert state.battlefield_state is not None
     placement = state.battlefield_state.unit_placement_by_id(units["mover"].unit_instance_id)
     witness = PathWitness.for_paths(
-        leading_first_translation_paths(
-            tuple(
+        tuple(
+            (
+                model.model_instance_id,
                 (
-                    model.model_instance_id,
-                    (
-                        model.pose,
-                        Pose.at(
-                            model.pose.position.x + 2,
-                            model.pose.position.y,
-                            facing_degrees=model.pose.facing.degrees,
-                        ),
+                    model.pose,
+                    Pose.at(
+                        model.pose.position.x + 2,
+                        model.pose.position.y,
+                        facing_degrees=model.pose.facing.degrees,
                     ),
-                )
-                for model in placement.model_placements
-            ),
-            dx=2.0,
+                ),
+            )
+            for model in placement.model_placements
         )
     )
     assert isinstance(option.payload, dict)
