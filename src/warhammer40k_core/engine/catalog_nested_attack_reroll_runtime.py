@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import cast
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
@@ -35,6 +36,7 @@ from warhammer40k_core.rules.rule_ir import parameter_payload
 def nested_attack_reroll_handler(
     source: CatalogDatasheetClauseSource,
     restrictions: ShootingTargetRestrictionHookRegistry | None,
+    army_catalog: ArmyCatalog | None,
 ) -> Callable[[AttackRerollPermissionContext], SourceBackedRerollPermissionContext | None]:
     def handler(
         context: AttackRerollPermissionContext,
@@ -57,7 +59,9 @@ def nested_attack_reroll_handler(
             raise GameLifecycleError(
                 "Nested attack reroll requires the actual weapon and shooting type."
             )
-        if not _target_is_closest_eligible(context, restrictions):
+        if army_catalog is None:
+            raise GameLifecycleError("Nested attack reroll requires the actual army catalog.")
+        if not _target_is_closest_eligible(context, restrictions, army_catalog):
             return None
         objectives = _opponent_controlled_objectives_in_target_range(context)
         parameters = parameter_payload(source.clause.effects[0].parameters)
@@ -94,6 +98,7 @@ def nested_attack_reroll_handler(
 def _target_is_closest_eligible(
     context: AttackRerollPermissionContext,
     restrictions: ShootingTargetRestrictionHookRegistry | None,
+    army_catalog: ArmyCatalog,
 ) -> bool:
     # These are the same complete detection/history inputs as ordinary declarations.
     from warhammer40k_core.engine.phases.shooting_eligibility import (
@@ -160,8 +165,21 @@ def _target_is_closest_eligible(
                 target_unit_id=enemy_id,
             ):
                 continue
-        elif context.shooting_type not in candidate.shooting_types:
-            continue
+        else:
+            from warhammer40k_core.engine.phases.shooting_requests import (
+                _shooting_types_for_selected_type_for_rules_unit,
+            )
+
+            if not _shooting_types_for_selected_type_for_rules_unit(
+                state=state,
+                base_types=candidate.shooting_types,
+                rules_unit=attacker,
+                weapon_profile=context.weapon_profile,
+                selected_shooting_type=context.shooting_type,
+                player_id=context.player_id,
+                army_catalog=army_catalog,
+            ):
+                continue
         if restrictions is not None and restrictions.restrictions_for(
             ShootingTargetRestrictionContext(
                 state=state,

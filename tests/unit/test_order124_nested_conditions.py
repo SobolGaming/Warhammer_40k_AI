@@ -227,7 +227,9 @@ def test_real_boundary_control_negatives_keep_only_the_basic_permission(control:
     before = session.lifecycle.to_payload()
     permissions = tuple(
         value
-        for binding in runtime.attack_reroll_permission_bindings()
+        for binding in runtime.attack_reroll_permission_bindings(
+            army_catalog=session.lifecycle.config.army_catalog
+        )
         if (value := binding.handler(context)) is not None
     )
     assert len(permissions) == 1
@@ -252,7 +254,10 @@ def test_unrelated_attack_contexts_cannot_gain_the_nested_source(mutation: str) 
     }[mutation]
     before = session.lifecycle.to_payload()
     assert not any(
-        binding.handler(changed) for binding in runtime.attack_reroll_permission_bindings()
+        binding.handler(changed)
+        for binding in runtime.attack_reroll_permission_bindings(
+            army_catalog=session.lifecycle.config.army_catalog
+        )
     )
     assert session.lifecycle.to_payload() == before
 
@@ -268,7 +273,9 @@ def test_nested_source_requires_complete_actual_attack_context(missing: str) -> 
     )
     binding = next(
         row
-        for row in runtime.attack_reroll_permission_bindings()
+        for row in runtime.attack_reroll_permission_bindings(
+            army_catalog=session.lifecycle.config.army_catalog
+        )
         if row.handler(context) is not None
     )
     before = session.lifecycle.to_payload()
@@ -291,7 +298,9 @@ def test_shared_target_legality_and_closest_ties_preserve_eligible_targets(case:
     ):
         permissions = tuple(
             value
-            for binding in runtime.attack_reroll_permission_bindings()
+            for binding in runtime.attack_reroll_permission_bindings(
+                army_catalog=session.lifecycle.config.army_catalog
+            )
             if (value := binding.handler(replace(context, target_unit_instance_id=target_id)))
             is not None
         )
@@ -300,7 +309,10 @@ def test_shared_target_legality_and_closest_ties_preserve_eligible_targets(case:
         assert nested["closest_eligible_target_unit_instance_id"] == target_id
     if case == "nearer_ineligible":
         assert not any(
-            binding.handler(context) for binding in runtime.attack_reroll_permission_bindings()
+            binding.handler(context)
+            for binding in runtime.attack_reroll_permission_bindings(
+                army_catalog=session.lifecycle.config.army_catalog
+            )
         )
     assert session.lifecycle.to_payload() == before
     _assert_roundtrips(session)
@@ -336,3 +348,45 @@ def test_real_weaker_branch_and_outer_source_negatives(
         finish_nested_shot(continuation, use_reroll=False)
         assert continuation.lifecycle.to_payload() == session.lifecycle.to_payload()
     _assert_roundtrips(session)
+
+
+@pytest.mark.parametrize("attached", [False, True])
+@pytest.mark.parametrize("use_reroll", [False, True])
+def test_real_advanced_assault_preserves_nested_permission_and_continuations(
+    attached: bool,
+    use_reroll: bool,
+) -> None:
+    session = nested_session(advanced=True, attached=attached)
+    state = session.lifecycle.state
+    assert state is not None
+    assert len(state.advanced_unit_states) == 1
+    assert state.objective_control_records[-1].results[0].controlled_by_player_id == "player-b"
+    _assert_roundtrips(session)
+    request = declare_nested_shot(session, shooting_type="assault")
+    assert request.decision_type == "select_dice_reroll"
+    source = _source_context(request)
+    assert source is not None
+    assert source["nested_conditions"] == {
+        "closest_eligible_target_unit_instance_id": TARGET,
+        "opponent_controlled_objective_ids": [OBJECTIVE],
+        "improved_reroll_applies": True,
+    }
+    assert "conditional_hit_reroll" not in source
+    loaded, fork = _assert_roundtrips(session)
+    requests = finish_nested_shot(session, use_reroll=use_reroll)
+    assert any(_source_context(row) is not None for row in requests)
+    for continuation in (loaded, fork):
+        finish_nested_shot(continuation, use_reroll=use_reroll)
+        assert continuation.lifecycle.to_payload() == session.lifecycle.to_payload()
+        _assert_roundtrips(continuation)
+    _assert_roundtrips(session)
+    hits = [
+        event
+        for event in session.lifecycle.decision_controller.event_log.records
+        if event.event_type == "dice_rolled"
+        and isinstance(event.payload, dict)
+        and isinstance(event.payload.get("spec"), dict)
+        and cast(dict[str, JsonValue], event.payload["spec"]).get("roll_type")
+        == "attack_sequence.hit"
+    ]
+    assert len(hits) == 6

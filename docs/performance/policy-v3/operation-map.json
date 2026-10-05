@@ -4374,6 +4374,7 @@
       ],
       "owners": [
         "@module",
+        "_advanced_movement_fixture",
         "_assert_roundtrips",
         "_runtime_context",
         "_source_context",
@@ -4383,6 +4384,7 @@
         "nested_source",
         "test_incomplete_structured_nested_sources_gain_no_runtime_hook",
         "test_nested_source_requires_complete_actual_attack_context",
+        "test_real_advanced_assault_preserves_nested_permission_and_continuations",
         "test_real_boundary_control_negatives_keep_only_the_basic_permission",
         "test_real_nested_upgrade_survives_pending_and_completed_continuations",
         "test_real_weaker_branch_and_outer_source_negatives",

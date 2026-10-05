@@ -1,8 +1,8 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "7f5d7bd66dddff051146aa4d95f97a5f041b31b7",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:16e06189ecda654f88143a240660d9e52d7dc514e02e16d2c5a68b7229467d3e",
-  "operation_map_sha256": "2cfb671391680ff164ad9a3c7f5441e947baed2b4381ebf534760ffa42cb7359",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:79ab20f7ffa439c1ee94f550e1e76d88a4198c6ee073986338a72460a3c06495",
+  "operation_map_sha256": "ec2ee5142d9a7311466ee697703ba754b5659ffd75c0ceeebf8eb8829a36c3f6",
   "changes": {
     "README.md": {
       "before_sha256": "e2fde7d3dbbfb4da6e22d49da1051fcbf532cc7fc6413ffbc8fdedc4d2f6dbd1",
@@ -16,131 +16,131 @@
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "abfa1728182fb4ff2e2a9da703ac9daff976e3802a8f2eb6fabbee20a28308d2",
-      "after_sha256": "e84e4a80fb132251e87293e7b5e38d24387c14caac0f885d2de91c7b0beb6209",
+      "after_sha256": "34a9d76f53f7f89e3c7c9006803e548d72e9187ed7b729de973f53f42cc1e788",
       "owners": {
         "@document": {
           "before": "abfa1728182fb4ff2e2a9da703ac9daff976e3802a8f2eb6fabbee20a28308d2",
-          "after": "e84e4a80fb132251e87293e7b5e38d24387c14caac0f885d2de91c7b0beb6209"
+          "after": "34a9d76f53f7f89e3c7c9006803e548d72e9187ed7b729de973f53f42cc1e788"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "d7ad8a9e185402c442bc99ae85f69b843d649103c786bff4639ab75157d9e313",
-      "after_sha256": "33f693a1d0f542712fcdd16ef2db8fa2d68d118e728227369cccfab664403d14",
+      "after_sha256": "51b04466bf5b48a52d921938a5903762f576888905eda1d5ac381cb79515d946",
       "owners": {
         "@document": {
           "before": "d7ad8a9e185402c442bc99ae85f69b843d649103c786bff4639ab75157d9e313",
-          "after": "33f693a1d0f542712fcdd16ef2db8fa2d68d118e728227369cccfab664403d14"
+          "after": "51b04466bf5b48a52d921938a5903762f576888905eda1d5ac381cb79515d946"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "f3817c7418dc7d85f31de85f544b138db86dc09a543deeb9732b80a54ac04a6e",
-      "after_sha256": "759f3a9fd42233cf1934ad1d6a42018e96168d1adbd89565da5775df46fac18d",
+      "after_sha256": "8563f69ae9795fde95e57c7b5c6539fefa9fe676aad33e11c6606fca91954b14",
       "owners": {
         "@document": {
           "before": "f3817c7418dc7d85f31de85f544b138db86dc09a543deeb9732b80a54ac04a6e",
-          "after": "759f3a9fd42233cf1934ad1d6a42018e96168d1adbd89565da5775df46fac18d"
+          "after": "8563f69ae9795fde95e57c7b5c6539fefa9fe676aad33e11c6606fca91954b14"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "9d6ca53c820201a815ec3c652a6e76b3ebadbb9c139370a0432c5987e81f3893",
-      "after_sha256": "30b11b309ef8c3039ccb29102014923f563b1d61d651deebc7216f2b5c853b68",
+      "after_sha256": "d506cb5a84755764bfda0a0ecae85aac038e1e4d535d29fc92286bdf62ca9090",
       "owners": {
         "@document": {
           "before": "9d6ca53c820201a815ec3c652a6e76b3ebadbb9c139370a0432c5987e81f3893",
-          "after": "30b11b309ef8c3039ccb29102014923f563b1d61d651deebc7216f2b5c853b68"
+          "after": "d506cb5a84755764bfda0a0ecae85aac038e1e4d535d29fc92286bdf62ca9090"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "34bcc99cba98fca716e95b06d0d07a591032ff7d58c912fa199b03c394cb68e3",
-      "after_sha256": "496e249721ab9e5cef6355e121a054519836c6565a04714031f6250708afa625",
+      "after_sha256": "c84c41e601d9a65e3697a43802309cdf72a904faaf698124b61fb56d7a72dd83",
       "owners": {
         "@document": {
           "before": "34bcc99cba98fca716e95b06d0d07a591032ff7d58c912fa199b03c394cb68e3",
-          "after": "496e249721ab9e5cef6355e121a054519836c6565a04714031f6250708afa625"
+          "after": "c84c41e601d9a65e3697a43802309cdf72a904faaf698124b61fb56d7a72dd83"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "323a3a5187e907e440fc0ce78ff4ba3af7a315acd492cafa496106ae67837384",
-      "after_sha256": "c151839d363a180bcc23858d033a4dce429b7b0dc01fe52c8e721e7c947bc9d5",
+      "after_sha256": "e1579926fb4ebf7dd3b9e8712fd3ef757826749d700680f9f128cd783657054c",
       "owners": {
         "@document": {
           "before": "323a3a5187e907e440fc0ce78ff4ba3af7a315acd492cafa496106ae67837384",
-          "after": "c151839d363a180bcc23858d033a4dce429b7b0dc01fe52c8e721e7c947bc9d5"
+          "after": "e1579926fb4ebf7dd3b9e8712fd3ef757826749d700680f9f128cd783657054c"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "56288cf140c2ca5ca903b9792643b17d43cbe459e398ce58ad1b5c608e012324",
-      "after_sha256": "de7d9819a67b8481948ad610a7763a8646db0b66fd7a33db54d6030f90041e67",
+      "after_sha256": "ded84ddb96ca3bac7cc71caa39240819802dd6492a5c25ceb68be03120ca1059",
       "owners": {
         "@document": {
           "before": "56288cf140c2ca5ca903b9792643b17d43cbe459e398ce58ad1b5c608e012324",
-          "after": "de7d9819a67b8481948ad610a7763a8646db0b66fd7a33db54d6030f90041e67"
+          "after": "ded84ddb96ca3bac7cc71caa39240819802dd6492a5c25ceb68be03120ca1059"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "a4a61aa9c81b55dce1a56b2f4193f240dc3946dc74f83438e6f165565b9e9804",
-      "after_sha256": "a30ad7ef2b65855ab6ceefe54db60a6c6bfe40297be53b94c7337e45fc8d3bb5",
+      "after_sha256": "609537f2428d11d9cc9bb904a1d5d6b7316dfb6f0283b462bbec503f19b601e9",
       "owners": {
         "@document": {
           "before": "a4a61aa9c81b55dce1a56b2f4193f240dc3946dc74f83438e6f165565b9e9804",
-          "after": "a30ad7ef2b65855ab6ceefe54db60a6c6bfe40297be53b94c7337e45fc8d3bb5"
+          "after": "609537f2428d11d9cc9bb904a1d5d6b7316dfb6f0283b462bbec503f19b601e9"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "dd89e8594a88d77be89a76dbfc23cc2774d9774cfaeb9e8c8d2d7aa97a8e40d3",
-      "after_sha256": "5e609e8eafdcd104fd50f9b31837fdc31158c9b6d620c394d8c9045133043fb9",
+      "after_sha256": "0f60958dc28a40cb97030053b5481a662d789e17da81acf7db5dfde82f35bfa1",
       "owners": {
         "@document": {
           "before": "dd89e8594a88d77be89a76dbfc23cc2774d9774cfaeb9e8c8d2d7aa97a8e40d3",
-          "after": "5e609e8eafdcd104fd50f9b31837fdc31158c9b6d620c394d8c9045133043fb9"
+          "after": "0f60958dc28a40cb97030053b5481a662d789e17da81acf7db5dfde82f35bfa1"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "07b217e2b10b5591c3f928daed9d122dd2cd891fd9d0e6344e774efbe5f33791",
-      "after_sha256": "b5215298eab275705c24a1c3d27ec6f2874ed2bf7c039cb54e83421388cd9bbd",
+      "after_sha256": "c1a363c15dd2225691009123feec83f1977bd8a18094ab6380bcb07f7f739c81",
       "owners": {
         "@document": {
           "before": "07b217e2b10b5591c3f928daed9d122dd2cd891fd9d0e6344e774efbe5f33791",
-          "after": "b5215298eab275705c24a1c3d27ec6f2874ed2bf7c039cb54e83421388cd9bbd"
+          "after": "c1a363c15dd2225691009123feec83f1977bd8a18094ab6380bcb07f7f739c81"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "8ebc3579fe31538cd6a78cb69b400ed67735af3cfe39866676996fbb1d8b256b",
-      "after_sha256": "243af468562bf7269e4620db37129ede28706aaaf13d790e31c4d8a5dc0166fd",
+      "after_sha256": "37d8a134983d92065b299de9cef79c9ab6715a4f4bc903e8158131db6898b778",
       "owners": {
         "@document": {
           "before": "8ebc3579fe31538cd6a78cb69b400ed67735af3cfe39866676996fbb1d8b256b",
-          "after": "243af468562bf7269e4620db37129ede28706aaaf13d790e31c4d8a5dc0166fd"
+          "after": "37d8a134983d92065b299de9cef79c9ab6715a4f4bc903e8158131db6898b778"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "e3e0ba05c270181b91a800ff03c266f1adf42bcc00314b6075fbccd989e275e1",
-      "after_sha256": "9fdcf04534e3c453bae467a0162ab798d94d4b66fa39131faebe4d4cae5c33d9",
+      "after_sha256": "b2e6426f04f859c24555d9ab3ead3182e06a5d5a498df4da352ae8609740e1e8",
       "owners": {
         "@document": {
           "before": "e3e0ba05c270181b91a800ff03c266f1adf42bcc00314b6075fbccd989e275e1",
-          "after": "9fdcf04534e3c453bae467a0162ab798d94d4b66fa39131faebe4d4cae5c33d9"
+          "after": "b2e6426f04f859c24555d9ab3ead3182e06a5d5a498df4da352ae8609740e1e8"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "e34870dddbb2df100f5daf9257bfac070617cdf8883bf23ea318b23298a29c2a",
-      "after_sha256": "e020eb82762a6638443c417e88aa4886ed0565e7087ef90c4d9da750829bcd8e",
+      "after_sha256": "c943e314e7a765220a5c945b510dadf7f1b3844043eaf64c503e58f3de2fae2d",
       "owners": {
         "@document": {
           "before": "e34870dddbb2df100f5daf9257bfac070617cdf8883bf23ea318b23298a29c2a",
-          "after": "e020eb82762a6638443c417e88aa4886ed0565e7087ef90c4d9da750829bcd8e"
+          "after": "c943e314e7a765220a5c945b510dadf7f1b3844043eaf64c503e58f3de2fae2d"
         }
       }
     },
@@ -166,81 +166,81 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "0da4b4bcf653f4d6ed04f9eda34475df85d89b3b8abf1e2a7785e3fb745f7079",
-      "after_sha256": "4af294a99804ed3e5340ab1191ce78d751427f2b547634f6835762254bfe2ad0",
+      "after_sha256": "bd4217cded9db9856e166c8b203cb6f54bcadbfa8a36b2bedf3c9f865264a016",
       "owners": {
         "@document": {
           "before": "0da4b4bcf653f4d6ed04f9eda34475df85d89b3b8abf1e2a7785e3fb745f7079",
-          "after": "4af294a99804ed3e5340ab1191ce78d751427f2b547634f6835762254bfe2ad0"
+          "after": "bd4217cded9db9856e166c8b203cb6f54bcadbfa8a36b2bedf3c9f865264a016"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "84b405efccd646dc3e3bbc4c29d024a00836d7d993612ed53cab2b0362ebbb07",
-      "after_sha256": "b546df44dcc07b9a1b99a5d0963be0c2773388e44a9b8d50d309b5e5db5ce006",
+      "after_sha256": "ddfd9b2b539cc0729d7638bc3d43430c551f23864442b7e5d20ff3b933fc5192",
       "owners": {
         "@document": {
           "before": "84b405efccd646dc3e3bbc4c29d024a00836d7d993612ed53cab2b0362ebbb07",
-          "after": "b546df44dcc07b9a1b99a5d0963be0c2773388e44a9b8d50d309b5e5db5ce006"
+          "after": "ddfd9b2b539cc0729d7638bc3d43430c551f23864442b7e5d20ff3b933fc5192"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "26a722c133bff05d14a70f9323fe258f66cc6098b70d715f78e59e137496a493",
-      "after_sha256": "b2fd61a3f0bf1ea1c020391fda690383bb1d3c917117a2b5b115ace894fa97ee",
+      "after_sha256": "2eaf7c54fae057107690d6c2c38f9d26ad6714f1683d94860841386a21e2cf0f",
       "owners": {
         "@document": {
           "before": "26a722c133bff05d14a70f9323fe258f66cc6098b70d715f78e59e137496a493",
-          "after": "b2fd61a3f0bf1ea1c020391fda690383bb1d3c917117a2b5b115ace894fa97ee"
+          "after": "2eaf7c54fae057107690d6c2c38f9d26ad6714f1683d94860841386a21e2cf0f"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "3ec8682e1510a1acc8ee64ca71ddde10dc7203417494f9a4a66084cf9e6878af",
-      "after_sha256": "ba61280706d615565e7082e91f3d73d7b876047c66e970e693837b9d7d29fb3d",
+      "after_sha256": "d8c7e43cc178b9e32b8666ea277dd3883e2a97cf753e45a4d2012d1332df14ad",
       "owners": {
         "@document": {
           "before": "3ec8682e1510a1acc8ee64ca71ddde10dc7203417494f9a4a66084cf9e6878af",
-          "after": "ba61280706d615565e7082e91f3d73d7b876047c66e970e693837b9d7d29fb3d"
+          "after": "d8c7e43cc178b9e32b8666ea277dd3883e2a97cf753e45a4d2012d1332df14ad"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "e1f37a4625bc0d6edebea9d15211d845ea10c7e98489157f2c7b06b770b2d09b",
-      "after_sha256": "8b8db5501fd0eb5dde1022bfa7cee3eb88cfb58e429c6be4152e1ed10b253d76",
+      "after_sha256": "8c5842588082c6d885caa1ec952425c75cc2837904b2a069d74784ff0b38ec97",
       "owners": {
         "@document": {
           "before": "e1f37a4625bc0d6edebea9d15211d845ea10c7e98489157f2c7b06b770b2d09b",
-          "after": "8b8db5501fd0eb5dde1022bfa7cee3eb88cfb58e429c6be4152e1ed10b253d76"
+          "after": "8c5842588082c6d885caa1ec952425c75cc2837904b2a069d74784ff0b38ec97"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "59f455c464fc012f19cea7c330b6ff5895fd8233c6664a7643402aa09f7671a1",
-      "after_sha256": "00c46953f2d132ce7c59989422b594dfbec0287df16ddc1b3862aa5b57068a8d",
+      "after_sha256": "5475daf70e03d6e48535e5b308dec9d016cfb1a01989f829dd9da9a1d7eaeb74",
       "owners": {
         "@document": {
           "before": "59f455c464fc012f19cea7c330b6ff5895fd8233c6664a7643402aa09f7671a1",
-          "after": "00c46953f2d132ce7c59989422b594dfbec0287df16ddc1b3862aa5b57068a8d"
+          "after": "5475daf70e03d6e48535e5b308dec9d016cfb1a01989f829dd9da9a1d7eaeb74"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "f04754fe61102fcdaea6064d225f4597abed1bb3e85b641ddb58dbbc7bbe603c",
-      "after_sha256": "8ebca1dcf91db2ca6610ef11960b39164b791a122b47828e58ea7a2946abb6b4",
+      "after_sha256": "edd1bdb8da59073d6426914c5e629d2a04139051ba4c9fcbf4587bbd47662ff7",
       "owners": {
         "@document": {
           "before": "f04754fe61102fcdaea6064d225f4597abed1bb3e85b641ddb58dbbc7bbe603c",
-          "after": "8ebca1dcf91db2ca6610ef11960b39164b791a122b47828e58ea7a2946abb6b4"
+          "after": "edd1bdb8da59073d6426914c5e629d2a04139051ba4c9fcbf4587bbd47662ff7"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "1163c97ee6e21d68080db0d83710edee34730d2acf4003190b709e393ca3b0d3",
-      "after_sha256": "f6883c42c5d42ffe3710443663718a30623fd951e5cf160cab49ad3e9d264cb0",
+      "after_sha256": "fed259774bc25dfd601bf5b49265633b5d5c9474e4b60717728d971cab619cec",
       "owners": {
         "@document": {
           "before": "1163c97ee6e21d68080db0d83710edee34730d2acf4003190b709e393ca3b0d3",
-          "after": "f6883c42c5d42ffe3710443663718a30623fd951e5cf160cab49ad3e9d264cb0"
+          "after": "fed259774bc25dfd601bf5b49265633b5d5c9474e4b60717728d971cab619cec"
         }
       }
     },
@@ -286,31 +286,31 @@
     },
     "docs/ORDER_124_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "5f7463e413583a56bc71b3785f09f52f23cd6fc515c31bd0f8795d09c9f7815a",
+      "after_sha256": "a75c5c6fd060b6fccbd29982da705c84ca8739696152e496fbb3da5077751a19",
       "owners": {
         "@document": {
           "before": null,
-          "after": "5f7463e413583a56bc71b3785f09f52f23cd6fc515c31bd0f8795d09c9f7815a"
+          "after": "a75c5c6fd060b6fccbd29982da705c84ca8739696152e496fbb3da5077751a19"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "61f01ea18437782bb92c99ca69533470041bc9aeab269a9c82b6d43dfb4d14fe",
-      "after_sha256": "cd76b8b867d6535fac05070146be94bd3c3b022e50cf22d4e271a3ad854ec1e6",
+      "after_sha256": "80c5159010099ce3749f18cad88db190f54901e6c2f6d50ae1007aeb58d3cb44",
       "owners": {
         "@document": {
           "before": "61f01ea18437782bb92c99ca69533470041bc9aeab269a9c82b6d43dfb4d14fe",
-          "after": "cd76b8b867d6535fac05070146be94bd3c3b022e50cf22d4e271a3ad854ec1e6"
+          "after": "80c5159010099ce3749f18cad88db190f54901e6c2f6d50ae1007aeb58d3cb44"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "3f16893433c753b5d106094574c45ecb489ca0a799c5d71d50a4c85d02e4dfa4",
-      "after_sha256": "6da2414ecc9df41446df90c3e62f62a42da7adcceca8b5ae1c0f37b1b6a2d23f",
+      "after_sha256": "24bf9840708e5e7552f523dbcd5ded83e40490513f2be147cfbeebb2d5336609",
       "owners": {
         "@document": {
           "before": "3f16893433c753b5d106094574c45ecb489ca0a799c5d71d50a4c85d02e4dfa4",
-          "after": "6da2414ecc9df41446df90c3e62f62a42da7adcceca8b5ae1c0f37b1b6a2d23f"
+          "after": "24bf9840708e5e7552f523dbcd5ded83e40490513f2be147cfbeebb2d5336609"
         }
       }
     },
@@ -348,15 +348,15 @@
     },
     "src/warhammer40k_core/engine/catalog_datasheet_rule_runtime.py": {
       "before_sha256": "8f04d86bfa07a8e0937c7a4079821069b87b77214553d7b8b4fb59837075fcca",
-      "after_sha256": "6482f767c6721bebd959285708d106bebf938cf7db7c1b6239fb1cf9740bdb5e",
+      "after_sha256": "044683f2a932407553d07f549f083a90f511feea2a9eb2596ec4c10742de258e",
       "owners": {
         "@module": {
           "before": "16b0b51b48d7c5417f8d7253e52cf081112eb7f9815d46c24bff2aff44c9a9d8",
-          "after": "cd368a061db9a549172b0096e30a8ead3d716758ca60e44146235f03865da6c7"
+          "after": "a7eaa26adf49a8e906eebb6ab39fa993137371401f455030c3619a8929c85ac0"
         },
         "CatalogDatasheetRuleRuntime.attack_reroll_permission_bindings": {
           "before": "ab38868b5cf3947be8cc71a3771bdb7dc92e445806bc6e3591028f9d4c1be6fa",
-          "after": "7a21301cba3c28f2534f0dd896aee118f0a5a57516c13850838c16c890e7c19a"
+          "after": "537d96a804bcb73c4c83c3929a86a4a417e7c603b5d52944e41a05fdb760861f"
         }
       }
     },
@@ -380,11 +380,11 @@
     },
     "src/warhammer40k_core/engine/catalog_nested_attack_reroll_runtime.py": {
       "before_sha256": null,
-      "after_sha256": "f081c60afc58a13b38c0dcdb013718a89a1d5a7fdc67f6a1acae5ab4555a2ad5",
+      "after_sha256": "da8fdfaded7e1d6bd879c843bf203aaff175cb72b1b008dc248ee50d4c4e1440",
       "owners": {
         "@module": {
           "before": null,
-          "after": "84c1e6d8103a4395b33cb407c431bf284bfc5edc278f2043b3635cf31a5faaa8"
+          "after": "3144ced15b4b8523a757dd1bbe3db347a45ddff940c840e97ddad55dbff37fe9"
         },
         "_opponent_controlled_objectives_in_target_range": {
           "before": null,
@@ -392,11 +392,11 @@
         },
         "_target_is_closest_eligible": {
           "before": null,
-          "after": "608066ee0bc2111d387e1bb109b582c40512fc6ac86a5e260a1b679c52042702"
+          "after": "d9a5a9f12063268398d6bb5ed5642117604fcb3f0ea3e1831beebfd86f2d7831"
         },
         "nested_attack_reroll_handler": {
           "before": null,
-          "after": "8e3eb7c322d38cd390fa578c74efd749f9caa88d43c35c066dfacd9365a811af"
+          "after": "1c991a8c34c3fff6145fbf73bd8fa472d32b495902707603dc876f5ddeac7e0b"
         }
       }
     },
@@ -420,11 +420,11 @@
     },
     "src/warhammer40k_core/engine/faction_content/bundle.py": {
       "before_sha256": "505ec30055481bd9e8c662960bccc467d72aa40c2de70304a8894d37caeb4142",
-      "after_sha256": "bedbc4019c77f37620ac7f9f56cd19541b56ed80249c6878d20cacf9c4dde232",
+      "after_sha256": "2f30bcf286a7d12532a5b7c7b4a216f2eb3044512d3d7838ac85dc04fbc444e0",
       "owners": {
         "RuntimeContentBundle.from_contributions": {
           "before": "79da7f5f30c7bfeb2a6f875bd3431b06b14d5e370164007c91cc0d66dd8da36a",
-          "after": "edea3b06d5f26f011a696bb307d903176e675ae7c42090138c4864f3aa98db90"
+          "after": "7c2fd19a53f2f532b241c311812d8730cde7bdcc34b50a9e80a6063545d9c8ea"
         }
       }
     },
@@ -506,15 +506,19 @@
     },
     "tests/order124_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "c04de83769c1f9a32732d00cd86fb41b6a268ab5700242f9560988c36e15a1e6",
+      "after_sha256": "babbbf5f7c998101a47daaf6693f6b5811116bca646ba7b927b5317e6c6b238a",
       "owners": {
         "@module": {
           "before": null,
-          "after": "40c573a0fb9ff135ba898e44c92729a849978f4623e0f36623879395dd2f9831"
+          "after": "2590eb14a8db2115802159b68230a723eb1802341a3996128ab5e014a2537c5c"
+        },
+        "_advanced_movement_fixture": {
+          "before": null,
+          "after": "edfae83eaba0d536ee45b71ed9aeade10b95aeb484e3b615a0bc3249797a266d"
         },
         "declare_nested_shot": {
           "before": null,
-          "after": "061219e4b7c8eeb92349238956a813397a03e9e5bc2212e5774d47fd6c64d672"
+          "after": "c8f418afe4ca72b45d9907e538685607735c1e0bed8d41543ae3a7c9f49568b3"
         },
         "finish_nested_shot": {
           "before": null,
@@ -522,7 +526,7 @@
         },
         "nested_session": {
           "before": null,
-          "after": "cc1df7f02678fe503eb2bf9d29eab5f4dd8652e8c492f9c6cea72c6722c80bd5"
+          "after": "ef645d5f060ff125dcfbb09a89d1e5eb4c1ccedc1011409be4756c7da0ef1081"
         },
         "nested_source": {
           "before": null,
@@ -532,7 +536,7 @@
     },
     "tests/unit/test_order124_nested_conditions.py": {
       "before_sha256": null,
-      "after_sha256": "b4847a83d32ab7419ebbdbb49b860741d1bdb7530f9f57a0abb3a24cc2401545",
+      "after_sha256": "a189bedf1e17b725809a6a85626d9ea04e8b3fa25a281943b92dd91b223412d9",
       "owners": {
         "@module": {
           "before": null,
@@ -556,11 +560,15 @@
         },
         "test_nested_source_requires_complete_actual_attack_context": {
           "before": null,
-          "after": "dba68222fb7dcec6651cfa35d399949f1fb58b20fc75220745fbf468c3ff1aa5"
+          "after": "6b34d604ed991a08717bcb1521373fd51b197bf914a5f3bf1488b3ac3a0bf474"
+        },
+        "test_real_advanced_assault_preserves_nested_permission_and_continuations": {
+          "before": null,
+          "after": "a0aaf9d961ee39216b7b8c4e904b591844421d41df2df0d1707029776a47a0ad"
         },
         "test_real_boundary_control_negatives_keep_only_the_basic_permission": {
           "before": null,
-          "after": "5f7a05e06bf4a76860091d933be774e617aa1edfcff7bbe28aab060439617238"
+          "after": "41b0feccc157aa8a2bdc24e6d95ef3833d39856659bc24907c07db09f60e4163"
         },
         "test_real_nested_upgrade_survives_pending_and_completed_continuations": {
           "before": null,
@@ -576,11 +584,11 @@
         },
         "test_shared_target_legality_and_closest_ties_preserve_eligible_targets": {
           "before": null,
-          "after": "9ac72b4534979e8b153eb78f938a270774e296349e33ed310aac3cdfba46ef88"
+          "after": "fffd84aa61ae3e52647afa5ce6585ccf1e35803dba38d8aeb1ad84d07ac11180"
         },
         "test_unrelated_attack_contexts_cannot_gain_the_nested_source": {
           "before": null,
-          "after": "dffcc5f5ee36fa303d2b758ff295ddb1bd8c7e2473df6fe2391080872a6e728c"
+          "after": "d9812172a1b8b7f831f9ae170dfb1b7de8cc3ee764e804b01735a7f765fd0f81"
         }
       }
     }

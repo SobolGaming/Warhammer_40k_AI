@@ -6,6 +6,7 @@ from functools import partial
 from types import MappingProxyType
 from typing import TYPE_CHECKING, TypeVar, cast
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import (
     RerollComponentSelectionPolicy,
@@ -398,6 +399,7 @@ class CatalogDatasheetRuleRuntime:
         self,
         *,
         shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
+        army_catalog: ArmyCatalog | None = None,
     ) -> tuple[AttackRerollPermissionBinding, ...]:
         passive = tuple(
             AttackRerollPermissionBinding(
@@ -430,7 +432,9 @@ class CatalogDatasheetRuleRuntime:
             AttackRerollPermissionBinding(
                 modifier_id=source.binding_id,
                 source_id=source.rule_ir.source_id,
-                handler=nested_attack_reroll_handler(source, shooting_target_restriction_hooks),
+                handler=nested_attack_reroll_handler(
+                    source, shooting_target_restriction_hooks, army_catalog
+                ),
             )
             for source in self._sources(nested_attack_reroll_clause_is_supported)
         )

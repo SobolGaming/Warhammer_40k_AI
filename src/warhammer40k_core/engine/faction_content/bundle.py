@@ -1741,7 +1741,8 @@ class RuntimeContentBundle:
             ),
             attack_reroll_permission_bindings=(
                 catalog_rules.attack_reroll_permission_bindings(
-                    shooting_target_restriction_hooks=shooting_target_restriction_hook_registry
+                    shooting_target_restriction_hooks=shooting_target_restriction_hook_registry,
+                    army_catalog=catalog,
                 )
                 + _contribution_values(
                     validated_contributions,

@@ -20,7 +20,9 @@ and compiles through the ordinary source compiler.
 
 The existing catalog reroll registry evaluates the actual attack weapon, model
 and shooting type using the shared shooting-target legality query and existing
-source-backed target restrictions. It compares eligible canonical enemy rules
+source-backed target restrictions. Ordinary selected-type conversion uses the
+same owner as declarations, including Advanced Assault and mixed Indirect
+weapons; forced Snap retains its shared eligibility owner. It compares eligible canonical enemy rules
 units with the shared physical-distance owner. Tied closest eligible targets
 remain eligible. The objective upgrade uses current model-group range and the
 latest recorded phase/turn-boundary control, including retained control; control
