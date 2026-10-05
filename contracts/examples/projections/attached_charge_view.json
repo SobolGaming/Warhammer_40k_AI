@@ -1511,6 +1511,7 @@
       "keywords": [
         "ATTACHED_UNIT",
         "CHARACTER",
+        "CORE CHARACTER LEADER",
         "INFANTRY",
         "LEADER"
       ],
@@ -1777,6 +1778,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -2040,6 +2042,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -2303,6 +2306,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -2566,6 +2570,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -2829,6 +2834,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -3094,6 +3100,7 @@
       "keywords": [
         "ATTACHED_UNIT",
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -3360,6 +3367,7 @@
       "keywords": [
         "ATTACHED_UNIT",
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -3626,6 +3634,7 @@
       "keywords": [
         "ATTACHED_UNIT",
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -3892,6 +3901,7 @@
       "keywords": [
         "ATTACHED_UNIT",
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -4158,6 +4168,7 @@
       "keywords": [
         "ATTACHED_UNIT",
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -4422,6 +4433,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -4685,6 +4697,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -4948,6 +4961,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -5211,6 +5225,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -5474,6 +5489,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -5972,7 +5988,7 @@
   },
   "primary_rules_unit_turn_start_snapshots": [],
   "projection_schema": "game-view-v13-random-profiles",
-  "projection_state_hash": "2526349daf6d7dada1b1bfc0f109a30b2d296621ddfc1d3b76bff695f091e3f6",
+  "projection_state_hash": "48be3ffbc6246a5e5650c79ade9a2d58f07b24ce3e23cabc0e1eac0d5e2a81b8",
   "public_command_point_ledgers": [
     {
       "command_points": 1,
@@ -6112,6 +6128,8 @@
         "ATTACHED_UNIT",
         "BATTLELINE",
         "CHARACTER",
+        "CORE CHARACTER LEADER",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY",
         "LEADER"
       ],
@@ -6145,6 +6163,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_instance_ids": [
@@ -6183,6 +6202,8 @@
         "ATTACHED_UNIT",
         "BATTLELINE",
         "CHARACTER",
+        "CORE CHARACTER LEADER",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY",
         "LEADER"
       ],
@@ -6220,6 +6241,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_instance_ids": [

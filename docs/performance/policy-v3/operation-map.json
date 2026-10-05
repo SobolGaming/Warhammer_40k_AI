@@ -3948,6 +3948,107 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order123-datasheet-identity": {
+      "paths": [
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/adapters/projection.py",
+        "src/warhammer40k_core/core/datasheet.py",
+        "src/warhammer40k_core/core/datasheet_identity.py",
+        "src/warhammer40k_core/core/model_keywords.py",
+        "src/warhammer40k_core/engine/army_mustering.py",
+        "src/warhammer40k_core/engine/list_validation.py"
+      ],
+      "owners": [
+        "@module",
+        "DatasheetDefinition",
+        "DatasheetDefinition.__post_init__",
+        "_datasheet_has_any_keyword",
+        "_datasheet_keyword_set",
+        "_transport_capacity_allows_datasheet",
+        "_with_datasheet_identity",
+        "model_keyword_assignment",
+        "normalized_datasheet_identity",
+        "project_rules_catalog_view"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order123-regressions": {
+      "paths": [
+        "tests/fixtures/phase18a_projection_join_sample.json",
+        "tests/model_keyword_helpers.py",
+        "tests/unit/test_model_keyword_authority.py",
+        "tests/unit/test_order123_datasheet_identity.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "mixed_keyword_catalog",
+        "test_catalog_name_transport_and_enhancement_gates_share_identity",
+        "test_identity_keeps_native_keyword_punctuation_and_deduplicates",
+        "test_keyword_casualty_facade_restore_replay_and_both_viewers",
+        "test_live_model_scope_keeps_identity_after_specialist_casualty",
+        "test_loaded_lifecycle_identity_pending_continuation_fork_viewers_and_exact_replay",
+        "test_materialized_model_keeps_datasheet_identity_despite_distinct_model_label",
+        "test_name_is_normalized_once_without_rewriting_retained_catalog_keywords",
+        "test_official_admitted_catalog_already_has_names_and_preserves_reconciliation",
+        "test_scoped_and_materialization_assignments_add_only_datasheet_identity"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order123-source-evidence": {
+      "paths": [
+        "data/source_audits/order123/baseline/tests/model_keyword_helpers.py.txt",
+        "data/source_audits/order123/baseline/tests/unit/test_model_keyword_authority.py.txt",
+        "data/source_audits/order123/historical-inputs.json",
+        "data/source_audits/order123/source.audit.json",
+        "tools/core_rules_order97_history.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "historical_evidence_path"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order123-contract-publication": {
+      "paths": [
+        "conformance/typescript/src/contract.ts",
+        "contracts/README.md",
+        "contracts/examples/events/initial-player-a.json",
+        "contracts/examples/events/initial-player-b.json",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/projections/attached_charge_view.json",
+        "contracts/examples/projections/hidden_secondary_redaction_view.json",
+        "contracts/examples/projections/initial_setup_view_player1.json",
+        "contracts/examples/projections/initial_setup_view_player2.json",
+        "contracts/examples/projections/post_deployment_view.json",
+        "contracts/examples/projections/rules_catalog_view.json",
+        "contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_a.json",
+        "contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_b.json",
+        "contracts/examples/projections/visible_modifier_datacard_view.json",
+        "contracts/examples/replay-metadata.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

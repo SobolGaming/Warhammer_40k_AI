@@ -12602,6 +12602,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -12880,6 +12881,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -13143,6 +13145,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -13406,6 +13409,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -13669,6 +13673,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -13932,6 +13937,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -14195,6 +14201,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -14458,6 +14465,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -14721,6 +14729,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -14984,6 +14993,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_display_name": "CORE Intercessor-like Infantry",
@@ -15146,7 +15156,7 @@
     }
   ],
   "projection_schema": "game-view-v13-random-profiles",
-  "projection_state_hash": "020ee8a9eac125c187d3d1e1c3f40ef01cfe9ccc36cd728717c95fe34a8da3ee",
+  "projection_state_hash": "6e3d174ea0496dea3594d771c6156353a3ae2d55403c42f8d13e3c51a8fb9110",
   "public_command_point_ledgers": [
     {
       "command_points": 1,
@@ -15284,6 +15294,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_instance_ids": [
@@ -15320,6 +15331,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_instance_ids": [

@@ -1,5 +1,14 @@
 # Adapter Decision Contract
 
+## Order123: datasheet identity keywords
+
+Existing model/unit keywords, catalog displays, finite submissions, viewer-scoped
+projections and persistence/replay envelopes carry the Core name-keyword repair.
+A display alias creates no identity, and attached unit union does not grant
+component names to unrelated models. No decision/schema family is added.
+Contract44.3.9 keeps exact current-runtime replay authority. See
+[Order123](ORDER_123_SCOPE_PLAN.md).
+
 ## Order122: default effect lifetimes
 
 Existing finite activation submissions and source-linked effect, event and

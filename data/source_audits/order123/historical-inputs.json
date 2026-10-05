@@ -1,0 +1,24 @@
+{
+  "reviewed_commit": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+  "also_present_at_base": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+  "purpose": "Retain every original mixed-keyword assertion and fixture byte. Current fixture explicitly includes its Core name token; the complete exact projection expectation adds only that token. No original assertion or branch is removed.",
+  "current_evidence": "docs/ORDER_123_SCOPE_PLAN.md",
+  "files": [
+    {
+      "path": "tests/model_keyword_helpers.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/model_keyword_helpers.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/model_keyword_helpers.py",
+      "sha256": "d1d5212fd3f9593d55f1b044b87b2cb8f25c358b3a6e2c840a368355bb542799",
+      "bytes": 5824
+    },
+    {
+      "path": "tests/unit/test_model_keyword_authority.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/unit/test_model_keyword_authority.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/unit/test_model_keyword_authority.py",
+      "sha256": "10f59d7b55948ac58c070af08f85f7b2276c9e88e5aaeef5c07313f6053b6b46",
+      "bytes": 16751
+    }
+  ]
+}

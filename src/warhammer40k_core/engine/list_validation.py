@@ -984,7 +984,7 @@ def _datasheet_has_any_keyword(
     stored_keywords = {
         _canonical_keyword(stored)
         for stored in (
-            *datasheet.keywords.keywords,
+            *datasheet.effective_keywords,
             *datasheet.keywords.faction_keywords,
         )
     }

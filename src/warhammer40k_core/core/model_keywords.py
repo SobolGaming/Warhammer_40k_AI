@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import NotRequired, Self, TypedDict
 
 from warhammer40k_core.core.datasheet import DatasheetDefinition
@@ -162,21 +162,31 @@ def model_keyword_assignment(
         if materialization_descriptor_id is not None and variants:
             for row in variants:
                 if row.materialization_descriptor_id == materialization_descriptor_id:
-                    return row
+                    return _with_datasheet_identity(row, datasheet)
             raise ModelKeywordError("Model keyword assignment has an unknown materialization ID.")
         for row in rows:
             if (
                 row.model_profile_id == model_profile_id
                 and row.materialization_descriptor_id is None
             ):
-                return row
+                return _with_datasheet_identity(row, datasheet)
         raise ModelKeywordError("Model keyword assignment is missing its profile.")
     return ModelKeywordAssignment(
         datasheet_id=datasheet.datasheet_id,
         model_profile_id=model_profile_id,
-        keywords=datasheet.keywords.keywords,
+        keywords=datasheet.effective_keywords,
         faction_keywords=datasheet.keywords.faction_keywords,
         source_ids=tuple(sorted({*datasheet.source_ids, *profile.source_ids})),
+    )
+
+
+def _with_datasheet_identity(
+    assignment: ModelKeywordAssignment, datasheet: DatasheetDefinition
+) -> ModelKeywordAssignment:
+    """Keep raw scoped provenance; the authenticated datasheet owns its name token."""
+    return replace(
+        assignment,
+        keywords=tuple(sorted({*assignment.keywords, datasheet.name_keyword})),
     )
 
 

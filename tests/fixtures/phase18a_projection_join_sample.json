@@ -148,7 +148,7 @@
       "wounds_remaining": 2
     },
     "projection_schema": "game-view-v13-random-profiles",
-    "projection_state_hash": "368fb7ac8c66b6e62159d7c86db7b1935545174771db1a635e0625b1052d5204",
+    "projection_state_hash": "f301a15ce8f62c8e332ca2cd19b16d3696756b86e24e95b5fc8a149d31e25503",
     "rules_catalog": {
       "catalog_id": "phase9a-canonical",
       "projection_schema": "rules-catalog-view-v2",
@@ -167,6 +167,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_instance_ids": [
@@ -202,6 +203,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_profile_ids": [

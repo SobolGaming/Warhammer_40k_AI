@@ -70,6 +70,7 @@
         "CORE MARINES"
       ],
       "keywords": [
+        "CORE BOYZ-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_profile_ids": [
@@ -92,6 +93,7 @@
       ],
       "keywords": [
         "CHARACTER",
+        "CORE CHARACTER LEADER",
         "INFANTRY",
         "LEADER"
       ],
@@ -115,6 +117,7 @@
       ],
       "keywords": [
         "CHARACTER",
+        "CORE CHARACTER SUPPORT",
         "INFANTRY",
         "SUPPORT"
       ],
@@ -161,6 +164,7 @@
         "CORE MARINES"
       ],
       "keywords": [
+        "CORE DEEP STRIKE UNIT",
         "DEEP STRIKE",
         "INFANTRY"
       ],
@@ -184,6 +188,7 @@
       ],
       "keywords": [
         "BATTLELINE",
+        "CORE INTERCESSOR-LIKE INFANTRY",
         "INFANTRY"
       ],
       "model_profile_ids": [
@@ -231,6 +236,7 @@
         "CORE MARINES"
       ],
       "keywords": [
+        "CORE TRANSPORT",
         "TRANSPORT",
         "VEHICLE"
       ],
@@ -253,6 +259,7 @@
         "CORE MARINES"
       ],
       "keywords": [
+        "CORE VEHICLE MONSTER",
         "MONSTER",
         "VEHICLE"
       ],

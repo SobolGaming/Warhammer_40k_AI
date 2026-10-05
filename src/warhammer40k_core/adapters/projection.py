@@ -392,7 +392,7 @@ def project_rules_catalog_view(*, catalog: ArmyCatalog) -> RulesCatalogViewPaylo
             "datasheet_id": datasheet.datasheet_id,
             "display_name": datasheet.name,
             "content_scope": datasheet.content_scope.value,
-            "keywords": list(datasheet.keywords.keywords),
+            "keywords": list(datasheet.effective_keywords),
             "faction_keywords": list(datasheet.keywords.faction_keywords),
             "model_profile_ids": sorted(model_profile_ids),
             "wargear_option_ids": sorted(wargear_option_ids),
