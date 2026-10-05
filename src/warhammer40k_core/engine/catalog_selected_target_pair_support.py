@@ -276,6 +276,16 @@ def shooting_start_selected_target_effect_clauses_after(
     for clause in clauses[selection_index + 1 :]:
         if clause.template_id == "phase17c:selected-target-constraint":
             break
+        if (
+            selection_clause.trigger is not None
+            and parameter_payload(selection_clause.trigger.parameters)
+            == {"edge": "start", "owner": "opponent", "phase": "shooting"}
+            and not all(
+                selected_target_effect_uses_unit_context(clause=clause, effect=effect)
+                for effect in clause.effects
+            )
+        ):
+            continue
         if selected_target_persisting_effect_clause_is_supported(
             clause
         ) or clause_has_immediate_selected_target_battle_shock_effect(clause):
@@ -532,6 +542,8 @@ def _shooting_start_selection_trigger_is_supported(clause: RuleClause) -> bool:
     if trigger is None or trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
         return False
     parameters = parameter_payload(trigger.parameters)
+    if parameters == {"edge": "start", "owner": "opponent", "phase": "shooting"}:
+        return True
     return (
         frozenset(parameters) == frozenset({"edge", "optional", "owner", "phase", "subject"})
         and parameters.get("edge") == "start"
@@ -556,6 +568,9 @@ def _shooting_start_selection_target_is_supported(target: RuleTargetSpec | None)
     if target is None or target.kind is not RuleTargetKind.FRIENDLY_UNIT:
         return False
     parameters = parameter_payload(target.parameters)
+    keyword = parameters.get("required_keyword")
+    if frozenset(parameters) == frozenset({"allegiance", "required_keyword"}):
+        return parameters.get("allegiance") == "friendly" and _non_empty_string(keyword)
     keywords = parameters.get("required_keyword_sequence")
     return (
         frozenset(parameters) == _SHOOTING_START_TARGET_PARAMETER_KEYS

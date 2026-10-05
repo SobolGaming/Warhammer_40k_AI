@@ -1,0 +1,115 @@
+{
+  "order": 125,
+  "roadmap": "P02N",
+  "finding": "C02-14",
+  "requirement_id": "02.05.01-obligation-11",
+  "selected_source": {
+    "row_id": "rule:02:02.05.01:1",
+    "category": "02",
+    "locator": "02.05.01",
+    "title": "Using Keywords & Mixed Keywords in Units",
+    "occurrence": 1,
+    "source_sha256": "48df8363e95ed138f1cf0af5f99b0cf159fc9a66d8141bae3c5e87ac2ad899ef",
+    "blocks": [
+      {
+        "ordinal": 1,
+        "kind": "text",
+        "sha256": "fbd269ac5e31c1a60ffb508a720bdc2a0fe34d93cb776f6eba9a6ef91d61aa6e",
+        "value": "When using keywords, the following points apply:"
+      },
+      {
+        "ordinal": 2,
+        "kind": "text",
+        "sha256": "cd5a551d353de0b4c29ed46c31929eef51de2cf3b4bac652e856404e39ccc6f2",
+        "value": "\u2022 A unit has all the keywords of all models in that unit. A model only has its own keywords."
+      },
+      {
+        "ordinal": 3,
+        "kind": "text",
+        "sha256": "3d0d53efedbd7defb3ad7ba0797343e9b68e697ccca7a7c464175a48e80f2033",
+        "value": "\u2022 If a rule specifies that it applies to a unit with a keyword, it applies to a unit which includes one or more models with that keyword."
+      },
+      {
+        "ordinal": 4,
+        "kind": "text",
+        "sha256": "083913006c59b36c093ac2dcbdeaba990045375651a813fa6a431058777bfb60",
+        "value": "\u2022 If a rule specifies that it applies to a model with a keyword, it only applies to a model with that keyword."
+      },
+      {
+        "ordinal": 5,
+        "kind": "text",
+        "sha256": "7ab0b77ab1dc7ce10b8b9fd6aaa72b25ae76a0e651bc41d56e4bb447800aecb7",
+        "value": "\u2022 If a rule specifies that it applies to \u2018non-\u0003Keyword\u0004\u2019 models/units, it only applies to models/units that do not have that keyword. For example, if a rule applies to non-\u0003Vehicle\u0004 units, it only applies to units that do not have the \u0003Vehicle\u0004 keyword."
+      },
+      {
+        "ordinal": 6,
+        "kind": "text",
+        "sha256": "e82cfed961d633cc06623e03c8a830dfc14d67f19d28c9885cf19a920e0fcca0",
+        "value": "\u2022 Some units can contain models that have different keywords. While this is the case, such a unit is considered to have all of the keywords of all of its models, and so is affected by any rule that applies to units with any of those keywords. Remember that attacks are made against units, not models."
+      },
+      {
+        "ordinal": 7,
+        "kind": "text",
+        "sha256": "1443e3ef5f01968e29f55ef61df03f71e45b7347511db6e6bd8be5926e75ba67",
+        "value": "\u2022 If a rule only applies to models with a specific keyword, then it instead only applies to models in such a unit that have the correct keyword."
+      },
+      {
+        "ordinal": 8,
+        "kind": "text",
+        "sha256": "3b890049f17247a3e8788fe4ad12362692c5bc85f021ecec9afdb8688e7f2262",
+        "value": "\u2022 A rule with a comma-separated list of keywords, or a series of keywords separated by slashes ('/'), or two keywords separated by the word \u2018or\u2019 (e.g. \u2018an \u0003Immortals\u0004, \u0003Deathmarks\u0004 or \u0003Lychguard\u0004 unit\u2019) refers to a model/unit that has any one of those keywords."
+      },
+      {
+        "ordinal": 9,
+        "kind": "text",
+        "sha256": "42a72bf3c5ca60d0ebaa0ab0eb0527ebe0384687b8f190f15a0ecf196780c2b5",
+        "value": "\u2022 A rule with multiple adjacent keywords (e.g. \u2018an \u0003Aeldari Guardians\u0004 unit\u2019) only refers to a model/unit that has all of those keywords."
+      },
+      {
+        "ordinal": 10,
+        "kind": "text",
+        "sha256": "94f8ace125b168d39248817067356869ef2eba3eaaa108a27a5421c332c5a0df",
+        "value": "\u2022 Some older rules use keywords without specifying model or unit: for example, \u0003MONSTER/VEHICLE\u0004 or \u0003TRANSPORT\u0004. These rules refer to units with those keywords."
+      },
+      {
+        "ordinal": 11,
+        "kind": "text",
+        "sha256": "b9a8f1937d717a0e7e7d6b1e185d5efb0f64aa5918396d6fcf574956c4d8bc31",
+        "value": "\u2022 Singular and plural instances of the same keyword function in the same way."
+      }
+    ],
+    "selected_provider": "Game Datamissions",
+    "historical_source_row_sha256": "b52aa983a704ed44503636e301f8125e828ce2701fb09ffa0d774d7cec98296b",
+    "review_category": "02"
+  },
+  "selected_block": {
+    "ordinal": 10,
+    "kind": "text",
+    "sha256": "94f8ace125b168d39248817067356869ef2eba3eaaa108a27a5421c332c5a0df",
+    "value": "\u2022 Some older rules use keywords without specifying model or unit: for example, \u0003MONSTER/VEHICLE\u0004 or \u0003TRANSPORT\u0004. These rules refer to units with those keywords."
+  },
+  "canonical_git_blob_sha256": {
+    "data/source_audits/order97/selected-sources.json": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+    "data/source_audits/order97/categories/02.json": "fe5d38f1e501e35e03bf1da51ee7a7e6ede785a9d2c0847488b87e068d04bfbf",
+    "data/source_audits/order97/observed_gaps_01_08.json": "93d0f121e578099c7c52155131668d8706fbc7689afe5fa8ac1267228e107bde",
+    "tests/order97_gap_probes_01_08.py": "e4e908605e084a8106e0aab42f52fb425f2c6f4ff5705c639ddad29c5ca762cc"
+  },
+  "interpretation": "Selected keyword subject without explicit model/unit noun defaults to a unit; explicit subjects and physical model keyword ownership remain unchanged.",
+  "original_observation": "Pinned unsupported PSYKER residual and explicit-unit parser control; not a demonstrated official-provider defect.",
+  "acceptance_exemplar_kind": "canonical source-backed Core permission fixture, not an official ability/provider",
+  "generic_execution": "Source-vocabulary selected-subject parser; existing opponent-Shooting selected-target catalog consumer, strict ordinary trigger and single-keyword shape, typed mandatory/optional distinction; real catalog-loaded finite decisions, rules-unit keyword/range/source checks, modifier consumption, persistence/viewers/events/fork/replay/full lifecycle expiry.",
+  "source_admission_changed": false,
+  "source_compiler_acceptance_extended": true,
+  "source_admission_meaning": "Official source and catalog allowlists unchanged",
+  "provider_admission_changed": false,
+  "named_faction_certification": false,
+  "original_test_assertions_modified": [],
+  "original_order97_audit_unchanged": true,
+  "excluded": [
+    "02.05.01-obligation-12/P02O",
+    "named official-provider repair",
+    "general alternative-list grammar"
+  ],
+  "scope_document": "docs/ORDER_125_SCOPE_PLAN.md",
+  "explicit_model_boundary": "The ordinary selected-model trigger retains typed subject=selected_model evidence and cannot enter the existing unit-context consumer. Native catalog play traverses the opponent Shooting phase without offering a unit option for this excluded model family."
+}

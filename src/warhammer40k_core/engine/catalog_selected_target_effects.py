@@ -213,7 +213,7 @@ from warhammer40k_core.engine.shooting_phase_start_hooks import (
 from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
-from warhammer40k_core.rules.rule_ir import RuleClause
+from warhammer40k_core.rules.rule_ir import RuleClause, parameter_payload
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -852,7 +852,13 @@ def _shooting_start_groups_for_record(
                         phase=BattlePhase.SHOOTING,
                         hook_id=CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,
                         submission_kind=_SHOOTING_START_SUBMISSION_KIND,
-                        optional=True,
+                        optional=(
+                            selection_clause.trigger is not None
+                            and parameter_payload(selection_clause.trigger.parameters).get(
+                                "optional"
+                            )
+                            is True
+                        ),
                     )
                 )
     return tuple(groups)
