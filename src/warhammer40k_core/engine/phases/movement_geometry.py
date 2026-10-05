@@ -546,11 +546,6 @@ def _unit_has_vehicle_or_monster_keyword(keywords: tuple[str, ...]) -> bool:
     return "VEHICLE" in keyword_set or "MONSTER" in keyword_set
 
 
-def _unit_has_keyword_any(keywords: tuple[str, ...], keyword_any: frozenset[str]) -> bool:
-    keyword_set = {_canonical_keyword(keyword) for keyword in keywords}
-    return bool(keyword_set.intersection(keyword_any))
-
-
 def _canonical_keyword_set(keywords: tuple[str, ...]) -> frozenset[str]:
     if type(keywords) is not tuple:
         raise GameLifecycleError("keyword_any must be a tuple.")

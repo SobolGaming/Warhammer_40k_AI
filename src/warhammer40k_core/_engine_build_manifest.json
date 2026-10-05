@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6eb04ea6c75896dc4b9a08e8c05edbd83a7e9ea2e5b936473acc7e87cfa2e7a4",
-  "fingerprint": "6eb04ea6c75896dc4b9a08e8c05edbd83a7e9ea2e5b936473acc7e87cfa2e7a4",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2efc9e20db869f29162e8026123768d6233f2b2c05815c851b44a48e18499a98",
+  "fingerprint": "2efc9e20db869f29162e8026123768d6233f2b2c05815c851b44a48e18499a98",
   "resource_count": 3074,
   "resources": [
     {
@@ -510,9 +510,9 @@
       "sha256": "2775585df458da022599168403592c7ad2de40ab86ed7387efb307d5fc5da309"
     },
     {
-      "byte_length": 10413,
+      "byte_length": 11882,
       "path": "warhammer40k_core/core/model_keywords.py",
-      "sha256": "d6855205d8c1ea2d29ccd71ca570874277eba926186a55d8fd4651982117ff24"
+      "sha256": "6fedff27c48855866f6c29230a8cd34ae58c4d60fba76c03cbc652ff814c3649"
     },
     {
       "byte_length": 8656,
@@ -645,9 +645,9 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "byte_length": 53744,
+      "byte_length": 53855,
       "path": "warhammer40k_core/engine/abilities.py",
-      "sha256": "281371ce5be41d8e9283d3dfecab9f1a672b53c6d7a4e484d65938496cbbf847"
+      "sha256": "d65667efa58c3878114d96a8d89e42758164c0ae96081aeea35e41712ecea2d6"
     },
     {
       "byte_length": 32110,
@@ -11245,9 +11245,9 @@
       "sha256": "9ca88a7016481dc885513eef583f949bc43f6ca7ac11b13210f854172e2d9308"
     },
     {
-      "byte_length": 34229,
+      "byte_length": 34009,
       "path": "warhammer40k_core/engine/phases/movement_geometry.py",
-      "sha256": "66b20791766fecee5da0ea3bc61ea4c6f162734247e82980cd3a814ed54b6a60"
+      "sha256": "3f3677697784aa1461ef9c65348dff869d80dd70305ecfe306c784a8a3c9aed0"
     },
     {
       "byte_length": 10334,
@@ -13045,9 +13045,9 @@
       "sha256": "2aa66ee1f32b8592e832088bd153bb51f0d0a61da0b8977ef48b507ceb2f585e"
     },
     {
-      "byte_length": 98890,
+      "byte_length": 98751,
       "path": "warhammer40k_core/engine/transports.py",
-      "sha256": "ce8adc4b762716827174fcf6865963952f7596b06f4244794f65d176e09f1da6"
+      "sha256": "3487121ab241df312fa6fb797f828cb981959192e6cfb5b43d76e087e4f39041"
     },
     {
       "byte_length": 53082,
@@ -13130,9 +13130,9 @@
       "sha256": "c8ad7f37c2717024fb1f5ce53484320eecbc7315b18ef162a83590baf315eabd"
     },
     {
-      "byte_length": 59997,
+      "byte_length": 58994,
       "path": "warhammer40k_core/engine/unit_factory.py",
-      "sha256": "e6297a2a8826ab92bb78241414cde6498c98851fc5a396d3f8fb7b5de8967dd4"
+      "sha256": "2c74adbd0e779a726416e65710c7d9227d0545cfbd18dc63aebcf928915fe2cb"
     },
     {
       "byte_length": 1859,

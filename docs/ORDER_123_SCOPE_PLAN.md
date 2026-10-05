@@ -32,13 +32,16 @@ separately, and materialization authenticates exact factory payloads. Generic ga
 receive name context from the same living/retained model population as their keyword
 inventory. Required, any, excluded, ability, transport and weapon/ANTI consumers match
 native names exactly and preserve their existing conventional keyword aliases.
-Grants, faction contributions and retained formation source evidence preserve genuine
+Grants, applicable selected mustering contributions, faction contributions and retained formation source evidence preserve genuine
 ordinary roles even when a token also names a datasheet. Native selector declarations
 resolve eager duplicate/overlap and selector-grammar ambiguity only; declared full
 native tokens retain punctuation such as a leading `Non-` or embedded `/`, while
 undeclared conventional selectors retain the existing grammar. Declarations cannot
 create runtime eligibility.
 These typed optional fields round-trip in the existing payload envelopes.
+The existing mustering assignment operation lives with the core model-keyword owner;
+it retains model-profile filtering and typed factory errors and keeps the factory
+module within its existing size budget.
 
 Living/retained model queries and attached/split rules-unit unions consume the
 effective assignments. The name therefore survives a specialist casualty while

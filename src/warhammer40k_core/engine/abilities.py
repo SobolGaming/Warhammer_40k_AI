@@ -1381,6 +1381,8 @@ def _validate_keyword_inventory(
 ) -> tuple[str, ...]:
     if type(values) is not tuple or type(name_keywords) is not tuple:
         raise GameLifecycleError(f"{field_name} must be a tuple.")
+    if not name_keywords:
+        return _validate_keyword_tuple(field_name, cast(tuple[object, ...], values))
     names = {_validate_identifier("name keyword", value).upper() for value in name_keywords}
     seen: set[tuple[bool, str]] = set()
     result: list[str] = []

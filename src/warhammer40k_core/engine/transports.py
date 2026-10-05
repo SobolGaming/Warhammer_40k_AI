@@ -2339,10 +2339,6 @@ def _validate_objective_marker_tuple(
     return tuple(sorted(markers, key=lambda marker: marker.objective_marker_id))
 
 
-def _canonical_keyword(value: str) -> str:
-    return _validate_identifier("keyword", value).upper().replace(" ", "_").replace("-", "_")
-
-
 def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
     if type(values) is not tuple:
         raise GameLifecycleError(f"{field_name} must be a tuple.")

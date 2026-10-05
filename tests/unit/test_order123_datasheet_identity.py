@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
+from typing import cast
 
 import pytest
 from tests.model_keyword_helpers import mixed_keyword_catalog, mixed_keyword_unit
@@ -369,8 +370,18 @@ def test_loaded_lifecycle_identity_pending_continuation_fork_viewers_and_exact_r
     assert_persistence_viewers_replay(restored)
 
 
-def _native_name_unit(name: str, *, ordinary_name: bool = False) -> UnitInstance:
-    from warhammer40k_core.engine.list_validation import UnitMusterSelection
+def _native_name_unit(
+    name: str, *, ordinary_name: bool = False, selected_name_grant: bool = False
+) -> UnitInstance:
+    from warhammer40k_core.core.datasheet import (
+        DatasheetMusteringOption,
+        DatasheetMusteringOptionEffect,
+        DatasheetMusteringOptionEffectKind,
+    )
+    from warhammer40k_core.engine.list_validation import (
+        MusteringOptionSelection,
+        UnitMusterSelection,
+    )
     from warhammer40k_core.engine.unit_factory import UnitFactory
     from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
 
@@ -384,6 +395,20 @@ def _native_name_unit(name: str, *, ordinary_name: bool = False) -> UnitInstance
                 keywords=tuple(sorted({*sheet.keywords.keywords, sheet.name_keyword})),
             ),
         )
+    if selected_name_grant:
+        option = DatasheetMusteringOption(
+            option_id="native-name-grant",
+            selection_group_id="native-name",
+            label="Independent ordinary keyword grant",
+            source_ids=("core-test:mustering-name",),
+            effects=(
+                DatasheetMusteringOptionEffect(
+                    kind=DatasheetMusteringOptionEffectKind.ADD_KEYWORD,
+                    keyword=sheet.name_keyword,
+                ),
+            ),
+        )
+        sheet = replace(sheet, mustering_options=(option,))
     catalog = replace(
         catalog,
         datasheets=tuple(
@@ -402,6 +427,9 @@ def _native_name_unit(name: str, *, ordinary_name: bool = False) -> UnitInstance
                 )
                 for row in sheet.composition
             ),
+            mustering_option_selections=(MusteringOptionSelection("native-name-grant"),)
+            if selected_name_grant
+            else (),
         ),
     )
 
@@ -727,8 +755,9 @@ def test_current_runtime_restore_authenticates_name_classification(change: str) 
         nonlocal found
         if isinstance(value, dict):
             if "keyword_assignment" in value and not found:
-                assignment = value["keyword_assignment"]
+                assignment = cast(dict[str, object], value)["keyword_assignment"]
                 assert isinstance(assignment, dict)
+                assignment = cast(dict[str, object], assignment)
                 if change == "lost":
                     del assignment["name_keyword"]
                     del assignment["name_is_ordinary_keyword"]
@@ -737,10 +766,10 @@ def test_current_runtime_restore_authenticates_name_classification(change: str) 
                         "name_is_ordinary_keyword"
                     ]
                 found = True
-            for child in value.values():
+            for child in cast(dict[str, object], value).values():
                 change_assignment(child)
         elif isinstance(value, list):
-            for child in value:
+            for child in cast(list[object], value):
                 change_assignment(child)
 
     change_assignment(payload)
@@ -816,3 +845,52 @@ def test_declared_native_weapon_selectors_preserve_names_at_grammar_boundaries(n
     assert (
         anti_keyword_critical_threshold(profile=anti_profile, target_keywords=("INFANTRY",)) is None
     )
+
+
+def test_selected_mustering_name_grant_keeps_its_independent_ordinary_role() -> None:
+    unit = _native_name_unit("DEDICATED TRANSPORT", selected_name_grant=True)
+    assert unit_has_keyword(unit, "DEDICATED-TRANSPORT")
+    assert unit.datasheet_name_keywords == ()
+    assert all(model.keyword_assignment.name_is_ordinary_keyword for model in unit.own_models)
+    assert all(
+        "core-test:mustering-name" in model.keyword_assignment.source_ids
+        for model in unit.own_models
+    )
+    restored = UnitInstance.from_payload(unit.to_payload())
+    assert all(model.keyword_assignment.name_is_ordinary_keyword for model in restored.own_models)
+    assert unit_has_keyword(restored, "DEDICATED-TRANSPORT")
+
+
+@pytest.mark.parametrize("applicable", [False, True])
+def test_mustering_name_role_is_limited_to_the_selected_model_profile(applicable: bool) -> None:
+    from warhammer40k_core.core.datasheet import (
+        DatasheetMusteringOption,
+        DatasheetMusteringOptionEffect,
+        DatasheetMusteringOptionEffectKind,
+    )
+    from warhammer40k_core.core.model_keywords import keyword_assignment_with_mustering_effects
+    from warhammer40k_core.engine.unit_factory import UnitFactoryError
+
+    assignment = _native_name_unit("DEDICATED TRANSPORT").own_models[0].keyword_assignment
+    option = DatasheetMusteringOption(
+        option_id="scoped-name-grant",
+        selection_group_id="scoped-name",
+        label="Scoped grant",
+        model_profile_id=assignment.model_profile_id if applicable else "unmatched-profile",
+        source_ids=("core-test:scoped-name",),
+        effects=(
+            DatasheetMusteringOptionEffect(
+                kind=DatasheetMusteringOptionEffectKind.ADD_KEYWORD,
+                keyword="DEDICATED TRANSPORT",
+            ),
+        ),
+    )
+    result = keyword_assignment_with_mustering_effects(
+        assignment=assignment,
+        selected_mustering_options=(option,),
+        error_factory=UnitFactoryError,
+    )
+    assert result.name_is_ordinary_keyword is applicable
+    assert ("core-test:scoped-name" in result.source_ids) is applicable
+    if not applicable:
+        assert result.to_payload() == assignment.to_payload()

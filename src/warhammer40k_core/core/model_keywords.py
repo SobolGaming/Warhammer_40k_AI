@@ -5,12 +5,51 @@ from __future__ import annotations
 from dataclasses import dataclass, field, replace
 from typing import NotRequired, Self, TypedDict
 
-from warhammer40k_core.core.datasheet import DatasheetDefinition
-from warhammer40k_core.core.validation import IdentifierValidator, canonical_keyword_token
+from warhammer40k_core.core.datasheet import (
+    DatasheetDefinition,
+    DatasheetMusteringOption,
+    DatasheetMusteringOptionEffectKind,
+)
+from warhammer40k_core.core.validation import (
+    IdentifierValidator,
+    ValidationErrorFactory,
+    canonical_keyword_token,
+)
 
 
 class ModelKeywordError(ValueError):
     """Model keyword ownership is incomplete, ambiguous, or malformed."""
+
+
+def keyword_assignment_with_mustering_effects(
+    *,
+    assignment: ModelKeywordAssignment,
+    selected_mustering_options: tuple[DatasheetMusteringOption, ...],
+    error_factory: ValidationErrorFactory,
+) -> ModelKeywordAssignment:
+    keywords = set(assignment.keywords)
+    source_ids = set(assignment.source_ids)
+    ordinary_name = assignment.name_is_ordinary_keyword
+    for option in selected_mustering_options:
+        if option.model_profile_id not in (None, assignment.model_profile_id):
+            continue
+        for effect in option.effects:
+            if effect.kind is DatasheetMusteringOptionEffectKind.ADD_KEYWORD:
+                if effect.keyword is None:
+                    raise error_factory("Mustering option keyword effect is missing keyword.")
+                keywords.add(effect.keyword)
+                source_ids.update(option.source_ids)
+                ordinary_name = ordinary_name or effect.keyword == assignment.name_keyword
+                continue
+            if effect.kind is DatasheetMusteringOptionEffectKind.ADD_WARGEAR:
+                continue
+            raise error_factory("Unsupported mustering option effect.")
+    return replace(
+        assignment,
+        keywords=tuple(sorted(keywords)),
+        source_ids=tuple(sorted(source_ids)),
+        name_is_ordinary_keyword=ordinary_name,
+    )
 
 
 class ModelKeywordAssignmentPayload(TypedDict):

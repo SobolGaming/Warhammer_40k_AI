@@ -39,6 +39,7 @@ from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRe
 from warhammer40k_core.core.model_keywords import (
     ModelKeywordAssignment,
     ModelKeywordAssignmentPayload,
+    keyword_assignment_with_mustering_effects,
     model_keyword_assignment,
 )
 from warhammer40k_core.core.random_profile_values import (
@@ -620,9 +621,10 @@ class UnitFactory:
             replace(
                 model,
                 wargear_ids=model_wargear_ids[model.model_instance_id],
-                keyword_assignment=_keyword_assignment_with_mustering_effects(
+                keyword_assignment=keyword_assignment_with_mustering_effects(
                     assignment=model.keyword_assignment,
                     selected_mustering_options=selected_mustering_options,
+                    error_factory=UnitFactoryError,
                 ),
             )
             for model in own_models
@@ -1178,31 +1180,6 @@ def _apply_mustering_add_wargear_effect_to_models(
         raise UnitFactoryError("Mustering option has no eligible model bearers.")
     model = sorted(models, key=lambda item: item.model_instance_id)[0]
     wargear_by_model_id[model.model_instance_id].append(effect.wargear_id)
-
-
-def _keyword_assignment_with_mustering_effects(
-    *,
-    assignment: ModelKeywordAssignment,
-    selected_mustering_options: tuple[DatasheetMusteringOption, ...],
-) -> ModelKeywordAssignment:
-    keywords = set(assignment.keywords)
-    source_ids = set(assignment.source_ids)
-    for option in selected_mustering_options:
-        if option.model_profile_id not in (None, assignment.model_profile_id):
-            continue
-        for effect in option.effects:
-            if effect.kind is DatasheetMusteringOptionEffectKind.ADD_KEYWORD:
-                if effect.keyword is None:
-                    raise UnitFactoryError("Mustering option keyword effect is missing keyword.")
-                keywords.add(effect.keyword)
-                source_ids.update(option.source_ids)
-                continue
-            if effect.kind is DatasheetMusteringOptionEffectKind.ADD_WARGEAR:
-                continue
-            raise UnitFactoryError("Unsupported mustering option effect.")
-    return replace(
-        assignment, keywords=tuple(sorted(keywords)), source_ids=tuple(sorted(source_ids))
-    )
 
 
 def _model_geometry_for_profile(
