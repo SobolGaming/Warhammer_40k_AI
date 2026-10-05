@@ -1064,6 +1064,7 @@ def test_phase17d_once_per_battle_activation_consumes_and_modifies_source_model(
 def test_phase17d_generic_modifier_rule_executes_as_source_linked_effect() -> None:
     compiled = _compiled("Add 1 to hit rolls for that unit.")
     context = _execution_context(
+        record_persisting_effects=False,
         target_unit_instance_ids=("army-alpha:intercessor-unit-1",),
     )
 
@@ -1109,17 +1110,22 @@ def test_phase17d_this_unit_effect_uses_source_unit_binding() -> None:
 
     missing_source = execute_rule_ir(
         rule_ir=compiled.rule_ir,
-        context=_execution_context(),
+        context=_execution_context(
+            record_persisting_effects=False,
+        ),
         registry=default_rule_execution_registry(),
     )
     explicit_target_without_source = execute_rule_ir(
         rule_ir=compiled.rule_ir,
-        context=_execution_context(target_unit_instance_ids=(unrelated_target_unit_id,)),
+        context=_execution_context(
+            record_persisting_effects=False, target_unit_instance_ids=(unrelated_target_unit_id,)
+        ),
         registry=default_rule_execution_registry(),
     )
     applied = execute_rule_ir(
         rule_ir=compiled.rule_ir,
         context=_execution_context(
+            record_persisting_effects=False,
             source_unit_instance_id=source_unit_id,
             target_unit_instance_ids=(unrelated_target_unit_id,),
         ),
@@ -1141,12 +1147,16 @@ def test_phase17d_optional_wargear_bearer_unit_effects_execute_generically() -> 
 
     icon_result = execute_rule_ir(
         rule_ir=icon.rule_ir,
-        context=_execution_context(source_unit_instance_id=source_unit_id),
+        context=_execution_context(
+            record_persisting_effects=False, source_unit_instance_id=source_unit_id
+        ),
         registry=default_rule_execution_registry(),
     )
     instrument_result = execute_rule_ir(
         rule_ir=instrument.rule_ir,
-        context=_execution_context(source_unit_instance_id=source_unit_id),
+        context=_execution_context(
+            record_persisting_effects=False, source_unit_instance_id=source_unit_id
+        ),
         registry=default_rule_execution_registry(),
     )
 
@@ -2370,6 +2380,7 @@ def test_phase17d_desperate_escape_modifier_executes_when_target_is_battle_shock
     result = execute_rule_ir(
         rule_ir=rule_ir,
         context=_execution_context(
+            record_persisting_effects=False,
             target_unit_instance_ids=(target_unit_id,),
             trigger_payload={"target_unit_is_battle_shocked": True},
             phase=BattlePhaseKind.MOVEMENT,
@@ -4252,6 +4263,7 @@ def test_phase17d_rule_ir_payload_round_trips_through_execution_result() -> None
     result = execute_rule_ir(
         rule_ir=compiled.rule_ir,
         context=_execution_context(
+            record_persisting_effects=False,
             target_unit_instance_ids=("army-alpha:intercessor-unit-1",),
         ),
         registry=default_rule_execution_registry(),
@@ -4607,6 +4619,7 @@ def test_phase17d_ability_bridge_executes_compiled_rule_ir_payload() -> None:
             trigger_kind=TimingTriggerKind.ANY_PHASE,
             target_unit_instance_id="army-alpha:intercessor-unit-1",
             source_keywords=(),
+            state=_battle_state_with_scenario(),
         ),
     )
     replay_payload = _json_object(result.replay_payload)
@@ -5132,6 +5145,7 @@ def _execution_context(
     trigger_payload: JsonValue = None,
     phase: BattlePhaseKind | None = BattlePhaseKind.COMMAND,
     active_player_id: str | None = "player-a",
+    record_persisting_effects: bool = True,
 ) -> RuleExecutionContext:
     return RuleExecutionContext(
         game_id="phase17d-game",
@@ -5146,6 +5160,7 @@ def _execution_context(
         trigger_payload=trigger_payload,
         state=state,
         event_log=event_log,
+        record_persisting_effects=record_persisting_effects,
     )
 
 

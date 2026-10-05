@@ -143,6 +143,16 @@ def generic_rule_modified_weapon_profile(context: WeaponProfileModifierContext) 
         legacy_attacker_role_allowed=lambda _candidate: True,
         legacy_target_role_allowed=lambda _candidate: False,
     ):
+        if _characteristic_parameter(effect.parameters) not in {
+            Characteristic.WEAPON_SKILL,
+            Characteristic.BALLISTIC_SKILL,
+            Characteristic.STRENGTH,
+            Characteristic.ATTACKS,
+            Characteristic.ARMOR_PENETRATION,
+            Characteristic.DAMAGE,
+            Characteristic.RANGE,
+        }:
+            continue
         profile = _profile_with_characteristic_modifier(profile=profile, effect=effect)
     return profile
 

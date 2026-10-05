@@ -3849,6 +3849,93 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order122-default-effect-lifetimes": {
+      "paths": [
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/engine/generic_effect_history.py",
+        "src/warhammer40k_core/engine/generic_rule_attack_hooks.py",
+        "src/warhammer40k_core/engine/primary_mission_objective_control_source_authority.py",
+        "src/warhammer40k_core/engine/rule_duration_execution.py",
+        "src/warhammer40k_core/engine/rule_execution.py"
+      ],
+      "owners": [
+        "@module",
+        "_clause_semantic_unavailable_reason",
+        "_effect_from_execution",
+        "_implicit_trigger_period",
+        "_persisting_effect_or_none",
+        "_validate_direct_effect_identity",
+        "effect_uses_implicit_duration",
+        "expiration_for_clause_effect",
+        "generic_rule_modified_weapon_profile",
+        "rule_duration_unavailable_reason"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order122-regressions": {
+      "paths": [
+        "tests/order122_helpers.py",
+        "tests/unit/test_order122_effect_defaults.py",
+        "tests/unit/test_phase17d_rule_execution.py"
+      ],
+      "owners": [
+        "@module",
+        "_execution_context",
+        "advance_to_default_grant",
+        "default_effect_session",
+        "submit_quiet_choice",
+        "test_default_lifetime_uses_period_and_actual_turn_owner",
+        "test_explicit_duration_always_overrides_default",
+        "test_implicit_duration_reaches_weapon_characteristic_consumer",
+        "test_loaded_default_grant_full_cycles_restore_fork_viewers_and_replay",
+        "test_missing_default_calendar_prevents_preceding_command_point_mutation",
+        "test_nonpersistent_rule_evaluation_needs_no_implicit_calendar",
+        "test_phase17d_ability_bridge_executes_compiled_rule_ir_payload",
+        "test_phase17d_desperate_escape_modifier_executes_when_target_is_battle_shocked",
+        "test_phase17d_generic_modifier_rule_executes_as_source_linked_effect",
+        "test_phase17d_optional_wargear_bearer_unit_effects_execute_generically",
+        "test_phase17d_rule_ir_payload_round_trips_through_execution_result",
+        "test_phase17d_this_unit_effect_uses_source_unit_binding",
+        "test_typed_trigger_period_cannot_be_granted_in_a_different_phase"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order122-source-evidence": {
+      "paths": [
+        "data/source_audits/order122/source.audit.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order122-contract-publication": {
+      "paths": [
+        "conformance/typescript/src/contract.ts",
+        "contracts/README.md",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

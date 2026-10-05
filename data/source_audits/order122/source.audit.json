@@ -1,0 +1,51 @@
+{
+  "order": 122,
+  "base": "e6d728833f41ac88d76a281b1ad93cac5346006b",
+  "requirements": [
+    "01.02.02-obligation-05",
+    "01.02.02-obligation-06"
+  ],
+  "selected_sources_path": "data/source_audits/order97/selected-sources.json",
+  "selected_sources_sha256": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+  "selected_core_rows": [
+    {
+      "row_id": "rule:01:01.02.02:1",
+      "category": "01",
+      "locator": "01.02.02",
+      "title": "Persisting Rules Effects",
+      "occurrence": 1,
+      "source_sha256": "ff0539396b6fb7d24b9c5e5cf92ddff75aee617b2d2dca2c86b71f12951abb62",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "ee4b1b41b2ff4a02ec05df70308fe27aba7ea553fbaf3a74c4889396be080a3e",
+          "value": "Some rules apply an effect that lasts until a certain duration has passed (e.g. until the start of your next turn). Such effects are known as persisting effects."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "832380551462786aaa3c8604b21e9c4826eff6d3ca56a66ad23f6188a04fc5f6",
+          "value": "If a persisting effect applies to a unit when you place it in \u0005strategic reserves\u0006 or when it embarks within a \u0003TRANSPORT\u0004, make a note of that effect and its duration; if that unit is set up on the battlefield again, any persisting effects continue to apply to that unit for their full duration."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "0fa4bcff9c3873ad8b5d8ecf199005e9ff89f6f74e2ba20ce98ac53e0311d5a1",
+          "value": "If you have a rule that specifies when it is triggered (e.g. 'In the Shooting phase') and it does not specify how long it is active for, it is only active for the duration of that specified period (e.g. until the end of that Shooting phase). After that period, that effect is no longer applicable/active."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "f997559fc50e18a64ac916a476121522849483ff351dcc443fe27e31783a210a",
+          "value": "If a rule or effect is given to a unit and it does not specify how long it is active for, it is only active for the phase in which it was given."
+        }
+      ],
+      "selected_provider": "Game Datamissions",
+      "historical_source_row_sha256": "81b05b43152d421e06fc462b1489b62edd9599375c7c8e927d989b811d9b4bde",
+      "review_category": "01"
+    }
+  ],
+  "current_faction_admission": false,
+  "scope": "Existing selected Core generic default duration permission. Canonical loaded RuleIR fixtures demonstrate execution; no provider/source-policy extension or named current faction activation."
+}

@@ -1,5 +1,10 @@
 # CORE V2 external contract
 
+Contract 44.3.8 publishes shared Core default effect lifetimes through existing
+activation, effect, event and persistence envelopes. Source duration metadata stays
+null; persisted effects carry derived expiry. Exact runtime identity remains
+required. See [Order 122](../docs/ORDER_122_SCOPE_PLAN.md).
+
 Contract 44.3.7 publishes the Core Command-abilities timing seam through existing
 sequencing and event envelopes. See [Order 121](../docs/ORDER_121_SCOPE_PLAN.md).
 
@@ -62,7 +67,7 @@ from HealingEffect and requires source-bound engagement evidence on battlefield
 revival events. See [35 to 36 migration](migrations/35-to-36.md).
 
 
-Contract version: `44.3.2`
+Contract version: `44.3.8`
 
 V963-SNAP applies complete current Core 15.09: Snap hits are ordinary hits,
 so critical-hit effects never trigger; Critical Wounds remain possible.
