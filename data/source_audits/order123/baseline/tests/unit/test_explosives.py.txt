@@ -5,7 +5,6 @@ from dataclasses import replace
 import pytest
 from tests.core_stratagem_helpers import _replace_unit_keywords, _replace_unit_poses
 from tests.explosives_helpers import explosives_scene
-from tests.unit_keyword_helpers import with_model_keywords
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.engine.explosives_selection import ExplosivesSelection
@@ -276,7 +275,7 @@ def test_explosives_revalidates_before_queue_pop_or_spend(drift: str) -> None:
         changed = replace(
             source,
             own_models=tuple(
-                with_model_keywords(m, keywords=("INFANTRY",))
+                replace(m, keyword_assignment=replace(m.keyword_assignment, keywords=("INFANTRY",)))
                 if m.model_instance_id == selected_model
                 else m
                 for m in source.own_models
@@ -410,7 +409,9 @@ def test_explosives_range_and_keywords_belong_to_the_selected_model() -> None:
     replacement = replace(
         source,
         own_models=(
-            with_model_keywords(first, keywords=("INFANTRY",)),
+            replace(
+                first, keyword_assignment=replace(first.keyword_assignment, keywords=("INFANTRY",))
+            ),
             second,
         ),
     )

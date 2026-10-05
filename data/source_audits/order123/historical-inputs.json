@@ -1,7 +1,7 @@
 {
   "reviewed_commit": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
   "also_present_at_base": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
-  "purpose": "Retain every original mixed-keyword assertion and fixture byte. Current fixture explicitly includes its Core name token; the complete exact projection expectation adds only that token. No original assertion or branch is removed.",
+  "purpose": "Retain every original keyword assertion and fixture byte. Current fixtures retain the exact factory-owned Core name token while replacing ordinary/faction contributions; the complete projection expectation adds only that token. No original assertion or branch is removed.",
   "current_evidence": "docs/ORDER_123_SCOPE_PLAN.md",
   "files": [
     {
@@ -19,6 +19,30 @@
       "git_path": "tests/unit/test_model_keyword_authority.py",
       "sha256": "10f59d7b55948ac58c070af08f85f7b2276c9e88e5aaeef5c07313f6053b6b46",
       "bytes": 16751
+    },
+    {
+      "path": "tests/unit_keyword_helpers.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/unit_keyword_helpers.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/unit_keyword_helpers.py",
+      "sha256": "3f290f4f7bcd08cdb65d01f8b3cb062da3ba919aa426a4ba190fae1eafd862a5",
+      "bytes": 1586
+    },
+    {
+      "path": "tests/unit/test_explosives.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/unit/test_explosives.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/unit/test_explosives.py",
+      "sha256": "9ada58347dbcf0568f0a3d36b76f23a89df35413aba441a3f5cfda0100863463",
+      "bytes": 25035
+    },
+    {
+      "path": "tests/unit/test_phase13b_shooting_declarations.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/unit/test_phase13b_shooting_declarations.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/unit/test_phase13b_shooting_declarations.py",
+      "sha256": "b3d88280274432f740c2c920976d2f4f225f0b6e670252da37e0ce57b2c0ba3c",
+      "bytes": 829124
     }
   ]
 }

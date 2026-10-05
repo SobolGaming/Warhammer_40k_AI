@@ -4171,8 +4171,11 @@
       "paths": [
         "tests/fixtures/phase18a_projection_join_sample.json",
         "tests/model_keyword_helpers.py",
+        "tests/unit/test_explosives.py",
         "tests/unit/test_model_keyword_authority.py",
-        "tests/unit/test_order123_datasheet_identity.py"
+        "tests/unit/test_order123_datasheet_identity.py",
+        "tests/unit/test_phase13b_shooting_declarations.py",
+        "tests/unit_keyword_helpers.py"
       ],
       "owners": [
         "@document",
@@ -4185,6 +4188,8 @@
         "test_current_runtime_restore_authenticates_name_classification",
         "test_declared_native_weapon_selectors_preserve_names_at_grammar_boundaries",
         "test_explicit_native_selector_declarations_disambiguate_eager_validation_only",
+        "test_explosives_range_and_keywords_belong_to_the_selected_model",
+        "test_explosives_revalidates_before_queue_pop_or_spend",
         "test_identity_keeps_native_keyword_punctuation_and_deduplicates",
         "test_keyword_casualty_facade_restore_replay_and_both_viewers",
         "test_live_model_scope_keeps_identity_after_specialist_casualty",
@@ -4197,9 +4202,12 @@
         "test_native_selector_metadata_preserves_eager_domain_container_errors",
         "test_near_names_coexist_in_one_attached_inventory_without_aliasing_each_other",
         "test_official_admitted_catalog_already_has_names_and_preserves_reconciliation",
+        "test_phase13d_hazardous_tests_resolve_after_all_attacks",
         "test_scoped_and_materialization_assignments_add_only_datasheet_identity",
         "test_selected_mustering_name_grant_keeps_its_independent_ordinary_role",
-        "test_weapon_positive_negative_and_anti_selectors_keep_native_spelling"
+        "test_weapon_positive_negative_and_anti_selectors_keep_native_spelling",
+        "with_model_keywords",
+        "with_unit_keywords"
       ],
       "families": [],
       "sensitive": false,
@@ -4208,7 +4216,10 @@
     "order123-source-evidence": {
       "paths": [
         "data/source_audits/order123/baseline/tests/model_keyword_helpers.py.txt",
+        "data/source_audits/order123/baseline/tests/unit/test_explosives.py.txt",
         "data/source_audits/order123/baseline/tests/unit/test_model_keyword_authority.py.txt",
+        "data/source_audits/order123/baseline/tests/unit/test_phase13b_shooting_declarations.py.txt",
+        "data/source_audits/order123/baseline/tests/unit_keyword_helpers.py.txt",
         "data/source_audits/order123/historical-inputs.json",
         "data/source_audits/order123/source.audit.json",
         "tools/core_rules_order97_history.py"

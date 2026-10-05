@@ -56,7 +56,10 @@ gates; they do not claim newly supported parsing of named faction rule text.
 The original mixed-keyword fixture now explicitly lists its own name token,
 preserving the original materialization equality and source-ID assertions. The
 complete projection expectation adds that same token without removing an existing
-assertion or branch. Exact pre-change Git blobs are retained in the bounded
+assertion or branch. The shared ordinary-keyword replacement fixture retains each
+model's factory-owned native name and explicitly classifies supplied ordinary
+contributions, preserving scoped ownership and original transport/Psychic controls.
+Exact pre-change Git blobs are retained in the bounded
 historical mapping; the Order97 correctness inventory remains historical.
 
 No source, provider or admission policy changes, faction scaffolds, named handlers,
