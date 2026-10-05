@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from math import cos, radians, sin
+
 import pytest
 from tests.core_clause_evidence_helpers import clause_session
 from tests.order126_movement_helpers import (
@@ -364,3 +366,74 @@ def test_native_sequential_move_against_overhanging_enemy_restores_and_replays(
         row.pose == witness.final_pose_for_model(row.model_instance_id)
         for row in moved.model_placements
     )
+
+
+@pytest.mark.parametrize("attached", [False, True])
+def test_native_sequential_charge_against_overhanging_enemy_restores_and_replays(
+    attached: bool,
+) -> None:
+    from tests.charge_distance_helpers import select_targets
+    from tests.order85_overhang_helpers import overhang_session
+
+    from warhammer40k_core.core.ruleset_descriptor import MovementMode
+    from warhammer40k_core.engine.movement_proposals import ProposalKind
+    from warhammer40k_core.engine.phases.charge import ChargeMoveProposal
+
+    session = overhang_session(phase=BattlePhase.CHARGE, start_y=8, attached=attached)
+    assert_session_roundtrips(session)
+    request = pending_request(session)
+    unit_id = "attached-unit:army-alpha:bodyguard" if attached else "army-alpha:source"
+    selected = session.submit_option(
+        request_id=request.request_id, option_id=unit_id, result_id="order126-charge-select"
+    )
+    assert selected.status_kind is not LifecycleStatusKind.INVALID
+    request = select_targets(
+        session, pending_request(session), ("army-beta:enemy",), result_id="order126-charge-targets"
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    placement = RulesUnitPlacement.from_battlefield(
+        view=rules_unit_view_from_armies(
+            armies=tuple(state.army_definitions), unit_instance_id=proposal.unit_instance_id
+        ),
+        battlefield_state=state.battlefield_state,
+    )
+    source = next(
+        row for row in placement.model_placements if row.unit_instance_id.endswith(":source")
+    )
+    bodyguard = tuple(
+        row for row in placement.model_placements if row.unit_instance_id.endswith(":bodyguard")
+    )
+    ordered = (source, *bodyguard)
+    radius = 4 + 16 / 25.4
+    endpoints = (
+        Pose.at(10, 14 - 4 - 20 / 25.4),
+        *(
+            Pose.at(10 + radius * cos(radians(angle)), 14 + radius * sin(radians(angle)))
+            for angle in (-50, -70, -110, -130, -150)
+        ),
+    )[: len(ordered)]
+    witness = PathWitness.for_paths(
+        tuple(
+            (row.model_instance_id, (row.pose, endpoint))
+            for row, endpoint in zip(ordered, endpoints, strict=True)
+        )
+    )
+    move = ChargeMoveProposal(
+        proposal_request_id=request.request_id,
+        proposal_kind=ProposalKind.CHARGE_MOVE,
+        unit_instance_id=unit_id,
+        movement_phase_action="charge_move",
+        movement_mode=MovementMode.CHARGE,
+        charge_target_unit_instance_ids=("army-beta:enemy",),
+        witness=witness,
+    )
+    result = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        payload=validate_json_value(move.to_payload()),
+        result_id="order126-charge-legal",
+    )
+    assert result.status_kind is not LifecycleStatusKind.INVALID
+    assert_session_roundtrips(session)

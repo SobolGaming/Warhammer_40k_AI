@@ -62,7 +62,7 @@ def test_selected_source_pins_and_original_fixture_archives_remain_exact() -> No
 
 @pytest.mark.parametrize("mutation", ["base", "category", "owner", "path"])
 @pytest.mark.parametrize(
-    "bound_path, operation",
+    ("bound_path", "operation"),
     [
         ("src/warhammer40k_core/geometry/pathing.py", "geometry-search"),
         ("tests/normal_move_occurrence_helpers.py", "fixture-movement"),

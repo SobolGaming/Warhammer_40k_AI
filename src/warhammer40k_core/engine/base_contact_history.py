@@ -294,10 +294,16 @@ def validate_base_contact_history(
                 non_targets = tuple(
                     (m,) for m in enemy_models if m.model_id not in target_model_ids
                 )
+                # Path occupancy is sequential; Charge endpoint coherency checks
+                # the whole moving rules unit at its completed placement.
+                endpoint_peers = tuple(
+                    replace(peer, pose=complete_witness.final_pose_for_model(peer.model_id))
+                    for peer in peers
+                )
                 expected_query = charge_endpoint_query(
                     path_context=context,
                     terrain_context=query.terrain_context,
-                    peers=peers,
+                    peers=endpoint_peers,
                     targets=targets,
                     non_targets=non_targets,
                     ruleset=ruleset,

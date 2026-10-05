@@ -32,6 +32,12 @@ Finite triggered decisions retain their required offered-witness boundary: a
 submitted model order must match the selected option's accepted order before
 physical mutation. Charge history recovers its complete order from the matched
 accepted decision, including stationary members.
+The independent frozen2 rules review reproduced an accepted attached Charge
+whose untouched completed checkpoint failed restore when sequential path peers
+were reused as coherent endpoint peers. Charge history now retains sequential
+path occupancy and independently reconstructs whole-group final endpoint poses
+from that same complete accepted witness. Ordinary and attached native Charge
+regressions cover save/load, forks, viewers/events and replay.
 Component validation retains the complete rules-unit witness
 to preserve interleaved component order. Existing whole-group final coherency,
 terrain, engagement, movement budgets and invalid-proposal atomicity remain
