@@ -107,6 +107,10 @@ from warhammer40k_core.rules.rule_parser_token_helpers import (
 from warhammer40k_core.rules.rule_parser_token_helpers import (
     subject_token as _subject_token,
 )
+from warhammer40k_core.rules.rule_target_subject_parser import (
+    first_target_subject_match,
+    target_subject_matches,
+)
 from warhammer40k_core.rules.rule_template_classifier import (
     template_id_for_clause as _template_id_for_clause,
 )
@@ -264,12 +268,6 @@ _DICE_TRIGGER_RE = re.compile(
 )
 _LEADING_UNIT_RE = re.compile(
     r"\bwhile\s+this\s+model\s+is\s+leading\s+a\s+unit\b",
-    re.IGNORECASE,
-)
-_TARGET_RE = re.compile(
-    r"\b(?:select\s+)?(?:one\s+)?(?:new\s+)?(?P<allegiance>friendly|enemy)\s+"
-    r"(?:(?P<keyword>[A-Z][A-Z0-9_'-]*(?:\s+[A-Z0-9_'-]+){0,5})\s+)?"
-    r"(?:model|unit)\b",
     re.IGNORECASE,
 )
 _THIS_UNIT_RE = re.compile(r"\bthis\s+unit\b", re.IGNORECASE)
@@ -1359,7 +1357,10 @@ def _parse_keyword_conditions(
                 gate_subject="destroyed_unit",
             )
         )
-    for match in _TARGET_RE.finditer(clause_text.text):
+    for match in target_subject_matches(
+        clause_text.text,
+        source_keyword_sequence_parts=parser_context.source_keyword_sequence_parts,
+    ):
         if _match_inside_ranges(match, target_match_ranges):
             continue
         keyword_text = match.group("keyword")
@@ -1576,7 +1577,10 @@ def _parse_target(
             source_span=_span_from_match(clause_text, hit_target_match),
             parameters=parameters_from_pairs(tuple(target_pairs)),
         )
-    match = _TARGET_RE.search(clause_text.text)
+    match = first_target_subject_match(
+        clause_text.text,
+        source_keyword_sequence_parts=parser_context.source_keyword_sequence_parts,
+    )
     if match is not None:
         allegiance = _lower_group(match, "allegiance")
         target_kind = (
@@ -1651,7 +1655,10 @@ def _aura_target_parameter_pairs(
     pairs: list[tuple[str, RuleParameterValue]] = [("eligible_target", "aura_units")]
     if aura_excludes_source_unit(clause_text.text):
         pairs.append(("include_source_unit", False))
-    match = _TARGET_RE.search(clause_text.text)
+    match = first_target_subject_match(
+        clause_text.text,
+        source_keyword_sequence_parts=parser_context.source_keyword_sequence_parts,
+    )
     if match is None:
         pairs.append(("allegiance", "any"))
         return tuple(pairs)

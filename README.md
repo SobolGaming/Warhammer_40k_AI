@@ -1,3 +1,8 @@
+Order125 / P02N normalizes selected implicit keyword subjects to units at the
+data boundary and executes them through the existing catalog selected-target
+consumer. Model keyword ownership remains separate; see
+[source and scope](docs/ORDER_125_SCOPE_PLAN.md).
+
 # warhammer40k-core-v2
 
 Order124 / P02M compiles the retained Core nested reroll exemplar through generic

@@ -4427,6 +4427,85 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order125-default-unit-subjects": {
+      "paths": [
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/engine/catalog_selected_target_effects.py",
+        "src/warhammer40k_core/engine/catalog_selected_target_pair_support.py",
+        "src/warhammer40k_core/rules/rule_parser.py",
+        "src/warhammer40k_core/rules/rule_target_subject_parser.py"
+      ],
+      "owners": [
+        "@module",
+        "_aura_target_parameter_pairs",
+        "_parse_keyword_conditions",
+        "_parse_target",
+        "_shooting_start_groups_for_record",
+        "_shooting_start_selection_target_is_supported",
+        "_shooting_start_selection_trigger_is_supported",
+        "first_target_subject_match",
+        "shooting_start_selected_target_effect_clauses_after",
+        "target_subject_matches"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order125-regressions": {
+      "paths": [
+        "tests/order125_helpers.py",
+        "tests/unit/test_order125_implicit_subjects.py"
+      ],
+      "owners": [
+        "@module",
+        "advance_to_default_unit_selection",
+        "default_unit_session",
+        "default_unit_text",
+        "test_catalog_loaded_selection_survives_full_lifecycle_continuations",
+        "test_complete_default_unit_rule_has_a_shared_executable_consumer",
+        "test_explicit_noun_and_source_spans_remain_intact",
+        "test_implicit_adjacent_keywords_keep_the_existing_conjunction",
+        "test_implicit_subject_does_not_invent_keywords_aliases_or_discard_language",
+        "test_ordinary_trigger_does_not_admit_unestablished_weapon_context",
+        "test_selected_default_subject_preserves_keyword_and_source_range",
+        "test_shared_selection_enforces_real_keyword_owner_range_and_source_boundaries",
+        "test_subject_matcher_keeps_explicit_overlap_and_literal_order",
+        "test_subject_matcher_preserves_literal_declared_keyword_parts"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order125-source-evidence": {
+      "paths": [
+        "data/source_audits/order125/source.audit.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order125-contract-publication": {
+      "paths": [
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

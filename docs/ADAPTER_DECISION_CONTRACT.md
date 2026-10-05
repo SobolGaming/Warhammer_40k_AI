@@ -7669,3 +7669,9 @@ end-phase rules. Existing `resolve_sequencing_order` and modifier choices retain
 their finite payload, validation, visibility and replay contracts. Body source
 occurrences and window completion are public timing events; start/end windows
 remain distinct. No decision family, submission schema or proposal kind is added.
+
+Contract44.3.11 retains the existing selected-target Shooting-start finite request
+and source-linked payload. Source-mandatory selections expose eligible unit
+options without decline; existing optional records retain decline. Catalog loading,
+validation, engine-owned mutation, viewers and exact persistence/replay use the
+shared authority. No decision/schema family is added. See [Order125](ORDER_125_SCOPE_PLAN.md).
