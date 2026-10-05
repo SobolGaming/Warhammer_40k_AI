@@ -46,10 +46,12 @@ controls additionally cover whole-group all-model permission and mixed denial.
 Source inventories and original assertions remain unchanged.
 
 The unchanged module-size gate exposed growth in the legacy prebattle owner.
-Its existing model validation and geometry dispatch now run in the same order
-through `prebattle_setup_geometry.validate_prebattle_placement`. The original
-model checks and redeploy/Scout predicate remain intact; the prebattle owner
-fits its existing ceiling. This source repair requires a fresh covered cohort.
+Its existing model validator and geometry dispatch now run in the same order
+within `prebattle_setup_geometry.validate_prebattle_placement`. Keeping the
+unchanged private validator with its local caller also satisfies the existing
+Pyright unused-function policy. The original model checks and redeploy/Scout
+predicate remain intact; the prebattle owner fits its existing ceiling. This
+source repair requires a fresh covered cohort.
 
 Required delivery evidence includes both type checkers, lint/format/imports and
 pre-commit, exact identity/contracts/source pins/shard inventory, wheel and

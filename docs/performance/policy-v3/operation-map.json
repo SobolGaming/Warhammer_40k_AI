@@ -4681,6 +4681,7 @@
         "@module",
         "PreBattleViolationCode",
         "_resolve_prebattle_placement",
+        "_validate_placement_models",
         "append_redeploy_geometry_violations",
         "validate_prebattle_placement"
       ],
