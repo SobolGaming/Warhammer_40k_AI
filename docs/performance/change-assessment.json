@@ -2,135 +2,145 @@
   "policy": "rules-engine-performance-v3",
   "base": "459a086d0ac164a0738dc710531b119febf5af53",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e37c232fe64bef50d69ad228da52834aecf6a5318829f72c0a08ecb9a48f4f3b",
-  "operation_map_sha256": "1d5e1fec95b9a752b87c654e2a66f87681f3253ccdd8c21cfdc8d52c5c5f1cc4",
+  "operation_map_sha256": "1f4ff52c8740d6a30036c02d87e94e6d80e40b379cf9ca48d894c10466dfd084",
   "changes": {
     "ci/test_shards/durations.json": {
       "before_sha256": "1938adbae5b23e32d882707540e9da62afa6e1bcf8614704322099fd7d675f50",
-      "after_sha256": "f051b3afa5d4480c52d815e09f0b216938c0b7235521b7678061d4ba7156eaee",
+      "after_sha256": "313ea5f470aee4ac6f81d8084bd743beec8d27c084ee16f9038455fb4fde3a34",
       "owners": {
         "@document": {
           "before": "1938adbae5b23e32d882707540e9da62afa6e1bcf8614704322099fd7d675f50",
-          "after": "f051b3afa5d4480c52d815e09f0b216938c0b7235521b7678061d4ba7156eaee"
+          "after": "313ea5f470aee4ac6f81d8084bd743beec8d27c084ee16f9038455fb4fde3a34"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "e24a18f6a75864f55d958552cc1ee0afe06c0bd1886a4f31a198ef1e61d2179c",
-      "after_sha256": "dd0df4a7ecfb2a1491a0acb01148de559d3bd993e1b99f8e4d9383be2fd484da",
+      "after_sha256": "dc48bd619f5950a2f52118c51610f0abcf17fdd6c23f34e7e199b80d5fcd4a83",
       "owners": {
         "@document": {
           "before": "e24a18f6a75864f55d958552cc1ee0afe06c0bd1886a4f31a198ef1e61d2179c",
-          "after": "dd0df4a7ecfb2a1491a0acb01148de559d3bd993e1b99f8e4d9383be2fd484da"
+          "after": "dc48bd619f5950a2f52118c51610f0abcf17fdd6c23f34e7e199b80d5fcd4a83"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "7103eff1ee6280ae2024f7bcd096e8e66c545b9173969d52e867791c0ceacd4b",
-      "after_sha256": "2057ed1f0a378c4fc1c2266d495a56d78f71f45adc60593da709b3c3338dcb7d",
+      "after_sha256": "805f04b8ccfa1c1bab40af28072af61e9bacd1f617f4628cc51a15d59901e51f",
       "owners": {
         "@document": {
           "before": "7103eff1ee6280ae2024f7bcd096e8e66c545b9173969d52e867791c0ceacd4b",
-          "after": "2057ed1f0a378c4fc1c2266d495a56d78f71f45adc60593da709b3c3338dcb7d"
+          "after": "805f04b8ccfa1c1bab40af28072af61e9bacd1f617f4628cc51a15d59901e51f"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "3ffd6ceeb55f8764812999643a6c0f8f78dc7767def306b5072dd0b94d3bdf7e",
-      "after_sha256": "72adf85bda25fece384ed5c21ccd240f48bf47010cee5d6f7afc2c028304b658",
+      "after_sha256": "cd802b39812d174d10d3155c13183dd37984ebe7a0d9bfdc5783d84aedf3ab7e",
       "owners": {
         "@document": {
           "before": "3ffd6ceeb55f8764812999643a6c0f8f78dc7767def306b5072dd0b94d3bdf7e",
-          "after": "72adf85bda25fece384ed5c21ccd240f48bf47010cee5d6f7afc2c028304b658"
+          "after": "cd802b39812d174d10d3155c13183dd37984ebe7a0d9bfdc5783d84aedf3ab7e"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "1067e7e8a787116616e81755dbd070100c3f5ab16b2e7bbb0ed18563bc92a701",
-      "after_sha256": "21c5552aa25b048bea25252582ca47ed541ab5bd47d151eb20dd46cdb3d54a53",
+      "after_sha256": "74e21b9c648ab5cb26adc58e76d7787b9a21b8974db66f2e2de4ef13a20255b5",
       "owners": {
         "@document": {
           "before": "1067e7e8a787116616e81755dbd070100c3f5ab16b2e7bbb0ed18563bc92a701",
-          "after": "21c5552aa25b048bea25252582ca47ed541ab5bd47d151eb20dd46cdb3d54a53"
+          "after": "74e21b9c648ab5cb26adc58e76d7787b9a21b8974db66f2e2de4ef13a20255b5"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "f120ff5d9b49fb3452570d1c9137dcec0607051d24d6c16c77075d6422021425",
-      "after_sha256": "72c87874074416c7397983b94c314717f4ef1e08f310aa00d6cf2d58d6721817",
+      "after_sha256": "5bdd26e5943601e2ece33cb39a8077548f74199957d5ba9f5b5c75e519388840",
       "owners": {
         "@document": {
           "before": "f120ff5d9b49fb3452570d1c9137dcec0607051d24d6c16c77075d6422021425",
-          "after": "72c87874074416c7397983b94c314717f4ef1e08f310aa00d6cf2d58d6721817"
+          "after": "5bdd26e5943601e2ece33cb39a8077548f74199957d5ba9f5b5c75e519388840"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "ed2c5670497227bfd0c81e47c6a9efcff12160552d97db6f15b2fde4c1475422",
-      "after_sha256": "8a32a895148c1a3d64598803cf7cb78070fa9d5fbffa0041a418c556a74caf5f",
+      "after_sha256": "1e6e46fb44a3866e049f0e7e18f32fbea799b7f616c39c9c0b8cbe8d35599e47",
       "owners": {
         "@document": {
           "before": "ed2c5670497227bfd0c81e47c6a9efcff12160552d97db6f15b2fde4c1475422",
-          "after": "8a32a895148c1a3d64598803cf7cb78070fa9d5fbffa0041a418c556a74caf5f"
+          "after": "1e6e46fb44a3866e049f0e7e18f32fbea799b7f616c39c9c0b8cbe8d35599e47"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "b875814f7cadb2e88d8c148457aff0b9d649e735098bee0d576ccf4efa428d5f",
-      "after_sha256": "04e6cd75955618765d1f87c78b394b02297559c601fb538bed20eb265eed025a",
+      "after_sha256": "7721da8a768de162549946bcf7fe30d77f3abbf3289885f5edd0fe3df7428647",
       "owners": {
         "@document": {
           "before": "b875814f7cadb2e88d8c148457aff0b9d649e735098bee0d576ccf4efa428d5f",
-          "after": "04e6cd75955618765d1f87c78b394b02297559c601fb538bed20eb265eed025a"
+          "after": "7721da8a768de162549946bcf7fe30d77f3abbf3289885f5edd0fe3df7428647"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "41bc628d8cb1ec4d6d3984366cd241187ed40c713600c154838839c271fc912a",
-      "after_sha256": "7d536b19055df8002e350b94ff36331de34998f19ff2e70c0e70e7fc3c4b56e3",
+      "after_sha256": "729027f4a20a2caaf1340b02ad4c9e9d99666f110e86aafb697ad62bb11fbb78",
       "owners": {
         "@document": {
           "before": "41bc628d8cb1ec4d6d3984366cd241187ed40c713600c154838839c271fc912a",
-          "after": "7d536b19055df8002e350b94ff36331de34998f19ff2e70c0e70e7fc3c4b56e3"
+          "after": "729027f4a20a2caaf1340b02ad4c9e9d99666f110e86aafb697ad62bb11fbb78"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "99aad1709e0a5b5b44b70d21083794f423ea5f10d631c9a7da03ff1dbb77858b",
-      "after_sha256": "e4197c198f38462691832b06507be047f98b8669c7966e63be8e4330fb860589",
+      "after_sha256": "dc0030445cbcfd86bb73daa2dad1a13c45d024dfda97f49f91fb2a9c259eebd8",
       "owners": {
         "@document": {
           "before": "99aad1709e0a5b5b44b70d21083794f423ea5f10d631c9a7da03ff1dbb77858b",
-          "after": "e4197c198f38462691832b06507be047f98b8669c7966e63be8e4330fb860589"
+          "after": "dc0030445cbcfd86bb73daa2dad1a13c45d024dfda97f49f91fb2a9c259eebd8"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "3943b77a8a809a0bb8c063411cbe01f58b02637c4c11e6504c076ced8945b5cc",
-      "after_sha256": "35ae1ce54da85b2e8192501c151f40aaff259a0da8cb083fcee2e5840b8d0714",
+      "after_sha256": "9f75205ccfe29d53f433e40b62e3316f2571b00e1fec6e7ed793aa7c39f23f54",
       "owners": {
         "@document": {
           "before": "3943b77a8a809a0bb8c063411cbe01f58b02637c4c11e6504c076ced8945b5cc",
-          "after": "35ae1ce54da85b2e8192501c151f40aaff259a0da8cb083fcee2e5840b8d0714"
+          "after": "9f75205ccfe29d53f433e40b62e3316f2571b00e1fec6e7ed793aa7c39f23f54"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "97e3ee765115fe76b9de6c927f77e2f17ddb1717dfaa15facabf9007fa332bbf",
-      "after_sha256": "2d4cc6e7d7edab6f2a7952ace0cc3fd8e91352839e34a32a6fba734f475f8535",
+      "after_sha256": "861ca9176e665d2ca151d67056dc748b9ba73e854e5eb0adbe45e6edb891ecb3",
       "owners": {
         "@document": {
           "before": "97e3ee765115fe76b9de6c927f77e2f17ddb1717dfaa15facabf9007fa332bbf",
-          "after": "2d4cc6e7d7edab6f2a7952ace0cc3fd8e91352839e34a32a6fba734f475f8535"
+          "after": "861ca9176e665d2ca151d67056dc748b9ba73e854e5eb0adbe45e6edb891ecb3"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "28ff6f6e0abbbab4cafc43d79e0332db344bc19c6d45fd8be546525e802e21a1",
-      "after_sha256": "dd26292360d886eb83da0e7e4f67b77a3122b01b3e2fdfffa6fe8006241858b0",
+      "after_sha256": "e0bd9dbe53f9c46c3839981eb33ef7e561dd7861a8957327cc5422546b90bf19",
       "owners": {
         "@document": {
           "before": "28ff6f6e0abbbab4cafc43d79e0332db344bc19c6d45fd8be546525e802e21a1",
-          "after": "dd26292360d886eb83da0e7e4f67b77a3122b01b3e2fdfffa6fe8006241858b0"
+          "after": "e0bd9dbe53f9c46c3839981eb33ef7e561dd7861a8957327cc5422546b90bf19"
+        }
+      }
+    },
+    "conformance/typescript/src/contract.ts": {
+      "before_sha256": "fe6a05a86fb8743837c011bea1c953e308e8fa8e24b16a1296ea9d7d6c23cff7",
+      "after_sha256": "739056b6306b86292edbdce1795249d3a557d43cc045525501424630b334fe5e",
+      "owners": {
+        "@document": {
+          "before": "fe6a05a86fb8743837c011bea1c953e308e8fa8e24b16a1296ea9d7d6c23cff7",
+          "after": "739056b6306b86292edbdce1795249d3a557d43cc045525501424630b334fe5e"
         }
       }
     },
@@ -276,11 +286,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "b7939bb663009b4f4be523e588ca661a7310e1eafdb288e864db2782b76c629b",
-      "after_sha256": "e33701cd74bde4a0403cffacc890e1849489259560c7a1774e3a78c028471095",
+      "after_sha256": "89e3176d22287d93d0123f91cf7ec522a2d2d5114d73276e143a49cb2be0989c",
       "owners": {
         "@document": {
           "before": "b7939bb663009b4f4be523e588ca661a7310e1eafdb288e864db2782b76c629b",
-          "after": "e33701cd74bde4a0403cffacc890e1849489259560c7a1774e3a78c028471095"
+          "after": "89e3176d22287d93d0123f91cf7ec522a2d2d5114d73276e143a49cb2be0989c"
         }
       }
     },
@@ -378,7 +388,7 @@
     },
     "tests/order127_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "81f25f1cd5c92b35cb8a338f944c010959d01d292b142c3a19dc0ff78fe42a93",
+      "after_sha256": "59d72d877d305f410db43026040e151f3dd40b24eae816bac525d5f7a4583684",
       "owners": {
         "@module": {
           "before": null,
@@ -398,7 +408,7 @@
         },
         "redeploy_payload": {
           "before": null,
-          "after": "e8feabdb822d5bfec775ca27fa3c90c9d466cb7197a3f2eeea564d0fdcb63b1d"
+          "after": "6146c8161e4f4f30eb47caa8a03641336973df37831661d11c8580ef37e57bd5"
         },
         "redeploy_session": {
           "before": null,
@@ -532,6 +542,16 @@
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
+      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
+      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+    },
+    "conformance/typescript/src/contract.ts": {
+      "category": "rule_semantics",
+      "operations": [
+        "order127-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",

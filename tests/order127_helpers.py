@@ -238,7 +238,7 @@ def redeploy_payload(
     assert state is not None
     assert context.placement_kind is not None
     assert len(poses) == len(context.model_instance_ids)
-    placements = []
+    placements: list[ModelPlacement] = []
     for model_id, pose in zip(context.model_instance_ids, poses, strict=True):
         army, unit = next(
             (army, unit)
