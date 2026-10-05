@@ -76,7 +76,7 @@ ORDER122_MAPPING_SHA256 = "4927ddb34e5697e93975fb0da8b977d2615649a2a5408a7d91ce9
 
 
 ORDER123_MAPPING = "data/source_audits/order123/historical-inputs.json"
-ORDER123_MAPPING_SHA256 = "e6290494d9cfdf862bd4ea700bb26e957734d934812c9db54a8b3a301ff020f5"
+ORDER123_MAPPING_SHA256 = "b7b6bf8e1a44454e31da5f08b7431ab05ee706448e16edd25aff2d8176ffb6f6"
 
 
 def historical_evidence_path(reference: str, *, root: Path) -> Path | None:

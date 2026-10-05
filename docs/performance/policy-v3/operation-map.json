@@ -4255,6 +4255,7 @@
     },
     "order123-source-evidence": {
       "paths": [
+        "data/source_audits/order123/baseline/tests/code_quality/test_model_keyword_authority.py.txt",
         "data/source_audits/order123/baseline/tests/fire_overwatch_helpers.py.txt",
         "data/source_audits/order123/baseline/tests/integration/test_fight_on_death_presence.py.txt",
         "data/source_audits/order123/baseline/tests/integration/test_retained_shooting.py.txt",

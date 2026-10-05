@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2efc9e20db869f29162e8026123768d6233f2b2c05815c851b44a48e18499a98",
-  "operation_map_sha256": "c40aed153ee44d5fb27a9774c8af86a68f214f957822dd0d18f1b088fa2f7937",
+  "operation_map_sha256": "e25f708aff453290c2f309605e00462ea80d407b0d049bf5b903d603aedc3dab",
   "changes": {
     "README.md": {
       "before_sha256": "a9e5991323f77192ba0790950f411cc9a24ec3c36174c9595cf68cbc2b11be4e",
@@ -374,6 +374,16 @@
         }
       }
     },
+    "data/source_audits/order123/baseline/tests/code_quality/test_model_keyword_authority.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "d3b1d6736cb5b51b197f4b32d5ce04aca02818bec8233980e133654edd03abed",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "d3b1d6736cb5b51b197f4b32d5ce04aca02818bec8233980e133654edd03abed"
+        }
+      }
+    },
     "data/source_audits/order123/baseline/tests/fire_overwatch_helpers.py.txt": {
       "before_sha256": null,
       "after_sha256": "1be0a2f51560fb55ba9d7c922b6f1c1f3fe598014f5a3764aa43e33f4076294a",
@@ -596,11 +606,11 @@
     },
     "data/source_audits/order123/historical-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "e6290494d9cfdf862bd4ea700bb26e957734d934812c9db54a8b3a301ff020f5",
+      "after_sha256": "b7b6bf8e1a44454e31da5f08b7431ab05ee706448e16edd25aff2d8176ffb6f6",
       "owners": {
         "@document": {
           "before": null,
-          "after": "e6290494d9cfdf862bd4ea700bb26e957734d934812c9db54a8b3a301ff020f5"
+          "after": "b7b6bf8e1a44454e31da5f08b7431ab05ee706448e16edd25aff2d8176ffb6f6"
         }
       }
     },
@@ -636,21 +646,21 @@
     },
     "docs/ORDER_123_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "efdc7385b03441dee7a011dd0e150c49b486db9b7aba77ca1b88297b32420086",
+      "after_sha256": "969e59eaeedfdc89b0ebdc64af20a8e69f2da858bb740116656905842b47da31",
       "owners": {
         "@document": {
           "before": null,
-          "after": "efdc7385b03441dee7a011dd0e150c49b486db9b7aba77ca1b88297b32420086"
+          "after": "969e59eaeedfdc89b0ebdc64af20a8e69f2da858bb740116656905842b47da31"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "313efdf78e0483b1ec1e50846024c9a829a8b5630826bdad992ce1891bb29036",
-      "after_sha256": "5e1a23926b98a52a4246256cff27936748fc5d381ed72a3c697735621f0082a1",
+      "after_sha256": "61f01ea18437782bb92c99ca69533470041bc9aeab269a9c82b6d43dfb4d14fe",
       "owners": {
         "@document": {
           "before": "313efdf78e0483b1ec1e50846024c9a829a8b5630826bdad992ce1891bb29036",
-          "after": "5e1a23926b98a52a4246256cff27936748fc5d381ed72a3c697735621f0082a1"
+          "after": "61f01ea18437782bb92c99ca69533470041bc9aeab269a9c82b6d43dfb4d14fe"
         }
       }
     },
@@ -1742,6 +1752,16 @@
         }
       }
     },
+    "tests/code_quality/test_model_keyword_authority.py": {
+      "before_sha256": "d3b1d6736cb5b51b197f4b32d5ce04aca02818bec8233980e133654edd03abed",
+      "after_sha256": "c7cbe800398cfe1d0a693d5d3458799fa939fb9ab9c039a31c90203227e6ed4f",
+      "owners": {
+        "test_current_keyword_gates_use_state_backed_rules_unit_authority": {
+          "before": "a7f23b00b2c4654e304b1dd92cc3d4a62eed7f3686fdbbd3af5dd83453ac7f58",
+          "after": "0f40ee0f48a23d349df4842e504a5e435b112cf4aba70ff712ee7f61bd361cdc"
+        }
+      }
+    },
     "tests/code_quality/test_order123_datasheet_identity.py": {
       "before_sha256": null,
       "after_sha256": "4e659b09d7b8f437f0a291383309700eb7d32f5e1a2bbef5fcdf78eb1af89a99",
@@ -2134,11 +2154,11 @@
     },
     "tools/core_rules_order97_history.py": {
       "before_sha256": "993bbd6a9224c2412a4c224d026d83c8084a9b61086f9b5023a9a9aab985ed48",
-      "after_sha256": "b912fae3ef9d1b988c306ce27a22f5409295b311c0f5cbe42f348513a383b06b",
+      "after_sha256": "0be8c1e6ed68a6f91980ffd379d3407aada4db6b81d2560df903d817c0841feb",
       "owners": {
         "@module": {
           "before": "bf658a7cc1a2214a67acbda56aca363b1477db217b3f7521f7a60b3f67caa2c0",
-          "after": "4985386ae00749ab612b2b48558ad068b5529e80f5d41ca9015a1efde11b9b64"
+          "after": "e64023fadb4a8bb9aa0fcc0fd6a40943cef42edd7f33e4836cbe69f373e991ff"
         },
         "historical_evidence_path": {
           "before": "5893fc40e533bf21056e100f923cce4a8149cc812a1d4ad4dc14364723773040",
@@ -2510,6 +2530,16 @@
       "category": "rule_semantics",
       "operations": [
         "order123-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "data/source_audits/order123/baseline/tests/code_quality/test_model_keyword_authority.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-source-evidence"
       ],
       "selected_families": [],
       "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
@@ -3343,6 +3373,14 @@
       "operations": [
         "order123-datasheet-identity"
       ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog/factory identity supplies the exact additional native token and immutable name/ordinary-role classification. Existing membership owners compare native names exactly while retaining their conventional ordinary-keyword normalization; real callers supply the same model population, and eager selector collisions use explicit native declarations. Payloads preserve these bounded identity fields with existing reconstruction and replay algorithms. Source owners, finite choices, dice, search and cache strategies, dependencies and measured workloads remain; no intended performance optimization or demonstrated severe regression. Quiet current-runtime smoke and relevant live semantic/work/source gates apply. No full-game certification or historical numeric refresh."
+    },
+    "tests/code_quality/test_model_keyword_authority.py": {
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
       "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
       "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",

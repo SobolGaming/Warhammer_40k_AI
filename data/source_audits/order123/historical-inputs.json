@@ -1,7 +1,7 @@
 {
   "reviewed_commit": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
   "also_present_at_base": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
-  "purpose": "Retain every original assertion, branch and fixture byte. Exact native factory names accompany ordinary/faction fixture replacements. Only proven scenario identifiers (game IDs or genuine facade decision result IDs) are renewed where authoritative additional keyword facts alter deterministic history-seeded outcomes; existing defaults remain for other callers. Production RNG/history and source admission are unchanged.",
+  "purpose": "Retain every original assertion, branch and fixture byte. Exact native factory names accompany ordinary/faction fixture replacements. Only proven scenario identifiers (game IDs or genuine facade decision result IDs) are renewed where authoritative additional keyword facts alter deterministic history-seeded outcomes; existing defaults remain for other callers. Production RNG/history and source admission are unchanged. The original state-backed keyword architecture audit is retained while its owner table follows the native-aware call chain; all original assertions and predicates remain, with additional exact population and native metadata checks.",
   "current_evidence": "docs/ORDER_123_SCOPE_PLAN.md",
   "files": [
     {
@@ -179,6 +179,14 @@
       "git_path": "tests/unit/test_unit_abilities.py",
       "sha256": "b1df5fa3527c5ce22df059575c5ec321f584e331ec034091e1fa2fa1782ddb43",
       "bytes": 40663
+    },
+    {
+      "path": "tests/code_quality/test_model_keyword_authority.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/code_quality/test_model_keyword_authority.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/code_quality/test_model_keyword_authority.py",
+      "sha256": "d3b1d6736cb5b51b197f4b32d5ce04aca02818bec8233980e133654edd03abed",
+      "bytes": 4732
     }
   ]
 }
