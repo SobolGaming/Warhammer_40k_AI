@@ -243,6 +243,7 @@ def eligible_selection_target_unit_ids(
             raise GameLifecycleError("Catalog selected-target allegiance drift.")
         if required_keywords and not unit_has_required_keywords(
             unit_keywords=target_rules_unit.keywords,
+            name_keywords=target_rules_unit.datasheet_name_keywords,
             faction_keywords=target_rules_unit.faction_keywords,
             required_keywords=required_keywords,
         ):
@@ -540,6 +541,7 @@ def effect_target_unit_ids(
             not required_keywords
             or unit_has_required_keywords(
                 unit_keywords=unit.keywords,
+                name_keywords=unit.datasheet_name_keywords,
                 faction_keywords=unit.faction_keywords,
                 required_keywords=required_keywords,
             )

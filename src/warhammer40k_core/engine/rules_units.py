@@ -4,6 +4,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Literal, cast
 
+from warhammer40k_core.core.keyword_membership import exclusive_name_keywords
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
@@ -133,6 +134,14 @@ class RulesUnitView:
             for keyword in model.faction_keywords
         }
         return tuple(sorted(keywords))
+
+    @property
+    def datasheet_name_keywords(self) -> tuple[str, ...]:
+        return exclusive_name_keywords(
+            model.keyword_assignment
+            for model in self.own_models
+            if (model.is_alive or model.model_instance_id in self.retained_model_ids)
+        )
 
     @property
     def living_components(self) -> tuple[RulesUnitComponent, ...]:

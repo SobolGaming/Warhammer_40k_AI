@@ -19,7 +19,9 @@ def mixed_keyword_catalog() -> ArmyCatalog:
     specialist = replace(profile, model_profile_id="core-keyword-specialist", name="Specialist")
     sheet = replace(
         sheet,
-        keywords=replace(sheet.keywords, keywords=(*sheet.keywords.keywords, "PSYKER")),
+        keywords=replace(
+            sheet.keywords, keywords=(*sheet.keywords.keywords, sheet.name_keyword, "PSYKER")
+        ),
         model_profiles=(profile, specialist),
         composition=(
             UnitCompositionDefinition(

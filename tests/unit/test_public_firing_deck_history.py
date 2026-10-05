@@ -118,9 +118,10 @@ def _select(session: AdapterGameSession, unit_id: str) -> None:
         assert status.status_kind is not LifecycleStatusKind.INVALID, status
 
 
-def _session(*, prior_shot: bool = True) -> LocalGameSession:
+def _session(*, prior_shot: bool = True, game_id: str = "phase13b-game") -> LocalGameSession:
     lifecycle, _units = _shooting_lifecycle(
         alpha_unit_ids=("prior", "passenger", "noncontributor", "transport-1"),
+        game_id=game_id,
         alpha_datasheets={
             "transport-1": ("core-transport", "core-transport", 1),
         },
@@ -157,7 +158,7 @@ def _session(*, prior_shot: bool = True) -> LocalGameSession:
 
 @pytest.mark.parametrize("prior_shot", [False, True])
 def test_public_firing_deck_after_shot_history(prior_shot: bool) -> None:
-    session = _session(prior_shot=prior_shot)
+    session = _session(prior_shot=prior_shot, game_id="order123-public-keyword-identity-2")
     state = session.lifecycle.state
     assert state is not None
     assert state.shooting_phase_state is not None

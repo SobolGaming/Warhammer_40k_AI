@@ -45,6 +45,7 @@ ENEMIES = ("army-beta:enemy", "army-beta:enemy-2")
 
 def overwatch_session(
     *,
+    game_id: str = "order45-overwatch",
     moved: bool = False,
     cp: int = 1,
     shooter_models: int = 1,
@@ -151,7 +152,7 @@ def overwatch_session(
         )
     lifecycle, _ = _shooting_lifecycle(
         alpha_unit_ids=("shooter", "leader") if attached else ("shooter",),
-        game_id="order45-overwatch",
+        game_id=game_id,
         alpha_unit_specs=(
             ("shooter", "core-intercessor-like-infantry", "core-intercessor-like", shooter_models),
         )

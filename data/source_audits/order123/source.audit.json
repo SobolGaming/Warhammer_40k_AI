@@ -1,0 +1,40 @@
+{
+  "order": 123,
+  "base": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+  "requirements": [
+    "02.01.01-obligation-01"
+  ],
+  "selected_sources_path": "data/source_audits/order97/selected-sources.json",
+  "selected_sources_sha256": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+  "selected_core_rows": [
+    {
+      "row_id": "rule:02:02.01.01:1",
+      "category": "02",
+      "locator": "02.01.01",
+      "title": "Datasheet Name and Keywords",
+      "occurrence": 1,
+      "source_sha256": "85e5ef1733b9cca9f2578256913dd334f10f03f4bd96a59a0583f1bf04aa288b",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "91101d9c198534f36db22c5582fcedcbb99cbf30387ccb4356cc5c4654cdf6c1",
+          "value": "As well as the keywords listed in each datasheet\u2019s Keywords section, each datasheet name acts as an additional keyword for that unit."
+        }
+      ],
+      "selected_provider": "Game Datamissions",
+      "historical_source_row_sha256": "e794e30d45f4cc8841b9759c36c0dc9e808c9263906845743215ae1577978044",
+      "review_category": "02"
+    }
+  ],
+  "current_faction_admission": false,
+  "source_admission_unchanged": true,
+  "official_provider_trace": {
+    "reconciliation_path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/artifacts/official-pdf-reconciliation.json",
+    "reconciliation_sha256": "689e0fb01ac80e2854edcc4c077ecd37aa3f5a470a6dc3e15480b00bc7e96db5",
+    "catalog_path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/artifacts/catalog.json",
+    "catalog_sha256": "eec0195ebc35da304780ef213f73ffda307121c2a8d0d5c6a74d20d99c127663",
+    "finding": "All five admitted official-PDF-reconciled datasheets already list their exact name keyword. No official-provider defect is established. Retained raw inventories and admission remain unchanged."
+  },
+  "scope": "Selected Core name-as-keyword permission at shared catalog identity/effective catalog gates and base/materialization model assignment boundary. Runtime displays cannot create new identity. Generic capability does not certify new faction text or authorize Wahapedia."
+}

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
+from warhammer40k_core.core.keyword_membership import keyword_inventory_contains
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import GameState
@@ -166,6 +167,7 @@ def target_spec_keyword_unavailable_reason(
             unit_keywords=unit.keywords,
             faction_keywords=unit.faction_keywords,
             required_keywords=required_keywords,
+            name_keywords=unit.datasheet_name_keywords,
         ):
             return "unit_missing_required_keyword"
     return None
@@ -182,7 +184,7 @@ def required_target_keywords(target: object) -> tuple[str, ...]:
     required_keyword_sequence = parameters.get("required_keyword_sequence")
     if type(required_keyword_sequence) is tuple:
         keywords.extend(required_keyword_sequence)
-    return tuple(sorted({canonical_keyword(keyword) for keyword in keywords}))
+    return tuple(sorted({keyword.strip().upper() for keyword in keywords}))
 
 
 def unit_instance_by_id(*, state: GameState, unit_instance_id: str) -> UnitInstance:
@@ -236,11 +238,18 @@ def unit_has_required_keywords(
     unit_keywords: tuple[str, ...],
     faction_keywords: tuple[str, ...],
     required_keywords: tuple[str, ...],
+    name_keywords: tuple[str, ...] = (),
 ) -> bool:
-    unit_keyword_set = {
-        canonical_keyword(keyword) for keyword in (*unit_keywords, *faction_keywords)
-    }
-    return {canonical_keyword(keyword) for keyword in required_keywords}.issubset(unit_keyword_set)
+    return all(
+        keyword_inventory_contains(
+            ordinary_keywords=faction_keywords,
+            keywords=(*unit_keywords, *faction_keywords),
+            keyword=keyword,
+            name_keywords=name_keywords,
+            normalizer=canonical_keyword,
+        )
+        for keyword in required_keywords
+    )
 
 
 def canonical_keyword(keyword: str) -> str:

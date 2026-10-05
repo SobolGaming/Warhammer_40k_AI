@@ -116,7 +116,7 @@ from warhammer40k_core.engine.unit_coherency import (
     unit_placement_coherency_result,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
-from warhammer40k_core.engine.unit_keyword_queries import unit_has_roster_keyword
+from warhammer40k_core.engine.unit_keyword_queries import unit_has_keyword, unit_has_roster_keyword
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
 if TYPE_CHECKING:
@@ -372,12 +372,11 @@ class TransportCapacityProfile:
     def allows_unit(self, unit: UnitInstance) -> bool:
         if type(unit) is not UnitInstance:
             raise GameLifecycleError("Transport capacity requires a UnitInstance.")
-        unit_keywords = {_canonical_keyword(keyword) for keyword in unit.keywords}
-        allowed = {_canonical_keyword(keyword) for keyword in self.allowed_keywords}
-        excluded = {_canonical_keyword(keyword) for keyword in self.excluded_keywords}
-        if allowed and not unit_keywords.intersection(allowed):
+        if self.allowed_keywords and not any(
+            unit_has_keyword(unit, keyword) for keyword in self.allowed_keywords
+        ):
             return False
-        return not unit_keywords.intersection(excluded)
+        return not any(unit_has_keyword(unit, keyword) for keyword in self.excluded_keywords)
 
     def to_payload(self) -> TransportCapacityProfilePayload:
         return {
@@ -2338,10 +2337,6 @@ def _validate_objective_marker_tuple(
         seen.add(value.objective_marker_id)
         markers.append(value)
     return tuple(sorted(markers, key=lambda marker: marker.objective_marker_id))
-
-
-def _canonical_keyword(value: str) -> str:
-    return _validate_identifier("keyword", value).upper().replace(" ", "_").replace("-", "_")
 
 
 def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:

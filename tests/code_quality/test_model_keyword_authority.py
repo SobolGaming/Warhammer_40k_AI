@@ -54,11 +54,11 @@ def test_current_keyword_gates_use_state_backed_rules_unit_authority() -> None:
         },
         "stratagems_targeting.py": {
             "_target_unit_keyword_set": "rules_unit_view_by_id",
-            "_target_unit_has_keyword": "_target_unit_keyword_set",
-            "_target_unit_satisfies_required_keywords": "_target_unit_keyword_set",
-            "_target_unit_satisfies_required_keywords_any": "_target_unit_keyword_set",
+            "_target_unit_has_keyword": "rules_unit_view_by_id",
+            "_target_unit_satisfies_required_keywords": "_target_unit_has_keyword",
+            "_target_unit_satisfies_required_keywords_any": "_target_unit_has_keyword",
             "_target_unit_satisfies_required_faction_keywords": "_target_unit_keyword_set",
-            "_target_unit_has_excluded_keywords": "_target_unit_keyword_set",
+            "_target_unit_has_excluded_keywords": "_target_unit_has_keyword",
             "_target_unit_has_excluded_faction_keywords": "_target_unit_keyword_set",
             "_fire_overwatch_target_binding_error": "fire_overwatch_shooter_ineligibility_reason",
         },
@@ -73,8 +73,8 @@ def test_current_keyword_gates_use_state_backed_rules_unit_authority() -> None:
         "stratagems_generic_metadata.py": {
             "companion_effect_selections_for_binding": "rules_unit_view_by_id",
             "companion_selection_error": "rules_unit_view_by_id",
-            "companion_keywords_match": "unit_keyword_set",
-            "unit_has_keyword": "unit_keyword_set",
+            "companion_keywords_match": "unit_has_keyword",
+            "unit_has_keyword": "keyword_inventory_contains",
         },
     }
     for module, gates in required_calls.items():
@@ -100,3 +100,33 @@ def test_current_keyword_gates_use_state_backed_rules_unit_authority() -> None:
     annotation = keyword_set.args.args[0].annotation
     assert annotation is not None
     assert ast.unparse(annotation) == "RulesUnitView", "Keyword helper must reject physical units"
+    # Direct membership retains the same state-backed population and exact native names.
+    for module, function in (
+        ("stratagems_targeting.py", "_target_unit_has_keyword"),
+        ("stratagems_generic_metadata.py", "unit_has_keyword"),
+    ):
+        owner = next(
+            node
+            for node in ast.parse((ENGINE / module).read_text()).body
+            if isinstance(node, ast.FunctionDef) and node.name == function
+        )
+        membership = [
+            node
+            for node in ast.walk(owner)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "keyword_inventory_contains"
+        ]
+        assert len(membership) == 1, "Membership must use the shared native-aware owner"
+        arguments = {keyword.arg: keyword.value for keyword in membership[0].keywords}
+        assert ast.unparse(arguments["name_keywords"]) == "unit.datasheet_name_keywords"
+        assert "unit.keywords" in {
+            ast.unparse(node)
+            for node in ast.walk(arguments["keywords"])
+            if isinstance(node, ast.Attribute)
+        }, "Membership must consume the same RulesUnitView inventory"
+        if function == "unit_has_keyword":
+            native_annotation = owner.args.args[0].annotation
+            assert native_annotation is not None
+            assert ast.unparse(native_annotation) == "RulesUnitView"
+            assert ast.unparse(arguments["ordinary_keywords"]) == "unit.faction_keywords"

@@ -169,7 +169,11 @@ def _without_private_formation_keywords(unit: UnitInstance) -> UnitInstance:
                 source_ids=tuple(s for s in model.source_ids if not s.startswith(private_prefixes)),
                 keyword_assignment=replace(
                     model.keyword_assignment,
-                    keywords=tuple(k for k in model.keywords if k != "ATTACHED_UNIT"),
+                    keywords=tuple(
+                        k
+                        for k in model.keywords
+                        if k != "ATTACHED_UNIT" or k == model.keyword_assignment.name_keyword
+                    ),
                     source_ids=tuple(
                         s
                         for s in model.keyword_assignment.source_ids

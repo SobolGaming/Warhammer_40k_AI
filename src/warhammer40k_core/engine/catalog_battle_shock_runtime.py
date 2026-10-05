@@ -12,6 +12,7 @@ from warhammer40k_core.core.dice import (
     RerollComponentSelectionPolicy,
     RerollPermission,
 )
+from warhammer40k_core.core.keyword_membership import keyword_inventory_contains
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import (
@@ -68,6 +69,7 @@ from warhammer40k_core.engine.rules_units import (
 )
 from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_keyword_queries import unit_datasheet_name_keywords
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -628,26 +630,39 @@ def _required_keywords_for_clause(clause: RuleClause) -> tuple[str, ...]:
 
 
 def _unit_has_required_keyword(unit: UnitInstance, *, required_keyword: str) -> bool:
-    required = _canonical_keyword(required_keyword)
-    keywords = {_canonical_keyword(keyword) for keyword in (*unit.keywords, *unit.faction_keywords)}
-    if required in keywords:
+    inventory = (*unit.keywords, *unit.faction_keywords)
+    names = set(unit_datasheet_name_keywords(unit)).difference(unit.faction_keywords)
+    if keyword_inventory_contains(
+        keywords=inventory,
+        keyword=required_keyword,
+        name_keywords=names,
+        normalizer=_canonical_keyword,
+    ):
         return True
-    return _keyword_sequence_is_covered(tuple(required.split()), frozenset(keywords))
+    ordinary = frozenset(
+        _canonical_keyword(keyword) for keyword in inventory if keyword not in names
+    )
+    return _keyword_sequence_is_covered(
+        tuple(_canonical_keyword(required_keyword).split()), ordinary
+    )
 
 
-def _rules_unit_has_required_keyword(
-    rules_unit: RulesUnitView,
-    *,
-    required_keyword: str,
-) -> bool:
-    required = _canonical_keyword(required_keyword)
-    keywords = {
-        _canonical_keyword(keyword)
-        for keyword in (*rules_unit.keywords, *rules_unit.faction_keywords)
-    }
-    if required in keywords:
+def _rules_unit_has_required_keyword(rules_unit: RulesUnitView, *, required_keyword: str) -> bool:
+    inventory = (*rules_unit.keywords, *rules_unit.faction_keywords)
+    names = set(rules_unit.datasheet_name_keywords).difference(rules_unit.faction_keywords)
+    if keyword_inventory_contains(
+        keywords=inventory,
+        keyword=required_keyword,
+        name_keywords=names,
+        normalizer=_canonical_keyword,
+    ):
         return True
-    return _keyword_sequence_is_covered(tuple(required.split()), frozenset(keywords))
+    ordinary = frozenset(
+        _canonical_keyword(keyword) for keyword in inventory if keyword not in names
+    )
+    return _keyword_sequence_is_covered(
+        tuple(_canonical_keyword(required_keyword).split()), ordinary
+    )
 
 
 def _keyword_sequence_is_covered(

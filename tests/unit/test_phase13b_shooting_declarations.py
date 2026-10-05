@@ -88,7 +88,7 @@ from tests.phase13b_shooting_declaration_helpers import (
     _weapon_profile_by_wargear,
 )
 from tests.psychic_modifier_helpers import submit_fixture_request
-from tests.unit_keyword_helpers import with_unit_keywords
+from tests.unit_keyword_helpers import with_model_keywords, with_unit_keywords
 from tests.visibility_corridor_helpers import one_millimeter_visibility_gap_ruins
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -5876,6 +5876,7 @@ def test_phase14e_grouped_precision_promotes_character_then_returns_to_bodyguard
 def test_phase13d_lethal_and_sustained_hits_resolve_generated_hits() -> None:
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
+        game_id="order123-lethal-keyword-identity-1",
         enemy_datasheet=("core-intercessor-like-infantry", "core-intercessor-like", 1),
         catalog=_compact_intercessor_catalog(_canonical_catalog()),
     )
@@ -7635,13 +7636,7 @@ def test_phase13d_hazardous_tests_resolve_after_all_attacks(
             attacker = replace(
                 attacker,
                 own_models=tuple(
-                    replace(
-                        model,
-                        keyword_assignment=replace(
-                            model.keyword_assignment,
-                            keywords=(replacement_attacker_keywords[index % 2],),
-                        ),
-                    )
+                    with_model_keywords(model, keywords=(replacement_attacker_keywords[index % 2],))
                     for index, model in enumerate(attacker.own_models)
                 ),
             )

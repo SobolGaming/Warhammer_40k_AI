@@ -251,7 +251,11 @@ def test_mixed_hazardous_facade_restore_and_replay(
         keyword,
         attached=attached,
         fragile=fragile,
-        game_id="order105-hazard-1" if attached else "order105-hazard",
+        game_id="order105-hazard-name-12"
+        if attached and fragile and keyword == "MOUNTED"
+        else "order105-hazard-1"
+        if attached
+        else "order105-hazard",
     )
     initial = json.loads(json.dumps(session.lifecycle.to_payload()))
     request = pending_request(session)

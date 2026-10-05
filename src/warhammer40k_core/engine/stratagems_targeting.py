@@ -2,6 +2,11 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.core.keyword_membership import keyword_inventory_contains
+from warhammer40k_core.engine.unit_keyword_queries import (
+    unit_has_keyword as _native_unit_has_keyword,
+)
+
 from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionHookRegistry
 from warhammer40k_core.engine.unit_objective_control import current_unit_objective_control
 
@@ -458,8 +463,14 @@ def _target_unit_has_keyword(
     target_binding: StratagemTargetBinding,
     keyword: str,
 ) -> bool:
-    return _canonical_keyword(keyword) in _target_unit_keyword_set(
-        state=state, target_binding=target_binding
+    unit = rules_unit_view_by_id(
+        state=state, unit_instance_id=_require_target_unit_id(target_binding)
+    )
+    return keyword_inventory_contains(
+        keywords=unit.keywords,
+        keyword=keyword,
+        name_keywords=unit.datasheet_name_keywords,
+        normalizer=_canonical_keyword,
     )
 
 
@@ -567,11 +578,12 @@ def _target_unit_satisfies_required_keywords(
     target_binding: StratagemTargetBinding,
     required_keywords: tuple[str, ...],
 ) -> bool:
-    required = {_canonical_keyword(keyword) for keyword in required_keywords}
-    if not required:
+    if not required_keywords:
         return True
-    stored = _target_unit_keyword_set(state=state, target_binding=target_binding)
-    return required.issubset(stored)
+    return all(
+        _target_unit_has_keyword(state=state, target_binding=target_binding, keyword=keyword)
+        for keyword in required_keywords
+    )
 
 
 def _target_unit_has_forbidden_stratagem_handler_effect(
@@ -606,11 +618,12 @@ def _target_unit_satisfies_required_keywords_any(
     target_binding: StratagemTargetBinding,
     required_keywords_any: tuple[str, ...],
 ) -> bool:
-    required = {_canonical_keyword(keyword) for keyword in required_keywords_any}
-    if not required:
+    if not required_keywords_any:
         return True
-    stored = _target_unit_keyword_set(state=state, target_binding=target_binding)
-    return bool(required & stored)
+    return any(
+        _target_unit_has_keyword(state=state, target_binding=target_binding, keyword=keyword)
+        for keyword in required_keywords_any
+    )
 
 
 def _target_unit_satisfies_required_faction_keywords(
@@ -632,11 +645,12 @@ def _target_unit_has_excluded_keywords(
     target_binding: StratagemTargetBinding,
     excluded_keywords: tuple[str, ...],
 ) -> bool:
-    excluded = {_canonical_keyword(keyword) for keyword in excluded_keywords}
-    if not excluded:
+    if not excluded_keywords:
         return False
-    stored = _target_unit_keyword_set(state=state, target_binding=target_binding)
-    return bool(excluded & stored)
+    return any(
+        _target_unit_has_keyword(state=state, target_binding=target_binding, keyword=keyword)
+        for keyword in excluded_keywords
+    )
 
 
 def _target_unit_has_excluded_faction_keywords(
@@ -655,8 +669,7 @@ def _target_unit_has_excluded_faction_keywords(
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Stratagem keyword lookup requires a UnitInstance.")
-    canonical = _canonical_keyword(keyword)
-    return canonical in {_canonical_keyword(unit_keyword) for unit_keyword in unit.keywords}
+    return _native_unit_has_keyword(unit, keyword)
 
 
 def _canonical_keyword(keyword: str) -> str:
@@ -1146,7 +1159,7 @@ def _effect_selection_required_target_keywords(
     if not isinstance(raw_keywords, list):
         raise GameLifecycleError("Effect selection required target keywords must be a list.")
     return tuple(
-        _canonical_keyword(_validate_identifier("Effect selection target keyword", keyword))
+        _validate_identifier("Effect selection target keyword", keyword).upper()
         for keyword in raw_keywords
     )
 

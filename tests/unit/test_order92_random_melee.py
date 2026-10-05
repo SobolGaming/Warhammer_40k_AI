@@ -259,7 +259,7 @@ def test_multiple_profiles_commit_exactly_one_without_exposing_another_profile()
 
 @pytest.mark.parametrize("split", [False, True])
 def test_random_cleave_is_a_single_target_bonus_never_a_splittable_budget(split: bool) -> None:
-    session = random_melee_session(cleave=True)
+    session = random_melee_session(cleave=True, game_id="order92-cleave-name-2")
     request, budgets = _all_committed(session)
     budget = budgets[0]
     count = cast(int, budget["base_attacks"])

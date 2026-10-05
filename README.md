@@ -1,5 +1,9 @@
 # warhammer40k-core-v2
 
+Order123 / P02L carries each datasheet name through shared catalog identity,
+effective catalog gates and model/unit keyword queries. Raw official inventories
+and faction admission remain unchanged; see [source and scope](docs/ORDER_123_SCOPE_PLAN.md).
+
 Strict bottom-up Warhammer 40k engine reconstruction.
 
 Order122 / P01K derives omitted effect lifetimes from typed trigger periods or

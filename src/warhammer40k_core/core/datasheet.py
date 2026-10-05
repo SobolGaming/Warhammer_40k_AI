@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import NotRequired, Self, TypedDict, cast
 
@@ -28,6 +28,7 @@ from warhammer40k_core.core.datasheet_ability import (
     DatasheetAbilityDescriptor as DatasheetAbilityDescriptor,
 )
 from warhammer40k_core.core.datasheet_composition import validate_unit_composition_counts
+from warhammer40k_core.core.datasheet_identity import normalized_datasheet_identity
 from warhammer40k_core.core.random_profile_values import (
     ProfileCharacteristicValue,
     ProfileCharacteristicValuePayload,
@@ -1038,22 +1039,16 @@ class DatasheetDefinition:
     damaged_effects: tuple[DamagedEffectDefinition, ...] = ()
     attachment_eligibilities: tuple[AttachmentEligibility, ...] = ()
     source_ids: tuple[str, ...] = ()
+    name_keyword: str = field(init=False)
+    effective_keywords: tuple[str, ...] = field(init=False)
 
     def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "datasheet_id",
-            _validate_unprefixed_identifier(
-                "DatasheetDefinition datasheet_id",
-                self.datasheet_id,
-                "datasheet:",
-            ),
+        identifier, name, name_keyword = normalized_datasheet_identity(
+            datasheet_id=self.datasheet_id, name=self.name, error_factory=DatasheetCatalogError
         )
-        object.__setattr__(
-            self,
-            "name",
-            _validate_identifier("DatasheetDefinition name", self.name),
-        )
+        object.__setattr__(self, "datasheet_id", identifier)
+        object.__setattr__(self, "name", name)
+        object.__setattr__(self, "name_keyword", name_keyword)
         object.__setattr__(
             self,
             "content_scope",
@@ -1064,6 +1059,9 @@ class DatasheetDefinition:
         )
         if type(self.keywords) is not DatasheetKeywordSet:
             raise DatasheetCatalogError("DatasheetDefinition keywords must be a keyword set.")
+        object.__setattr__(
+            self, "effective_keywords", tuple(sorted({*self.keywords.keywords, name_keyword}))
+        )
         model_profiles = _validate_model_profile_tuple(
             "DatasheetDefinition model_profiles",
             self.model_profiles,
@@ -1215,6 +1213,10 @@ class DatasheetDefinition:
             if model_profile.model_profile_id == requested_id:
                 return model_profile
         raise DatasheetCatalogError("DatasheetDefinition model_profile_id was not found.")
+
+    @property
+    def name_has_ordinary_role(self) -> bool:
+        return self.name_keyword in self.keywords.keywords
 
     def to_payload(self) -> DatasheetDefinitionPayload:
         payload: DatasheetDefinitionPayload = {

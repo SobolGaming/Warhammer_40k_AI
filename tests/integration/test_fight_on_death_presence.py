@@ -49,7 +49,12 @@ def test_r32_retained_only_observer_eligibility_restores_replays_and_cleans_up(
     attached: bool,
     retain: bool,
 ) -> None:
-    session, observer_id, target_id = retained_observer_session(attached=attached)
+    session, observer_id, target_id = retained_observer_session(
+        attached=attached,
+        game_id="order123-retained-observer-attached-keyword-identity-0"
+        if attached
+        else "order123-retained-observer-unattached-keyword-identity-0",
+    )
     pending_request(session)
     initial = session.lifecycle.to_payload()
     for _ in range(30):
@@ -605,7 +610,7 @@ def test_order_30_retained_transport_defers_cargo_placement_and_restores_cleanup
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         catalog=lethal_retained_attack_catalog(),
-        game_id="order32-retained-transport-0",
+        game_id="order123-retained-transport-keyword-identity-0",
         enemy_unit_specs=(
             ("enemy", "core-transport", "core-transport", 1),
             ("passenger", "core-intercessor-like-infantry", "core-intercessor-like", 5),

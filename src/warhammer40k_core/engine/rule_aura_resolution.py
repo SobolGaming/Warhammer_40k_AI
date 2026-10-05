@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from warhammer40k_core.core.keyword_membership import keyword_inventory_contains
 from warhammer40k_core.engine.ability_presence import (
     AbilitySpatialRelationship,
     ability_presence,
@@ -83,6 +84,7 @@ def aura_affected_unit_ids(
             continue
         if required_keywords and not unit_has_required_keywords(
             unit_keywords=target_rules_unit.keywords,
+            name_keywords=target_rules_unit.datasheet_name_keywords,
             faction_keywords=target_rules_unit.faction_keywords,
             required_keywords=required_keywords,
         ):
@@ -293,12 +295,13 @@ def _rules_unit_has_excluded_keyword(
     rules_unit: RulesUnitView,
     excluded_keywords: tuple[str, ...],
 ) -> bool:
-    if not excluded_keywords:
-        return False
-    unit_keywords = {
-        canonical_keyword(keyword)
-        for keyword in (*rules_unit.keywords, *rules_unit.faction_keywords)
-    }
-    return bool(
-        unit_keywords.intersection(canonical_keyword(keyword) for keyword in excluded_keywords)
+    return any(
+        keyword_inventory_contains(
+            keywords=(*rules_unit.keywords, *rules_unit.faction_keywords),
+            keyword=keyword,
+            name_keywords=rules_unit.datasheet_name_keywords,
+            ordinary_keywords=rules_unit.faction_keywords,
+            normalizer=canonical_keyword,
+        )
+        for keyword in excluded_keywords
     )

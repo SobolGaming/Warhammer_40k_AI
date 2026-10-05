@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass
 
+from warhammer40k_core.core.keyword_membership import keyword_inventory_contains
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
@@ -32,6 +33,7 @@ from warhammer40k_core.engine.rule_execution import (
     generic_rule_effect_payload,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_keyword_queries import unit_datasheet_name_keywords
 from warhammer40k_core.rules.rule_ir import (
     RuleDurationKind,
     RuleEffectKind,
@@ -655,11 +657,17 @@ def _unit_matches_keyword_requirement(
 ) -> bool:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Generic detachment target requires UnitInstance.")
-    keywords = {_canonical_keyword(keyword) for keyword in unit.keywords}
     faction_keywords = {_canonical_keyword(keyword) for keyword in unit.faction_keywords}
-    if not all(
-        _canonical_keyword(keyword) in keywords for keyword in requirement.required_keywords
-    ):
+
+    def matches(keyword: str) -> bool:
+        return keyword_inventory_contains(
+            keywords=unit.keywords,
+            keyword=keyword,
+            name_keywords=unit_datasheet_name_keywords(unit),
+            normalizer=_canonical_keyword,
+        )
+
+    if not all(matches(keyword) for keyword in requirement.required_keywords):
         return False
     if not all(
         _canonical_keyword(keyword) in faction_keywords
@@ -667,11 +675,11 @@ def _unit_matches_keyword_requirement(
     ):
         return False
     if requirement.required_keyword_any is not None and not any(
-        _canonical_keyword(keyword) in keywords for keyword in requirement.required_keyword_any
+        matches(keyword) for keyword in requirement.required_keyword_any
     ):
         return False
     return not any(
-        _canonical_keyword(keyword) in keywords or _canonical_keyword(keyword) in faction_keywords
+        matches(keyword) or _canonical_keyword(keyword) in faction_keywords
         for keyword in requirement.excluded_keywords
     )
 

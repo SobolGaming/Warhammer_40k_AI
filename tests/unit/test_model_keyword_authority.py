@@ -138,6 +138,7 @@ def test_keyword_casualty_facade_restore_replay_and_both_viewers(retained: bool)
         assert "PSYKER" not in projection["unit_display_by_id"]["army-beta:enemy"]["keywords"]
         assert projection["model_display_by_id"][model_id]["keywords"] == [
             "BATTLELINE",
+            "CORE INTERCESSOR-LIKE INFANTRY",
             "INFANTRY",
             "PSYKER",
         ]

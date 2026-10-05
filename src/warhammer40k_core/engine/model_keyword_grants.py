@@ -27,6 +27,10 @@ def grant_unit_keywords(
                 keyword_assignment=replace(
                     model.keyword_assignment,
                     keywords=tuple(sorted({*model.keywords, *keywords})),
+                    name_is_ordinary_keyword=(
+                        model.keyword_assignment.name_is_ordinary_keyword
+                        or model.keyword_assignment.name_keyword in keywords
+                    ),
                     source_ids=tuple(sorted({*model.keyword_assignment.source_ids, source_id})),
                 ),
             )

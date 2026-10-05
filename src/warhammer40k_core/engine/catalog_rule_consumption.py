@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from warhammer40k_core.core.keyword_membership import keyword_inventory_contains
 from warhammer40k_core.engine.core_ability_materialization import (
     DEADLY_DEMISE_RANGE_INCHES as DEADLY_DEMISE_RANGE_INCHES,
 )
@@ -1361,6 +1362,7 @@ def catalog_wound_roll_reroll_permission_for_attack(
     player_id: str,
     attack_kind: str,
     target_keywords: tuple[str, ...],
+    name_keywords: tuple[str, ...] = (),
 ) -> RerollPermission | None:
     _validate_ability_index(ability_index)
     _validate_unit(unit)
@@ -1370,7 +1372,9 @@ def catalog_wound_roll_reroll_permission_for_attack(
     resolved_attack_kind = _catalog_ir_lookup_token(
         _validate_identifier("attack_kind", attack_kind)
     )
-    resolved_target_keywords = _validate_keyword_tokens("target_keywords", target_keywords)
+    resolved_target_keywords = _validate_keyword_tokens(
+        "target_keywords", target_keywords, name_keywords=name_keywords
+    )
     permissions: list[RerollPermission] = []
     for record in _unit_scoped_generic_records(
         ability_index=ability_index,
@@ -1385,6 +1389,7 @@ def catalog_wound_roll_reroll_permission_for_attack(
                 clause=clause,
                 attack_kind=resolved_attack_kind,
                 target_keywords=resolved_target_keywords,
+                name_keywords=name_keywords,
             ):
                 continue
             for effect_index, effect in enumerate(clause.effects):
@@ -1416,6 +1421,7 @@ def catalog_restore_lost_wounds_after_destroying_unit(
     player_id: str,
     destroyed_player_id: str,
     destroyed_unit_keywords: tuple[str, ...],
+    name_keywords: tuple[str, ...] = (),
     healing_amount: int,
     source_event_id: str,
 ) -> tuple[HealingEffect, DecisionRequest | None] | None:
@@ -1440,6 +1446,7 @@ def catalog_restore_lost_wounds_after_destroying_unit(
     resolved_destroyed_keywords = _validate_keyword_tokens(
         "destroyed_unit_keywords",
         destroyed_unit_keywords,
+        name_keywords=name_keywords,
     )
     amount = _validate_healing_amount(healing_amount)
     matches: list[tuple[AbilityCatalogRecord, RuleClause, int, RuleEffectSpec]] = []
@@ -1455,6 +1462,7 @@ def catalog_restore_lost_wounds_after_destroying_unit(
             if not _clause_is_destroyed_enemy_keyword_restore_lost_wounds(
                 clause=clause,
                 destroyed_unit_keywords=resolved_destroyed_keywords,
+                name_keywords=name_keywords,
             ):
                 continue
             for effect_index, effect in enumerate(clause.effects):
@@ -4625,6 +4633,7 @@ def _clause_is_melee_wound_reroll_against_target_keywords(
     clause: RuleClause,
     attack_kind: str,
     target_keywords: tuple[str, ...],
+    name_keywords: tuple[str, ...] = (),
 ) -> bool:
     if attack_kind != "melee":
         return False
@@ -4636,6 +4645,7 @@ def _clause_is_melee_wound_reroll_against_target_keywords(
     )
     return _keywords_match_any(
         target_keywords=target_keywords,
+        name_keywords=name_keywords,
         required_keywords=required_keywords,
     )
 
@@ -4644,6 +4654,7 @@ def _clause_is_destroyed_enemy_keyword_restore_lost_wounds(
     *,
     clause: RuleClause,
     destroyed_unit_keywords: tuple[str, ...],
+    name_keywords: tuple[str, ...] = (),
 ) -> bool:
     if not _clause_is_structured_destroyed_unit_restore_clause(clause):
         return False
@@ -4653,6 +4664,7 @@ def _clause_is_destroyed_enemy_keyword_restore_lost_wounds(
     )
     return _keywords_match_any(
         target_keywords=destroyed_unit_keywords,
+        name_keywords=name_keywords,
         required_keywords=required_keywords,
     )
 
@@ -4735,12 +4747,16 @@ def _keywords_match_any(
     *,
     target_keywords: tuple[str, ...],
     required_keywords: tuple[str, ...],
+    name_keywords: tuple[str, ...] = (),
 ) -> bool:
-    if not required_keywords:
-        return False
-    target_keyword_set = {_catalog_keyword_token(keyword) for keyword in target_keywords}
     return any(
-        _catalog_keyword_token(keyword) in target_keyword_set for keyword in required_keywords
+        keyword_inventory_contains(
+            keywords=target_keywords,
+            keyword=keyword,
+            name_keywords=name_keywords,
+            normalizer=_catalog_keyword_token,
+        )
+        for keyword in required_keywords
     )
 
 
@@ -5728,21 +5744,27 @@ def _validate_non_empty_text(field_name: str, value: object) -> str:
     return stripped
 
 
-def _validate_keyword_tokens(field_name: str, values: object) -> tuple[str, ...]:
+def _validate_keyword_tokens(
+    field_name: str, values: object, *, name_keywords: tuple[str, ...] = ()
+) -> tuple[str, ...]:
     if type(field_name) is not str or not field_name:
         raise GameLifecycleError("Catalog rule keyword validation requires a field name.")
     if type(values) is not tuple:
         raise GameLifecycleError(f"Catalog rule {field_name} must be a tuple.")
     validated: list[str] = []
-    seen: set[str] = set()
+    seen: set[tuple[bool, str]] = set()
     for value in cast(tuple[object, ...], values):
         if type(value) is not str or not value.strip():
             raise GameLifecycleError(f"Catalog rule {field_name} must contain keyword strings.")
-        token = _catalog_keyword_token(value)
+        native = value.strip().upper()
+        token = (
+            native in name_keywords,
+            native if native in name_keywords else _catalog_keyword_token(value),
+        )
         if token in seen:
             raise GameLifecycleError(f"Catalog rule {field_name} must not duplicate keywords.")
         seen.add(token)
-        validated.append(token)
+        validated.append(value.strip().upper())
     return tuple(validated)
 
 

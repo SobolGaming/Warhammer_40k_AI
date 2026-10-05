@@ -355,6 +355,9 @@ def defer_grouped_devastating_wounds(
             pool=pool,
             attack_context=attack_context,
             target_keywords=target_keywords,
+            name_keywords=rules_unit_view_by_id(
+                state=state, unit_instance_id=pool.target_unit_instance_id
+            ).datasheet_name_keywords,
         )
         if resolution is not DevastatingWoundsResolution.MORTAL_WOUNDS:
             normal_contexts.append((wounded_sequence, attack_context))
@@ -384,7 +387,13 @@ def defer_grouped_devastating_wounds(
             stratagem_index=stratagem_index,
             stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
             runtime_modifier_registry=runtime_modifier_registry,
-            melta_bonus=_melta_damage_modifier(pool, target_keywords=target_keywords),
+            melta_bonus=_melta_damage_modifier(
+                pool,
+                target_keywords=target_keywords,
+                name_keywords=rules_unit_view_by_id(
+                    state=state, unit_instance_id=pool.target_unit_instance_id
+                ).datasheet_name_keywords,
+            ),
         )
         if status is not None:
             return current, (), status

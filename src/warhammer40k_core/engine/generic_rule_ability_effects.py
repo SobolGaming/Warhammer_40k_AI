@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import cast
 
+from warhammer40k_core.core.keyword_membership import keyword_inventory_contains
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.advance_eligibility_hooks import AdvanceEligibilityContext
 from warhammer40k_core.engine.advance_hooks import AdvanceMoveContext
@@ -311,8 +312,12 @@ def _required_keyword_any_values(
 def _rules_unit_has_keyword(rules_unit: RulesUnitView, keyword: str) -> bool:
     if type(rules_unit) is not RulesUnitView:
         raise GameLifecycleError("Generic RuleIR ability keyword lookup requires RulesUnitView.")
-    requested_keyword = _canonical_keyword(_validate_identifier("keyword", keyword))
-    return requested_keyword in {_canonical_keyword(stored) for stored in rules_unit.keywords}
+    return keyword_inventory_contains(
+        keywords=rules_unit.keywords,
+        keyword=_validate_identifier("keyword", keyword),
+        name_keywords=rules_unit.datasheet_name_keywords,
+        normalizer=_canonical_keyword,
+    )
 
 
 def _rules_unit_has_faction_keyword(rules_unit: RulesUnitView, keyword: str) -> bool:

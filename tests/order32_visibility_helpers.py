@@ -49,7 +49,9 @@ from warhammer40k_core.rules.rule_ir import (
 )
 
 
-def retained_observer_session(*, attached: bool) -> tuple[LocalGameSession, str, str]:
+def retained_observer_session(
+    *, attached: bool, game_id: str | None = None
+) -> tuple[LocalGameSession, str, str]:
     """A lethal facade shot leaves a retained-only component beside a blocked Leader."""
     catalog = _compact_intercessor_catalog(lethal_retained_attack_catalog())
     enemy_specs: tuple[tuple[str, str, str, int], ...] = (
@@ -58,7 +60,7 @@ def retained_observer_session(*, attached: bool) -> tuple[LocalGameSession, str,
     if attached:
         enemy_specs += (("leader", "core-character-leader", "core-character-leader", 1),)
     config = _config(
-        game_id=f"r32-retained-observer:{attached}",
+        game_id=game_id if game_id is not None else f"r32-retained-observer:{attached}",
         alpha_unit_ids=("intercessor-1", "intercessor-2"),
         alpha_datasheets=None,
         alpha_unit_specs=tuple(

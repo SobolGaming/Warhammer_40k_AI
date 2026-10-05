@@ -1220,7 +1220,7 @@ def test_voluntary_desperate_escape_waits_for_delirium_fnp_before_embark(
 
 
 def test_delirium_destruction_reconciles_identity_without_embark_request() -> None:
-    game_id = "order99-escape-destroy-0"
+    game_id = "order99-escape-destroy-name-1"
     lifecycle, status, target_unit_id = _advance_voluntary_desperate_escape_to_delirium_fnp(
         game_id=game_id,
         with_reroll=False,

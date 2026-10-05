@@ -2579,7 +2579,7 @@ def _transport_capacity_allows_datasheet(
         )
     if type(datasheet) is not DatasheetDefinition:
         raise ArmyMusteringError("Transport capacity check requires DatasheetDefinition.")
-    unit_keywords = {_canonical_keyword(keyword) for keyword in datasheet.keywords.keywords}
+    unit_keywords = {_canonical_keyword(keyword) for keyword in datasheet.effective_keywords}
     allowed = {_canonical_keyword(keyword) for keyword in capacity_profile.allowed_keywords}
     excluded = {_canonical_keyword(keyword) for keyword in capacity_profile.excluded_keywords}
     if allowed and not unit_keywords.intersection(allowed):
@@ -2622,7 +2622,7 @@ def _effective_unit_keywords(
 def _datasheet_keyword_set(datasheet: DatasheetDefinition) -> frozenset[str]:
     if type(datasheet) is not DatasheetDefinition:
         raise ArmyMusteringError("Datasheet keyword lookup requires DatasheetDefinition.")
-    return frozenset(_canonical_keyword(keyword) for keyword in datasheet.keywords.keywords)
+    return frozenset(_canonical_keyword(keyword) for keyword in datasheet.effective_keywords)
 
 
 def _keyword_set_has_keyword(keywords: frozenset[str], keyword: str) -> bool:
@@ -2650,7 +2650,7 @@ def _datasheet_has_any_keyword(
     stored_keywords = {
         _canonical_keyword(stored_keyword)
         for stored_keyword in (
-            *datasheet.keywords.keywords,
+            *datasheet.effective_keywords,
             *datasheet.keywords.faction_keywords,
         )
     }

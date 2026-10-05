@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, cast
 
+from warhammer40k_core.core.keyword_membership import keyword_inventory_contains
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import (
@@ -170,9 +171,6 @@ def force_desperate_escape_clause(record: AbilityCatalogRecord) -> RuleClause | 
 def falling_back_unit_allowed(*, clause: RuleClause, unit: UnitInstance) -> bool:
     from warhammer40k_core.engine.rule_target_resolution import canonical_keyword
 
-    unit_keywords = {
-        canonical_keyword(keyword) for keyword in (*unit.keywords, *unit.faction_keywords)
-    }
     for condition in clause.conditions:
         if condition.kind is not RuleConditionKind.KEYWORD_GATE:
             continue
@@ -185,19 +183,26 @@ def falling_back_unit_allowed(*, clause: RuleClause, unit: UnitInstance) -> bool
                 "Catalog Desperate Escape excluded keywords must be structured."
             )
         excluded_keywords = _canonical_keyword_set(excluded_any)
-        if unit_keywords & excluded_keywords:
+        if any(
+            keyword_inventory_contains(
+                keywords=(*unit.keywords, *unit.faction_keywords),
+                keyword=keyword,
+                name_keywords=unit.datasheet_name_keywords,
+                ordinary_keywords=unit.faction_keywords,
+                normalizer=canonical_keyword,
+            )
+            for keyword in excluded_keywords
+        ):
             return False
     return True
 
 
 def _canonical_keyword_set(values: tuple[RuleParameterValue, ...]) -> frozenset[str]:
     keywords: set[str] = set()
-    from warhammer40k_core.engine.rule_target_resolution import canonical_keyword
-
     for value in values:
         if type(value) is not str:
             raise GameLifecycleError("Catalog Desperate Escape keyword value is invalid.")
-        keywords.add(canonical_keyword(value))
+        keywords.add(value.strip().upper())
     return frozenset(keywords)
 
 

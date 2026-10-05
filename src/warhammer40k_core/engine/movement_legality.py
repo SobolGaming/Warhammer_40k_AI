@@ -232,7 +232,7 @@ class MovementCapabilitySet:
         object.__setattr__(
             self,
             "friendly_model_transit_blocker_keywords",
-            _validate_keyword_tuple(
+            _validate_keyword_selector_tuple(
                 "MovementCapabilitySet friendly_model_transit_blocker_keywords",
                 self.friendly_model_transit_blocker_keywords,
             ),
@@ -240,7 +240,7 @@ class MovementCapabilitySet:
         object.__setattr__(
             self,
             "enemy_model_transit_blocker_keywords",
-            _validate_keyword_tuple(
+            _validate_keyword_selector_tuple(
                 "MovementCapabilitySet enemy_model_transit_blocker_keywords",
                 self.enemy_model_transit_blocker_keywords,
             ),
@@ -292,7 +292,20 @@ class MovementCapabilitySet:
         flags = set(
             movement_capability_flags_from_index(
                 index=resolved_ability_index,
-                keywords=normalized_keywords,
+                keywords=tuple(value.strip().upper() for value in keywords),
+                name_keywords=(
+                    ()
+                    if unit is None
+                    else tuple(
+                        name
+                        for name in (
+                            unit.own_model_by_id(model_instance_id).datasheet_name_keywords
+                            if model_instance_id is not None
+                            else unit.datasheet_name_keywords
+                        )
+                        if name in keywords
+                    )
+                ),
                 registry=ability_registry,
             )
         )
@@ -1337,3 +1350,11 @@ def _movement_ability_blocker_keywords(
         # Independent permissions are alternatives; a narrower grant cannot revoke another.
         return tuple(sorted(set(existing).intersection(intrinsic)))
     return intrinsic
+
+
+def _validate_keyword_selector_tuple(field_name: str, values: object) -> tuple[str, ...]:
+    _validate_keyword_tuple(field_name, values)
+    return tuple(
+        _validate_identifier(field_name, value).upper()
+        for value in cast(tuple[object, ...], values)
+    )

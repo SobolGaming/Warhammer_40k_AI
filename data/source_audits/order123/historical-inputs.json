@@ -1,0 +1,192 @@
+{
+  "reviewed_commit": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+  "also_present_at_base": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+  "purpose": "Retain every original assertion, branch and fixture byte. Exact native factory names accompany ordinary/faction fixture replacements. Only proven scenario identifiers (game IDs or genuine facade decision result IDs) are renewed where authoritative additional keyword facts alter deterministic history-seeded outcomes; existing defaults remain for other callers. Production RNG/history and source admission are unchanged. The original state-backed keyword architecture audit is retained while its owner table follows the native-aware call chain; all original assertions and predicates remain, with additional exact population and native metadata checks.",
+  "current_evidence": "docs/ORDER_123_SCOPE_PLAN.md",
+  "files": [
+    {
+      "path": "tests/model_keyword_helpers.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/model_keyword_helpers.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/model_keyword_helpers.py",
+      "sha256": "d1d5212fd3f9593d55f1b044b87b2cb8f25c358b3a6e2c840a368355bb542799",
+      "bytes": 5824
+    },
+    {
+      "path": "tests/unit/test_model_keyword_authority.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/unit/test_model_keyword_authority.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/unit/test_model_keyword_authority.py",
+      "sha256": "10f59d7b55948ac58c070af08f85f7b2276c9e88e5aaeef5c07313f6053b6b46",
+      "bytes": 16751
+    },
+    {
+      "path": "tests/unit_keyword_helpers.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/unit_keyword_helpers.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/unit_keyword_helpers.py",
+      "sha256": "3f290f4f7bcd08cdb65d01f8b3cb062da3ba919aa426a4ba190fae1eafd862a5",
+      "bytes": 1586
+    },
+    {
+      "path": "tests/unit/test_explosives.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/unit/test_explosives.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/unit/test_explosives.py",
+      "sha256": "9ada58347dbcf0568f0a3d36b76f23a89df35413aba441a3f5cfda0100863463",
+      "bytes": 25035
+    },
+    {
+      "path": "tests/unit/test_phase13b_shooting_declarations.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/unit/test_phase13b_shooting_declarations.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/unit/test_phase13b_shooting_declarations.py",
+      "sha256": "b3d88280274432f740c2c920976d2f4f225f0b6e670252da37e0ce57b2c0ba3c",
+      "bytes": 829124
+    },
+    {
+      "path": "tests/fire_overwatch_helpers.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/fire_overwatch_helpers.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/fire_overwatch_helpers.py",
+      "sha256": "1be0a2f51560fb55ba9d7c922b6f1c1f3fe598014f5a3764aa43e33f4076294a",
+      "bytes": 12442
+    },
+    {
+      "path": "tests/integration/test_fight_on_death_presence.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/integration/test_fight_on_death_presence.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/integration/test_fight_on_death_presence.py",
+      "sha256": "fbd82453fd824ba5284711d6d06718318d460e742628d6a18fb19b1296fb3fd9",
+      "bytes": 41925
+    },
+    {
+      "path": "tests/integration/test_retained_shooting.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/integration/test_retained_shooting.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/integration/test_retained_shooting.py",
+      "sha256": "518bcd57d83e4ebce07064ffc7660e34c8117fe88c8d803289d7b91fdac65deb",
+      "bytes": 77108
+    },
+    {
+      "path": "tests/order101_failed_setup_helpers.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/order101_failed_setup_helpers.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/order101_failed_setup_helpers.py",
+      "sha256": "994f4ba3e13882d171a4ac14f3be9f980e8ecf900f79feb0c697da9837ff75fa",
+      "bytes": 43059
+    },
+    {
+      "path": "tests/order118_source_helpers.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/order118_source_helpers.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/order118_source_helpers.py",
+      "sha256": "5eb647a40fdad838d711cb13f3a351e8fe80c84368b50aae0acc471404f598db",
+      "bytes": 19323
+    },
+    {
+      "path": "tests/order32_visibility_helpers.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/order32_visibility_helpers.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/order32_visibility_helpers.py",
+      "sha256": "697825677aa89155d578c46b51b052dbecd8a83663bc2f8f2f80532d2d1e03cc",
+      "bytes": 12237
+    },
+    {
+      "path": "tests/random_melee_helpers.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/random_melee_helpers.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/random_melee_helpers.py",
+      "sha256": "8fcf80415c3facc1f56312e627c7d0330754097873897645a82a2415d0c21839",
+      "bytes": 9037
+    },
+    {
+      "path": "tests/unit/test_action_movement_interruption.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/unit/test_action_movement_interruption.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/unit/test_action_movement_interruption.py",
+      "sha256": "bed1af7a8f389b5161a82da78361db9c7ffcbc89d3d9663ef2cd7af2a2affaff",
+      "bytes": 35538
+    },
+    {
+      "path": "tests/unit/test_fire_overwatch.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/unit/test_fire_overwatch.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/unit/test_fire_overwatch.py",
+      "sha256": "e4c60c4f0a19dd3689f9e8740bcdd68be5e254ae26c2f6dda9cc6c8397c0d342",
+      "bytes": 51328
+    },
+    {
+      "path": "tests/unit/test_order105_hazard.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/unit/test_order105_hazard.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/unit/test_order105_hazard.py",
+      "sha256": "1860d3d874d7bcce2dd6af6473519e0ed9d378a2e36629aa51d1c88a90b50e42",
+      "bytes": 16393
+    },
+    {
+      "path": "tests/unit/test_order92_random_melee.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/unit/test_order92_random_melee.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/unit/test_order92_random_melee.py",
+      "sha256": "d7f160998f9f191f4c41694c49fa1fb1ebac4b628c518728f3b62f735e71484f",
+      "bytes": 49027
+    },
+    {
+      "path": "tests/unit/test_order95_optional_shooting.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/unit/test_order95_optional_shooting.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/unit/test_order95_optional_shooting.py",
+      "sha256": "e747c37b56fd10f9c68cebc1d0b00361791001945e5b2c384b9fc8747218436e",
+      "bytes": 30454
+    },
+    {
+      "path": "tests/unit/test_order97_attack_evidence.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/unit/test_order97_attack_evidence.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/unit/test_order97_attack_evidence.py",
+      "sha256": "40182aa32ca5ae3a0946667baadfb60e78963b7e34d1f06e4a34c788e0b01120",
+      "bytes": 14172
+    },
+    {
+      "path": "tests/unit/test_phase10o_fall_back.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/unit/test_phase10o_fall_back.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/unit/test_phase10o_fall_back.py",
+      "sha256": "15a44de8036b59bf5c4f232c9353d15bce6df8011bd747b5a27c2af40964c0a7",
+      "bytes": 133104
+    },
+    {
+      "path": "tests/unit/test_phase17g_chaos_knights_army_rule.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/unit/test_phase17g_chaos_knights_army_rule.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/unit/test_phase17g_chaos_knights_army_rule.py",
+      "sha256": "1e6f5ac2499f0e87506dbb69608e9632eaf77b6bbdfc4d9380e3635d5b52c05b",
+      "bytes": 159148
+    },
+    {
+      "path": "tests/unit/test_public_firing_deck_history.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/unit/test_public_firing_deck_history.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/unit/test_public_firing_deck_history.py",
+      "sha256": "f963ed00df9f55415e8a77c5ef78e1efc3dcd347594e291eba133cffd1c2336f",
+      "bytes": 14313
+    },
+    {
+      "path": "tests/unit/test_unit_abilities.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/unit/test_unit_abilities.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/unit/test_unit_abilities.py",
+      "sha256": "b1df5fa3527c5ce22df059575c5ec321f584e331ec034091e1fa2fa1782ddb43",
+      "bytes": 40663
+    },
+    {
+      "path": "tests/code_quality/test_model_keyword_authority.py",
+      "historical_path": "data/source_audits/order123/baseline/tests/code_quality/test_model_keyword_authority.py.txt",
+      "git_revision": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
+      "git_path": "tests/code_quality/test_model_keyword_authority.py",
+      "sha256": "d3b1d6736cb5b51b197f4b32d5ce04aca02818bec8233980e133654edd03abed",
+      "bytes": 4732
+    }
+  ]
+}

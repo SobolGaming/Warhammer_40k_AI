@@ -16,6 +16,7 @@ from warhammer40k_core.core.datasheet import (
 )
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.faction import FactionDefinition
+from warhammer40k_core.core.keyword_membership import keyword_inventory_contains
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.engine.faction_content.datasheet_faction_access import (
@@ -980,15 +981,16 @@ def _datasheet_has_any_keyword(
     datasheet: DatasheetDefinition,
     keywords: frozenset[str],
 ) -> bool:
-    requested_keywords = {_canonical_keyword(keyword) for keyword in keywords}
-    stored_keywords = {
-        _canonical_keyword(stored)
-        for stored in (
-            *datasheet.keywords.keywords,
-            *datasheet.keywords.faction_keywords,
+    return any(
+        keyword_inventory_contains(
+            keywords=(*datasheet.effective_keywords, *datasheet.keywords.faction_keywords),
+            ordinary_keywords=datasheet.keywords.faction_keywords,
+            keyword=keyword,
+            name_keywords=() if datasheet.name_has_ordinary_role else (datasheet.name_keyword,),
+            normalizer=_canonical_keyword,
         )
-    }
-    return bool(requested_keywords & stored_keywords)
+        for keyword in keywords
+    )
 
 
 def _faction_has_keyword(

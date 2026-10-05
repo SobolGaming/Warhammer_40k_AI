@@ -1,5 +1,9 @@
 # CORE V2 external contract
 
+Contract 44.3.9 publishes Core datasheet-name keywords through existing keyword,
+projection and persistence envelopes. Native catalog identity is derived once;
+exact runtime identity remains required. See [Order123](../docs/ORDER_123_SCOPE_PLAN.md).
+
 Contract 44.3.8 publishes shared Core default effect lifetimes through existing
 activation, effect, event and persistence envelopes. Source duration metadata stays
 null; persisted effects carry derived expiry. Exact runtime identity remains

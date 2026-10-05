@@ -136,7 +136,9 @@ def test_explicit_shocked_action_permission_preserves_movement_interruption_and_
 def test_shocked_start_uses_explicit_catalog_permission_through_facade(permission: bool) -> None:
     from tests.action_battle_shock_helpers import shocked_action_opportunity_session
 
-    session, _unit_id = shocked_action_opportunity_session(permission=permission)
+    session, _unit_id = shocked_action_opportunity_session(
+        permission=permission, game_id="order110-walker-keyword-identity"
+    )
     state = session.lifecycle.state
     assert state is not None
     request = session.lifecycle.pending_decision_request()

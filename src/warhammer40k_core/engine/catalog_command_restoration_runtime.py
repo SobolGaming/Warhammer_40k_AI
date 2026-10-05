@@ -467,6 +467,7 @@ class CatalogCommandRestorationRuntime:
                 continue
             if not unit_has_required_keywords(
                 unit_keywords=view.keywords,
+                name_keywords=view.datasheet_name_keywords,
                 faction_keywords=view.faction_keywords,
                 required_keywords=source.descriptor.required_keyword_sequence,
             ):

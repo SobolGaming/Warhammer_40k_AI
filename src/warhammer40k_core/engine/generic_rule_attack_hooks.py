@@ -1237,6 +1237,7 @@ def _unit_has_keyword(*, state: object, unit_instance_id: str, keyword: str) -> 
     )
     return unit_has_required_keywords(
         unit_keywords=rules_unit.keywords,
+        name_keywords=rules_unit.datasheet_name_keywords,
         faction_keywords=rules_unit.faction_keywords,
         required_keywords=(_validate_identifier("keyword", keyword),),
     )

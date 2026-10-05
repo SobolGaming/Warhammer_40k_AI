@@ -192,6 +192,8 @@ def _armies_match_muster_runtime_state(
                     casualty_model_ids=setup_casualty_model_ids,
                 ),
             )
+            if not _same_model_name_roles(normalized_state_army, expected_army):
+                return False
             if normalized_state_army != expected_army:
                 return False
             continue
@@ -205,9 +207,25 @@ def _armies_match_muster_runtime_state(
                 materialized_model_payloads_by_unit_id=(materialized_model_payloads_by_unit_id),
             ),
         )
+        if not _same_model_name_roles(normalized_state_army, expected_army):
+            return False
         if normalized_state_army != expected_army:
             return False
     return True
+
+
+def _same_model_name_roles(actual: ArmyDefinition, expected: ArmyDefinition) -> bool:
+    def roles(army: ArmyDefinition) -> dict[str, tuple[str | None, bool]]:
+        return {
+            model.model_instance_id: (
+                model.keyword_assignment.name_keyword,
+                model.keyword_assignment.name_is_ordinary_keyword,
+            )
+            for unit in army.units
+            for model in unit.own_models
+        }
+
+    return roles(actual) == roles(expected)
 
 
 def _units_with_authenticated_setup_casualty_muster_wounds(

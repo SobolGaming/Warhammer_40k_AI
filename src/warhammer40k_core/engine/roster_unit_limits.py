@@ -8,9 +8,9 @@ def datasheet_unit_limit(
     datasheet: DatasheetDefinition, *, policy: BattleSizeMusteringPolicy
 ) -> int:
     """Apply the Dedicated Transport exception only at source-backed battle sizes."""
-    if "BATTLELINE" in datasheet.keywords.keywords or (
+    if "BATTLELINE" in datasheet.effective_keywords or (
         policy.battle_size in (BattleSize.INCURSION, BattleSize.STRIKE_FORCE)
-        and "DEDICATED TRANSPORT" in datasheet.keywords.keywords
+        and "DEDICATED TRANSPORT" in datasheet.effective_keywords
     ):
         return policy.battleline_unit_limit
     return policy.unit_limit

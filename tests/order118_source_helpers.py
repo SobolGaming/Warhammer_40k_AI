@@ -55,6 +55,7 @@ from warhammer40k_core.rules.rule_ir import RuleIR
 def source_retention_session(
     phase: BattlePhase,
     *,
+    game_id: str | None = None,
     source_role: str = "bodyguard",
     source_wargear: bool = False,
     optional_fnp: bool = True,
@@ -155,7 +156,7 @@ def source_retention_session(
             ),
             enemy_unit_specs=specs,
             enemy_attachment_declarations=attachments,
-            game_id="order118-shooting",
+            game_id=game_id if game_id is not None else "order118-shooting",
             catalog=catalog,
             enemy_pose=Pose.at(30, 35),
         )
@@ -200,7 +201,7 @@ def source_retention_session(
                 "support": Pose.at(11.65, 8.35),
                 "other": Pose.at(8.35, 11.65),
             },
-            game_id="order118-fight",
+            game_id=game_id if game_id is not None else "order118-fight",
             model_count=1,
             catalog=catalog,
             alpha_unit_specs={

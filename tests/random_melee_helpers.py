@@ -19,6 +19,7 @@ from warhammer40k_core.geometry.pose import Pose
 
 def random_melee_session(
     *,
+    game_id: str = "order92-random-melee",
     random: bool = True,
     extra: bool = False,
     cleave: bool = False,
@@ -150,7 +151,7 @@ def random_melee_session(
             "target-a": Pose.at(22, 20),
             "target-b": Pose.at(20, 22),
         },
-        game_id="order92-random-melee",
+        game_id=game_id,
         catalog=catalog,
         datasheet_id="core-character-leader",
         model_profile_id="core-character-leader",

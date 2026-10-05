@@ -2502,9 +2502,9 @@ def _record_real_harbingers_selection(
 
 def _assert_selected_target_delirium_continuation(*, reroll: bool) -> None:
     game_id = (
-        "order117-delirium-reroll-continuation-1"
+        "order117-delirium-reroll-continuation-name-7"
         if reroll
-        else "order65-complete-boundary-direct-0"
+        else "order65-complete-boundary-direct-name-1"
     )
     selected_target_record = _selected_target_battle_shock_then_modifier_record()
     extra_contributions: tuple[RuntimeContentContribution, ...] = ()
@@ -2641,7 +2641,7 @@ def _selected_target_delirium_provider_checkpoint(
 
 
 def _assert_phase_start_selected_target_delirium_continuation(*, phase: BattlePhase) -> None:
-    game_id = f"phase17g-selected-target-{phase.value}-start-delirium-ordered-1"
+    game_id = f"phase17g-selected-target-{phase.value}-start-delirium-ordered-name-3"
     selected_target_record = _phase_start_selected_target_battle_shock_record(phase=phase)
     lifecycle, bundle = _command_delirium_lifecycle_fixture(
         game_id=game_id,

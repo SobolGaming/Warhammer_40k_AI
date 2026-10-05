@@ -330,6 +330,9 @@ def _eligible(state: GameState, sequence: AttackSequence, hit: HitRoll) -> bool:
             target_keywords=rules_unit_view_by_id(
                 state=state, unit_instance_id=sequence.current_pool().target_unit_instance_id
             ).keywords,
+            name_keywords=rules_unit_view_by_id(
+                state=state, unit_instance_id=sequence.current_pool().target_unit_instance_id
+            ).datasheet_name_keywords,
         )
     )
 

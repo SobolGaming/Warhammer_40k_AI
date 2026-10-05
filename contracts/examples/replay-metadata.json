@@ -17546,6 +17546,7 @@
               ],
               "keywords": [
                 "BATTLELINE",
+                "CORE INTERCESSOR-LIKE INFANTRY",
                 "INFANTRY",
                 "REDEPLOY",
                 "SCOUTS"
@@ -17660,11 +17661,14 @@
                     ],
                     "keywords": [
                       "BATTLELINE",
+                      "CORE INTERCESSOR-LIKE INFANTRY",
                       "INFANTRY",
                       "REDEPLOY",
                       "SCOUTS"
                     ],
                     "model_profile_id": "core-intercessor-like",
+                    "name_is_ordinary_keyword": false,
+                    "name_keyword": "CORE INTERCESSOR-LIKE INFANTRY",
                     "source_ids": [
                       "datasheet:core-intercessor-like-infantry",
                       "datasheet:core-intercessor-like-infantry:profile"
@@ -17790,11 +17794,14 @@
                     ],
                     "keywords": [
                       "BATTLELINE",
+                      "CORE INTERCESSOR-LIKE INFANTRY",
                       "INFANTRY",
                       "REDEPLOY",
                       "SCOUTS"
                     ],
                     "model_profile_id": "core-intercessor-like",
+                    "name_is_ordinary_keyword": false,
+                    "name_keyword": "CORE INTERCESSOR-LIKE INFANTRY",
                     "source_ids": [
                       "datasheet:core-intercessor-like-infantry",
                       "datasheet:core-intercessor-like-infantry:profile"
@@ -17920,11 +17927,14 @@
                     ],
                     "keywords": [
                       "BATTLELINE",
+                      "CORE INTERCESSOR-LIKE INFANTRY",
                       "INFANTRY",
                       "REDEPLOY",
                       "SCOUTS"
                     ],
                     "model_profile_id": "core-intercessor-like",
+                    "name_is_ordinary_keyword": false,
+                    "name_keyword": "CORE INTERCESSOR-LIKE INFANTRY",
                     "source_ids": [
                       "datasheet:core-intercessor-like-infantry",
                       "datasheet:core-intercessor-like-infantry:profile"
@@ -18050,11 +18060,14 @@
                     ],
                     "keywords": [
                       "BATTLELINE",
+                      "CORE INTERCESSOR-LIKE INFANTRY",
                       "INFANTRY",
                       "REDEPLOY",
                       "SCOUTS"
                     ],
                     "model_profile_id": "core-intercessor-like",
+                    "name_is_ordinary_keyword": false,
+                    "name_keyword": "CORE INTERCESSOR-LIKE INFANTRY",
                     "source_ids": [
                       "datasheet:core-intercessor-like-infantry",
                       "datasheet:core-intercessor-like-infantry:profile"
@@ -18180,11 +18193,14 @@
                     ],
                     "keywords": [
                       "BATTLELINE",
+                      "CORE INTERCESSOR-LIKE INFANTRY",
                       "INFANTRY",
                       "REDEPLOY",
                       "SCOUTS"
                     ],
                     "model_profile_id": "core-intercessor-like",
+                    "name_is_ordinary_keyword": false,
+                    "name_keyword": "CORE INTERCESSOR-LIKE INFANTRY",
                     "source_ids": [
                       "datasheet:core-intercessor-like-infantry",
                       "datasheet:core-intercessor-like-infantry:profile"
@@ -18227,6 +18243,7 @@
                 "CORE MARINES"
               ],
               "keywords": [
+                "CORE VEHICLE MONSTER",
                 "MONSTER",
                 "VEHICLE"
               ],
@@ -18339,10 +18356,13 @@
                       "CORE MARINES"
                     ],
                     "keywords": [
+                      "CORE VEHICLE MONSTER",
                       "MONSTER",
                       "VEHICLE"
                     ],
                     "model_profile_id": "core-vehicle-monster",
+                    "name_is_ordinary_keyword": false,
+                    "name_keyword": "CORE VEHICLE MONSTER",
                     "source_ids": [
                       "datasheet:core-vehicle-monster",
                       "datasheet:core-vehicle-monster:profile"
@@ -18402,6 +18422,7 @@
                 "CORE MARINES"
               ],
               "keywords": [
+                "CORE DEEP STRIKE UNIT",
                 "DEEP STRIKE",
                 "INFANTRY"
               ],
@@ -18514,10 +18535,13 @@
                       "CORE MARINES"
                     ],
                     "keywords": [
+                      "CORE DEEP STRIKE UNIT",
                       "DEEP STRIKE",
                       "INFANTRY"
                     ],
                     "model_profile_id": "core-deep-strike-model",
+                    "name_is_ordinary_keyword": false,
+                    "name_keyword": "CORE DEEP STRIKE UNIT",
                     "source_ids": [
                       "datasheet:core-deep-strike-unit",
                       "datasheet:core-deep-strike-unit:profile"
@@ -18642,10 +18666,13 @@
                       "CORE MARINES"
                     ],
                     "keywords": [
+                      "CORE DEEP STRIKE UNIT",
                       "DEEP STRIKE",
                       "INFANTRY"
                     ],
                     "model_profile_id": "core-deep-strike-model",
+                    "name_is_ordinary_keyword": false,
+                    "name_keyword": "CORE DEEP STRIKE UNIT",
                     "source_ids": [
                       "datasheet:core-deep-strike-unit",
                       "datasheet:core-deep-strike-unit:profile"
@@ -18770,10 +18797,13 @@
                       "CORE MARINES"
                     ],
                     "keywords": [
+                      "CORE DEEP STRIKE UNIT",
                       "DEEP STRIKE",
                       "INFANTRY"
                     ],
                     "model_profile_id": "core-deep-strike-model",
+                    "name_is_ordinary_keyword": false,
+                    "name_keyword": "CORE DEEP STRIKE UNIT",
                     "source_ids": [
                       "datasheet:core-deep-strike-unit",
                       "datasheet:core-deep-strike-unit:profile"
@@ -18884,6 +18914,7 @@
               ],
               "keywords": [
                 "BATTLELINE",
+                "CORE INTERCESSOR-LIKE INFANTRY",
                 "INFANTRY",
                 "REDEPLOY",
                 "SCOUTS"
@@ -18998,11 +19029,14 @@
                     ],
                     "keywords": [
                       "BATTLELINE",
+                      "CORE INTERCESSOR-LIKE INFANTRY",
                       "INFANTRY",
                       "REDEPLOY",
                       "SCOUTS"
                     ],
                     "model_profile_id": "core-intercessor-like",
+                    "name_is_ordinary_keyword": false,
+                    "name_keyword": "CORE INTERCESSOR-LIKE INFANTRY",
                     "source_ids": [
                       "datasheet:core-intercessor-like-infantry",
                       "datasheet:core-intercessor-like-infantry:profile"
@@ -19128,11 +19162,14 @@
                     ],
                     "keywords": [
                       "BATTLELINE",
+                      "CORE INTERCESSOR-LIKE INFANTRY",
                       "INFANTRY",
                       "REDEPLOY",
                       "SCOUTS"
                     ],
                     "model_profile_id": "core-intercessor-like",
+                    "name_is_ordinary_keyword": false,
+                    "name_keyword": "CORE INTERCESSOR-LIKE INFANTRY",
                     "source_ids": [
                       "datasheet:core-intercessor-like-infantry",
                       "datasheet:core-intercessor-like-infantry:profile"
@@ -19258,11 +19295,14 @@
                     ],
                     "keywords": [
                       "BATTLELINE",
+                      "CORE INTERCESSOR-LIKE INFANTRY",
                       "INFANTRY",
                       "REDEPLOY",
                       "SCOUTS"
                     ],
                     "model_profile_id": "core-intercessor-like",
+                    "name_is_ordinary_keyword": false,
+                    "name_keyword": "CORE INTERCESSOR-LIKE INFANTRY",
                     "source_ids": [
                       "datasheet:core-intercessor-like-infantry",
                       "datasheet:core-intercessor-like-infantry:profile"
@@ -19388,11 +19428,14 @@
                     ],
                     "keywords": [
                       "BATTLELINE",
+                      "CORE INTERCESSOR-LIKE INFANTRY",
                       "INFANTRY",
                       "REDEPLOY",
                       "SCOUTS"
                     ],
                     "model_profile_id": "core-intercessor-like",
+                    "name_is_ordinary_keyword": false,
+                    "name_keyword": "CORE INTERCESSOR-LIKE INFANTRY",
                     "source_ids": [
                       "datasheet:core-intercessor-like-infantry",
                       "datasheet:core-intercessor-like-infantry:profile"
@@ -19518,11 +19561,14 @@
                     ],
                     "keywords": [
                       "BATTLELINE",
+                      "CORE INTERCESSOR-LIKE INFANTRY",
                       "INFANTRY",
                       "REDEPLOY",
                       "SCOUTS"
                     ],
                     "model_profile_id": "core-intercessor-like",
+                    "name_is_ordinary_keyword": false,
+                    "name_keyword": "CORE INTERCESSOR-LIKE INFANTRY",
                     "source_ids": [
                       "datasheet:core-intercessor-like-infantry",
                       "datasheet:core-intercessor-like-infantry:profile"

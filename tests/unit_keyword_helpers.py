@@ -3,7 +3,24 @@
 from dataclasses import replace
 
 from warhammer40k_core.core.validation import canonical_keyword_token
-from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+
+
+def with_model_keywords(model: ModelInstance, *, keywords: tuple[str, ...]) -> ModelInstance:
+    requested = {canonical_keyword_token(k) for k in keywords}
+    name = model.keyword_assignment.name_keyword
+    return replace(
+        model,
+        keyword_assignment=replace(
+            model.keyword_assignment,
+            keywords=tuple(sorted(requested | ({name} if name is not None else set()))),
+            name_is_ordinary_keyword=(
+                model.keyword_assignment.name_is_ordinary_keyword
+                if name is None
+                else name in requested
+            ),
+        ),
+    )
 
 
 def with_unit_keywords(
@@ -29,7 +46,13 @@ def with_unit_keywords(
                     model.keyword_assignment,
                     keywords=tuple(
                         sorted(
-                            (set(model.keywords) - (current - requested)) | (requested - current)
+                            (set(model.keywords) - (current - requested))
+                            | (requested - current)
+                            | (
+                                {model.keyword_assignment.name_keyword}
+                                if model.keyword_assignment.name_keyword is not None
+                                else set()
+                            )
                         )
                     ),
                     faction_keywords=tuple(
@@ -37,6 +60,11 @@ def with_unit_keywords(
                             (set(model.faction_keywords) - (factions - requested_factions))
                             | (requested_factions - factions)
                         )
+                    ),
+                    name_is_ordinary_keyword=(
+                        model.keyword_assignment.name_is_ordinary_keyword
+                        if keywords is None or model.keyword_assignment.name_keyword is None
+                        else model.keyword_assignment.name_keyword in requested
                     ),
                 ),
             )

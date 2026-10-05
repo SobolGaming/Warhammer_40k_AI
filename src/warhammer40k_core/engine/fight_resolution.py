@@ -2234,6 +2234,7 @@ def _cleave_attack_bonus_for_target(
             else target_unit.alive_own_models()
         ),
         target_keywords=target_unit.keywords,
+        name_keywords=target_unit.datasheet_name_keywords,
     )
 
 
