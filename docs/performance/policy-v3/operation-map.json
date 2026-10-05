@@ -3957,7 +3957,8 @@
         "src/warhammer40k_core/core/datasheet_identity.py",
         "src/warhammer40k_core/core/model_keywords.py",
         "src/warhammer40k_core/engine/army_mustering.py",
-        "src/warhammer40k_core/engine/list_validation.py"
+        "src/warhammer40k_core/engine/list_validation.py",
+        "src/warhammer40k_core/engine/roster_unit_limits.py"
       ],
       "owners": [
         "@module",
@@ -3967,6 +3968,7 @@
         "_datasheet_keyword_set",
         "_transport_capacity_allows_datasheet",
         "_with_datasheet_identity",
+        "datasheet_unit_limit",
         "model_keyword_assignment",
         "normalized_datasheet_identity",
         "project_rules_catalog_view"

@@ -1,8 +1,8 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "041c89b1c2110c815b5d3cffe722eb5a0b3e3fed",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:32eaa23490707deb15da403216bb42c9a788e82110d995b433ef16dc7fad3bd4",
-  "operation_map_sha256": "4441ae452e4ca6df35cd14698689e5579965cdeabb0995ccb5f758bbd117b8cc",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2d88e82d876ce7476b9d734470c1d83e3d5bad8fc1379352215201c12b6c6152",
+  "operation_map_sha256": "f19f2802c3e526509205788978c6e3d34b1491e5a8fbef161892f2438469a179",
   "changes": {
     "README.md": {
       "before_sha256": "a9e5991323f77192ba0790950f411cc9a24ec3c36174c9595cf68cbc2b11be4e",
@@ -186,11 +186,11 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "14ac21df8fd20017bb8f3109ca1f383df2fc14e0ac25ccc2b1add569c8a7c706",
-      "after_sha256": "83708a5edbdbcbbf6cdc5547d3e616fc2637ef7a1aa373c79601bf7754f5baf7",
+      "after_sha256": "b1278e017b0ebf49fdc0ce0172f76dd04398c86a80c6fddc1667f15916a224c0",
       "owners": {
         "@document": {
           "before": "14ac21df8fd20017bb8f3109ca1f383df2fc14e0ac25ccc2b1add569c8a7c706",
-          "after": "83708a5edbdbcbbf6cdc5547d3e616fc2637ef7a1aa373c79601bf7754f5baf7"
+          "after": "b1278e017b0ebf49fdc0ce0172f76dd04398c86a80c6fddc1667f15916a224c0"
         }
       }
     },
@@ -296,71 +296,71 @@
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "76ff315f54dd4b51ef44917bc1913ed28f0a7efc2e4cf7c8d48dea3ee924c2fd",
-      "after_sha256": "ad45fde99c63b4740914216585dd52ef923062f02118a5ecf95884e50cb27b09",
+      "after_sha256": "e3b2f6968b4509611cac4c450ef0d34158b037d4c93e406bc81b816dc23008d2",
       "owners": {
         "@document": {
           "before": "76ff315f54dd4b51ef44917bc1913ed28f0a7efc2e4cf7c8d48dea3ee924c2fd",
-          "after": "ad45fde99c63b4740914216585dd52ef923062f02118a5ecf95884e50cb27b09"
+          "after": "e3b2f6968b4509611cac4c450ef0d34158b037d4c93e406bc81b816dc23008d2"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "0af0804bdbe252d35a3337199ed53d3cf32e9b9287959469337514853dad8e4a",
-      "after_sha256": "34145da9f0d077fdf721641abc2a7a70cb443b943d2dcb86a3b24f6f2e00c94f",
+      "after_sha256": "d745f4f0a6f7ccbabb12356dfabfd9918c6bfb59905aa5e5be49ccc45dfc3805",
       "owners": {
         "@document": {
           "before": "0af0804bdbe252d35a3337199ed53d3cf32e9b9287959469337514853dad8e4a",
-          "after": "34145da9f0d077fdf721641abc2a7a70cb443b943d2dcb86a3b24f6f2e00c94f"
+          "after": "d745f4f0a6f7ccbabb12356dfabfd9918c6bfb59905aa5e5be49ccc45dfc3805"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "59c958c721195e4fafb7df959e81b46f90b522fb5e0721202a7baadb2c64f108",
-      "after_sha256": "c001369900e452279762a2447b65081776c4fe1496c8dbde749eb3df11c4b9c8",
+      "after_sha256": "3abd85faba73a30254eef80ae3cc652ed856830d73c05d54bd36700ec47bb9de",
       "owners": {
         "@document": {
           "before": "59c958c721195e4fafb7df959e81b46f90b522fb5e0721202a7baadb2c64f108",
-          "after": "c001369900e452279762a2447b65081776c4fe1496c8dbde749eb3df11c4b9c8"
+          "after": "3abd85faba73a30254eef80ae3cc652ed856830d73c05d54bd36700ec47bb9de"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "ce38b2256a46790691133e22e8062857e27322254bef5991bd2c0e8b90504f8f",
-      "after_sha256": "e82bb30fd860cedf75cc893dab6ecb533a7f8bb74c2e47bd229fc31fe4c0508b",
+      "after_sha256": "1f994e4941e3e2bba07086354e996b041f504bff5e93d5d37ba5d6d5ce491005",
       "owners": {
         "@document": {
           "before": "ce38b2256a46790691133e22e8062857e27322254bef5991bd2c0e8b90504f8f",
-          "after": "e82bb30fd860cedf75cc893dab6ecb533a7f8bb74c2e47bd229fc31fe4c0508b"
+          "after": "1f994e4941e3e2bba07086354e996b041f504bff5e93d5d37ba5d6d5ce491005"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "1c1986501252b2f9c030aa64e5a28dff759e712a49e085c35f7cc11d0534b3b7",
-      "after_sha256": "08aa315c947b5769da2782e558f4374eb7459b7d77fb831900ae3c75155e0c10",
+      "after_sha256": "d1cf02f49ceb5e8698d775c2c3e722097e6e69c43bbb509809c62cff5251ee7e",
       "owners": {
         "@document": {
           "before": "1c1986501252b2f9c030aa64e5a28dff759e712a49e085c35f7cc11d0534b3b7",
-          "after": "08aa315c947b5769da2782e558f4374eb7459b7d77fb831900ae3c75155e0c10"
+          "after": "d1cf02f49ceb5e8698d775c2c3e722097e6e69c43bbb509809c62cff5251ee7e"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "cee045df94e4d1816f472df1ac71f28dec474df5e09ec3ceb87d4e282413af72",
-      "after_sha256": "5b688d5eb2e9fb113af8e96bfdb00988a7c646148277b44de5b345a6fa3d9113",
+      "after_sha256": "acf42095dac5affb96b76f5ece33e2b4644320228db4a4380f31bfe75363ae7c",
       "owners": {
         "@document": {
           "before": "cee045df94e4d1816f472df1ac71f28dec474df5e09ec3ceb87d4e282413af72",
-          "after": "5b688d5eb2e9fb113af8e96bfdb00988a7c646148277b44de5b345a6fa3d9113"
+          "after": "acf42095dac5affb96b76f5ece33e2b4644320228db4a4380f31bfe75363ae7c"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "f8b3baae0218cd3b61bbea0230121632a49c80aaef716705f8ab790c33059eb5",
-      "after_sha256": "419873a3d80ad30d83535b33cccbcac0f48c9632ba59f9319345059fe25e9b75",
+      "after_sha256": "a423b0801eae154fff34e020270aeaa79b9e9fca5406108081222bbd81881a37",
       "owners": {
         "@document": {
           "before": "f8b3baae0218cd3b61bbea0230121632a49c80aaef716705f8ab790c33059eb5",
-          "after": "419873a3d80ad30d83535b33cccbcac0f48c9632ba59f9319345059fe25e9b75"
+          "after": "a423b0801eae154fff34e020270aeaa79b9e9fca5406108081222bbd81881a37"
         }
       }
     },
@@ -436,31 +436,31 @@
     },
     "docs/ORDER_123_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "9a567b67fcda206b43c6ac48c7a93c67e1ae4d674ed50f1cf78583b155338bb1",
+      "after_sha256": "40e1be6f8b7e9e544d002080657670f36e98fe6a5889941743e86caae2f4d001",
       "owners": {
         "@document": {
           "before": null,
-          "after": "9a567b67fcda206b43c6ac48c7a93c67e1ae4d674ed50f1cf78583b155338bb1"
+          "after": "40e1be6f8b7e9e544d002080657670f36e98fe6a5889941743e86caae2f4d001"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "313efdf78e0483b1ec1e50846024c9a829a8b5630826bdad992ce1891bb29036",
-      "after_sha256": "937c7d266f9c1277210bc210ec6342882b6a658ddb59ee0532e97b31568949c9",
+      "after_sha256": "0cd2e2e86eb52d7287d4cd1ca8d186c4ed36812dad3df8698cfbbc998053253f",
       "owners": {
         "@document": {
           "before": "313efdf78e0483b1ec1e50846024c9a829a8b5630826bdad992ce1891bb29036",
-          "after": "937c7d266f9c1277210bc210ec6342882b6a658ddb59ee0532e97b31568949c9"
+          "after": "0cd2e2e86eb52d7287d4cd1ca8d186c4ed36812dad3df8698cfbbc998053253f"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "9a27fd48c2e4adfeeab3f5c79e4031dc8962ff6ee91a8193be71473e6008f852",
-      "after_sha256": "c6e2d6b248961dad78a9741a3a8ed3762db1e7445bf0ec8b5d0f1bd5c22fec93",
+      "after_sha256": "67be4fb795b2759eca2e09a76ab743c5938bb1be2b9008b585aa83489ad6a216",
       "owners": {
         "@document": {
           "before": "9a27fd48c2e4adfeeab3f5c79e4031dc8962ff6ee91a8193be71473e6008f852",
-          "after": "c6e2d6b248961dad78a9741a3a8ed3762db1e7445bf0ec8b5d0f1bd5c22fec93"
+          "after": "67be4fb795b2759eca2e09a76ab743c5938bb1be2b9008b585aa83489ad6a216"
         }
       }
     },
@@ -562,9 +562,19 @@
         }
       }
     },
+    "src/warhammer40k_core/engine/roster_unit_limits.py": {
+      "before_sha256": "91b700de5af5799c63f1cab18921052773dcfa751618d2237c6f407c47baca18",
+      "after_sha256": "c9dcdf6e25b0fff2909ae28c17344b2a78a07066bd5933bc11fdfa5388fac757",
+      "owners": {
+        "datasheet_unit_limit": {
+          "before": "0064be246f537467cf51a948870b245f27b05693467b94df6c662ee54cfbaafc",
+          "after": "7f3460837e2c65b7d11d477736caf4db107da553dc9a3202ba48eb45985108f3"
+        }
+      }
+    },
     "tests/code_quality/test_order123_datasheet_identity.py": {
       "before_sha256": null,
-      "after_sha256": "f2f82aa357cac88b2e67180db111c1a6da741d08f7a4773c71133eae909fafc1",
+      "after_sha256": "4e659b09d7b8f437f0a291383309700eb7d32f5e1a2bbef5fcdf78eb1af89a99",
       "owners": {
         "@module": {
           "before": null,
@@ -572,7 +582,7 @@
         },
         "test_catalog_name_queries_consume_shared_effective_identity": {
           "before": null,
-          "after": "8a3322455e7ab3470c43c3d6993149880397052da49c6131b68f53f47b10bf8f"
+          "after": "39d25e82ebf891cf155f570c71518261b478283a5d695e8c75d311bc4dcd2958"
         },
         "test_name_keyword_permission_preserves_exact_source_and_official_admission": {
           "before": null,
@@ -616,7 +626,7 @@
     },
     "tests/unit/test_order123_datasheet_identity.py": {
       "before_sha256": null,
-      "after_sha256": "99c2729b3e97f476f4d8735dc3e22fa9b455acd9fef3aa88dddaa0b30cbc6692",
+      "after_sha256": "88f528b85fce2ac58dff9e09151204e84357f70e2f3a217decd44e537987d1d4",
       "owners": {
         "@module": {
           "before": null,
@@ -624,7 +634,7 @@
         },
         "test_catalog_name_transport_and_enhancement_gates_share_identity": {
           "before": null,
-          "after": "00525852a9ae7b8bf3cdd9f61b04b434171e7f7584a8e50b7d423381a57d6b0b"
+          "after": "f7a8519af497b1b3ee4eda653255fe6c41be31b65815ee766da1e144b4ebcaff"
         },
         "test_identity_keeps_native_keyword_punctuation_and_deduplicates": {
           "before": null,
@@ -1183,6 +1193,16 @@
       "unchanged_work": "Catalog construction derives immutable identity/effective native tokens once; ordinary and materialization assignment boundaries add only that token. Existing query membership, scoped source owners, model/unit/attached/split unions, finite choices and persistence/replay algorithms remain unchanged. Catalog mustering/transport/enhancement gates and display consume the effective inventory. No algorithm, search, cache policy, serializer algorithm, dice work, dependency role or measured-workload change; no intended performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and live semantic/work/source controls apply. No full-game certificate or historical numerical refresh."
     },
     "src/warhammer40k_core/engine/list_validation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order123-datasheet-identity"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core datasheet identity keyword seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.01.01:1 obligation01 requires datasheet names as additional keywords. Existing official reconciled five-sheet provider already lists names; no official omission or new faction/provider admission is claimed.",
+      "unchanged_work": "Catalog construction derives immutable identity/effective native tokens once; ordinary and materialization assignment boundaries add only that token. Existing query membership, scoped source owners, model/unit/attached/split unions, finite choices and persistence/replay algorithms remain unchanged. Catalog mustering/transport/enhancement gates and display consume the effective inventory. No algorithm, search, cache policy, serializer algorithm, dice work, dependency role or measured-workload change; no intended performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and live semantic/work/source controls apply. No full-game certificate or historical numerical refresh."
+    },
+    "src/warhammer40k_core/engine/roster_unit_limits.py": {
       "category": "rule_semantics",
       "operations": [
         "order123-datasheet-identity"

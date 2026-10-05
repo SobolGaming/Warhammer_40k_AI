@@ -36,6 +36,7 @@ def test_name_keyword_permission_preserves_exact_source_and_official_admission()
         ("engine/army_mustering.py", "_datasheet_has_any_keyword"),
         ("engine/army_mustering.py", "_transport_capacity_allows_datasheet"),
         ("engine/list_validation.py", "_datasheet_has_any_keyword"),
+        ("engine/roster_unit_limits.py", "datasheet_unit_limit"),
     ],
 )
 def test_catalog_name_queries_consume_shared_effective_identity(path: str, function: str) -> None:

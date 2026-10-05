@@ -166,11 +166,35 @@ def test_catalog_name_transport_and_enhancement_gates_share_identity() -> None:
     from warhammer40k_core.adapters.projection import project_rules_catalog_view
     from warhammer40k_core.engine import army_mustering, list_validation
     from warhammer40k_core.engine.army_mustering import DedicatedTransportCapacityProfile
+    from warhammer40k_core.engine.list_validation import BattleSizeMusteringPolicy
+    from warhammer40k_core.engine.roster_unit_limits import datasheet_unit_limit
 
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     sheet = catalog.datasheet_by_id("core-intercessor-like-infantry")
     token = sheet.name_keyword
     assert token not in sheet.keywords.keywords
+    ordinary = replace(
+        sheet,
+        keywords=replace(
+            sheet.keywords,
+            keywords=tuple(
+                keyword
+                for keyword in sheet.keywords.keywords
+                if keyword not in {"BATTLELINE", "DEDICATED TRANSPORT"}
+            ),
+        ),
+    )
+    strike = BattleSizeMusteringPolicy.strike_force()
+    onslaught = BattleSizeMusteringPolicy.onslaught()
+    assert datasheet_unit_limit(ordinary, policy=strike) == strike.unit_limit
+    for name in ("BATTLELINE", "DEDICATED TRANSPORT"):
+        named = replace(ordinary, name=name)
+        assert name not in named.keywords.keywords
+        assert named.effective_keywords.count(name) == 1
+        assert datasheet_unit_limit(named, policy=strike) == strike.battleline_unit_limit
+        assert datasheet_unit_limit(named, policy=onslaught) == (
+            onslaught.battleline_unit_limit if name == "BATTLELINE" else onslaught.unit_limit
+        )
     for query in (
         army_mustering._datasheet_has_any_keyword,
         list_validation._datasheet_has_any_keyword,

@@ -17,7 +17,7 @@ the existing native uppercase keyword spelling, preserving spaces, hyphens and
 apostrophes. Derived immutable name/effective keyword fields are reconstructed
 from the catalog payload; retained catalog keyword inventories, provenance,
 official reconciliation and scoped-union validation remain byte-identical.
-Mustering, transport/enhancement eligibility and catalog display consume the
+Mustering, roster duplication limits, transport/enhancement eligibility and catalog display consume the
 effective inventory. The shared factory model-assignment boundary adds only
 this name token to ordinary and materialization-variant assignments. Scoped
 keywords and faction keywords retain their original owners and source IDs.
