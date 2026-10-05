@@ -35,7 +35,10 @@ finite decisions, engine mutation and modifier queries share existing owners.
 A PSYKER Leader makes an attached rules unit eligible even when a non-PSYKER
 bodyguard supplies range. Physical model keyword queries still select only the
 PSYKER member. Explicit model/noun parsing is preserved as the prior shared
-behavior; no unsupported model-target family is claimed as newly playable.
+behavior. An explicit model subject on the ordinary selected-target timing
+clause retains typed selected-model evidence at the data boundary; the unit-only
+consumer rejects that shape instead of borrowing a bodyguard's range. No
+unsupported model-target family is claimed as newly playable.
 
 Acceptance includes implicit and explicit-unit controls, ordinary and attached
 targets, wrong keyword/allegiance/range/source/owner negatives, source vocabulary

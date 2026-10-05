@@ -1,8 +1,8 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "2b871d57d2be8e24f877e4a2e5101f26a0beb38f",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2f83959afb8aeda332daf588c93d4cb300d3bf90a0b9b20a490b48033e72737a",
-  "operation_map_sha256": "985c3d6e6c9f66fb6b2fc1ca5d5f090c6d1ca59609c14a75f9b35c0a2ed45b6c",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a12a4c4cf2ff68d3fde9c874d93758a8bbd2a7b424ca280e6fbb8afd20154dcb",
+  "operation_map_sha256": "aed6cf09edaaeb4071bfd3ad2cf92e1f4568e564cd101733efbf64a7a06f167a",
   "changes": {
     "README.md": {
       "before_sha256": "370a025f542e10c6745fd34181459ff78a4c9fe489dbf22349072c39193eab20",
@@ -16,211 +16,221 @@
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "62b5dddd3f10d133b4387a4fda2835f062530ecad889ead8c875f73dcce1782a",
-      "after_sha256": "e8bff8ea068cd553d14a80ff373acdd2debf0bc4a0ece70438d8066b5ca48b20",
+      "after_sha256": "9a01e1e398b831dd3a77a0da3d0779d13bc03a4e225873b91e7e2c321fa471a9",
       "owners": {
         "@document": {
           "before": "62b5dddd3f10d133b4387a4fda2835f062530ecad889ead8c875f73dcce1782a",
-          "after": "e8bff8ea068cd553d14a80ff373acdd2debf0bc4a0ece70438d8066b5ca48b20"
+          "after": "9a01e1e398b831dd3a77a0da3d0779d13bc03a4e225873b91e7e2c321fa471a9"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "a8895bcbbf13351f159852c038d63712818b750779f4c5aa1c50d4b4e9deea3c",
-      "after_sha256": "ee5887b1c8039a6974eb0a66b8347fde92bbc4a6bcb784728686b2a536155f80",
+      "after_sha256": "2d5906e77cad028ebf1ced8ed0a0de2895664d22cd42c8c82acb9c6c118fefdc",
       "owners": {
         "@document": {
           "before": "a8895bcbbf13351f159852c038d63712818b750779f4c5aa1c50d4b4e9deea3c",
-          "after": "ee5887b1c8039a6974eb0a66b8347fde92bbc4a6bcb784728686b2a536155f80"
+          "after": "2d5906e77cad028ebf1ced8ed0a0de2895664d22cd42c8c82acb9c6c118fefdc"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "58c2590bc3cca683210982636e97aa3490d2c94ff931c94b6224c5b1a208e247",
-      "after_sha256": "414999181c9d9cc3aed7601354eebcc3e0351253b48110665f43d5be1f1f9e87",
+      "after_sha256": "506700bc175c3b17e5ae8756afd5212fb0dcda4dc2349cff0a16a57ae2918c49",
       "owners": {
         "@document": {
           "before": "58c2590bc3cca683210982636e97aa3490d2c94ff931c94b6224c5b1a208e247",
-          "after": "414999181c9d9cc3aed7601354eebcc3e0351253b48110665f43d5be1f1f9e87"
+          "after": "506700bc175c3b17e5ae8756afd5212fb0dcda4dc2349cff0a16a57ae2918c49"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "ab26119717c39952712d13047b2126dfd4e816d3196afbcd4656a8a5168f8212",
-      "after_sha256": "af9d6e43da42bc05ed3665d9442b5ae09d433291015b83ad8901c656e4d03a8e",
+      "after_sha256": "f52f56e9d5272863fef100b6aa54a713cce4d442d14ac349907e51f19edbfe3e",
       "owners": {
         "@document": {
           "before": "ab26119717c39952712d13047b2126dfd4e816d3196afbcd4656a8a5168f8212",
-          "after": "af9d6e43da42bc05ed3665d9442b5ae09d433291015b83ad8901c656e4d03a8e"
+          "after": "f52f56e9d5272863fef100b6aa54a713cce4d442d14ac349907e51f19edbfe3e"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "406f3067b67869965de1451df60d36755e4a05aa5b4cbf2ac92060e29f0dd3ed",
-      "after_sha256": "473266b3dc0cf70c7fedb9f6c1bec538ad094327885f696f6adf19c8bf242e9d",
+      "after_sha256": "242f4bc97206b53ed3dd789eb7a21e957bb59c138569007fa8758470f4921ef7",
       "owners": {
         "@document": {
           "before": "406f3067b67869965de1451df60d36755e4a05aa5b4cbf2ac92060e29f0dd3ed",
-          "after": "473266b3dc0cf70c7fedb9f6c1bec538ad094327885f696f6adf19c8bf242e9d"
+          "after": "242f4bc97206b53ed3dd789eb7a21e957bb59c138569007fa8758470f4921ef7"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "ec9e473a8a53ebc6bac862de498f008a20e7f123f3079ec450d2b5276df03329",
-      "after_sha256": "bb79835ce0374f0643c704e1018ac4d42e8baaa7ef9a02c682a278fc545c36df",
+      "after_sha256": "1a0c23686b26f21159296884e774e94055175c16f27d99b700d774c4feb447c8",
       "owners": {
         "@document": {
           "before": "ec9e473a8a53ebc6bac862de498f008a20e7f123f3079ec450d2b5276df03329",
-          "after": "bb79835ce0374f0643c704e1018ac4d42e8baaa7ef9a02c682a278fc545c36df"
+          "after": "1a0c23686b26f21159296884e774e94055175c16f27d99b700d774c4feb447c8"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "d1f8a59bf9d46d767365ab27e7b1966970fef5246213be1c26f7f2761ea1a72d",
-      "after_sha256": "44c6b39c698db8f0f236ffdea4551c5301180d41fb6bcc8bed3a949de68a5ebd",
+      "after_sha256": "f9da70bb0af1fd7d2e73c643bea4b537817a61305813c84a2a5db9e43e6318e5",
       "owners": {
         "@document": {
           "before": "d1f8a59bf9d46d767365ab27e7b1966970fef5246213be1c26f7f2761ea1a72d",
-          "after": "44c6b39c698db8f0f236ffdea4551c5301180d41fb6bcc8bed3a949de68a5ebd"
+          "after": "f9da70bb0af1fd7d2e73c643bea4b537817a61305813c84a2a5db9e43e6318e5"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "bb634b9ec7e1a69b224546fa58331ee03ed764625c5d17245fbf3a21ea7cdc75",
-      "after_sha256": "c89837272674209cdc1158d704286a3e33a7b0c934b63b3cd000439767059ac8",
+      "after_sha256": "32208283292e04e79087d708820115553dda6d7b97c3fb01714da6d1aeefaf10",
       "owners": {
         "@document": {
           "before": "bb634b9ec7e1a69b224546fa58331ee03ed764625c5d17245fbf3a21ea7cdc75",
-          "after": "c89837272674209cdc1158d704286a3e33a7b0c934b63b3cd000439767059ac8"
+          "after": "32208283292e04e79087d708820115553dda6d7b97c3fb01714da6d1aeefaf10"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "0b5fc07c7d6ac90b3487e120cd9b39c4774390f9c822be7165767bcde5120b8f",
-      "after_sha256": "f5507a5aa5ea48294429ced587813d22863878c1caf0513400c9da2f780c7f99",
+      "after_sha256": "63f4debc99b257080b8161f1ff5113f66322261877453a1536c9f3d20063ff48",
       "owners": {
         "@document": {
           "before": "0b5fc07c7d6ac90b3487e120cd9b39c4774390f9c822be7165767bcde5120b8f",
-          "after": "f5507a5aa5ea48294429ced587813d22863878c1caf0513400c9da2f780c7f99"
+          "after": "63f4debc99b257080b8161f1ff5113f66322261877453a1536c9f3d20063ff48"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "d78ef0d4b47a4826f8e596f207ac50bbb211b000acf0e19cd23e17e9855a8a43",
-      "after_sha256": "ad8fa274ce6c456f4fae15da316b40a631feda225ea95b0293b28ee227a99e42",
+      "after_sha256": "729b74598b3c84e8974bd185274d9d8fdb5ccff621d2c4b2602e980ee17f9465",
       "owners": {
         "@document": {
           "before": "d78ef0d4b47a4826f8e596f207ac50bbb211b000acf0e19cd23e17e9855a8a43",
-          "after": "ad8fa274ce6c456f4fae15da316b40a631feda225ea95b0293b28ee227a99e42"
+          "after": "729b74598b3c84e8974bd185274d9d8fdb5ccff621d2c4b2602e980ee17f9465"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "e112c86b165abfbb76cabbd1a296277a1a29a483235d873cf3cf58b2fe717adc",
-      "after_sha256": "de16e615f3bd65abc148fb14dc7dc6248c6ea7ed48706ac88e445bc4f0ac5e03",
+      "after_sha256": "23b85d85a68d07735a359da6f1af0f6135df62b3dc2e588f56418815fa873989",
       "owners": {
         "@document": {
           "before": "e112c86b165abfbb76cabbd1a296277a1a29a483235d873cf3cf58b2fe717adc",
-          "after": "de16e615f3bd65abc148fb14dc7dc6248c6ea7ed48706ac88e445bc4f0ac5e03"
+          "after": "23b85d85a68d07735a359da6f1af0f6135df62b3dc2e588f56418815fa873989"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "46c924c306cbaad4d298675a75481bb416e8cac09c8c467c77479f418049367a",
-      "after_sha256": "5d7e46b31884946c06fdd604031d3a0ef341e235d57cb1305976cdda8982ce23",
+      "after_sha256": "089bf14ef7a7ac5e9f901e04a85c358ff04144705ddd091a5edd16b27a337e4d",
       "owners": {
         "@document": {
           "before": "46c924c306cbaad4d298675a75481bb416e8cac09c8c467c77479f418049367a",
-          "after": "5d7e46b31884946c06fdd604031d3a0ef341e235d57cb1305976cdda8982ce23"
+          "after": "089bf14ef7a7ac5e9f901e04a85c358ff04144705ddd091a5edd16b27a337e4d"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "0f268dd23647a5f75c795afe570f4658fb1e1be0e374c7e81144b4da05b26835",
-      "after_sha256": "59139d17de276ebd5d2105ef41503399f5d72c05611d535f69e9946eab6cdb32",
+      "after_sha256": "6ec9fa22901a30df07d33cb9ed2c5cb0c4e1b55e3cf0b09bde55764773f7118c",
       "owners": {
         "@document": {
           "before": "0f268dd23647a5f75c795afe570f4658fb1e1be0e374c7e81144b4da05b26835",
-          "after": "59139d17de276ebd5d2105ef41503399f5d72c05611d535f69e9946eab6cdb32"
+          "after": "6ec9fa22901a30df07d33cb9ed2c5cb0c4e1b55e3cf0b09bde55764773f7118c"
+        }
+      }
+    },
+    "conformance/typescript/src/contract.ts": {
+      "before_sha256": "0c411d81d42471840bb8a468f6b07de3735eb2eca2fdcf767707a9568e72677b",
+      "after_sha256": "b065bd91e9e113014412cce7415f58170763ad2215a4d57dc71eb1023daceacc",
+      "owners": {
+        "@document": {
+          "before": "0c411d81d42471840bb8a468f6b07de3735eb2eca2fdcf767707a9568e72677b",
+          "after": "b065bd91e9e113014412cce7415f58170763ad2215a4d57dc71eb1023daceacc"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "bd4217cded9db9856e166c8b203cb6f54bcadbfa8a36b2bedf3c9f865264a016",
-      "after_sha256": "c6c836dba549045d45c46995e653038c524062fa9b3bfceb3d09bdf8bd2c2105",
+      "after_sha256": "16d202acde22380e4f7a27fc773b6d13e7188b61d75bfb94b0d0688fb13a4bd4",
       "owners": {
         "@document": {
           "before": "bd4217cded9db9856e166c8b203cb6f54bcadbfa8a36b2bedf3c9f865264a016",
-          "after": "c6c836dba549045d45c46995e653038c524062fa9b3bfceb3d09bdf8bd2c2105"
+          "after": "16d202acde22380e4f7a27fc773b6d13e7188b61d75bfb94b0d0688fb13a4bd4"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "ddfd9b2b539cc0729d7638bc3d43430c551f23864442b7e5d20ff3b933fc5192",
-      "after_sha256": "801744d9f2884124b799a3c1bb1cee3f1ee49815c610ddb8172be8430d99f706",
+      "after_sha256": "442552d8bb17e06faa8dcfb2f34afd1be4019e440be8893e4c656652a0a24f6e",
       "owners": {
         "@document": {
           "before": "ddfd9b2b539cc0729d7638bc3d43430c551f23864442b7e5d20ff3b933fc5192",
-          "after": "801744d9f2884124b799a3c1bb1cee3f1ee49815c610ddb8172be8430d99f706"
+          "after": "442552d8bb17e06faa8dcfb2f34afd1be4019e440be8893e4c656652a0a24f6e"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "2eaf7c54fae057107690d6c2c38f9d26ad6714f1683d94860841386a21e2cf0f",
-      "after_sha256": "09a12e8e0b782d83ab9866227483de8bbc35c016ba28994e7d06a36d0b532c8c",
+      "after_sha256": "1984ef09aacc263d7d4ee94049d800ca3ef8f723cf835e6e699f55a713daa1ee",
       "owners": {
         "@document": {
           "before": "2eaf7c54fae057107690d6c2c38f9d26ad6714f1683d94860841386a21e2cf0f",
-          "after": "09a12e8e0b782d83ab9866227483de8bbc35c016ba28994e7d06a36d0b532c8c"
+          "after": "1984ef09aacc263d7d4ee94049d800ca3ef8f723cf835e6e699f55a713daa1ee"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "d8c7e43cc178b9e32b8666ea277dd3883e2a97cf753e45a4d2012d1332df14ad",
-      "after_sha256": "e93e9d0bafb067646b2066ed8efd950d263ed63986f388b118eccd71d9309b96",
+      "after_sha256": "b84e5e1ec6ed2e4b25e1a5c4a90ec0cf633dcb5e6fcf49cff942ad153d952a90",
       "owners": {
         "@document": {
           "before": "d8c7e43cc178b9e32b8666ea277dd3883e2a97cf753e45a4d2012d1332df14ad",
-          "after": "e93e9d0bafb067646b2066ed8efd950d263ed63986f388b118eccd71d9309b96"
+          "after": "b84e5e1ec6ed2e4b25e1a5c4a90ec0cf633dcb5e6fcf49cff942ad153d952a90"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "8c5842588082c6d885caa1ec952425c75cc2837904b2a069d74784ff0b38ec97",
-      "after_sha256": "fc922a708c5e2c13e410768fe5feb884fd95416ae7994391d5c0ee7908467c8f",
+      "after_sha256": "ce020a322f16e8b8972d65de215dce6fcd839aeac04b0ae37fe8ab8238ef3b30",
       "owners": {
         "@document": {
           "before": "8c5842588082c6d885caa1ec952425c75cc2837904b2a069d74784ff0b38ec97",
-          "after": "fc922a708c5e2c13e410768fe5feb884fd95416ae7994391d5c0ee7908467c8f"
+          "after": "ce020a322f16e8b8972d65de215dce6fcd839aeac04b0ae37fe8ab8238ef3b30"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "5475daf70e03d6e48535e5b308dec9d016cfb1a01989f829dd9da9a1d7eaeb74",
-      "after_sha256": "c8008a475acc5bfc3fedf200fc5cc44ab572592fbfb12e430dde2a6bb3d0f7f7",
+      "after_sha256": "db704ce9c5e4b844a561e094172a3a6b25f60db693ade584dc68548899014bee",
       "owners": {
         "@document": {
           "before": "5475daf70e03d6e48535e5b308dec9d016cfb1a01989f829dd9da9a1d7eaeb74",
-          "after": "c8008a475acc5bfc3fedf200fc5cc44ab572592fbfb12e430dde2a6bb3d0f7f7"
+          "after": "db704ce9c5e4b844a561e094172a3a6b25f60db693ade584dc68548899014bee"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "edd1bdb8da59073d6426914c5e629d2a04139051ba4c9fcbf4587bbd47662ff7",
-      "after_sha256": "199deef1d2b38935917cea3268b10ac3a6d63a2520ed54caddac8647ebcbb983",
+      "after_sha256": "0fd1417e3d9bd145129ce634015d1364aabb74a4f365d87431a51d9d8d398491",
       "owners": {
         "@document": {
           "before": "edd1bdb8da59073d6426914c5e629d2a04139051ba4c9fcbf4587bbd47662ff7",
-          "after": "199deef1d2b38935917cea3268b10ac3a6d63a2520ed54caddac8647ebcbb983"
+          "after": "0fd1417e3d9bd145129ce634015d1364aabb74a4f365d87431a51d9d8d398491"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "fed259774bc25dfd601bf5b49265633b5d5c9474e4b60717728d971cab619cec",
-      "after_sha256": "0f3d581e5a402de18e84028a9fb88b29c0325dfae8df63b95c3d6efac4234e81",
+      "after_sha256": "5aa015c9b76c082ac46fac89b4071bbabf9a3bee0ec1d341b261d23ee8dbb9c6",
       "owners": {
         "@document": {
           "before": "fed259774bc25dfd601bf5b49265633b5d5c9474e4b60717728d971cab619cec",
-          "after": "0f3d581e5a402de18e84028a9fb88b29c0325dfae8df63b95c3d6efac4234e81"
+          "after": "5aa015c9b76c082ac46fac89b4071bbabf9a3bee0ec1d341b261d23ee8dbb9c6"
         }
       }
     },
@@ -236,11 +246,11 @@
     },
     "data/source_audits/order125/source.audit.json": {
       "before_sha256": null,
-      "after_sha256": "cfa4563aec0d971593c55cbdc30eaeafb0db3cbf737a3123cdf1f22382da58e9",
+      "after_sha256": "1bb91211d0c7f08927f5d0bc6dd003223e6064ee6689db3d6bcf46d925c66a2a",
       "owners": {
         "@document": {
           "before": null,
-          "after": "cfa4563aec0d971593c55cbdc30eaeafb0db3cbf737a3123cdf1f22382da58e9"
+          "after": "1bb91211d0c7f08927f5d0bc6dd003223e6064ee6689db3d6bcf46d925c66a2a"
         }
       }
     },
@@ -256,41 +266,41 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "6d023c3170a0fd54d5083819a8906d013512a10246cb1957d1a3203a7b5fc5f3",
-      "after_sha256": "525f73d72dc9709279522bc26bc462fec1eb36ae878f54d23a9644b418b0a3f1",
+      "after_sha256": "6b396799ae0046ccdff64ce54e9b39d8bd61e452c213e7d1afdfda6c4ae3fced",
       "owners": {
         "@document": {
           "before": "6d023c3170a0fd54d5083819a8906d013512a10246cb1957d1a3203a7b5fc5f3",
-          "after": "525f73d72dc9709279522bc26bc462fec1eb36ae878f54d23a9644b418b0a3f1"
+          "after": "6b396799ae0046ccdff64ce54e9b39d8bd61e452c213e7d1afdfda6c4ae3fced"
         }
       }
     },
     "docs/ORDER_125_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "5fdf2143bf36eed26d33c21686488cfe11377722a3cf6793521de7d804ad8a8e",
+      "after_sha256": "10b27a528a81d4514d12d1b7d491cb29f4a8f88ba02fc90781c79c1ec2e95e34",
       "owners": {
         "@document": {
           "before": null,
-          "after": "5fdf2143bf36eed26d33c21686488cfe11377722a3cf6793521de7d804ad8a8e"
+          "after": "10b27a528a81d4514d12d1b7d491cb29f4a8f88ba02fc90781c79c1ec2e95e34"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "80c5159010099ce3749f18cad88db190f54901e6c2f6d50ae1007aeb58d3cb44",
-      "after_sha256": "884d9ee8af9f6c1aa7babe4ad3ccb452094f2486d78f212fe12c45ce3e1f33c8",
+      "after_sha256": "b20ec777768ef75012883c14012ed4e3df21b252dcd978df562ff4f41dc7caf2",
       "owners": {
         "@document": {
           "before": "80c5159010099ce3749f18cad88db190f54901e6c2f6d50ae1007aeb58d3cb44",
-          "after": "884d9ee8af9f6c1aa7babe4ad3ccb452094f2486d78f212fe12c45ce3e1f33c8"
+          "after": "b20ec777768ef75012883c14012ed4e3df21b252dcd978df562ff4f41dc7caf2"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "24bf9840708e5e7552f523dbcd5ded83e40490513f2be147cfbeebb2d5336609",
-      "after_sha256": "7b28702febb66765677880fe059a00c938bd7524687b0e0371d513e262dcb760",
+      "after_sha256": "38ba87918ee8fc324860cce0fa1688de365576ae18b7fa3981abeda560a6bb5c",
       "owners": {
         "@document": {
           "before": "24bf9840708e5e7552f523dbcd5ded83e40490513f2be147cfbeebb2d5336609",
-          "after": "7b28702febb66765677880fe059a00c938bd7524687b0e0371d513e262dcb760"
+          "after": "38ba87918ee8fc324860cce0fa1688de365576ae18b7fa3981abeda560a6bb5c"
         }
       }
     },
@@ -338,15 +348,19 @@
     },
     "src/warhammer40k_core/rules/rule_parser.py": {
       "before_sha256": "44b7948519c96dfdcd55fad0b26fd3c853e4b85ded27ef76990e010960899869",
-      "after_sha256": "9a11fde66a3ed1caa19ea81cfead4b5cf2a3116eaae99c48e5f01ba820eac96b",
+      "after_sha256": "3e37613a9e61f3bc1b4aa71215280352aaf7ff1ad33b38ef897e62bc5d0139b9",
       "owners": {
         "@module": {
           "before": "1bf04a387c041bba6072d1d4a0e3f5e886e12d3db6320b1d91f94435b7c740f4",
-          "after": "00a752e7737f27a7ec87e424eb57190b5aa05ca76343d814ffcc37fdb50eff6e"
+          "after": "46d18d5aeb61b11763c8615e4b69cb400959abd4e5f521602bed0ea86c6cafe5"
         },
         "_aura_target_parameter_pairs": {
           "before": "bed4aa1a161f51e330b45f7579679a3edbcc8e756894fad56f9d5c1f7a5c767c",
           "after": "ff5595007507e341d7040b8730e393810b34feb2e747e20334c13bb67c9a2968"
+        },
+        "_compile_clause": {
+          "before": "a6dd2dfe6a05f6b4bb613572e2a5010eef0166be0eec59bad72f8dc7075caf7d",
+          "after": "9cf80d765c82b284ac5f96c372260439c3a24a52b420c5f681ce0babc6cd1aae"
         },
         "_parse_keyword_conditions": {
           "before": "6dd6fee0cc2066f434693adf706e5e89b9cb0f67ba88e0f31a837056612cfb66",
@@ -360,15 +374,19 @@
     },
     "src/warhammer40k_core/rules/rule_target_subject_parser.py": {
       "before_sha256": null,
-      "after_sha256": "aa09dc15f6456e6d371048ffdd1d8e618aac480202541b73cbefe6291b5eca91",
+      "after_sha256": "3574fba964ddd3c6e4a15c62e10a082543c9a2a10a27bcf5d86bff32173c83d4",
       "owners": {
         "@module": {
           "before": null,
-          "after": "dcd10592ef8f65736e80a9465d79df39876cd89aa5bf6c2062a72bd5e2f81058"
+          "after": "461d1f83af949ef21b4bcc07bbbb493f96d0aeb74069af44dc9eb40c3d4a4733"
         },
         "first_target_subject_match": {
           "before": null,
           "after": "98c113739d438c0f58f1d1a8da61c75f100e21067279dbcb3d15fa502856deb2"
+        },
+        "selection_trigger_with_subject": {
+          "before": null,
+          "after": "c66462b64fc1e675f9621e550a47d0b09662dd9b92e32e4dc40e5f9e555bd15f"
         },
         "target_subject_matches": {
           "before": null,
@@ -400,11 +418,11 @@
     },
     "tests/unit/test_order125_implicit_subjects.py": {
       "before_sha256": null,
-      "after_sha256": "477a050361b36925a56568a8a5452fd12615e18f34122e376f7c7d44098e5efe",
+      "after_sha256": "66a1448e8780ba08714e522400738dfbc9416a8e069452b09876b76e5251a332",
       "owners": {
         "@module": {
           "before": null,
-          "after": "26cb3ca777cf5b5e470979c3a4feb4d90b2d78ba6fc887b24c7fc070586dfe88"
+          "after": "7e14ebe9604efd86a84f6881ffe0abd9c8f3ae19ae0d971e4eeb97f394a4b745"
         },
         "test_catalog_loaded_selection_survives_full_lifecycle_continuations": {
           "before": null,
@@ -413,6 +431,14 @@
         "test_complete_default_unit_rule_has_a_shared_executable_consumer": {
           "before": null,
           "after": "99ffd45a92dea927a23dcf51cc386cd7825f43e87fa24fd619e9621ddbe70443"
+        },
+        "test_explicit_model_catalog_subject_never_offers_a_unit_selection_in_native_play": {
+          "before": null,
+          "after": "86b101bec91dcb5a01458a91786fc19ab2c2c0a821330ec74a541b4068d16679"
+        },
+        "test_explicit_model_subject_keeps_typed_evidence_and_no_unit_consumer": {
+          "before": null,
+          "after": "f7d97af939ab0621ce1e399770efa469e4cd843c2f43db92c1f4f3a41811822e"
         },
         "test_explicit_noun_and_source_spans_remain_intact": {
           "before": null,
@@ -582,6 +608,16 @@
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
+      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+    },
+    "conformance/typescript/src/contract.ts": {
+      "category": "rule_semantics",
+      "operations": [
+        "order125-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",

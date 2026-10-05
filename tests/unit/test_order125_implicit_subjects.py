@@ -23,8 +23,11 @@ from warhammer40k_core.engine.catalog_rule_consumption import catalog_rule_ir_co
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     eligible_selection_target_unit_ids,
 )
+from warhammer40k_core.engine.catalog_selected_target_pair_support import (
+    clause_is_shooting_start_selected_target_selection,
+)
 from warhammer40k_core.engine.decision_request import DecisionError
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_unit_geometry import present_geometry_models_for_rules_unit
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -258,3 +261,51 @@ def test_subject_matcher_keeps_explicit_overlap_and_literal_order() -> None:
         "select one enemy PSYKER",
     ]
     assert [match.start() for match in matches] == [0, text.index("select one enemy")]
+
+
+@pytest.mark.parametrize("noun", [" model", " MODEL"])
+def test_explicit_model_subject_keeps_typed_evidence_and_no_unit_consumer(noun: str) -> None:
+    rule = compiled_ability_rule(default_unit_text(noun=noun))
+    assert not rule.diagnostics
+    selection = rule.clauses[0]
+    assert selection.target is not None
+    assert selection.target.source_span.text == f"select one friendly PSYKER{noun}"
+    assert parameter_payload(selection.target.parameters) == {
+        "allegiance": "friendly",
+        "required_keyword": "PSYKER",
+    }
+    assert selection.trigger is not None
+    assert parameter_payload(selection.trigger.parameters) == {
+        "edge": "start",
+        "owner": "opponent",
+        "phase": "shooting",
+        "subject": "selected_model",
+    }
+    assert not clause_is_shooting_start_selected_target_selection(selection)
+    assert catalog_rule_ir_consumers_for_rule(rule) == ()
+
+
+def test_explicit_model_catalog_subject_never_offers_a_unit_selection_in_native_play() -> None:
+    session = default_unit_session(noun=" model")
+    state = session.lifecycle.state
+    assert state is not None
+    reached_opponent_shooting = False
+    for index in range(180):
+        status = session.advance_until_decision_or_terminal()
+        reached_opponent_shooting |= (
+            state.active_player_id == "player-b"
+            and state.current_battle_phase is BattlePhase.SHOOTING
+        )
+        if state.battle_round == 2:
+            break
+        request = status.decision_request
+        assert request is not None
+        assert not (
+            isinstance(request.payload, dict) and request.payload.get("source_rule_id") == SOURCE_ID
+        )
+        submit_quiet_choice(session, request, result_id=f"order125-model-boundary-{index}")
+    else:
+        raise AssertionError("Explicit model boundary did not complete the native turn.")
+    assert reached_opponent_shooting
+    assert not [effect for effect in state.persisting_effects if effect.source_rule_id == SOURCE_ID]
+    assert_persistence_viewers_replay(session)

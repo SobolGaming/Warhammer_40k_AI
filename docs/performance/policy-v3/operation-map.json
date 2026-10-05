@@ -4439,12 +4439,14 @@
       "owners": [
         "@module",
         "_aura_target_parameter_pairs",
+        "_compile_clause",
         "_parse_keyword_conditions",
         "_parse_target",
         "_shooting_start_groups_for_record",
         "_shooting_start_selection_target_is_supported",
         "_shooting_start_selection_trigger_is_supported",
         "first_target_subject_match",
+        "selection_trigger_with_subject",
         "shooting_start_selected_target_effect_clauses_after",
         "target_subject_matches"
       ],
@@ -4464,6 +4466,8 @@
         "default_unit_text",
         "test_catalog_loaded_selection_survives_full_lifecycle_continuations",
         "test_complete_default_unit_rule_has_a_shared_executable_consumer",
+        "test_explicit_model_catalog_subject_never_offers_a_unit_selection_in_native_play",
+        "test_explicit_model_subject_keeps_typed_evidence_and_no_unit_consumer",
         "test_explicit_noun_and_source_spans_remain_intact",
         "test_implicit_adjacent_keywords_keep_the_existing_conjunction",
         "test_implicit_subject_does_not_invent_keywords_aliases_or_discard_language",
@@ -4490,6 +4494,7 @@
     },
     "order125-contract-publication": {
       "paths": [
+        "conformance/typescript/src/contract.ts",
         "contracts/examples/persistence/session-persistence.json",
         "contracts/examples/sessions/session-command-outcome.json",
         "contracts/examples/sessions/session-command-started.json",

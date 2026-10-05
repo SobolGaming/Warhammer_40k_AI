@@ -109,6 +109,7 @@ from warhammer40k_core.rules.rule_parser_token_helpers import (
 )
 from warhammer40k_core.rules.rule_target_subject_parser import (
     first_target_subject_match,
+    selection_trigger_with_subject,
     target_subject_matches,
 )
 from warhammer40k_core.rules.rule_template_classifier import (
@@ -877,6 +878,12 @@ def _compile_clause(
         conditions=conditions,
         target=target,
         effects=effects,
+    )
+    trigger = selection_trigger_with_subject(
+        trigger,
+        template_id=template_id,
+        text=clause_text.text,
+        source_keyword_sequence_parts=parser_context.source_keyword_sequence_parts,
     )
     clause_id = f"{source_id}:clause:{clause_index:03d}"
     residual_diagnostic = _residual_diagnostic(
