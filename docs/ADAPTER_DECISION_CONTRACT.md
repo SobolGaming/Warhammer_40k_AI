@@ -1,5 +1,14 @@
 # Adapter Decision Contract
 
+## Order122: default effect lifetimes
+
+Existing finite activation submissions and source-linked effect, event and
+persistence envelopes carry the shared Core default lifetime repair. Compiled
+source duration remains null; the persisted expiration records the triggering
+period or given phase and actual active turn owner. Pending choices, viewers,
+forks and exact replay use the same engine authority and current runtime identity.
+No request/schema family is added. See [Order122](ORDER_122_SCOPE_PLAN.md).
+
 ## Order119: source-authorized Movement-phase reposition
 
 `select_source_reposition` is a public finite opportunity request. Its options

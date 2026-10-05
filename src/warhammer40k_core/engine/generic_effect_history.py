@@ -28,7 +28,7 @@ from warhammer40k_core.engine.generic_rule_source_authority import (
 )
 from warhammer40k_core.engine.mutation_decision_authority import validate_mutation_decision_closure
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
-from warhammer40k_core.engine.rule_duration_execution import expiration_for_duration
+from warhammer40k_core.engine.rule_duration_execution import expiration_for_clause_effect
 from warhammer40k_core.engine.rule_execution import RuleExecutionContext
 from warhammer40k_core.engine.rule_frequency import optional_ability_frequency_condition
 from warhammer40k_core.engine.rule_target_resolution import target_unit_instance_ids_for_clause
@@ -264,10 +264,11 @@ def _effect_from_execution(
         creation_index=creation_index,
     ):
         raise GameLifecycleError("Historical generic effect lacks source provider authority.")
-    if not target_ids or clause.duration is None:
+    if not target_ids:
         return None
-    expiration = expiration_for_duration(
-        duration=clause.duration,
+    expiration = expiration_for_clause_effect(
+        clause=clause,
+        effect=clause.effects[index],
         context=_HistoricalDurationContext(
             state=historical,
             player_id=context.player_id,

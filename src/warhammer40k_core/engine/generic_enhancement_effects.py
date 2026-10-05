@@ -660,6 +660,7 @@ def _rule_execution_context(
         target_player_id=context.army.player_id,
         trigger_payload=trigger_payload,
         state=context.state,
+        record_persisting_effects=False,
     )
 
 

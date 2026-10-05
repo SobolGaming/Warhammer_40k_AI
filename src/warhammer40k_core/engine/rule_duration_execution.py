@@ -14,7 +14,10 @@ from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleDuration,
     RuleDurationKind,
+    RuleEffectKind,
+    RuleEffectSpec,
     RuleParameterValue,
+    RuleTriggerKind,
     parameter_payload,
 )
 
@@ -45,6 +48,68 @@ class RuleDurationExecutionContext(Protocol):
 
     @property
     def active_player_id(self) -> str | None: ...
+
+
+def expiration_for_clause_effect(
+    *,
+    clause: RuleClause,
+    effect: RuleEffectSpec,
+    context: RuleDurationExecutionContext,
+) -> EffectExpiration | None:
+    """Retain explicit lifetimes; derive Core defaults for lasting unit effects."""
+    if clause.duration is not None:
+        return expiration_for_duration(duration=clause.duration, context=context)
+    if not effect_uses_implicit_duration(effect):
+        return None
+    period = _implicit_trigger_period(clause)
+    if period == "battle_round":
+        return EffectExpiration.end_battle_round(battle_round=context.battle_round)
+    if period == "turn":
+        return EffectExpiration.end_turn(
+            battle_round=context.battle_round,
+            player_id=_current_active_player_id(context),
+        )
+    if context.phase is None:
+        raise GameLifecycleError("Implicit phase duration requires execution phase.")
+    if period not in {"phase", "any", context.phase.value}:
+        raise GameLifecycleError("Implicit trigger period does not match execution phase.")
+    return EffectExpiration.end_phase(
+        battle_round=context.battle_round,
+        phase=context.phase,
+        player_id=_current_active_player_id(context),
+    )
+
+
+def effect_uses_implicit_duration(effect: RuleEffectSpec) -> bool:
+    """Instant operations have their own mutation/continuation, not a live grant."""
+    if effect.kind is RuleEffectKind.PLACEMENT_PERMISSION:
+        return parameter_payload(effect.parameters).get("operation") != "remove_to_reserves"
+    if effect.kind is RuleEffectKind.SET_CONTEXTUAL_STATUS:
+        return parameter_payload(effect.parameters).get("status") != "force_battle_shock_test"
+    return effect.kind in {
+        RuleEffectKind.MODIFY_CHARACTERISTIC,
+        RuleEffectKind.SET_CHARACTERISTIC,
+        RuleEffectKind.MODIFY_DICE_ROLL,
+        RuleEffectKind.OVERRIDE_DICE_ROLL_RESULT,
+        RuleEffectKind.MODIFY_MOVE_DISTANCE,
+        RuleEffectKind.GRANT_ABILITY,
+        RuleEffectKind.GRANT_WEAPON_ABILITY,
+        RuleEffectKind.REROLL_PERMISSION,
+        RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION,
+        RuleEffectKind.PLACEMENT_PERMISSION,
+        RuleEffectKind.PLACEMENT_RESTRICTION,
+    }
+
+
+def _implicit_trigger_period(clause: RuleClause) -> str:
+    trigger = clause.trigger
+    if trigger is not None and trigger.kind is RuleTriggerKind.TIMING_WINDOW:
+        period = parameter_payload(trigger.parameters).get("phase")
+        if period is not None:
+            if type(period) is not str:
+                raise GameLifecycleError("Implicit trigger period must be a string.")
+            return period
+    return "phase"
 
 
 def expiration_for_duration(
@@ -131,8 +196,25 @@ def rule_duration_unavailable_reason(
     *,
     clause: RuleClause,
     context: RuleDurationExecutionContext,
+    record_persisting_effects: bool = True,
 ) -> str | None:
     if clause.duration is None:
+        if (
+            record_persisting_effects
+            and clause_requires_unit_target(clause)
+            and any(effect_uses_implicit_duration(effect) for effect in clause.effects)
+        ):
+            if context.state is None:
+                return "missing_input:game_state"
+            period = _implicit_trigger_period(clause)
+            if period != "battle_round" and context.active_player_id is None:
+                return "missing_active_player"
+            if period not in {"turn", "battle_round"} and context.phase is None:
+                return "missing_phase"
+            if period not in {"turn", "battle_round", "phase", "any"} and (
+                context.phase is None or context.phase.value != period
+            ):
+                return "implicit_trigger_phase_mismatch"
         return None
     if (
         clause.duration.kind is not RuleDurationKind.IMMEDIATE

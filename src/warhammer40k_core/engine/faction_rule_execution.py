@@ -570,6 +570,7 @@ def _generic_rule_ir_executor(
             source_unit_instance_id=context.source_unit_instance_id,
             target_unit_instance_ids=context.target_unit_instance_ids,
             trigger_payload=context.trigger_payload,
+            record_persisting_effects=False,
         ),
     )
     return faction_result_from_rule_execution_result(

@@ -39,7 +39,7 @@ from warhammer40k_core.engine.psychic_ability_usage import (
     record_psychic_ability_use,
 )
 from warhammer40k_core.engine.rule_duration_execution import (
-    expiration_for_duration,
+    expiration_for_clause_effect,
     rule_duration_unavailable_reason,
 )
 from warhammer40k_core.engine.rule_execution_validation import (
@@ -1119,10 +1119,9 @@ def _persisting_effect_or_none(
         not context.record_persisting_effects
         or context.state is None
         or not target_unit_instance_ids
-        or clause.duration is None
     ):
         return None
-    expiration = expiration_for_duration(duration=clause.duration, context=context)
+    expiration = expiration_for_clause_effect(clause=clause, effect=effect, context=context)
     if expiration is None:
         return None
     persisting_effect = generic_rule_persisting_effect(
@@ -1166,7 +1165,11 @@ def _clause_semantic_unavailable_reason(
     target_reason = effect_clause_target_unavailable_reason(clause=clause, context=context)
     if target_reason is not None:
         return target_reason
-    duration_reason = rule_duration_unavailable_reason(clause=clause, context=context)
+    duration_reason = rule_duration_unavailable_reason(
+        clause=clause,
+        context=context,
+        record_persisting_effects=context.record_persisting_effects,
+    )
     if duration_reason is not None:
         return duration_reason
     for effect in clause.effects:

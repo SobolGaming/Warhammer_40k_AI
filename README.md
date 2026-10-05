@@ -2,6 +2,11 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order122 / P01K derives omitted effect lifetimes from typed trigger periods or
+the phase in which a lasting effect is given. Live modifiers, historical
+reconstruction and Objective Control use shared expiry; see
+[source and scope](docs/ORDER_122_SCOPE_PLAN.md).
+
 Order121 / P08C resolves source-backed unqualified Command abilities after
 Core CP/Battle-shock and before end-phase rules through the shared catalog,
 sequencing and continuation owners. Named faction activation remains deferred;
