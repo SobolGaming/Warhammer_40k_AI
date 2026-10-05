@@ -34,6 +34,7 @@ from tests.phase13b_shooting_declaration_helpers import (
 from tests.phase13b_shooting_declaration_helpers import (
     _weapon_profile_by_wargear as _shooting_weapon_profile_by_wargear,
 )
+from tests.sequential_translation_helpers import leading_first_translation_paths
 from tests.setup_completion_helpers import (
     record_current_battlefield_placements_for_fixture,
     record_primary_turn_start_evidence_for_fixture,
@@ -6777,7 +6778,7 @@ def _fight_movement_witness_for_unit(
             facing_degrees=start.facing.degrees,
         )
         model_paths.append((placement.model_instance_id, (start, midpoint, end)))
-    return PathWitness.for_paths(tuple(model_paths))
+    return PathWitness.for_paths(leading_first_translation_paths(tuple(model_paths), dx=dx))
 
 
 def _fight_movement_witness_for_model_ids(
@@ -6805,7 +6806,7 @@ def _fight_movement_witness_for_model_ids(
             facing_degrees=start.facing.degrees,
         )
         model_paths.append((model_id, (start, midpoint, end)))
-    return PathWitness.for_paths(tuple(model_paths))
+    return PathWitness.for_paths(leading_first_translation_paths(tuple(model_paths), dx=dx))
 
 
 def _fight_movement_witness_ending_model_at_pose(

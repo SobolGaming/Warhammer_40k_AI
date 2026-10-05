@@ -11,6 +11,7 @@ from tests.deployment_submission_helpers import (
     submit_deployment_placement,
     submit_deployment_unit_selection,
 )
+from tests.sequential_translation_helpers import leading_first_translation_paths
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.projection import GameViewPayload
@@ -536,7 +537,7 @@ def _scout_witness(
                 ),
             )
         )
-    return PathWitness.for_paths(tuple(paths))
+    return PathWitness.for_paths(leading_first_translation_paths(tuple(paths), dx=dx))
 
 
 def _model_source_for_id(

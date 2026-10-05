@@ -20,6 +20,7 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.physical_engagement import (
     physical_geometry_models_for_rules_unit,
 )
+from warhammer40k_core.engine.sequential_movement import sequential_friendly_models
 from warhammer40k_core.geometry.pathing import (
     PathValidationResult,
     PathWitness,
@@ -84,28 +85,14 @@ def _friendly_geometry_models_for_charge_path(
     unit_placement: ChargePlacement,
     attempted_placement: ChargePlacement,
     moving_model_instance_id: str,
+    witness: PathWitness,
 ) -> tuple[GeometryModel, ...]:
-    moving_model_id = _validate_identifier("moving_model_instance_id", moving_model_instance_id)
-    friendly_models: list[GeometryModel] = []
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id != unit_placement.player_id:
-            continue
-        for current_unit_placement in placed_army.unit_placements:
-            endpoints = {m.model_instance_id: m for m in attempted_placement.model_placements}
-            placements = tuple(
-                endpoints.get(m.model_instance_id, m)
-                for m in current_unit_placement.model_placements
-            )
-            for placement in placements:
-                if placement.model_instance_id == moving_model_id:
-                    continue
-                friendly_models.append(
-                    geometry_model_for_placement(
-                        model=scenario.model_instance_for_placement(placement),
-                        placement=placement,
-                    )
-                )
-    return tuple(friendly_models)
+    return sequential_friendly_models(
+        scenario=scenario,
+        player_id=unit_placement.player_id,
+        witness=witness,
+        moving_model_instance_id=moving_model_instance_id,
+    )
 
 
 def _friendly_vehicle_monster_model_ids(

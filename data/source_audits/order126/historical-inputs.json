@@ -1,0 +1,144 @@
+{
+  "reviewed_commit": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+  "also_present_at_base": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+  "purpose": "Preserve every original assertion, branch and exact base fixture byte. Complete model paths retain all original poses, including vertical legs, budgets, terrain and expected controls. Only witness order becomes physically leading-first under the scoped sequential source invariant; no assertion or branch is weakened.",
+  "current_evidence": "docs/ORDER_126_SCOPE_PLAN.md",
+  "files": [
+    {
+      "path": "tests/phase15a_charge_test_support.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/phase15a_charge_test_support.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/phase15a_charge_test_support.py",
+      "sha256": "21214ce6cae70499da006366f76244796cd2af333a4871e56516807caca73872",
+      "bytes": 49370
+    },
+    {
+      "path": "tests/integration/test_setup_prebattle_ui_smoke.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/integration/test_setup_prebattle_ui_smoke.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/integration/test_setup_prebattle_ui_smoke.py",
+      "sha256": "52f98d973cb10b4d6608a079e4e790a50a8957f475f17ef1827e622a86ce30fe",
+      "bytes": 33851
+    },
+    {
+      "path": "tests/movement_submission_helpers.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/movement_submission_helpers.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/movement_submission_helpers.py",
+      "sha256": "545bcbab3e60df4a42c140f1430c7f1d57d0d78f072c2e4bac130c02247c5198",
+      "bytes": 14762
+    },
+    {
+      "path": "tests/integration/test_aeldari_rangers_facade.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/integration/test_aeldari_rangers_facade.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/integration/test_aeldari_rangers_facade.py",
+      "sha256": "2adba692ff42e4cac5ab96fc000be5e012d1450cba09f151183804107de3cd88",
+      "bytes": 25286
+    },
+    {
+      "path": "tests/unit/test_phase10q_transports.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/unit/test_phase10q_transports.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/unit/test_phase10q_transports.py",
+      "sha256": "52a3659d356a2167e8c3a5ebea8d560b2bcac42d5e273445d186297d98e704da",
+      "bytes": 382404
+    },
+    {
+      "path": "tests/unit/test_phase10s_triggered_movement.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/unit/test_phase10s_triggered_movement.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/unit/test_phase10s_triggered_movement.py",
+      "sha256": "78ea70949e7f75940be7ac0cbe1e227fef93fbff412e6bf6b9b29ce9e3a981a1",
+      "bytes": 108979
+    },
+    {
+      "path": "tests/unit/test_phase11d_adapter_proposals.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/unit/test_phase11d_adapter_proposals.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/unit/test_phase11d_adapter_proposals.py",
+      "sha256": "e4f3b2c65a1cfc2a1c1fa5ab33a9b19a92326360f0b8c3383d133c95a054b70e",
+      "bytes": 101484
+    },
+    {
+      "path": "tests/unit/test_phase15c_fight_order.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/unit/test_phase15c_fight_order.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/unit/test_phase15c_fight_order.py",
+      "sha256": "632e37f25205a8f096cce373880ef4c17dbd655c9d4656cdd0216ada5f9c2814",
+      "bytes": 308997
+    },
+    {
+      "path": "tests/unit/test_phase16b_prebattle.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/unit/test_phase16b_prebattle.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/unit/test_phase16b_prebattle.py",
+      "sha256": "6aaff2330b761a7c2b5272d0644d4bfaca5626d27a2c227daed77c3fddf6e607",
+      "bytes": 107336
+    },
+    {
+      "path": "tests/action_movement_interruption_helpers.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/action_movement_interruption_helpers.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/action_movement_interruption_helpers.py",
+      "sha256": "2a218754a6ed327e6e99e8fd3baa76b81312bf9b71402f7b3a86bf202f89cdeb",
+      "bytes": 12329
+    },
+    {
+      "path": "tests/normal_move_occurrence_helpers.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/normal_move_occurrence_helpers.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/normal_move_occurrence_helpers.py",
+      "sha256": "4dd0d0bfff7f30e330421567a1e256b232dd43ac0aede66b30a33306a6b67928",
+      "bytes": 8309
+    },
+    {
+      "path": "tests/surge_fixed_target_helpers.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/surge_fixed_target_helpers.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/surge_fixed_target_helpers.py",
+      "sha256": "73fda088d8de0b792973e21fa011eff378f68d3ef962d68d65f217c14c13e79c",
+      "bytes": 9089
+    },
+    {
+      "path": "tests/unit/test_phase17n_primary_scoring_conditions.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/unit/test_phase17n_primary_scoring_conditions.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/unit/test_phase17n_primary_scoring_conditions.py",
+      "sha256": "32a66669f7e81966bc004f436891fea4f68a37d470c4d3b8c383d7b2ed0f80d9",
+      "bytes": 279986
+    },
+    {
+      "path": "tests/unit/test_order51_flight.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/unit/test_order51_flight.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/unit/test_order51_flight.py",
+      "sha256": "98c0643d79011eb48020fd3e2ae759e7dc847ed20e6aee94594e41bc419be4a2",
+      "bytes": 32064
+    },
+    {
+      "path": "tests/phase10o_fall_back_helpers.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/phase10o_fall_back_helpers.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/phase10o_fall_back_helpers.py",
+      "sha256": "f785f295da41921bc892e6219b5c846f700f0a0822dd586258fdcf6529b0408f",
+      "bytes": 6272
+    },
+    {
+      "path": "tests/absent_movement_helpers.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/absent_movement_helpers.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/absent_movement_helpers.py",
+      "sha256": "adc299d615b72ebe858407d84b5252afc0b78e1259f57937b72a77fe2213492e",
+      "bytes": 2817
+    },
+    {
+      "path": "tests/unit/test_order97_facade_evidence.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/unit/test_order97_facade_evidence.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/unit/test_order97_facade_evidence.py",
+      "sha256": "ad7315c58f339dd09866d9f4b4f2fa2f3fb7462bf233ea81e06ad5c5658d5eba",
+      "bytes": 17538
+    }
+  ]
+}

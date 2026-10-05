@@ -11,6 +11,7 @@ from tests.phase15a_charge_declaration_helpers import (
     mustered_armies,
     unit_placement_at,
 )
+from tests.sequential_translation_helpers import leading_first_translation_paths
 from tests.setup_completion_helpers import (
     ensure_army_mustered_events_for_fixture,
     record_completed_command_occurrences_for_fixture,
@@ -218,12 +219,16 @@ def fixed_target_surge_payload(
         )
 
     witness = PathWitness.for_paths(
-        tuple(
-            (
-                model.model_instance_id,
-                (model.pose, shifted(model.pose, distance / 2), shifted(model.pose, distance)),
-            )
-            for model in placement.model_placements
+        leading_first_translation_paths(
+            tuple(
+                (
+                    model.model_instance_id,
+                    (model.pose, shifted(model.pose, distance / 2), shifted(model.pose, distance)),
+                )
+                for model in placement.model_placements
+            ),
+            dx=-sin(radians(placement.model_placements[0].pose.facing.degrees)),
+            dy=cos(radians(placement.model_placements[0].pose.facing.degrees)),
         )
     )
     return validate_json_value(

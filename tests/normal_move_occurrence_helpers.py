@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from tests.phase15c_fight_order_helpers import fight_lifecycle
+from tests.sequential_translation_helpers import leading_first_translation_paths
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
@@ -46,20 +47,23 @@ def move_witness(session: LocalGameSession, unit_id: str, dx: float = 0.25) -> P
         scenario=battlefield_scenario_for_state(state=state), unit_instance_id=unit_id
     )
     return PathWitness.for_paths(
-        tuple(
-            (
-                model.model_instance_id,
+        leading_first_translation_paths(
+            tuple(
                 (
-                    model.pose,
-                    Pose.at(
-                        model.pose.position.x + dx,
-                        model.pose.position.y,
-                        model.pose.position.z,
-                        facing_degrees=model.pose.facing.degrees,
+                    model.model_instance_id,
+                    (
+                        model.pose,
+                        Pose.at(
+                            model.pose.position.x + dx,
+                            model.pose.position.y,
+                            model.pose.position.z,
+                            facing_degrees=model.pose.facing.degrees,
+                        ),
                     ),
-                ),
-            )
-            for model in placement.model_placements
+                )
+                for model in placement.model_placements
+            ),
+            dx=dx,
         )
     )
 

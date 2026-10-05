@@ -10,6 +10,7 @@ import pytest
 from tests.core_clause_evidence_helpers import assert_persistence_viewers_replay, clause_session
 from tests.phase13b_shooting_declaration_helpers import _proposal_from_request
 from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
+from tests.sequential_translation_helpers import leading_first_translation_paths
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -48,16 +49,19 @@ def test_heavy_accepted_vertical_movement_reaches_facade_attack(flying: bool) ->
     assert state.battlefield_state is not None
     placement = state.battlefield_state.unit_placement_by_id("army-alpha:mover")
     witness = PathWitness.for_paths(
-        tuple(
-            (
-                model.model_instance_id,
+        leading_first_translation_paths(
+            tuple(
                 (
-                    model.pose,
-                    Pose.at(model.pose.position.x + 1, model.pose.position.y, 1.5),
-                    Pose.at(model.pose.position.x + 2, model.pose.position.y),
-                ),
-            )
-            for model in placement.model_placements
+                    model.model_instance_id,
+                    (
+                        model.pose,
+                        Pose.at(model.pose.position.x + 1, model.pose.position.y, 1.5),
+                        Pose.at(model.pose.position.x + 2, model.pose.position.y),
+                    ),
+                )
+                for model in placement.model_placements
+            ),
+            dx=2.0,
         )
     )
     assert isinstance(option.payload, dict)

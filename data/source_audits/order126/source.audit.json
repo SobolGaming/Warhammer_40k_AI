@@ -1,0 +1,217 @@
+{
+  "order": 126,
+  "roadmap": "P03G",
+  "finding": "C03-07",
+  "requirement_id": "03.01-obligation-03",
+  "selected_source": {
+    "row_id": "rule:03:03.01:1",
+    "category": "03",
+    "locator": "03.01",
+    "title": "Moving Units",
+    "occurrence": 1,
+    "source_sha256": "b33ca1abcf7bd4b2edeb2771ce45bb50a5d7f7842d6a2a0f088eaff723cfd9c3",
+    "blocks": [
+      {
+        "ordinal": 1,
+        "kind": "text",
+        "sha256": "2c05b6f7c727ca25dcc0a42b2096b6c0a845fb8b95bf022ecc769fcc6cad6c96",
+        "value": "There are several types of move a unit can make. Each one defines which units are eligible to make it, what its \u0005maximum distance\u0006 or \u0005set-up distance\u0006 is, and any conditions that must be met."
+      },
+      {
+        "ordinal": 2,
+        "kind": "text",
+        "sha256": "e853bfd79761a47a9c27b2e8fb4ea26933342110a2f178fe61d61420623d1bb5",
+        "value": "Each time you move a unit, you can move one or more of its models, one at a time, by moving it in a straight line and/or rotating it, as many times as you want to."
+      },
+      {
+        "ordinal": 3,
+        "kind": "text",
+        "sha256": "a520d29b20a197e7149a235e9494b570db5bfa347a0997f77b946b2140663781",
+        "value": "Each time you move a model, unless otherwise stated:"
+      },
+      {
+        "ordinal": 4,
+        "kind": "text",
+        "sha256": "b980338c8e5d9465b5587dd5484a2e979dd7e4da148cba8d591282e20696bf26",
+        "value": "\u2022 It can be moved through friendly models."
+      },
+      {
+        "ordinal": 5,
+        "kind": "text",
+        "sha256": "e1dfec56a4b7e0f2f0112a2cfc34cab82680eac8cc9dec6e7224404b175ceafc",
+        "value": "\u2022 It can be moved through any space its base can fit through."
+      },
+      {
+        "ordinal": 6,
+        "kind": "text",
+        "sha256": "d2e9f652ccaf5256b0667a0b1581ae3a19465679a1eb0995d5211ee1b8ecd0d6",
+        "value": "\u2022 Its base cannot be moved through enemy models."
+      },
+      {
+        "ordinal": 7,
+        "kind": "text",
+        "sha256": "d744a50aaec5949416c51753b8433d75afec33f1d7211f65776f83f91b47e97c",
+        "value": "\u2022 Its base cannot cross the edge of the battlefield."
+      },
+      {
+        "ordinal": 8,
+        "kind": "text",
+        "sha256": "c4496467a5b74e47d67d0c096678b76cd25faa18d6bfab3072d4dda7e8528564",
+        "value": "\u2022 All stated \u2018While Moving\u2019 conditions must be met."
+      },
+      {
+        "ordinal": 9,
+        "kind": "text",
+        "sha256": "06a4fa3e3907c105287cc8b890c4518c22b57bf0eb4b61cbaeae5f4ea4d0c211",
+        "value": "\u0005MOVING A MODEL IN A STRAIGHT LINE\u0006"
+      },
+      {
+        "ordinal": 10,
+        "kind": "text",
+        "sha256": "9448f357d3cd7b5356744a269cf6b1cc32b6494ebd5c67f449022c08d5f82ed6",
+        "value": "Each time you move a model in a straight line, move it horizontally across the battlefield. Measure from the same point on its base at the start and end of that move, and add that distance to any other distance it has moved since its unit began that move. The distance moved cannot be greater than the \u0005maximum distance\u0006 of that \u0005move type\u0006."
+      },
+      {
+        "ordinal": 11,
+        "kind": "text",
+        "sha256": "f11d06976c29b5047ce5e4ef76e799379c6d083c54afd1c348e185134936b286",
+        "value": "\u0005ROTATING A MODEL\u0006"
+      },
+      {
+        "ordinal": 12,
+        "kind": "text",
+        "sha256": "ed3a1381608610112bfe0816f9e87b8d502d559a7d2f0c6231240d2467db7f18",
+        "value": "Each time you rotate a model, turn it any amount around the centre of its base, while keeping it upright. Note that rotating a model does not count towards the distance it has moved."
+      },
+      {
+        "ordinal": 13,
+        "kind": "text",
+        "sha256": "7503dec811200cc1879ba204a744f60d0dace451faace22e92ae77099e77cf82",
+        "value": "\u0005ENDING A MOVE\u0006"
+      },
+      {
+        "ordinal": 14,
+        "kind": "text",
+        "sha256": "0521e1eb0d4d4d14c705c766bf9226682d71db85aec8534e22c0b3a31ca93a53",
+        "value": "After you have finished setting up all of the models in a unit and/or moving all of the models in a unit that you want to move, check that all of the following apply:"
+      },
+      {
+        "ordinal": 15,
+        "kind": "text",
+        "sha256": "050d921fb266bcc0bad83a2b1be0aef37bbd6c21da888858e1c03adf5f7c8aaf",
+        "value": "\u2022 If that unit is on the battlefield, it is in \u0005coherency\u0006 (03.03)."
+      },
+      {
+        "ordinal": 16,
+        "kind": "text",
+        "sha256": "38fccda9bb86ed2e09a84ebac33172cad3761dfb65c20e65507afca92be84966",
+        "value": "\u2022 No models in that unit are on another model or partway through a surface of a \u0005terrain feature\u0006 (e.g. a wall or ceiling)."
+      },
+      {
+        "ordinal": 17,
+        "kind": "text",
+        "sha256": "2934f013e7649554f1355e8cbbe5f7d1c601a541a4d7ee3618fad43c56c58f7a",
+        "value": "\u2022 All stated \u2018After Moving\u2019 conditions are met."
+      },
+      {
+        "ordinal": 18,
+        "kind": "text",
+        "sha256": "a7c997df8467f475ac193f4147839771674d7a8fdd911afe5e02febe6937ae46",
+        "value": "If one or more of the above conditions are not met, that unit cannot make that move and its models are returned to their positions at the start of that move. Otherwise, after resolving any additional rules stated in the \u2018After Moving\u2019 section of that \u0005move type\u0006, that move ends."
+      },
+      {
+        "ordinal": 19,
+        "kind": "text",
+        "sha256": "f9df905a22e74316e2fd85e511e5d9b2f906026221f54021bc3af4340b8b63c3",
+        "value": "\u000eMoving in a straight line"
+      },
+      {
+        "ordinal": 20,
+        "kind": "text",
+        "sha256": "4c7009d077c4585ca0f3008d96ff4d3fe331a9dcaa5b6636c09968ecca04f191",
+        "value": "Both models shown here can move a \u0005\u0007maximum distance\b\u0006 of 6\". They both move 3\" in a straight line, then 3\" in another straight line, for a total movement of 6\"."
+      },
+      {
+        "ordinal": 21,
+        "kind": "text",
+        "sha256": "b474eaf4e28ee5999a2b4c5ec4a6bf601bce4792e3a9e1d5579d0d906ed4757e",
+        "value": "\u000eRotating"
+      },
+      {
+        "ordinal": 22,
+        "kind": "text",
+        "sha256": "6c4a58adf369f7eead8a79eba48e7c3e64b073a8e57c2f6d376636df7e5c2685",
+        "value": "1. This model can move a \u0005\u0007maximum distance\b\u0006 of 12\". It moves in a series of straight lines and rotations, as follows:"
+      },
+      {
+        "ordinal": 23,
+        "kind": "text",
+        "sha256": "a533faed277fd48d997b7944aa93912a2d23855d89ff0c4213b99a96b1b67fa6",
+        "value": "\u0005\u0007A)\b\u0006 Moves 6\" in a straight line"
+      },
+      {
+        "ordinal": 24,
+        "kind": "text",
+        "sha256": "488a51b15212b2ab896065614c477cffdd62d8d727f4f9c17ad4d246ad4c9ceb",
+        "value": "\u0005\u0007B)\b\u0006 Rotates"
+      },
+      {
+        "ordinal": 25,
+        "kind": "text",
+        "sha256": "549ddf717dea9a99cdb0c9fbe9b9787df204c5c83e8f4f9cb3fe509d129dbd42",
+        "value": "\u0005\u0007C)\b\u0006 Moves 6\" in a straight line"
+      },
+      {
+        "ordinal": 26,
+        "kind": "text",
+        "sha256": "4e7c86b7f9b28737a311d131d765bd9b7b1453f2425c0cffa3ed7cd1e4c97663",
+        "value": "\u0005\u0007D)\b\u0006 Rotates"
+      },
+      {
+        "ordinal": 27,
+        "kind": "text",
+        "sha256": "3908d92e245bc3570a350364435513cb60dced83eaf4abd524f3da59cca81c0c",
+        "value": "This model has moved a total of 12\"."
+      },
+      {
+        "ordinal": 28,
+        "kind": "text",
+        "sha256": "0f19f9f463938257be13b1f1abfabcbdc0a0d28fe864bee809da032649b38098",
+        "value": "2. Models without a base are rotated around their central axis (see Frame, \u000717.02\b)."
+      }
+    ],
+    "selected_provider": "Game Datamissions",
+    "historical_source_row_sha256": "57843cbc10d3d921831818bc822150c80f393a7c12e95d14fc9824cab54d24cb",
+    "review_category": "03"
+  },
+  "selected_block": {
+    "ordinal": 2,
+    "kind": "text",
+    "sha256": "e853bfd79761a47a9c27b2e8fb4ea26933342110a2f178fe61d61420623d1bb5",
+    "value": "Each time you move a unit, you can move one or more of its models, one at a time, by moving it in a straight line and/or rotating it, as many times as you want to."
+  },
+  "source_sha256": "b33ca1abcf7bd4b2edeb2771ce45bb50a5d7f7842d6a2a0f088eaff723cfd9c3",
+  "pinned_git_blob_sha256": {
+    "data/source_audits/order97/selected-sources.json": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+    "data/source_audits/order97/categories/03.json": "1e5f98b23d3e0dbad9cfcff967c54b02aae899c93cfa500528d6c65b6d7d3cbe",
+    "data/source_audits/order97/observed_gaps_01_08.json": "93d0f121e578099c7c52155131668d8706fbc7689afe5fa8ac1267228e107bde",
+    "tests/order97_gap_probes_01_08.py": "e4e908605e084a8106e0aab42f52fb425f2c6f4ff5705c639ddad29c5ca762cc"
+  },
+  "baseline": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+  "baseline_tree": "05d55fcc445325ec6f6f7e3bd4a3d65eeaa84fe4",
+  "diagnostic": "tests/order97_gap_probes_01_08.py:sequential_model_movement_observation",
+  "diagnostic_before": true,
+  "required_after": false,
+  "truthfulness": "Engine occupancy consumer defect established by retained real-model diagnostic. No official provider defect is claimed. Authoritative source archives and admission status unchanged.",
+  "owner": "src/warhammer40k_core/engine/sequential_movement.py:sequential_friendly_models",
+  "acceptance": "Complete physical paths in submitted model_paths order, completed-before/current-after occupancy, group final coherency, legal friendly transit, invalid atomicity and real catalog/facade persistence/viewers/events/fork/replay.",
+  "excluded": [
+    "Order127/P03H Infiltrators redeployment",
+    "new placement semantics",
+    "provider admission changes",
+    "speculative coordinated hand-edited-history hardening"
+  ],
+  "required_normal_history_repair": "Independent frozen1 review reproduced normal attached movement against an overhanging enemy: legal native submission succeeded, untouched completed checkpoint failed restore because retained contact history assumed all-final peers. Live and historical accepted complete witnesses now share sequential peer geometry; no hand-edited-history expansion.",
+  "fixture_preservation": "Uniform translation witness builders choose physical leading-first order across components; every original assertion, branch and pose remains, and exact base inputs are mapped/archived.",
+  "required_normal_charge_history_repair": "Independent frozen2 rules review reproduced an accepted attached Charge against an overhanging enemy whose untouched completed checkpoint failed restore: sequential path occupancy had replaced whole-group final endpoint coherency peers in history. Charge history retains sequential path context and reconstructs final coherent peers from the same complete accepted witness; ordinary and attached native save/load/fork/views/events/replay controls cover the distinction. No hand-edited-history expansion."
+}

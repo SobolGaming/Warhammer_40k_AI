@@ -11,6 +11,7 @@ from tests.deployment_submission_helpers import (
     default_deployment_pose,
     submit_all_deployments_if_pending,
 )
+from tests.sequential_translation_helpers import leading_first_translation_paths
 
 from warhammer40k_core.adapters.contracts import (
     FiniteOptionSubmission,
@@ -1947,7 +1948,7 @@ def _shift_witness(
             facing_degrees=start.facing.degrees,
         )
         model_paths.append((placement.model_instance_id, (start, midpoint, end)))
-    return PathWitness.for_paths(tuple(model_paths))
+    return PathWitness.for_paths(leading_first_translation_paths(tuple(model_paths), dx=dx, dy=dy))
 
 
 def _config(*, game_id: str = "phase11d-game") -> GameConfig:

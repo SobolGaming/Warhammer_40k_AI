@@ -14,6 +14,7 @@ from tests.phase11c_command_phase_helpers import (
 )
 from tests.phase17n_primary_mission_helpers import phase17n_event_setup, phase17n_state_with_setup
 from tests.phase17n_step5g_pairing_certification_helpers import pairing_certification_config
+from tests.sequential_translation_helpers import leading_first_translation_paths
 from tests.setup_completion_helpers import (
     ensure_army_mustered_events_for_fixture,
     record_completed_command_occurrences_for_fixture,
@@ -271,7 +272,9 @@ def action_move_witness(placement: ChargePlacement, case: MovementCase) -> PathW
             else start
         )
         paths.append((model.model_instance_id, (start, step, end)))
-    return PathWitness.for_paths(tuple(paths))
+    return PathWitness.for_paths(
+        leading_first_translation_paths(tuple(paths), dx=0.25 if case == "translation" else 0.0)
+    )
 
 
 def request_action_move(

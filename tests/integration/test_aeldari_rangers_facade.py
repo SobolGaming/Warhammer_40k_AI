@@ -5,6 +5,7 @@ import math
 from typing import cast
 
 import pytest
+from tests.sequential_translation_helpers import leading_first_translation_paths
 from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
@@ -657,26 +658,29 @@ def _state(lifecycle: GameLifecycle) -> GameState:
 
 def _shift_witness(placement: UnitPlacement, *, dx: float) -> PathWitness:
     return PathWitness.for_paths(
-        tuple(
-            (
-                model.model_instance_id,
+        leading_first_translation_paths(
+            tuple(
                 (
-                    model.pose,
-                    Pose.at(
-                        model.pose.position.x + (dx / 2.0),
-                        model.pose.position.y,
-                        model.pose.position.z,
-                        facing_degrees=model.pose.facing.degrees,
+                    model.model_instance_id,
+                    (
+                        model.pose,
+                        Pose.at(
+                            model.pose.position.x + (dx / 2.0),
+                            model.pose.position.y,
+                            model.pose.position.z,
+                            facing_degrees=model.pose.facing.degrees,
+                        ),
+                        Pose.at(
+                            model.pose.position.x + dx,
+                            model.pose.position.y,
+                            model.pose.position.z,
+                            facing_degrees=model.pose.facing.degrees,
+                        ),
                     ),
-                    Pose.at(
-                        model.pose.position.x + dx,
-                        model.pose.position.y,
-                        model.pose.position.z,
-                        facing_degrees=model.pose.facing.degrees,
-                    ),
-                ),
-            )
-            for model in placement.model_placements
+                )
+                for model in placement.model_placements
+            ),
+            dx=dx,
         )
     )
 

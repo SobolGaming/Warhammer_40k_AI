@@ -7675,3 +7675,11 @@ and source-linked payload. Source-mandatory selections expose eligible unit
 options without decline; existing optional records retain decline. Catalog loading,
 validation, engine-owned mutation, viewers and exact persistence/replay use the
 shared authority. No decision/schema family is added. See [Order125](ORDER_125_SCOPE_PLAN.md).
+
+Contract44.3.12 retains model_paths in submitted physical movement order. Each
+model completes its witnessed translation/rotation before the next model starts;
+earlier models occupy final poses and later models retain their initial poses.
+The model_ids() inventory remains canonical. Ordinary and attached Movement,
+Scout, Charge, Fight and triggered moves share occupancy authority. Existing
+payload families, invalid atomicity and engine persistence/replay remain; see
+[Order126 scope](ORDER_126_SCOPE_PLAN.md).

@@ -317,6 +317,7 @@ def _resolve_unit_move(
     temporary_movement_keywords: tuple[str, ...],
     ignores_vertical_distance: bool = False,
     rules_unit_instance_id: str | None = None,
+    occupancy_witness: PathWitness | None = None,
 ) -> _ResolvedUnitMove:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError(f"{action_label} requires a BattlefieldScenario.")
@@ -471,6 +472,7 @@ def _resolve_unit_move(
                     scenario=scenario,
                     unit_placement=unit_placement,
                     attempted_placement=attempted_placement,
+                    witness=witness if occupancy_witness is None else occupancy_witness,
                     moving_model_instance_id=placement.model_instance_id,
                 ),
                 enemy_models=_enemy_geometry_models_for_player(

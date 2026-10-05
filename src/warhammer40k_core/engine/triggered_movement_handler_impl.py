@@ -258,6 +258,10 @@ def apply_decision(
         normal_move_states=tuple(state.normal_move_states),
     )
     drift_code = resolution.selected_payload_drift_code(payload)
+    if drift_code != "triggered_movement_descriptor_drift" and witness != _offered_witness(
+        decisions=decisions, result=result
+    ):
+        drift_code = "triggered_movement_witness_drift"
     if drift_code is not None:
         invalid_payload = _triggered_movement_invalid_payload(
             state=state,
@@ -450,3 +454,15 @@ def apply_proposal_decision(
         decisions=decisions,
         unit_instance_id=proposal_request.unit_instance_id,
     )
+
+
+def _offered_witness(*, decisions: DecisionController, result: DecisionResult) -> PathWitness:
+    requests = (
+        *decisions.queue.pending_requests,
+        *(record.request for record in decisions.records if record.result == result),
+    )
+    matches = tuple(request for request in requests if request.request_id == result.request_id)
+    if len(matches) != 1:
+        raise GameLifecycleError("Triggered movement offered request is absent or duplicated.")
+    option = matches[0].option_by_id(result.selected_option_id)
+    return _payload_path_witness(_decision_payload_object(option.payload), "witness")

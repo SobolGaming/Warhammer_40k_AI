@@ -23,6 +23,7 @@ from tests.phase15a_charge_config_helpers import (
 from tests.phase15a_charge_config_helpers import (
     _unit_selection as _unit_selection,
 )
+from tests.sequential_translation_helpers import leading_first_translation_paths
 from tests.setup_completion_helpers import (
     ensure_army_mustered_events_for_fixture,
     record_current_battlefield_placements_for_fixture,
@@ -1171,7 +1172,7 @@ def _charge_path_witness_for_unit(
             facing_degrees=start.facing.degrees,
         )
         model_paths.append((placement.model_instance_id, (start, midpoint, end)))
-    return PathWitness.for_paths(tuple(model_paths))
+    return PathWitness.for_paths(leading_first_translation_paths(tuple(model_paths), dx=dx, dy=dy))
 
 
 def _destroy_unit_models_for_test(state: GameState, *, unit_instance_id: str) -> None:

@@ -286,6 +286,7 @@ def resolve_charge_move(
                 scenario=scenario,
                 unit_placement=unit_placement,
                 attempted_placement=attempted_placement,
+                witness=path_witness,
                 moving_model_instance_id=placement.model_instance_id,
             ),
             enemy_models=_enemy_geometry_models_for_player(
