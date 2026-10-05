@@ -153,6 +153,10 @@ class PreBattleViolationCode(StrEnum):
     DEPLOYMENT_ZONE_VIOLATION = "deployment_zone_violation"
     LARGE_MODEL_PLAYER_EDGE_UNSUPPORTED = "large_model_player_edge_unsupported"
     LARGE_MODEL_EDGE_CONTACT_MISSING = "large_model_edge_contact_missing"
+    INFILTRATORS_KEYWORD_REQUIRED = "infiltrators_keyword_required"
+    INFILTRATORS_ENEMY_ZONE_DISTANCE = "infiltrators_enemy_zone_distance"
+    INFILTRATORS_ENEMY_UNIT_DISTANCE = "infiltrators_enemy_unit_distance"
+    FORTIFICATION_DEPLOYMENT_UNSUPPORTED = "fortification_deployment_unsupported"
     MODEL_OVERLAP = "model_overlap"
     TERRAIN_ENDPOINT_ILLEGAL = "terrain_endpoint_illegal"
     OBJECTIVE_MARKER_ENDPOINT_OVERLAP = "objective_marker_endpoint_overlap"
@@ -1657,9 +1661,17 @@ def _resolve_prebattle_placement(
         proposal=proposal,
         view=view,
     )
-    from warhammer40k_core.engine.prebattle_setup_geometry import append_setup_geometry_violations
+    from warhammer40k_core.engine.prebattle_setup_geometry import (
+        append_redeploy_geometry_violations,
+        append_setup_geometry_violations,
+    )
 
-    append_setup_geometry_violations(
+    geometry_validator = (
+        append_redeploy_geometry_violations
+        if request.proposal_kind == REDEPLOY_PROPOSAL_KIND
+        else append_setup_geometry_violations
+    )
+    geometry_validator(
         violations=violations,
         state=state,
         scenario=scenario,

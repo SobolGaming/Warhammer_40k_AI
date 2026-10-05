@@ -14,6 +14,7 @@
     "tests/integration/test_horror_split_materialization.py": 160.476,
     "tests/integration/test_movement_mission_geometry.py": 4.922,
     "tests/integration/test_off_battlefield_command_battle_shock.py": 111.12,
+    "tests/integration/test_order127_infiltrators_redeploy.py": 588.451,
     "tests/integration/test_phase10a_placement_smoke.py": 4.62,
     "tests/integration/test_phase10l_coherency_integration.py": 44.408,
     "tests/integration/test_phase9d_smoke.py": 11.879,
@@ -313,76 +314,77 @@
     {
       "junit_sha256": [
         "0c5c0918cfa948593c287452aa908fe1bc78a84cee2ce97658e82622aeeea4e0",
-        "2eeefdc9c984066c62c201a9aeefde959024e60eda385e09b87f925e8f09f444"
+        "2eeefdc9c984066c62c201a9aeefde959024e60eda385e09b87f925e8f09f444",
+        "a7c1ebeff1150263ecb50e07db857123511bbdd8f0d0eea850c6eb521356af9b"
       ],
-      "source": "Order126 complete corrected current cohort HEAD b241a874c4fae003a66b571f48c35f2dcdb503ab, tree 4e0ca4e928b51a9caf0385fa5e5968a9d635450d: all 10926 cases once, 16 serial polygon cases and remaining cases in 32 parallel workers, all phases/durations authenticated; no predecessor or focused timings. JUnit SHA256 serial 0c5c0918cfa948593c287452aa908fe1bc78a84cee2ce97658e82622aeeea4e0; parallel 2eeefdc9c984066c62c201a9aeefde959024e60eda385e09b87f925e8f09f444.",
-      "test_cases": 10926,
-      "test_files": 308
+      "source": "Order127 provisional inventory: retained complete Order126 profile plus all new cases; complete current Order127 cohort replaces before delivery. Base 459a086d0ac164a0738dc710531b119febf5af53",
+      "test_cases": 10938,
+      "test_files": 309
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 4836.711,
+      "duration_seconds": 4885.747,
       "shard_id": 1,
-      "test_file_count": 24
+      "test_file_count": 25
     },
     {
-      "duration_seconds": 4836.729,
+      "duration_seconds": 4885.75,
       "shard_id": 2,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4836.713,
+      "duration_seconds": 4885.783,
       "shard_id": 3,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4836.717,
+      "duration_seconds": 4885.75,
       "shard_id": 4,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4836.711,
+      "duration_seconds": 4885.804,
       "shard_id": 5,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4836.81,
+      "duration_seconds": 4885.756,
       "shard_id": 6,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4836.714,
+      "duration_seconds": 4885.756,
       "shard_id": 7,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4836.718,
+      "duration_seconds": 4885.759,
       "shard_id": 8,
-      "test_file_count": 25
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 4836.783,
+      "duration_seconds": 4885.822,
       "shard_id": 9,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4836.714,
+      "duration_seconds": 4885.749,
       "shard_id": 10,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4836.714,
+      "duration_seconds": 4885.75,
       "shard_id": 11,
-      "test_file_count": 26
+      "test_file_count": 25
     },
     {
-      "duration_seconds": 4836.761,
+      "duration_seconds": 4885.82,
       "shard_id": 12,
       "test_file_count": 26
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 58040.795
+  "total_test_duration_seconds": 58629.246
 }

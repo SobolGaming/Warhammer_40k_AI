@@ -6,6 +6,8 @@ from __future__ import annotations
 from warhammer40k_core.core.deployment_zones import DeploymentZone
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
+from warhammer40k_core.engine.deployment import DeploymentPlacementViolation
+from warhammer40k_core.engine.deployment_geometry import append_geometry_violations
 from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
     terrain_endpoint_placement_violation,
@@ -28,6 +30,39 @@ from warhammer40k_core.geometry.volume import Model
 
 _EPSILON = 1e-9
 _INFILTRATORS_DISTANCE_INCHES = 8.0
+
+
+def append_redeploy_geometry_violations(
+    *,
+    violations: list[PreBattleViolation],
+    state: GameState,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    view: RulesUnitView,
+    models: tuple[Model, ...],
+    deployment_zones: tuple[DeploymentZone, ...],
+) -> None:
+    """Redeployment uses the same normal setup permissions and geometry owner."""
+    deployment_violations: list[DeploymentPlacementViolation] = []
+    append_geometry_violations(
+        violations=deployment_violations,
+        state=state,
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        view=view,
+        models=models,
+        deployment_zones=deployment_zones,
+    )
+    violations.extend(
+        PreBattleViolation(
+            violation_code=PreBattleViolationCode(violation.violation_code.value),
+            message=violation.message,
+            field=violation.field,
+            model_instance_id=violation.model_instance_id,
+            blocker_id=violation.blocker_id,
+        )
+        for violation in deployment_violations
+    )
 
 
 def append_setup_geometry_violations(

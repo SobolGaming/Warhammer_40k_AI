@@ -1,0 +1,49 @@
+{
+  "order": 127,
+  "roadmap": "P03H",
+  "finding": "C03-08",
+  "requirement_id": "03.02.03-obligation-03",
+  "selected_source": {
+    "row_id": "rule:03:03.02.03:1",
+    "category": "03",
+    "locator": "03.02.03",
+    "title": "Redeployments",
+    "occurrence": 1,
+    "source_sha256": "a1e1f344a9c0e7ac4ac613434bc293130eaf9f1f3090dd43b5068245bbdea92d",
+    "blocks": [
+      {
+        "ordinal": 1,
+        "kind": "text",
+        "sha256": "556cdeeb9ebc9b2998b35dc8272f9e16ae594a249a62442ac0726bff920031f2",
+        "value": "When a player uses a rule that lets them redeploy their unit, they remove that unit from the battlefield, then deploy it again using all the normal rules (e.g. if all the models in the redeploying unit have the Infiltrators ability, that unit can be set up using that ability)."
+      }
+    ],
+    "selected_provider": "Game Datamissions",
+    "historical_source_row_sha256": "3413ef8e953f97fa08f72943b89d82b25cb20ce810d855e87f4d7eda77fb71aa",
+    "review_category": "03"
+  },
+  "selected_block": {
+    "ordinal": 1,
+    "kind": "text",
+    "sha256": "556cdeeb9ebc9b2998b35dc8272f9e16ae594a249a62442ac0726bff920031f2",
+    "value": "When a player uses a rule that lets them redeploy their unit, they remove that unit from the battlefield, then deploy it again using all the normal rules (e.g. if all the models in the redeploying unit have the Infiltrators ability, that unit can be set up using that ability)."
+  },
+  "source_sha256": "a1e1f344a9c0e7ac4ac613434bc293130eaf9f1f3090dd43b5068245bbdea92d",
+  "pinned_git_blob_sha256": {
+    "data/source_audits/order97/selected-sources.json": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+    "data/source_audits/order97/categories/03.json": "1e5f98b23d3e0dbad9cfcff967c54b02aae899c93cfa500528d6c65b6d7d3cbe",
+    "data/source_audits/order97/observed_gaps_01_08.json": "93d0f121e578099c7c52155131668d8706fbc7689afe5fa8ac1267228e107bde",
+    "tests/order97_gap_probes_01_08.py": "e4e908605e084a8106e0aab42f52fb425f2c6f4ff5705c639ddad29c5ca762cc"
+  },
+  "baseline": "459a086d0ac164a0738dc710531b119febf5af53",
+  "baseline_tree": "5e045a15965a12da75686e8dc34c87bd81c65ac8",
+  "diagnostic": "tests/order97_gap_probes_01_08.py:infiltrators_redeploy_observation",
+  "owner": "src/warhammer40k_core/engine/prebattle.py:_resolve_prebattle_placement",
+  "acceptance": "Apply source-backed all-model Infiltrators permissions at redeployment as at initial setup through the actual facade; retain enemy distances, full model geometry, invalid atomicity, restore and replay. Read-only next inputs; do not implement Order127 here.",
+  "truthfulness": "Retained diagnostic identifies Core redeploy geometry omission. Actual catalog Rangers and Prince Yriel descriptors exercise the generic consumer. No named provider defect, changed admission, full Core or faction certification is claimed.",
+  "excluded": [
+    "Order128 whole-model fit and impossible-fit exception",
+    "other source obligations",
+    "coordinated hand-edited-history hardening"
+  ]
+}
