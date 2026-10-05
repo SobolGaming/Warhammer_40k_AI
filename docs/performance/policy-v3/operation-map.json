@@ -3854,6 +3854,7 @@
       "paths": [
         "src/warhammer40k_core/adapters/external_contract.py",
         "src/warhammer40k_core/engine/generic_effect_history.py",
+        "src/warhammer40k_core/engine/generic_enhancement_effects.py",
         "src/warhammer40k_core/engine/generic_rule_attack_hooks.py",
         "src/warhammer40k_core/engine/primary_mission_objective_control_source_authority.py",
         "src/warhammer40k_core/engine/rule_duration_execution.py",
@@ -3865,6 +3866,7 @@
         "_effect_from_execution",
         "_implicit_trigger_period",
         "_persisting_effect_or_none",
+        "_rule_execution_context",
         "_validate_direct_effect_identity",
         "effect_uses_implicit_duration",
         "expiration_for_clause_effect",

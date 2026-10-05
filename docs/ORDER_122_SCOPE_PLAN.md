@@ -10,8 +10,10 @@ Previously the generic RuleIR owner discarded every effect with duration=None.
 The shared duration owner now derives expiry for lasting characteristic/roll/
 movement modifiers, ability grants, rerolls, placement/transit permissions and
 contextual status grants. Instant CP/VP, damage, healing, returns, forced tests
-and other operation continuations retain their own owners. Explicit immediate,
-conditional, permanent and endpoint lifetimes retain precedence. Source payloads
+and other operation continuations retain their own owners. Placement permissions
+that perform remove-to-reserves mutate the reserve inventory through their existing
+operation owner and do not become a lasting grant. Explicit immediate, conditional,
+permanent and endpoint lifetimes retain precedence. Source payloads
 continue to record duration=None; the engine records a derived expiration rather
 than rewriting compiled source metadata.
 
@@ -26,6 +28,11 @@ use one derivation. Shared modifier consumers and boundary cleanup retain source
 model, attached-unit and replay ownership. The shared weapon query excludes typed
 unit characteristics, so a compound default OC grant remains with its unit consumer
 while its weapon modifiers reach the weapon profile.
+
+Standing enhancement installation explicitly uses nonpersistent RuleIR evaluation.
+Its existing assignment owner validates absent clause durations and installs the
+end-of-battle grant itself, including pregame when no phase or active player exists.
+This preserves that owner rather than creating a second default-duration record.
 
 The loaded canonical once-per-battle compound modifier fixture exercises the
 existing finite activation and lifecycle path, retaining a second genuine source

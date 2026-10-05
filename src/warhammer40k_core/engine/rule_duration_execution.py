@@ -82,6 +82,8 @@ def expiration_for_clause_effect(
 
 def effect_uses_implicit_duration(effect: RuleEffectSpec) -> bool:
     """Instant operations have their own mutation/continuation, not a live grant."""
+    if effect.kind is RuleEffectKind.PLACEMENT_PERMISSION:
+        return parameter_payload(effect.parameters).get("operation") != "remove_to_reserves"
     if effect.kind is RuleEffectKind.SET_CONTEXTUAL_STATUS:
         return parameter_payload(effect.parameters).get("status") != "force_battle_shock_test"
     return effect.kind in {
