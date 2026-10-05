@@ -14,6 +14,7 @@ from warhammer40k_core.engine.random_weapon_profiles import evaluate_attack_weap
 from warhammer40k_core.engine.random_profile_evaluation import evaluate_unit_profile_characteristics
 
 from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
+from warhammer40k_core.engine.shooting_types import ShootingType
 
 from typing import TYPE_CHECKING
 
@@ -178,6 +179,8 @@ def _roll_hit_and_wound(
             attack_context_id=attack_context_id,
             source_phase=attack_sequence.source_phase,
             weapon_profile_id=pool.weapon_profile_id,
+            weapon_profile=pool.weapon_profile,
+            shooting_type=pool.shooting_type,
             runtime_modifier_registry=runtime_modifier_registry,
         )
         if status is not None:
@@ -515,6 +518,8 @@ def _request_source_backed_hit_reroll_if_available(
     source_phase: BattlePhase,
     weapon_profile_id: str,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    weapon_profile: WeaponProfile | None = None,
+    shooting_type: ShootingType | None = None,
 ) -> LifecycleStatus | None:
     if roll_state is None:
         return None
@@ -537,6 +542,8 @@ def _request_source_backed_hit_reroll_if_available(
         attack_kind=_source_backed_attack_kind_for_phase(source_phase),
         roll_type=roll_state.original_result.spec.roll_type,
         registry=_runtime_modifier_registry(runtime_modifier_registry),
+        weapon_profile=weapon_profile,
+        shooting_type=shooting_type,
     )
     applicable_contexts: list[SourceBackedRerollPermissionContext] = []
     for candidate in permission_contexts:
@@ -877,6 +884,8 @@ def _validate_current_source_backed_attack_reroll_context_if_required(
         attack_kind=_source_backed_attack_kind_for_phase(attack_sequence.source_phase),
         roll_type=roll_type,
         registry=_runtime_modifier_registry(runtime_modifier_registry),
+        weapon_profile=current_pool.weapon_profile,
+        shooting_type=current_pool.shooting_type,
     )
     if roll_type == "attack_sequence.wound":
         permission_contexts += intrinsic_wound_reroll_contexts(

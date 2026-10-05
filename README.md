@@ -1,5 +1,10 @@
 # warhammer40k-core-v2
 
+Order124 / P02M compiles the retained Core nested reroll exemplar through generic
+RuleIR and the catalog reroll registry. The stronger objective branch retains
+closest eligible target selection with the actual weapon/type and recorded
+objective control. See [source and scope](docs/ORDER_124_SCOPE_PLAN.md).
+
 Order123 / P02L carries each datasheet name through shared catalog identity,
 effective catalog gates and model/unit keyword queries. Raw official inventories
 and faction admission remain unchanged; see [source and scope](docs/ORDER_123_SCOPE_PLAN.md).

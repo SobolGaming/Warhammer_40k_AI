@@ -32,6 +32,7 @@ from warhammer40k_core.engine.runtime_characteristic_context import (
     UnitCharacteristicModifierContext as UnitCharacteristicModifierContext,
 )
 from warhammer40k_core.engine.saves import SaveOption
+from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.source_backed_rerolls import (
     SourceBackedRerollPermissionContext,
     select_source_backed_reroll_permission_context,
@@ -470,6 +471,8 @@ class AttackRerollPermissionContext:
     source_phase: BattlePhase
     roll_type: str
     timing_window: str
+    weapon_profile: WeaponProfile | None = None
+    shooting_type: ShootingType | None = None
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -498,6 +501,10 @@ class AttackRerollPermissionContext:
                 ),
             )
         object.__setattr__(self, "source_phase", _battle_phase_from_token(self.source_phase))
+        if self.weapon_profile is not None and type(self.weapon_profile) is not WeaponProfile:
+            raise GameLifecycleError("Attack reroll weapon_profile must be WeaponProfile.")
+        if self.shooting_type is not None and type(self.shooting_type) is not ShootingType:
+            raise GameLifecycleError("Attack reroll shooting_type must be ShootingType.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -1326,6 +1333,8 @@ def unified_attack_reroll_permission_contexts_for_unit(
     attack_kind: str,
     roll_type: str,
     registry: RuntimeModifierRegistry,
+    weapon_profile: WeaponProfile | None = None,
+    shooting_type: ShootingType | None = None,
 ) -> tuple[SourceBackedRerollPermissionContext, ...]:
     source_backed_contexts = source_backed_reroll_permission_contexts_for_unit(
         state=state,
@@ -1349,6 +1358,8 @@ def unified_attack_reroll_permission_contexts_for_unit(
             source_phase=source_phase,
             roll_type=roll_type,
             timing_window=roll_type,
+            weapon_profile=weapon_profile,
+            shooting_type=shooting_type,
         )
     )
     return (*source_backed_contexts, *catalog_contexts)

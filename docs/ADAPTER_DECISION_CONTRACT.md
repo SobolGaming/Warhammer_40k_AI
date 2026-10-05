@@ -1,5 +1,16 @@
 # Adapter Decision Contract
 
+## Order124: nested attack reroll conditions
+
+Contract44.3.10 carries the selected Core nested reroll through the existing
+`select_dice_reroll` finite request and source-linked attack context. The context
+records the closest eligible target, opponent-controlled objectives in its range,
+and whether the improved reroll applies. The improved branch retains the outer
+condition. Eligibility uses the actual weapon and shooting type; objective control
+comes from the latest engine-recorded boundary. No request/schema family is added.
+Pending/full persistence, forks, viewer projections and exact replay retain the
+same engine authority and current runtime identity. See [Order124](ORDER_124_SCOPE_PLAN.md).
+
 ## Order123: datasheet identity keywords
 
 Existing model/unit keywords, catalog displays, finite submissions, viewer-scoped

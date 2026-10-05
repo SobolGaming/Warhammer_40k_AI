@@ -94,6 +94,7 @@
     "tests/unit/test_order121_command_abilities.py": 277.138,
     "tests/unit/test_order122_effect_defaults.py": 238.144,
     "tests/unit/test_order123_datasheet_identity.py": 141.64,
+    "tests/unit/test_order124_nested_conditions.py": 715.295,
     "tests/unit/test_order36_sequencing.py": 251.876,
     "tests/unit/test_order36_timing_authority.py": 172.672,
     "tests/unit/test_order51_flight.py": 169.651,
@@ -309,77 +310,79 @@
   "profiles": [
     {
       "junit_sha256": [
+        "06fd4f49cac584740c16266620390306cba8428f71231cefc7b7839f44a57fef",
+        "7c0e44b318fa9f71b8f69944575ebe35e187267adea9bc30e74b8ee5c8f4116e",
         "cb34d3e68dd297d40b956ecba54e809072d7f996f90994012315f0c748d1c341",
         "ff5bbb80ebf1f63a6b43bd387da76ae8c35f882f664c58c58f296e27dcec9859"
       ],
-      "source": "Order123 current complete authenticated Python3.14.5 local cohort at feeaf911127f8ed12092bf97681d08f7046eb359; disjoint16serial+10834parallel branch-covered cases, every outcome and JUnit duration authenticated",
-      "test_cases": 10850,
-      "test_files": 305
+      "source": "Order124 provisional profile: retained Order123 complete cohort plus all 26 new cases; current complete Order124 cohort must replace this before delivery. Base 7f5d7bd66dddff051146aa4d95f97a5f041b31b7",
+      "test_cases": 10876,
+      "test_files": 306
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 4639.147,
+      "duration_seconds": 4698.761,
       "shard_id": 1,
-      "test_file_count": 24
+      "test_file_count": 23
     },
     {
-      "duration_seconds": 4639.151,
+      "duration_seconds": 4698.759,
       "shard_id": 2,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4639.144,
+      "duration_seconds": 4698.78,
       "shard_id": 3,
-      "test_file_count": 26
+      "test_file_count": 25
     },
     {
-      "duration_seconds": 4639.16,
+      "duration_seconds": 4698.754,
       "shard_id": 4,
-      "test_file_count": 25
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 4639.147,
+      "duration_seconds": 4698.753,
       "shard_id": 5,
-      "test_file_count": 26
+      "test_file_count": 28
     },
     {
-      "duration_seconds": 4639.149,
+      "duration_seconds": 4698.753,
       "shard_id": 6,
-      "test_file_count": 26
-    },
-    {
-      "duration_seconds": 4639.167,
-      "shard_id": 7,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4639.144,
+      "duration_seconds": 4698.752,
+      "shard_id": 7,
+      "test_file_count": 27
+    },
+    {
+      "duration_seconds": 4698.755,
       "shard_id": 8,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4639.145,
+      "duration_seconds": 4698.761,
       "shard_id": 9,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4639.143,
+      "duration_seconds": 4698.76,
       "shard_id": 10,
-      "test_file_count": 27
-    },
-    {
-      "duration_seconds": 4639.143,
-      "shard_id": 11,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4639.16,
+      "duration_seconds": 4698.752,
+      "shard_id": 11,
+      "test_file_count": 26
+    },
+    {
+      "duration_seconds": 4698.755,
       "shard_id": 12,
       "test_file_count": 26
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 55669.8
+  "total_test_duration_seconds": 56385.095
 }

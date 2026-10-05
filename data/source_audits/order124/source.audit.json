@@ -1,0 +1,62 @@
+{
+  "order": 124,
+  "roadmap": "P02M",
+  "finding": "C02-13",
+  "requirement_id": "02.03.01-obligation-01",
+  "selected_source": {
+    "row_id": "rule:02:02.03.01:1",
+    "category": "02",
+    "locator": "02.03.01",
+    "title": "Rules With Multiple Conditions And Effects",
+    "occurrence": 1,
+    "source_sha256": "30091dfbc59e53fb250c880610847a3a3f1da9c223f748761381b9d81fa37018",
+    "blocks": [
+      {
+        "ordinal": 1,
+        "kind": "text",
+        "sha256": "0d4cfbf9a14acd1bb4a9ec392b6c5fec2a882f7fb4db1e92a7679dfbd2de40e2",
+        "value": "Some rules have multiple conditions, with the second, more specific condition conferring an improved rule, either instead of the first condition\u2019s rule or as well as it. Such rules require both the first condition and the second condition to be satisfied for the improved rule to apply."
+      },
+      {
+        "ordinal": 2,
+        "kind": "text",
+        "sha256": "569c63949f16b3e20827fce0872330b8c837173507fb7b522d19e5071fe5b045",
+        "value": "For example, an ability reads: \u2018This unit's ranged attacks that target the closest eligible target can:"
+      },
+      {
+        "ordinal": 3,
+        "kind": "text",
+        "sha256": "7084be1c86186a31d610dd746e0b13d5a2f003fb8608857b6e46035176529c0b",
+        "value": "\u2022 Re-roll \u0005hit rolls\u0006 of 1."
+      },
+      {
+        "ordinal": 4,
+        "kind": "text",
+        "sha256": "e9962f0a28c46dde3c9318d377374cdfdb9807ef0117f330b950fb71291fbaf3",
+        "value": "\u2022 \u0001Or:\u0002If that target is within range of an \u0005objective\u0006 your opponent controls, re-roll \u0005hit rolls\u0006.\u2019"
+      },
+      {
+        "ordinal": 5,
+        "kind": "text",
+        "sha256": "f8b652e3e643f6b464db2d6a04ab36b60cc2eed67a72846e22e41280c39d50bb",
+        "value": "In order for those attacks to re-roll \u0005hit rolls\u0006, that target must be both the closest eligible target and within range of an \u0005objective\u0006 your opponent controls."
+      }
+    ],
+    "selected_provider": "Game Datamissions",
+    "historical_source_row_sha256": "ecdebf6cbad57ebf25b8ba861ea6d68c1d2374fb996ee5a326fcb2c5265a970d",
+    "review_category": "02"
+  },
+  "selected_source_file": "data/source_audits/order97/selected-sources.json",
+  "selected_source_file_git_blob_sha256": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+  "interpretation": "The stronger inner effect retains the closest eligible ranged target condition. Reroll unmodified hit values of 1 unless the target is in range of an opponent-controlled objective at the latest engine-recorded control boundary.",
+  "exemplar_extraction": "Authenticate every retained block fingerprint; extract literal ability blocks 2-4; remove only introductory quotation, control typography and bullet formatting. Compile through ordinary RuleSourceText/RuleIR.",
+  "original_observation": "Typed unsupported source compilation, not proof of incorrect applied rerolls.",
+  "generic_execution": "Bounded complete nested template and existing catalog hit-reroll registry; actual weapon/type target legality, source-backed restrictions, canonical rules units, shared distance and recorded objective control.",
+  "source_admission_changed": false,
+  "provider_admission_changed": false,
+  "named_faction_certification": false,
+  "original_test_assertions_modified": [],
+  "original_order97_audit_unchanged": true,
+  "publication": "ON HOLD pending explicit user clarification",
+  "scope_document": "docs/ORDER_124_SCOPE_PLAN.md"
+}

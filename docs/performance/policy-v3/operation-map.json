@@ -4323,6 +4323,108 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order124-nested-conditions": {
+      "paths": [
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/engine/attack_sequence_dice_rerolls.py",
+        "src/warhammer40k_core/engine/catalog_datasheet_rule_runtime.py",
+        "src/warhammer40k_core/engine/catalog_datasheet_rule_support.py",
+        "src/warhammer40k_core/engine/catalog_nested_attack_reroll_runtime.py",
+        "src/warhammer40k_core/engine/catalog_nested_attack_reroll_support.py",
+        "src/warhammer40k_core/engine/faction_content/bundle.py",
+        "src/warhammer40k_core/engine/generic_rule_attack_conditions.py",
+        "src/warhammer40k_core/engine/runtime_modifiers.py",
+        "src/warhammer40k_core/rules/nested_attack_reroll_parser.py",
+        "src/warhammer40k_core/rules/specialized_rule_parser.py"
+      ],
+      "owners": [
+        "@module",
+        "AttackRerollPermissionContext",
+        "AttackRerollPermissionContext.__post_init__",
+        "CatalogDatasheetRuleRuntime.attack_reroll_permission_bindings",
+        "RuntimeContentBundle.from_contributions",
+        "_closest_attack_target_distance_inches",
+        "_opponent_controlled_objectives_in_target_range",
+        "_request_source_backed_hit_reroll_if_available",
+        "_roll_hit_and_wound",
+        "_span",
+        "_target_is_closest_eligible",
+        "_target_is_closest_enemy_within_distance",
+        "_target_is_enemy_within_distance",
+        "_validate_current_source_backed_attack_reroll_context_if_required",
+        "clause_has_invalid_exact_datasheet_runtime_shape",
+        "closest_attack_target_distance_inches",
+        "compile_nested_attack_reroll_clauses",
+        "compile_specialized_rule_clauses",
+        "consumer_ids_for_clause",
+        "nested_attack_reroll_clause_has_invalid_shape",
+        "nested_attack_reroll_clause_is_supported",
+        "nested_attack_reroll_handler",
+        "unified_attack_reroll_permission_contexts_for_unit"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order124-regressions": {
+      "paths": [
+        "tests/order124_helpers.py",
+        "tests/unit/test_order124_nested_conditions.py"
+      ],
+      "owners": [
+        "@module",
+        "_assert_roundtrips",
+        "_runtime_context",
+        "_source_context",
+        "declare_nested_shot",
+        "finish_nested_shot",
+        "nested_session",
+        "nested_source",
+        "test_incomplete_structured_nested_sources_gain_no_runtime_hook",
+        "test_nested_source_requires_complete_actual_attack_context",
+        "test_real_boundary_control_negatives_keep_only_the_basic_permission",
+        "test_real_nested_upgrade_survives_pending_and_completed_continuations",
+        "test_real_weaker_branch_and_outer_source_negatives",
+        "test_selected_source_compiles_with_parent_and_stronger_branch",
+        "test_shared_target_legality_and_closest_ties_preserve_eligible_targets",
+        "test_unrelated_attack_contexts_cannot_gain_the_nested_source"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order124-source-evidence": {
+      "paths": [
+        "data/source_audits/order124/source.audit.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order124-contract-publication": {
+      "paths": [
+        "conformance/typescript/src/contract.ts",
+        "contracts/README.md",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

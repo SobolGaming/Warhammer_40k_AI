@@ -393,7 +393,7 @@ def _target_is_closest_enemy_within_distance(
     target_owner = _unit_owner(state=state, unit_instance_id=target_unit_instance_id)
     if attacker_owner == target_owner:
         return False
-    target_distance = _closest_attack_target_distance_inches(
+    target_distance = closest_attack_target_distance_inches(
         state=state,
         attacking_unit_instance_id=attacking_unit_instance_id,
         attacker_model_instance_id=attacker_model_instance_id,
@@ -402,7 +402,7 @@ def _target_is_closest_enemy_within_distance(
     if target_distance > distance_inches:
         return False
     for enemy_unit_id in _enemy_unit_ids_for_player(state=state, player_id=attacker_owner):
-        candidate_distance = _closest_attack_target_distance_inches(
+        candidate_distance = closest_attack_target_distance_inches(
             state=state,
             attacking_unit_instance_id=attacking_unit_instance_id,
             attacker_model_instance_id=attacker_model_instance_id,
@@ -426,7 +426,7 @@ def _target_is_enemy_within_distance(
     if attacker_owner == target_owner:
         return False
     return (
-        _closest_attack_target_distance_inches(
+        closest_attack_target_distance_inches(
             state=state,
             attacking_unit_instance_id=attacking_unit_instance_id,
             attacker_model_instance_id=attacker_model_instance_id,
@@ -590,7 +590,7 @@ def _closest_placed_alive_unit_distance_inches(
     )
 
 
-def _closest_attack_target_distance_inches(
+def closest_attack_target_distance_inches(
     *,
     state: object,
     attacking_unit_instance_id: str,
