@@ -60,3 +60,5 @@ The original Order97-pinned RuleIR test bytes are retained exactly in the bounde
 historical-input mapping. Current metadata-only tests explicitly opt out of
 persistence; the existing bridge fixture supplies genuine battle state. Historical
 assertions and inventory remain unchanged and are not current gameplay evidence.
+
+The faction registry adapter has no game-state field and explicitly evaluates without persistence. Live ability execution retains persistence; its optional-wargear bridge fixture now supplies the actual source army/player and Charge-phase state, preserving every original assertion. The exact pinned original bridge test bytes join the bounded historical mapping. This changes no provider or source-admission gate.

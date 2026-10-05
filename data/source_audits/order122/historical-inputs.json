@@ -12,6 +12,15 @@
       "sha256": "39a3056620613379c97875c979dc30b7583a1a3633a5a4ec015706e5f884350a",
       "bytes": 220949,
       "order97_file_pin": "39a3056620613379c97875c979dc30b7583a1a3633a5a4ec015706e5f884350a"
+    },
+    {
+      "path": "tests/unit/rules/test_wahapedia_bridge_catalog.py",
+      "historical_path": "data/source_audits/order122/baseline/tests/unit/rules/test_wahapedia_bridge_catalog.py.txt",
+      "git_revision": "e6d728833f41ac88d76a281b1ad93cac5346006b",
+      "git_path": "tests/unit/rules/test_wahapedia_bridge_catalog.py",
+      "sha256": "e6e1e30142c89e8b1a2fd20eab487d8d5bbcb677ee09e5cadc8ee7d97f7f4348",
+      "bytes": 70262,
+      "order97_file_pin": "e6e1e30142c89e8b1a2fd20eab487d8d5bbcb677ee09e5cadc8ee7d97f7f4348"
     }
   ]
 }

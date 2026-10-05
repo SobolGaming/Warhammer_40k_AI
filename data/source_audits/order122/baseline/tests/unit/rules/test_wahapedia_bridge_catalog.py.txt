@@ -61,7 +61,6 @@ from warhammer40k_core.core.model_geometry_catalog import (
     GeometryReviewStatus,
     GeometrySourceUnits,
 )
-from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
 )
@@ -103,7 +102,6 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari impor
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.orks import (
     army_rule as orks_army_rule,
 )
-from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     MusteringOptionSelection,
@@ -112,7 +110,6 @@ from warhammer40k_core.engine.list_validation import (
     resolve_wargear_selections,
 )
 from warhammer40k_core.engine.list_validation_errors import ListValidationError
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import (
     UnitFactory,
@@ -1293,35 +1290,18 @@ def test_phase17k_selected_optional_wargear_adds_catalog_ir_ability_record() -> 
     player_records_by_name = {
         record.definition.name: record for record in player_index.all_records()
     }
-    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
-    state = GameState(
-        game_id="phase17k-game",
-        ruleset_descriptor_hash=descriptor.descriptor_hash,
-        stage=GameLifecycleStage.BATTLE,
-        setup_sequence=tuple(descriptor.setup_sequence.steps),
-        battle_phase_sequence=tuple(descriptor.battle_phase_sequence.phases),
-        setup_step_index=None,
-        battle_phase_index=descriptor.battle_phase_sequence.phases.index(BattlePhase.CHARGE),
-        battle_round=1,
-        active_player_id="player-khorne",
-        player_ids=("player-khorne", "player-opponent"),
-        turn_order=("player-khorne", "player-opponent"),
-        tactical_secondary_draw_count=2,
-    )
-    state.record_army_definition(army)
     result = default_ability_handler_registry().execute(
         record=player_records_by_name["Instrument of Chaos"],
         context=AbilityExecutionContext(
             game_id="phase17k-game",
             player_id="player-khorne",
             battle_round=1,
-            phase=BattlePhaseKind.CHARGE,
+            phase=None,
             active_player_id="player-khorne",
             trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
             source_unit_instance_id=unit.unit_instance_id,
             source_keywords=unit.keywords,
             trigger_payload={"roll_type": "charge"},
-            state=state,
         ),
     )
 

@@ -3853,6 +3853,7 @@
     "order122-default-effect-lifetimes": {
       "paths": [
         "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/engine/faction_rule_execution.py",
         "src/warhammer40k_core/engine/generic_effect_history.py",
         "src/warhammer40k_core/engine/generic_enhancement_effects.py",
         "src/warhammer40k_core/engine/generic_rule_attack_hooks.py",
@@ -3864,6 +3865,7 @@
         "@module",
         "_clause_semantic_unavailable_reason",
         "_effect_from_execution",
+        "_generic_rule_ir_executor",
         "_implicit_trigger_period",
         "_persisting_effect_or_none",
         "_rule_execution_context",
@@ -3880,6 +3882,7 @@
     "order122-regressions": {
       "paths": [
         "tests/order122_helpers.py",
+        "tests/unit/rules/test_wahapedia_bridge_catalog.py",
         "tests/unit/test_order122_effect_defaults.py",
         "tests/unit/test_phase17d_rule_execution.py"
       ],
@@ -3901,6 +3904,7 @@
         "test_phase17d_optional_wargear_bearer_unit_effects_execute_generically",
         "test_phase17d_rule_ir_payload_round_trips_through_execution_result",
         "test_phase17d_this_unit_effect_uses_source_unit_binding",
+        "test_phase17k_selected_optional_wargear_adds_catalog_ir_ability_record",
         "test_typed_trigger_period_cannot_be_granted_in_a_different_phase"
       ],
       "families": [],
@@ -3909,6 +3913,7 @@
     },
     "order122-source-evidence": {
       "paths": [
+        "data/source_audits/order122/baseline/tests/unit/rules/test_wahapedia_bridge_catalog.py.txt",
         "data/source_audits/order122/baseline/tests/unit/test_phase17d_rule_execution.py.txt",
         "data/source_audits/order122/historical-inputs.json",
         "data/source_audits/order122/source.audit.json",
