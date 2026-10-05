@@ -122,6 +122,7 @@ def critical_trigger_markers_for_attack(
     roll_type: str,
     weapon_profile: WeaponProfile,
     target_keywords: tuple[str, ...],
+    name_keywords: tuple[str, ...] = (),
 ) -> tuple[CriticalTriggerMarker, ...]:
     if type(weapon_profile) is not WeaponProfile:
         raise GameLifecycleError("Critical trigger markers require a WeaponProfile.")
@@ -129,7 +130,9 @@ def critical_trigger_markers_for_attack(
         raise GameLifecycleError("Critical trigger marker target_keywords must be a tuple.")
     markers: list[CriticalTriggerMarker] = []
     if roll_type == "hit":
-        if lethal_hits_applies(weapon_profile, target_keywords=target_keywords):
+        if lethal_hits_applies(
+            weapon_profile, target_keywords=target_keywords, name_keywords=name_keywords
+        ):
             markers.append(
                 CriticalTriggerMarker(
                     marker_id=CRITICAL_HIT_LETHAL_HITS_MARKER_ID,
@@ -143,6 +146,7 @@ def critical_trigger_markers_for_attack(
                 weapon_profile,
                 AbilityKind.SUSTAINED_HITS,
                 target_keywords=target_keywords,
+                name_keywords=name_keywords,
             )
             is not None
         ):
@@ -159,6 +163,7 @@ def critical_trigger_markers_for_attack(
             devastating_wounds_resolution(
                 weapon_profile,
                 target_keywords=target_keywords,
+                name_keywords=name_keywords,
             )
             is not None
         ):
@@ -201,6 +206,9 @@ def request_dice_result_override_if_available(
         roll_type=roll_type,
         weapon_profile=weapon_profile,
         target_keywords=target_keywords,
+        name_keywords=rules_unit_view_by_id(
+            state=state, unit_instance_id=target_unit_instance_id
+        ).datasheet_name_keywords,
     )
     if _dice_result_override_already_answered(
         decisions=decisions,
@@ -398,6 +406,9 @@ def invalid_dice_result_override_status(
             roll_type=payload["roll_type"],
             weapon_profile=pool.weapon_profile,
             target_keywords=target_keywords,
+            name_keywords=rules_unit_view_by_id(
+                state=state, unit_instance_id=pool.target_unit_instance_id
+            ).datasheet_name_keywords,
         )
     ]
     if payload["critical_trigger_markers"] != expected_markers:

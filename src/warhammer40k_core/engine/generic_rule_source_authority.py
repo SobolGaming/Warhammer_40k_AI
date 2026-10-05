@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, cast
 
+from warhammer40k_core.core.keyword_membership import exclusive_name_keywords
 from warhammer40k_core.core.ruleset_descriptor import battle_phase_kind_from_token
 from warhammer40k_core.engine.abilities import AbilityCatalogRecord, AbilitySourceKind
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
@@ -468,7 +469,15 @@ def generic_ability_provider_matches(
             }
         )
     )
-    if not record.definition.keyword_gate.matches(actual_keywords):
+    ordinary_factions = {keyword for unit in source_units for keyword in unit.faction_keywords}
+    names = tuple(
+        name
+        for name in exclusive_name_keywords(
+            model.keyword_assignment for unit in source_units for model in unit.alive_own_models()
+        )
+        if name not in ordinary_factions
+    )
+    if not record.definition.keyword_gate.matches(actual_keywords, name_keywords=names):
         return False
     source_kind = record.source_kind
     if source_kind in {AbilitySourceKind.CORE, AbilitySourceKind.KEYWORD}:

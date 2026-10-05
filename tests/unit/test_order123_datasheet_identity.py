@@ -12,6 +12,7 @@ from tests.model_keyword_helpers import mixed_keyword_catalog, mixed_keyword_uni
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.model_keywords import model_keyword_assignment
+from warhammer40k_core.core.weapon_profiles import WeaponProfile
 from warhammer40k_core.engine.catalog_model_scope import scoped_roll_model_ids_for_effect
 from warhammer40k_core.engine.rules_units import RulesUnitComponent, RulesUnitView
 from warhammer40k_core.engine.unit_factory import UnitInstance
@@ -64,7 +65,11 @@ def test_scoped_and_materialization_assignments_add_only_datasheet_identity(expl
         ),
     )
     assignments = tuple(
-        replace(row, keywords=tuple(k for k in row.keywords if k != sheet.name_keyword))
+        replace(
+            row,
+            keywords=tuple(k for k in row.keywords if k != sheet.name_keyword),
+            name_keyword=None,
+        )
         for row in catalog.model_keyword_assignments
     )
     catalog = replace(
@@ -315,6 +320,9 @@ def test_loaded_lifecycle_identity_pending_continuation_fork_viewers_and_exact_r
     )
     for keyword, reason in (
         (token, None),
+        (bodyguard_token, None),
+        (bodyguard_token.replace("-", " "), "unit_missing_required_keyword"),
+        (bodyguard_token.replace("-", "_").replace(" ", "_"), "unit_missing_required_keyword"),
         ("UNRELATED DATASHEET", "unit_missing_required_keyword"),
     ):
         span = TextSpan(start=0, end=len(keyword), text=keyword)
@@ -346,6 +354,7 @@ def test_loaded_lifecycle_identity_pending_continuation_fork_viewers_and_exact_r
     )
     assert forked.to_persistence_payload() == checkpoint
     assert_persistence_viewers_replay(restored)
+
     for index in range(120):
         status = restored.advance_until_decision_or_terminal()
         if state.battle_round == 2:
@@ -358,3 +367,452 @@ def test_loaded_lifecycle_identity_pending_continuation_fork_viewers_and_exact_r
         token in rules_unit_view_by_id(state=state, unit_instance_id="army-alpha:leader").keywords
     )
     assert_persistence_viewers_replay(restored)
+
+
+def _native_name_unit(name: str, *, ordinary_name: bool = False) -> UnitInstance:
+    from warhammer40k_core.engine.list_validation import UnitMusterSelection
+    from warhammer40k_core.engine.unit_factory import UnitFactory
+    from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
+
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    sheet = replace(catalog.datasheet_by_id("core-intercessor-like-infantry"), name=name)
+    if ordinary_name:
+        sheet = replace(
+            sheet,
+            keywords=replace(
+                sheet.keywords,
+                keywords=tuple(sorted({*sheet.keywords.keywords, sheet.name_keyword})),
+            ),
+        )
+    catalog = replace(
+        catalog,
+        datasheets=tuple(
+            sheet if row.datasheet_id == sheet.datasheet_id else row for row in catalog.datasheets
+        ),
+    )
+    return UnitFactory(catalog=catalog).instantiate_unit(
+        army_id="order123-native",
+        datasheet=sheet,
+        selection=UnitMusterSelection(
+            unit_selection_id=f"identity:{name}",
+            datasheet_id=sheet.datasheet_id,
+            model_profile_selections=tuple(
+                ModelProfileSelection(
+                    model_profile_id=row.model_profile_id, model_count=row.min_models
+                )
+                for row in sheet.composition
+            ),
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    ("name", "near"),
+    [
+        ("Name-with-hyphens", "Name with hyphens"),
+        ("Name with hyphens", "Name-with-hyphens"),
+        ("Be'lakor", "Belakor"),
+        ("Lords of Change", "Lord of Change"),
+    ],
+)
+def test_contextful_generic_gates_preserve_both_native_sides(name: str, near: str) -> None:
+    from warhammer40k_core.engine import catalog_battle_shock_runtime, generic_rule_ability_effects
+    from warhammer40k_core.engine.abilities import AbilityExecutionContext, KeywordGate
+    from warhammer40k_core.engine.generic_detachment_rule_effects import (
+        _unit_matches_keyword_requirement,
+        _UnitKeywordRequirement,
+    )
+    from warhammer40k_core.engine.rule_aura_resolution import _rules_unit_has_excluded_keyword
+    from warhammer40k_core.engine.rule_target_resolution import unit_has_required_keywords
+    from warhammer40k_core.engine.transports import TransportCapacityProfile
+
+    unit = _native_name_unit(name)
+    view = RulesUnitView(
+        unit_instance_id=unit.unit_instance_id,
+        owner_player_id="player-a",
+        components=(RulesUnitComponent(unit=unit, role="unit"),),
+    )
+    assert unit.datasheet_name_keywords == (name.upper(),)
+    context = AbilityExecutionContext.passive_keyword_gate(
+        source_keywords=view.keywords, source_name_keywords=view.datasheet_name_keywords
+    )
+    restored = AbilityExecutionContext.from_payload(context.to_payload())
+    assert restored == context
+    for query, expected in ((name, True), (near, False), (near.replace(" ", "_"), False)):
+        assert unit_has_keyword(unit, query) is expected
+        assert (
+            unit_has_required_keywords(
+                unit_keywords=view.keywords,
+                faction_keywords=view.faction_keywords,
+                required_keywords=("INFANTRY", query),
+                name_keywords=view.datasheet_name_keywords,
+            )
+            is expected
+        )
+        assert generic_rule_ability_effects._rules_unit_has_keyword(view, query) is expected
+        assert (
+            catalog_battle_shock_runtime._unit_has_required_keyword(unit, required_keyword=query)
+            is expected
+        )
+        assert (
+            catalog_battle_shock_runtime._rules_unit_has_required_keyword(
+                view, required_keyword=query
+            )
+            is expected
+        )
+        assert (
+            _rules_unit_has_excluded_keyword(rules_unit=view, excluded_keywords=(query,))
+            is expected
+        )
+        gate = KeywordGate(required_keywords=(query,))
+        assert (
+            KeywordGate.from_payload(gate.to_payload()).matches(
+                restored.source_keywords, name_keywords=restored.source_name_keywords
+            )
+            is expected
+        )
+        assert (
+            KeywordGate(forbidden_keywords=(query,)).matches(
+                restored.source_keywords, name_keywords=restored.source_name_keywords
+            )
+            is not expected
+        )
+        requirement = _UnitKeywordRequirement(
+            required_keywords=(query,),
+            required_faction_keywords=(),
+            required_keyword_any=None,
+            excluded_keywords=(),
+        )
+        assert _unit_matches_keyword_requirement(unit, requirement) is expected
+        assert (
+            _unit_matches_keyword_requirement(
+                unit, replace(requirement, required_keywords=(), required_keyword_any=(query,))
+            )
+            is expected
+        )
+        assert (
+            _unit_matches_keyword_requirement(
+                unit, replace(requirement, required_keywords=(), excluded_keywords=(query,))
+            )
+            is not expected
+        )
+        assert (
+            TransportCapacityProfile(
+                transport_datasheet_id="test", max_model_count=20, allowed_keywords=(query,)
+            ).allows_unit(unit)
+            is expected
+        )
+        assert (
+            TransportCapacityProfile(
+                transport_datasheet_id="test", max_model_count=20, excluded_keywords=(query,)
+            ).allows_unit(unit)
+            is not expected
+        )
+
+
+@pytest.mark.parametrize("ordinary", [False, True])
+def test_name_role_and_independent_grant_keep_conventional_keyword_compatibility(
+    ordinary: bool,
+) -> None:
+    from warhammer40k_core.engine.model_keyword_grants import grant_unit_keywords
+    from warhammer40k_core.engine.rule_target_resolution import unit_has_required_keywords
+
+    unit = _native_name_unit("DEDICATED TRANSPORT", ordinary_name=ordinary)
+    assert unit_has_keyword(unit, "DEDICATED TRANSPORT")
+    assert unit_has_keyword(unit, "DEDICATED-TRANSPORT") is ordinary
+    assert unit_has_required_keywords(
+        unit_keywords=("DEDICATED TRANSPORT",),
+        faction_keywords=(),
+        required_keywords=("DEDICATED-TRANSPORT",),
+    )
+    granted = grant_unit_keywords(
+        unit, keywords=("DEDICATED TRANSPORT",), source_id="core-test:grant"
+    )
+    assert unit_has_keyword(granted, "DEDICATED-TRANSPORT")
+    assert all(model.keyword_assignment.name_is_ordinary_keyword for model in granted.own_models)
+    assert UnitInstance.from_payload(granted.to_payload()).datasheet_name_keywords == ()
+    assert unit_has_required_keywords(
+        unit_keywords=unit.keywords,
+        faction_keywords=("DEDICATED TRANSPORT",),
+        required_keywords=("DEDICATED-TRANSPORT",),
+        name_keywords=unit.datasheet_name_keywords,
+    )
+
+
+def test_near_names_coexist_in_one_attached_inventory_without_aliasing_each_other() -> None:
+    from warhammer40k_core.engine.abilities import AbilityExecutionContext, KeywordGate
+    from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
+    from warhammer40k_core.engine.rule_target_resolution import unit_has_required_keywords
+
+    first = _native_name_unit("Name-with-hyphens")
+    second = _native_name_unit("Name with hyphens")
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id="attached-unit:order123-near-names",
+        bodyguard_unit_instance_id=first.unit_instance_id,
+        leader_unit_instance_ids=(second.unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((first.unit_instance_id, second.unit_instance_id))
+        ),
+        source_id="core-test:formation",
+        attachment_source_ids=("core-test:attachment",),
+    )
+    view = RulesUnitView(
+        unit_instance_id=formation.attached_unit_instance_id,
+        owner_player_id="player-a",
+        components=(
+            RulesUnitComponent(unit=first, role="bodyguard"),
+            RulesUnitComponent(unit=second, role="leader"),
+        ),
+        attached_unit=formation,
+    )
+    assert unit_has_required_keywords(
+        unit_keywords=view.keywords,
+        faction_keywords=view.faction_keywords,
+        required_keywords=("NAME-WITH-HYPHENS", "NAME WITH HYPHENS"),
+        name_keywords=view.datasheet_name_keywords,
+    )
+    context = AbilityExecutionContext.passive_keyword_gate(
+        source_keywords=view.keywords, source_name_keywords=view.datasheet_name_keywords
+    )
+    assert AbilityExecutionContext.from_payload(context.to_payload()) == context
+    for name in view.datasheet_name_keywords:
+        assert KeywordGate(required_keywords=(name,)).matches(
+            context.source_keywords, name_keywords=context.source_name_keywords
+        )
+    assert not unit_has_keyword(first, "NAME WITH HYPHENS")
+    assert not unit_has_keyword(second, "NAME-WITH-HYPHENS")
+
+
+def _native_weapon_profile() -> WeaponProfile:
+    return ArmyCatalog.phase9a_canonical_content_pack().wargear[0].weapon_profiles[0]
+
+
+def test_explicit_native_selector_declarations_disambiguate_eager_validation_only() -> None:
+    from warhammer40k_core.core.weapon_profiles import AbilityDescriptor
+    from warhammer40k_core.engine.abilities import KeywordGate
+    from warhammer40k_core.engine.phase import GameLifecycleError
+    from warhammer40k_core.engine.weapon_abilities import anti_keyword_critical_threshold
+
+    unit = _native_name_unit("Name-with-hyphens")
+    names = ("NAME-WITH-HYPHENS", "NAME WITH HYPHENS")
+    gate = KeywordGate(
+        required_keywords=(names[0],),
+        forbidden_keywords=(names[1],),
+        native_keyword_selectors=names,
+    )
+    assert KeywordGate.from_payload(gate.to_payload()) == gate
+    assert gate.matches(unit.keywords, name_keywords=unit.datasheet_name_keywords)
+    assert not replace(gate, required_keywords=(names[1],), forbidden_keywords=(names[0],)).matches(
+        unit.keywords, name_keywords=unit.datasheet_name_keywords
+    )
+    both = KeywordGate(required_keywords=names, native_keyword_selectors=names)
+    assert not both.matches(unit.keywords, name_keywords=unit.datasheet_name_keywords)
+    anti = AbilityDescriptor.anti_keyword("/".join(names), 2, native_keyword_selectors=names)
+    assert AbilityDescriptor.from_payload(anti.to_payload()) == anti
+    profile = replace(_native_weapon_profile(), keywords=(), abilities=(anti,))
+    assert (
+        anti_keyword_critical_threshold(
+            profile=profile,
+            target_keywords=unit.keywords,
+            name_keywords=unit.datasheet_name_keywords,
+        )
+        == 2
+    )
+    with pytest.raises(GameLifecycleError, match="duplicate"):
+        KeywordGate(required_keywords=("Deep Strike", "DEEP-STRIKE"))
+    with pytest.raises(GameLifecycleError, match="cannot be both"):
+        KeywordGate(required_keywords=("Deep Strike",), forbidden_keywords=("DEEP-STRIKE",))
+    with pytest.raises(GameLifecycleError, match="selector inventory"):
+        KeywordGate(required_keywords=(names[0],), native_keyword_selectors=("UNRELATED",))
+
+
+@pytest.mark.parametrize("change", ["one-field", "null", "wrong-role-type"])
+def test_model_name_payload_metadata_is_strictly_paired(change: str) -> None:
+    from typing import cast
+
+    from warhammer40k_core.core.model_keywords import (
+        ModelKeywordAssignment,
+        ModelKeywordAssignmentPayload,
+        ModelKeywordError,
+    )
+
+    assignment = _native_name_unit("Native-name").own_models[0].keyword_assignment
+    payload = dict(assignment.to_payload())
+    if change == "one-field":
+        del payload["name_is_ordinary_keyword"]
+    elif change == "null":
+        payload["name_keyword"] = None
+    else:
+        payload["name_is_ordinary_keyword"] = "false"
+    with pytest.raises(ModelKeywordError, match=r"metadata fields|identity must|role must"):
+        ModelKeywordAssignment.from_payload(cast(ModelKeywordAssignmentPayload, payload))
+
+
+@pytest.mark.parametrize(
+    ("name", "near"),
+    [
+        ("Name-with-hyphens", "Name with hyphens"),
+        ("Name with hyphens", "Name-with-hyphens"),
+    ],
+)
+def test_weapon_positive_negative_and_anti_selectors_keep_native_spelling(
+    name: str, near: str
+) -> None:
+    from warhammer40k_core.core.weapon_profiles import (
+        AbilityDescriptor,
+        AntiKeywordMatchMode,
+        TargetKeywordMatchMode,
+        WeaponKeyword,
+    )
+    from warhammer40k_core.engine.weapon_abilities import (
+        anti_keyword_critical_threshold,
+        lethal_hits_applies,
+    )
+
+    unit = _native_name_unit(name)
+    for selector, expected in ((name, True), (near, False)):
+        descriptor = AbilityDescriptor.lethal_hits(target_keywords=(selector,))
+        assert descriptor.target_keywords == (selector.upper(),)
+        assert AbilityDescriptor.from_payload(descriptor.to_payload()) == descriptor
+        profile = replace(
+            _native_weapon_profile(), keywords=(WeaponKeyword.LETHAL_HITS,), abilities=(descriptor,)
+        )
+        assert (
+            lethal_hits_applies(
+                profile, target_keywords=unit.keywords, name_keywords=unit.datasheet_name_keywords
+            )
+            is expected
+        )
+        negative = AbilityDescriptor.lethal_hits(
+            target_keywords=(selector,),
+            target_keyword_match_mode=TargetKeywordMatchMode.MISSING_KEYWORD,
+        )
+        assert (
+            lethal_hits_applies(
+                replace(profile, abilities=(negative,)),
+                target_keywords=unit.keywords,
+                name_keywords=unit.datasheet_name_keywords,
+            )
+            is not expected
+        )
+        anti = AbilityDescriptor.anti_keyword(selector, 2)
+        anti_profile = replace(_native_weapon_profile(), keywords=(), abilities=(anti,))
+        assert anti_keyword_critical_threshold(
+            profile=anti_profile,
+            target_keywords=unit.keywords,
+            name_keywords=unit.datasheet_name_keywords,
+        ) == (2 if expected else None)
+        anti_negative = AbilityDescriptor.anti_keyword(
+            selector, 2, match_mode=AntiKeywordMatchMode.MISSING_KEYWORD
+        )
+        assert anti_keyword_critical_threshold(
+            profile=replace(anti_profile, abilities=(anti_negative,)),
+            target_keywords=unit.keywords,
+            name_keywords=unit.datasheet_name_keywords,
+        ) == (None if expected else 2)
+
+
+@pytest.mark.parametrize("change", ["lost", "role"])
+def test_current_runtime_restore_authenticates_name_classification(change: str) -> None:
+    from tests.order122_helpers import advance_to_default_grant, default_effect_session
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession, _payload_sha256
+
+    session = default_effect_session()
+    advance_to_default_grant(session)
+    payload = json.loads(json.dumps(session.to_persistence_payload()))
+    found = False
+
+    def change_assignment(value: object) -> None:
+        nonlocal found
+        if isinstance(value, dict):
+            if "keyword_assignment" in value and not found:
+                assignment = value["keyword_assignment"]
+                assert isinstance(assignment, dict)
+                if change == "lost":
+                    del assignment["name_keyword"]
+                    del assignment["name_is_ordinary_keyword"]
+                else:
+                    assignment["name_is_ordinary_keyword"] = not assignment[
+                        "name_is_ordinary_keyword"
+                    ]
+                found = True
+            for child in value.values():
+                change_assignment(child)
+        elif isinstance(value, list):
+            for child in value:
+                change_assignment(child)
+
+    change_assignment(payload)
+    assert found
+    payload["content_hash"] = _payload_sha256(
+        {key: value for key, value in payload.items() if key != "content_hash"}
+    )
+    with pytest.raises(ValueError, match="could not be reconstructed") as error:
+        LocalGameSession.from_persistence_payload(payload)
+    assert str(error.value.__cause__) == "Lifecycle state army definitions do not match config."
+
+
+@pytest.mark.parametrize("field", ["required_keywords", "forbidden_keywords", "target_keywords"])
+def test_native_selector_metadata_preserves_eager_domain_container_errors(field: str) -> None:
+    from typing import Any, cast
+
+    from warhammer40k_core.core.weapon_profiles import AbilityDescriptor, WeaponProfileError
+    from warhammer40k_core.engine.abilities import KeywordGate
+    from warhammer40k_core.engine.phase import GameLifecycleError
+
+    invalid = cast(Any, None)
+    if field == "target_keywords":
+        with pytest.raises(WeaponProfileError, match="target_keywords must be a tuple"):
+            AbilityDescriptor.lethal_hits(target_keywords=invalid)
+    elif field == "required_keywords":
+        with pytest.raises(GameLifecycleError, match="required_keywords must be a tuple"):
+            KeywordGate(required_keywords=invalid)
+    else:
+        with pytest.raises(GameLifecycleError, match="forbidden_keywords must be a tuple"):
+            KeywordGate(forbidden_keywords=invalid)
+
+
+@pytest.mark.parametrize("name", ["Non-standard Squad", "Alpha/Beta Squad", "Captain's Guard"])
+def test_declared_native_weapon_selectors_preserve_names_at_grammar_boundaries(name: str) -> None:
+    from warhammer40k_core.core.weapon_profiles import (
+        AbilityDescriptor,
+        TargetKeywordMatchMode,
+        WeaponKeyword,
+    )
+    from warhammer40k_core.engine.weapon_abilities import (
+        anti_keyword_critical_threshold,
+        hunter_target_allowed,
+    )
+
+    unit = _native_name_unit(name)
+    native = (name.upper(),)
+    descriptor = AbilityDescriptor.hunter(
+        target_keywords=native,
+        target_keyword_match_mode=TargetKeywordMatchMode.HAS_KEYWORD,
+        native_keyword_selectors=native,
+    )
+    assert descriptor.target_keywords == native
+    assert AbilityDescriptor.from_payload(descriptor.to_payload()) == descriptor
+    profile = replace(
+        _native_weapon_profile(), keywords=(WeaponKeyword.HUNTER,), abilities=(descriptor,)
+    )
+    assert hunter_target_allowed(
+        profile, target_keywords=unit.keywords, name_keywords=unit.datasheet_name_keywords
+    )
+    assert not hunter_target_allowed(profile, target_keywords=("INFANTRY",))
+    anti = AbilityDescriptor.anti_keyword(name, 2, native_keyword_selectors=native)
+    anti_profile = replace(
+        profile, keywords=(), abilities=(AbilityDescriptor.from_payload(anti.to_payload()),)
+    )
+    assert (
+        anti_keyword_critical_threshold(
+            profile=anti_profile,
+            target_keywords=unit.keywords,
+            name_keywords=unit.datasheet_name_keywords,
+        )
+        == 2
+    )
+    assert (
+        anti_keyword_critical_threshold(profile=anti_profile, target_keywords=("INFANTRY",)) is None
+    )

@@ -3,6 +3,7 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import cast
 
+from warhammer40k_core.core.keyword_membership import keyword_inventory_contains
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     TARGET_KEYWORD_MATCH_MODE_PARAMETER,
@@ -92,11 +93,13 @@ def weapon_ability_int_value(
     ability_kind: AbilityKind,
     *,
     target_keywords: tuple[str, ...] = (),
+    name_keywords: tuple[str, ...] = (),
 ) -> int | None:
     value = weapon_ability_value(
         profile,
         ability_kind,
         target_keywords=target_keywords,
+        name_keywords=name_keywords,
     )
     if value is None:
         return None
@@ -112,6 +115,7 @@ def weapon_ability_value(
     ability_kind: AbilityKind,
     *,
     target_keywords: tuple[str, ...] = (),
+    name_keywords: tuple[str, ...] = (),
 ) -> int | str | None:
     _validate_weapon_profile(profile)
     _validate_ability_kind(ability_kind)
@@ -126,6 +130,7 @@ def weapon_ability_value(
         profile,
         ability_kind,
         target_keywords=target_keywords,
+        name_keywords=name_keywords,
     )
     descriptor = matching_descriptors[0] if matching_descriptors else None
     if descriptor is not None:
@@ -150,6 +155,7 @@ def weapon_ability_applies(
     ability_kind: AbilityKind,
     *,
     target_keywords: tuple[str, ...],
+    name_keywords: tuple[str, ...] = (),
 ) -> bool:
     _validate_weapon_profile(profile)
     _validate_ability_kind(ability_kind)
@@ -165,6 +171,7 @@ def weapon_ability_applies(
             _target_keyword_gate_matches_descriptor(
                 descriptor,
                 target_keywords=target_keywords,
+                name_keywords=name_keywords,
             )
             for descriptor in descriptors
         )
@@ -177,15 +184,20 @@ def weapon_ability_applies(
     return False
 
 
-def lethal_hits_applies(profile: WeaponProfile, *, target_keywords: tuple[str, ...]) -> bool:
+def lethal_hits_applies(
+    profile: WeaponProfile, *, target_keywords: tuple[str, ...], name_keywords: tuple[str, ...] = ()
+) -> bool:
     return weapon_ability_applies(
         profile,
         AbilityKind.LETHAL_HITS,
         target_keywords=target_keywords,
+        name_keywords=name_keywords,
     )
 
 
-def hunter_target_allowed(profile: WeaponProfile, *, target_keywords: tuple[str, ...]) -> bool:
+def hunter_target_allowed(
+    profile: WeaponProfile, *, target_keywords: tuple[str, ...], name_keywords: tuple[str, ...] = ()
+) -> bool:
     _validate_weapon_profile(profile)
     _target_keyword_set(target_keywords)
     descriptors = tuple(
@@ -201,6 +213,7 @@ def hunter_target_allowed(profile: WeaponProfile, *, target_keywords: tuple[str,
         _target_keyword_gate_matches_descriptor(
             descriptor,
             target_keywords=target_keywords,
+            name_keywords=name_keywords,
         )
         for descriptor in descriptors
     )
@@ -210,8 +223,9 @@ def hunter_targeting_rule_ids(
     profile: WeaponProfile,
     *,
     target_keywords: tuple[str, ...],
+    name_keywords: tuple[str, ...] = (),
 ) -> tuple[str, ...]:
-    if hunter_target_allowed(profile, target_keywords=target_keywords):
+    if hunter_target_allowed(profile, target_keywords=target_keywords, name_keywords=name_keywords):
         if any(ability.ability_kind is AbilityKind.HUNTER for ability in profile.abilities):
             return (HUNTER_RULE_ID,)
         return ()
@@ -222,6 +236,7 @@ def anti_keyword_critical_threshold(
     *,
     profile: WeaponProfile,
     target_keywords: tuple[str, ...],
+    name_keywords: tuple[str, ...] = (),
 ) -> int | None:
     _validate_weapon_profile(profile)
     _target_keyword_set(target_keywords)
@@ -230,6 +245,7 @@ def anti_keyword_critical_threshold(
             profile,
             AbilityKind.ANTI_KEYWORD,
             target_keywords=target_keywords,
+            name_keywords=name_keywords,
         )
     )
     if not matching_descriptors:
@@ -248,6 +264,7 @@ def devastating_wounds_resolution(
     profile: WeaponProfile,
     *,
     target_keywords: tuple[str, ...] = (),
+    name_keywords: tuple[str, ...] = (),
 ) -> DevastatingWoundsResolution | None:
     _validate_weapon_profile(profile)
     _target_keyword_set(target_keywords)
@@ -268,6 +285,7 @@ def devastating_wounds_resolution(
         profile,
         AbilityKind.DEVASTATING_WOUNDS,
         target_keywords=target_keywords,
+        name_keywords=name_keywords,
     )
     if not matching_descriptors:
         return None
@@ -291,11 +309,13 @@ def rapid_fire_attack_bonus(
     *,
     target_within_half_range: bool,
     target_keywords: tuple[str, ...] = (),
+    name_keywords: tuple[str, ...] = (),
 ) -> int:
     value = weapon_ability_int_value(
         profile,
         AbilityKind.RAPID_FIRE,
         target_keywords=target_keywords,
+        name_keywords=name_keywords,
     )
     if value is None or not target_within_half_range:
         return 0
@@ -313,8 +333,11 @@ def blast_attack_bonus_for_profile(
     *,
     target_model_count: int,
     target_keywords: tuple[str, ...] = (),
+    name_keywords: tuple[str, ...] = (),
 ) -> int:
-    value = weapon_ability_int_value(profile, AbilityKind.BLAST, target_keywords=target_keywords)
+    value = weapon_ability_int_value(
+        profile, AbilityKind.BLAST, target_keywords=target_keywords, name_keywords=name_keywords
+    )
     if value is None:
         return 0
     return blast_attack_bonus(target_model_count=target_model_count, blast_value=value)
@@ -326,11 +349,13 @@ def cleave_attack_bonus(
     single_target: bool,
     target_model_count: int,
     target_keywords: tuple[str, ...] = (),
+    name_keywords: tuple[str, ...] = (),
 ) -> int:
     value = weapon_ability_int_value(
         profile,
         AbilityKind.CLEAVE,
         target_keywords=target_keywords,
+        name_keywords=name_keywords,
     )
     if value is None or not single_target:
         return 0
@@ -352,11 +377,13 @@ def melta_damage_bonus(
     *,
     target_within_half_range: bool,
     target_keywords: tuple[str, ...] = (),
+    name_keywords: tuple[str, ...] = (),
 ) -> int:
     value = weapon_ability_int_value(
         profile,
         AbilityKind.MELTA,
         target_keywords=target_keywords,
+        name_keywords=name_keywords,
     )
     if value is None or not target_within_half_range:
         return 0
@@ -368,12 +395,14 @@ def sustained_hits_generated_hits(
     *,
     critical_hit: bool,
     target_keywords: tuple[str, ...] = (),
+    name_keywords: tuple[str, ...] = (),
     d3_value: int | None = None,
 ) -> int:
     value = weapon_ability_value(
         profile,
         AbilityKind.SUSTAINED_HITS,
         target_keywords=target_keywords,
+        name_keywords=name_keywords,
     )
     if value is None or not critical_hit:
         return 1
@@ -449,19 +478,22 @@ def _matching_ability_descriptors(
     ability_kind: AbilityKind,
     *,
     target_keywords: tuple[str, ...],
+    name_keywords: tuple[str, ...] = (),
 ) -> tuple[AbilityDescriptor, ...]:
     if ability_kind is AbilityKind.ANTI_KEYWORD:
-        target_keyword_set = _target_keyword_set(target_keywords)
+        _target_keyword_set(target_keywords)
         return tuple(
             descriptor
             for descriptor in _ability_descriptors(profile, ability_kind)
             if _target_keyword_gate_matches_descriptor(
                 descriptor,
                 target_keywords=target_keywords,
+                name_keywords=name_keywords,
             )
             and _anti_keyword_descriptor_matches(
                 descriptor=descriptor,
-                target_keyword_set=target_keyword_set,
+                target_keywords=target_keywords,
+                name_keywords=name_keywords,
             )
         )
     return tuple(
@@ -470,6 +502,7 @@ def _matching_ability_descriptors(
         if _target_keyword_gate_matches_descriptor(
             descriptor,
             target_keywords=target_keywords,
+            name_keywords=name_keywords,
         )
     )
 
@@ -505,12 +538,20 @@ def _optional_ability_parameter_by_name_from_descriptor(
 def _anti_keyword_descriptor_matches(
     *,
     descriptor: AbilityDescriptor,
-    target_keyword_set: frozenset[str],
+    target_keywords: tuple[str, ...],
+    name_keywords: tuple[str, ...] = (),
 ) -> bool:
     if descriptor.ability_kind is not AbilityKind.ANTI_KEYWORD:
         raise GameLifecycleError("Anti keyword matching requires an Anti descriptor.")
-    keywords = _anti_keyword_descriptor_keywords(descriptor)
-    has_matching_keyword = bool(set(keywords) & target_keyword_set)
+    has_matching_keyword = any(
+        keyword_inventory_contains(
+            keywords=target_keywords,
+            keyword=keyword,
+            name_keywords=name_keywords,
+            normalizer=_canonical_keyword,
+        )
+        for keyword in _anti_keyword_descriptor_keywords(descriptor)
+    )
     match_mode = _anti_keyword_descriptor_match_mode(descriptor)
     if match_mode is AntiKeywordMatchMode.HAS_KEYWORD:
         return has_matching_keyword
@@ -528,12 +569,20 @@ def _anti_keyword_descriptor_keywords(descriptor: AbilityDescriptor) -> tuple[st
         raise GameLifecycleError("Anti ability keyword parameter must be a string.")
     keywords: list[str] = []
     seen: set[str] = set()
-    for part in keyword.split("/"):
-        canonical = _canonical_keyword(part)
+    parts = (
+        (keyword,)
+        if keyword.strip().upper() in descriptor.native_keyword_selectors
+        else keyword.split("/")
+    )
+    for part in parts:
+        native = part.strip().upper()
+        canonical = (
+            native if native in descriptor.native_keyword_selectors else _canonical_keyword(part)
+        )
         if canonical in seen:
             raise GameLifecycleError("Anti ability keyword parameter must not duplicate keywords.")
         seen.add(canonical)
-        keywords.append(canonical)
+        keywords.append(part.strip().upper())
     return tuple(keywords)
 
 
@@ -551,6 +600,7 @@ def _target_keyword_gate_matches_descriptor(
     descriptor: AbilityDescriptor,
     *,
     target_keywords: tuple[str, ...],
+    name_keywords: tuple[str, ...] = (),
 ) -> bool:
     if type(descriptor) is not AbilityDescriptor:
         raise GameLifecycleError("Weapon ability target gate requires an ability descriptor.")
@@ -561,7 +611,15 @@ def _target_keyword_gate_matches_descriptor(
     )
     if not validated_gate_keywords:
         return True
-    has_matching_keyword = bool(set(validated_gate_keywords) & _target_keyword_set(target_keywords))
+    has_matching_keyword = any(
+        keyword_inventory_contains(
+            keywords=target_keywords,
+            keyword=keyword,
+            name_keywords=name_keywords,
+            normalizer=_canonical_keyword,
+        )
+        for keyword in gate_keywords
+    )
     match_mode = _target_keyword_match_mode_from_descriptor(descriptor)
     if match_mode is TargetKeywordMatchMode.HAS_KEYWORD:
         return has_matching_keyword

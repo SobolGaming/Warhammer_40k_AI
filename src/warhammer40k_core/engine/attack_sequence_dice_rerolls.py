@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.core.keyword_membership import keyword_inventory_contains
+
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.engine.intrinsic_attack_rerolls import intrinsic_wound_reroll_contexts
 from warhammer40k_core.engine.attack_modifier_evaluation import (
@@ -900,6 +902,9 @@ def _validate_current_source_backed_attack_reroll_context_if_required(
                     state=state,
                     unit_instance_id=attack_sequence.attacking_unit_instance_id,
                 ).keywords,
+                attacker_name_keywords=rules_unit_view_by_id(
+                    state=state, unit_instance_id=attack_sequence.attacking_unit_instance_id
+                ).datasheet_name_keywords,
             )
         elif roll_type.startswith("attack_sequence.save."):
             candidate_permission = _source_backed_save_permission_for_attack(
@@ -1051,6 +1056,9 @@ def build_source_backed_wound_reroll_request(
             roll_state=roll_state,
             target_unit_instance_id=pool.target_unit_instance_id,
             attacker_keywords=attacker_keywords,
+            attacker_name_keywords=rules_unit_view_by_id(
+                state=state, unit_instance_id=attacking_unit_instance_id
+            ).datasheet_name_keywords,
         )
         if candidate_permission is not None:
             applicable_contexts.append(replace(candidate, permission=candidate_permission))
@@ -1094,6 +1102,7 @@ def _source_backed_wound_permission_for_attack(
     roll_state: DiceRollState,
     target_unit_instance_id: str,
     attacker_keywords: tuple[str, ...],
+    attacker_name_keywords: tuple[str, ...] = (),
 ) -> RerollPermission | None:
     source_payload = permission_context.source_payload
     conditional = source_payload.get("conditional_wound_reroll")
@@ -1106,6 +1115,7 @@ def _source_backed_wound_permission_for_attack(
         conditional=conditional,
         target_unit_instance_id=target_unit_instance_id,
         attacker_keywords=attacker_keywords,
+        attacker_name_keywords=attacker_name_keywords,
     ):
         return replace(
             permission_context.permission,
@@ -1132,6 +1142,7 @@ def _conditional_wound_full_reroll_applies(
     conditional: dict[str, JsonValue],
     target_unit_instance_id: str,
     attacker_keywords: tuple[str, ...],
+    attacker_name_keywords: tuple[str, ...] = (),
 ) -> bool:
     battle_shock_reroll = conditional.get("full_reroll_if_target_battle_shocked")
     if battle_shock_reroll is not None and type(battle_shock_reroll) is not bool:
@@ -1147,8 +1158,12 @@ def _conditional_wound_full_reroll_applies(
     if required_keyword is not None:
         if type(required_keyword) is not str:
             raise GameLifecycleError("Conditional wound reroll required keyword must be a string.")
-        canonical_required = _canonical_keyword(required_keyword)
-        if canonical_required not in {_canonical_keyword(keyword) for keyword in attacker_keywords}:
+        if not keyword_inventory_contains(
+            keywords=attacker_keywords,
+            keyword=required_keyword,
+            name_keywords=attacker_name_keywords,
+            normalizer=_canonical_keyword,
+        ):
             return False
     return _target_unit_within_any_objective_marker_range(
         state=state,

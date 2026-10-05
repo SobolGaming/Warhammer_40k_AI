@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.core.keyword_membership import keyword_inventory_contains
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -364,21 +365,20 @@ def companion_keywords_match(
     if not isinstance(mapping, dict):
         raise GameLifecycleError("Companion keyword mapping must be an object.")
     required_keywords: set[str] = set()
-    target_keywords = unit_keyword_set(target_unit)
     for raw_target_keyword, raw_companion_keywords in mapping.items():
         if type(raw_target_keyword) is not str:
             raise GameLifecycleError("Companion keyword map keys must be strings.")
-        if _canonical_keyword(raw_target_keyword) not in target_keywords:
+        if not unit_has_keyword(target_unit, raw_target_keyword):
             continue
         if not isinstance(raw_companion_keywords, list):
             raise GameLifecycleError("Companion keyword map values must be lists.")
         for raw_companion_keyword in raw_companion_keywords:
             if type(raw_companion_keyword) is not str:
                 raise GameLifecycleError("Companion keyword map values must contain strings.")
-            required_keywords.add(_canonical_keyword(raw_companion_keyword))
+            required_keywords.add(raw_companion_keyword)
     if not required_keywords:
         return False
-    return bool(required_keywords & unit_keyword_set(companion_unit))
+    return any(unit_has_keyword(companion_unit, keyword) for keyword in required_keywords)
 
 
 def unit_arrived_from_reserves_this_turn(*, state: GameState, unit_instance_id: str) -> bool:
@@ -417,7 +417,17 @@ def unit_owner_player_id(*, state: GameState, unit_instance_id: str) -> str:
 
 
 def unit_has_keyword(unit: RulesUnitView, keyword: str) -> bool:
-    return _canonical_keyword(keyword) in unit_keyword_set(unit)
+    if type(unit) is not RulesUnitView:
+        raise GameLifecycleError(
+            "Generic stratagem keyword lookup requires a current RulesUnitView."
+        )
+    return keyword_inventory_contains(
+        ordinary_keywords=unit.faction_keywords,
+        keywords=(*unit.keywords, *unit.faction_keywords),
+        keyword=keyword,
+        name_keywords=unit.datasheet_name_keywords,
+        normalizer=_canonical_keyword,
+    )
 
 
 def unit_keyword_set(unit: RulesUnitView) -> set[str]:

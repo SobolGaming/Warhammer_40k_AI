@@ -26,6 +26,10 @@ from warhammer40k_core.core.count_profiles import (
 from warhammer40k_core.core.count_profiles import (
     DamageProfilePayload as DamageProfilePayload,
 )
+from warhammer40k_core.core.keyword_selectors import (
+    native_keyword_selectors,
+    native_selectors_from_payload,
+)
 from warhammer40k_core.core.modifiers import Modifier, ModifierPayload
 from warhammer40k_core.core.random_profile_values import (
     ProfileCharacteristicValue,
@@ -125,6 +129,7 @@ class AbilityParameterPayload(TypedDict):
 
 
 class AbilityDescriptorPayload(TypedDict):
+    native_keyword_selectors: NotRequired[list[str]]
     ability_id: str
     name: str
     ability_kind: str
@@ -181,6 +186,7 @@ class AbilityDescriptor:
     ability_kind: AbilityKind
     parameters: tuple[AbilityParameter, ...] = ()
     target_keywords: tuple[str, ...] = ()
+    native_keyword_selectors: tuple[str, ...] = ()
     timing: AbilityTiming | None = None
     condition: AbilityCondition | None = None
 
@@ -197,9 +203,43 @@ class AbilityDescriptor:
             object.__setattr__(self, "ability_kind", ability_kind)
 
         raw_parameters = _canonical_ability_parameters(self.parameters)
+        if type(self.target_keywords) is not tuple:
+            raise WeaponProfileError("AbilityDescriptor target_keywords must be a tuple.")
+        native = native_keyword_selectors(
+            self.native_keyword_selectors,
+            allowed=(
+                *(
+                    _validate_identifier("AbilityDescriptor target keyword", value).upper()
+                    for value in self.target_keywords
+                ),
+                *(
+                    parameter.value.strip().upper()
+                    for parameter in raw_parameters
+                    if self.ability_kind is AbilityKind.ANTI_KEYWORD
+                    and parameter.name == "keyword"
+                    and type(parameter.value) is str
+                ),
+                *(
+                    part.strip().upper()
+                    for value in self.target_keywords
+                    for part in _target_keyword_condition_group(value)[1].split("/")
+                ),
+                *(
+                    part.strip().upper()
+                    for parameter in raw_parameters
+                    if self.ability_kind is AbilityKind.ANTI_KEYWORD
+                    and parameter.name == "keyword"
+                    and type(parameter.value) is str
+                    for part in parameter.value.split("/")
+                ),
+            ),
+            error_type=WeaponProfileError,
+        )
+        object.__setattr__(self, "native_keyword_selectors", native)
         target_keywords, target_keyword_match_mode = _canonical_target_keyword_gate(
             self.target_keywords,
             explicit_match_mode=_optional_target_keyword_match_mode(raw_parameters),
+            native_keyword_selectors=native,
         )
         if target_keywords != self.target_keywords:
             object.__setattr__(self, "target_keywords", target_keywords)
@@ -225,6 +265,7 @@ class AbilityDescriptor:
             target_keywords=target_keywords,
             timing=timing,
             condition=condition,
+            native_keyword_selectors=native,
         )
 
     @classmethod
@@ -234,11 +275,13 @@ class AbilityDescriptor:
         *,
         target_keywords: tuple[str, ...] = (),
         target_keyword_match_mode: TargetKeywordMatchMode | None = None,
+        native_keyword_selectors: tuple[str, ...] = (),
     ) -> Self:
         resolved_value = _validate_sustained_hits_value(value)
         canonical_target_keywords, resolved_match_mode = _canonical_target_keyword_gate(
             target_keywords,
             explicit_match_mode=target_keyword_match_mode,
+            native_keyword_selectors=native_keyword_selectors,
         )
         id_suffix = _target_keyword_ability_id_suffix(
             canonical_target_keywords,
@@ -256,6 +299,7 @@ class AbilityDescriptor:
             ),
             target_keywords=canonical_target_keywords,
             timing=AbilityTiming.ATTACK_SEQUENCE,
+            native_keyword_selectors=native_keyword_selectors,
         )
 
     @classmethod
@@ -264,10 +308,12 @@ class AbilityDescriptor:
         *,
         target_keywords: tuple[str, ...] = (),
         target_keyword_match_mode: TargetKeywordMatchMode | None = None,
+        native_keyword_selectors: tuple[str, ...] = (),
     ) -> Self:
         canonical_target_keywords, resolved_match_mode = _canonical_target_keyword_gate(
             target_keywords,
             explicit_match_mode=target_keyword_match_mode,
+            native_keyword_selectors=native_keyword_selectors,
         )
         id_suffix = _target_keyword_ability_id_suffix(
             canonical_target_keywords,
@@ -285,6 +331,7 @@ class AbilityDescriptor:
             ),
             target_keywords=canonical_target_keywords,
             timing=AbilityTiming.ATTACK_SEQUENCE,
+            native_keyword_selectors=native_keyword_selectors,
         )
 
     @classmethod
@@ -293,10 +340,12 @@ class AbilityDescriptor:
         *,
         target_keywords: tuple[str, ...],
         target_keyword_match_mode: TargetKeywordMatchMode | None = None,
+        native_keyword_selectors: tuple[str, ...] = (),
     ) -> Self:
         canonical_target_keywords, resolved_match_mode = _canonical_target_keyword_gate(
             target_keywords,
             explicit_match_mode=target_keyword_match_mode,
+            native_keyword_selectors=native_keyword_selectors,
         )
         id_suffix = _target_keyword_ability_id_suffix(
             canonical_target_keywords,
@@ -314,6 +363,7 @@ class AbilityDescriptor:
             ),
             target_keywords=canonical_target_keywords,
             timing=AbilityTiming.TARGET_DECLARATION,
+            native_keyword_selectors=native_keyword_selectors,
         )
 
     @classmethod
@@ -323,9 +373,12 @@ class AbilityDescriptor:
         *,
         target_keywords: tuple[str, ...] = (),
         target_keyword_match_mode: TargetKeywordMatchMode | None = None,
+        native_keyword_selectors: tuple[str, ...] = (),
     ) -> Self:
         canonical_keywords, match_mode = _canonical_target_keyword_gate(
-            target_keywords, explicit_match_mode=target_keyword_match_mode
+            target_keywords,
+            explicit_match_mode=target_keyword_match_mode,
+            native_keyword_selectors=native_keyword_selectors,
         )
         id_suffix = _target_keyword_ability_id_suffix(canonical_keywords, match_mode)
         return cls(
@@ -339,6 +392,7 @@ class AbilityDescriptor:
             ),
             target_keywords=canonical_keywords,
             timing=AbilityTiming.ATTACK_SEQUENCE,
+            native_keyword_selectors=native_keyword_selectors,
         )
 
     @classmethod
@@ -348,10 +402,12 @@ class AbilityDescriptor:
         *,
         target_keywords: tuple[str, ...] = (),
         target_keyword_match_mode: TargetKeywordMatchMode | None = None,
+        native_keyword_selectors: tuple[str, ...] = (),
     ) -> Self:
         canonical_target_keywords, resolved_match_mode = _canonical_target_keyword_gate(
             target_keywords,
             explicit_match_mode=target_keyword_match_mode,
+            native_keyword_selectors=native_keyword_selectors,
         )
         id_suffix = _target_keyword_ability_id_suffix(
             canonical_target_keywords,
@@ -369,6 +425,7 @@ class AbilityDescriptor:
             ),
             target_keywords=canonical_target_keywords,
             timing=AbilityTiming.ATTACK_SEQUENCE,
+            native_keyword_selectors=native_keyword_selectors,
         )
 
     @classmethod
@@ -378,10 +435,12 @@ class AbilityDescriptor:
         *,
         target_keywords: tuple[str, ...] = (),
         target_keyword_match_mode: TargetKeywordMatchMode | None = None,
+        native_keyword_selectors: tuple[str, ...] = (),
     ) -> Self:
         canonical_target_keywords, resolved_match_mode = _canonical_target_keyword_gate(
             target_keywords,
             explicit_match_mode=target_keyword_match_mode,
+            native_keyword_selectors=native_keyword_selectors,
         )
         id_suffix = _target_keyword_ability_id_suffix(
             canonical_target_keywords,
@@ -399,6 +458,7 @@ class AbilityDescriptor:
             ),
             target_keywords=canonical_target_keywords,
             timing=AbilityTiming.ATTACK_SEQUENCE,
+            native_keyword_selectors=native_keyword_selectors,
         )
 
     @classmethod
@@ -408,10 +468,12 @@ class AbilityDescriptor:
         *,
         target_keywords: tuple[str, ...] = (),
         target_keyword_match_mode: TargetKeywordMatchMode | None = None,
+        native_keyword_selectors: tuple[str, ...] = (),
     ) -> Self:
         canonical_target_keywords, resolved_match_mode = _canonical_target_keyword_gate(
             target_keywords,
             explicit_match_mode=target_keyword_match_mode,
+            native_keyword_selectors=native_keyword_selectors,
         )
         id_suffix = _target_keyword_ability_id_suffix(
             canonical_target_keywords,
@@ -429,6 +491,7 @@ class AbilityDescriptor:
             ),
             target_keywords=canonical_target_keywords,
             timing=AbilityTiming.ATTACK_SEQUENCE,
+            native_keyword_selectors=native_keyword_selectors,
         )
 
     @classmethod
@@ -438,8 +501,11 @@ class AbilityDescriptor:
         threshold: int,
         *,
         match_mode: AntiKeywordMatchMode = AntiKeywordMatchMode.HAS_KEYWORD,
+        native_keyword_selectors: tuple[str, ...] = (),
     ) -> Self:
-        canonical_keywords = _canonical_rule_keyword_group(keyword)
+        canonical_keywords = _canonical_rule_keyword_group(
+            keyword, native_keyword_selectors=native_keyword_selectors
+        )
         resolved_match_mode = anti_keyword_match_mode_from_token(match_mode)
         _validate_d6_critical_threshold("Anti keyword threshold", threshold)
         ability_id_prefix = (
@@ -468,6 +534,7 @@ class AbilityDescriptor:
             ability_kind=AbilityKind.ANTI_KEYWORD,
             parameters=tuple(parameters),
             timing=AbilityTiming.ATTACK_SEQUENCE,
+            native_keyword_selectors=native_keyword_selectors,
         )
 
     @classmethod
@@ -477,11 +544,13 @@ class AbilityDescriptor:
         *,
         target_keywords: tuple[str, ...] = (),
         target_keyword_match_mode: TargetKeywordMatchMode | None = None,
+        native_keyword_selectors: tuple[str, ...] = (),
     ) -> Self:
         resolved_effect = devastating_wounds_effect_from_token(effect)
         canonical_target_keywords, resolved_match_mode = _canonical_target_keyword_gate(
             target_keywords,
             explicit_match_mode=target_keyword_match_mode,
+            native_keyword_selectors=native_keyword_selectors,
         )
         id_suffix = _target_keyword_ability_id_suffix(
             canonical_target_keywords,
@@ -499,6 +568,7 @@ class AbilityDescriptor:
             ),
             target_keywords=canonical_target_keywords,
             timing=AbilityTiming.ATTACK_SEQUENCE,
+            native_keyword_selectors=native_keyword_selectors,
         )
 
     @classmethod
@@ -512,7 +582,7 @@ class AbilityDescriptor:
         )
 
     def to_payload(self) -> AbilityDescriptorPayload:
-        return {
+        payload: AbilityDescriptorPayload = {
             "ability_id": self.ability_id,
             "name": self.name,
             "ability_kind": self.ability_kind.value,
@@ -521,6 +591,9 @@ class AbilityDescriptor:
             "timing": None if self.timing is None else self.timing.value,
             "condition": None if self.condition is None else self.condition.value,
         }
+        if self.native_keyword_selectors:
+            payload["native_keyword_selectors"] = list(self.native_keyword_selectors)
+        return payload
 
     @classmethod
     def from_payload(cls, payload: AbilityDescriptorPayload) -> Self:
@@ -532,6 +605,9 @@ class AbilityDescriptor:
                 AbilityParameter.from_payload(parameter) for parameter in payload["parameters"]
             ),
             target_keywords=tuple(payload["target_keywords"]),
+            native_keyword_selectors=native_selectors_from_payload(
+                payload.get("native_keyword_selectors", []), error_type=WeaponProfileError
+            ),
             timing=ability_timing_from_token(payload["timing"]),
             condition=ability_condition_from_token(payload["condition"]),
         )
@@ -987,6 +1063,7 @@ def _canonical_target_keyword_gate(
     values: tuple[str, ...],
     *,
     explicit_match_mode: TargetKeywordMatchMode | None,
+    native_keyword_selectors: tuple[str, ...] = (),
 ) -> tuple[tuple[str, ...], TargetKeywordMatchMode]:
     if type(values) is not tuple:
         raise WeaponProfileError("AbilityDescriptor target_keywords must be a tuple.")
@@ -996,20 +1073,32 @@ def _canonical_target_keyword_gate(
     for value in values:
         if type(value) is not str:
             raise WeaponProfileError("AbilityDescriptor target keyword must be a string.")
-        match_mode, keyword_group = _target_keyword_condition_group(value)
+        match_mode, keyword_group = _target_keyword_condition_group(
+            value, native_keyword_selectors=native_keyword_selectors
+        )
         if inferred_match_mode is None:
             inferred_match_mode = match_mode
         elif inferred_match_mode is not match_mode:
             raise WeaponProfileError(
                 "AbilityDescriptor target keyword gate must not mix positive and non- conditions."
             )
-        for part in keyword_group.split("/"):
+        parts = (
+            (keyword_group,)
+            if keyword_group.upper() in native_keyword_selectors
+            else keyword_group.split("/")
+        )
+        for part in parts:
             keyword = _canonical_rule_keyword(part)
-            if keyword in seen:
+            key = (
+                keyword
+                if keyword in native_keyword_selectors
+                else keyword.replace(" ", "_").replace("-", "_")
+            )
+            if key in seen:
                 raise WeaponProfileError(
                     "AbilityDescriptor target_keywords must not contain duplicates."
                 )
-            seen.add(keyword)
+            seen.add(key)
             keywords.append(keyword)
     resolved_match_mode = _resolve_target_keyword_match_mode(
         explicit_match_mode=explicit_match_mode,
@@ -1020,8 +1109,12 @@ def _canonical_target_keyword_gate(
     return tuple(keywords), resolved_match_mode
 
 
-def _target_keyword_condition_group(value: str) -> tuple[TargetKeywordMatchMode, str]:
+def _target_keyword_condition_group(
+    value: str, *, native_keyword_selectors: tuple[str, ...] = ()
+) -> tuple[TargetKeywordMatchMode, str]:
     stripped = _validate_identifier("AbilityDescriptor target keyword", value)
+    if stripped.upper() in native_keyword_selectors:
+        return TargetKeywordMatchMode.HAS_KEYWORD, stripped
     for prefix in ("non-", "non_", "non "):
         if stripped.casefold().startswith(prefix):
             keyword_group = stripped[len(prefix) :].strip()
@@ -1128,6 +1221,7 @@ def _validate_supported_ability_shape(
     target_keywords: tuple[str, ...],
     timing: AbilityTiming | None,
     condition: AbilityCondition | None,
+    native_keyword_selectors: tuple[str, ...] = (),
 ) -> None:
     if ability_kind in {
         AbilityKind.BLAST,
@@ -1181,7 +1275,11 @@ def _validate_supported_ability_shape(
         return
 
     if ability_kind is AbilityKind.ANTI_KEYWORD:
-        _validate_anti_keyword_parameters(parameters, target_keywords=target_keywords)
+        _validate_anti_keyword_parameters(
+            parameters,
+            target_keywords=target_keywords,
+            native_keyword_selectors=native_keyword_selectors,
+        )
         if timing is not AbilityTiming.ATTACK_SEQUENCE:
             raise WeaponProfileError("Anti keyword ability must use attack timing.")
         if condition is not None:
@@ -1275,6 +1373,7 @@ def _validate_anti_keyword_parameters(
     parameters: tuple[AbilityParameter, ...],
     *,
     target_keywords: tuple[str, ...],
+    native_keyword_selectors: tuple[str, ...] = (),
 ) -> None:
     by_name = {parameter.name: parameter for parameter in parameters}
     allowed_names = {"keyword", "threshold", "match_mode", TARGET_KEYWORD_MATCH_MODE_PARAMETER}
@@ -1286,7 +1385,14 @@ def _validate_anti_keyword_parameters(
     keyword = by_name["keyword"].value
     if type(keyword) is not str:
         raise WeaponProfileError("anti_keyword keyword parameter must be a string.")
-    if "/".join(_canonical_rule_keyword_group(keyword)) != keyword:
+    if (
+        "/".join(
+            _canonical_rule_keyword_group(
+                keyword, native_keyword_selectors=native_keyword_selectors
+            )
+        )
+        != keyword
+    ):
         raise WeaponProfileError("anti_keyword keyword parameter must be canonical.")
     if "match_mode" in by_name:
         anti_keyword_match_mode_from_token(by_name["match_mode"].value)
@@ -1315,19 +1421,29 @@ def _canonical_rule_keyword(keyword: object) -> str:
     stripped = keyword.strip()
     if not stripped:
         raise WeaponProfileError("Rule keyword must not be empty.")
-    return stripped.upper().replace(" ", "_").replace("-", "_")
+    return stripped.upper()
 
 
-def _canonical_rule_keyword_group(keyword: object) -> tuple[str, ...]:
+def _canonical_rule_keyword_group(
+    keyword: object, *, native_keyword_selectors: tuple[str, ...] = ()
+) -> tuple[str, ...]:
     if type(keyword) is not str:
         raise WeaponProfileError("Rule keyword must be a string.")
     keywords: list[str] = []
     seen: set[str] = set()
-    for part in keyword.split("/"):
+    parts = (
+        (keyword,) if keyword.strip().upper() in native_keyword_selectors else keyword.split("/")
+    )
+    for part in parts:
         canonical = _canonical_rule_keyword(part)
-        if canonical in seen:
+        key = (
+            canonical
+            if canonical in native_keyword_selectors
+            else canonical.replace(" ", "_").replace("-", "_")
+        )
+        if key in seen:
             raise WeaponProfileError("Rule keyword group must not contain duplicates.")
-        seen.add(canonical)
+        seen.add(key)
         keywords.append(canonical)
     return tuple(keywords)
 

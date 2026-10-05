@@ -7,6 +7,7 @@ from types import MappingProxyType
 from typing import cast
 
 from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
+from warhammer40k_core.core.keyword_membership import keyword_inventory_contains
 from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
     AbilityCatalogRecord,
@@ -473,16 +474,17 @@ def _component_is_canonical_anchor(
     component_unit_instance_id: str,
     keyword: str,
 ) -> bool:
-    required_keyword = canonical_keyword(keyword)
     matching_component_ids = tuple(
         sorted(
             component.unit.unit_instance_id
             for component in view.living_components
-            if required_keyword
-            in {
-                canonical_keyword(value)
-                for value in (*component.unit.keywords, *component.unit.faction_keywords)
-            }
+            if keyword_inventory_contains(
+                keywords=(*component.unit.keywords, *component.unit.faction_keywords),
+                keyword=keyword,
+                name_keywords=component.unit.datasheet_name_keywords,
+                ordinary_keywords=component.unit.faction_keywords,
+                normalizer=canonical_keyword,
+            )
         )
     )
     return bool(matching_component_ids) and component_unit_instance_id == matching_component_ids[0]

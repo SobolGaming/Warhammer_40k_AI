@@ -619,6 +619,10 @@ def apply_warlord_keyword_if_selected(
                     keyword_assignment=replace(
                         model.keyword_assignment,
                         keywords=tuple(sorted({*model.keywords, "WARLORD"})),
+                        name_is_ordinary_keyword=(
+                            model.keyword_assignment.name_is_ordinary_keyword
+                            or model.keyword_assignment.name_keyword == "WARLORD"
+                        ),
                         source_ids=tuple(
                             sorted(
                                 {

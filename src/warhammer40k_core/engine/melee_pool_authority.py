@@ -46,6 +46,7 @@ def commitment_inventory(rows: tuple[JsonValue, ...], state: GameState) -> tuple
                     "canonical_unit_instance_id": target.unit_instance_id,
                     "alive_model_ids": [model.model_instance_id for model in target.alive_models()],
                     "keywords": list(target.keywords),
+                    "name_keywords": list(target.datasheet_name_keywords),
                 }
         enriched.append({**row, "melee_target_facts": facts})
     return tuple(enriched)
@@ -109,6 +110,7 @@ def validate_committed_pools(
                     single_target=True,
                     target_model_count=len(models),
                     target_keywords=tuple(cast(list[str], keywords)),
+                    name_keywords=tuple(cast(list[str], target["name_keywords"])),
                 )
                 if len(declaration.target_allocations) == 1
                 else allocation.attacks

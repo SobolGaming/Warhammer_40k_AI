@@ -201,6 +201,9 @@ def _save_options_for_allocation(
                 state=state,
                 unit_instance_id=attack_context["target_unit_instance_id"],
             ).keywords,
+            name_keywords=rules_unit_view_by_id(
+                state=state, unit_instance_id=attack_context["target_unit_instance_id"]
+            ).datasheet_name_keywords,
         )
         is DevastatingWoundsResolution.NO_SAVES
     )

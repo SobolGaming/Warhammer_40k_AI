@@ -761,7 +761,12 @@ def _record_keyword_gate_matches_player(
     if record.source_kind is AbilitySourceKind.WEAPON:
         return record.definition.keyword_gate.matches(tuple(selected_weapon_keywords))
     return any(
-        record.definition.keyword_gate.matches((*unit.keywords, *unit.faction_keywords))
+        record.definition.keyword_gate.matches(
+            (*unit.keywords, *unit.faction_keywords),
+            name_keywords=tuple(
+                name for name in unit.datasheet_name_keywords if name not in unit.faction_keywords
+            ),
+        )
         for unit in army.units
     )
 

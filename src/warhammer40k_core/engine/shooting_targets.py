@@ -757,7 +757,11 @@ def _target_candidate(
     hunter_rule_ids: tuple[str, ...] = ()
     if WeaponKeyword.HUNTER in weapon_profile.keywords:
         hunter_rule_ids = (HUNTER_RULE_ID,)
-        if not hunter_target_allowed(weapon_profile, target_keywords=target_rules_unit.keywords):
+        if not hunter_target_allowed(
+            weapon_profile,
+            target_keywords=target_rules_unit.keywords,
+            name_keywords=target_rules_unit.datasheet_name_keywords,
+        ):
             return _invalid_candidate(
                 attacker_unit=attacker_unit,
                 weapon_profile=weapon_profile,

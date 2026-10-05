@@ -179,6 +179,9 @@ def _roll_hit(
             pool.weapon_profile,
             AbilityKind.SUSTAINED_HITS,
             target_keywords=target_keywords,
+            name_keywords=rules_unit_view_by_id(
+                state=state, unit_instance_id=pool.target_unit_instance_id
+            ).datasheet_name_keywords,
         )
         == SUSTAINED_HITS_D3_VALUE
     ):
@@ -195,6 +198,9 @@ def _roll_hit(
         pool.weapon_profile,
         critical_hit=critical,
         target_keywords=target_keywords,
+        name_keywords=rules_unit_view_by_id(
+            state=state, unit_instance_id=pool.target_unit_instance_id
+        ).datasheet_name_keywords,
         d3_value=sustained_hits_d3_value,
     )
     return HitRoll(
@@ -279,6 +285,9 @@ def _critical_wound_threshold(
     threshold = anti_keyword_critical_threshold(
         profile=pool.weapon_profile,
         target_keywords=target_keywords,
+        name_keywords=rules_unit_view_by_id(
+            state=state, unit_instance_id=pool.target_unit_instance_id
+        ).datasheet_name_keywords,
     )
     return generic_rule_critical_wound_threshold(
         WoundRollCriticalThresholdContext(
@@ -690,6 +699,7 @@ def _melta_damage_modifier(
     pool: RangedAttackPool,
     *,
     target_keywords: tuple[str, ...],
+    name_keywords: tuple[str, ...] = (),
 ) -> int:
     if not any(rule_id.startswith(MELTA_RULE_ID) for rule_id in pool.targeting_rule_ids):
         return 0
@@ -697,6 +707,7 @@ def _melta_damage_modifier(
         pool.weapon_profile,
         target_within_half_range=True,
         target_keywords=target_keywords,
+        name_keywords=name_keywords,
     )
 
 
@@ -705,7 +716,10 @@ def _devastating_wounds_resolution_for_attack(
     pool: RangedAttackPool,
     attack_context: AttackResolutionContextPayload,
     target_keywords: tuple[str, ...],
+    name_keywords: tuple[str, ...] = (),
 ) -> DevastatingWoundsResolution | None:
     if not bool(attack_context["wound_roll"]["critical"]):
         return None
-    return devastating_wounds_resolution(pool.weapon_profile, target_keywords=target_keywords)
+    return devastating_wounds_resolution(
+        pool.weapon_profile, target_keywords=target_keywords, name_keywords=name_keywords
+    )

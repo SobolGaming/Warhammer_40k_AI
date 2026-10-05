@@ -746,6 +746,9 @@ def _resolve_grouped_damage_from(
                     state=state,
                     unit_instance_id=pool.target_unit_instance_id,
                 ).keywords,
+                name_keywords=rules_unit_view_by_id(
+                    state=state, unit_instance_id=pool.target_unit_instance_id
+                ).datasheet_name_keywords,
             ),
         )
         if status is not None:

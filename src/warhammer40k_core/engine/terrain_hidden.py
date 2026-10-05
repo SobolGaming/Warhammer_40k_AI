@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.core.keyword_membership import keyword_inventory_contains
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -34,7 +35,7 @@ def terrain_hidden_model_ids(
     if not policy.hidden_supported:
         return ()
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
-    required_keywords = {_canonical_keyword(keyword) for keyword in policy.hidden_requires_keywords}
+    required_keywords = policy.hidden_requires_keywords
     if policy.hidden_lost_after_shooting and (
         state.unit_made_ranged_attacks_current_or_previous_turn(
             unit_instance_id=rules_unit.unit_instance_id
@@ -70,9 +71,16 @@ def terrain_hidden_model_ids(
             for model in models
             if (
                 not required_keywords
-                or required_keywords.intersection(
-                    _canonical_keyword(keyword)
-                    for keyword in rules_unit.model_by_id(model.model_id).keywords
+                or any(
+                    keyword_inventory_contains(
+                        keywords=rules_unit.model_by_id(model.model_id).keywords,
+                        keyword=keyword,
+                        name_keywords=rules_unit.model_by_id(
+                            model.model_id
+                        ).datasheet_name_keywords,
+                        normalizer=_canonical_keyword,
+                    )
+                    for keyword in required_keywords
                 )
             )
             and any(model_intersects_terrain_area(model, area) for area in eligible_areas)

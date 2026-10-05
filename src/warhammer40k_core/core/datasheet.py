@@ -1214,6 +1214,10 @@ class DatasheetDefinition:
                 return model_profile
         raise DatasheetCatalogError("DatasheetDefinition model_profile_id was not found.")
 
+    @property
+    def name_has_ordinary_role(self) -> bool:
+        return self.name_keyword in self.keywords.keywords
+
     def to_payload(self) -> DatasheetDefinitionPayload:
         payload: DatasheetDefinitionPayload = {
             "datasheet_id": self.datasheet_id,

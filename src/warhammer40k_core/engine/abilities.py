@@ -4,8 +4,13 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from enum import StrEnum
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Self, TypedDict, cast
+from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
+from warhammer40k_core.core.keyword_membership import keyword_inventory_contains
+from warhammer40k_core.core.keyword_selectors import (
+    native_keyword_selectors,
+    native_selectors_from_payload,
+)
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     RulesetDescriptorError,
@@ -57,6 +62,7 @@ class AbilityResolutionStatus(StrEnum):
 
 
 class KeywordGatePayload(TypedDict):
+    native_keyword_selectors: NotRequired[list[str]]
     required_keywords: list[str]
     forbidden_keywords: list[str]
 
@@ -105,6 +111,7 @@ class AbilityExecutionContextPayload(TypedDict):
     source_model_instance_id: str | None
     target_unit_instance_id: str | None
     source_keywords: list[str]
+    source_name_keywords: NotRequired[list[str]]
     trigger_payload: JsonValue
 
 
@@ -122,17 +129,38 @@ class AbilityResolutionResultPayload(TypedDict):
 class KeywordGate:
     required_keywords: tuple[str, ...] = ()
     forbidden_keywords: tuple[str, ...] = ()
+    native_keyword_selectors: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
-        required_keywords = _validate_keyword_tuple(
-            "KeywordGate required_keywords",
-            self.required_keywords,
+        if type(self.required_keywords) is not tuple:
+            raise GameLifecycleError("KeywordGate required_keywords must be a tuple.")
+        if type(self.forbidden_keywords) is not tuple:
+            raise GameLifecycleError("KeywordGate forbidden_keywords must be a tuple.")
+        native = native_keyword_selectors(
+            self.native_keyword_selectors,
+            allowed=(
+                _validate_identifier("keyword", value).upper()
+                for value in (*self.required_keywords, *self.forbidden_keywords)
+            ),
+            error_type=GameLifecycleError,
         )
-        forbidden_keywords = _validate_keyword_tuple(
-            "KeywordGate forbidden_keywords",
-            self.forbidden_keywords,
+        required_keywords = _validate_keyword_inventory(
+            "KeywordGate required_keywords", self.required_keywords, native
         )
-        overlap = set(required_keywords) & set(forbidden_keywords)
+        forbidden_keywords = _validate_keyword_inventory(
+            "KeywordGate forbidden_keywords", self.forbidden_keywords, native
+        )
+        object.__setattr__(self, "native_keyword_selectors", native)
+
+        def validation_key(value: str) -> tuple[bool, str]:
+            return (
+                value in native,
+                value if value in native else _validate_keyword("keyword", value),
+            )
+
+        overlap = {validation_key(value) for value in required_keywords} & {
+            validation_key(value) for value in forbidden_keywords
+        }
         if overlap:
             raise GameLifecycleError("KeywordGate keywords cannot be both required and forbidden.")
         object.__setattr__(self, "required_keywords", required_keywords)
@@ -142,23 +170,40 @@ class KeywordGate:
     def is_empty(self) -> bool:
         return not self.required_keywords and not self.forbidden_keywords
 
-    def matches(self, keywords: tuple[str, ...]) -> bool:
-        keyword_set = set(_validate_keyword_tuple("KeywordGate source keywords", keywords))
-        return set(self.required_keywords).issubset(keyword_set) and not (
-            set(self.forbidden_keywords) & keyword_set
+    def matches(self, keywords: tuple[str, ...], *, name_keywords: tuple[str, ...] = ()) -> bool:
+        inventory = _validate_keyword_inventory(
+            "KeywordGate source keywords", keywords, name_keywords
+        )
+
+        def contains(keyword: str) -> bool:
+            return keyword_inventory_contains(
+                keywords=inventory,
+                keyword=keyword,
+                name_keywords=name_keywords,
+                normalizer=lambda value: _validate_keyword("keyword", value),
+            )
+
+        return all(contains(keyword) for keyword in self.required_keywords) and not any(
+            contains(keyword) for keyword in self.forbidden_keywords
         )
 
     def to_payload(self) -> KeywordGatePayload:
-        return {
+        payload: KeywordGatePayload = {
             "required_keywords": list(self.required_keywords),
             "forbidden_keywords": list(self.forbidden_keywords),
         }
+        if self.native_keyword_selectors:
+            payload["native_keyword_selectors"] = list(self.native_keyword_selectors)
+        return payload
 
     @classmethod
     def from_payload(cls, payload: KeywordGatePayload) -> Self:
         return cls(
             required_keywords=tuple(payload["required_keywords"]),
             forbidden_keywords=tuple(payload["forbidden_keywords"]),
+            native_keyword_selectors=native_selectors_from_payload(
+                payload.get("native_keyword_selectors", []), error_type=GameLifecycleError
+            ),
         )
 
 
@@ -452,6 +497,7 @@ class AbilityExecutionContext:
     source_model_instance_id: str | None = None
     target_unit_instance_id: str | None = None
     source_keywords: tuple[str, ...] = ()
+    source_name_keywords: tuple[str, ...] = ()
     trigger_payload: JsonValue = None
     state: GameState | None = None
     event_log: EventLog | None = None
@@ -528,11 +574,25 @@ class AbilityExecutionContext:
         object.__setattr__(
             self,
             "source_keywords",
-            _validate_keyword_tuple(
+            _validate_keyword_inventory(
                 "AbilityExecutionContext source_keywords",
                 self.source_keywords,
+                self.source_name_keywords,
             ),
         )
+        object.__setattr__(
+            self,
+            "source_name_keywords",
+            _validate_keyword_inventory(
+                "AbilityExecutionContext source_name_keywords",
+                self.source_name_keywords,
+                self.source_name_keywords,
+            ),
+        )
+        if not set(self.source_name_keywords).issubset(self.source_keywords):
+            raise GameLifecycleError(
+                "AbilityExecutionContext name identity must be in its inventory."
+            )
         object.__setattr__(self, "trigger_payload", validate_json_value(self.trigger_payload))
         if self.state is not None:
             from warhammer40k_core.engine.game_state import GameState
@@ -543,7 +603,9 @@ class AbilityExecutionContext:
             raise GameLifecycleError("AbilityExecutionContext event_log must be an EventLog.")
 
     @classmethod
-    def passive_keyword_gate(cls, *, source_keywords: tuple[str, ...]) -> Self:
+    def passive_keyword_gate(
+        cls, *, source_keywords: tuple[str, ...], source_name_keywords: tuple[str, ...] = ()
+    ) -> Self:
         return cls(
             game_id="ability-keyword-gate",
             player_id="engine",
@@ -552,10 +614,11 @@ class AbilityExecutionContext:
             active_player_id=None,
             trigger_kind=TimingTriggerKind.ANY_PHASE,
             source_keywords=source_keywords,
+            source_name_keywords=source_name_keywords,
         )
 
     def to_payload(self) -> AbilityExecutionContextPayload:
-        return {
+        payload: AbilityExecutionContextPayload = {
             "game_id": self.game_id,
             "player_id": self.player_id,
             "battle_round": self.battle_round,
@@ -569,6 +632,9 @@ class AbilityExecutionContext:
             "source_keywords": list(self.source_keywords),
             "trigger_payload": self.trigger_payload,
         }
+        if self.source_name_keywords:
+            payload["source_name_keywords"] = list(self.source_name_keywords)
+        return payload
 
     @classmethod
     def from_payload(cls, payload: AbilityExecutionContextPayload) -> Self:
@@ -585,6 +651,9 @@ class AbilityExecutionContext:
             source_model_instance_id=payload["source_model_instance_id"],
             target_unit_instance_id=payload["target_unit_instance_id"],
             source_keywords=tuple(payload["source_keywords"]),
+            source_name_keywords=native_selectors_from_payload(
+                payload.get("source_name_keywords", []), error_type=GameLifecycleError
+            ),
             trigger_payload=payload["trigger_payload"],
         )
 
@@ -783,7 +852,9 @@ class AbilityHandlerRegistry:
             return AbilityResolutionResult.unsupported(record, reason="ability_disabled")
         if not record.definition.timing.matches(context):
             return AbilityResolutionResult.invalid(record, reason="timing_window_mismatch")
-        if not record.definition.keyword_gate.matches(context.source_keywords):
+        if not record.definition.keyword_gate.matches(
+            context.source_keywords, name_keywords=context.source_name_keywords
+        ):
             return AbilityResolutionResult.invalid(record, reason="keyword_gate_closed")
         if record.definition.handler_id.startswith("unsupported:"):
             return AbilityResolutionResult.unsupported(record, reason="unsupported_handler")
@@ -939,6 +1010,7 @@ def movement_capability_flags_from_index(
     *,
     index: AbilityCatalogIndex,
     keywords: tuple[str, ...],
+    name_keywords: tuple[str, ...] = (),
     registry: AbilityHandlerRegistry | None = None,
 ) -> tuple[str, ...]:
     if type(index) is not AbilityCatalogIndex:
@@ -946,7 +1018,9 @@ def movement_capability_flags_from_index(
     resolved_registry = default_ability_handler_registry() if registry is None else registry
     if type(resolved_registry) is not AbilityHandlerRegistry:
         raise GameLifecycleError("Movement capability lookup requires an AbilityHandlerRegistry.")
-    context = AbilityExecutionContext.passive_keyword_gate(source_keywords=keywords)
+    context = AbilityExecutionContext.passive_keyword_gate(
+        source_keywords=keywords, source_name_keywords=name_keywords
+    )
     flags: list[str] = []
     seen: set[str] = set()
     for record in ability_records_for_context_from_index(index=index, context=context):
@@ -1133,7 +1207,9 @@ def _ability_records_for_context(
         for record in records
         if not record.disabled
         and record.definition.timing.matches(context)
-        and record.definition.keyword_gate.matches(context.source_keywords)
+        and record.definition.keyword_gate.matches(
+            context.source_keywords, name_keywords=context.source_name_keywords
+        )
     )
 
 
@@ -1261,7 +1337,7 @@ def _validate_keyword_tuple(field_name: str, values: object) -> tuple[str, ...]:
         if keyword in seen:
             raise GameLifecycleError(f"{field_name} must not contain duplicate keywords.")
         seen.add(keyword)
-        keywords.append(keyword)
+        keywords.append(_validate_identifier(f"{field_name} keyword", value).upper())
     return tuple(sorted(keywords))
 
 
@@ -1298,3 +1374,21 @@ def _validate_bool(field_name: str, value: object) -> bool:
     if type(value) is not bool:
         raise GameLifecycleError(f"{field_name} must be a bool.")
     return value
+
+
+def _validate_keyword_inventory(
+    field_name: str, values: object, name_keywords: tuple[str, ...]
+) -> tuple[str, ...]:
+    if type(values) is not tuple or type(name_keywords) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    names = {_validate_identifier("name keyword", value).upper() for value in name_keywords}
+    seen: set[tuple[bool, str]] = set()
+    result: list[str] = []
+    for value in cast(tuple[object, ...], values):
+        native = _validate_identifier(f"{field_name} keyword", value).upper()
+        key = (native in names, native if native in names else _validate_keyword("keyword", value))
+        if key in seen:
+            raise GameLifecycleError(f"{field_name} must not contain duplicate keywords.")
+        seen.add(key)
+        result.append(native)
+    return tuple(sorted(result))

@@ -1023,6 +1023,7 @@ def _apply_phase13d_weapon_modifiers(
         weapon_profile,
         target_within_half_range=target_within_half_range,
         target_keywords=target_rules_unit.keywords,
+        name_keywords=target_rules_unit.datasheet_name_keywords,
     )
     if rapid_bonus > 0:
         attacks += rapid_bonus
@@ -1032,6 +1033,7 @@ def _apply_phase13d_weapon_modifiers(
         weapon_profile,
         target_model_count=len(target_rules_unit.alive_models()),
         target_keywords=target_rules_unit.keywords,
+        name_keywords=target_rules_unit.datasheet_name_keywords,
     )
     if blast_bonus > 0:
         attacks += blast_bonus
@@ -1041,6 +1043,7 @@ def _apply_phase13d_weapon_modifiers(
         weapon_profile,
         target_within_half_range=target_within_half_range,
         target_keywords=target_rules_unit.keywords,
+        name_keywords=target_rules_unit.datasheet_name_keywords,
     )
     if melta_bonus > 0:
         targeting_rule_ids.append(melta_rule_id(melta_bonus))

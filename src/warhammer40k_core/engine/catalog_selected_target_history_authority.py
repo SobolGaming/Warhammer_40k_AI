@@ -564,6 +564,7 @@ def _validate_phase_start_target(
             required
             and not unit_has_required_keywords(
                 unit_keywords=target.keywords,
+                name_keywords=target.datasheet_name_keywords,
                 faction_keywords=target.faction_keywords,
                 required_keywords=required,
             )
@@ -787,6 +788,7 @@ def _eligible_hit_target_ids(
             continue
         if required_keywords and not unit_has_required_keywords(
             unit_keywords=target.keywords,
+            name_keywords=target.datasheet_name_keywords,
             faction_keywords=target.faction_keywords,
             required_keywords=required_keywords,
         ):
@@ -1117,6 +1119,7 @@ def _historical_effect_target_ids(
             not required
             or unit_has_required_keywords(
                 unit_keywords=unit.keywords,
+                name_keywords=unit.datasheet_name_keywords,
                 faction_keywords=unit.faction_keywords,
                 required_keywords=required,
             )

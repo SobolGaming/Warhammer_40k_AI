@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.unit_keyword_queries import unit_has_keyword
+
 from warhammer40k_core.geometry.physical_model import base_crosses_physical_model_footprint
 
 from typing import TYPE_CHECKING
@@ -494,7 +496,8 @@ def _friendly_model_ids_with_keyword_any(
 ) -> tuple[str, ...]:
     requested_player_id = _validate_identifier("player_id", player_id)
     moving_model_id = _validate_identifier("moving_model_instance_id", moving_model_instance_id)
-    requested_keywords = _canonical_keyword_set(keyword_any)
+    _canonical_keyword_set(keyword_any)
+    requested_keywords = keyword_any
     if not requested_keywords:
         return ()
     model_ids: list[str] = []
@@ -503,7 +506,7 @@ def _friendly_model_ids_with_keyword_any(
             continue
         for unit_placement in placed_army.unit_placements:
             unit = scenario.unit_instance_for_placement(unit_placement)
-            if not _unit_has_keyword_any(unit.keywords, requested_keywords):
+            if not any(unit_has_keyword(unit, keyword) for keyword in requested_keywords):
                 continue
             model_ids.extend(
                 placement.model_instance_id
@@ -520,7 +523,8 @@ def _enemy_model_ids_with_keyword_any_for_player(
     keyword_any: tuple[str, ...],
 ) -> tuple[str, ...]:
     requested_player_id = _validate_identifier("player_id", player_id)
-    requested_keywords = _canonical_keyword_set(keyword_any)
+    _canonical_keyword_set(keyword_any)
+    requested_keywords = keyword_any
     if not requested_keywords:
         return ()
     model_ids: list[str] = []
@@ -529,7 +533,7 @@ def _enemy_model_ids_with_keyword_any_for_player(
             continue
         for unit_placement in placed_army.unit_placements:
             unit = scenario.unit_instance_for_placement(unit_placement)
-            if not _unit_has_keyword_any(unit.keywords, requested_keywords):
+            if not any(unit_has_keyword(unit, keyword) for keyword in requested_keywords):
                 continue
             model_ids.extend(
                 placement.model_instance_id for placement in unit_placement.model_placements

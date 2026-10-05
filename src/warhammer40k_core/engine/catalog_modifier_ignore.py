@@ -427,6 +427,11 @@ def _catalog_subject_permissions(
                             trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
                             source_unit_instance_id=source_unit.unit_instance_id,
                             source_model_instance_id=source_id,
+                            source_name_keywords=(
+                                source_unit.own_model_by_id(source_id).datasheet_name_keywords
+                                if model_scope
+                                else view.datasheet_name_keywords
+                            ),
                             source_keywords=(
                                 source_unit.own_model_by_id(source_id).keywords
                                 if model_scope

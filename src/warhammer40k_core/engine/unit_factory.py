@@ -34,6 +34,7 @@ from warhammer40k_core.core.datasheet import (
     WargearOptionConditionKind,
     WargearOptionEffectKind,
 )
+from warhammer40k_core.core.keyword_membership import exclusive_name_keywords
 from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
 from warhammer40k_core.core.model_keywords import (
     ModelKeywordAssignment,
@@ -244,6 +245,10 @@ class ModelInstance:
     def faction_keywords(self) -> tuple[str, ...]:
         return self.keyword_assignment.faction_keywords
 
+    @property
+    def datasheet_name_keywords(self) -> tuple[str, ...]:
+        return exclusive_name_keywords((self.keyword_assignment,))
+
     def stable_identity(self) -> str:
         return f"model:{self.model_instance_id}"
 
@@ -435,6 +440,12 @@ class UnitInstance:
             if model.model_instance_id == requested:
                 return model
         raise UnitFactoryError("Model does not belong to this physical unit.")
+
+    @property
+    def datasheet_name_keywords(self) -> tuple[str, ...]:
+        return exclusive_name_keywords(
+            model.keyword_assignment for model in self.alive_own_models()
+        )
 
     def alive_own_models(self) -> tuple[ModelInstance, ...]:
         return tuple(model for model in self.own_models if model.is_alive)

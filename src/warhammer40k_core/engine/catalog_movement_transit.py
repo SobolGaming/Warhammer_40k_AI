@@ -446,7 +446,7 @@ def _validate_keyword_tokens(field_name: str, values: object) -> tuple[str, ...]
         if token in seen:
             raise GameLifecycleError(f"Catalog rule {field_name} must not duplicate keywords.")
         seen.add(token)
-        validated.append(token)
+        validated.append(value.strip().upper())
     return tuple(validated)
 
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from typing import NotRequired, Self, TypedDict
 
 from warhammer40k_core.core.datasheet import DatasheetDefinition
@@ -14,6 +14,8 @@ class ModelKeywordError(ValueError):
 
 
 class ModelKeywordAssignmentPayload(TypedDict):
+    name_keyword: NotRequired[str]
+    name_is_ordinary_keyword: NotRequired[bool]
     datasheet_id: str
     model_profile_id: str
     keywords: list[str]
@@ -30,6 +32,8 @@ class ModelKeywordAssignment:
     faction_keywords: tuple[str, ...]
     source_ids: tuple[str, ...]
     materialization_descriptor_id: str | None = None
+    name_keyword: str | None = field(default=None, compare=False)
+    name_is_ordinary_keyword: bool = field(default=False, compare=False)
 
     def __post_init__(self) -> None:
         if self.materialization_descriptor_id is not None:
@@ -55,6 +59,15 @@ class ModelKeywordAssignment:
             if name == "source_ids" and not tokens:
                 raise ModelKeywordError("Model keyword assignment requires source_ids.")
             object.__setattr__(self, name, tuple(sorted(tokens)))
+        if type(self.name_is_ordinary_keyword) is not bool:
+            raise ModelKeywordError("Model keyword name role must be a boolean.")
+        if self.name_keyword is None and self.name_is_ordinary_keyword:
+            raise ModelKeywordError("Model keyword ordinary name role requires name identity.")
+        if self.name_keyword is not None:
+            native = canonical_keyword_token(_identifier("name_keyword", self.name_keyword))
+            if native not in self.keywords:
+                raise ModelKeywordError("Model keyword name identity must occur in its inventory.")
+            object.__setattr__(self, "name_keyword", native)
 
     def to_payload(self) -> ModelKeywordAssignmentPayload:
         payload: ModelKeywordAssignmentPayload = {
@@ -66,11 +79,18 @@ class ModelKeywordAssignment:
         }
         if self.materialization_descriptor_id is not None:
             payload["materialization_descriptor_id"] = self.materialization_descriptor_id
+        if self.name_keyword is not None:
+            payload["name_keyword"] = self.name_keyword
+            payload["name_is_ordinary_keyword"] = self.name_is_ordinary_keyword
         return payload
 
     @classmethod
     def from_payload(cls, payload: ModelKeywordAssignmentPayload) -> Self:
-        if set(payload) - {"materialization_descriptor_id"} != {
+        if set(payload) - {
+            "materialization_descriptor_id",
+            "name_keyword",
+            "name_is_ordinary_keyword",
+        } != {
             "datasheet_id",
             "model_profile_id",
             "keywords",
@@ -78,6 +98,10 @@ class ModelKeywordAssignment:
             "source_ids",
         }:
             raise ModelKeywordError("Model keyword assignment payload fields are invalid.")
+        if ("name_keyword" in payload) != ("name_is_ordinary_keyword" in payload):
+            raise ModelKeywordError("Model keyword name metadata fields must occur together.")
+        if "name_keyword" in payload and type(payload["name_keyword"]) is not str:
+            raise ModelKeywordError("Model keyword name identity must be a string.")
         for values in (payload["keywords"], payload["faction_keywords"], payload["source_ids"]):
             if type(values) is not list or any(type(value) is not str for value in values):
                 raise ModelKeywordError("Model keyword payload inventories must be string lists.")
@@ -87,6 +111,8 @@ class ModelKeywordAssignment:
             keywords=tuple(payload["keywords"]),
             faction_keywords=tuple(payload["faction_keywords"]),
             source_ids=tuple(payload["source_ids"]),
+            name_keyword=payload.get("name_keyword"),
+            name_is_ordinary_keyword=payload.get("name_is_ordinary_keyword", False),
             materialization_descriptor_id=(
                 _identifier(
                     "materialization_descriptor_id", payload["materialization_descriptor_id"]
@@ -117,6 +143,8 @@ def validate_model_keyword_assignments(
             p.model_profile_id for p in sheet.model_profiles
         }:
             raise ModelKeywordError("Catalog model keyword assignment has unknown lineage.")
+        if row.name_keyword is not None and row.name_keyword != sheet.name_keyword:
+            raise ModelKeywordError("Catalog model keyword assignment name identity differs.")
     for sheet_id in {row.datasheet_id for row in assignments}:
         sheet = by_sheet[sheet_id]
         rows = tuple(row for row in assignments if row.datasheet_id == sheet_id)
@@ -177,6 +205,8 @@ def model_keyword_assignment(
         keywords=datasheet.effective_keywords,
         faction_keywords=datasheet.keywords.faction_keywords,
         source_ids=tuple(sorted({*datasheet.source_ids, *profile.source_ids})),
+        name_keyword=datasheet.name_keyword,
+        name_is_ordinary_keyword=datasheet.name_keyword in datasheet.keywords.keywords,
     )
 
 
@@ -187,6 +217,8 @@ def _with_datasheet_identity(
     return replace(
         assignment,
         keywords=tuple(sorted({*assignment.keywords, datasheet.name_keyword})),
+        name_keyword=datasheet.name_keyword,
+        name_is_ordinary_keyword=datasheet.name_keyword in assignment.keywords,
     )
 
 

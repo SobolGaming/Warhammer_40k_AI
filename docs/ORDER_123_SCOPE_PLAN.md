@@ -25,6 +25,21 @@ Existing assignment datasheet lineage, factory-selected catalog identity and
 unit datasheet source IDs authenticate the derived token; restore uses the same
 factory comparison. Model labels and player-facing unit aliases create no keyword.
 
+Runtime assignments persist the factory-selected `name_keyword` and its independent
+ordinary-keyword role. Raw catalog assignments omit this metadata. Raw provenance
+equality remains unchanged; the existing muster authority compares runtime roles
+separately, and materialization authenticates exact factory payloads. Generic gates
+receive name context from the same living/retained model population as their keyword
+inventory. Required, any, excluded, ability, transport and weapon/ANTI consumers match
+native names exactly and preserve their existing conventional keyword aliases.
+Grants, faction contributions and retained formation source evidence preserve genuine
+ordinary roles even when a token also names a datasheet. Native selector declarations
+resolve eager duplicate/overlap and selector-grammar ambiguity only; declared full
+native tokens retain punctuation such as a leading `Non-` or embedded `/`, while
+undeclared conventional selectors retain the existing grammar. Declarations cannot
+create runtime eligibility.
+These typed optional fields round-trip in the existing payload envelopes.
+
 Living/retained model queries and attached/split rules-unit unions consume the
 effective assignments. The name therefore survives a specialist casualty while
 that specialist's scoped keywords disappear. It does not transfer a Leader's

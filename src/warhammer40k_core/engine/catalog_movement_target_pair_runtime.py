@@ -58,7 +58,6 @@ from warhammer40k_core.engine.rule_execution import (
     rule_ir_from_execution_payload,
 )
 from warhammer40k_core.engine.rule_target_resolution import (
-    canonical_keyword,
     unit_has_required_keywords,
 )
 from warhammer40k_core.engine.rules_unit_geometry import (
@@ -530,15 +529,18 @@ class CatalogMovementTargetPairRuntime:
                 continue
             if not unit_has_required_keywords(
                 unit_keywords=view.keywords,
+                name_keywords=view.datasheet_name_keywords,
                 faction_keywords=view.faction_keywords,
                 required_keywords=source.descriptor.required_keyword_sequence,
             ):
                 continue
-            keywords = {
-                canonical_keyword(keyword) for keyword in (*view.keywords, *view.faction_keywords)
-            }
             if any(
-                canonical_keyword(keyword) in keywords
+                unit_has_required_keywords(
+                    unit_keywords=view.keywords,
+                    faction_keywords=view.faction_keywords,
+                    name_keywords=view.datasheet_name_keywords,
+                    required_keywords=(keyword,),
+                )
                 for keyword in source.descriptor.excluded_keywords
             ):
                 continue
