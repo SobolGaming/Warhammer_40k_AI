@@ -1,8 +1,8 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "447d5c34a4fba4ce1605cb494de7badb5304af3e",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b864327b1dc7e1e765298dc494640d635ed25d78e2fe20e2f81e2eb28c244bca",
-  "operation_map_sha256": "123e2e87232b378231e7f7691b7a6c290ec859b4f43fc4cec0c34d45dfefe5dc",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d5daea012745c1e3b6b9d93a9a8903ec58c943b64bf78164783262f31beea607",
+  "operation_map_sha256": "56c1a50428dd4fd079e7e693c1b6900976ca25de3888c0ebb47b44d6a357f942",
   "changes": {
     "ci/test_shards/durations.json": {
       "before_sha256": "f9c75d2a9a8c1820f6a7f8ebf99d823095df820be2d728b236f5b517868723e7",
@@ -146,81 +146,81 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "a47c8b19a562029374707f9dad5f93e92aad6e9e1aa44f138bfbbe0bb4cbcf3a",
-      "after_sha256": "557daf4c9bec8b519a0e825bad39c093109064b7fe4e98b39ebbaa70674377e5",
+      "after_sha256": "d613702d05a63c4e6c7699b2405b862c15a3c8a33209a15c497d9735ff36e31e",
       "owners": {
         "@document": {
           "before": "a47c8b19a562029374707f9dad5f93e92aad6e9e1aa44f138bfbbe0bb4cbcf3a",
-          "after": "557daf4c9bec8b519a0e825bad39c093109064b7fe4e98b39ebbaa70674377e5"
+          "after": "d613702d05a63c4e6c7699b2405b862c15a3c8a33209a15c497d9735ff36e31e"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "b43624a5179a19506192deb7a94a60b1ba651db521490fab0771027b4ba4645a",
-      "after_sha256": "8863e22a3fd68f3eaf14f920aecacecc36c034a4ddbdb1bf333958329bc5b707",
+      "after_sha256": "d1a5cf7c49c0b5aff92cba601548700158ae388f935b956fa0df67bf3c7da2c7",
       "owners": {
         "@document": {
           "before": "b43624a5179a19506192deb7a94a60b1ba651db521490fab0771027b4ba4645a",
-          "after": "8863e22a3fd68f3eaf14f920aecacecc36c034a4ddbdb1bf333958329bc5b707"
+          "after": "d1a5cf7c49c0b5aff92cba601548700158ae388f935b956fa0df67bf3c7da2c7"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "00f65baab496e8fdafd3c1ad5f18a10fb8c06d397d103ce749111348313ab7ec",
-      "after_sha256": "1da7e581fd625664ebccb4aba67e73c0695604066bd1bd26e47e551c1d036a85",
+      "after_sha256": "30809e73a98317838931e36b2620dcc73d208d18db2e4e1ec4892b7bcaa1b64c",
       "owners": {
         "@document": {
           "before": "00f65baab496e8fdafd3c1ad5f18a10fb8c06d397d103ce749111348313ab7ec",
-          "after": "1da7e581fd625664ebccb4aba67e73c0695604066bd1bd26e47e551c1d036a85"
+          "after": "30809e73a98317838931e36b2620dcc73d208d18db2e4e1ec4892b7bcaa1b64c"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "6fb5dc0a4c4d8336bd150ec35fcb3ee9f231651ad8d5a3288c1c5899c0f88e8d",
-      "after_sha256": "9ef75f3292384b08f8d6bc297c137cdc094e2db2b690ec55ddb0321470f5b881",
+      "after_sha256": "07f13511e771f47e6fbad8e9659a7b40d18adc81d5f3613a1bd337d7de03af09",
       "owners": {
         "@document": {
           "before": "6fb5dc0a4c4d8336bd150ec35fcb3ee9f231651ad8d5a3288c1c5899c0f88e8d",
-          "after": "9ef75f3292384b08f8d6bc297c137cdc094e2db2b690ec55ddb0321470f5b881"
+          "after": "07f13511e771f47e6fbad8e9659a7b40d18adc81d5f3613a1bd337d7de03af09"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "82da73da406fd54339bbe66bd3f00b84579928c223b263bd9a7aaabeee3feb1c",
-      "after_sha256": "d8e60bc645fe4d15ca46f9a2c8594537ea1eadba48955a336fe99e846cb9b6bd",
+      "after_sha256": "435087bf9e186e1921e8e57fe7cd83df9b2b9c0fa95ec618093adbe35ae7f1a6",
       "owners": {
         "@document": {
           "before": "82da73da406fd54339bbe66bd3f00b84579928c223b263bd9a7aaabeee3feb1c",
-          "after": "d8e60bc645fe4d15ca46f9a2c8594537ea1eadba48955a336fe99e846cb9b6bd"
+          "after": "435087bf9e186e1921e8e57fe7cd83df9b2b9c0fa95ec618093adbe35ae7f1a6"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "52d78a9bfc115f1357d0822a8768f11fa7ec62d78a779fb91d706d229d9c19ac",
-      "after_sha256": "1656d6ed0f87f65c67f87049680004427fa88c839479fdba322453186c5eac3f",
+      "after_sha256": "0ecb7c6f20e7f001eaa0be68f043339f9f65051b0f2bc50c7cb4591598d6ed4f",
       "owners": {
         "@document": {
           "before": "52d78a9bfc115f1357d0822a8768f11fa7ec62d78a779fb91d706d229d9c19ac",
-          "after": "1656d6ed0f87f65c67f87049680004427fa88c839479fdba322453186c5eac3f"
+          "after": "0ecb7c6f20e7f001eaa0be68f043339f9f65051b0f2bc50c7cb4591598d6ed4f"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "372fab842b1d9967f2b07cdbcb8272f615712baece09556dd9cf1f064f243b70",
-      "after_sha256": "cbd5b7c515f6ebe256ab99f0905f5f8a9fa9204ec4de2f6934e2dfc60e30d77c",
+      "after_sha256": "ece6567fbf66126402d6af61424c41a42e6fa88233005bb83ee8664629835fc8",
       "owners": {
         "@document": {
           "before": "372fab842b1d9967f2b07cdbcb8272f615712baece09556dd9cf1f064f243b70",
-          "after": "cbd5b7c515f6ebe256ab99f0905f5f8a9fa9204ec4de2f6934e2dfc60e30d77c"
+          "after": "ece6567fbf66126402d6af61424c41a42e6fa88233005bb83ee8664629835fc8"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "e988e77b250bde4f581b65559417cc13604165eb6e7f75dbb6a54dae74df2be8",
-      "after_sha256": "281df3c17e9effabee6ce8e18774043b84670a371709135e2ba1489672cbd033",
+      "after_sha256": "5507640a763dec30309967da659d0ea38aeea5f013a3b4db26d1c6c0762aeb14",
       "owners": {
         "@document": {
           "before": "e988e77b250bde4f581b65559417cc13604165eb6e7f75dbb6a54dae74df2be8",
-          "after": "281df3c17e9effabee6ce8e18774043b84670a371709135e2ba1489672cbd033"
+          "after": "5507640a763dec30309967da659d0ea38aeea5f013a3b4db26d1c6c0762aeb14"
         }
       }
     },
@@ -246,11 +246,11 @@
     },
     "data/source_audits/order128/source.audit.json": {
       "before_sha256": null,
-      "after_sha256": "95e64341cbfe2ce80bf78a83606106b8dc6e21b253d8413a00b9664c259a9f2a",
+      "after_sha256": "5dd1f6650e0a19590559536eb65191ad971de955fe853329d30b9d501e423e2d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "95e64341cbfe2ce80bf78a83606106b8dc6e21b253d8413a00b9664c259a9f2a"
+          "after": "5dd1f6650e0a19590559536eb65191ad971de955fe853329d30b9d501e423e2d"
         }
       }
     },
@@ -266,51 +266,51 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "c5c5efd889f809da87153057a527964d375011a0c931ee42e34a8811e47fe65d",
-      "after_sha256": "3d0fed7aa24c6261c05f2aa24dbc0dd1634f1f572fca85a6fc0b4e6e3d3a16b6",
+      "after_sha256": "ac9bceec3575370411b528cbbab8c38ffe4c7c186161ad2d76e11fc97782d818",
       "owners": {
         "@document": {
           "before": "c5c5efd889f809da87153057a527964d375011a0c931ee42e34a8811e47fe65d",
-          "after": "3d0fed7aa24c6261c05f2aa24dbc0dd1634f1f572fca85a6fc0b4e6e3d3a16b6"
+          "after": "ac9bceec3575370411b528cbbab8c38ffe4c7c186161ad2d76e11fc97782d818"
         }
       }
     },
     "docs/ORDER_128_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "da319fe70bc209e89ff4ffd425a580b88b7c0d5a5d22d7f4dba95f588c03510b",
+      "after_sha256": "09439b9444342d4e3058c7a893d6d2692789f803977006c1cfa5f2357694bfb9",
       "owners": {
         "@document": {
           "before": null,
-          "after": "da319fe70bc209e89ff4ffd425a580b88b7c0d5a5d22d7f4dba95f588c03510b"
+          "after": "09439b9444342d4e3058c7a893d6d2692789f803977006c1cfa5f2357694bfb9"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "6a90731336ec4af6a4e696b5a02d8ee8f98c1dd4efc4430a4b345664c231f683",
-      "after_sha256": "7d8710a24098b0c13011009679509e1f10a8946ad71ad5c6ad335c48b0a43286",
+      "after_sha256": "ad420af5d6bf40410682d416d80748cb2701db1b885038b7292456b367415180",
       "owners": {
         "@document": {
           "before": "6a90731336ec4af6a4e696b5a02d8ee8f98c1dd4efc4430a4b345664c231f683",
-          "after": "7d8710a24098b0c13011009679509e1f10a8946ad71ad5c6ad335c48b0a43286"
+          "after": "ad420af5d6bf40410682d416d80748cb2701db1b885038b7292456b367415180"
         }
       }
     },
     "docs/performance/policy-v3/order128-rule-semantics.json": {
       "before_sha256": null,
-      "after_sha256": "cada08d1feac096128f03720e1e47c9d7cc61d9bab36b11352ca636e2a459cd1",
+      "after_sha256": "f5038460302958373a6a0047e872539a2c23835caa437425d243c13023eb76bb",
       "owners": {
         "@document": {
           "before": null,
-          "after": "cada08d1feac096128f03720e1e47c9d7cc61d9bab36b11352ca636e2a459cd1"
+          "after": "f5038460302958373a6a0047e872539a2c23835caa437425d243c13023eb76bb"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "f35493e8b34b63a245605f0682c67b1f67a85029fab538fc3850aa2110c1bf5c",
-      "after_sha256": "173246f2eb317484c5598e2f860ee8aea014e0f9409aca06615efbaaefa6c1f2",
+      "after_sha256": "66aee9f5ffeaeb3cc792edc18260dfbdcd71659d5ce6dbe0a122ca24b5357ba4",
       "owners": {
         "@document": {
           "before": "f35493e8b34b63a245605f0682c67b1f67a85029fab538fc3850aa2110c1bf5c",
-          "after": "173246f2eb317484c5598e2f860ee8aea014e0f9409aca06615efbaaefa6c1f2"
+          "after": "66aee9f5ffeaeb3cc792edc18260dfbdcd71659d5ce6dbe0a122ca24b5357ba4"
         }
       }
     },
@@ -319,8 +319,8 @@
       "after_sha256": "2f8c99f6e9a182099f7fe5fd24e0a21084e9b2353fbb7345038a85543445ede6",
       "owners": {
         "@module": {
-          "before": "ee51895602cab49a580c051f71da1236d49a5da89a302027af6d821a78e99a1a",
-          "after": "bf9dd5ae5174451dd84c568814856aaf1e1f81d6818aca3a7a4b7d0cac79ab89"
+          "before": "47435526bb397a41cf5f5ccb4558531b092a218fe47230e63d31b06b0ca77ffa",
+          "after": "88b2a0740009d71a373a84fe99368b70c50e63d6a6a4c43da47e7e2539c6da71"
         }
       }
     },
@@ -329,12 +329,12 @@
       "after_sha256": "e3eb1851835eeef4f0b88bf443cf74fcd47257e7024fb06044777c602145deee",
       "owners": {
         "@module": {
-          "before": "561da0f2fe1c18951a4d57575bed03a3288b215891ea105fb4b487d7aa4248d2",
-          "after": "5f37dc5d1581ec0463ab7fb4d6666cdc3d69d6ea533023029e980164f631748e"
+          "before": "aafb72a1d3de871a8c9cacf99dbc003eaeea5ddbb28f0e7830280afa1dbea13a",
+          "after": "639b15fc198676afd34ba1d64e24532123a531a16b7b728ee9b466dee8b52a48"
         },
         "append_geometry_violations": {
-          "before": "f6c77d54e9f03ae3f397c42e741718275ee2f5a468d58a2f1d5c6b65b87fdc35",
-          "after": "a85780118172562bf9205568169d42ef0169b943a4973469a961830b35026655"
+          "before": "4092af7986030dc82e5ec38f652a33af185daccd29cfa8f843a19966ff2e17f8",
+          "after": "2ca96edb2ed5d5bc61eb8b76b46c681f9a6be7a835a4f5c7f0254b79e8e975ad"
         }
       }
     },
@@ -343,16 +343,16 @@
       "after_sha256": "68ea3dcec2666fdb47a9da250e7373d244ef5cfb7d657c3c2b96320d8aba44df",
       "owners": {
         "@module": {
-          "before": "c17adce49772f103d484c8c4aec4e01f76867ab4518ea8de0ed638416e941822",
-          "after": "89de743078540bf58098682293589c48b34ba1a5aca0325831f1b108b6b1bba7"
+          "before": "c1d81ec95a5ca3224ef87736daac53286c4f9a39664892a9f365a4a4ab29f903",
+          "after": "a498dbcc6e9034d9a9e8bfc8e9dd9ad3162d7f63edba4ccdbf162011a1312d54"
         },
         "battlefield_region": {
           "before": null,
-          "after": "78ad1f814a5636cb231e8ec2995fb0289bd7ac8284fc7e25b4def7a76d75c72f"
+          "after": "2e0883f6f8c0ecc3ff445435d91535fc428039d552eb60769d7c2a91ca430c5c"
         },
         "deployment_body_containment": {
           "before": null,
-          "after": "575e8404fd7134e27a6a54ea1df8d7223040c3bf0bea80547df6dd5eef7f20b9"
+          "after": "c95613fdf44055bf2efc9bf8dcee8f280e898f0276c54fdc85a90ff67489baa8"
         }
       }
     },
@@ -361,8 +361,8 @@
       "after_sha256": "5db1ae79206cdc4f4d92b1523f892fd75d9ae213ef4eda7e6d2c6331e340f2ce",
       "owners": {
         "resolve_reserve_arrival": {
-          "before": "17d7ac3aac0360f8551ffd3d6c4077295a1f6d6c03a26b2274201d04dc5b21a7",
-          "after": "ea586e5d8d4b72d521c9ec4b47d6896f0774ee1257d19135ad27c4f44548ca71"
+          "before": "0884403277221b280dacc0d120ca0dfacd47e530f8c969c77048bb90765811a0",
+          "after": "2167447ca85951fc1d8d340679975aa8758f87ae9d7f28f1713acd266a791004"
         }
       }
     },
@@ -372,33 +372,51 @@
       "owners": {
         "append_reserve_body_violations": {
           "before": null,
-          "after": "02b76d6ad7ed9c6f5b66da2e0920ae881bbdb7cfba924a02e44bcd6b4101596c"
+          "after": "e0960f6ae5857c769a7be7b5d14c3c215402fefbc14e9771ab638d3908127ba4"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/setup_circle_fit.py": {
+      "before_sha256": null,
+      "after_sha256": "b3a0197538860da18e8b172594a2d5c008612dd69962045d35e0c1348f5657d9",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "9f53619fcc8e65c38216eebb16649114ffe8a30ef983a7f9ef9ee869fd63dc5a"
+        },
+        "circle_containment": {
+          "before": null,
+          "after": "0348f1f94a4a86dcad8d0472c40f334d11f4cb88fcefd727a4c1f15a7ff3d39c"
+        },
+        "circle_outside_convex_polygon": {
+          "before": null,
+          "after": "29cbb245128e60b46e290e87e56d1d92b60d8859280ddc125e4df61d357521ee"
         }
       }
     },
     "src/warhammer40k_core/geometry/setup_fit.py": {
       "before_sha256": "27b034eaffc97898a5b9e1275ffc6b8d76623939157f53c18a9532e90676613d",
-      "after_sha256": "640f7c3c47023484bf5e548df8bcf1521415f4583e77b64e1e429c4de5aca0a9",
+      "after_sha256": "1b80654b6a8271823c957b188ea64f4b89a75b6cfb6425397bc5af9b5369e68c",
       "owners": {
         "@module": {
-          "before": "2ec85f1413ec565516c50032da2ff7a0cbddf0028957a6adda6725c84b45218d",
-          "after": "3a8e9e02188003723a90976e2490475fd6454b7a23b9412abd1a1b3f59d7d7ef"
+          "before": "f44914bbc358fb771992a1517652e4bad3f83d153ebac7147ce74ec10088b4a1",
+          "after": "ddc6ba6252ac9d2fee5f1bb4c87da1953206b1f9e51108aec618c6197a667f36"
         },
         "_fit": {
           "before": null,
-          "after": "e92ab511c3bfa3e5c81a99ed7e387c9cd5a54d3414e8da65dee53caec7c1f127"
+          "after": "72c5225367b2e14a8d426e0d0e50ef5ece72d1ca4de4ffed2a8b50d6860bcc09"
         },
         "_shape_containment": {
           "before": null,
-          "after": "d7e90e29d67521f16bedc8d6f23534774064c0ccaee8213a24af7c594f3d80f0"
+          "after": "b0045c3522aa77b90181e529fc598425db17a6af7ce2348f69b2e017dcb3efd9"
         },
         "model_fits_regions": {
           "before": null,
-          "after": "a0cdfc3ef3016618d333af708b44f9a250c1d577eb3438a4be227ac0ab3d8e53"
+          "after": "a94c73f997ab7d175b3b453fd97e915e6c1bd9ac9bf0089864bf641f54e19fa9"
         },
         "model_wholly_within_regions": {
           "before": null,
-          "after": "a108a690be3d680200d95fbf622d1b357a9936f907f337a126cc7c66fbc1b43b"
+          "after": "8b38de4fa08ab6afc657baa62405b69a24e5d12b12b190d5c10a5a262d4c8478"
         }
       }
     },
@@ -408,101 +426,117 @@
       "owners": {
         "@module": {
           "before": null,
-          "after": "17763f3c706f3bdd47b31aedcd5be36a52f67e30f7006e516f6b2fbe664f5f04"
+          "after": "8ecc29b9420d70d63f538fbc8663b2927a7a45a741a8cd9f91a9f9367c4be81a"
         },
         "test_order128_selected_blocks_and_original_source_archives_remain_exact": {
           "before": null,
-          "after": "e5ee4b1ac77f400dab93a40bb6f51ca2fda402a38be6437aeabaabf95bfa0aed"
+          "after": "98b308631f916819bd3ec5d745ad17414de1a399cd814e1b518c28a7c78e81d3"
         }
       }
     },
     "tests/integration/test_order128_setup_overhang.py": {
       "before_sha256": null,
-      "after_sha256": "636a4b8b96ab5df2529ee5b98fa7513bd0421b55c9a19d80bd4a81f310798a99",
+      "after_sha256": "c7db2cdfae537a71b61ef1546bbbb7bc1c6d6465552688f50384b6679ab16442",
       "owners": {
         "@module": {
           "before": null,
-          "after": "6124de619147c263e821e7ceab994cc338d13028e6d876fdeb08fe8badb00ced"
+          "after": "e2bec7ec62373d45cd278017f9c85b5984e1603ebcf09e9f85e4a342d2789e3d"
         },
         "test_body_exception_keeps_base_and_submission_boundaries_atomic": {
           "before": null,
-          "after": "8254a70d30fec8fa1ef63107fcd28cc684e8cc1757cdd24d426a7ac1b24345e7"
+          "after": "efd9f853819bd669a6d97571061001f0401238508c19242d7bdf7bb17902f3bd"
         },
         "test_catalog_deployment_body_fit_atomic_retry_restore_fork_views_events_replay": {
           "before": null,
-          "after": "f33b074a045b18e5a28182f38f470439af283ae17f27d654a5e07dde3f924620"
+          "after": "3110c39dc0d00a328c68b3871a33ba9b5e48f10076aa6cd9d34a661615a48e07"
         },
         "test_catalog_strategic_reserve_whole_body_fit_and_impossible_exception": {
           "before": null,
-          "after": "83c73ee0b76c2ce320f1271a0e9d43b4f33c0b8d96da222c17843b33a1722df1"
+          "after": "ff1e07d8cd4c2d975ea34b40398c47465faea3258ca292cce74141292474e8d8"
+        },
+        "test_cutout_zone_legal_impossible_body_fit_and_avoidable_retry": {
+          "before": null,
+          "after": "733bce75f2205fd56a565f6d159809cc1349b85007eb3ab0a380225a4f8d629d"
         },
         "test_normal_catalog_redeploy_consumes_body_fit_authority": {
           "before": null,
-          "after": "45b500522a989ba63bec5a8bfebaff601421aeedfafda85c3c0af521c1b065f8"
+          "after": "6a3410987a87918c04c774762009a11a93e3f525b56586fd68eec0396139da48"
         }
       }
     },
     "tests/order128_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "dc2cbde749ce357105777b4fc47c681950f4b7a73e64d5bbe87416d3adb54dec",
+      "after_sha256": "35e12fa1083f1d2db71b19ab570b0c91be4faa6e245f2cff948a1f4618896c41",
       "owners": {
         "@module": {
           "before": null,
-          "after": "b2fb1a1993faf5d316cad4c3676864f395d710bbe67846af96dcab6dc4f06603"
+          "after": "5d7e1a3545bc97dd6f2593e095fa9759228297f0c250e3b0f521e3eb296177ef"
         },
         "assert_checkpoint": {
           "before": null,
-          "after": "a764f4e2dfcad4c8c75e34d9d3998d2f4b4afabc18fca527905cf282d2ab7499"
+          "after": "e1a383bfa4d347d7fcb08ac994a86a5f7e68083de3d22ae95cfb158f1a6ee0b7"
         },
         "deployment_session": {
           "before": null,
-          "after": "ab6b49e35fb35e906fd4a9c8de218229e0bb0e2972137e3c2cc39e51f7f26450"
+          "after": "3da7e91a0ca607ce0015ea4e89e39725e886b6ee2cd0c9fee7c1522d338349cd"
         },
         "evidence": {
           "before": null,
-          "after": "ef42a9552e5e39eac987d1ed0db5c4b662e1574ab81bbb518239fc063a43635b"
+          "after": "08bad95a0943dc045702a902c5e58f467d9f932f5996a746e1f5c22082899d6e"
         },
         "redeploy_session": {
           "before": null,
-          "after": "be3ab6177f7d548e6b9d67f502803d6376dbcf364b84ccf44b5394713f105187"
+          "after": "ca3ae65d13013ac1ff248b9068fc4386dfc475fc285838ab8c3cf8630786885b"
         },
         "reserve_session": {
           "before": null,
-          "after": "83bb182ba72197f665415a622801070c59cc98dbdf5b002edaefdd664ad8c473"
+          "after": "db050eb337da484c1c345d0250eba0ddb85a41e28bc307e183d9d1e3c1bb1eef"
         },
         "setup_config": {
           "before": null,
-          "after": "906bdc537c539be56fbecff0c9ed37d0ea3e7ab05f8ad9b2848140cfc4999ea1"
+          "after": "c8ac0f6003004862db119ec9de522d5db4839fa4fa26275c7c10d9580b73600f"
         }
       }
     },
     "tests/unit/test_order128_setup_model_fit.py": {
       "before_sha256": null,
-      "after_sha256": "75045463de5587e8271522d28b6a1c4634677ed95c7d822bd15ed6de30d1e60c",
+      "after_sha256": "40e210b73becd766b11bb8c2c218f2be2c7e638706a32dfbd2ee074f6416bf8f",
       "owners": {
         "@module": {
           "before": null,
-          "after": "6a15e7b6086af039a557d501034fd3506c161e7d046e1fb12250c48fc11b20b1"
+          "after": "d3eb75e0bcd945c9f900aab7cc2907bd68270e32186533617fbfc1d34211649c"
         },
         "test_cardinal_boundary_contact_is_wholly_contained": {
           "before": null,
-          "after": "f748c6c965b9ded171ce582c29e2ecad36903b50853b8767adb40a8e2728637e"
+          "after": "ee6fb22dcccee7b931916f3fa7524212589250d858bb57bae8ce51bb7c492db5"
+        },
+        "test_circular_body_concave_cutout_preserves_decomposition_seams": {
+          "before": null,
+          "after": "97e8f4838d63eb5d41b0d89406246f3004c4a88fa55dfd93e6ea54baadb5cba4"
+        },
+        "test_circular_body_polygon_cutout_edge_corner_and_interior": {
+          "before": null,
+          "after": "ed75d376271c588827d6246f6f47cf682d29995ff9d953b5c491e76db4f2ebb5"
         },
         "test_compound_parts_require_one_common_pose_not_independent_fits": {
           "before": null,
-          "after": "80f593ea4332ad69404d188963a441d282c35b7255e7f0a6192d57bdcc685e65"
+          "after": "757ba842e2bac15e42e327f92d6d351c887333085112f91ebcaf8ef28457abd7"
+        },
+        "test_concentric_cutout_fit_preserves_largest_base_or_body": {
+          "before": null,
+          "after": "211399b89e38228f831737dcbcbaedad848a641def63cfa85468b146e422836a"
         },
         "test_impossible_zone_fit_does_not_excuse_avoidable_battlefield_overhang": {
           "before": null,
-          "after": "5297201e41353ca5b9b027eaf38af7377e5b7d57e148673a3174c3f0223818c0"
+          "after": "290afb99be1d0365e8ec1496942e7e9ee402174fe7e7fbd9327507d438f18922"
         },
         "test_original_avoidable_overhang_probe_rejects_and_ordinary_fit_survives": {
           "before": null,
-          "after": "797d55444a27a1c90625ce48a4b5a42c3abda1baba7c525efc40e41745de707f"
+          "after": "02a03b1ea05c148acf80979fd44f6427697a2dd6e662b87c280ea6f5a1c367c0"
         },
         "test_whole_model_fit_searches_all_rotations_and_preserves_offset": {
           "before": null,
-          "after": "2d60cafbcc0fb36ffb25d0e9b704c900ef96606b167f80b539fd2b0b7cfa0bd7"
+          "after": "84026befb22ce668ac88b017c196b9cc8029a998ad4dafdd1225718be3920db3"
         }
       }
     },
@@ -511,16 +545,16 @@
       "after_sha256": "f098cc41ff54f4f486e0e89e829666e0166c4410c08b643ac298f0af73750e21",
       "owners": {
         "@module": {
-          "before": "4e22880bf4d5e26056ec18a58ff058d90568020ae633bfa566f7b09605fa2653",
-          "after": "9546c1c2aed1f18798e18f178a9a91901d49f918f1e76af74ee8303a38825954"
+          "before": "8df47be7044c807f823afb716ed1ec586d66cb5fdfcd47c507afc00cef2c5f79",
+          "after": "4e788e20a2573c77efb2d23447d51d60eb7eaf9da157dab8db44c5641093e163"
         },
         "_order128_smoke_operations": {
           "before": null,
-          "after": "2f8456f8cff398e6b79f6ddeca10fbbcd9900d710c3eff38e48d1e9f333df5ac"
+          "after": "806eec037c1cd4c31a7b5f4435756cf659374dd1955e5398474c6638e09402ec"
         },
         "validate_assessment": {
-          "before": "70da5930fa3eaae54a0ee85fcb485694cee24634c7f5a360f5079b66a1667d8e",
-          "after": "1e048c5edd75de387b2d90b8adacdc67ac4af55510bcea294a3814f693b9e1bb"
+          "before": "4d296c04cd0434356b9a933584c1157b654cfa19c75f92195f0f64935f10a394",
+          "after": "03c5667fd24eadccd1d38cddfa0358588379161310e9b683cfae76bf43161806"
         }
       }
     }
@@ -532,9 +566,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -542,9 +576,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -552,9 +586,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -562,9 +596,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -572,9 +606,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -582,9 +616,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -592,9 +626,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -602,9 +636,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -612,9 +646,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -622,9 +656,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -632,9 +666,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -642,9 +676,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -652,9 +686,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "conformance/typescript/src/contract.ts": {
       "category": "rule_semantics",
@@ -662,9 +696,9 @@
         "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -672,9 +706,9 @@
         "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -682,9 +716,9 @@
         "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -692,9 +726,9 @@
         "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -702,9 +736,9 @@
         "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -712,9 +746,9 @@
         "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -722,9 +756,9 @@
         "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -732,9 +766,9 @@
         "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -742,9 +776,9 @@
         "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "contracts/migrations/44.3.13-to-44.3.14.md": {
       "category": "rule_semantics",
@@ -752,9 +786,9 @@
         "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "contracts/openapi.yaml": {
       "category": "rule_semantics",
@@ -762,9 +796,9 @@
         "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "data/source_audits/order128/source.audit.json": {
       "category": "rule_semantics",
@@ -772,49 +806,49 @@
         "order128-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "docs/ORDER_128_SCOPE_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "docs/performance/policy-v3/order128-rule-semantics.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -822,9 +856,9 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
@@ -832,9 +866,9 @@
         "order128-whole-model-setup"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "src/warhammer40k_core/engine/deployment_geometry.py": {
       "category": "rule_semantics",
@@ -842,9 +876,9 @@
         "order128-whole-model-setup"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "src/warhammer40k_core/engine/large_model_setup.py": {
       "category": "rule_semantics",
@@ -852,9 +886,9 @@
         "order128-whole-model-setup"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "src/warhammer40k_core/engine/reserve_arrival_resolution.py": {
       "category": "rule_semantics",
@@ -862,9 +896,9 @@
         "order128-whole-model-setup"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "src/warhammer40k_core/engine/reserve_setup_geometry.py": {
       "category": "rule_semantics",
@@ -872,9 +906,20 @@
         "order128-whole-model-setup"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
+    },
+    "src/warhammer40k_core/geometry/setup_circle_fit.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "geometry-search",
+        "order128-whole-model-setup"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "src/warhammer40k_core/geometry/setup_fit.py": {
       "category": "rule_semantics",
@@ -883,17 +928,17 @@
         "order128-whole-model-setup"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "tests/code_quality/test_order128_source_authority.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "tests/integration/test_order128_setup_overhang.py": {
       "category": "rule_semantics",
@@ -901,9 +946,9 @@
         "order128-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "tests/order128_helpers.py": {
       "category": "rule_semantics",
@@ -911,9 +956,9 @@
         "order128-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "tests/unit/test_order128_setup_model_fit.py": {
       "category": "rule_semantics",
@@ -921,9 +966,9 @@
         "order128-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "tools/performance_policy.py": {
       "category": "rule_semantics",
@@ -931,9 +976,9 @@
         "order128-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Bounded whole-model setup fit, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
       "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-      "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     }
   },
   "milestone": "ordinary",

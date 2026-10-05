@@ -4750,6 +4750,7 @@
         "src/warhammer40k_core/engine/large_model_setup.py",
         "src/warhammer40k_core/engine/reserve_arrival_resolution.py",
         "src/warhammer40k_core/engine/reserve_setup_geometry.py",
+        "src/warhammer40k_core/geometry/setup_circle_fit.py",
         "src/warhammer40k_core/geometry/setup_fit.py"
       ],
       "owners": [
@@ -4759,6 +4760,8 @@
         "append_geometry_violations",
         "append_reserve_body_violations",
         "battlefield_region",
+        "circle_containment",
+        "circle_outside_convex_polygon",
         "deployment_body_containment",
         "model_fits_regions",
         "model_wholly_within_regions",
@@ -4786,7 +4789,11 @@
         "test_cardinal_boundary_contact_is_wholly_contained",
         "test_catalog_deployment_body_fit_atomic_retry_restore_fork_views_events_replay",
         "test_catalog_strategic_reserve_whole_body_fit_and_impossible_exception",
+        "test_circular_body_concave_cutout_preserves_decomposition_seams",
+        "test_circular_body_polygon_cutout_edge_corner_and_interior",
         "test_compound_parts_require_one_common_pose_not_independent_fits",
+        "test_concentric_cutout_fit_preserves_largest_base_or_body",
+        "test_cutout_zone_legal_impossible_body_fit_and_avoidable_retry",
         "test_impossible_zone_fit_does_not_excuse_avoidable_battlefield_overhang",
         "test_normal_catalog_redeploy_consumes_body_fit_authority",
         "test_original_avoidable_overhang_probe_rejects_and_ordinary_fit_survives",

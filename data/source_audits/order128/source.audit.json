@@ -158,5 +158,24 @@
   "acceptance": "Shared whole-model setup fit and geometric impossible-fit proof; retained base restrictions, enemy separation, physical ownership, terrain/overlap/objectives/coherency; atomic proposals, legal retry, engine-generated pending/rejected/completed JSON persistence, independent fork, both players/all roles/views/events and exact replay.",
   "baseline_diagnostic_boundary": "Whole-model fit and only genuine impossible-fit exception across deployment and reserve setup; preserved diagnostic demonstrates deployment and leaves shared reserve counterpart for same geometry-owner audit. No Order128 implementation performed.",
   "handoff_roadmap_row": "| 128 | P03I | C03-09 | Order 97 identifies the source/consumer gap documented in its pinned evidence. | Setup accepts avoidable body overhang because it tests support bases against the deployment region. Apply the selected whole-model fit and only its genuine impossible-fit exception across deployment and reserve setup; the retained probe demonstrates deployment and explicitly leaves the shared reserve counterpart for the same geometry-owner audit. | Selected Order 97 clauses: 03.02.02-obligation-04; 03.02.02-obligation-09. Full literal blocks and owner links are in the [inventory](ORDER_97_EVIDENCE_REPORT.md). | PEVIDENCE | IMPLEMENTATION-GAP |",
-  "boundary": "Implemented shared whole-model fit and proven geometric impossible-fit exception across deployment, normal redeployment and Strategic Reserves; deployment base containment and reserve enemy distance stay mandatory. Other obligations and disembark expansion are excluded."
+  "boundary": "Implemented shared whole-model fit and proven geometric impossible-fit exception across deployment, normal redeployment and Strategic Reserves; deployment base containment and reserve enemy distance stay mandatory. Other obligations and disembark expansion are excluded.",
+  "review_repair": {
+    "failed_head": "5f19ecf2c68163a0fa6d0b2acc1fec64db7a4756",
+    "normal_entry": "Engine-generated LocalGameSession submit_deployment_placement request000006 for catalog core-vehicle-monster with catalog120mm support base and declared synthetic8-inch circular body.",
+    "zone": "[0,14]x[18,32] minus polygon [6,8]x[18,32]",
+    "legal_pose": [
+      11,
+      25,
+      0
+    ],
+    "impact": "Base is wholly in one width-six arm; body cannot fit either arm and is wholly on the field, but the legal impossible-fit exception exceeded60-second watchdog in compound proof.",
+    "qualification": "Exact unchanged base oracle for body-equivalent radius4 disk also exceeded30-second watchdog. Earlier smaller-origin controls are analogous, not exact-input regression proof. Frozen1 aggregate and insufficient largest-disk candidate runs remain unqualified outside repo.",
+    "implementation": "geometry.setup_circle_fit supplies exact finite disk outer support and separation from cutout edges/vertex normal cones, intersected across convex hole parts. Circle cutouts use radius-sum separation. Common base/body pose, offsets, required base region/contact and other-shape quantified fallback remain; original base-fit/membership predicates unchanged.",
+    "controls": [
+      "tests/unit/test_order128_setup_model_fit.py::test_concentric_cutout_fit_preserves_largest_base_or_body",
+      "tests/unit/test_order128_setup_model_fit.py::test_circular_body_polygon_cutout_edge_corner_and_interior",
+      "tests/unit/test_order128_setup_model_fit.py::test_circular_body_concave_cutout_preserves_decomposition_seams",
+      "tests/integration/test_order128_setup_overhang.py::test_cutout_zone_legal_impossible_body_fit_and_avoidable_retry"
+    ]
+  }
 }

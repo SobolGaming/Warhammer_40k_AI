@@ -35,6 +35,18 @@ the submitted orientation or congestion are not size-based impossibility proofs.
 Unresolved calculations raise domain errors. Geometry is never guessed from
 display names or AIRCRAFT membership.
 
+Independent frozen1 review exposed a legal circular-body deployment stalled in
+a polygon-cutout impossibility proof. Its exact translated disk query also
+stalled in the unchanged base oracle; smaller-origin controls do not establish
+a matched performance regression. Circular parts in convex outer regions now
+use finite exact outer support and cutout separation by edge halfplanes or
+vertex outward normal cones. Concave cutouts require separation from every
+convex part; tangency remains legal. All coupled parts, base regions and contact
+constraints remain. Other shapes/unions retain the quantified fallback. The
+original base-fit functions and predicates are unchanged. New cutout controls
+cover the normal facade exception, avoidable retry, edge/corner contact,
+interior overlap, concave seams and engine-owned checkpoint/replay recovery.
+
 Acceptance covers positive whole-body fit and genuine impossible-fit controls,
 negative avoidable overhang and retained base/enemy/ownership boundaries.
 Catalog-mustered real domain objects use explicitly synthetic, source-linked

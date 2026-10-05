@@ -159,10 +159,12 @@ def setup_config(
 
 
 def deployment_session(
-    *, player_id: str = "player-a", impossible: bool = False
+    *, player_id: str = "player-a", impossible: bool = False, config: GameConfig | None = None
 ) -> tuple[LocalGameSession, DecisionRequest]:
     session = LocalGameSession()
-    session.start(setup_config(zone_width=6 if impossible else 18))
+    session.start(
+        config if config is not None else setup_config(zone_width=6 if impossible else 18)
+    )
     for i in range(20):
         request = session.advance_until_decision_or_terminal().decision_request
         assert request is not None

@@ -3,27 +3,45 @@
   "changes": {
     "src/warhammer40k_core/geometry/setup_fit.py": {
       "before_sha256": "27b034eaffc97898a5b9e1275ffc6b8d76623939157f53c18a9532e90676613d",
-      "after_sha256": "640f7c3c47023484bf5e548df8bcf1521415f4583e77b64e1e429c4de5aca0a9",
+      "after_sha256": "1b80654b6a8271823c957b188ea64f4b89a75b6cfb6425397bc5af9b5369e68c",
       "owners": {
         "@module": {
-          "before": "2ec85f1413ec565516c50032da2ff7a0cbddf0028957a6adda6725c84b45218d",
-          "after": "3a8e9e02188003723a90976e2490475fd6454b7a23b9412abd1a1b3f59d7d7ef"
+          "before": "f44914bbc358fb771992a1517652e4bad3f83d153ebac7147ce74ec10088b4a1",
+          "after": "ddc6ba6252ac9d2fee5f1bb4c87da1953206b1f9e51108aec618c6197a667f36"
         },
         "_fit": {
           "before": null,
-          "after": "e92ab511c3bfa3e5c81a99ed7e387c9cd5a54d3414e8da65dee53caec7c1f127"
+          "after": "72c5225367b2e14a8d426e0d0e50ef5ece72d1ca4de4ffed2a8b50d6860bcc09"
         },
         "_shape_containment": {
           "before": null,
-          "after": "d7e90e29d67521f16bedc8d6f23534774064c0ccaee8213a24af7c594f3d80f0"
+          "after": "b0045c3522aa77b90181e529fc598425db17a6af7ce2348f69b2e017dcb3efd9"
         },
         "model_fits_regions": {
           "before": null,
-          "after": "a0cdfc3ef3016618d333af708b44f9a250c1d577eb3438a4be227ac0ab3d8e53"
+          "after": "a94c73f997ab7d175b3b453fd97e915e6c1bd9ac9bf0089864bf641f54e19fa9"
         },
         "model_wholly_within_regions": {
           "before": null,
-          "after": "a108a690be3d680200d95fbf622d1b357a9936f907f337a126cc7c66fbc1b43b"
+          "after": "8b38de4fa08ab6afc657baa62405b69a24e5d12b12b190d5c10a5a262d4c8478"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/setup_circle_fit.py": {
+      "before_sha256": null,
+      "after_sha256": "b3a0197538860da18e8b172594a2d5c008612dd69962045d35e0c1348f5657d9",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "9f53619fcc8e65c38216eebb16649114ffe8a30ef983a7f9ef9ee869fd63dc5a"
+        },
+        "circle_containment": {
+          "before": null,
+          "after": "0348f1f94a4a86dcad8d0472c40f334d11f4cb88fcefd727a4c1f15a7ff3d39c"
+        },
+        "circle_outside_convex_polygon": {
+          "before": null,
+          "after": "29cbb245128e60b46e290e87e56d1d92b60d8859280ddc125e4df61d357521ee"
         }
       }
     }
@@ -31,9 +49,12 @@
   "smoke_operations": {
     "src/warhammer40k_core/geometry/setup_fit.py": [
       "geometry-search"
+    ],
+    "src/warhammer40k_core/geometry/setup_circle_fit.py": [
+      "geometry-search"
     ]
   },
-  "authority": "Owner approved bounded repair default: quiet serial current-runtime smoke and exact-base assessment; detailed comparisons for deliberate performance changes or a serious regression. Exact owner hashes preserve mandatory sensitive mapping.",
+  "authority": "Owner approved bounded repair default: quiet serial current-runtime smoke and exact-base assessment; detailed comparisons for deliberate performance changes or a demonstrated serious regression. Exact translated unchanged-oracle stall is preserved; analogous faster inputs are not matched regression proof. Exact owner hashes preserve mandatory sensitive mapping.",
   "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
-  "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+  "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
 }

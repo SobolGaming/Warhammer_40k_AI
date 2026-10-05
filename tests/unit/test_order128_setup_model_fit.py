@@ -40,6 +40,70 @@ def test_compound_parts_require_one_common_pose_not_independent_fits() -> None:
     assert not model_fits_regions(model, (square,))
 
 
+@pytest.mark.parametrize(
+    ("base_radius", "body_radius", "fits"), [(1, 2, True), (1, 4, False), (4, 2, False)]
+)
+def test_concentric_cutout_fit_preserves_largest_base_or_body(
+    base_radius: float, body_radius: float, fits: bool
+) -> None:
+    model = Model(
+        "cutout",
+        Pose.at(11, 25),
+        CircularBase(base_radius),
+        ModelVolume(1),
+        (ModelBodyPart("body", CircularBase(body_radius), 0, 0, 0, 1, "synthetic:cutout"),),
+    )
+    region = (
+        (((0.0, 18.0), (14.0, 18.0), (14.0, 32.0), (0.0, 32.0)),),
+        (((6.0, 18.0), (8.0, 18.0), (8.0, 32.0), (6.0, 32.0)),),
+        (),
+    )
+    assert model_fits_regions(model, (region,)) is fits
+
+
+@pytest.mark.parametrize(
+    ("x", "y", "radius", "inside"),
+    [(3, 5, 1, True), (3.1, 5, 1, False), (3, 3, 1, True), (3, 3, 1.5, False), (5, 5, 1, False)],
+)
+def test_circular_body_polygon_cutout_edge_corner_and_interior(
+    x: float, y: float, radius: float, inside: bool
+) -> None:
+    model = Model(
+        "cutout",
+        Pose.at(x, y),
+        CircularBase(0.25),
+        ModelVolume(1),
+        (ModelBodyPart("body", CircularBase(radius), 0, 0, 0, 1, "synthetic:cutout"),),
+    )
+    region = (
+        (((0.0, 0.0), (10.0, 0.0), (10.0, 10.0), (0.0, 10.0)),),
+        (((4.0, 4.0), (6.0, 4.0), (6.0, 6.0), (4.0, 6.0)),),
+        (),
+    )
+    assert model_wholly_within_regions(model, (region,)) is inside
+
+
+@pytest.mark.parametrize(
+    ("x", "y", "inside"), [(5.5, 5.5, True), (5.25, 5.25, False), (4.5, 4.5, False)]
+)
+def test_circular_body_concave_cutout_preserves_decomposition_seams(
+    x: float, y: float, inside: bool
+) -> None:
+    model = Model(
+        "concave",
+        Pose.at(x, y),
+        CircularBase(0.25),
+        ModelVolume(1),
+        (ModelBodyPart("body", CircularBase(0.5), 0, 0, 0, 1, "synthetic:cutout"),),
+    )
+    region = (
+        (((0.0, 0.0), (10.0, 0.0), (10.0, 10.0), (0.0, 10.0)),),
+        (((4.0, 4.0), (6.0, 4.0), (6.0, 5.0), (5.0, 5.0), (5.0, 6.0), (4.0, 6.0)),),
+        (),
+    )
+    assert model_wholly_within_regions(model, (region,)) is inside
+
+
 def test_original_avoidable_overhang_probe_rejects_and_ordinary_fit_survives() -> None:
     from tests.order97_gap_probes_01_08 import avoidable_setup_body_overhang_observation
 

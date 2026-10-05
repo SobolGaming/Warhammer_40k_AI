@@ -13,6 +13,7 @@ from functools import lru_cache
 from warhammer40k_core.geometry.base import BaseShape, CircularBase, OvalBase, RectangularBase
 from warhammer40k_core.geometry.model_body import ModelBodyPart
 from warhammer40k_core.geometry.pose import GeometryError
+from warhammer40k_core.geometry.setup_circle_fit import circle_containment
 from warhammer40k_core.geometry.visibility_algebra import (
     Formula,
     RealTerm,
@@ -187,6 +188,10 @@ def _shape_containment(
     else:
         raise GeometryError("Unsupported whole-model setup shape.")
     polygons, holes, circles = regions[0]
+    if isinstance(base, CircularBase) and len(regions) == 1:
+        finite = circle_containment(x, y, a, polygons, holes, circles)
+        if finite is not None:
+            return finite
     parts = convex_polygon_parts(_rational_polygon(polygons[0])) if len(polygons) == 1 else ()
     if len(regions) == 1 and len(parts) == 1 and not holes and not circles:
         constraints: list[Formula] = []

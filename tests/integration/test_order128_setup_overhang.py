@@ -10,6 +10,79 @@ from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.geometry.pose import Pose
 
 
+@pytest.mark.parametrize("body_diameter", [6.0, 8.0])
+def test_cutout_zone_legal_impossible_body_fit_and_avoidable_retry(body_diameter: float) -> None:
+    from dataclasses import replace
+
+    from tests.order128_helpers import setup_config
+
+    from warhammer40k_core.core.deployment_zones import (
+        DeploymentZone,
+        DeploymentZonePoint,
+        DeploymentZonePolygonCutout,
+        DeploymentZoneShape,
+    )
+    from warhammer40k_core.engine.mission_state_validation import (
+        runtime_ruleset_descriptor_for_mission_setup,
+    )
+
+    config = setup_config(body_diameter=body_diameter)
+    mission = config.mission_setup
+    assert mission is not None
+    shape = replace(
+        DeploymentZoneShape.rectangle(min_x=0, min_y=18, max_x=14, max_y=32),
+        cutouts=(
+            DeploymentZonePolygonCutout(
+                tuple(DeploymentZonePoint(x, y) for x, y in ((6, 18), (8, 18), (8, 32), (6, 32)))
+            ),
+        ),
+    )
+    mission = replace(
+        mission,
+        deployment_zones=(
+            DeploymentZone("order128-cutout", "player-a", shape),
+            mission.deployment_zones[1],
+        ),
+    )
+    config = replace(
+        config,
+        mission_setup=mission,
+        ruleset_descriptor=runtime_ruleset_descriptor_for_mission_setup(
+            mission, rules_overlay_ids=()
+        ),
+    )
+    session, request = deployment_session(config=config)
+    assert_checkpoint(session)
+    assert session.lifecycle.state is not None
+    before = session.lifecycle.state.battlefield_state
+    payload = deployment_placement_payload_for_request(
+        session.lifecycle,
+        request=request,
+        pose_factory=lambda _i, _owner, _id: Pose.at(11.5, 25),
+    )
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id, payload=payload, result_id="cutout-body"
+    )
+    if body_diameter == 6:
+        assert status.status_kind is LifecycleStatusKind.INVALID
+        assert "deployment_zone_violation" in json.dumps(status.payload)
+        assert session.lifecycle.state is not None
+        assert session.lifecycle.state.battlefield_state == before
+        assert_checkpoint(session)
+        retry = session.advance_until_decision_or_terminal().decision_request
+        assert retry is not None
+        payload = deployment_placement_payload_for_request(
+            session.lifecycle,
+            request=retry,
+            pose_factory=lambda _i, _owner, _id: Pose.at(11, 25),
+        )
+        status = session.submit_parameterized_payload(
+            request_id=retry.request_id, payload=payload, result_id="cutout-retry"
+        )
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()
+    assert_checkpoint(session)
+
+
 @pytest.mark.parametrize(
     ("body_diameter", "enemy"),
     [(6.0, False), (8.0, False), (50.0, False), (8.0, True)],
