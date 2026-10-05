@@ -2853,6 +2853,14 @@ Required Phase 16A adapter-contract tests:
 
 ## Phase 16B Redeploy And Scout Pre-Battle Decisions
 
+Order127 / Contract44.3.13 routes redeploy placement through normal deployment
+geometry and typed all-model Infiltrators permission. Outside-zone redeployment
+retains the more-than-eight-inch enemy-unit and enemy-zone restrictions. New
+prebattle diagnostics mirror the existing deployment diagnostics; see
+`contracts/migrations/44.3.12-to-44.3.13.md`. The existing finite/parameterized
+submission, atomic invalid/retry, event and viewer-redaction contract applies.
+Scout reserve setup retains its existing zone restriction.
+
 Phase 16B adds setup decisions after ordinary deployment and before the first battle round. Redeploy is a remove-and-set-up operation, not movement. Scout reserve setup is setup placement from Strategic Reserves. Scout Move and Dedicated Transport Scout Move are physical movement and require path evidence, but they are not Movement phase actions.
 
 Phase 16B exposes these finite setup decisions:

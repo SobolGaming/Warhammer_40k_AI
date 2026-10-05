@@ -106,10 +106,7 @@ from warhammer40k_core.engine.scout_movement import (
 from warhammer40k_core.engine.scout_movement import (
     resolve_scout_move as _resolve_scout_move,
 )
-from warhammer40k_core.engine.unit_coherency import (
-    UnitCoherencyContext,
-    UnitCoherencyResult,
-)
+from warhammer40k_core.engine.unit_coherency import UnitCoherencyResult
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.pathing import (
@@ -153,6 +150,10 @@ class PreBattleViolationCode(StrEnum):
     DEPLOYMENT_ZONE_VIOLATION = "deployment_zone_violation"
     LARGE_MODEL_PLAYER_EDGE_UNSUPPORTED = "large_model_player_edge_unsupported"
     LARGE_MODEL_EDGE_CONTACT_MISSING = "large_model_edge_contact_missing"
+    INFILTRATORS_KEYWORD_REQUIRED = "infiltrators_keyword_required"
+    INFILTRATORS_ENEMY_ZONE_DISTANCE = "infiltrators_enemy_zone_distance"
+    INFILTRATORS_ENEMY_UNIT_DISTANCE = "infiltrators_enemy_unit_distance"
+    FORTIFICATION_DEPLOYMENT_UNSUPPORTED = "fortification_deployment_unsupported"
     MODEL_OVERLAP = "model_overlap"
     TERRAIN_ENDPOINT_ILLEGAL = "terrain_endpoint_illegal"
     OBJECTIVE_MARKER_ENDPOINT_OVERLAP = "objective_marker_endpoint_overlap"
@@ -1649,24 +1650,16 @@ def _resolve_prebattle_placement(
         request=request,
         view=view,
     )
-    coherency_result, models = _validate_placement_models(
-        violations=violations,
-        state=state,
-        ruleset_descriptor=ruleset_descriptor,
-        request=request,
-        proposal=proposal,
-        view=view,
-    )
-    from warhammer40k_core.engine.prebattle_setup_geometry import append_setup_geometry_violations
+    from warhammer40k_core.engine.prebattle_setup_geometry import validate_prebattle_placement
 
-    append_setup_geometry_violations(
+    coherency_result = validate_prebattle_placement(
         violations=violations,
         state=state,
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
+        request=request,
+        proposal=proposal,
         view=view,
-        models=models,
-        deployment_zones=request.deployment_zones,
     )
     if violations:
         return PreBattleResolution(
@@ -1858,80 +1851,6 @@ def _append_action_eligibility_violations(
                     field="unit_instance_id",
                 )
             )
-
-
-def _validate_placement_models(
-    *,
-    violations: list[PreBattleViolation],
-    state: GameState,
-    ruleset_descriptor: RulesetDescriptor,
-    request: PreBattleProposalRequest,
-    proposal: PreBattlePlacementProposal,
-    view: RulesUnitView,
-) -> tuple[UnitCoherencyResult, tuple[Model, ...]]:
-    model_by_id = {model.model_instance_id: model for model in view.alive_models()}
-    placement_by_id = {
-        placement.model_instance_id: placement for placement in proposal.model_placements
-    }
-    expected_model_ids = tuple(sorted(model_by_id))
-    submitted_model_ids = tuple(sorted(placement_by_id))
-    if submitted_model_ids != expected_model_ids:
-        violations.append(
-            PreBattleViolation(
-                violation_code=PreBattleViolationCode.MODEL_SET_DRIFT,
-                message="Pre-battle placement must include every alive model in the rules unit.",
-                field="model_placements",
-            )
-        )
-    models: list[Model] = []
-    for placement in proposal.model_placements:
-        model = model_by_id.get(placement.model_instance_id)
-        if model is None:
-            violations.append(
-                PreBattleViolation(
-                    violation_code=PreBattleViolationCode.WRONG_UNIT_MODEL,
-                    message="Pre-battle placement model is not in the selected rules unit.",
-                    field="model_placements",
-                    model_instance_id=placement.model_instance_id,
-                )
-            )
-            continue
-        if placement.player_id != request.player_id:
-            violations.append(
-                PreBattleViolation(
-                    violation_code=PreBattleViolationCode.PLAYER_DRIFT,
-                    message="Pre-battle placement model player does not match request.",
-                    field="model_placements",
-                    model_instance_id=placement.model_instance_id,
-                )
-            )
-        if placement.unit_instance_id not in view.component_unit_instance_ids:
-            violations.append(
-                PreBattleViolation(
-                    violation_code=PreBattleViolationCode.WRONG_UNIT_MODEL,
-                    message="Pre-battle placement component unit is not in the rules unit.",
-                    field="model_placements",
-                    model_instance_id=placement.model_instance_id,
-                    blocker_id=placement.unit_instance_id,
-                )
-            )
-            continue
-        models.append(geometry_model_for_placement(model=model, placement=placement))
-    coherency_result = UnitCoherencyContext.from_ruleset_descriptor(
-        ruleset_descriptor,
-        unit_instance_id=request.unit_instance_id,
-    ).validate_models(tuple(models))
-    if not coherency_result.is_coherent:
-        for model_id in coherency_result.offending_model_instance_ids:
-            violations.append(
-                PreBattleViolation(
-                    violation_code=PreBattleViolationCode.UNIT_COHERENCY_BROKEN,
-                    message="Pre-battle placement breaks unit coherency.",
-                    field="model_placements",
-                    model_instance_id=model_id,
-                )
-            )
-    return coherency_result, tuple(models)
 
 
 def _common_request_drift_violations(

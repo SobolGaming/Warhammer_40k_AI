@@ -4670,6 +4670,78 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order127-redeploy-validation": {
+      "paths": [
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/engine/prebattle.py",
+        "src/warhammer40k_core/engine/prebattle_setup_geometry.py"
+      ],
+      "owners": [
+        "@module",
+        "PreBattleViolationCode",
+        "_resolve_prebattle_placement",
+        "_validate_placement_models",
+        "append_redeploy_geometry_violations",
+        "validate_prebattle_placement"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order127-regressions": {
+      "paths": [
+        "tests/integration/test_order127_infiltrators_redeploy.py",
+        "tests/order127_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "_start_redeploy",
+        "assert_checkpoint",
+        "canonical_attached_redeploy_session",
+        "redeploy_catalog",
+        "redeploy_payload",
+        "redeploy_session",
+        "test_attached_redeploy_requires_infiltrators_on_every_component",
+        "test_catalog_infiltrator_geometry_rejection_preserves_state_and_retry",
+        "test_catalog_infiltrators_redeploy_outside_zone_restores_and_replays",
+        "test_catalog_noninfiltrators_remain_zone_bound_and_invalid_placement_is_atomic"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order127-source-evidence": {
+      "paths": [
+        "data/source_audits/order127/source.audit.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order127-contract-publication": {
+      "paths": [
+        "conformance/typescript/src/contract.ts",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/migrations/44.3.12-to-44.3.13.md",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
