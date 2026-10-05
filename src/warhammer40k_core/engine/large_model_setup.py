@@ -13,7 +13,13 @@ from warhammer40k_core.core.deployment_zones import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.geometry.base import BaseShape, CircularBase, OvalBase, RectangularBase
-from warhammer40k_core.geometry.setup_fit import Region, base_fits_region, base_fits_regions
+from warhammer40k_core.geometry.setup_fit import (
+    Region,
+    base_fits_region,
+    base_fits_regions,
+    model_fits_regions,
+    model_wholly_within_regions,
+)
 from warhammer40k_core.geometry.visibility_algebra import VisibilityComputationError
 from warhammer40k_core.geometry.volume import Model
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -120,3 +126,32 @@ def base_fits_edge_band(
     else:
         raise GameLifecycleError("Unsupported oversized setup battlefield edge.")
     return base_fits_region(model.base, (((0.0, 0.0), (width, 0.0), (width, depth), (0.0, depth)),))
+
+
+def battlefield_region(width: float, depth: float) -> Region:
+    return ((((0.0, 0.0), (width, 0.0), (width, depth), (0.0, depth)),), (), ())
+
+
+def deployment_body_containment(
+    *,
+    model: Model,
+    zones: tuple[DeploymentZone, ...],
+    width: float,
+    depth: float,
+    unrestricted_zone: bool,
+) -> tuple[bool, bool]:
+    """Body overhang needs a size-based impossibility proof; the base stays governed separately."""
+    field = (battlefield_region(width, depth),)
+    regions = field if unrestricted_zone else tuple(_zone_region(zone.shape) for zone in zones)
+    in_zone = unrestricted_zone or model_wholly_within_regions(model, regions)
+    in_field = model_wholly_within_regions(model, field)
+    if in_zone and in_field:
+        return True, True
+    try:
+        impossible = not model_fits_regions(model, regions) if not in_zone else False
+        field_impossible = (
+            not model_fits_regions(model, field, base_regions=regions) if not in_field else False
+        )
+    except VisibilityComputationError as exc:
+        raise GameLifecycleError("Whole-model deployment fit computation is unresolved.") from exc
+    return in_zone or impossible, in_field or field_impossible

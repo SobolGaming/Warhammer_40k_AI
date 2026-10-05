@@ -7691,3 +7691,10 @@ The model_ids() inventory remains canonical. Ordinary and attached Movement,
 Scout, Charge, Fight and triggered moves share occupancy authority. Existing
 payload families, invalid atomicity and engine persistence/replay remain; see
 [Order126 scope](ORDER_126_SCOPE_PLAN.md).
+
+
+Order128 / Contract44.3.14 uses the existing deployment, redeploy and reserve
+parameterized proposals and diagnostics for whole-model fit and proven
+impossible-fit body overhang. Atomic invalid submissions, retry, engine-owned
+placement records and viewer-scoped events retain the existing contract.
+No new decision family, proposal field or visibility rule is introduced.

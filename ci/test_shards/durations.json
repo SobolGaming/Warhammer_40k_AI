@@ -15,6 +15,7 @@
     "tests/integration/test_movement_mission_geometry.py": 6.895,
     "tests/integration/test_off_battlefield_command_battle_shock.py": 110.175,
     "tests/integration/test_order127_infiltrators_redeploy.py": 675.498,
+    "tests/integration/test_order128_setup_overhang.py": 360.589,
     "tests/integration/test_phase10a_placement_smoke.py": 4.692,
     "tests/integration/test_phase10l_coherency_integration.py": 14.573,
     "tests/integration/test_phase9d_smoke.py": 6.252,
@@ -98,6 +99,7 @@
     "tests/unit/test_order124_nested_conditions.py": 1210.539,
     "tests/unit/test_order125_implicit_subjects.py": 397.931,
     "tests/unit/test_order126_sequential_movement.py": 401.308,
+    "tests/unit/test_order128_setup_model_fit.py": 13.03,
     "tests/unit/test_order36_sequencing.py": 250.328,
     "tests/unit/test_order36_timing_authority.py": 170.03,
     "tests/unit/test_order51_flight.py": 163.389,
@@ -313,77 +315,80 @@
   "profiles": [
     {
       "junit_sha256": [
+        "5cb15354a8965c5cc34b036411b459348742466b4c03e38b721f9be04b2539d3",
         "905315c8a007ea761f909545b400f11ffc331a20e6c4fe36eff3d1de583103bd",
+        "a484240cd4b4b1a06a248cb6ded975abf8187f0f8f370b7ea9ebcf007f810d30",
+        "a6d87eb1cdd2acfe9948454a25f7170312e469fc5182ea6ddc19c7224914ec1b",
         "d81de24beabf36bf58293f7886057ee7d44e837ec7f7e6b21eb96c1dd16a0b82"
       ],
-      "source": "Order127 complete corrected current cohort HEAD 1bf0660030e740e49ed80be8b04a3eb3b5d7277b, tree a90852461149057483f5ba0d69c2ddf35e29bed1: all 10938 cases once, 16 serial polygon cases and remaining cases in 32 parallel workers, all phases/durations authenticated; no predecessor or focused timings. JUnit SHA256 serial d81de24beabf36bf58293f7886057ee7d44e837ec7f7e6b21eb96c1dd16a0b82; parallel 905315c8a007ea761f909545b400f11ffc331a20e6c4fe36eff3d1de583103bd.",
-      "test_cases": 10938,
-      "test_files": 309
+      "source": "Order128 provisional per-file inventory: retained complete Order127 profile plus seven successful deployment/reserve facade cases, ten current analytic cases and two actual Prince Yriel redeploy cases. Enemy/submission boundary controls passed separately without JUnit; complete current covered Order128 cohort replaces all provisional timings before delivery. Base 447d5c34a4fba4ce1605cb494de7badb5304af3e",
+      "test_cases": 10957,
+      "test_files": 311
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 4909.444,
+      "duration_seconds": 4940.648,
       "shard_id": 1,
-      "test_file_count": 23
+      "test_file_count": 24
     },
     {
-      "duration_seconds": 4909.486,
+      "duration_seconds": 4940.555,
       "shard_id": 2,
-      "test_file_count": 25
-    },
-    {
-      "duration_seconds": 4909.445,
-      "shard_id": 3,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4909.477,
-      "shard_id": 4,
+      "duration_seconds": 4940.595,
+      "shard_id": 3,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4909.472,
+      "duration_seconds": 4940.646,
+      "shard_id": 4,
+      "test_file_count": 26
+    },
+    {
+      "duration_seconds": 4940.598,
       "shard_id": 5,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4909.442,
+      "duration_seconds": 4940.58,
       "shard_id": 6,
-      "test_file_count": 29
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 4909.474,
+      "duration_seconds": 4940.592,
       "shard_id": 7,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4909.455,
+      "duration_seconds": 4940.553,
       "shard_id": 8,
-      "test_file_count": 26
-    },
-    {
-      "duration_seconds": 4909.448,
-      "shard_id": 9,
       "test_file_count": 27
     },
     {
-      "duration_seconds": 4909.461,
-      "shard_id": 10,
-      "test_file_count": 25
+      "duration_seconds": 4940.648,
+      "shard_id": 9,
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 4909.443,
+      "duration_seconds": 4940.547,
+      "shard_id": 10,
+      "test_file_count": 27
+    },
+    {
+      "duration_seconds": 4940.598,
       "shard_id": 11,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4909.463,
+      "duration_seconds": 4940.569,
       "shard_id": 12,
-      "test_file_count": 25
+      "test_file_count": 26
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 58913.51
+  "total_test_duration_seconds": 59287.129
 }

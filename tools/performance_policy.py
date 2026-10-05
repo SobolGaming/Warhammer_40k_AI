@@ -21,6 +21,7 @@ ORDER108_SCOPE = "docs/performance/policy-v3/order108-rule-semantics.json"
 ORDER115_SCOPE = "docs/performance/policy-v3/order115-rule-semantics.json"
 ORDER116_SCOPE = "docs/performance/policy-v3/order116-rule-semantics.json"
 ORDER126_SCOPE = "docs/performance/policy-v3/order126-rule-semantics.json"
+ORDER128_SCOPE = "docs/performance/policy-v3/order128-rule-semantics.json"
 CATEGORIES = frozenset(
     {
         "governance",
@@ -237,6 +238,18 @@ def _order126_smoke_operations(
     return frozenset(_strings(object_value(scope["smoke_operations"])[path]))
 
 
+def _order128_smoke_operations(
+    *, base: str, path: str, category: str, change: object
+) -> frozenset[str]:
+    """Bind the owner's bounded whole-model setup rule repair to exact owner bytes."""
+    if base != "447d5c34a4fba4ce1605cb494de7badb5304af3e" or category != "rule_semantics":
+        return frozenset()
+    scope = read_object(Path(__file__).resolve().parents[1] / ORDER128_SCOPE)
+    if scope["base"] != base or object_value(scope["changes"]).get(path) != change:
+        return frozenset()
+    return frozenset(_strings(object_value(scope["smoke_operations"])[path]))
+
+
 def validate_assessment(
     assessment: dict[str, object],
     *,
@@ -337,6 +350,9 @@ def validate_assessment(
                 base=base, path=path, category=category, change=changes[path]
             )
             | _order126_smoke_operations(
+                base=base, path=path, category=category, change=changes[path]
+            )
+            | _order128_smoke_operations(
                 base=base, path=path, category=category, change=changes[path]
             )
         )

@@ -4742,6 +4742,95 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order128-whole-model-setup": {
+      "paths": [
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/engine/deployment_geometry.py",
+        "src/warhammer40k_core/engine/large_model_setup.py",
+        "src/warhammer40k_core/engine/reserve_arrival_resolution.py",
+        "src/warhammer40k_core/engine/reserve_setup_geometry.py",
+        "src/warhammer40k_core/geometry/setup_fit.py"
+      ],
+      "owners": [
+        "@module",
+        "_fit",
+        "_shape_containment",
+        "append_geometry_violations",
+        "append_reserve_body_violations",
+        "battlefield_region",
+        "deployment_body_containment",
+        "model_fits_regions",
+        "model_wholly_within_regions",
+        "resolve_reserve_arrival"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order128-regressions": {
+      "paths": [
+        "tests/integration/test_order128_setup_overhang.py",
+        "tests/order128_helpers.py",
+        "tests/unit/test_order128_setup_model_fit.py"
+      ],
+      "owners": [
+        "@module",
+        "assert_checkpoint",
+        "deployment_session",
+        "evidence",
+        "redeploy_session",
+        "reserve_session",
+        "setup_config",
+        "test_body_exception_keeps_base_and_submission_boundaries_atomic",
+        "test_cardinal_boundary_contact_is_wholly_contained",
+        "test_catalog_deployment_body_fit_atomic_retry_restore_fork_views_events_replay",
+        "test_catalog_strategic_reserve_whole_body_fit_and_impossible_exception",
+        "test_compound_parts_require_one_common_pose_not_independent_fits",
+        "test_impossible_zone_fit_does_not_excuse_avoidable_battlefield_overhang",
+        "test_normal_catalog_redeploy_consumes_body_fit_authority",
+        "test_original_avoidable_overhang_probe_rejects_and_ordinary_fit_survives",
+        "test_whole_model_fit_searches_all_rotations_and_preserves_offset"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order128-source-evidence": {
+      "paths": [
+        "data/source_audits/order128/source.audit.json",
+        "tools/performance_policy.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_order128_smoke_operations",
+        "validate_assessment"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order128-contract-publication": {
+      "paths": [
+        "conformance/typescript/src/contract.ts",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/migrations/44.3.13-to-44.3.14.md",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

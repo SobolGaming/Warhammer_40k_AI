@@ -167,6 +167,17 @@ def resolve_reserve_arrival(
 
     models = rules_unit_placement.geometry_models(scenario)
     if placement_kind is BattlefieldPlacementKind.STRATEGIC_RESERVES:
+        from warhammer40k_core.engine.reserve_setup_geometry import append_reserve_body_violations
+
+        append_reserve_body_violations(
+            violations=violations,
+            models=models,
+            width=width,
+            depth=depth,
+            qualifying_edges=qualifying_edges,
+            strategic_rule=strategic_rule,
+            exceptions=exceptions,
+        )
         append_strategic_reserves_edge_violations(
             violations=violations,
             models=models,

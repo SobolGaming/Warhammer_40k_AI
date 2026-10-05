@@ -1,0 +1,39 @@
+{
+  "base": "447d5c34a4fba4ce1605cb494de7badb5304af3e",
+  "changes": {
+    "src/warhammer40k_core/geometry/setup_fit.py": {
+      "before_sha256": "27b034eaffc97898a5b9e1275ffc6b8d76623939157f53c18a9532e90676613d",
+      "after_sha256": "640f7c3c47023484bf5e548df8bcf1521415f4583e77b64e1e429c4de5aca0a9",
+      "owners": {
+        "@module": {
+          "before": "2ec85f1413ec565516c50032da2ff7a0cbddf0028957a6adda6725c84b45218d",
+          "after": "3a8e9e02188003723a90976e2490475fd6454b7a23b9412abd1a1b3f59d7d7ef"
+        },
+        "_fit": {
+          "before": null,
+          "after": "e92ab511c3bfa3e5c81a99ed7e387c9cd5a54d3414e8da65dee53caec7c1f127"
+        },
+        "_shape_containment": {
+          "before": null,
+          "after": "d7e90e29d67521f16bedc8d6f23534774064c0ccaee8213a24af7c594f3d80f0"
+        },
+        "model_fits_regions": {
+          "before": null,
+          "after": "a0cdfc3ef3016618d333af708b44f9a250c1d577eb3438a4be227ac0ab3d8e53"
+        },
+        "model_wholly_within_regions": {
+          "before": null,
+          "after": "a108a690be3d680200d95fbf622d1b357a9936f907f337a126cc7c66fbc1b43b"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "src/warhammer40k_core/geometry/setup_fit.py": [
+      "geometry-search"
+    ]
+  },
+  "authority": "Owner approved bounded repair default: quiet serial current-runtime smoke and exact-base assessment; detailed comparisons for deliberate performance changes or a serious regression. Exact owner hashes preserve mandatory sensitive mapping.",
+  "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+  "unchanged_work": "The existing exact analytic setup-fit owner now constrains one common translated/rotated support base and all body parts. Deployment, normal redeployment and Strategic Reserves share that authority, with unchanged base/ownership/coherency/terrain/enemy/input validation and engine persistence/replay. This is bounded rule semantics, not deliberate performance work; no demonstrated serious regression. Existing solver fail-closed errors, bounded caches, complete work/semantic checks and quiet serial current-runtime smoke remain required. No full-game or historical numerical refresh is claimed."
+}
