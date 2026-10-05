@@ -1653,32 +1653,16 @@ def _resolve_prebattle_placement(
         request=request,
         view=view,
     )
-    coherency_result, models = _validate_placement_models(
-        violations=violations,
-        state=state,
-        ruleset_descriptor=ruleset_descriptor,
-        request=request,
-        proposal=proposal,
-        view=view,
-    )
-    from warhammer40k_core.engine.prebattle_setup_geometry import (
-        append_redeploy_geometry_violations,
-        append_setup_geometry_violations,
-    )
+    from warhammer40k_core.engine.prebattle_setup_geometry import validate_prebattle_placement
 
-    geometry_validator = (
-        append_redeploy_geometry_violations
-        if request.proposal_kind == REDEPLOY_PROPOSAL_KIND
-        else append_setup_geometry_violations
-    )
-    geometry_validator(
+    coherency_result = validate_prebattle_placement(
         violations=violations,
         state=state,
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
+        request=request,
+        proposal=proposal,
         view=view,
-        models=models,
-        deployment_zones=request.deployment_zones,
     )
     if violations:
         return PreBattleResolution(

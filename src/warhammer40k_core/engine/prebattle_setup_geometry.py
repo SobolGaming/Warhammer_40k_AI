@@ -15,21 +15,62 @@ from warhammer40k_core.engine.endpoint_placement import (
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.large_model_setup import oversized_deployment_violation
 from warhammer40k_core.engine.prebattle import (
+    REDEPLOY_PROPOSAL_KIND,
+    PreBattlePlacementProposal,
+    PreBattleProposalRequest,
     PreBattleViolation,
     PreBattleViolationCode,
     _models_overlap_with_volume,
     _require_mission_setup,
+    _validate_placement_models,
     model_is_within_battlefield,
     model_owner_player_id,
     moving_models_overlap,
     unit_for_model,
 )
 from warhammer40k_core.engine.rules_units import RulesUnitView
+from warhammer40k_core.engine.unit_coherency import UnitCoherencyResult
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.volume import Model
 
 _EPSILON = 1e-9
 _INFILTRATORS_DISTANCE_INCHES = 8.0
+
+
+def validate_prebattle_placement(
+    *,
+    violations: list[PreBattleViolation],
+    state: GameState,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    request: PreBattleProposalRequest,
+    proposal: PreBattlePlacementProposal,
+    view: RulesUnitView,
+) -> UnitCoherencyResult:
+    """Validate the complete rules unit before dispatching its setup geometry."""
+    coherency_result, models = _validate_placement_models(
+        violations=violations,
+        state=state,
+        ruleset_descriptor=ruleset_descriptor,
+        request=request,
+        proposal=proposal,
+        view=view,
+    )
+    geometry_validator = (
+        append_redeploy_geometry_violations
+        if request.proposal_kind == REDEPLOY_PROPOSAL_KIND
+        else append_setup_geometry_violations
+    )
+    geometry_validator(
+        violations=violations,
+        state=state,
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        view=view,
+        models=models,
+        deployment_zones=request.deployment_zones,
+    )
+    return coherency_result
 
 
 def append_redeploy_geometry_violations(

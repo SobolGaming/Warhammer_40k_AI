@@ -4681,7 +4681,8 @@
         "@module",
         "PreBattleViolationCode",
         "_resolve_prebattle_placement",
-        "append_redeploy_geometry_violations"
+        "append_redeploy_geometry_violations",
+        "validate_prebattle_placement"
       ],
       "families": [],
       "sensitive": false,

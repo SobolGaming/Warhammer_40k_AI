@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e37c232fe64bef50d69ad228da52834aecf6a5318829f72c0a08ecb9a48f4f3b",
-  "fingerprint": "e37c232fe64bef50d69ad228da52834aecf6a5318829f72c0a08ecb9a48f4f3b",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ca50d647d26e7288794483422d5bdd6a383e0c6726df74b31f771d876b45342e",
+  "fingerprint": "ca50d647d26e7288794483422d5bdd6a383e0c6726df74b31f771d876b45342e",
   "resource_count": 3079,
   "resources": [
     {
@@ -11465,9 +11465,9 @@
       "sha256": "ff6c156cf54d6ce5de6b2ce1c87cc4e9bbfa8b7475922a2812e06ee86cd6ed7f"
     },
     {
-      "byte_length": 96578,
+      "byte_length": 96102,
       "path": "warhammer40k_core/engine/prebattle.py",
-      "sha256": "a53be35ac116eb7ba34052a838349bf1ab0546ad8b6c32640fdc1e7f1139e533"
+      "sha256": "a11af40341a3d83b36eb0b72dcc6c942278a417a18e252ca60977ca782316fef"
     },
     {
       "byte_length": 2096,
@@ -11490,9 +11490,9 @@
       "sha256": "65da657f5d401f368cfa01063b20827616f32f69bc05925267082f6bc5d928f2"
     },
     {
-      "byte_length": 8548,
+      "byte_length": 9835,
       "path": "warhammer40k_core/engine/prebattle_setup_geometry.py",
-      "sha256": "e773f688989deeeb92ff6098bd402d4c810c7a718c5cf286d42a88ee73d1e3b2"
+      "sha256": "f8ca4648ffc902ffc7b58b3669fd2279da927bf9a7328d59abb37e1ee2b2c433"
     },
     {
       "byte_length": 27774,
