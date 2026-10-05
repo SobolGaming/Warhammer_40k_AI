@@ -48,3 +48,8 @@ inventory, generated contracts and identities, installed wheel and TypeScript
 checks, two distinct exact-head CLEAN reviews and all protected hosted CI.
 This is an ordinary rules repair with no intended performance change or full-game
 performance certification. Stop after delivery and the Order123 handoff.
+
+The original Order97-pinned RuleIR test bytes are retained exactly in the bounded
+historical-input mapping. Current metadata-only tests explicitly opt out of
+persistence; the existing bridge fixture supplies genuine battle state. Historical
+assertions and inventory remain unchanged and are not current gameplay evidence.

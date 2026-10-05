@@ -1,0 +1,17 @@
+{
+  "reviewed_commit": "e6d728833f41ac88d76a281b1ad93cac5346006b",
+  "also_present_at_base": "e6d728833f41ac88d76a281b1ad93cac5346006b",
+  "purpose": "Retain exact original Order97 RuleIR metadata-only fixture and assertion bytes before current default-duration preflight requires explicit nonpersistent evaluation or genuine state. Historical evidence is separate from current Order122 executable gameplay claims.",
+  "current_evidence": "docs/ORDER_122_SCOPE_PLAN.md",
+  "files": [
+    {
+      "path": "tests/unit/test_phase17d_rule_execution.py",
+      "historical_path": "data/source_audits/order122/baseline/tests/unit/test_phase17d_rule_execution.py.txt",
+      "git_revision": "e6d728833f41ac88d76a281b1ad93cac5346006b",
+      "git_path": "tests/unit/test_phase17d_rule_execution.py",
+      "sha256": "39a3056620613379c97875c979dc30b7583a1a3633a5a4ec015706e5f884350a",
+      "bytes": 220949,
+      "order97_file_pin": "39a3056620613379c97875c979dc30b7583a1a3633a5a4ec015706e5f884350a"
+    }
+  ]
+}

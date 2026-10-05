@@ -3907,10 +3907,15 @@
     },
     "order122-source-evidence": {
       "paths": [
-        "data/source_audits/order122/source.audit.json"
+        "data/source_audits/order122/baseline/tests/unit/test_phase17d_rule_execution.py.txt",
+        "data/source_audits/order122/historical-inputs.json",
+        "data/source_audits/order122/source.audit.json",
+        "tools/core_rules_order97_history.py"
       ],
       "owners": [
-        "@document"
+        "@document",
+        "@module",
+        "historical_evidence_path"
       ],
       "families": [],
       "sensitive": false,

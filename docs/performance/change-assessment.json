@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "e6d728833f41ac88d76a281b1ad93cac5346006b",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c08442ab6d9b1ec4dad78b09634284b900bd1fe64e0e241435e35d8602760d66",
-  "operation_map_sha256": "561766c6db1f0cc6c1ea83c29ad448b1bdba81b64335f8fe0b0b2380ce236c8b",
+  "operation_map_sha256": "4178cf65211407e64591651b1553e3cc3bbac0205c7cd4c0f554dcf6700a06b9",
   "changes": {
     "README.md": {
       "before_sha256": "f761eb782c0ea2cb6ddd739d0eae659b82a65a68c0bc0bfe0fd166577c5dc97c",
@@ -254,6 +254,26 @@
         }
       }
     },
+    "data/source_audits/order122/baseline/tests/unit/test_phase17d_rule_execution.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "39a3056620613379c97875c979dc30b7583a1a3633a5a4ec015706e5f884350a",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "39a3056620613379c97875c979dc30b7583a1a3633a5a4ec015706e5f884350a"
+        }
+      }
+    },
+    "data/source_audits/order122/historical-inputs.json": {
+      "before_sha256": null,
+      "after_sha256": "129e4e961a7355a45628105857b06106e9fe9c05415ae58e751bb8b780cb259b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "129e4e961a7355a45628105857b06106e9fe9c05415ae58e751bb8b780cb259b"
+        }
+      }
+    },
     "data/source_audits/order122/source.audit.json": {
       "before_sha256": null,
       "after_sha256": "39dadcd4a0ddb65e242ac3aecbacc4a25623696e0f61d4fd820ebbf29ea615dc",
@@ -286,21 +306,21 @@
     },
     "docs/ORDER_122_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "0623a9d26cda650596268ea7e09f70e01628255359de2c1bbb7e263214e9ba61",
+      "after_sha256": "3d4ec74cda9cf0434278b269dc77592cfb492e4a4efd95473f4e0adad7bd92ae",
       "owners": {
         "@document": {
           "before": null,
-          "after": "0623a9d26cda650596268ea7e09f70e01628255359de2c1bbb7e263214e9ba61"
+          "after": "3d4ec74cda9cf0434278b269dc77592cfb492e4a4efd95473f4e0adad7bd92ae"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "1c7cdcb11c650cec9ea292ac80b5b01b41a639dc558127b3f2e5805784ed4b6a",
-      "after_sha256": "9fc2680600bf50e9a2747a5fa0b915c27ab25b73c18db3250b9cddafa09311e8",
+      "after_sha256": "d4ef1f24e8a19a79307d24709dc0a88fb400e7ee94ea88ce9578c578e26086a9",
       "owners": {
         "@document": {
           "before": "1c7cdcb11c650cec9ea292ac80b5b01b41a639dc558127b3f2e5805784ed4b6a",
-          "after": "9fc2680600bf50e9a2747a5fa0b915c27ab25b73c18db3250b9cddafa09311e8"
+          "after": "d4ef1f24e8a19a79307d24709dc0a88fb400e7ee94ea88ce9578c578e26086a9"
         }
       }
     },
@@ -525,6 +545,20 @@
         "test_phase17d_this_unit_effect_uses_source_unit_binding": {
           "before": "0a91efbeaae8b3d0874dd4c207434aeb810bbf887de078a28a2f0ba5b2827c8f",
           "after": "433e0122de22fb63395efd51502fe0742df6a3cfd962d78dc8527b6656ef8637"
+        }
+      }
+    },
+    "tools/core_rules_order97_history.py": {
+      "before_sha256": "b5591f326712ad15958bdcdcf7a4c6c272b307d73f1bbbd3e558773a2d122a3b",
+      "after_sha256": "fd7a41f29726cb33d0234f3c1d9069c3b6f7d27d801e245502fda0b3954a8312",
+      "owners": {
+        "@module": {
+          "before": "d7a3850d2cfb04bbecb1c6dd80afa89373772be6f6b9dca3e182d1aa0afbab4e",
+          "after": "fa340fb2c9cea0a3b82e7bf0a91b8942c4c22fd801cc6794a53907b2ee7d5da3"
+        },
+        "historical_evidence_path": {
+          "before": "c1dcc6245eb193024b9e6d9e37fff303a53dc03dc03ac38d8957dd828757c368",
+          "after": "5893fc40e533bf21056e100f923cce4a8149cc812a1d4ad4dc14364723773040"
         }
       }
     }
@@ -778,6 +812,26 @@
       "source_obligation": "Selected immutable Order97 Core rule:01:01.02.02:1 blocks3/4, obligations05/06: a lasting effect without explicit duration lasts through its triggering period or the phase in which it was given. Canonical source-linked fixtures exercise existing Core permissions; no current faction admission or source-policy extension.",
       "unchanged_work": "The shared duration owner adds a constant-size lasting-effect/typed-period dispatch. Existing execution, historical effect reconstruction and Objective Control authority derive the same default expiration; existing modifier queries and lifecycle cleanup consume the resulting records. Explicit durations and instant mutation/continuation owners retain precedence. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads or dice work. No intended performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and live semantic/ownership/work controls apply; no full-game certification or numerical budget refresh."
     },
+    "data/source_audits/order122/baseline/tests/unit/test_phase17d_rule_execution.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order122-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core default-effect lifetime seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Order97 Core rule:01:01.02.02:1 blocks3/4, obligations05/06: a lasting effect without explicit duration lasts through its triggering period or the phase in which it was given. Canonical source-linked fixtures exercise existing Core permissions; no current faction admission or source-policy extension.",
+      "unchanged_work": "The shared duration owner adds a constant-size lasting-effect/typed-period dispatch. Existing execution, historical effect reconstruction and Objective Control authority derive the same default expiration; existing modifier queries and lifecycle cleanup consume the resulting records. Explicit durations and instant mutation/continuation owners retain precedence. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads or dice work. No intended performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and live semantic/ownership/work controls apply; no full-game certification or numerical budget refresh."
+    },
+    "data/source_audits/order122/historical-inputs.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order122-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core default-effect lifetime seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Order97 Core rule:01:01.02.02:1 blocks3/4, obligations05/06: a lasting effect without explicit duration lasts through its triggering period or the phase in which it was given. Canonical source-linked fixtures exercise existing Core permissions; no current faction admission or source-policy extension.",
+      "unchanged_work": "The shared duration owner adds a constant-size lasting-effect/typed-period dispatch. Existing execution, historical effect reconstruction and Objective Control authority derive the same default expiration; existing modifier queries and lifecycle cleanup consume the resulting records. Explicit durations and instant mutation/continuation owners retain precedence. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads or dice work. No intended performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and live semantic/ownership/work controls apply; no full-game certification or numerical budget refresh."
+    },
     "data/source_audits/order122/source.audit.json": {
       "category": "rule_semantics",
       "operations": [
@@ -930,6 +984,16 @@
       "category": "rule_semantics",
       "operations": [
         "order122-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked Core default-effect lifetime seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Order97 Core rule:01:01.02.02:1 blocks3/4, obligations05/06: a lasting effect without explicit duration lasts through its triggering period or the phase in which it was given. Canonical source-linked fixtures exercise existing Core permissions; no current faction admission or source-policy extension.",
+      "unchanged_work": "The shared duration owner adds a constant-size lasting-effect/typed-period dispatch. Existing execution, historical effect reconstruction and Objective Control authority derive the same default expiration; existing modifier queries and lifecycle cleanup consume the resulting records. Explicit durations and instant mutation/continuation owners retain precedence. No changes to search algorithms, geometry, caches, serializers, dependency roles, measured workloads or dice work. No intended performance optimization or demonstrated severe regression. Quiet serial current-runtime smoke and live semantic/ownership/work controls apply; no full-game certification or numerical budget refresh."
+    },
+    "tools/core_rules_order97_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order122-source-evidence"
       ],
       "selected_families": [],
       "rationale": "Bounded source-linked Core default-effect lifetime seam, canonical facade regressions and truthful separately retained source evidence.",
