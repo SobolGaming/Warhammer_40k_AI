@@ -1,476 +1,668 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "2b871d57d2be8e24f877e4a2e5101f26a0beb38f",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a12a4c4cf2ff68d3fde9c874d93758a8bbd2a7b424ca280e6fbb8afd20154dcb",
-  "operation_map_sha256": "aed6cf09edaaeb4071bfd3ad2cf92e1f4568e564cd101733efbf64a7a06f167a",
+  "base": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:cc8bd89da690af9e304774430d636ae0efe0914daafedb535bf732aeb48193bc",
+  "operation_map_sha256": "0609fe13d78c55e830f34549ea427ddf1b7af388a884fbad4f5a8bcc77507a83",
   "changes": {
     "README.md": {
-      "before_sha256": "370a025f542e10c6745fd34181459ff78a4c9fe489dbf22349072c39193eab20",
-      "after_sha256": "3b4d88e8483627f0a6f6fb8d3b710912a91c60a7fc57e08810f7f4d6ff91eb37",
+      "before_sha256": "3b4d88e8483627f0a6f6fb8d3b710912a91c60a7fc57e08810f7f4d6ff91eb37",
+      "after_sha256": "5ec94a03258d3dd4d28406bf17628428562bd83ff2c49b21625bf11d49b44005",
       "owners": {
         "@document": {
-          "before": "370a025f542e10c6745fd34181459ff78a4c9fe489dbf22349072c39193eab20",
-          "after": "3b4d88e8483627f0a6f6fb8d3b710912a91c60a7fc57e08810f7f4d6ff91eb37"
+          "before": "3b4d88e8483627f0a6f6fb8d3b710912a91c60a7fc57e08810f7f4d6ff91eb37",
+          "after": "5ec94a03258d3dd4d28406bf17628428562bd83ff2c49b21625bf11d49b44005"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "62b5dddd3f10d133b4387a4fda2835f062530ecad889ead8c875f73dcce1782a",
-      "after_sha256": "96e72a8400edb8ea33bfbbc68e9defb1874a7a4f605f12ca23ca644e0a4ad5ba",
+      "before_sha256": "96e72a8400edb8ea33bfbbc68e9defb1874a7a4f605f12ca23ca644e0a4ad5ba",
+      "after_sha256": "fb2098bacce3ed251793fd195e883b83d8a8f53f1f953f15ea46da95e96e60fc",
       "owners": {
         "@document": {
-          "before": "62b5dddd3f10d133b4387a4fda2835f062530ecad889ead8c875f73dcce1782a",
-          "after": "96e72a8400edb8ea33bfbbc68e9defb1874a7a4f605f12ca23ca644e0a4ad5ba"
+          "before": "96e72a8400edb8ea33bfbbc68e9defb1874a7a4f605f12ca23ca644e0a4ad5ba",
+          "after": "fb2098bacce3ed251793fd195e883b83d8a8f53f1f953f15ea46da95e96e60fc"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "a8895bcbbf13351f159852c038d63712818b750779f4c5aa1c50d4b4e9deea3c",
-      "after_sha256": "cbda807f1f4d95ed910f664ea3784f410d7f9d925757831e392184f3d0ac1c96",
+      "before_sha256": "cbda807f1f4d95ed910f664ea3784f410d7f9d925757831e392184f3d0ac1c96",
+      "after_sha256": "ed68288ab1c8ab753568a8653e68343eb90f81d9275236ad6953af5a32fcf608",
       "owners": {
         "@document": {
-          "before": "a8895bcbbf13351f159852c038d63712818b750779f4c5aa1c50d4b4e9deea3c",
-          "after": "cbda807f1f4d95ed910f664ea3784f410d7f9d925757831e392184f3d0ac1c96"
+          "before": "cbda807f1f4d95ed910f664ea3784f410d7f9d925757831e392184f3d0ac1c96",
+          "after": "ed68288ab1c8ab753568a8653e68343eb90f81d9275236ad6953af5a32fcf608"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "58c2590bc3cca683210982636e97aa3490d2c94ff931c94b6224c5b1a208e247",
-      "after_sha256": "4fb450db303f98e287c5add8a8f65dc1335f4377b88740a157cf364a0493e97a",
+      "before_sha256": "4fb450db303f98e287c5add8a8f65dc1335f4377b88740a157cf364a0493e97a",
+      "after_sha256": "01858a1d07711b513d7c39baa2d0039a2af183e55b6baa4b2a0aa7d7819219ec",
       "owners": {
         "@document": {
-          "before": "58c2590bc3cca683210982636e97aa3490d2c94ff931c94b6224c5b1a208e247",
-          "after": "4fb450db303f98e287c5add8a8f65dc1335f4377b88740a157cf364a0493e97a"
+          "before": "4fb450db303f98e287c5add8a8f65dc1335f4377b88740a157cf364a0493e97a",
+          "after": "01858a1d07711b513d7c39baa2d0039a2af183e55b6baa4b2a0aa7d7819219ec"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "ab26119717c39952712d13047b2126dfd4e816d3196afbcd4656a8a5168f8212",
-      "after_sha256": "34930d212fdb1e0fe59cf24bdc0bd65a14fa1453a8ffd2e226a3f1818e2f264a",
+      "before_sha256": "34930d212fdb1e0fe59cf24bdc0bd65a14fa1453a8ffd2e226a3f1818e2f264a",
+      "after_sha256": "72f310669400432dd509a738e88a4705a3d3280a84782042fc288a594deb5c41",
       "owners": {
         "@document": {
-          "before": "ab26119717c39952712d13047b2126dfd4e816d3196afbcd4656a8a5168f8212",
-          "after": "34930d212fdb1e0fe59cf24bdc0bd65a14fa1453a8ffd2e226a3f1818e2f264a"
+          "before": "34930d212fdb1e0fe59cf24bdc0bd65a14fa1453a8ffd2e226a3f1818e2f264a",
+          "after": "72f310669400432dd509a738e88a4705a3d3280a84782042fc288a594deb5c41"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "406f3067b67869965de1451df60d36755e4a05aa5b4cbf2ac92060e29f0dd3ed",
-      "after_sha256": "e2ccf4f7c3c0e811b9ef5a8c86db47ec6132015d3c7eb453f02d68f61f0e978e",
+      "before_sha256": "e2ccf4f7c3c0e811b9ef5a8c86db47ec6132015d3c7eb453f02d68f61f0e978e",
+      "after_sha256": "637eabc9b8212959a2b74869e25a699af20407098c0d12c962d1553fec1ecac1",
       "owners": {
         "@document": {
-          "before": "406f3067b67869965de1451df60d36755e4a05aa5b4cbf2ac92060e29f0dd3ed",
-          "after": "e2ccf4f7c3c0e811b9ef5a8c86db47ec6132015d3c7eb453f02d68f61f0e978e"
+          "before": "e2ccf4f7c3c0e811b9ef5a8c86db47ec6132015d3c7eb453f02d68f61f0e978e",
+          "after": "637eabc9b8212959a2b74869e25a699af20407098c0d12c962d1553fec1ecac1"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "ec9e473a8a53ebc6bac862de498f008a20e7f123f3079ec450d2b5276df03329",
-      "after_sha256": "797266fe66ef5ed412eed079a0f1cc02cc49dc4393c085ef5b8222c1ed70f00b",
+      "before_sha256": "797266fe66ef5ed412eed079a0f1cc02cc49dc4393c085ef5b8222c1ed70f00b",
+      "after_sha256": "150d7da414baa42e5cb8f813f53397a8a13adf5a12b229826afc7e9dc5352d07",
       "owners": {
         "@document": {
-          "before": "ec9e473a8a53ebc6bac862de498f008a20e7f123f3079ec450d2b5276df03329",
-          "after": "797266fe66ef5ed412eed079a0f1cc02cc49dc4393c085ef5b8222c1ed70f00b"
+          "before": "797266fe66ef5ed412eed079a0f1cc02cc49dc4393c085ef5b8222c1ed70f00b",
+          "after": "150d7da414baa42e5cb8f813f53397a8a13adf5a12b229826afc7e9dc5352d07"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "d1f8a59bf9d46d767365ab27e7b1966970fef5246213be1c26f7f2761ea1a72d",
-      "after_sha256": "1623717e1ce4faa9ab612a957226509b933e3c02508cee381078500ffb9bafc8",
+      "before_sha256": "1623717e1ce4faa9ab612a957226509b933e3c02508cee381078500ffb9bafc8",
+      "after_sha256": "850fca6789e1e2958eb2d6ca044032c2243e2743eed8ba8ca59d0b5ae7674486",
       "owners": {
         "@document": {
-          "before": "d1f8a59bf9d46d767365ab27e7b1966970fef5246213be1c26f7f2761ea1a72d",
-          "after": "1623717e1ce4faa9ab612a957226509b933e3c02508cee381078500ffb9bafc8"
+          "before": "1623717e1ce4faa9ab612a957226509b933e3c02508cee381078500ffb9bafc8",
+          "after": "850fca6789e1e2958eb2d6ca044032c2243e2743eed8ba8ca59d0b5ae7674486"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "bb634b9ec7e1a69b224546fa58331ee03ed764625c5d17245fbf3a21ea7cdc75",
-      "after_sha256": "0062eb4ab70966b5fc59b17d196c319e5ca1abaefd3151f0a63819f0e261b530",
+      "before_sha256": "0062eb4ab70966b5fc59b17d196c319e5ca1abaefd3151f0a63819f0e261b530",
+      "after_sha256": "5125dd865a5d1f6e9c05c4e5547490e94e559f6145c7e6ef08e52a4cf76f9d96",
       "owners": {
         "@document": {
-          "before": "bb634b9ec7e1a69b224546fa58331ee03ed764625c5d17245fbf3a21ea7cdc75",
-          "after": "0062eb4ab70966b5fc59b17d196c319e5ca1abaefd3151f0a63819f0e261b530"
+          "before": "0062eb4ab70966b5fc59b17d196c319e5ca1abaefd3151f0a63819f0e261b530",
+          "after": "5125dd865a5d1f6e9c05c4e5547490e94e559f6145c7e6ef08e52a4cf76f9d96"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "0b5fc07c7d6ac90b3487e120cd9b39c4774390f9c822be7165767bcde5120b8f",
-      "after_sha256": "e85fda42bc06df40170b665fdd6d25bf357314aa5c037e367f068fea9021a7ee",
+      "before_sha256": "e85fda42bc06df40170b665fdd6d25bf357314aa5c037e367f068fea9021a7ee",
+      "after_sha256": "56d59b9f4edef0c786f3922fd1110c4047352548827dcc1b5213a87eea9d6907",
       "owners": {
         "@document": {
-          "before": "0b5fc07c7d6ac90b3487e120cd9b39c4774390f9c822be7165767bcde5120b8f",
-          "after": "e85fda42bc06df40170b665fdd6d25bf357314aa5c037e367f068fea9021a7ee"
+          "before": "e85fda42bc06df40170b665fdd6d25bf357314aa5c037e367f068fea9021a7ee",
+          "after": "56d59b9f4edef0c786f3922fd1110c4047352548827dcc1b5213a87eea9d6907"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "d78ef0d4b47a4826f8e596f207ac50bbb211b000acf0e19cd23e17e9855a8a43",
-      "after_sha256": "a250714d0747695d7c9826e4fa989c50af7d6d47b61b0a77820ba1a675319d74",
+      "before_sha256": "a250714d0747695d7c9826e4fa989c50af7d6d47b61b0a77820ba1a675319d74",
+      "after_sha256": "cbc5eeb259289d732333f842f8fd1dbc0af570c59070ad8f7b1b43e4a6e5859d",
       "owners": {
         "@document": {
-          "before": "d78ef0d4b47a4826f8e596f207ac50bbb211b000acf0e19cd23e17e9855a8a43",
-          "after": "a250714d0747695d7c9826e4fa989c50af7d6d47b61b0a77820ba1a675319d74"
+          "before": "a250714d0747695d7c9826e4fa989c50af7d6d47b61b0a77820ba1a675319d74",
+          "after": "cbc5eeb259289d732333f842f8fd1dbc0af570c59070ad8f7b1b43e4a6e5859d"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "e112c86b165abfbb76cabbd1a296277a1a29a483235d873cf3cf58b2fe717adc",
-      "after_sha256": "1bd79a865744232a443c8f941ac651011d6e89b600c89672361d0b6639eb2c81",
+      "before_sha256": "1bd79a865744232a443c8f941ac651011d6e89b600c89672361d0b6639eb2c81",
+      "after_sha256": "3f57aa594ac1c8845dab6ea6121ee3a1853a6b7156afee602e44c38f2902cbdf",
       "owners": {
         "@document": {
-          "before": "e112c86b165abfbb76cabbd1a296277a1a29a483235d873cf3cf58b2fe717adc",
-          "after": "1bd79a865744232a443c8f941ac651011d6e89b600c89672361d0b6639eb2c81"
+          "before": "1bd79a865744232a443c8f941ac651011d6e89b600c89672361d0b6639eb2c81",
+          "after": "3f57aa594ac1c8845dab6ea6121ee3a1853a6b7156afee602e44c38f2902cbdf"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "46c924c306cbaad4d298675a75481bb416e8cac09c8c467c77479f418049367a",
-      "after_sha256": "e177625f11109bc6a62578d5b04d9897268770f7347a5124007381b5a47ae721",
+      "before_sha256": "e177625f11109bc6a62578d5b04d9897268770f7347a5124007381b5a47ae721",
+      "after_sha256": "d94ab9ffbb39f7022d435a843f1fc0b9f407303d5c0013d3505ad6ae35dd1f5a",
       "owners": {
         "@document": {
-          "before": "46c924c306cbaad4d298675a75481bb416e8cac09c8c467c77479f418049367a",
-          "after": "e177625f11109bc6a62578d5b04d9897268770f7347a5124007381b5a47ae721"
+          "before": "e177625f11109bc6a62578d5b04d9897268770f7347a5124007381b5a47ae721",
+          "after": "d94ab9ffbb39f7022d435a843f1fc0b9f407303d5c0013d3505ad6ae35dd1f5a"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "0f268dd23647a5f75c795afe570f4658fb1e1be0e374c7e81144b4da05b26835",
-      "after_sha256": "e23d47c394aa651358812f21e83d52241aad5b4f2cbb2f24ffe630b5025083b3",
+      "before_sha256": "e23d47c394aa651358812f21e83d52241aad5b4f2cbb2f24ffe630b5025083b3",
+      "after_sha256": "0e6312ff119208ba4048a4878c2d40d213e66c9ad15d3cbe24b67626bf284faf",
       "owners": {
         "@document": {
-          "before": "0f268dd23647a5f75c795afe570f4658fb1e1be0e374c7e81144b4da05b26835",
-          "after": "e23d47c394aa651358812f21e83d52241aad5b4f2cbb2f24ffe630b5025083b3"
-        }
-      }
-    },
-    "conformance/typescript/src/contract.ts": {
-      "before_sha256": "0c411d81d42471840bb8a468f6b07de3735eb2eca2fdcf767707a9568e72677b",
-      "after_sha256": "b065bd91e9e113014412cce7415f58170763ad2215a4d57dc71eb1023daceacc",
-      "owners": {
-        "@document": {
-          "before": "0c411d81d42471840bb8a468f6b07de3735eb2eca2fdcf767707a9568e72677b",
-          "after": "b065bd91e9e113014412cce7415f58170763ad2215a4d57dc71eb1023daceacc"
+          "before": "e23d47c394aa651358812f21e83d52241aad5b4f2cbb2f24ffe630b5025083b3",
+          "after": "0e6312ff119208ba4048a4878c2d40d213e66c9ad15d3cbe24b67626bf284faf"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "bd4217cded9db9856e166c8b203cb6f54bcadbfa8a36b2bedf3c9f865264a016",
-      "after_sha256": "16d202acde22380e4f7a27fc773b6d13e7188b61d75bfb94b0d0688fb13a4bd4",
+      "before_sha256": "16d202acde22380e4f7a27fc773b6d13e7188b61d75bfb94b0d0688fb13a4bd4",
+      "after_sha256": "95f4f5476bf41d7590e17119fa9e5f48f54b0d57f73f8baaa39d5bafc95a495e",
       "owners": {
         "@document": {
-          "before": "bd4217cded9db9856e166c8b203cb6f54bcadbfa8a36b2bedf3c9f865264a016",
-          "after": "16d202acde22380e4f7a27fc773b6d13e7188b61d75bfb94b0d0688fb13a4bd4"
+          "before": "16d202acde22380e4f7a27fc773b6d13e7188b61d75bfb94b0d0688fb13a4bd4",
+          "after": "95f4f5476bf41d7590e17119fa9e5f48f54b0d57f73f8baaa39d5bafc95a495e"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "ddfd9b2b539cc0729d7638bc3d43430c551f23864442b7e5d20ff3b933fc5192",
-      "after_sha256": "442552d8bb17e06faa8dcfb2f34afd1be4019e440be8893e4c656652a0a24f6e",
+      "before_sha256": "442552d8bb17e06faa8dcfb2f34afd1be4019e440be8893e4c656652a0a24f6e",
+      "after_sha256": "73d2a355987978d69eced60f1db7ca7e071db616af3139851e022d8e5b21e8f6",
       "owners": {
         "@document": {
-          "before": "ddfd9b2b539cc0729d7638bc3d43430c551f23864442b7e5d20ff3b933fc5192",
-          "after": "442552d8bb17e06faa8dcfb2f34afd1be4019e440be8893e4c656652a0a24f6e"
+          "before": "442552d8bb17e06faa8dcfb2f34afd1be4019e440be8893e4c656652a0a24f6e",
+          "after": "73d2a355987978d69eced60f1db7ca7e071db616af3139851e022d8e5b21e8f6"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "2eaf7c54fae057107690d6c2c38f9d26ad6714f1683d94860841386a21e2cf0f",
-      "after_sha256": "1984ef09aacc263d7d4ee94049d800ca3ef8f723cf835e6e699f55a713daa1ee",
+      "before_sha256": "1984ef09aacc263d7d4ee94049d800ca3ef8f723cf835e6e699f55a713daa1ee",
+      "after_sha256": "0aaaa2c086958ad04059601afe9bc955dfcff46eb42e0eb3ae06d3df6827767a",
       "owners": {
         "@document": {
-          "before": "2eaf7c54fae057107690d6c2c38f9d26ad6714f1683d94860841386a21e2cf0f",
-          "after": "1984ef09aacc263d7d4ee94049d800ca3ef8f723cf835e6e699f55a713daa1ee"
+          "before": "1984ef09aacc263d7d4ee94049d800ca3ef8f723cf835e6e699f55a713daa1ee",
+          "after": "0aaaa2c086958ad04059601afe9bc955dfcff46eb42e0eb3ae06d3df6827767a"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "d8c7e43cc178b9e32b8666ea277dd3883e2a97cf753e45a4d2012d1332df14ad",
-      "after_sha256": "b84e5e1ec6ed2e4b25e1a5c4a90ec0cf633dcb5e6fcf49cff942ad153d952a90",
+      "before_sha256": "b84e5e1ec6ed2e4b25e1a5c4a90ec0cf633dcb5e6fcf49cff942ad153d952a90",
+      "after_sha256": "3795c419496976558f8265e12a2ec00d6a142f595e742f00526ecc3b6f5cd485",
       "owners": {
         "@document": {
-          "before": "d8c7e43cc178b9e32b8666ea277dd3883e2a97cf753e45a4d2012d1332df14ad",
-          "after": "b84e5e1ec6ed2e4b25e1a5c4a90ec0cf633dcb5e6fcf49cff942ad153d952a90"
+          "before": "b84e5e1ec6ed2e4b25e1a5c4a90ec0cf633dcb5e6fcf49cff942ad153d952a90",
+          "after": "3795c419496976558f8265e12a2ec00d6a142f595e742f00526ecc3b6f5cd485"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "8c5842588082c6d885caa1ec952425c75cc2837904b2a069d74784ff0b38ec97",
-      "after_sha256": "ce020a322f16e8b8972d65de215dce6fcd839aeac04b0ae37fe8ab8238ef3b30",
+      "before_sha256": "ce020a322f16e8b8972d65de215dce6fcd839aeac04b0ae37fe8ab8238ef3b30",
+      "after_sha256": "d4c596cc1936ab5c0bc40557f3b279f0d35b63bd80c9d05be3a29fa71878e02f",
       "owners": {
         "@document": {
-          "before": "8c5842588082c6d885caa1ec952425c75cc2837904b2a069d74784ff0b38ec97",
-          "after": "ce020a322f16e8b8972d65de215dce6fcd839aeac04b0ae37fe8ab8238ef3b30"
+          "before": "ce020a322f16e8b8972d65de215dce6fcd839aeac04b0ae37fe8ab8238ef3b30",
+          "after": "d4c596cc1936ab5c0bc40557f3b279f0d35b63bd80c9d05be3a29fa71878e02f"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "5475daf70e03d6e48535e5b308dec9d016cfb1a01989f829dd9da9a1d7eaeb74",
-      "after_sha256": "db704ce9c5e4b844a561e094172a3a6b25f60db693ade584dc68548899014bee",
+      "before_sha256": "db704ce9c5e4b844a561e094172a3a6b25f60db693ade584dc68548899014bee",
+      "after_sha256": "59256d6782144e672f1c418ef715489f27c9f34a5894cd5cbd3e7c276a79efbf",
       "owners": {
         "@document": {
-          "before": "5475daf70e03d6e48535e5b308dec9d016cfb1a01989f829dd9da9a1d7eaeb74",
-          "after": "db704ce9c5e4b844a561e094172a3a6b25f60db693ade584dc68548899014bee"
+          "before": "db704ce9c5e4b844a561e094172a3a6b25f60db693ade584dc68548899014bee",
+          "after": "59256d6782144e672f1c418ef715489f27c9f34a5894cd5cbd3e7c276a79efbf"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "edd1bdb8da59073d6426914c5e629d2a04139051ba4c9fcbf4587bbd47662ff7",
-      "after_sha256": "0fd1417e3d9bd145129ce634015d1364aabb74a4f365d87431a51d9d8d398491",
+      "before_sha256": "0fd1417e3d9bd145129ce634015d1364aabb74a4f365d87431a51d9d8d398491",
+      "after_sha256": "71fcb582834e42d785e3598ba7a6771342e8e71293615d992b86a724a8e9dcf5",
       "owners": {
         "@document": {
-          "before": "edd1bdb8da59073d6426914c5e629d2a04139051ba4c9fcbf4587bbd47662ff7",
-          "after": "0fd1417e3d9bd145129ce634015d1364aabb74a4f365d87431a51d9d8d398491"
+          "before": "0fd1417e3d9bd145129ce634015d1364aabb74a4f365d87431a51d9d8d398491",
+          "after": "71fcb582834e42d785e3598ba7a6771342e8e71293615d992b86a724a8e9dcf5"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "fed259774bc25dfd601bf5b49265633b5d5c9474e4b60717728d971cab619cec",
-      "after_sha256": "5aa015c9b76c082ac46fac89b4071bbabf9a3bee0ec1d341b261d23ee8dbb9c6",
+      "before_sha256": "5aa015c9b76c082ac46fac89b4071bbabf9a3bee0ec1d341b261d23ee8dbb9c6",
+      "after_sha256": "0c657a98767bd109a7551ad621eb4a2b1f1715d6fcd0df4e403a16b052ea0848",
       "owners": {
         "@document": {
-          "before": "fed259774bc25dfd601bf5b49265633b5d5c9474e4b60717728d971cab619cec",
-          "after": "5aa015c9b76c082ac46fac89b4071bbabf9a3bee0ec1d341b261d23ee8dbb9c6"
+          "before": "5aa015c9b76c082ac46fac89b4071bbabf9a3bee0ec1d341b261d23ee8dbb9c6",
+          "after": "0c657a98767bd109a7551ad621eb4a2b1f1715d6fcd0df4e403a16b052ea0848"
         }
       }
     },
     "contracts/openapi.yaml": {
-      "before_sha256": "b56d45a895b1e7ddc7b15268706388c32532d9f4d94f30307df33eff75818cd2",
-      "after_sha256": "d1bbc8b841c9e573cbf2c10ca4df68cd68234e71d65bc1893f5e2e4b32536482",
+      "before_sha256": "d1bbc8b841c9e573cbf2c10ca4df68cd68234e71d65bc1893f5e2e4b32536482",
+      "after_sha256": "19ae0523aa99f59505175646d5a665239edfeab5363f29064a0e82291bedd3f1",
       "owners": {
         "@document": {
-          "before": "b56d45a895b1e7ddc7b15268706388c32532d9f4d94f30307df33eff75818cd2",
-          "after": "d1bbc8b841c9e573cbf2c10ca4df68cd68234e71d65bc1893f5e2e4b32536482"
+          "before": "d1bbc8b841c9e573cbf2c10ca4df68cd68234e71d65bc1893f5e2e4b32536482",
+          "after": "19ae0523aa99f59505175646d5a665239edfeab5363f29064a0e82291bedd3f1"
         }
       }
     },
-    "data/source_audits/order125/source.audit.json": {
+    "data/source_audits/order126/baseline/tests/integration/test_setup_prebattle_ui_smoke.py.txt": {
       "before_sha256": null,
-      "after_sha256": "1bb91211d0c7f08927f5d0bc6dd003223e6064ee6689db3d6bcf46d925c66a2a",
+      "after_sha256": "52f98d973cb10b4d6608a079e4e790a50a8957f475f17ef1827e622a86ce30fe",
       "owners": {
         "@document": {
           "before": null,
-          "after": "1bb91211d0c7f08927f5d0bc6dd003223e6064ee6689db3d6bcf46d925c66a2a"
+          "after": "52f98d973cb10b4d6608a079e4e790a50a8957f475f17ef1827e622a86ce30fe"
+        }
+      }
+    },
+    "data/source_audits/order126/baseline/tests/phase15a_charge_test_support.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "21214ce6cae70499da006366f76244796cd2af333a4871e56516807caca73872",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "21214ce6cae70499da006366f76244796cd2af333a4871e56516807caca73872"
+        }
+      }
+    },
+    "data/source_audits/order126/historical-inputs.json": {
+      "before_sha256": null,
+      "after_sha256": "c6712c5355c756746296d63615c7a6a80093a7d50900453d67309b187efa0559",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c6712c5355c756746296d63615c7a6a80093a7d50900453d67309b187efa0559"
+        }
+      }
+    },
+    "data/source_audits/order126/source.audit.json": {
+      "before_sha256": null,
+      "after_sha256": "30cc24538d59bb10b7b89017372608c51a401ab0d6d56b6c93b1a78b8c3482bb",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "30cc24538d59bb10b7b89017372608c51a401ab0d6d56b6c93b1a78b8c3482bb"
         }
       }
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "15311b54374ce92df63191b63ea73318df133f6ea3d27a4108ad4c1e400355db",
-      "after_sha256": "a6b3075a6f655e790b6bd8cfe585b82ddc5f404c1caf607b067176500a348dc2",
+      "before_sha256": "a6b3075a6f655e790b6bd8cfe585b82ddc5f404c1caf607b067176500a348dc2",
+      "after_sha256": "0cbe69bfdca6a8afb87502382c3c998e3fdadc990580e0e4391e36bb7e687a3d",
       "owners": {
         "@document": {
-          "before": "15311b54374ce92df63191b63ea73318df133f6ea3d27a4108ad4c1e400355db",
-          "after": "a6b3075a6f655e790b6bd8cfe585b82ddc5f404c1caf607b067176500a348dc2"
+          "before": "a6b3075a6f655e790b6bd8cfe585b82ddc5f404c1caf607b067176500a348dc2",
+          "after": "0cbe69bfdca6a8afb87502382c3c998e3fdadc990580e0e4391e36bb7e687a3d"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "6d023c3170a0fd54d5083819a8906d013512a10246cb1957d1a3203a7b5fc5f3",
-      "after_sha256": "6b396799ae0046ccdff64ce54e9b39d8bd61e452c213e7d1afdfda6c4ae3fced",
+      "before_sha256": "6b396799ae0046ccdff64ce54e9b39d8bd61e452c213e7d1afdfda6c4ae3fced",
+      "after_sha256": "314ec893192d887e40f9f32b22d74c6d18783ae779d0326cc22dd098a4882236",
       "owners": {
         "@document": {
-          "before": "6d023c3170a0fd54d5083819a8906d013512a10246cb1957d1a3203a7b5fc5f3",
-          "after": "6b396799ae0046ccdff64ce54e9b39d8bd61e452c213e7d1afdfda6c4ae3fced"
+          "before": "6b396799ae0046ccdff64ce54e9b39d8bd61e452c213e7d1afdfda6c4ae3fced",
+          "after": "314ec893192d887e40f9f32b22d74c6d18783ae779d0326cc22dd098a4882236"
         }
       }
     },
-    "docs/ORDER_125_SCOPE_PLAN.md": {
+    "docs/ORDER_126_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "10b27a528a81d4514d12d1b7d491cb29f4a8f88ba02fc90781c79c1ec2e95e34",
+      "after_sha256": "e7479a17764ee778b525c56ea99625b579d53c25d047e7bbfbc244041c2afb90",
       "owners": {
         "@document": {
           "before": null,
-          "after": "10b27a528a81d4514d12d1b7d491cb29f4a8f88ba02fc90781c79c1ec2e95e34"
+          "after": "e7479a17764ee778b525c56ea99625b579d53c25d047e7bbfbc244041c2afb90"
+        }
+      }
+    },
+    "docs/performance/PERFORMANCE_POLICY.md": {
+      "before_sha256": "5702f2af0f8155a427ffa1f5c3b511870fd3656775af7b4f519651da198b2fe2",
+      "after_sha256": "0bb63dab0def0284560c3c38107e6e4a5d31a6387014e9e95ccef8a146f8b86c",
+      "owners": {
+        "@document": {
+          "before": "5702f2af0f8155a427ffa1f5c3b511870fd3656775af7b4f519651da198b2fe2",
+          "after": "0bb63dab0def0284560c3c38107e6e4a5d31a6387014e9e95ccef8a146f8b86c"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "80c5159010099ce3749f18cad88db190f54901e6c2f6d50ae1007aeb58d3cb44",
-      "after_sha256": "b20ec777768ef75012883c14012ed4e3df21b252dcd978df562ff4f41dc7caf2",
+      "before_sha256": "b20ec777768ef75012883c14012ed4e3df21b252dcd978df562ff4f41dc7caf2",
+      "after_sha256": "a56f3ad481386d5ff415f3daa13478481b2758944d726b418b89e2fab6a94fc1",
       "owners": {
         "@document": {
-          "before": "80c5159010099ce3749f18cad88db190f54901e6c2f6d50ae1007aeb58d3cb44",
-          "after": "b20ec777768ef75012883c14012ed4e3df21b252dcd978df562ff4f41dc7caf2"
+          "before": "b20ec777768ef75012883c14012ed4e3df21b252dcd978df562ff4f41dc7caf2",
+          "after": "a56f3ad481386d5ff415f3daa13478481b2758944d726b418b89e2fab6a94fc1"
+        }
+      }
+    },
+    "docs/performance/policy-v3/order126-rule-semantics.json": {
+      "before_sha256": null,
+      "after_sha256": "0923ff840687b4c36a92d45ad2afc991403232d2f52a99ae415b2eed6f57f932",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "0923ff840687b4c36a92d45ad2afc991403232d2f52a99ae415b2eed6f57f932"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "24bf9840708e5e7552f523dbcd5ded83e40490513f2be147cfbeebb2d5336609",
-      "after_sha256": "38ba87918ee8fc324860cce0fa1688de365576ae18b7fa3981abeda560a6bb5c",
+      "before_sha256": "38ba87918ee8fc324860cce0fa1688de365576ae18b7fa3981abeda560a6bb5c",
+      "after_sha256": "b8831ba8de31294e552acf56b3a34d7126283310c6a52e8043c45cbd1ea1c771",
       "owners": {
         "@document": {
-          "before": "24bf9840708e5e7552f523dbcd5ded83e40490513f2be147cfbeebb2d5336609",
-          "after": "38ba87918ee8fc324860cce0fa1688de365576ae18b7fa3981abeda560a6bb5c"
+          "before": "38ba87918ee8fc324860cce0fa1688de365576ae18b7fa3981abeda560a6bb5c",
+          "after": "b8831ba8de31294e552acf56b3a34d7126283310c6a52e8043c45cbd1ea1c771"
         }
       }
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
-      "before_sha256": "e8066c10a5d4b2352bd22980e96920e9169347ff92bdb8b40e9d44f59726ea7c",
-      "after_sha256": "6309afe5f5f576a35c71afa23387c00cc52f0a9614057ad61a3e83636ab41463",
+      "before_sha256": "6309afe5f5f576a35c71afa23387c00cc52f0a9614057ad61a3e83636ab41463",
+      "after_sha256": "9d2b9e83b65d9f7ad94520622e84764e705456045d2e6ff9259e6f637c3bcd78",
       "owners": {
         "@module": {
-          "before": "f2f013990a178a9f2e0a5fd1d6165b743ec6d845f342e476137ea646e34f28bc",
-          "after": "87e349b9d5ea3557dceec9a5e961262815501b0a3e43c3da309f7d3fc39007a0"
+          "before": "87e349b9d5ea3557dceec9a5e961262815501b0a3e43c3da309f7d3fc39007a0",
+          "after": "1e5dc46585c89f421df93ff4605fca1ffe4d9b6200c047e20c38b4a0ec2eb5dc"
         }
       }
     },
-    "src/warhammer40k_core/engine/catalog_selected_target_effects.py": {
-      "before_sha256": "7f537df4902af0ba1b9520b8e7174c5748ea15063ba44d3d8ee2e899e1a3b32f",
-      "after_sha256": "226e32e6e9d021db247d23bbfb8a7f5fbb1cf7d82e7b8a13b556443a794ea10b",
+    "src/warhammer40k_core/engine/charge_move_geometry.py": {
+      "before_sha256": "86b9773102cedc5f519110050d848f2583feca213f48c76aef93da1938bf10da",
+      "after_sha256": "0c7e142e9ff51d82cc0a55d74d308dcb8c58147b7d3f8725aa8a873e4f03924c",
       "owners": {
         "@module": {
-          "before": "5bc27ac8d793f9ce8113c1de71bd09f11bbf5ee62b5fc17e9239d1c8cfe2142f",
-          "after": "3def86491607b0222a4006ae273bcf5063163a93947bb016d05c36471e5f99fa"
+          "before": "7413933636004f6933847d783305f52b0ad544c1f2e8b8f83a01dafb4073dddb",
+          "after": "e9f110e21f5924fce9a756cbf71ff981c8539afbdbf72b9ae89bf872d3dae38d"
         },
-        "_shooting_start_groups_for_record": {
-          "before": "a3aaf527a0d9f98aba43743f4c80f3bc968ed66fef4975a18883f0fe2c923ead",
-          "after": "0f120ce4b5a005ed2d6ae92a6f24ef04fcb20860a0bbc10fc4a5c7d8fb5b10d1"
+        "_friendly_geometry_models_for_charge_path": {
+          "before": "ba2b606bfbd23ad792f4c7fb5fbd80082773d7c302a7bc97e51f8c65dd091550",
+          "after": "4bad878514d540d24a10e9f680af612c3eb1492d639321c3b5175b7f09e485fd"
         }
       }
     },
-    "src/warhammer40k_core/engine/catalog_selected_target_pair_support.py": {
-      "before_sha256": "025cd5b4d959f8e3eb6109caf3dc9e40cacdfa246edaa71c5664fc93fbd42a6d",
-      "after_sha256": "1d873b761aace5dc9503c9e9a1e52ba4bc0ba5819ee48c477ac5ea8cdcee567a",
+    "src/warhammer40k_core/engine/charge_move_resolution.py": {
+      "before_sha256": "1591ad0a613e1aaa9baa542cf5b39e57d4cd6002353677e9804314d311c674d8",
+      "after_sha256": "4c4618b195289e917ee8abeb410e2827851e6e5cd13f5c12050ab42ed4e75be4",
       "owners": {
-        "_shooting_start_selection_target_is_supported": {
-          "before": "91ee36f1b35d7e7f63917a36c9e3a10cf00a522dac5ed54b185e86b27b842f37",
-          "after": "ca7e0bdd0e50af89b86340f8fefbc61780793fd081b380666bfc4fd0d6f8cf8e"
-        },
-        "_shooting_start_selection_trigger_is_supported": {
-          "before": "0310a6e0a9ea277bfdebf5e3a836307c42d8db112b3b9bc94690b005f7845671",
-          "after": "8edeff0a57afa1d796e8478de138ae9ba3d76e8d21d66597a6c81d65bffe1d87"
-        },
-        "shooting_start_selected_target_effect_clauses_after": {
-          "before": "841a3afb80ac1972c2753e76e678afee349339e35f38b81052573cd4a6306f07",
-          "after": "4111a7dd6b55b1dafd6158a8e8e769c3411a48a1772551fd77852ddaba33be2c"
+        "resolve_charge_move": {
+          "before": "78ef0b813de3a0c28bc0e21efaba8962228a8b5171a39bc792677506e1e9b684",
+          "after": "dc06df2783df04277a5085756f12d9ae811e68fc543d738665730f78efad0ca3"
         }
       }
     },
-    "src/warhammer40k_core/rules/rule_parser.py": {
-      "before_sha256": "44b7948519c96dfdcd55fad0b26fd3c853e4b85ded27ef76990e010960899869",
-      "after_sha256": "3e37613a9e61f3bc1b4aa71215280352aaf7ff1ad33b38ef897e62bc5d0139b9",
+    "src/warhammer40k_core/engine/fight_movement_paths.py": {
+      "before_sha256": "0624fb6ac3b5b5119856420d4877747d6b5dae915e51bdb990cd9143404c857b",
+      "after_sha256": "8b7afe554f3ba79c8bb1e1c9340f7d19d5ac52433e86178c819bfb566515f773",
       "owners": {
         "@module": {
-          "before": "1bf04a387c041bba6072d1d4a0e3f5e886e12d3db6320b1d91f94435b7c740f4",
-          "after": "46d18d5aeb61b11763c8615e4b69cb400959abd4e5f521602bed0ea86c6cafe5"
+          "before": "08c0ddfa14dd1fe56f19db96daae17095465c2a1ded691d6fdccd65efa80f512",
+          "after": "3c4495c07b0814c43592faf24ddcef872cd894b26c6c312611045b5a7a2b8a3d"
         },
-        "_aura_target_parameter_pairs": {
-          "before": "bed4aa1a161f51e330b45f7579679a3edbcc8e756894fad56f9d5c1f7a5c767c",
-          "after": "ff5595007507e341d7040b8730e393810b34feb2e747e20334c13bb67c9a2968"
+        "_friendly_geometry_models_for_path": {
+          "before": "f33ead3a4793cbb8647dcf2632dde9207ba339920629ba405ce0733bf4a78544",
+          "after": "742f6eacc2138b4fc885c993cb470d8f6c7da13763799f5b33bc44cd0c22d739"
         },
-        "_compile_clause": {
-          "before": "a6dd2dfe6a05f6b4bb613572e2a5010eef0166be0eec59bad72f8dc7075caf7d",
-          "after": "9cf80d765c82b284ac5f96c372260439c3a24a52b420c5f681ce0babc6cd1aae"
-        },
-        "_parse_keyword_conditions": {
-          "before": "6dd6fee0cc2066f434693adf706e5e89b9cb0f67ba88e0f31a837056612cfb66",
-          "after": "738c1db505d842b2a0e9184d084c5f0e1f2225c6a8b7128bbde144b64f8aa6b1"
-        },
-        "_parse_target": {
-          "before": "266392e4780afb992351b39cdfa3bddb50bf5d1857328c847b2261e582010545",
-          "after": "5b68c8c6d8515b29339e12437208e0715545c49ed443a763d34ef76c7739a18d"
+        "validate_fight_paths": {
+          "before": "e4a6b479bbb20550825493de2d08031438a3ae6bd7bc8f0ffbc642eaf3a34d86",
+          "after": "820e9afd170837f2b44c0ffd023f49d13bb7f4103f66ba81fed66dc6179ede6c"
         }
       }
     },
-    "src/warhammer40k_core/rules/rule_target_subject_parser.py": {
+    "src/warhammer40k_core/engine/fight_resolution.py": {
+      "before_sha256": "69d71eb012cd143580e57657a2675de4aa6749c5fddff0bd5ca3f5883c9a5c05",
+      "after_sha256": "e7c87d51ffa8bbe923faf2c612daca6a5e651c5be56fb5c5c33d034f6e20f336",
+      "owners": {
+        "resolve_fight_movement": {
+          "before": "4788648519f6ec8d5c710001b2b4f56fff3b6f7856c7a6c5e7428958aeb0537b",
+          "after": "6ebd47154c31fb2c9983d0f0b0148e35ee463af5de30e7f07abecbfc5c4a3856"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/fight_rules_unit_movement.py": {
+      "before_sha256": "2f6c0e5817c3b7d2b039045cbbbdba4b2cc8c4bd0fafd957e9f85f5b1513637e",
+      "after_sha256": "2c1869f538e2e59071a5d62265b22881683119a9a630eb5b90c28b46f8d66236",
+      "owners": {
+        "resolve_rules_unit_fight_movement": {
+          "before": "e6865b6da751f2bd5ab11efe9a68be575edb47ca61edb26290893e2b480c1413",
+          "after": "003849c2f3b99e5c2ffc15c945c29479b01c390e7c47efc5226f1463152ee7e8"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_geometry.py": {
+      "before_sha256": "3f3677697784aa1461ef9c65348dff869d80dd70305ecfe306c784a8a3c9aed0",
+      "after_sha256": "0caae25e34d7993fd874948eeff51789137c21bb0cbb11ec4f200aea84d4ded7",
+      "owners": {
+        "@module": {
+          "before": "cae9d8ea2817a07a39840987cee5a96f0d51219dd072054165e498620f5357f0",
+          "after": "dd876daf52c2cdd518d8d41244aae6d32befcc5a8cb4c19616b5aa6a19797532"
+        },
+        "_friendly_geometry_models_for_path": {
+          "before": "b31bf887db442889d6e2386c661b70243936898385722493af58f9212b5263c9",
+          "after": "7a9db5ce18bdd33d432ad007bd80395411d7b40ccb8b6d2beba4b23de8c31c10"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_resolvers.py": {
+      "before_sha256": "276bad687be9437215a86ff366b824c04a373ff3ad7372551ca860d10a861d91",
+      "after_sha256": "284cba6225543c37f882945d0dd11fae0459c59688fd57458b612f0ff77db4f1",
+      "owners": {
+        "_resolve_unit_move": {
+          "before": "5655b4ae5a7a49532d83cd851f64683dd6d856bbc2b903bbaee766e78b529e8c",
+          "after": "0ac200cc76ad66974d477b99726e25465402cf742f2a9d6c6359b02d36198059"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_rules_units.py": {
+      "before_sha256": "7001fa38be41eca65452fbb54a25c79252ae453e27bf3d950230f8ae1d07d846",
+      "after_sha256": "0e8bae1578bf0b77fe736bcbc7af389584d2f792b66287d5f2cbc7de9eff4186",
+      "owners": {
+        "_component_witness": {
+          "before": "c3bf01490d20b7aad5059b166e494ace7691c50401fb87f7e268d1cd98bce451",
+          "after": "3ec2a91a9c7139d7cd763da4dc577536d7814c80c0d43825cd5d245ad3d0eac1"
+        },
+        "_resolve_rules_unit_move": {
+          "before": "03a7f95998bf4bd0be7a4fb2624831fed80756d201c1e418bfbb872d1cb70bfa",
+          "after": "429692d8bfd7f16a35f3c5c48f554b175858bc5b65a7a7b3ad48b737507e9fa3"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/scout_movement_paths.py": {
+      "before_sha256": "3843db3765b20a45fc4fc04f0b77a59e95d1bd00a30160ce09b7f145ebf3e8fb",
+      "after_sha256": "c7d71e8cd67845f29fb06c1c2bd3e9890e4c266f64155c566b4f391dc808265a",
+      "owners": {
+        "@module": {
+          "before": "fde4590d74a74a8a076b4fe4ce3083713cd5f85e4f1513264f6b632beefbf86c",
+          "after": "b12faedb338d87b6818ed82eeb7335e07a7eb3324a85d88e5797551efee2a00f"
+        },
+        "_friendly_geometry_models_for_path": {
+          "before": "358a94856113c502ea9905e6524b46238862f44603babe8f2181fed6e9589b8c",
+          "after": "d11159315e47a9a74ac1f30a2d8efb2ac2a05d68cf298186e0d0915dc70b2df7"
+        },
+        "append_scout_path_violations": {
+          "before": "61979529d3e220834df55554c335440f2be03b8475d3c4a249b9526dbac25e8a",
+          "after": "868b616d11c94bb07fef38caa9d77b411d4c217f627f15219f66d3ca2a55e73d"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/sequential_movement.py": {
       "before_sha256": null,
-      "after_sha256": "3574fba964ddd3c6e4a15c62e10a082543c9a2a10a27bcf5d86bff32173c83d4",
+      "after_sha256": "e50ad013aad2db3da309ac3e9a890b92eb12d63b88269c5010b649b9ac73f321",
       "owners": {
         "@module": {
           "before": null,
-          "after": "461d1f83af949ef21b4bcc07bbbb493f96d0aeb74069af44dc9eb40c3d4a4733"
+          "after": "e85cfd9235e4c8891eb4f3f9b709ac2a9d4f6adcf6e194037c2ae4c906d0648c"
         },
-        "first_target_subject_match": {
+        "sequential_friendly_models": {
           "before": null,
-          "after": "98c113739d438c0f58f1d1a8da61c75f100e21067279dbcb3d15fa502856deb2"
-        },
-        "selection_trigger_with_subject": {
-          "before": null,
-          "after": "c66462b64fc1e675f9621e550a47d0b09662dd9b92e32e4dc40e5f9e555bd15f"
-        },
-        "target_subject_matches": {
-          "before": null,
-          "after": "ea24a923a4f3c8b773336f45f2fa289f703c3a3a98e61dad36158128d4acd673"
+          "after": "9d989dfb45b6dd48f20c6b42a42a80720c3a67c13ad64f7adb73778f17af5874"
         }
       }
     },
-    "tests/order125_helpers.py": {
-      "before_sha256": null,
-      "after_sha256": "21accbfb57177db677bfa2afc421616415969a6ccc271e5085c3abb3f1ffc7e3",
+    "src/warhammer40k_core/engine/triggered_movement_resolution.py": {
+      "before_sha256": "ec54c7df2de1b8e1830cab8b9b7042e4955072d51fe5154d9704bde905b8a909",
+      "after_sha256": "057f38645dd9b2137f29126a1a531157e6fc1f02917010ae865308d1530baab7",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "28b77d8db890f8b709ede9a4f1bad20500e15f20b5378f4f3abbe8668ae6a36c"
+          "before": "c5db3411923af2e45b9c98ca4e39230a1e6767aebb1255c275b47302bb12f4a8",
+          "after": "e1a2ed8196eb2ee6d1a1f9927a42fd517623c3e8156efad4f6a6292620b31911"
         },
-        "advance_to_default_unit_selection": {
-          "before": null,
-          "after": "fb5a0343565aba97dbc7c64831ac4ed3f1a5e147e9f4610ac0c30131af8b1333"
+        "_friendly_geometry_models_for_path": {
+          "before": "d8f81a9ef5bf997d5db4caa7d973f981b87b62d1575e0b6850e0bd3d1d033af3",
+          "after": "03d77ef2611c2f9a538c107a4168271873ee8083c101894425f33b1818b3ee62"
         },
-        "default_unit_session": {
-          "before": null,
-          "after": "ad35b94f69ea2e80f4b6cf65f3aeb1ea717b4ca184f54bae38ac343ecb8074d2"
-        },
-        "default_unit_text": {
-          "before": null,
-          "after": "507ac513c962cd5de4e60e16fb87fe9c8c75b6daa8b65fd6780c79e76aa77924"
+        "resolve_triggered_movement": {
+          "before": "4096544102d500c161016d685777b9b03c2f50f0566a0dbe97549feae0b2dd82",
+          "after": "381d4e8dfb365e68c95bfb41d98311baf90e9f13b9c70f5561d4633a6530cf65"
         }
       }
     },
-    "tests/unit/test_order125_implicit_subjects.py": {
+    "src/warhammer40k_core/geometry/pathing.py": {
+      "before_sha256": "20ce2138f32c5cd70c580f37dd18ea5bc2f09dbc7a109c1b609ae30115e79e21",
+      "after_sha256": "9b23a84f5b9ae7bde4bf917663c40f718acd75f365120933806fad3202dc783b",
+      "owners": {
+        "PathWitness.__post_init__": {
+          "before": "1d80681bac0fdb6625b55c2dc3b18988169dbdc75ea0278fa44e84c425b9475b",
+          "after": "22067c31fe0069c47c7c75b155c0b2525692e2d36544d9bed239bbbc48776778"
+        },
+        "PathWitness.model_ids": {
+          "before": "e85a2a5998041076da2ce66e6cd671694d0e89588648d2b7fe950ac13e79d2a9",
+          "after": "b951a6fbb779432aaea63df13d25e5df559ecf9feb350e834946ca7a74b66543"
+        }
+      }
+    },
+    "tests/code_quality/test_order126_sequential_authority.py": {
       "before_sha256": null,
-      "after_sha256": "66a1448e8780ba08714e522400738dfbc9416a8e069452b09876b76e5251a332",
+      "after_sha256": "fa2bcf3c3fa628d94938cb1354570feb911380e422e198c602f7b8aef8533786",
       "owners": {
         "@module": {
           "before": null,
-          "after": "7e14ebe9604efd86a84f6881ffe0abd9c8f3ae19ae0d971e4eeb97f394a4b745"
+          "after": "cb2baa6ee1ee82c55da7151acb10503be3f063e490e4d63c2b422ca57fd1cabe"
         },
-        "test_catalog_loaded_selection_survives_full_lifecycle_continuations": {
+        "test_all_physical_occupancy_wrappers_delegate_complete_witness_to_one_owner": {
           "before": null,
-          "after": "93fbfcfdf98fd5aad2a6be255764bd26a2bd5bb28a935b5d59b04268a5c66075"
+          "after": "6ae710faf5d2e9b718de4997f115108bd9c3e4a0074eaf55cacccb1892a33079"
         },
-        "test_complete_default_unit_rule_has_a_shared_executable_consumer": {
+        "test_order126_smoke_scope_rejects_unbound_inputs": {
           "before": null,
-          "after": "99ffd45a92dea927a23dcf51cc386cd7825f43e87fa24fd619e9621ddbe70443"
+          "after": "040d55aae295bc6bc5bd8a1fb16abde172954bcb95a1a8f9ba4c2a1160094720"
         },
-        "test_explicit_model_catalog_subject_never_offers_a_unit_selection_in_native_play": {
+        "test_selected_source_pins_and_original_fixture_archives_remain_exact": {
           "before": null,
-          "after": "86b101bec91dcb5a01458a91786fc19ab2c2c0a821330ec74a541b4068d16679"
+          "after": "48ef64b859a7048d66f1a70c7947203119aa7441dd578f2cd66e6f42526c56cf"
+        }
+      }
+    },
+    "tests/integration/test_setup_prebattle_ui_smoke.py": {
+      "before_sha256": "52f98d973cb10b4d6608a079e4e790a50a8957f475f17ef1827e622a86ce30fe",
+      "after_sha256": "0c22e78f679d8726d10265fe9d093776fc5fafcf90e5f6d25744263742037fff",
+      "owners": {
+        "@module": {
+          "before": "d97cd3f0c0e1479958d5c87b172da33ec24af17235cfbf5a3567c9508fb24e68",
+          "after": "d9f54b9361c2e4bc58cc165a631e946e01f862363a00987f5a8d7453232796fb"
         },
-        "test_explicit_model_subject_keeps_typed_evidence_and_no_unit_consumer": {
+        "_scout_witness": {
+          "before": "3b655d461a1aae6eda67c8153bdef0e802f44f15b776c05716d17202255caec2",
+          "after": "aefbfd9f3b2e2ffa385b3edfc95d16947fc8af6196d3b005d9454ab4e74f664e"
+        }
+      }
+    },
+    "tests/order126_movement_helpers.py": {
+      "before_sha256": null,
+      "after_sha256": "834d6706d52c6eaedc810faf9b3ace041d46191a87ee057cde95ef122edb12a1",
+      "owners": {
+        "@module": {
           "before": null,
-          "after": "f7d97af939ab0621ce1e399770efa469e4cd843c2f43db92c1f4f3a41811822e"
+          "after": "a3badcdf6e0488016d56183835a9b930231cab9532dd0ce4772cc9522d8e7f63"
         },
-        "test_explicit_noun_and_source_spans_remain_intact": {
+        "assert_session_roundtrips": {
           "before": null,
-          "after": "ab08ac5a1b4dcaf2526b9481143b5f4636ec5b8fcbb90be6849582a782245f4b"
+          "after": "dc9a2849993aadc7a01dcad6a3542de745c251f19421e891a610e6044cd30fdb"
         },
-        "test_implicit_adjacent_keywords_keep_the_existing_conjunction": {
+        "select_move": {
           "before": null,
-          "after": "cebf5d4bfa464230a0b92fee46a2ed1dd8447e95d4a3651d0af469cab8dd17c9"
+          "after": "38460b1584d470509a66c66adb68f26e40d77cb5fe2e6ec7d5f71e7926b1bd9d"
         },
-        "test_implicit_subject_does_not_invent_keywords_aliases_or_discard_language": {
+        "sequential_session": {
           "before": null,
-          "after": "64db6a85c0dbf4d41f88e60d1c688040b065f2b7712fca9d47eb398059186ed1"
+          "after": "8e0e75143329e803b78b118855277a1289725484637a8d06f4b5d0f020c5d98f"
         },
-        "test_ordinary_trigger_does_not_admit_unestablished_weapon_context": {
+        "submit_path": {
           "before": null,
-          "after": "d202045f2785fc81fc1f3fa64fa98f553296fd86e44bc68b1fd2b4a454fe760f"
+          "after": "ece4a1deda5013c296f67876f5065b372b9e09d92a8b1dfa61d103ba4ef01f9b"
+        }
+      }
+    },
+    "tests/phase15a_charge_test_support.py": {
+      "before_sha256": "21214ce6cae70499da006366f76244796cd2af333a4871e56516807caca73872",
+      "after_sha256": "fb636f35ba5a193565a4221bfcf39601849f862bf5b34c91d0b6a7c741ff0ec8",
+      "owners": {
+        "@module": {
+          "before": "951330865125baf137129e984be1bc81a2eb7279cc0377c00660f24b184c657c",
+          "after": "3bcda9031d1010f154f2bb15fc5418f28f18933a64114a8f4c349e9d47861630"
         },
-        "test_selected_default_subject_preserves_keyword_and_source_range": {
+        "_charge_path_witness_for_unit": {
+          "before": "f0c871dbce5e0ba4b7fa593015224d4ca9234e6869354fec265506a2f2cd1fad",
+          "after": "1cd0ba15397065acafcb896d6cd1b0ed430df9a59af6ddd251610a2c2d02953f"
+        }
+      }
+    },
+    "tests/sequential_translation_helpers.py": {
+      "before_sha256": null,
+      "after_sha256": "3296ea9b9822b73915899499eedb1b873713c42e0fe88f2d1e8e7b87976bdf58",
+      "owners": {
+        "@module": {
           "before": null,
-          "after": "74a7cd786525f080bcf353282bbc641eed176efd1c87c1dc83e2b564ae4a98c9"
+          "after": "ef3b59478004811f96bce9a5b2981adbe75afe21f89299741f9fb8608d240fde"
         },
-        "test_shared_selection_enforces_real_keyword_owner_range_and_source_boundaries": {
+        "leading_first_translation_paths": {
           "before": null,
-          "after": "cba12874a1ea4c6e7107d047e1842e1343703edcfebe0d060edae98b80188ae6"
+          "after": "35a81a156a02edffa5891cf44f68953cb7126d3a78d6833089798b9207e628c0"
+        }
+      }
+    },
+    "tests/unit/test_order126_sequential_movement.py": {
+      "before_sha256": null,
+      "after_sha256": "b679340752513471399de759d25aad1067762fdfdd9eaa275f96139f0f84c8ac",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "fdea9c231363f02ce4440815dfa43e9de62acc553a4cb99922793d97948db0d6"
         },
-        "test_subject_matcher_keeps_explicit_overlap_and_literal_order": {
+        "test_cyclic_exchange_cannot_complete_either_model_first": {
           "before": null,
-          "after": "4774cf7014db85a3390dc4197e6dc78a1588aa53ab7410e07afd08ed7402c498"
+          "after": "b62655d77108a264fe3e6273d5a06728041c290ec7763f2cdf5bef878b3c9ee7"
         },
-        "test_subject_matcher_preserves_literal_declared_keyword_parts": {
+        "test_facade_occupancy_order_invalid_retry_pending_completed_restore_and_replay": {
           "before": null,
-          "after": "77d5cb8a45a3ccdf7b26bb2d4dea6c0b9175354ca2ee97636784870b565ebdbd"
+          "after": "d1cc0e2e0f14a735771f0cd412dd4cd6cded2042b6c534dd2e4d76a632021a8c"
+        },
+        "test_legal_friendly_transit_and_multisegment_rotation_remain_playable": {
+          "before": null,
+          "after": "be8a2779e6b3759e64620acc74c08d6f2262b9dbbce47f54b9a25211a78648ac"
+        },
+        "test_shared_path_consumers_accept_vacate_before_follow_and_reject_cyclic_occupancy": {
+          "before": null,
+          "after": "9e7297264dc61135059363c6e1febff85c4851e7483012f363c472ab87943988"
+        }
+      }
+    },
+    "tools/core_rules_order97_history.py": {
+      "before_sha256": "0be8c1e6ed68a6f91980ffd379d3407aada4db6b81d2560df903d817c0841feb",
+      "after_sha256": "833c46e3a9877583121a4aed61c596dcfb406510e16b2e48c5cecf7bea8b2807",
+      "owners": {
+        "@module": {
+          "before": "e64023fadb4a8bb9aa0fcc0fd6a40943cef42edd7f33e4836cbe69f373e991ff",
+          "after": "abd0ec2cb11c43771588fa67386e39c04b8a4970ef5369d18834acfa1bd145d4"
+        },
+        "historical_evidence_path": {
+          "before": "44e15dbe30348227b609a604856da325835c8cd39f8ed5237e5919a75927ffe0",
+          "after": "db4f3e81fe1e819d7519a77d5263559265e7a3b1e00157f5a11c77d29194bf67"
+        }
+      }
+    },
+    "tools/performance_policy.py": {
+      "before_sha256": "d4a3b06f0d10ff1369496db1e8e7e2f39839f4f2e9c33b436b64d569759f8d2e",
+      "after_sha256": "b2df639cb46a2cc1f706457c87bd2c2c44b4ecd19a3c38fab7f6c366c7576394",
+      "owners": {
+        "@module": {
+          "before": "d1c0451b5944e4c1dbbdb43dd5ba8c972033c1f22738fd55abd891dab633b417",
+          "after": "8df47be7044c807f823afb716ed1ec586d66cb5fdfcd47c507afc00cef2c5f79"
+        },
+        "_order126_smoke_operations": {
+          "before": null,
+          "after": "45b420ec147b8d2817251d2f232e371b312014a9f2bf0a945ec34bfe0472166d"
+        },
+        "validate_assessment": {
+          "before": "4659b195edac6ea43aa6756a3fc788a11078f2291d3315611334ae9dd263f3c1",
+          "after": "4d296c04cd0434356b9a933584c1157b654cfa19c75f92195f0f64935f10a394"
         }
       }
     }
@@ -480,9 +672,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
@@ -490,9 +682,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -500,9 +692,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -510,9 +702,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -520,9 +712,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -530,9 +722,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -540,9 +732,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -550,9 +742,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -560,9 +752,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -570,9 +762,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -580,9 +772,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -590,9 +782,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -600,9 +792,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -610,151 +802,187 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
-    },
-    "conformance/typescript/src/contract.ts": {
-      "category": "rule_semantics",
-      "operations": [
-        "order125-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
-        "order125-contract-publication"
+        "order126-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
-        "order125-contract-publication"
+        "order126-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
-        "order125-contract-publication"
+        "order126-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
-        "order125-contract-publication"
+        "order126-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "order125-contract-publication"
+        "order126-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "order125-contract-publication"
+        "order126-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
-        "order125-contract-publication"
+        "order126-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "order125-contract-publication"
+        "order126-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "contracts/openapi.yaml": {
       "category": "rule_semantics",
       "operations": [
-        "order125-contract-publication"
+        "order126-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
-    "data/source_audits/order125/source.audit.json": {
+    "data/source_audits/order126/baseline/tests/integration/test_setup_prebattle_ui_smoke.py.txt": {
       "category": "rule_semantics",
       "operations": [
-        "order125-source-evidence"
+        "order126-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "data/source_audits/order126/baseline/tests/phase15a_charge_test_support.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order126-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "data/source_audits/order126/historical-inputs.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order126-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "data/source_audits/order126/source.audit.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order126-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
-    "docs/ORDER_125_SCOPE_PLAN.md": {
+    "docs/ORDER_126_SCOPE_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "docs/performance/PERFORMANCE_POLICY.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "docs/performance/policy-v3/order126-rule-semantics.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -762,79 +990,218 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
       "operations": [
-        "order125-default-unit-subjects"
+        "order126-sequential-physical-movement"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
-    "src/warhammer40k_core/engine/catalog_selected_target_effects.py": {
+    "src/warhammer40k_core/engine/charge_move_geometry.py": {
       "category": "rule_semantics",
       "operations": [
-        "order125-default-unit-subjects"
+        "order126-sequential-physical-movement"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
-    "src/warhammer40k_core/engine/catalog_selected_target_pair_support.py": {
+    "src/warhammer40k_core/engine/charge_move_resolution.py": {
       "category": "rule_semantics",
       "operations": [
-        "order125-default-unit-subjects"
+        "order126-sequential-physical-movement"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
-    "src/warhammer40k_core/rules/rule_parser.py": {
+    "src/warhammer40k_core/engine/fight_movement_paths.py": {
       "category": "rule_semantics",
       "operations": [
-        "order125-default-unit-subjects"
+        "order126-sequential-physical-movement"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
-    "src/warhammer40k_core/rules/rule_target_subject_parser.py": {
+    "src/warhammer40k_core/engine/fight_resolution.py": {
       "category": "rule_semantics",
       "operations": [
-        "order125-default-unit-subjects"
+        "order126-sequential-physical-movement"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
-    "tests/order125_helpers.py": {
+    "src/warhammer40k_core/engine/fight_rules_unit_movement.py": {
       "category": "rule_semantics",
       "operations": [
-        "order125-regressions"
+        "order126-sequential-physical-movement"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     },
-    "tests/unit/test_order125_implicit_subjects.py": {
+    "src/warhammer40k_core/engine/phases/movement_geometry.py": {
       "category": "rule_semantics",
       "operations": [
-        "order125-regressions"
+        "order126-sequential-physical-movement"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-linked Core default-unit subject seam, canonical facade regressions and truthful separately retained source evidence.",
-      "source_obligation": "Selected immutable Core rule:02:02.05.01:1 obligation11 block10 establishes that omitted model/unit keyword subjects refer to units. The retained PSYKER diagnostic and explicit-unit parser control establish the input boundary, not an official provider defect. A constructed canonical Core permission fixture proves ordinary catalog selection and unit-context Charge-roll modifier execution. Plural obligation12 is excluded.",
-      "unchanged_work": "The bounded source-vocabulary subject normalizer and existing catalog selected-target consumer add ordinary rules branches. Trigger and keyword shape admission preserve source/model ownership, target presence, canonical rules-unit keyword and range checks, finite engine choices, modifier ownership, effect mutation and duration handling. Existing targeting algorithms, geometry solvers, source/model authority, dice draw order, cache policies, persistence/reconstruction/replay algorithms, dependencies and measured workloads are unchanged. No performance optimization or demonstrated severe regression. Quiet current-runtime smoke and live semantic/work/source gates apply; no full-game certification or historical numerical refresh."
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "src/warhammer40k_core/engine/phases/movement_resolvers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order126-sequential-physical-movement"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "src/warhammer40k_core/engine/phases/movement_rules_units.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order126-sequential-physical-movement"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "src/warhammer40k_core/engine/scout_movement_paths.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order126-sequential-physical-movement"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "src/warhammer40k_core/engine/sequential_movement.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order126-sequential-physical-movement"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "src/warhammer40k_core/engine/triggered_movement_resolution.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order126-sequential-physical-movement"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "src/warhammer40k_core/geometry/pathing.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "geometry-search",
+        "order126-sequential-physical-movement"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "tests/code_quality/test_order126_sequential_authority.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "tests/integration/test_setup_prebattle_ui_smoke.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order126-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "tests/order126_movement_helpers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order126-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "tests/phase15a_charge_test_support.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order126-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "tests/sequential_translation_helpers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order126-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "tests/unit/test_order126_sequential_movement.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order126-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "tools/core_rules_order97_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order126-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+    },
+    "tools/performance_policy.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order126-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded source-linked sequential physical movement seam, canonical facade regressions and truthful separately retained source evidence.",
+      "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+      "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
     }
   },
   "milestone": "ordinary",

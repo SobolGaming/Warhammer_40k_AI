@@ -18,6 +18,7 @@ from warhammer40k_core.engine.model_movement_permission import model_movement_pa
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
+from warhammer40k_core.engine.sequential_movement import sequential_friendly_models
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.volume import Model
 
@@ -79,6 +80,7 @@ def append_scout_path_violations(
                     scenario=scenario,
                     unit_placement=current,
                     attempted_placement=attempted,
+                    witness=witness,
                     moving_model_instance_id=placement.model_instance_id,
                 ),
                 enemy_models=enemy_geometry_models_for_player(
@@ -161,30 +163,14 @@ def _friendly_geometry_models_for_path(
     unit_placement: RulesUnitPlacement,
     attempted_placement: RulesUnitPlacement,
     moving_model_instance_id: str,
+    witness: PathWitness,
 ) -> tuple[Model, ...]:
-    moving_model_id = _validate_identifier("moving_model_instance_id", moving_model_instance_id)
-    attempted_by_component = {
-        component.unit_instance_id: component
-        for component in attempted_placement.component_unit_placements
-    }
-    friendly_models: list[Model] = []
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id != unit_placement.player_id:
-            continue
-        for current_unit_placement in placed_army.unit_placements:
-            placements = attempted_by_component.get(
-                current_unit_placement.unit_instance_id, current_unit_placement
-            ).model_placements
-            for placement in placements:
-                if placement.model_instance_id == moving_model_id:
-                    continue
-                friendly_models.append(
-                    geometry_model_for_placement(
-                        model=scenario.model_instance_for_placement(placement),
-                        placement=placement,
-                    )
-                )
-    return tuple(friendly_models)
+    return sequential_friendly_models(
+        scenario=scenario,
+        player_id=unit_placement.player_id,
+        witness=witness,
+        moving_model_instance_id=moving_model_instance_id,
+    )
 
 
 def _friendly_vehicle_monster_model_ids(

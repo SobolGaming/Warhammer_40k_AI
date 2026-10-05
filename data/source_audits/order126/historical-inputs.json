@@ -1,0 +1,24 @@
+{
+  "reviewed_commit": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+  "also_present_at_base": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+  "purpose": "Preserve every original assertion, branch and fixture byte. Uniform-translation fixtures now submit complete leading-first physical model moves, satisfying the scoped sequential source invariant while retaining their original targeted positive/negative controls. No assertion or branch is weakened.",
+  "current_evidence": "docs/ORDER_126_SCOPE_PLAN.md",
+  "files": [
+    {
+      "path": "tests/phase15a_charge_test_support.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/phase15a_charge_test_support.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/phase15a_charge_test_support.py",
+      "sha256": "21214ce6cae70499da006366f76244796cd2af333a4871e56516807caca73872",
+      "bytes": 49370
+    },
+    {
+      "path": "tests/integration/test_setup_prebattle_ui_smoke.py",
+      "historical_path": "data/source_audits/order126/baseline/tests/integration/test_setup_prebattle_ui_smoke.py.txt",
+      "git_revision": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "git_path": "tests/integration/test_setup_prebattle_ui_smoke.py",
+      "sha256": "52f98d973cb10b4d6608a079e4e790a50a8957f475f17ef1827e622a86ce30fe",
+      "bytes": 33851
+    }
+  ]
+}

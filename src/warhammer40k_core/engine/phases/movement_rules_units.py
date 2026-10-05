@@ -392,6 +392,7 @@ def _resolve_rules_unit_move(
             temporary_movement_keywords=temporary_movement_keywords,
             ignores_vertical_distance=ignores_vertical_distance,
             rules_unit_instance_id=rules_unit.unit_instance_id,
+            occupancy_witness=witness,
         )
         if (
             component_resolution.attempted_placement
@@ -449,14 +450,9 @@ def _resolve_rules_unit_move(
 
 
 def _component_witness(*, witness: PathWitness, component: UnitPlacement) -> PathWitness:
+    model_ids = {row.model_instance_id for row in component.model_placements}
     return PathWitness.for_paths(
-        tuple(
-            (
-                placement.model_instance_id,
-                witness.poses_for_model(placement.model_instance_id),
-            )
-            for placement in component.model_placements
-        )
+        tuple(path for path in witness.model_paths if path[0] in model_ids)
     )
 
 

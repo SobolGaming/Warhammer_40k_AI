@@ -916,6 +916,7 @@ def resolve_fight_movement(
     proposal: FightMovementProposal,
     maximum_distance_inches: float | None = None,
     state: GameState | None = None,
+    occupancy_witness: PathWitness | None = None,
 ) -> FightMovementResolution:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Fight movement requires a BattlefieldScenario.")
@@ -968,6 +969,7 @@ def resolve_fight_movement(
         displacement_kind=_displacement_kind_for_proposal(proposal),
         distance_budget_inches=distance_budget_inches,
         proposal=proposal,
+        occupancy_witness=occupancy_witness,
     )
     _, coherency_result, rollback_record = resolve_unit_movement_endpoint_coherency(
         scenario=scenario,

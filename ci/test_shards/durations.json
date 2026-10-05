@@ -96,6 +96,7 @@
     "tests/unit/test_order123_datasheet_identity.py": 144.19,
     "tests/unit/test_order124_nested_conditions.py": 1198.655,
     "tests/unit/test_order125_implicit_subjects.py": 392.186,
+    "tests/unit/test_order126_sequential_movement.py": 163.589,
     "tests/unit/test_order36_sequencing.py": 249.386,
     "tests/unit/test_order36_timing_authority.py": 171.801,
     "tests/unit/test_order51_flight.py": 162.869,
@@ -312,76 +313,77 @@
     {
       "junit_sha256": [
         "3f30771ac4e1412a0f9b3722eaa854a5fb6ffc40569aaf4c79d331370fa86721",
+        "6c6adf45c9f3b3073785af071f9afc7e9790f7d58040c6f6e5b80d017f3f47ad",
         "aca03f29d888ba3359795068661ce331d2a1acdd5ee94b6c5df56afb874158d1"
       ],
-      "source": "Order125 complete corrected current cohort HEAD a44bf3172e334982bab1e7fbba1f01c478f65f66, tree 3bc2257cb22add38e45e9f6895829a758f219e67: all 10909 cases once, 16 serial polygon cases and remaining cases in 32 parallel workers, all phases/durations authenticated; no predecessor or focused timings. JUnit SHA256 serial 3f30771ac4e1412a0f9b3722eaa854a5fb6ffc40569aaf4c79d331370fa86721; parallel aca03f29d888ba3359795068661ce331d2a1acdd5ee94b6c5df56afb874158d1.",
-      "test_cases": 10909,
-      "test_files": 307
+      "source": "Order126 provisional profile: retained complete Order125 cohort plus all 13 new cases; current complete Order126 cohort must replace before delivery. Base ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+      "test_cases": 10922,
+      "test_files": 308
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 4812.715,
+      "duration_seconds": 4826.34,
       "shard_id": 1,
       "test_file_count": 24
     },
     {
-      "duration_seconds": 4812.713,
+      "duration_seconds": 4826.332,
       "shard_id": 2,
-      "test_file_count": 25
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 4812.712,
+      "duration_seconds": 4826.339,
       "shard_id": 3,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4812.717,
+      "duration_seconds": 4826.335,
       "shard_id": 4,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4812.71,
+      "duration_seconds": 4826.35,
       "shard_id": 5,
-      "test_file_count": 26
+      "test_file_count": 25
     },
     {
-      "duration_seconds": 4812.713,
+      "duration_seconds": 4826.395,
       "shard_id": 6,
-      "test_file_count": 25
-    },
-    {
-      "duration_seconds": 4812.718,
-      "shard_id": 7,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4812.707,
-      "shard_id": 8,
+      "duration_seconds": 4826.334,
+      "shard_id": 7,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4812.712,
+      "duration_seconds": 4826.34,
+      "shard_id": 8,
+      "test_file_count": 27
+    },
+    {
+      "duration_seconds": 4826.423,
       "shard_id": 9,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4812.708,
+      "duration_seconds": 4826.334,
       "shard_id": 10,
-      "test_file_count": 26
+      "test_file_count": 25
     },
     {
-      "duration_seconds": 4812.773,
+      "duration_seconds": 4826.377,
       "shard_id": 11,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4812.754,
+      "duration_seconds": 4826.342,
       "shard_id": 12,
       "test_file_count": 26
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 57752.652
+  "total_test_duration_seconds": 57916.241
 }

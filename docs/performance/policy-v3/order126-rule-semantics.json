@@ -1,0 +1,27 @@
+{
+  "base": "ab79049bbd52b8da7291d1e37f742c3d49c6afb9",
+  "changes": {
+    "src/warhammer40k_core/geometry/pathing.py": {
+      "before_sha256": "20ce2138f32c5cd70c580f37dd18ea5bc2f09dbc7a109c1b609ae30115e79e21",
+      "after_sha256": "9b23a84f5b9ae7bde4bf917663c40f718acd75f365120933806fad3202dc783b",
+      "owners": {
+        "PathWitness.__post_init__": {
+          "before": "1d80681bac0fdb6625b55c2dc3b18988169dbdc75ea0278fa44e84c425b9475b",
+          "after": "22067c31fe0069c47c7c75b155c0b2525692e2d36544d9bed239bbbc48776778"
+        },
+        "PathWitness.model_ids": {
+          "before": "e85a2a5998041076da2ce66e6cd671694d0e89588648d2b7fe950ac13e79d2a9",
+          "after": "b951a6fbb779432aaea63df13d25e5df559ecf9feb350e834946ca7a74b66543"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "src/warhammer40k_core/geometry/pathing.py": [
+      "geometry-search"
+    ]
+  },
+  "authority": "Owner approved bounded repairs default to quiet serial current-runtime smoke and exact-base assessment; detailed benchmarks only for deliberate performance work or serious regression. This binds one rule-semantics repair to exact current owner bytes without weakening mandatory mappings.",
+  "source_obligation": "Selected immutable Core rule:03:03.01:1 obligation03 block2 requires complete physical model moves one at a time, including straight and rotating legs. Retained cyclic swap diagnostic shows prior all-final occupancy error. No official provider defect or unrelated movement obligation is claimed.",
+  "unchanged_work": "The source repair preserves submitted model_paths order while retaining canonical model_ids inventory and shares existing validation geometry across ordinary/attached Movement, Scout, Charge, Fight and triggered consumers. Completed peers use final poses; remaining peers retain initial poses. Existing path sampling, geometry/search engines, terrain and range algorithms, budgets, whole-group coherency, atomic mutation, caches, RNG and serializers remain; no performance optimization or demonstrated serious regression. Quiet current-runtime smoke and every historical/live semantic gate remain, without numerical refresh or full-game certification."
+}

@@ -386,14 +386,9 @@ def resolve_rules_unit_fight_movement(
             scenario=attempted_scenario,
             placement=before_component,
         )
+        component_model_ids = {row.model_instance_id for row in before_component.model_placements}
         component_witness = PathWitness.for_paths(
-            tuple(
-                (
-                    placement.model_instance_id,
-                    witness.poses_for_model(placement.model_instance_id),
-                )
-                for placement in before_component.model_placements
-            )
+            tuple(path for path in witness.model_paths if path[0] in component_model_ids)
         )
         component_proposal = replace(
             proposal,
@@ -412,6 +407,7 @@ def resolve_rules_unit_fight_movement(
             proposal=component_proposal,
             maximum_distance_inches=maximum_distance_inches,
             state=state,
+            occupancy_witness=witness,
         )
         if (
             component_resolution.attempted_placement

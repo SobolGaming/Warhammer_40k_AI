@@ -138,6 +138,17 @@ waiver of correctness, reviews, CI, smoke or aggregate gates.
 
 ## Current-change budgets and historical qualification
 
+Order126's bounded sequential-occupancy source repair follows the owner's
+subsequent-order smoke default. `policy-v3/order126-rule-semantics.json` binds
+the sole sensitive geometry row to exact base
+`ab79049bbd52b8da7291d1e37f742c3d49c6afb9`, complete file hashes and changed
+owner AST hashes. Preserving submitted `PathWitness` order changes the source
+rule semantics, without optimizing path search, caches or serialization algorithms.
+Only that exact `rule_semantics` row selects smoke for `geometry-search`;
+other inputs retain the existing detailed-family selection. The shared engine
+occupancy owner, live correctness/work checks and full quiet smoke remain required.
+No historical performance refresh or full-game certification is claimed.
+
 `current-change-relative-v1` is a new versioned engineering envelope: arithmetic
 mean at most `1.25 * matched_base_mean + 0.05 s`, and observed maximum at most
 `1.5 * matched_base_maximum + 0.10 s`. The multiplicative allowance tolerates

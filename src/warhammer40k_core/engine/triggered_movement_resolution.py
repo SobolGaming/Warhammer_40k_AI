@@ -36,6 +36,7 @@ from warhammer40k_core.engine.physical_engagement import (
     scenario_physically_engaged_enemy_rules_unit_ids,
 )
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
+from warhammer40k_core.engine.sequential_movement import sequential_friendly_models
 
 # pyright: reportPrivateUsage=false
 from warhammer40k_core.engine.triggered_movement import (
@@ -232,6 +233,7 @@ def resolve_triggered_movement(
                     scenario=scenario,
                     unit_placement=unit_placement,
                     attempted_placement=attempted_placement,
+                    witness=path_witness,
                     moving_model_instance_id=placement.model_instance_id,
                 ),
                 enemy_models=_enemy_geometry_models_for_player(
@@ -513,32 +515,14 @@ def _friendly_geometry_models_for_path(
     unit_placement: ChargePlacement,
     attempted_placement: ChargePlacement,
     moving_model_instance_id: str,
+    witness: PathWitness,
 ) -> tuple[Model, ...]:
-    moving_model_id = _validate_identifier("moving_model_instance_id", moving_model_instance_id)
-    friendly_models: list[Model] = []
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id != unit_placement.player_id:
-            continue
-        for current_unit_placement in placed_army.unit_placements:
-            endpoints = {
-                model.model_instance_id: model for model in attempted_placement.model_placements
-            }
-            placements = tuple(
-                endpoints.get(model.model_instance_id, model)
-                for model in current_unit_placement.model_placements
-            )
-            for placement in placements:
-                if placement.model_instance_id == moving_model_id:
-                    continue
-                if not scenario.model_is_present_at_placement(placement):
-                    continue
-                friendly_models.append(
-                    geometry_model_for_placement(
-                        model=scenario.model_instance_for_placement(placement),
-                        placement=placement,
-                    )
-                )
-    return tuple(friendly_models)
+    return sequential_friendly_models(
+        scenario=scenario,
+        player_id=unit_placement.player_id,
+        witness=witness,
+        moving_model_instance_id=moving_model_instance_id,
+    )
 
 
 def _enemy_geometry_models_for_player(

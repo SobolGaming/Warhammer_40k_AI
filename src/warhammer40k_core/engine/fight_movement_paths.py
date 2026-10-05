@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.model_movement_permission import model_movement_path_context
+from warhammer40k_core.engine.sequential_movement import sequential_friendly_models
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.fight_resolution import FightMovementProposal
@@ -49,6 +50,7 @@ def validate_fight_paths(
     displacement_kind: ModelDisplacementKind,
     distance_budget_inches: float,
     proposal: FightMovementProposal,
+    occupancy_witness: PathWitness | None = None,
 ) -> tuple[tuple[PathValidationResult, ...], tuple[TerrainPathLegalityResult, ...]]:
     path_results: list[PathValidationResult] = []
     terrain_results: list[TerrainPathLegalityResult] = []
@@ -97,6 +99,7 @@ def validate_fight_paths(
                     scenario=scenario,
                     unit_placement=before,
                     attempted_placement=after,
+                    witness=witness if occupancy_witness is None else occupancy_witness,
                     moving_model_instance_id=placement.model_instance_id,
                 ),
                 enemy_models=_enemy_geometry_models_for_player(
@@ -145,28 +148,14 @@ def _friendly_geometry_models_for_path(
     unit_placement: UnitPlacement,
     attempted_placement: UnitPlacement,
     moving_model_instance_id: str,
+    witness: PathWitness,
 ) -> tuple[GeometryModel, ...]:
-    moving_model_id = _validate_identifier("moving_model_instance_id", moving_model_instance_id)
-    friendly_models: list[GeometryModel] = []
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id != unit_placement.player_id:
-            continue
-        for current_unit_placement in placed_army.unit_placements:
-            placements = (
-                attempted_placement.model_placements
-                if current_unit_placement.unit_instance_id == unit_placement.unit_instance_id
-                else current_unit_placement.model_placements
-            )
-            for placement in placements:
-                if placement.model_instance_id == moving_model_id:
-                    continue
-                friendly_models.append(
-                    geometry_model_for_placement(
-                        model=scenario.model_instance_for_placement(placement),
-                        placement=placement,
-                    )
-                )
-    return tuple(friendly_models)
+    return sequential_friendly_models(
+        scenario=scenario,
+        player_id=unit_placement.player_id,
+        witness=witness,
+        moving_model_instance_id=moving_model_instance_id,
+    )
 
 
 def fight_terrain_volumes_for_features(

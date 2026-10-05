@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.sequential_movement import sequential_friendly_models
+
 from warhammer40k_core.engine.unit_keyword_queries import unit_has_keyword
 
 from warhammer40k_core.geometry.physical_model import base_crosses_physical_model_footprint
@@ -395,30 +397,14 @@ def _friendly_geometry_models_for_path(
     unit_placement: UnitPlacement,
     attempted_placement: UnitPlacement,
     moving_model_instance_id: str,
+    witness: PathWitness,
 ) -> tuple[Model, ...]:
-    moving_model_id = _validate_identifier("moving_model_instance_id", moving_model_instance_id)
-    friendly_models: list[Model] = []
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id != unit_placement.player_id:
-            continue
-        for current_unit_placement in placed_army.unit_placements:
-            placements = (
-                attempted_placement.model_placements
-                if current_unit_placement.unit_instance_id == unit_placement.unit_instance_id
-                else current_unit_placement.model_placements
-            )
-            for placement in placements:
-                if placement.model_instance_id == moving_model_id:
-                    continue
-                if not scenario.model_is_present_at_placement(placement):
-                    continue
-                friendly_models.append(
-                    geometry_model_for_placement(
-                        model=scenario.model_instance_for_placement(placement),
-                        placement=placement,
-                    )
-                )
-    return tuple(friendly_models)
+    return sequential_friendly_models(
+        scenario=scenario,
+        player_id=unit_placement.player_id,
+        witness=witness,
+        moving_model_instance_id=moving_model_instance_id,
+    )
 
 
 def _enemy_geometry_models_for_player(

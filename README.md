@@ -1,3 +1,7 @@
+Order126 / P03G preserves physical model movement order across shared Movement,
+Scout, Charge, Fight and triggered consumers, including attached units. See
+[source and scope](docs/ORDER_126_SCOPE_PLAN.md).
+
 Order125 / P02N normalizes selected implicit keyword subjects to units at the
 data boundary and executes them through the existing catalog selected-target
 consumer. Model keyword ownership remains separate; see

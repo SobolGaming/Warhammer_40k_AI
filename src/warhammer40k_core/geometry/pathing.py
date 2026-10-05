@@ -624,7 +624,7 @@ class PathWitness:
         object.__setattr__(
             self,
             "model_paths",
-            tuple(sorted(model_paths, key=lambda path: path[0])),
+            model_paths,
         )
 
     @classmethod
@@ -648,7 +648,8 @@ class PathWitness:
         )
 
     def model_ids(self) -> tuple[str, ...]:
-        return tuple(model_id for model_id, _poses in self.model_paths)
+        """Return the canonical inventory; model_paths retains physical move order."""
+        return tuple(sorted(model_id for model_id, _poses in self.model_paths))
 
     def poses_for_model(self, model_id: str) -> tuple[Pose, ...]:
         requested_model_id = _validate_identifier("model_id", model_id)

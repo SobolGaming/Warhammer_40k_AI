@@ -4511,6 +4511,108 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order126-sequential-physical-movement": {
+      "paths": [
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/engine/charge_move_geometry.py",
+        "src/warhammer40k_core/engine/charge_move_resolution.py",
+        "src/warhammer40k_core/engine/fight_movement_paths.py",
+        "src/warhammer40k_core/engine/fight_resolution.py",
+        "src/warhammer40k_core/engine/fight_rules_unit_movement.py",
+        "src/warhammer40k_core/engine/phases/movement_geometry.py",
+        "src/warhammer40k_core/engine/phases/movement_resolvers.py",
+        "src/warhammer40k_core/engine/phases/movement_rules_units.py",
+        "src/warhammer40k_core/engine/scout_movement_paths.py",
+        "src/warhammer40k_core/engine/sequential_movement.py",
+        "src/warhammer40k_core/engine/triggered_movement_resolution.py",
+        "src/warhammer40k_core/geometry/pathing.py"
+      ],
+      "owners": [
+        "@module",
+        "PathWitness.__post_init__",
+        "PathWitness.model_ids",
+        "_component_witness",
+        "_friendly_geometry_models_for_charge_path",
+        "_friendly_geometry_models_for_path",
+        "_resolve_rules_unit_move",
+        "_resolve_unit_move",
+        "append_scout_path_violations",
+        "resolve_charge_move",
+        "resolve_fight_movement",
+        "resolve_rules_unit_fight_movement",
+        "resolve_triggered_movement",
+        "sequential_friendly_models",
+        "validate_fight_paths"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order126-regressions": {
+      "paths": [
+        "tests/integration/test_setup_prebattle_ui_smoke.py",
+        "tests/order126_movement_helpers.py",
+        "tests/phase15a_charge_test_support.py",
+        "tests/sequential_translation_helpers.py",
+        "tests/unit/test_order126_sequential_movement.py"
+      ],
+      "owners": [
+        "@module",
+        "_charge_path_witness_for_unit",
+        "_scout_witness",
+        "assert_session_roundtrips",
+        "leading_first_translation_paths",
+        "select_move",
+        "sequential_session",
+        "submit_path",
+        "test_cyclic_exchange_cannot_complete_either_model_first",
+        "test_facade_occupancy_order_invalid_retry_pending_completed_restore_and_replay",
+        "test_legal_friendly_transit_and_multisegment_rotation_remain_playable",
+        "test_shared_path_consumers_accept_vacate_before_follow_and_reject_cyclic_occupancy"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order126-source-evidence": {
+      "paths": [
+        "data/source_audits/order126/baseline/tests/integration/test_setup_prebattle_ui_smoke.py.txt",
+        "data/source_audits/order126/baseline/tests/phase15a_charge_test_support.py.txt",
+        "data/source_audits/order126/historical-inputs.json",
+        "data/source_audits/order126/source.audit.json",
+        "tools/core_rules_order97_history.py",
+        "tools/performance_policy.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_order126_smoke_operations",
+        "historical_evidence_path",
+        "validate_assessment"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order126-contract-publication": {
+      "paths": [
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
