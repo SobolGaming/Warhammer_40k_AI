@@ -73,7 +73,7 @@ def secondary_model_destructions_for_boundary(
         for model in unit.own_models
     }
     record_key = _context_key(state, record.battle_round, record.active_player_id, record.phase)
-    result = []
+    result: list[SecondaryModelDestructionState] = []
     for departure in state.primary_battlefield_departure_states:
         if departure.removal_kind is not BattlefieldRemovalKind.DESTROYED:
             continue
