@@ -4872,7 +4872,8 @@
         "test_ordinary_and_flight_modes_keep_complete_post_cleanup_authority",
         "test_original_fly_transit_exact_checkpoint_restores_forks_and_replays",
         "test_pending_movement_mode_omission_is_rejected_atomically",
-        "test_post_cleanup_commit_still_authenticates_movement_and_cleanup"
+        "test_post_cleanup_commit_still_authenticates_movement_and_cleanup",
+        "test_pre_cleanup_scoring_history_survives_later_native_turn_completion"
       ],
       "families": [],
       "sensitive": false,

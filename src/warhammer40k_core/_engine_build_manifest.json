@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ecc4c77b7730e94e1b81c0ff9c24ecb4d35672c825763e8a3a42f2c65172e804",
-  "fingerprint": "ecc4c77b7730e94e1b81c0ff9c24ecb4d35672c825763e8a3a42f2c65172e804",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:435878c7cb437bc49c0835828ade60542193a7efa91c8963382dafa8101d31b7",
+  "fingerprint": "435878c7cb437bc49c0835828ade60542193a7efa91c8963382dafa8101d31b7",
   "resource_count": 3080,
   "resources": [
     {
@@ -11610,9 +11610,9 @@
       "sha256": "3c3c9c3529bb81a9d3afd4fe1a12e6c566ac69d9ff3ab5d02b79fa4985009a3a"
     },
     {
-      "byte_length": 10229,
+      "byte_length": 10404,
       "path": "warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py",
-      "sha256": "fe87e4ad68fe0bfbe7c6a0ac00763ffffb69c03e658ac572be6cf9d98028ddd9"
+      "sha256": "1589d29362ef85186450713e04fb68f43b254daab2f89b954692df262b2cf6be"
     },
     {
       "byte_length": 3375,
