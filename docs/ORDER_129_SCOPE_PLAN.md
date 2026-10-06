@@ -12,8 +12,9 @@ followed native cleanup and had no Advanced state. Restore accumulated the
 accepted Advance from history and incorrectly demanded Advanced state there.
 The shared history owner still authenticates accepted proposals and witnesses,
 then recognizes the existing exact turn-end control and cleanup boundary.
-Scoring commits recorded before cleanup retain turn-action restrictions; a unique
-matching cleanup clears them. Earlier control/rule checkpoints retain restrictions. Accepted proposal mode
+Action-bearing scoring checkpoints retain authenticated turn-action restrictions
+after later native cleanup. Only an empty scoring checkpoint with a unique
+matching cleanup clears reconstructed action IDs. Earlier control/rule checkpoints retain restrictions. Accepted proposal mode
 is checked against the completion event with the explicit mode required by existing proposal acceptance.
 
 Controls use the original canonical catalog fixture and the admitted Be'lakor

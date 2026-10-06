@@ -24,6 +24,7 @@ from warhammer40k_core.engine.phase import (
     PhaseHandler,
     PlaceholderPhaseHandler,
 )
+from warhammer40k_core.engine.phases.movement_handler import MovementPhaseHandler
 from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence import (
     PrimaryMissionBoundaryCheckpoint,
 )
@@ -180,7 +181,12 @@ def test_pre_cleanup_scoring_history_survives_later_native_turn_completion(
         payload=validate_json_value(proposal.to_payload()),
     )
     decisions.submit_result(result)
-    lifecycle._movement_phase_handler.apply_decision(
+    movement_handler = MovementPhaseHandler(
+        ruleset_descriptor=lifecycle.config.ruleset_descriptor,
+        army_catalog=lifecycle.config.army_catalog,
+        parameterized_proposals=lifecycle.parameterized_movement_proposals,
+    )
+    movement_handler.apply_decision(
         state=state, decisions=decisions, result=result, reaction_queue=lifecycle.reaction_queue
     )
     assert state.advanced_unit_states or state.fell_back_unit_states
@@ -191,7 +197,7 @@ def test_pre_cleanup_scoring_history_survives_later_native_turn_completion(
     handlers: dict[BattlePhase, PhaseHandler] = {
         phase: PlaceholderPhaseHandler(phase) for phase in state.battle_phase_sequence
     }
-    handlers[BattlePhase.MOVEMENT] = lifecycle._movement_phase_handler
+    handlers[BattlePhase.MOVEMENT] = movement_handler
     fixture_flow = BattleRoundFlow(phase_handlers=handlers)
     while state.current_battle_phase is not BattlePhase.FIGHT:
         fixture_flow.advance(state=state, decisions=decisions)

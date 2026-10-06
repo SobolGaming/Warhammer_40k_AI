@@ -100,7 +100,7 @@
     "tests/unit/test_order125_implicit_subjects.py": 402.977,
     "tests/unit/test_order126_sequential_movement.py": 396.815,
     "tests/unit/test_order128_setup_model_fit.py": 6.673,
-    "tests/unit/test_order129_flight_history.py": 461.273,
+    "tests/unit/test_order129_flight_history.py": 458.408,
     "tests/unit/test_order36_sequencing.py": 249.366,
     "tests/unit/test_order36_timing_authority.py": 171.554,
     "tests/unit/test_order51_flight.py": 211.812,
@@ -317,13 +317,13 @@
     {
       "junit_sha256": [
         "0cbe117e799b184b07c0a6ce6c07f6dc3aba5b1f4f23fbf16c8757867d3c31a6",
-        "726e2d2f4768348bbe3fc676cb2a614b1122af452ce276a17b7d57a55ecd0981",
         "78e98164ddb45312ff03cda134813ec4a2a53f9f1432e7b500b7128e03fa53ad",
+        "93129409b56519a9b82d8b9806ad69bcfbe1d37073f01c8d1d4296cacda314e7",
         "bfecc4f72798cce5643114d0a4afcdbbbee22f7f0f5c176a3c06f6e276ff96dc",
         "db19530a7f625ddbf131ed20a6f8deecd6fde971a8c518d2bec0015c4c634859",
         "e83a1661365872b3bc9547248f25604ece76ff27e9bf2d5aa27974f573e64f9a"
       ],
-      "source": "Order129 provisional prior complete profile plus current scoped controls and four repaired scoring chronology cases. Final timing will exclusively use complete successful current cohort.",
+      "source": "Order129 provisional prior complete profile and earlier scoped controls plus current four public-handler chronology controls. Final timings will exclusively use complete successful current cohort.",
       "test_cases": 10991,
       "test_files": 312
     }
@@ -331,66 +331,66 @@
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 4999.587,
+      "duration_seconds": 4999.406,
       "shard_id": 1,
-      "test_file_count": 25
+      "test_file_count": 24
     },
     {
-      "duration_seconds": 4999.645,
+      "duration_seconds": 4999.411,
       "shard_id": 2,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4999.647,
+      "duration_seconds": 4999.373,
       "shard_id": 3,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4999.653,
+      "duration_seconds": 4999.352,
       "shard_id": 4,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4999.618,
+      "duration_seconds": 4999.406,
       "shard_id": 5,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4999.591,
+      "duration_seconds": 4999.41,
       "shard_id": 6,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4999.604,
+      "duration_seconds": 4999.354,
       "shard_id": 7,
-      "test_file_count": 26
+      "test_file_count": 28
     },
     {
-      "duration_seconds": 4999.642,
+      "duration_seconds": 4999.401,
       "shard_id": 8,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4999.652,
+      "duration_seconds": 4999.354,
       "shard_id": 9,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4999.584,
+      "duration_seconds": 4999.358,
       "shard_id": 10,
-      "test_file_count": 27
+      "test_file_count": 25
     },
     {
-      "duration_seconds": 4999.599,
+      "duration_seconds": 4999.366,
       "shard_id": 11,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4999.584,
+      "duration_seconds": 4999.35,
       "shard_id": 12,
-      "test_file_count": 27
+      "test_file_count": 28
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 59995.406
+  "total_test_duration_seconds": 59992.541
 }
