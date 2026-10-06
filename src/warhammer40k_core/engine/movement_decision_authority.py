@@ -435,6 +435,7 @@ def validate_movement_completion_decision_authority(
         or proposal_request.movement_phase_action != action
         or proposal.unit_instance_id != unit_id
         or proposal.movement_phase_action != action
+        or payload.get("movement_mode") != proposal.movement_mode
         or payload.get("witness") != proposal.witness.to_payload()
     ):
         raise GameLifecycleError("Primary mission movement proposal semantics drifted.")
