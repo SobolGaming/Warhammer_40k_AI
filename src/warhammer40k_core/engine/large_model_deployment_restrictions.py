@@ -15,7 +15,10 @@ from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.rules_unit_effects import rules_unit_effect_applications
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import (
+    rules_unit_view_by_id,
+    rules_unit_views_from_armies,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_large_model_setup_2026_09 as large_model_source,
 )
@@ -60,6 +63,46 @@ def deployment_restriction_payload(effect: PersistingEffect) -> DeploymentRestri
     ):
         raise GameLifecycleError("Large-model deployment restriction source or turn drifted.")
     return row
+
+
+def validate_deployment_restriction_identity(
+    *, state: GameState, effect: PersistingEffect, row: DeploymentRestrictionPayload
+) -> None:
+    """Bind the restored condition to current/recorded physical ownership.
+
+    Dead models remain part of their unit inventory. Split source snapshots retain
+    original model membership; starting attached identities retain their components.
+    This authenticates the effect envelope, not deployment geometry or permission.
+    """
+    if row.turn_player_id not in state.player_ids:
+        raise GameLifecycleError("Deployment restriction turn player is not in this game.")
+    target = effect.target_unit_instance_ids[0]
+    target_ids = {target}
+    for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+        if target in (view.unit_instance_id, *view.component_unit_instance_ids):
+            target_ids.update(view.component_unit_instance_ids)
+    for attached in state.starting_attached_unit_records:
+        if attached.attached_unit_instance_id == target:
+            target_ids.update(attached.component_unit_instance_ids)
+    for army in state.army_definitions:
+        for split in army.unit_splits:
+            if split.source_unit_instance_id == target:
+                target_ids.update(unit.unit_instance_id for unit in split.source_units)
+    model_owners = {
+        model.model_instance_id: army.player_id
+        for army in state.army_definitions
+        for unit in (
+            *army.units,
+            *(unit for split in army.unit_splits for unit in split.source_units),
+        )
+        if unit.unit_instance_id in target_ids
+        for model in unit.own_models
+    }
+    if any(
+        model_owners.get(model_id) != effect.owner_player_id
+        for model_id in row.qualifying_model_instance_ids
+    ):
+        raise GameLifecycleError("Deployment restriction model or target ownership drifted.")
 
 
 def record_conditional_deployment_restriction(

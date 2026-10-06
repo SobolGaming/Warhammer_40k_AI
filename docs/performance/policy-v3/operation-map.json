@@ -5352,6 +5352,7 @@
         "deployment_restriction_payload",
         "large_model_activity_reason",
         "record_conditional_deployment_restriction",
+        "validate_deployment_restriction_identity",
         "validate_persisting_effects"
       ],
       "families": [],
@@ -5368,8 +5369,11 @@
         "conditional_deployment_session",
         "test_conditional_checkpoint_facade_restore_fork_views_events_replay_continuation",
         "test_conditional_effect_envelope_rejects_malformed_restore",
+        "test_conditional_restore_binds_model_target_and_owner",
         "test_conditional_seam_invalid_context_is_atomic",
         "test_constructed_condition_shared_consumers_and_actual_turn_expiry",
+        "test_constructed_split_inventory_retains_conditional_source_model_membership",
+        "test_dead_qualifying_model_keeps_valid_conditional_state_and_remaining_unit_lock",
         "test_pregame_seam_creates_no_first_turn_effect"
       ],
       "families": [],

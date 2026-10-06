@@ -28,6 +28,9 @@ an already-qualified condition and verifies identity before mutation; it neither
 places a model nor grants permission nor proves geometry. A future deployment
 owner must authenticate its granting rule and validate oversized geometry first.
 No admitted in-turn owner calls the helper today. It records no pregame effect.
+Restore binds qualifying model identities and ownership to current units and
+retained split-source inventories, including models that have since died. This
+validates the new effect envelope without claiming geometry or permission proof.
 
 The shared `large_model_activity_reason` reads these effects through established
 rules-unit lineage before its unchanged Strategic Reserves branch. Expiration uses

@@ -107,7 +107,7 @@
     "tests/unit/test_order132_disembark_distance.py": 92.244,
     "tests/unit/test_order133_keyword_materialization.py": 0.386,
     "tests/unit/test_order133_keyword_numbers.py": 488.86,
-    "tests/unit/test_order134_deployment_restrictions.py": 29.711,
+    "tests/unit/test_order134_deployment_restrictions.py": 35.465,
     "tests/unit/test_order36_sequencing.py": 244.016,
     "tests/unit/test_order36_timing_authority.py": 216.545,
     "tests/unit/test_order51_flight.py": 170.748,
@@ -323,78 +323,78 @@
   "profiles": [
     {
       "junit_sha256": [
-        "7594bb6bd081f45a5b87ee6350523e27f2d790dd28c3b20df4a7ecc7f52fb516",
+        "8296eae0bd5f3fc3736234403a3cbb909894fbb00affbc59ad87966b6f54c8c9",
         "ad8eba65541cf307667a7dc7d2a965b95ca5b1faf2ba0f8a4fa8e7d73d5706ea",
         "d642e3e1dbe64b86908507ea0805a62b3cde6e27c6ec778eed440018bc29b82e"
       ],
       "source": "Provisional scheduling only: authenticated predecessor Order133 complete cohort plus stable diagnostic Order134 conditional restriction file durations. Mixed source profile; no current complete-cohort pass or final timing credit. Replace every duration using complete passing current covered cohort before publication.",
-      "test_cases": 11112,
+      "test_cases": 11119,
       "test_files": 319
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 5097.288,
+      "duration_seconds": 5097.735,
       "shard_id": 1,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 5097.262,
+      "duration_seconds": 5097.75,
       "shard_id": 2,
-      "test_file_count": 25
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 5097.278,
+      "duration_seconds": 5097.736,
       "shard_id": 3,
       "test_file_count": 27
     },
     {
-      "duration_seconds": 5097.293,
+      "duration_seconds": 5097.744,
       "shard_id": 4,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 5097.246,
+      "duration_seconds": 5097.731,
       "shard_id": 5,
       "test_file_count": 27
     },
     {
-      "duration_seconds": 5097.249,
+      "duration_seconds": 5097.73,
       "shard_id": 6,
       "test_file_count": 27
     },
     {
-      "duration_seconds": 5097.25,
+      "duration_seconds": 5097.732,
       "shard_id": 7,
       "test_file_count": 27
     },
     {
-      "duration_seconds": 5097.254,
+      "duration_seconds": 5097.792,
       "shard_id": 8,
       "test_file_count": 27
     },
     {
-      "duration_seconds": 5097.251,
+      "duration_seconds": 5097.733,
       "shard_id": 9,
-      "test_file_count": 28
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 5097.244,
+      "duration_seconds": 5097.735,
       "shard_id": 10,
-      "test_file_count": 28
+      "test_file_count": 27
     },
     {
-      "duration_seconds": 5097.278,
+      "duration_seconds": 5097.758,
       "shard_id": 11,
-      "test_file_count": 26
+      "test_file_count": 27
     },
     {
-      "duration_seconds": 5097.27,
+      "duration_seconds": 5097.741,
       "shard_id": 12,
-      "test_file_count": 26
+      "test_file_count": 27
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 61167.163
+  "total_test_duration_seconds": 61172.917
 }

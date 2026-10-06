@@ -19,6 +19,7 @@ from warhammer40k_core.adapters.access_control import (
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.engine.charge_eligibility import charge_unit_ineligibility_reason
 from warhammer40k_core.engine.charge_phase_state import ChargePhaseState
+from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
 from warhammer40k_core.engine.decision_request import DecisionError
 from warhammer40k_core.engine.effects import EffectExpirationBoundary
 from warhammer40k_core.engine.event_log import JsonValue
@@ -26,12 +27,17 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.large_model_deployment_restrictions import (
     deployment_restriction_payload,
     record_conditional_deployment_restriction,
+    validate_deployment_restriction_identity,
 )
 from warhammer40k_core.engine.large_model_restrictions import large_model_activity_reason
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import (
+    rules_unit_view_by_id,
+    rules_unit_views_from_armies,
+)
 from warhammer40k_core.engine.shooting_eligibility_state import shooting_state_restriction_reason
+from warhammer40k_core.engine.unit_splitting import build_split_army
 
 
 @pytest.mark.parametrize("opponent_turn", [False, True])
@@ -182,6 +188,81 @@ def test_conditional_effect_envelope_rejects_malformed_restore(
     payload["persisting_effects"][0][field] = value
     with pytest.raises(GameLifecycleError):
         GameState.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    "invalid", ["unknown-model", "foreign-model", "wrong-unit", "wrong-owner", "wrong-turn-player"]
+)
+def test_conditional_restore_binds_model_target_and_owner(invalid: str) -> None:
+    state = conditional_deployment_session().lifecycle.state
+    assert state is not None
+    original = state.to_payload()
+    payload = json.loads(json.dumps(original))
+    effect = payload["persisting_effects"][0]
+    if invalid in ("unknown-model", "foreign-model"):
+        effect["effect_payload"]["qualifying_model_instance_ids"] = [
+            "unknown"
+            if invalid == "unknown-model"
+            else state.army_definitions[1].units[0].own_models[0].model_instance_id
+        ]
+    elif invalid == "wrong-unit":
+        effect["target_unit_instance_ids"] = ["army-alpha:transport"]
+    elif invalid == "wrong-owner":
+        effect["owner_player_id"] = "player-b"
+    else:
+        effect["effect_payload"]["turn_player_id"] = "unknown"
+        effect["expiration"]["player_id"] = "unknown"
+    with pytest.raises(GameLifecycleError):
+        GameState.from_payload(payload)
+    assert state.to_payload() == original
+    assert GameState.from_payload(json.loads(json.dumps(original))).to_payload() == original
+
+
+def test_dead_qualifying_model_keeps_valid_conditional_state_and_remaining_unit_lock() -> None:
+    state = conditional_deployment_session().lifecycle.state
+    assert state is not None
+    effect = state.persisting_effects[0]
+    row = deployment_restriction_payload(effect)
+    assert row is not None
+    view = rules_unit_view_by_id(state=state, unit_instance_id="army-alpha:passengers")
+    model = next(
+        m for m in view.own_models if m.model_instance_id in row.qualifying_model_instance_ids
+    )
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=view.unit_instance_id,
+        model_instance_id=model.model_instance_id,
+        damage=model.current_wounds,
+        damage_kind=DamageKind.NORMAL,
+    )
+    restored = GameState.from_payload(json.loads(json.dumps(state.to_payload())))
+    assert restored.to_payload() == state.to_payload()
+    assert large_model_activity_reason(restored, "army-alpha:passengers", "normal") is not None
+
+
+def test_constructed_split_inventory_retains_conditional_source_model_membership() -> None:
+    # Pure inventory control: no in-turn split or deployment permission is claimed.
+    state = conditional_deployment_session().lifecycle.state
+    assert state is not None
+    effect = state.persisting_effects[0]
+    row = deployment_restriction_payload(effect)
+    assert row is not None
+    view = rules_unit_view_by_id(state=state, unit_instance_id="army-alpha:passengers")
+    split = build_split_army(
+        army=state.army_definitions[0],
+        unit_instance_id=view.unit_instance_id,
+        first_model_ids=tuple(sorted(m.model_instance_id for m in view.own_models)[::2]),
+        request_id="order134-constructed-split",
+        source_id="order134:inventory-control",
+        specified_strengths=None,
+    )
+    state.army_definitions[0] = split
+    validate_deployment_restriction_identity(state=state, effect=effect, row=row)
+    for successor in rules_unit_views_from_armies(armies=(split,)):
+        if successor.split_record is not None:
+            assert (
+                large_model_activity_reason(state, successor.unit_instance_id, "normal") is not None
+            )
 
 
 def test_conditional_checkpoint_facade_restore_fork_views_events_replay_continuation() -> None:
