@@ -65,7 +65,7 @@ export type SessionEventQuery = GetSessionEventsOperation["parameters"]["query"]
 
 export type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
 
-export const EXTERNAL_CONTRACT_VERSION = "44.3.15";
+export const EXTERNAL_CONTRACT_VERSION = "44.3.16";
 
 const REQUIRED_OPERATION_IDS = new Set([
   "createAuthoritativeSession",

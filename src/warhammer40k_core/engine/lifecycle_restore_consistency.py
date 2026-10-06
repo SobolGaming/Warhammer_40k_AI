@@ -13,6 +13,9 @@ from warhammer40k_core.engine import transport_state_integrity as _tsi
 from warhammer40k_core.engine.attack_hit_authority import validate_attack_hit_authority
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
+from warhammer40k_core.engine.casualty_coherency_restore import (
+    scenario_for_required_restore_coherency,
+)
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import EventRecord
@@ -239,8 +242,11 @@ def _validate_battlefield_state_consistency(
             scenario.assert_all_mustered_models_placed_or_accounted(state.unavailable_model_ids())
         if config is not None and _state_requires_deployed_battlefield_state(state):
             assert_battlefield_units_in_coherency(
-                scenario=_fahi.battlefield_scenario_for_living_model_coherency(
-                    scenario=scenario,
+                scenario=scenario_for_required_restore_coherency(
+                    scenario=_fahi.battlefield_scenario_for_living_model_coherency(
+                        scenario=scenario,
+                        state=state,
+                    ),
                     state=state,
                 ),
                 ruleset_descriptor=config.ruleset_descriptor,
