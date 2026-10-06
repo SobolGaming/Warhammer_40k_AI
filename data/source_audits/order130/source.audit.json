@@ -1,0 +1,121 @@
+{
+  "order": 130,
+  "scope": "P03K/C03-11; faq-904b8b36-09f0-4449-a9c3-45892664ef60-obligation-01",
+  "selected_source": {
+    "row_id": "faq:904b8b36-09f0-4449-a9c3-45892664ef60",
+    "category": "FAQ",
+    "locator": "904b8b36-09f0-4449-a9c3-45892664ef60",
+    "title": "FAQ 04",
+    "occurrence": 1,
+    "source_sha256": "4d6f85a577496676241ac385c0cb4fa2e672c8c679d56ff363d7344279670845",
+    "blocks": [
+      {
+        "ordinal": 1,
+        "kind": "question",
+        "sha256": "2aad2c76c21440bfbbc0797234fc180b747d6ba8d59d625f84aa898541ac5d69",
+        "value": "Do models destroyed when a unit is out of coherency count for mission objectives?"
+      },
+      {
+        "ordinal": 2,
+        "kind": "answer",
+        "sha256": "cf87b23d0f70cff8f9ce62b411ad616fd9be0b93edeba67c70f647e5a4b848e1",
+        "value": "Yes."
+      }
+    ],
+    "selected_provider": "Game Datamissions",
+    "historical_source_row_sha256": "2998c28a0d8931c6c85b5a0455c7f953c29a877655da8bdf536e7cee4a9d5d1d",
+    "review_category": "03"
+  },
+  "selected_literal_blocks": [
+    {
+      "ordinal": 2,
+      "kind": "answer",
+      "sha256": "cf87b23d0f70cff8f9ce62b411ad616fd9be0b93edeba67c70f647e5a4b848e1",
+      "value": "Yes."
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "faq-904b8b36-09f0-4449-a9c3-45892664ef60-obligation-01",
+      "source_blocks": [
+        2
+      ],
+      "summary": "Models destroyed for coherency count toward mission destruction objectives.",
+      "owners": [
+        "src/warhammer40k_core/engine/game_state.py:GameState.resolve_end_turn_cleanup_boundary",
+        "src/warhammer40k_core/engine/secondary_unit_destruction_tracking.py:secondary_unit_destruction_from_primary",
+        "src/warhammer40k_core/engine/secondary_scoring_conditions.py:evaluate_secondary_scoring_condition"
+      ],
+      "evidence": [],
+      "qualifications": [
+        "Evidence gap: Confirmed consumer discrepancy: actual end-turn coherency cleanup removes a starting-W10 enemy model as destroyed while four unit mates survive, but the Bring It Down condition returns score_count0 and no destroyed model IDs. Primary departure evidence exists; Secondary destroyed-model inventory is projected only after unit/component completion. Retained probe: probe_coherency_destroyed_model_mission_count in tests/order97_gap_probes_18_25.py. Prerequisite: carry each mission-relevant coherency casualty into the shared per-model destruction/scoring route, audit other causes sharing that route, and prove real scoring, restore and replay while preserving the established control-first boundary ordering."
+      ]
+    }
+  ],
+  "pinned_git_blob_sha256": {
+    "data/source_audits/order97/selected-sources.json": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+    "data/source_audits/order97/categories/03.json": "1e5f98b23d3e0dbad9cfcff967c54b02aae899c93cfa500528d6c65b6d7d3cbe",
+    "data/source_audits/order97/observed_gaps_01_08.json": "93d0f121e578099c7c52155131668d8706fbc7689afe5fa8ac1267228e107bde",
+    "tests/order97_gap_probes_01_08.py": "e4e908605e084a8106e0aab42f52fb425f2c6f4ff5705c639ddad29c5ca762cc",
+    "data/source_audits/order97/gap_observations_18_25.json": "c7606514a2e04500313e8425c456612d1af0e0b87728b2848de3db368812223f",
+    "tests/order97_gap_probes_18_25.py": "7305e6f7a169289bb19cb2e88205fabb2e844b0a6f4abcccc85bb8a8a3719312"
+  },
+  "boundary": "Shared eligible per-model secondary destruction history including coherency casualties while the unit survives. Preserve objective-control-first ordering, physical ownership, no duplicate unit completion, actual score ledgers and engine-generated restore/replay across causes. No other obligation or Order130 implementation started.",
+  "diagnostic_locators": [
+    "tests/order97_gap_probes_18_25.py:418:probe_coherency_destroyed_model_mission_count"
+  ],
+  "retained_diagnostics": [
+    {
+      "expected": {
+        "destroyed_model_ids": [
+          "army-beta:enemy:core-intercessor-like:005"
+        ],
+        "score_count": 1
+      },
+      "input": {
+        "enemy_isolated_model": "army-beta:enemy:core-intercessor-like:005",
+        "isolated_model_starting_wounds": 10,
+        "remaining_component_model_count": 4,
+        "scoring_player": "player-a",
+        "secondary_scoring_condition": "each_enemy_model_w10_or_more_destroyed_this_turn"
+      },
+      "observed": {
+        "cleanup_removed_model_ids": [
+          "army-beta:enemy:core-intercessor-like:005"
+        ],
+        "destroyed_model_rules_triggered": false,
+        "primary_departure_count": 1,
+        "removal_kind": "destroyed",
+        "score_condition_result": {
+          "controlled_objective_ids": [],
+          "destroyed_model_instance_ids": [],
+          "destroyed_unit_instance_ids": [],
+          "enemy_unit_instance_ids": [],
+          "home_objective_ids": [],
+          "objective_marker_ids": [],
+          "score_count": 0,
+          "terrain_feature_ids": []
+        },
+        "secondary_destruction_count": 0
+      },
+      "owners": [
+        "src/warhammer40k_core/engine/game_state.py:GameState.resolve_end_turn_cleanup_boundary",
+        "src/warhammer40k_core/engine/secondary_unit_destruction_tracking.py:secondary_unit_destruction_from_primary",
+        "src/warhammer40k_core/engine/secondary_scoring_conditions.py:evaluate_secondary_scoring_condition"
+      ],
+      "qualification": "This exercises the actual cleanup and Bring It Down condition consumer with a real domain unit. It does not claim a completed scoring-ledger transaction or facade replay. The Secondary model inventory is projected only after unit/component completion, so a qualifying coherency casualty in a surviving component is absent. Repair the shared per-model destruction evidence route and audit other destruction causes using the same inventory.",
+      "requirement_ids": [
+        "faq-904b8b36-09f0-4449-a9c3-45892664ef60-obligation-01"
+      ],
+      "source_row_ids": [
+        "faq:904b8b36-09f0-4449-a9c3-45892664ef60"
+      ]
+    }
+  ],
+  "base": "010573378e25e32e7ff4d79265c59f1865d5351a",
+  "tree": "2b65c4dea05453136f0e03aef8f963785ace35e0",
+  "baseline_verified": true,
+  "truthfulness": "Canonical catalog control explicitly supplies W9/W10 at the fixture catalog boundary. The native Be'lakor control preserves the admitted W20 datasheet, keywords, wargear and reconciled geometry, with explicit fixture mission force-disposition admission. Pre-existing casualties are generated by shared mortal-wound allocation decisions; their complete engine payload is the continuation replay root. No named-faction activation or provider certification is claimed.",
+  "acceptance": "Shared eligible per-model destruction history across causes and surviving units, physical ownership, objective-control-first ordering, no duplicate unit completion or re-credit of earlier-turn casualties, real scoring ledgers, valid-state JSON restore, independent forks, all-role views/events and exact replay. Preserve original source archives, tests, assertions and pins.",
+  "observed_root_cause": "Coherency cleanup has authoritative primary departure evidence, but secondary model scoring previously projects only completed units. Physical cleanup previously removed placements without marking wounds dead, and restore required immediate coherency after authentic casualties before turn-end cleanup."
+}

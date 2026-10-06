@@ -12,6 +12,9 @@ from warhammer40k_core.engine.secondary_mission_selection import (
     SecondaryMissionSelection,
     secondary_mission_selection_from_json,
 )
+from warhammer40k_core.engine.secondary_model_destruction_history import (
+    secondary_model_destructions_for_boundary,
+)
 from warhammer40k_core.engine.secondary_scoring_conditions import SecondaryScoringConditionContext
 from warhammer40k_core.engine.secondary_scoring_occupancy import (
     build_secondary_battlefield_occupancy,
@@ -92,6 +95,9 @@ def secondary_scoring_condition_context_from_state(
         terrain_plunder_states=tuple(state.secondary_terrain_plunder_states),
         enemy_unit_ids_in_player_deployment_zone=enemy_zone_ids,
         starting_strength_records=tuple(state.starting_strength_records),
+        model_destruction_states=secondary_model_destructions_for_boundary(
+            state=state, record=record
+        ),
         occupancy=occupancy,
         game_length_battle_rounds=(
             None if state.mission_setup is None else _game_length_battle_rounds(state)

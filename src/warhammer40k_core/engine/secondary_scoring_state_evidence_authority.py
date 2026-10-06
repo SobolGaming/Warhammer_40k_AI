@@ -54,6 +54,9 @@ from warhammer40k_core.engine.secondary_deployment_zone_evidence import (
 from warhammer40k_core.engine.secondary_mission_selection import (
     secondary_mission_selection_from_json,
 )
+from warhammer40k_core.engine.secondary_model_destruction_history import (
+    validate_secondary_model_destruction_boundary_history,
+)
 from warhammer40k_core.engine.secondary_scoring_conditions import (
     SecondaryScoringConditionContext,
 )
@@ -228,11 +231,15 @@ def validate_secondary_scoring_state_evidence_authority(
     )
     policies = mission_scoring_policies_from_setup(state.mission_setup)
     player_policy = policies.policy_for_player(card.player_id)
+    validate_secondary_model_destruction_boundary_history(
+        state=state, record=record, history=evidence.model_destruction_states
+    )
     context = SecondaryScoringConditionContext(
         record=record,
         mission_setup=state.mission_setup,
         player_id=card.player_id,
         unit_destruction_states=destructions,
+        model_destruction_states=evidence.model_destruction_states,
         objective_cleanse_states=cleanses,
         terrain_plunder_states=plunders,
         enemy_unit_ids_in_player_deployment_zone=enemy_zone_ids,

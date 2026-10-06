@@ -4910,6 +4910,110 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order130-model-mission-history": {
+      "paths": [
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/engine/casualty_coherency_restore.py",
+        "src/warhammer40k_core/engine/fight_model_authority_history.py",
+        "src/warhammer40k_core/engine/game_state.py",
+        "src/warhammer40k_core/engine/lifecycle_restore_consistency.py",
+        "src/warhammer40k_core/engine/mission_cleanup_boundary.py",
+        "src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py",
+        "src/warhammer40k_core/engine/rule_model_destruction_unplaced.py",
+        "src/warhammer40k_core/engine/secondary_model_destruction_history.py",
+        "src/warhammer40k_core/engine/secondary_scoring_conditions.py",
+        "src/warhammer40k_core/engine/secondary_scoring_context.py",
+        "src/warhammer40k_core/engine/secondary_scoring_state_evidence.py",
+        "src/warhammer40k_core/engine/secondary_scoring_state_evidence_authority.py"
+      ],
+      "owners": [
+        "@module",
+        "GameState.resolve_end_turn_cleanup_boundary",
+        "SecondaryModelDestructionState",
+        "SecondaryModelDestructionState.__post_init__",
+        "SecondaryModelDestructionState.from_payload",
+        "SecondaryModelDestructionState.to_payload",
+        "SecondaryModelDestructionStatePayload",
+        "SecondaryScoringConditionContext",
+        "SecondaryScoringStateEvidence",
+        "SecondaryScoringStateEvidence.create",
+        "SecondaryScoringStateEvidence.from_payload",
+        "SecondaryScoringStateEvidence.to_payload",
+        "SecondaryScoringStateEvidencePayload",
+        "_authority_mutations_by_event_index",
+        "_context_key",
+        "_destroyed_character_models_this_turn",
+        "_enemy_character_model_ids_destroyed_during_battle",
+        "_enemy_destroyed_models",
+        "_no_trigger_destroyed_departure_ids",
+        "_validate_battlefield_state_consistency",
+        "build_secondary_scoring_state_evidence",
+        "destroy_end_turn_coherency_models",
+        "evaluate_secondary_scoring_condition",
+        "resolve_mission_cleanup_boundary",
+        "scenario_for_required_restore_coherency",
+        "secondary_model_destructions_for_boundary",
+        "secondary_scoring_condition_context_from_evidence",
+        "secondary_scoring_condition_context_from_state",
+        "validate_secondary_model_destruction_boundary_history",
+        "validate_secondary_scoring_state_evidence_authority"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order130-regressions": {
+      "paths": [
+        "tests/order130_helpers.py",
+        "tests/unit/test_order130_model_mission_destruction.py"
+      ],
+      "owners": [
+        "@module",
+        "assert_destruction_checkpoint",
+        "destruction_session",
+        "finish_turn",
+        "native_destruction_session",
+        "session_from_casualty_checkpoint",
+        "test_native_w20_casualty_uses_the_same_model_scoring_history_once",
+        "test_surviving_unit_coherency_casualty_scores_per_model",
+        "unaffected_unit_with_invalid_coherency_payload"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order130-source-evidence": {
+      "paths": [
+        "data/source_audits/order130/source.audit.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order130-contract-publication": {
+      "paths": [
+        "conformance/typescript/src/contract.ts",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/migrations/44.3.15-to-44.3.16.md",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

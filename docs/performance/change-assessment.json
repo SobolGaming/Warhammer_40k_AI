@@ -1,422 +1,614 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "b6e55e2dd3ca0a04169093e60060134febca528b",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:435878c7cb437bc49c0835828ade60542193a7efa91c8963382dafa8101d31b7",
-  "operation_map_sha256": "c049bb586a1623e95cb802faaba13e440e7b40e4283009a69b0cbf6797119f61",
+  "base": "010573378e25e32e7ff4d79265c59f1865d5351a",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:00215581416c4a7d8487de36fed4dfe07d61aded88c3667bc03bb7f20ced3998",
+  "operation_map_sha256": "d675c6ad052e4c099ae19b248a27733be2e9c08df37c41537cefbbe02079424a",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "67740fed911fe41c119d3cff61d44d7e6d9a50bad878e14341dd8ff7ef6d57f8",
-      "after_sha256": "0aaff9eaea4721367be5f2b336c09971a1f4652b4fa43a2c7948284d2736569d",
+      "before_sha256": "0aaff9eaea4721367be5f2b336c09971a1f4652b4fa43a2c7948284d2736569d",
+      "after_sha256": "b42a0544f2bd7d07e87da50e3df13401b60018dd44131943acef3324ba8d4112",
       "owners": {
         "@document": {
-          "before": "67740fed911fe41c119d3cff61d44d7e6d9a50bad878e14341dd8ff7ef6d57f8",
-          "after": "0aaff9eaea4721367be5f2b336c09971a1f4652b4fa43a2c7948284d2736569d"
+          "before": "0aaff9eaea4721367be5f2b336c09971a1f4652b4fa43a2c7948284d2736569d",
+          "after": "b42a0544f2bd7d07e87da50e3df13401b60018dd44131943acef3324ba8d4112"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "29724008cb7709c665603b25731d22a4ffaaa8b0db16b9fd36fbe9b69e449575",
-      "after_sha256": "d56422d3ba75a4035169ec5e37148a2483cbdb7127e060b846202107e80c6408",
+      "before_sha256": "d56422d3ba75a4035169ec5e37148a2483cbdb7127e060b846202107e80c6408",
+      "after_sha256": "754b2d21f2077572850844f3b2c37746e8a6172ca20f2a3d9e489cdadfb68c39",
       "owners": {
         "@document": {
-          "before": "29724008cb7709c665603b25731d22a4ffaaa8b0db16b9fd36fbe9b69e449575",
-          "after": "d56422d3ba75a4035169ec5e37148a2483cbdb7127e060b846202107e80c6408"
+          "before": "d56422d3ba75a4035169ec5e37148a2483cbdb7127e060b846202107e80c6408",
+          "after": "754b2d21f2077572850844f3b2c37746e8a6172ca20f2a3d9e489cdadfb68c39"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "176f32171217f2b546fcaed43bc5eb873219f863a2f23d89abc32f3dbc58514b",
-      "after_sha256": "2fa51c68b4e270638c3f8eeeb0ce183a228e291bf6f25535bf6e6e5795450987",
+      "before_sha256": "2fa51c68b4e270638c3f8eeeb0ce183a228e291bf6f25535bf6e6e5795450987",
+      "after_sha256": "d430c5d46cee407bdbaf683c9160cba790e997e163abc16509158faf83e421f5",
       "owners": {
         "@document": {
-          "before": "176f32171217f2b546fcaed43bc5eb873219f863a2f23d89abc32f3dbc58514b",
-          "after": "2fa51c68b4e270638c3f8eeeb0ce183a228e291bf6f25535bf6e6e5795450987"
+          "before": "2fa51c68b4e270638c3f8eeeb0ce183a228e291bf6f25535bf6e6e5795450987",
+          "after": "d430c5d46cee407bdbaf683c9160cba790e997e163abc16509158faf83e421f5"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "b6a2ab0f4c8e7989ac6b8b576216e4afcf526ab9cf8721a93db9576b6d4c13b5",
-      "after_sha256": "d42be7f08d458611e7cb21a8c00f62d58718d8348ed90e13bfd0cfe15ff8845e",
+      "before_sha256": "d42be7f08d458611e7cb21a8c00f62d58718d8348ed90e13bfd0cfe15ff8845e",
+      "after_sha256": "d56d23f61219c68f01543bee0fa56d3e5b877586656489beb2881c66a733c445",
       "owners": {
         "@document": {
-          "before": "b6a2ab0f4c8e7989ac6b8b576216e4afcf526ab9cf8721a93db9576b6d4c13b5",
-          "after": "d42be7f08d458611e7cb21a8c00f62d58718d8348ed90e13bfd0cfe15ff8845e"
+          "before": "d42be7f08d458611e7cb21a8c00f62d58718d8348ed90e13bfd0cfe15ff8845e",
+          "after": "d56d23f61219c68f01543bee0fa56d3e5b877586656489beb2881c66a733c445"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "123d75dc7953882f4298d88a51d179fdc78aea97a25e0aaa1f14b63f5d774d3f",
-      "after_sha256": "dd72380de8d864c7002d80c409282044fd7e38d8e90ff0b417075c5652e0fe88",
+      "before_sha256": "dd72380de8d864c7002d80c409282044fd7e38d8e90ff0b417075c5652e0fe88",
+      "after_sha256": "2aa8b96be8269f1724105ce5eaac1d80f792b63a452f36ad30a2fa0cb1c022fc",
       "owners": {
         "@document": {
-          "before": "123d75dc7953882f4298d88a51d179fdc78aea97a25e0aaa1f14b63f5d774d3f",
-          "after": "dd72380de8d864c7002d80c409282044fd7e38d8e90ff0b417075c5652e0fe88"
+          "before": "dd72380de8d864c7002d80c409282044fd7e38d8e90ff0b417075c5652e0fe88",
+          "after": "2aa8b96be8269f1724105ce5eaac1d80f792b63a452f36ad30a2fa0cb1c022fc"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "778e4cf5e9b67fe0690fd779b3e3e8631c2e2dfa09c04177c03bf9c1557f1293",
-      "after_sha256": "d8a03b90405dba46206fc16fade03dede75754c83b1b9012a01f5c5014a6478f",
+      "before_sha256": "d8a03b90405dba46206fc16fade03dede75754c83b1b9012a01f5c5014a6478f",
+      "after_sha256": "4720bec76e22226940eecf5c70bdddeec889f532d82e78abd40a9a27f14449ea",
       "owners": {
         "@document": {
-          "before": "778e4cf5e9b67fe0690fd779b3e3e8631c2e2dfa09c04177c03bf9c1557f1293",
-          "after": "d8a03b90405dba46206fc16fade03dede75754c83b1b9012a01f5c5014a6478f"
+          "before": "d8a03b90405dba46206fc16fade03dede75754c83b1b9012a01f5c5014a6478f",
+          "after": "4720bec76e22226940eecf5c70bdddeec889f532d82e78abd40a9a27f14449ea"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "c72f3147d88f2e2bb2ed225dfe6936e4a9364d47368a8bec6eeb3b047a5f2795",
-      "after_sha256": "a8b39426a004024c70c905d692f75f638403d26ed827b4e0bd572fff62e2911a",
+      "before_sha256": "a8b39426a004024c70c905d692f75f638403d26ed827b4e0bd572fff62e2911a",
+      "after_sha256": "f4d48923ecd444448af75ef46cc24493f5370068b5315ddce02f09724e769442",
       "owners": {
         "@document": {
-          "before": "c72f3147d88f2e2bb2ed225dfe6936e4a9364d47368a8bec6eeb3b047a5f2795",
-          "after": "a8b39426a004024c70c905d692f75f638403d26ed827b4e0bd572fff62e2911a"
+          "before": "a8b39426a004024c70c905d692f75f638403d26ed827b4e0bd572fff62e2911a",
+          "after": "f4d48923ecd444448af75ef46cc24493f5370068b5315ddce02f09724e769442"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "a1ad398d272e7dc356b6e2ea42ea6a9bc97939e138e92335f322ee458bd6bea8",
-      "after_sha256": "53ded17b9354bdc3d148f6572cd0fc9c777652778e5b4e478af46ac3206d3616",
+      "before_sha256": "53ded17b9354bdc3d148f6572cd0fc9c777652778e5b4e478af46ac3206d3616",
+      "after_sha256": "b6b207a943129fd2e08315351666696a3368546197090518d02fb7f55f739745",
       "owners": {
         "@document": {
-          "before": "a1ad398d272e7dc356b6e2ea42ea6a9bc97939e138e92335f322ee458bd6bea8",
-          "after": "53ded17b9354bdc3d148f6572cd0fc9c777652778e5b4e478af46ac3206d3616"
+          "before": "53ded17b9354bdc3d148f6572cd0fc9c777652778e5b4e478af46ac3206d3616",
+          "after": "b6b207a943129fd2e08315351666696a3368546197090518d02fb7f55f739745"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "295a6b6868ff209798ec1ba06e531cf2444b5c496bb69d291071b4bd071a9057",
-      "after_sha256": "ce5aca206d41a1e972a95ec3767fbfdcab619e340e0fabe8ae43a706c71cf29e",
+      "before_sha256": "ce5aca206d41a1e972a95ec3767fbfdcab619e340e0fabe8ae43a706c71cf29e",
+      "after_sha256": "168dbd3dda7b372086ad9b92c35861f3aac1624511c53fddb3a6783fdc7a7e31",
       "owners": {
         "@document": {
-          "before": "295a6b6868ff209798ec1ba06e531cf2444b5c496bb69d291071b4bd071a9057",
-          "after": "ce5aca206d41a1e972a95ec3767fbfdcab619e340e0fabe8ae43a706c71cf29e"
+          "before": "ce5aca206d41a1e972a95ec3767fbfdcab619e340e0fabe8ae43a706c71cf29e",
+          "after": "168dbd3dda7b372086ad9b92c35861f3aac1624511c53fddb3a6783fdc7a7e31"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "f85bfd7525a8f878974b4773b25209d10c3b4a4eb19b2092a2672aef5c28b868",
-      "after_sha256": "0b786813a2990bc58c25b3bba217e9ac1fcaba4e6ed631e536a7e25fcb87c049",
+      "before_sha256": "0b786813a2990bc58c25b3bba217e9ac1fcaba4e6ed631e536a7e25fcb87c049",
+      "after_sha256": "f34975be6dc3d26eb3e90dc2342abaee815ceef6f0c74230dee5248d463ff730",
       "owners": {
         "@document": {
-          "before": "f85bfd7525a8f878974b4773b25209d10c3b4a4eb19b2092a2672aef5c28b868",
-          "after": "0b786813a2990bc58c25b3bba217e9ac1fcaba4e6ed631e536a7e25fcb87c049"
+          "before": "0b786813a2990bc58c25b3bba217e9ac1fcaba4e6ed631e536a7e25fcb87c049",
+          "after": "f34975be6dc3d26eb3e90dc2342abaee815ceef6f0c74230dee5248d463ff730"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "b9bc2629cd3f9bb7b59ffa2ebad9ba0ced848cd08ffb670ad3f5bbf20674c202",
-      "after_sha256": "676c7fd2fe47dfa1e2247b8989a88a3219576a17c290eb85411f4b1ad44eb9da",
+      "before_sha256": "676c7fd2fe47dfa1e2247b8989a88a3219576a17c290eb85411f4b1ad44eb9da",
+      "after_sha256": "96a938bd17d3bcb77b83475ff2ed8a42adedb96e307b5d98f1992314dfcb6181",
       "owners": {
         "@document": {
-          "before": "b9bc2629cd3f9bb7b59ffa2ebad9ba0ced848cd08ffb670ad3f5bbf20674c202",
-          "after": "676c7fd2fe47dfa1e2247b8989a88a3219576a17c290eb85411f4b1ad44eb9da"
+          "before": "676c7fd2fe47dfa1e2247b8989a88a3219576a17c290eb85411f4b1ad44eb9da",
+          "after": "96a938bd17d3bcb77b83475ff2ed8a42adedb96e307b5d98f1992314dfcb6181"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "3ac782662a2ee12935a99d642a7d85634abb140ccaa02f54290b06d17b43e973",
-      "after_sha256": "0fb7fdf068946d9819595c5a40a21f018edc64fc59700ea82e4ac195ebd278a6",
+      "before_sha256": "0fb7fdf068946d9819595c5a40a21f018edc64fc59700ea82e4ac195ebd278a6",
+      "after_sha256": "e183633f4ae215b0bfc5e9d3d582b139256ed40d389f9046e1cc6bf15853014e",
       "owners": {
         "@document": {
-          "before": "3ac782662a2ee12935a99d642a7d85634abb140ccaa02f54290b06d17b43e973",
-          "after": "0fb7fdf068946d9819595c5a40a21f018edc64fc59700ea82e4ac195ebd278a6"
+          "before": "0fb7fdf068946d9819595c5a40a21f018edc64fc59700ea82e4ac195ebd278a6",
+          "after": "e183633f4ae215b0bfc5e9d3d582b139256ed40d389f9046e1cc6bf15853014e"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "6c9a4a79c57373c8b2e22b064f52782a50cfb88aed765f0fb81b6aefb48fc385",
-      "after_sha256": "571f134e656e388f01cc98f8fe6a04df647f2a3253babbec40291d139d4f28d7",
+      "before_sha256": "571f134e656e388f01cc98f8fe6a04df647f2a3253babbec40291d139d4f28d7",
+      "after_sha256": "ee17438aa9e24e6f2bb5e7df99b59eff552d02d27dbdace36b4faa0aadeebaa2",
       "owners": {
         "@document": {
-          "before": "6c9a4a79c57373c8b2e22b064f52782a50cfb88aed765f0fb81b6aefb48fc385",
-          "after": "571f134e656e388f01cc98f8fe6a04df647f2a3253babbec40291d139d4f28d7"
+          "before": "571f134e656e388f01cc98f8fe6a04df647f2a3253babbec40291d139d4f28d7",
+          "after": "ee17438aa9e24e6f2bb5e7df99b59eff552d02d27dbdace36b4faa0aadeebaa2"
         }
       }
     },
     "conformance/typescript/src/contract.ts": {
-      "before_sha256": "779362a6e83a17c12399eb1be6f5869d5e98b9c2893123addd9f87cf979c50fc",
-      "after_sha256": "031e8bb2c3a75f9eba66d5dd5784646ce78fb0c81a17eea549b3789146335c88",
+      "before_sha256": "031e8bb2c3a75f9eba66d5dd5784646ce78fb0c81a17eea549b3789146335c88",
+      "after_sha256": "ca1ee048f1088c71452bb1ee27053e4b8721f7bf645a079a45ed3f8402f67443",
       "owners": {
         "@document": {
-          "before": "779362a6e83a17c12399eb1be6f5869d5e98b9c2893123addd9f87cf979c50fc",
-          "after": "031e8bb2c3a75f9eba66d5dd5784646ce78fb0c81a17eea549b3789146335c88"
+          "before": "031e8bb2c3a75f9eba66d5dd5784646ce78fb0c81a17eea549b3789146335c88",
+          "after": "ca1ee048f1088c71452bb1ee27053e4b8721f7bf645a079a45ed3f8402f67443"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "d613702d05a63c4e6c7699b2405b862c15a3c8a33209a15c497d9735ff36e31e",
-      "after_sha256": "2cb5560c616ad3cbfd1f1bb1c4ca9252413ae64e67a5f624077ff1299f137581",
+      "before_sha256": "2cb5560c616ad3cbfd1f1bb1c4ca9252413ae64e67a5f624077ff1299f137581",
+      "after_sha256": "1a8211a3be3e1a41156b8c3404394667519554c2acc569e7cd89362c17980dbe",
       "owners": {
         "@document": {
-          "before": "d613702d05a63c4e6c7699b2405b862c15a3c8a33209a15c497d9735ff36e31e",
-          "after": "2cb5560c616ad3cbfd1f1bb1c4ca9252413ae64e67a5f624077ff1299f137581"
+          "before": "2cb5560c616ad3cbfd1f1bb1c4ca9252413ae64e67a5f624077ff1299f137581",
+          "after": "1a8211a3be3e1a41156b8c3404394667519554c2acc569e7cd89362c17980dbe"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "d1a5cf7c49c0b5aff92cba601548700158ae388f935b956fa0df67bf3c7da2c7",
-      "after_sha256": "df9d9cbe063069807d8be4d4f4e792b3ee5e44c14cfb1c35ba32ee5fcf65ad97",
+      "before_sha256": "df9d9cbe063069807d8be4d4f4e792b3ee5e44c14cfb1c35ba32ee5fcf65ad97",
+      "after_sha256": "f5c589b1e056161eba4253057a10f3127e351da1d06b74ed06decc8f9517390f",
       "owners": {
         "@document": {
-          "before": "d1a5cf7c49c0b5aff92cba601548700158ae388f935b956fa0df67bf3c7da2c7",
-          "after": "df9d9cbe063069807d8be4d4f4e792b3ee5e44c14cfb1c35ba32ee5fcf65ad97"
+          "before": "df9d9cbe063069807d8be4d4f4e792b3ee5e44c14cfb1c35ba32ee5fcf65ad97",
+          "after": "f5c589b1e056161eba4253057a10f3127e351da1d06b74ed06decc8f9517390f"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "30809e73a98317838931e36b2620dcc73d208d18db2e4e1ec4892b7bcaa1b64c",
-      "after_sha256": "ddf5f1d40d0c5f3a326fe95e199b8752e79820cfa12d40f4fc08020732561307",
+      "before_sha256": "ddf5f1d40d0c5f3a326fe95e199b8752e79820cfa12d40f4fc08020732561307",
+      "after_sha256": "2f26135417152bd78abd723eef374f58d6b0a8b461f959ebc4ef7ef555bbe748",
       "owners": {
         "@document": {
-          "before": "30809e73a98317838931e36b2620dcc73d208d18db2e4e1ec4892b7bcaa1b64c",
-          "after": "ddf5f1d40d0c5f3a326fe95e199b8752e79820cfa12d40f4fc08020732561307"
+          "before": "ddf5f1d40d0c5f3a326fe95e199b8752e79820cfa12d40f4fc08020732561307",
+          "after": "2f26135417152bd78abd723eef374f58d6b0a8b461f959ebc4ef7ef555bbe748"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "07f13511e771f47e6fbad8e9659a7b40d18adc81d5f3613a1bd337d7de03af09",
-      "after_sha256": "472afeb9a4b09bafdcebc8418578b76d1c4caed010d66bec1007509b4a219502",
+      "before_sha256": "472afeb9a4b09bafdcebc8418578b76d1c4caed010d66bec1007509b4a219502",
+      "after_sha256": "af55878e534f77d02c5cc72855f318610d1f1a85bcd9290af9a7bb85ad06c0a0",
       "owners": {
         "@document": {
-          "before": "07f13511e771f47e6fbad8e9659a7b40d18adc81d5f3613a1bd337d7de03af09",
-          "after": "472afeb9a4b09bafdcebc8418578b76d1c4caed010d66bec1007509b4a219502"
+          "before": "472afeb9a4b09bafdcebc8418578b76d1c4caed010d66bec1007509b4a219502",
+          "after": "af55878e534f77d02c5cc72855f318610d1f1a85bcd9290af9a7bb85ad06c0a0"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "435087bf9e186e1921e8e57fe7cd83df9b2b9c0fa95ec618093adbe35ae7f1a6",
-      "after_sha256": "f972bbcf3123458ddf4dce50aecbfa280f6ca2f01a139f40419e3797ff6c70c4",
+      "before_sha256": "f972bbcf3123458ddf4dce50aecbfa280f6ca2f01a139f40419e3797ff6c70c4",
+      "after_sha256": "6734061f502ae90d651479ae7cfb0133848026a114b08a4c5d91d265347f44b5",
       "owners": {
         "@document": {
-          "before": "435087bf9e186e1921e8e57fe7cd83df9b2b9c0fa95ec618093adbe35ae7f1a6",
-          "after": "f972bbcf3123458ddf4dce50aecbfa280f6ca2f01a139f40419e3797ff6c70c4"
+          "before": "f972bbcf3123458ddf4dce50aecbfa280f6ca2f01a139f40419e3797ff6c70c4",
+          "after": "6734061f502ae90d651479ae7cfb0133848026a114b08a4c5d91d265347f44b5"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "0ecb7c6f20e7f001eaa0be68f043339f9f65051b0f2bc50c7cb4591598d6ed4f",
-      "after_sha256": "388d6159734675edd84e7691854d8b65340e3a3d4032b0c86239c3e7f3fcac59",
+      "before_sha256": "388d6159734675edd84e7691854d8b65340e3a3d4032b0c86239c3e7f3fcac59",
+      "after_sha256": "1fd32bac60fb13f15f63be2c961426b09c468612002a6a0d814b21436a9124a6",
       "owners": {
         "@document": {
-          "before": "0ecb7c6f20e7f001eaa0be68f043339f9f65051b0f2bc50c7cb4591598d6ed4f",
-          "after": "388d6159734675edd84e7691854d8b65340e3a3d4032b0c86239c3e7f3fcac59"
+          "before": "388d6159734675edd84e7691854d8b65340e3a3d4032b0c86239c3e7f3fcac59",
+          "after": "1fd32bac60fb13f15f63be2c961426b09c468612002a6a0d814b21436a9124a6"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "ece6567fbf66126402d6af61424c41a42e6fa88233005bb83ee8664629835fc8",
-      "after_sha256": "780eee7caf6e489bce2a4b8470b139b6ac62b91126c38283891ff0c844c3cd2c",
+      "before_sha256": "780eee7caf6e489bce2a4b8470b139b6ac62b91126c38283891ff0c844c3cd2c",
+      "after_sha256": "99ae4ce32196b12db1aefdf6726942896092336911d403feb78b2efb73f338fe",
       "owners": {
         "@document": {
-          "before": "ece6567fbf66126402d6af61424c41a42e6fa88233005bb83ee8664629835fc8",
-          "after": "780eee7caf6e489bce2a4b8470b139b6ac62b91126c38283891ff0c844c3cd2c"
+          "before": "780eee7caf6e489bce2a4b8470b139b6ac62b91126c38283891ff0c844c3cd2c",
+          "after": "99ae4ce32196b12db1aefdf6726942896092336911d403feb78b2efb73f338fe"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "5507640a763dec30309967da659d0ea38aeea5f013a3b4db26d1c6c0762aeb14",
-      "after_sha256": "1c2411356260bdd79d77496e6116e41526b47fa820b62f8bc5ede20e82eb5629",
+      "before_sha256": "1c2411356260bdd79d77496e6116e41526b47fa820b62f8bc5ede20e82eb5629",
+      "after_sha256": "080c6698420b5a2d467e4371997a97e7ac9abea5f5bfb66f5788a67a4321eed8",
       "owners": {
         "@document": {
-          "before": "5507640a763dec30309967da659d0ea38aeea5f013a3b4db26d1c6c0762aeb14",
-          "after": "1c2411356260bdd79d77496e6116e41526b47fa820b62f8bc5ede20e82eb5629"
+          "before": "1c2411356260bdd79d77496e6116e41526b47fa820b62f8bc5ede20e82eb5629",
+          "after": "080c6698420b5a2d467e4371997a97e7ac9abea5f5bfb66f5788a67a4321eed8"
         }
       }
     },
-    "contracts/migrations/44.3.14-to-44.3.15.md": {
+    "contracts/migrations/44.3.15-to-44.3.16.md": {
       "before_sha256": null,
-      "after_sha256": "f199f566880dc53fdce2e00aef3ff3c81d1bc865b01b7ab8d121e5478e350482",
+      "after_sha256": "38a75d3fcd6b799784d6145ee265f3c83755b3fdbe3b47762f3f67718f4a53f6",
       "owners": {
         "@document": {
           "before": null,
-          "after": "f199f566880dc53fdce2e00aef3ff3c81d1bc865b01b7ab8d121e5478e350482"
+          "after": "38a75d3fcd6b799784d6145ee265f3c83755b3fdbe3b47762f3f67718f4a53f6"
         }
       }
     },
     "contracts/openapi.yaml": {
-      "before_sha256": "75494d3b31b7c3b7cfb01cada17475d8d10c7c5e2e2108e450fe3a81a1fcefed",
-      "after_sha256": "8c4c3e06803c692c22f5d5345a1c71678c0415e72f5385a84fe6068e3a0e8562",
+      "before_sha256": "8c4c3e06803c692c22f5d5345a1c71678c0415e72f5385a84fe6068e3a0e8562",
+      "after_sha256": "da04ae439030a64374ea98f7f9a9018366de4788fbfa41ac94d6ea4b2c09754c",
       "owners": {
         "@document": {
-          "before": "75494d3b31b7c3b7cfb01cada17475d8d10c7c5e2e2108e450fe3a81a1fcefed",
-          "after": "8c4c3e06803c692c22f5d5345a1c71678c0415e72f5385a84fe6068e3a0e8562"
+          "before": "8c4c3e06803c692c22f5d5345a1c71678c0415e72f5385a84fe6068e3a0e8562",
+          "after": "da04ae439030a64374ea98f7f9a9018366de4788fbfa41ac94d6ea4b2c09754c"
         }
       }
     },
-    "data/source_audits/order129/source.audit.json": {
+    "data/source_audits/order130/source.audit.json": {
       "before_sha256": null,
-      "after_sha256": "24cbb56cd5de3faa2ee7c381b1902dc939c2d951666be3ab880105fbea559397",
+      "after_sha256": "86b582cd4cabfa5fba52040380fa70145517136a4fd6f3dc4722533942c32913",
       "owners": {
         "@document": {
           "before": null,
-          "after": "24cbb56cd5de3faa2ee7c381b1902dc939c2d951666be3ab880105fbea559397"
+          "after": "86b582cd4cabfa5fba52040380fa70145517136a4fd6f3dc4722533942c32913"
         }
       }
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "0166091ac0b96d94ee0c465b22ad7538a9c0b1e2be66a2a517763da15f7736d4",
-      "after_sha256": "5a9674cc23c79756f01c002dcce943a0d67ce0d2d7e739e9f2eaf036c6a60022",
+      "before_sha256": "5a9674cc23c79756f01c002dcce943a0d67ce0d2d7e739e9f2eaf036c6a60022",
+      "after_sha256": "a5c6064d3ae4abdea510e1b6150d6b2a876e54b1fdfd8a4917e22dd01bfcc043",
       "owners": {
         "@document": {
-          "before": "0166091ac0b96d94ee0c465b22ad7538a9c0b1e2be66a2a517763da15f7736d4",
-          "after": "5a9674cc23c79756f01c002dcce943a0d67ce0d2d7e739e9f2eaf036c6a60022"
+          "before": "5a9674cc23c79756f01c002dcce943a0d67ce0d2d7e739e9f2eaf036c6a60022",
+          "after": "a5c6064d3ae4abdea510e1b6150d6b2a876e54b1fdfd8a4917e22dd01bfcc043"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "ac9bceec3575370411b528cbbab8c38ffe4c7c186161ad2d76e11fc97782d818",
-      "after_sha256": "6b24d2a27409091cd4a273ea258ac8cb1a51f71873dad47c344ec0d0274d8256",
+      "before_sha256": "6b24d2a27409091cd4a273ea258ac8cb1a51f71873dad47c344ec0d0274d8256",
+      "after_sha256": "258e0a42fb421ce8c312c132386f91a29c70b34272003cc2fe0164f5e227d488",
       "owners": {
         "@document": {
-          "before": "ac9bceec3575370411b528cbbab8c38ffe4c7c186161ad2d76e11fc97782d818",
-          "after": "6b24d2a27409091cd4a273ea258ac8cb1a51f71873dad47c344ec0d0274d8256"
+          "before": "6b24d2a27409091cd4a273ea258ac8cb1a51f71873dad47c344ec0d0274d8256",
+          "after": "258e0a42fb421ce8c312c132386f91a29c70b34272003cc2fe0164f5e227d488"
         }
       }
     },
-    "docs/ORDER_129_SCOPE_PLAN.md": {
+    "docs/ORDER_130_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "17ebd5f163f2ae41a8829bd714099418b7455a41e54fad99cba5ee5632b853db",
+      "after_sha256": "1b8ca368c4414ce3d864ab4f7f6489f6b1b4ae370815e9bce145c7a4809f4ddf",
       "owners": {
         "@document": {
           "before": null,
-          "after": "17ebd5f163f2ae41a8829bd714099418b7455a41e54fad99cba5ee5632b853db"
+          "after": "1b8ca368c4414ce3d864ab4f7f6489f6b1b4ae370815e9bce145c7a4809f4ddf"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "ad420af5d6bf40410682d416d80748cb2701db1b885038b7292456b367415180",
-      "after_sha256": "d0156ff6120213a38e8300d2f46d7a8cf23a1544ba3e236f5c7703db0d663a21",
+      "before_sha256": "d0156ff6120213a38e8300d2f46d7a8cf23a1544ba3e236f5c7703db0d663a21",
+      "after_sha256": "2f820ad533cabe204ba544718ade1d3e098c88de19718278d139c1453aed3c27",
       "owners": {
         "@document": {
-          "before": "ad420af5d6bf40410682d416d80748cb2701db1b885038b7292456b367415180",
-          "after": "d0156ff6120213a38e8300d2f46d7a8cf23a1544ba3e236f5c7703db0d663a21"
+          "before": "d0156ff6120213a38e8300d2f46d7a8cf23a1544ba3e236f5c7703db0d663a21",
+          "after": "2f820ad533cabe204ba544718ade1d3e098c88de19718278d139c1453aed3c27"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "66aee9f5ffeaeb3cc792edc18260dfbdcd71659d5ce6dbe0a122ca24b5357ba4",
-      "after_sha256": "c6e5c16cc3d8e0cfe8fd3e4ead3914c2db84eed66024d02ee8430776e693c24e",
+      "before_sha256": "c6e5c16cc3d8e0cfe8fd3e4ead3914c2db84eed66024d02ee8430776e693c24e",
+      "after_sha256": "4a6fbcbcb9529d2b9e6eb9bf7feea2dbf671cc26dfc31aad1ad69e5d673bc8b2",
       "owners": {
         "@document": {
-          "before": "66aee9f5ffeaeb3cc792edc18260dfbdcd71659d5ce6dbe0a122ca24b5357ba4",
-          "after": "c6e5c16cc3d8e0cfe8fd3e4ead3914c2db84eed66024d02ee8430776e693c24e"
+          "before": "c6e5c16cc3d8e0cfe8fd3e4ead3914c2db84eed66024d02ee8430776e693c24e",
+          "after": "4a6fbcbcb9529d2b9e6eb9bf7feea2dbf671cc26dfc31aad1ad69e5d673bc8b2"
         }
       }
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
-      "before_sha256": "2f8c99f6e9a182099f7fe5fd24e0a21084e9b2353fbb7345038a85543445ede6",
-      "after_sha256": "e6817660c5e538d94b9f96621424503b7ec62a9b6c6c50f15b2d2ce1bd49d428",
+      "before_sha256": "e6817660c5e538d94b9f96621424503b7ec62a9b6c6c50f15b2d2ce1bd49d428",
+      "after_sha256": "819d30f309299c389288c175ca265c2f0f0e6be21260dbd4fbe922e9fbd88a0f",
       "owners": {
         "@module": {
-          "before": "88b2a0740009d71a373a84fe99368b70c50e63d6a6a4c43da47e7e2539c6da71",
-          "after": "0fc4d1404a7834a2fa84142aea9a260950aec27ab34a5a3a4710d9a31ada13b4"
+          "before": "0fc4d1404a7834a2fa84142aea9a260950aec27ab34a5a3a4710d9a31ada13b4",
+          "after": "7c362992e14d69887bfa406e5b511015c8fdc4a29bcdf156de3973c23e3e9ada"
         }
       }
     },
-    "src/warhammer40k_core/engine/movement_decision_authority.py": {
-      "before_sha256": "afb6dceb7e1de1f7e989792962ea8e2dbfd24f70ff8518fe504c1c427e27bbf5",
-      "after_sha256": "a80f6068e85766fadab5021e59d0a5c50d079972a9f4fec1a8d4794f5270d25c",
-      "owners": {
-        "validate_movement_completion_decision_authority": {
-          "before": "d29ffd58205f50d7dc72628cbe98bd6a53d10f9230372f0984bf7b65080bf43c",
-          "after": "4caf99c49f442a322f9ced2fd3174525520ba337a3c7d865520b79e3c4c58c6b"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py": {
-      "before_sha256": "c43db81b1aa8ac1942502150268108d6f81aefee84e1c47fa389a2de61829126",
-      "after_sha256": "1589d29362ef85186450713e04fb68f43b254daab2f89b954692df262b2cf6be",
-      "owners": {
-        "_is_post_cleanup_scoring_checkpoint": {
-          "before": null,
-          "after": "d7100edf826debcb7d3943acea410d89a7b16da9b19a1823f4a7f4c34835d06d"
-        },
-        "validate_primary_mission_boundary_unit_history_authority": {
-          "before": "e0508a596f03126d677b5ff101805f5c99312b3018a6fe2c531ccff848ef4220",
-          "after": "f7d5e06209f094370d4b99c31bedcef9d4a6f378dd2616fd47aefd0a93fada1b"
-        }
-      }
-    },
-    "tests/code_quality/test_order129_source_authority.py": {
+    "src/warhammer40k_core/engine/casualty_coherency_restore.py": {
       "before_sha256": null,
-      "after_sha256": "f1131bfdc68510c172dc0f446c6cb6d9dd1dfafba35dfbe836f573b4e84dd665",
+      "after_sha256": "78e062d588754edc360cc5a51994dda94452f6f0bd5f438d83ddab92d14dd5e4",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "df11a05571daf1147fcc588e1797ddbc4977c00fcb603879b5317083b955a7e1"
+        },
+        "scenario_for_required_restore_coherency": {
+          "before": null,
+          "after": "d4a94b6dcaba74bd4a330b07af174a7eec3f94358c5c7375940489d4c2d33c00"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/fight_model_authority_history.py": {
+      "before_sha256": "a1b449c2928df40055b0a419ed8ec7b5fa0ed281e7dcf6430ab7a0d24faf5777",
+      "after_sha256": "16a2b349785bc5cfca1baa6dc0ea49bfba354edcb124dbe54cd0a1ddf173380e",
+      "owners": {
+        "@module": {
+          "before": "1dda77b7ed2d57113132995a4ea5c57a17261da4ffa0bfc7af2ffaf1b0cb5c75",
+          "after": "d3ed254a0b07569cfaed68b0672a35b5da2a9958cd0254dad4c5e83ebb1c1c1c"
+        },
+        "_authority_mutations_by_event_index": {
+          "before": "2ba3774568fbec9f8e9b9d2580c531b1374edfe004b48a981fd702778adaeb99",
+          "after": "37d5b8754a998c0d0be1c45038626059ffd6ce6e28cfb08cd98b08e3259bc589"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/game_state.py": {
+      "before_sha256": "395047d5c2b242d66f7c0923d00e08d6d4efea10c21975bdf6c909b652eab37f",
+      "after_sha256": "be128a034dad11a94c7f7bf024540a72d68a5033a1074fd2db0977fa6bd309ab",
+      "owners": {
+        "@module": {
+          "before": "cc2f3bcd0d2adfa56f178e98365055e537866ba048c05f2cfa8728babfb484e9",
+          "after": "9df0f48b8718e666236c0b0366e9b25ee4003b7d89f59e070082b3d19be47ae1"
+        },
+        "GameState.resolve_end_turn_cleanup_boundary": {
+          "before": "8f93f8e04d8e2c9025227f722f4bd86c06b68cdcd8eb5354b43f8ed599096a26",
+          "after": "5a842a1e8a801f97d37176206fdd8392f7aa85adbef627a55318052d3b628dd4"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/lifecycle_restore_consistency.py": {
+      "before_sha256": "c5b4361ba088c115697e65e8e289928f6272884cf886308a99772df69a61a54a",
+      "after_sha256": "123d76e52a0a78805136fec2a33c69e3a049ffd1efe30db2e9951459efff4b29",
+      "owners": {
+        "@module": {
+          "before": "876d711b936c0910fab69fc997d556e5b07085005ccda68dd9af52832f95990c",
+          "after": "863089ba0a4fe1e1386b289bc2ba1039974cc237e4550c6b480393d450371cfc"
+        },
+        "_validate_battlefield_state_consistency": {
+          "before": "94854aeefe942cb0b8e51a188774d7d8c3267bf35acb80113827f31270e67ad2",
+          "after": "5e68136e4aacbf8f8763edbfff259d562702fc130757346cd48211ede70877d8"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/mission_cleanup_boundary.py": {
+      "before_sha256": null,
+      "after_sha256": "9d6dc801abf6db033cdb86d28782f7e279ac0702154e7a2bd0da56f98dac6676",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "7cffb03389b029568c397a5077b5e920bd3305a8073038dfa3e22b7832389da8"
+        },
+        "resolve_mission_cleanup_boundary": {
+          "before": null,
+          "after": "f58b4133143dd9d4e7152078c2a0b572d9b00b0e3142d8b3eaf0c957617eb2d4"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py": {
+      "before_sha256": "3a996c6b5282b3664eb3c17a0220482fb3a75438108b7c9d43f3cb0a64f45d42",
+      "after_sha256": "7df434b15f175cc8486dbc765a7badc3f6c2ff7b6d1fab54bf72419c9269ff57",
+      "owners": {
+        "_no_trigger_destroyed_departure_ids": {
+          "before": "9175aed6dbc0b12f5d3a98d98fa0ab0d3e10f048a0a28784026ae3ef221ea5ed",
+          "after": "72c0986527808f11b3bb6a3e62fe16a4a20982394597281dd54a9517d999a44b"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/rule_model_destruction_unplaced.py": {
+      "before_sha256": "a33c94b2bce0f1367c14c86cc943f1885679d7007df2cafa35c3c1698a5f998b",
+      "after_sha256": "4e1d44fe02f4fe42c798bce2ac11c1da478da2c563c59d9432659d1afdbf5e4c",
+      "owners": {
+        "@module": {
+          "before": "06e309a737566acdaf64e88eb431d9d8ab0ac846e23d6ad5e8eec278a014cc87",
+          "after": "16bc640fff4803b7b4d2d6f677d163517bcc42c8e855393e412313598ce32df0"
+        },
+        "destroy_end_turn_coherency_models": {
+          "before": null,
+          "after": "155790501985fa87d52719db8e9f0e6de97da3eab85b4e1f6df94e487d2efaa9"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/secondary_model_destruction_history.py": {
+      "before_sha256": null,
+      "after_sha256": "7757f1c2e11907b6c38d43ff3f4bb9517442b2496af402e747d6aa8e1f69a864",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "63538a1d10b81a2728f1bd4ce77d2180d753391585399d12cb43105cea6717df"
+        },
+        "SecondaryModelDestructionState": {
+          "before": null,
+          "after": "5c9e551a5580bcc3d95b8f4d2e20d714f7877f7d910e7657896d22e6612be724"
+        },
+        "SecondaryModelDestructionState.__post_init__": {
+          "before": null,
+          "after": "5b27a7fbe1bef045404746b4530b11e13c33bb6ff9e46cb1fa157b9868af9b58"
+        },
+        "SecondaryModelDestructionState.from_payload": {
+          "before": null,
+          "after": "f91b455ce625e08af1997fc89e1c546d590a7cc48d72c610ebea18d004962422"
+        },
+        "SecondaryModelDestructionState.to_payload": {
+          "before": null,
+          "after": "35cb09f8be5dee7750dd1eaf4874b6974d7b3aa9a795f780f89c9ef5ea205cf4"
+        },
+        "SecondaryModelDestructionStatePayload": {
+          "before": null,
+          "after": "b89809a98869248bd45d848f83ce15634e3e3afbb6476e0e7b00bdc940d062ff"
+        },
+        "_context_key": {
+          "before": null,
+          "after": "7192c697dfffecc24bae01a10db74a5ef491554a6c81967a4cef5ae084a88599"
+        },
+        "secondary_model_destructions_for_boundary": {
+          "before": null,
+          "after": "38fccacc50a1442f2d6f7a7fefd29687d07c78a2f875ab667dd5f54035e68258"
+        },
+        "validate_secondary_model_destruction_boundary_history": {
+          "before": null,
+          "after": "e628d4b78b088642e3a0415c337a1c65d39c8f4f4788a981596d9bcbc0625140"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/secondary_scoring_conditions.py": {
+      "before_sha256": "c3b9df2ed63377c10b774e1bbc528637de87e6129cd7d6d968906de00226cdcb",
+      "after_sha256": "090a9ea69ba032af50350b9e093d238bd839bc8b984eb5da414631b411de49d9",
+      "owners": {
+        "@module": {
+          "before": "9ca9bbdda578697cb10a9c266c8038466112bbc2229d9efdc099c0895fd4afc5",
+          "after": "71fff5693b4ce98023d1dd1e0a25fce64cbb4f35cd94501d56baf0c46894b90c"
+        },
+        "SecondaryScoringConditionContext": {
+          "before": "6bbf1d75f5b20760b60bfe17295edf2e6e6f4ae6485a79705c7a7608802d0705",
+          "after": "2c2c1b846de179944a2a6506e9be81481855fd329f20c150f5e514a742808573"
+        },
+        "_destroyed_character_models_this_turn": {
+          "before": "af08d6682249d11135717bdf6f2a905ad9ee8002c637a32879e3c59b61917d63",
+          "after": "bb6f03e63ce856f1a7cb1d3a2b03cc4587134901d4ba3c1e38d608f2e6d3dfc5"
+        },
+        "_enemy_character_model_ids_destroyed_during_battle": {
+          "before": "0ea1f6de3f631ff1b243f7b6b3a654a59f1e1da3821b30af26a66a7c8328f72c",
+          "after": "ee40ef78310e4cf2201e67964bee0c055996ead27972ff1d59aa494306ab49b7"
+        },
+        "_enemy_destroyed_models": {
+          "before": null,
+          "after": "0acae7d177d9c5625562b39770b9e0e05141a5a60a52c0afd75f032c452f2389"
+        },
+        "evaluate_secondary_scoring_condition": {
+          "before": "37dac264c4716b663469b5843d111dc0463535441b9c563cab631b58a5ddab53",
+          "after": "39e6dfd9696958422e5a912c34a907b19b0a4e0e601512aa539f30070615c648"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/secondary_scoring_context.py": {
+      "before_sha256": "6ffb68d563c37808c4062b217764223aa67c7ac4a39579bcf326222811128e2f",
+      "after_sha256": "0728c46c438bb8a4b314696e6473b33f359ceaa053802cab7087f86d013cd392",
+      "owners": {
+        "@module": {
+          "before": "448491e0980950e919b6f88a9e48bac215e88f80c44717a03da2bd633e242cc0",
+          "after": "f3724ac2cb7bbf9d36157424b18640d5e951d571043c9fb8c98ddd40e241362d"
+        },
+        "secondary_scoring_condition_context_from_state": {
+          "before": "72d41366358527ce6d12fbb8b8fb27052da7973cb7e6270421a39f145fa7639c",
+          "after": "97716c929a066721793d645cadcbbaf5f934cd6cf95fb17ccacb18dd5c291170"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/secondary_scoring_state_evidence.py": {
+      "before_sha256": "56270907c11acc8df6895c0029b4b749099aefb3af949ab5b673cafb8586134e",
+      "after_sha256": "b7bbc2e866ed3f160e2d0ea4a765dd3472e23af4bdf34e5e1b48c98dca0bf933",
+      "owners": {
+        "@module": {
+          "before": "657edeccf79dc6c857d72a00630939fe0205dcb6fd20ca3ab8837c6715bd5e76",
+          "after": "6355cced8e464518e5e52e3bc1c656f9385d88872850c4001e695ad6dc6382fc"
+        },
+        "SecondaryScoringStateEvidence": {
+          "before": "4a7962fb7ddc574b784f82c98b537e2d1ddbea870d07f76eaf36ff807134d170",
+          "after": "70f8c7bf3230b67bf6c2e401e81336db70cdfbb794765d0684b9cd29a78b1581"
+        },
+        "SecondaryScoringStateEvidence.create": {
+          "before": "b3797eef2dba69149dde8b375f085b614cf09878aed91afbc09c50a1535b91e2",
+          "after": "14332502c0092228cf741dd9a11175afda6c881ce6411593abd3c5b8807f2d7a"
+        },
+        "SecondaryScoringStateEvidence.from_payload": {
+          "before": "c995ab4cf067c8c6955254e5d16b89bc4a8310195786b60ba000e276ce51d1e8",
+          "after": "b0d8935181c68b9650d8550918f351aef4e7fead2ff1598d1e408f10f99575c0"
+        },
+        "SecondaryScoringStateEvidence.to_payload": {
+          "before": "35d6076dc02fac848913c874fe8debec114a2669abf0021911cae68296a25e14",
+          "after": "b96b7d24f3432f6dc7b8e9b643e1125e5fe1a230487bb9b1ee30856a7c3e79b9"
+        },
+        "SecondaryScoringStateEvidencePayload": {
+          "before": "247c112b26dd81a26e6338ce33d23d218b5fa1ecb24a45156f8757c3ee7a02de",
+          "after": "fbc0352c4b939f478e75fdfdf1b83c6c3c2d40683f271c6aec017f026d8fbe0f"
+        },
+        "build_secondary_scoring_state_evidence": {
+          "before": "3ea133e634892c1dc9efdacc93387f6800e6a5440e9301456917128417a57ff4",
+          "after": "7f879e35447993eb837f51726fc650783076752a79cd978d87588953468ae135"
+        },
+        "secondary_scoring_condition_context_from_evidence": {
+          "before": "d20cf9cbf9d44e8443489bfaea80b980ed65c7af049a0268b7f5ea538e7ca426",
+          "after": "7d454e40e4833ee389b6b903864ba9bce36c2efb9685f5397a59e55649d0abb6"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/secondary_scoring_state_evidence_authority.py": {
+      "before_sha256": "308b256642d395bdc34eb0176f0c6cf826f74582da0ad2b6f2e194dbdffd335b",
+      "after_sha256": "c009505689d7e31b9f98b5ec67f80e0fe92812ab125fd812b19181c6a8eaed5d",
+      "owners": {
+        "@module": {
+          "before": "690711557a85a6dfa8d1d18554c70356a92451b70b9a1d622a548ba6656fffca",
+          "after": "d2ad33726404747e08e7ac7a94330e2a2897213d7068e8cdf91d1fa5639dda7c"
+        },
+        "validate_secondary_scoring_state_evidence_authority": {
+          "before": "c8a70b768556597e17d0f57f01c566a7e81d73d1cb1850b9b3e323d205805919",
+          "after": "9c5cb34e259adb33f59af57cd67bac12870287a49114867de4ee8233ab38f576"
+        }
+      }
+    },
+    "tests/code_quality/test_order130_source_authority.py": {
+      "before_sha256": null,
+      "after_sha256": "8485953e5e6e89a00307279fad7afcb0bcd726aca3835abdc4758684503191f6",
       "owners": {
         "@module": {
           "before": null,
           "after": "8ecc29b9420d70d63f538fbc8663b2927a7a45a741a8cd9f91a9f9367c4be81a"
         },
-        "test_order129_selected_faq_and_original_source_archives_remain_exact": {
+        "test_order130_selected_faq_and_original_source_archives_remain_exact": {
           "before": null,
-          "after": "167ea0ad2f510015e5d78838a4cfbdc9c6f19ec0dec474803e14b21c25937918"
+          "after": "a035c4a4d576805bdbb46c8332ec332b7cb556047dbf1390e52fde53968d6b36"
         }
       }
     },
-    "tests/order129_helpers.py": {
+    "tests/order130_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "763809395e7e7072ac03bdc3d87c1927766e454ac717faf4a5cb1aac962432c7",
+      "after_sha256": "d171f612448ef3b4aca115dd2f94993226fd1f7158872b64022c4b27e6eefd7e",
       "owners": {
         "@module": {
           "before": null,
-          "after": "e4f2778168fe19ce9ccccb7f733f2c97c38886ba9bda2946df080f51da06c0d6"
+          "after": "c9d32b089fbba9141d43b2e2772cf376de010b8f4016f3439599034caa365381"
         },
-        "assert_flight_checkpoint": {
+        "assert_destruction_checkpoint": {
           "before": null,
-          "after": "6569a5bb64c3d06fd59c34ba6fb14ce18710cba8e80c9280f49d36e5f5acaa36"
+          "after": "1271493419766908c65981c9d3aad7c4590fb8eedbb0003704167c1503dbb189"
         },
-        "flight_proposal": {
+        "destruction_session": {
           "before": null,
-          "after": "a8ec2dc9c4e476b4e9d7d513c2b51993b2d5ec5255d1c25206bb3a016028f046"
+          "after": "0d61a031a9346e8a84148fa01834d1f99fba7018ca786f2179aab3013a075e9b"
         },
-        "native_flight_session": {
+        "finish_turn": {
           "before": null,
-          "after": "7bd40fe24f9bc45567b07a2f8423a18e806c96ab3f6f0ce56bd81c2c6c2b44f2"
+          "after": "f08e0d4fdbaae80b4d758246ba42c5fd23d10e07061539685ccc4a4db1ceaae6"
         },
-        "submit_flight": {
+        "native_destruction_session": {
           "before": null,
-          "after": "fb3a91002e6e6ca90ed7e634a698d2b5171174ae5e94a1f0b721bd9161caa896"
+          "after": "f1e7c4e6a53e0fd994f4751a06c0b639c56a1f115de50c4ebdbddf5887fb2cea"
+        },
+        "session_from_casualty_checkpoint": {
+          "before": null,
+          "after": "0799871af2e0b25b719b193b4c049ac5bdc496a977a1d568f572645984a08c1f"
+        },
+        "unaffected_unit_with_invalid_coherency_payload": {
+          "before": null,
+          "after": "c7696286074f8e965e32d98c4d2efb61e19c02f374d66df0d1ff8188258b07f2"
         }
       }
     },
-    "tests/unit/test_order129_flight_history.py": {
+    "tests/unit/test_order130_model_mission_destruction.py": {
       "before_sha256": null,
-      "after_sha256": "0f9014353eb47b2a186bdfba192f4a10e2d2aaa2283e602f26a9c46121c5b8c1",
+      "after_sha256": "f16c2257397f9f0f0957f24d1f8f688aebfe1359484ba4cee78774c755a634a1",
       "owners": {
         "@module": {
           "before": null,
-          "after": "88dfb3e0f45d039063be368c6efd7c140040fe4a645a1aa4ae7efe5b79fd19aa"
+          "after": "a8f2f33d55b3db5466b330f5d0676cebbea05c15a6dbdce896ebfdb59c4dc3a3"
         },
-        "test_fall_back_modes_restore_after_the_same_native_turn_cleanup": {
+        "test_native_w20_casualty_uses_the_same_model_scoring_history_once": {
           "before": null,
-          "after": "9de5fb8cefe803cd1cb8f452c9708d718e29a52c7d4ef6d926bf173988a73970"
+          "after": "ad5fa3f02ef8260aa62a6966b5d4d838d2467c39d95d80caefb4d377298e3859"
         },
-        "test_fly_transit_pending_rejected_retry_and_post_cleanup_history": {
+        "test_surviving_unit_coherency_casualty_scores_per_model": {
           "before": null,
-          "after": "931276ca92e59ebd035f362cced5a004df4ace2e54479fca168a22ab4ea2bb83"
-        },
-        "test_ground_advance_cannot_borrow_fly_transit_and_can_retry_away": {
-          "before": null,
-          "after": "3fd3deece75bc75c102be95796c4ec40a4410370979f3499d1423cd57c00755d"
-        },
-        "test_ordinary_and_flight_modes_keep_complete_post_cleanup_authority": {
-          "before": null,
-          "after": "9a24360d86cc5d38da869b6813eaa9cef09853791fb8dbb836897129e44da099"
-        },
-        "test_original_fly_transit_exact_checkpoint_restores_forks_and_replays": {
-          "before": null,
-          "after": "3de832575be05afea7ab25bdce94fedf350d798231ed2b4287ac24cefb7bc7c4"
-        },
-        "test_pending_movement_mode_omission_is_rejected_atomically": {
-          "before": null,
-          "after": "3acf2818ed7d5f67b2a583c1d81620766bb1d6358d1b73de7be730270d55d350"
-        },
-        "test_post_cleanup_commit_still_authenticates_movement_and_cleanup": {
-          "before": null,
-          "after": "2a5343a4f6f01028773dfc7083bdc1cb6627d93183045f77f3e6d0f4aac2beb9"
-        },
-        "test_pre_cleanup_scoring_history_survives_later_native_turn_completion": {
-          "before": null,
-          "after": "1b4a624a594bf6779b4e34dd0a305934e01a6173eadf55976f79a668c4f3a959"
+          "after": "594430d6d55534ac1ae9fe4be2f78a5295cc20689c1d446a774f01cf29e7294a"
         }
       }
     }
@@ -428,9 +620,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -438,9 +630,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -448,9 +640,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -458,9 +650,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -468,9 +660,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -478,9 +670,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -488,9 +680,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -498,9 +690,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -508,9 +700,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -518,9 +710,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -528,9 +720,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -538,9 +730,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -548,161 +740,161 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "conformance/typescript/src/contract.ts": {
       "category": "rule_semantics",
       "operations": [
-        "order129-contract-publication"
+        "order130-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
-        "order129-contract-publication"
+        "order130-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
-        "order129-contract-publication"
+        "order130-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
-        "order129-contract-publication"
+        "order130-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
-        "order129-contract-publication"
+        "order130-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "order129-contract-publication"
+        "order130-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "order129-contract-publication"
+        "order130-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
-        "order129-contract-publication"
+        "order130-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "order129-contract-publication"
+        "order130-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
-    "contracts/migrations/44.3.14-to-44.3.15.md": {
+    "contracts/migrations/44.3.15-to-44.3.16.md": {
       "category": "rule_semantics",
       "operations": [
-        "order129-contract-publication"
+        "order130-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "contracts/openapi.yaml": {
       "category": "rule_semantics",
       "operations": [
-        "order129-contract-publication"
+        "order130-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
-    "data/source_audits/order129/source.audit.json": {
+    "data/source_audits/order130/source.audit.json": {
       "category": "rule_semantics",
       "operations": [
-        "order129-source-evidence"
+        "order130-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
-    "docs/ORDER_129_SCOPE_PLAN.md": {
+    "docs/ORDER_130_SCOPE_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -710,67 +902,167 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
       "operations": [
-        "order129-flight-history"
+        "order130-model-mission-history"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
-    "src/warhammer40k_core/engine/movement_decision_authority.py": {
+    "src/warhammer40k_core/engine/casualty_coherency_restore.py": {
       "category": "rule_semantics",
       "operations": [
-        "order129-flight-history"
+        "order130-model-mission-history"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
-    "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py": {
+    "src/warhammer40k_core/engine/fight_model_authority_history.py": {
       "category": "rule_semantics",
       "operations": [
-        "order129-flight-history"
+        "order130-model-mission-history"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
-    "tests/code_quality/test_order129_source_authority.py": {
+    "src/warhammer40k_core/engine/game_state.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order130-model-mission-history"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+    },
+    "src/warhammer40k_core/engine/lifecycle_restore_consistency.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order130-model-mission-history"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+    },
+    "src/warhammer40k_core/engine/mission_cleanup_boundary.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order130-model-mission-history"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+    },
+    "src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order130-model-mission-history"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+    },
+    "src/warhammer40k_core/engine/rule_model_destruction_unplaced.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order130-model-mission-history"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+    },
+    "src/warhammer40k_core/engine/secondary_model_destruction_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order130-model-mission-history"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+    },
+    "src/warhammer40k_core/engine/secondary_scoring_conditions.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order130-model-mission-history"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+    },
+    "src/warhammer40k_core/engine/secondary_scoring_context.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order130-model-mission-history"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+    },
+    "src/warhammer40k_core/engine/secondary_scoring_state_evidence.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order130-model-mission-history"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+    },
+    "src/warhammer40k_core/engine/secondary_scoring_state_evidence_authority.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order130-model-mission-history"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+    },
+    "tests/code_quality/test_order130_source_authority.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
-    "tests/order129_helpers.py": {
+    "tests/order130_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "order129-regressions"
+        "order130-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
-    "tests/unit/test_order129_flight_history.py": {
+    "tests/unit/test_order130_model_mission_destruction.py": {
       "category": "rule_semantics",
       "operations": [
-        "order129-regressions"
+        "order130-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded existing movement and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03J/C03-10 FAQ e5941469-5653-49b2-919e-9c9246e811d4 obligation01 only: transiting enemy Engagement Range does not itself establish engagement. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing accepted movement proposals and physical witnesses stay authoritative. The bounded rule branch recognizes the existing turn-end cleanup at primary scoring commits; earlier checkpoints retain turn-action restrictions. Mode equality binds the existing typed accepted proposal. No new persistence format, search, cache, query or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     }
   },
   "milestone": "ordinary",

@@ -1365,15 +1365,6 @@ def _primary_battlefield_departure_by_id(
 
 
 def _no_trigger_destroyed_departure_ids(*, state: GameState) -> frozenset[str]:
-    cleanup_removals_by_source_id: dict[str, list[str]] = {}
-    for cleanup in state.end_turn_cleanup_states:
-        for removal in cleanup.removals:
-            if removal.destroyed_model_rules_triggered:
-                continue
-            cleanup_removals_by_source_id.setdefault(
-                f"{cleanup.cleanup_id}:{removal.unit_instance_id}",
-                [],
-            ).append(removal.model_instance_id)
     departure_ids: set[str] = set()
     for departure in state.primary_battlefield_departure_states:
         if departure.removal_kind is not BattlefieldRemovalKind.DESTROYED:
@@ -1383,12 +1374,6 @@ def _no_trigger_destroyed_departure_ids(*, state: GameState) -> frozenset[str]:
         ) or departure.source_id.startswith(_EMERGENCY_DISEMBARK_DEPARTURE_SOURCE_PREFIX):
             departure_ids.add(departure.departure_id)
             continue
-        expected_model_ids = cleanup_removals_by_source_id.get(departure.source_id)
-        if expected_model_ids is None:
-            continue
-        if departure.removed_model_instance_ids != tuple(sorted(expected_model_ids)):
-            raise GameLifecycleError("Primary mission no-trigger departure model drifted.")
-        departure_ids.add(departure.departure_id)
     return frozenset(departure_ids)
 
 

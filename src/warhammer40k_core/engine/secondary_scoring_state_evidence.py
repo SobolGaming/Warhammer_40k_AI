@@ -27,6 +27,10 @@ from warhammer40k_core.engine.scoring import (
     secondary_mission_card_status_from_token,
     victory_point_source_kind_from_token,
 )
+from warhammer40k_core.engine.secondary_model_destruction_history import (
+    SecondaryModelDestructionState,
+    SecondaryModelDestructionStatePayload,
+)
 from warhammer40k_core.engine.secondary_scoring_conditions import SecondaryScoringConditionContext
 from warhammer40k_core.engine.secondary_scoring_occupancy import (
     SecondaryBattlefieldOccupancy,
@@ -41,7 +45,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.mission_setup import MissionSetup
 
-SECONDARY_SCORING_STATE_EVIDENCE_SCHEMA = "secondary-scoring-state-evidence-v1"
+SECONDARY_SCORING_STATE_EVIDENCE_SCHEMA = "secondary-scoring-state-evidence-v2"
 SECONDARY_SCORING_STATE_EVIDENCE_ID_KEY = "secondary_scoring_state_evidence_id"
 SECONDARY_SCORING_STATE_EVIDENCE_HASH_KEY = "secondary_scoring_state_evidence_hash"
 _EVIDENCE_ID_PREFIX = "secondary-scoring-state-evidence"
@@ -61,6 +65,7 @@ class SecondaryScoringStateEvidencePayload(TypedDict):
     card_battle_round: int
     selection_payload: JsonValue | None
     occupancy: SecondaryBattlefieldOccupancyPayload | None
+    model_destruction_states: list[SecondaryModelDestructionStatePayload]
     unit_destruction_states: list[SecondaryUnitDestructionStatePayload]
     objective_cleanse_states: list[SecondaryObjectiveCleanseStatePayload]
     terrain_plunder_states: list[SecondaryTerrainPlunderStatePayload]
@@ -89,6 +94,7 @@ class SecondaryScoringStateEvidence:
     card_battle_round: int
     selection_payload: JsonValue | None
     occupancy: SecondaryBattlefieldOccupancy | None
+    model_destruction_states: tuple[SecondaryModelDestructionState, ...]
     unit_destruction_states: tuple[SecondaryUnitDestructionState, ...]
     objective_cleanse_states: tuple[SecondaryObjectiveCleanseState, ...]
     terrain_plunder_states: tuple[SecondaryTerrainPlunderState, ...]
@@ -223,6 +229,7 @@ class SecondaryScoringStateEvidence:
             "card_battle_round": self.card_battle_round,
             "selection_payload": self.selection_payload,
             "occupancy": None if self.occupancy is None else self.occupancy.to_payload(),
+            "model_destruction_states": [row.to_payload() for row in self.model_destruction_states],
             "unit_destruction_states": [
                 state.to_payload() for state in self.unit_destruction_states
             ],
@@ -264,6 +271,10 @@ class SecondaryScoringStateEvidence:
                 None
                 if occupancy_payload is None
                 else SecondaryBattlefieldOccupancy.from_payload(occupancy_payload)
+            ),
+            model_destruction_states=tuple(
+                SecondaryModelDestructionState.from_payload(row)
+                for row in payload["model_destruction_states"]
             ),
             unit_destruction_states=tuple(
                 SecondaryUnitDestructionState.from_payload(state)
@@ -308,6 +319,7 @@ class SecondaryScoringStateEvidence:
         card_battle_round: int,
         selection_payload: JsonValue | None,
         occupancy: SecondaryBattlefieldOccupancy | None,
+        model_destruction_states: tuple[SecondaryModelDestructionState, ...] = (),
         unit_destruction_states: tuple[SecondaryUnitDestructionState, ...],
         objective_cleanse_states: tuple[SecondaryObjectiveCleanseState, ...],
         terrain_plunder_states: tuple[SecondaryTerrainPlunderState, ...],
@@ -336,6 +348,7 @@ class SecondaryScoringStateEvidence:
             "card_battle_round": card_battle_round,
             "selection_payload": validated_selection,
             "occupancy": occupancy_payload,
+            "model_destruction_states": [row.to_payload() for row in model_destruction_states],
             "unit_destruction_states": [state.to_payload() for state in unit_destruction_states],
             "objective_cleanse_states": [state.to_payload() for state in objective_cleanse_states],
             "terrain_plunder_states": [state.to_payload() for state in terrain_plunder_states],
@@ -365,6 +378,7 @@ class SecondaryScoringStateEvidence:
             card_battle_round=card_battle_round,
             selection_payload=validated_selection,
             occupancy=occupancy,
+            model_destruction_states=model_destruction_states,
             unit_destruction_states=unit_destruction_states,
             objective_cleanse_states=objective_cleanse_states,
             terrain_plunder_states=terrain_plunder_states,
@@ -403,6 +417,7 @@ def build_secondary_scoring_state_evidence(
         card_battle_round=card.battle_round,
         selection_payload=_selection_payload_at_record_boundary(card=card, record=record),
         occupancy=context.occupancy,
+        model_destruction_states=context.model_destruction_states,
         unit_destruction_states=tuple(
             value
             for value in context.unit_destruction_states
@@ -497,6 +512,7 @@ def secondary_scoring_condition_context_from_evidence(
         record=record,
         mission_setup=mission_setup,
         player_id=evidence.scoring_player_id,
+        model_destruction_states=evidence.model_destruction_states,
         unit_destruction_states=evidence.unit_destruction_states,
         objective_cleanse_states=evidence.objective_cleanse_states,
         terrain_plunder_states=evidence.terrain_plunder_states,

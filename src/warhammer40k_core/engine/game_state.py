@@ -228,7 +228,6 @@ from warhammer40k_core.engine.primary_turn_start_evidence import (
 )
 from warhammer40k_core.engine.primary_unit_destruction_tracking import (
     build_primary_unit_destruction_state,
-    record_primary_unit_destructions_for_end_turn_cleanup,
 )
 from warhammer40k_core.engine.random_weapon_range import WeaponRangeEvaluation
 from warhammer40k_core.engine.ranged_attack_history_lineage import (
@@ -329,7 +328,6 @@ from warhammer40k_core.engine.transports import (
 )
 from warhammer40k_core.engine.turn_cleanup import (
     EndTurnCleanupState,
-    resolve_end_turn_cleanup,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_keyword_queries import (
@@ -5473,26 +5471,17 @@ class GameState:
         )
 
     def resolve_end_turn_cleanup_boundary(self, *, completed_phase: BattlePhase) -> None:
-        if self.battlefield_state is None:
-            raise GameLifecycleError("End-turn cleanup requires battlefield_state.")
-        if self.active_player_id is None:
-            raise GameLifecycleError("End-turn cleanup requires an active player.")
-        scenario = BattlefieldScenario(
-            armies=tuple(self.army_definitions),
-            battlefield_state=self.battlefield_state,
+        from warhammer40k_core.engine.mission_cleanup_boundary import (
+            resolve_mission_cleanup_boundary,
         )
-        cleanup, updated_battlefield = resolve_end_turn_cleanup(
-            game_id=self.game_id,
-            scenario=scenario,
-            ruleset_descriptor=self.ruleset_descriptor_for_runtime_policy(),
-            battle_round=self.battle_round,
-            active_player_id=self.active_player_id,
-            phase=completed_phase,
+        from warhammer40k_core.engine.primary_unit_destruction_tracking import (
+            record_primary_unit_destructions_for_end_turn_cleanup,
         )
-        self.battlefield_state = updated_battlefield
+
+        cleanup = resolve_mission_cleanup_boundary(state=self, completed_phase=completed_phase)
         record_primary_unit_destructions_for_end_turn_cleanup(state=self, cleanup=cleanup)
         self.end_turn_cleanup_states.append(cleanup)
-        self.end_turn_cleanup_states.sort(key=lambda state: state.cleanup_id)
+        self.end_turn_cleanup_states.sort(key=lambda row: row.cleanup_id)
 
     def _resolve_unarrived_reserve_destruction_boundary(self, *, end_of_battle: bool) -> None:
         from warhammer40k_core.engine.reserve_lifetime_boundary import resolve_boundary

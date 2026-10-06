@@ -3,7 +3,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.damage_allocation import destroy_model_by_rule, model_by_id
+from warhammer40k_core.engine.damage_allocation import (
+    destroy_model_by_rule,
+    model_by_id,
+    model_owner_player_id,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
     rules_unit_contains_component_lineage,
@@ -14,12 +18,47 @@ from warhammer40k_core.engine.transports import (
     DestroyedTransportDisembark,
     DisembarkModeKind,
 )
+from warhammer40k_core.engine.turn_cleanup import EndTurnCleanupState
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.destroyed_transport_rules_unit_disembark import (
         DestroyedTransportRulesUnitDisembark,
     )
     from warhammer40k_core.engine.game_state import GameState
+
+
+def destroy_end_turn_coherency_models(*, state: GameState, cleanup: EndTurnCleanupState) -> None:
+    """Apply the explicit coherency exception without destroyed-model reactions.
+
+    The typed cleanup owns removal and mission provenance. Validate every casualty
+    before changing wounds; the boundary applies that exact physical result next.
+    """
+    if type(cleanup) is not EndTurnCleanupState or (
+        cleanup.game_id != state.game_id
+        or cleanup.battle_round != state.battle_round
+        or cleanup.active_player_id != state.active_player_id
+        or state.current_battle_phase is None
+        or cleanup.phase != state.current_battle_phase.value
+    ):
+        raise GameLifecycleError("Coherency destruction cleanup context drift.")
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Coherency destruction requires battlefield state.")
+    for removal in cleanup.removals:
+        if (
+            not model_by_id(state=state, model_instance_id=removal.model_instance_id).is_alive
+            or battlefield.model_placement_or_none(removal.model_instance_id) is None
+            or state.unit_instance_id_for_model(removal.model_instance_id)
+            != removal.unit_instance_id
+            or model_owner_player_id(state=state, model_instance_id=removal.model_instance_id)
+            != removal.player_id
+            or removal.destroyed_model_rules_triggered
+        ):
+            raise GameLifecycleError("Coherency destruction casualty authority drift.")
+    for model_id in cleanup.removed_model_instance_ids:
+        destroy_model_by_rule(
+            state=state, model_instance_id=model_id, remove_from_battlefield=False
+        )
 
 
 def destroy_emergency_disembark_omitted_model(

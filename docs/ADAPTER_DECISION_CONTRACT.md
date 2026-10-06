@@ -7704,3 +7704,8 @@ Order129 / Contract44.3.15 uses the existing finite movement action/flight choic
 parameterized witnessed movement and scoring checkpoint families. Restore binds
 the accepted mode and retains turn actions before cleanup, then authenticates
 the existing post-cleanup scoring commit. No payload or visibility change.
+
+Order130 / Contract44.3.16 freezes shared per-model destruction occurrences in
+secondary scoring evidence v2. Coherency cleanup updates model wounds without
+triggering destroyed-model rules, and authentic casualty-gap saves remain valid
+until turn-end cleanup. Decision and viewer families retain their payloads.

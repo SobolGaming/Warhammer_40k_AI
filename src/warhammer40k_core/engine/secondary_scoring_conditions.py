@@ -23,6 +23,9 @@ if TYPE_CHECKING:
         SecondaryTerrainPlunderState,
         SecondaryUnitDestructionState,
     )
+    from warhammer40k_core.engine.secondary_model_destruction_history import (
+        SecondaryModelDestructionState,
+    )
     from warhammer40k_core.engine.secondary_scoring_occupancy import SecondaryBattlefieldOccupancy
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
@@ -110,6 +113,7 @@ class SecondaryScoringConditionContext:
     terrain_plunder_states: tuple[object, ...]
     enemy_unit_ids_in_player_deployment_zone: tuple[str, ...]
     starting_strength_records: tuple[StartingStrengthRecord, ...]
+    model_destruction_states: tuple[SecondaryModelDestructionState, ...] = ()
     occupancy: SecondaryBattlefieldOccupancy | None = None
     game_length_battle_rounds: int | None = None
 
@@ -179,8 +183,7 @@ def evaluate_secondary_scoring_condition(
         matching = _enemy_destructions_this_turn(context)
         model_ids = tuple(
             model.model_instance_id
-            for state in matching
-            for model in state.destroyed_models
+            for model in _enemy_destroyed_models(context, this_turn=True)
             if model.starting_wounds >= 10
         )
         return _score_count_evidence(
@@ -509,12 +512,11 @@ def _destroyed_character_models_this_turn(
         raise GameLifecycleError(
             "Character secondary scoring requires battlefield occupancy with the enemy roster."
         )
-    matching: list[SecondaryDestroyedModelState] = []
-    for state in _enemy_destructions_this_turn(context):
-        for model in state.destroyed_models:
-            if model.model_instance_id in character_ids:
-                matching.append(model)
-    return tuple(matching)
+    return tuple(
+        model
+        for model in _enemy_destroyed_models(context, this_turn=True)
+        if model.model_instance_id in character_ids
+    )
 
 
 def _enemy_destructions_this_turn(
@@ -543,14 +545,43 @@ def _enemy_destructions_this_turn(
 def _enemy_character_model_ids_destroyed_during_battle(
     context: SecondaryScoringConditionContext,
 ) -> set[str]:
-    from warhammer40k_core.engine.scoring import SecondaryUnitDestructionState
-
     occupancy = _require_occupancy(
         context.occupancy,
         condition="all_enemy_character_models_destroyed_during_battle",
     )
     roster_ids = {model.model_instance_id for model in occupancy.enemy_character_models}
-    destroyed_ids: set[str] = set()
+    return {
+        model.model_instance_id
+        for model in _enemy_destroyed_models(context, this_turn=False)
+        if model.model_instance_id in roster_ids
+    }
+
+
+def _enemy_destroyed_models(
+    context: SecondaryScoringConditionContext, *, this_turn: bool
+) -> tuple[SecondaryDestroyedModelState, ...]:
+    from warhammer40k_core.engine.scoring import SecondaryUnitDestructionState
+
+    # Unit completions still own unit objectives. Their cumulative model inventory
+    # must not re-credit earlier casualties already represented by physical edges.
+    edge_model_ids = {
+        model.model_instance_id
+        for row in context.model_destruction_states
+        for model in row.destroyed_models
+    }
+    models = [
+        model
+        for row in context.model_destruction_states
+        if row.departure.owner_player_id != context.player_id
+        and (
+            not this_turn
+            or (
+                row.departure.battle_round == context.record.battle_round
+                and row.departure.active_player_id == context.record.active_player_id
+            )
+        )
+        for model in row.destroyed_models
+    ]
     for value in context.unit_destruction_states:
         if type(value) is not SecondaryUnitDestructionState:
             raise GameLifecycleError(
@@ -558,10 +589,17 @@ def _enemy_character_model_ids_destroyed_during_battle(
             )
         if value.destroyed_player_id == context.player_id:
             continue
-        for model in value.destroyed_models:
-            if model.model_instance_id in roster_ids:
-                destroyed_ids.add(model.model_instance_id)
-    return destroyed_ids
+        if this_turn and (value.battle_round, value.active_player_id) != (
+            context.record.battle_round,
+            context.record.active_player_id,
+        ):
+            continue
+        models.extend(
+            model
+            for model in value.destroyed_models
+            if model.model_instance_id not in edge_model_ids
+        )
+    return tuple(sorted(models, key=lambda model: model.model_instance_id))
 
 
 def _cleanses_this_turn(

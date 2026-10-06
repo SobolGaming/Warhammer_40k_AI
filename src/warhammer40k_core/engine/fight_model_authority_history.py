@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from bisect import bisect_left
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.engine.battlefield_state import (
@@ -476,7 +476,11 @@ def _authority_mutations_by_event_index(
                 )
             )
         event_mutations.extend(
-            _physical_exit_mutation(model_id, source="end_turn_cleanup")
+            replace(
+                _physical_exit_mutation(model_id, source="end_turn_cleanup"),
+                after_living=False,
+                before_living=True,
+            )
             for model_id in cleanup_model_ids_by_index.get(event_index, ())
         )
         if len({mutation.model_instance_id for mutation in event_mutations}) != len(
