@@ -1,640 +1,440 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "56fabeae7a645e1c138b85a8877a994fa93339ec",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4dc9d828cac21d568fc4ff81b5a65e8e767e372a67cf9212c19c329a68408766",
-  "operation_map_sha256": "fc9b83d00dcf636a751a7de211ca5cbd72604f9e1ed09f4d824985f564ae9a7f",
+  "base": "52f17e357ee900e1214c026246be3dedb73b5272",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:974e84fd17ba5199fa553a06be359cf49ab933afdbcd5cd396226c4077d137de",
+  "operation_map_sha256": "c977b8f5605dc470f80347707520340330ab9c5f075233109fb23b5076585c65",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "5774dc7adb3313468e37a7b5e3129b665ffeea03736ca943a139ee51966ed820",
-      "after_sha256": "68c850ae2c53e677e3b2794b6b4b36653887f2b08bf67690008ad92f576027a5",
+      "before_sha256": "68c850ae2c53e677e3b2794b6b4b36653887f2b08bf67690008ad92f576027a5",
+      "after_sha256": "1ca5cda643a0ea2b0d886575b73effaea7a5d925a986bda7068e73b1db6e9aff",
       "owners": {
         "@document": {
-          "before": "5774dc7adb3313468e37a7b5e3129b665ffeea03736ca943a139ee51966ed820",
-          "after": "68c850ae2c53e677e3b2794b6b4b36653887f2b08bf67690008ad92f576027a5"
+          "before": "68c850ae2c53e677e3b2794b6b4b36653887f2b08bf67690008ad92f576027a5",
+          "after": "1ca5cda643a0ea2b0d886575b73effaea7a5d925a986bda7068e73b1db6e9aff"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "ecfbe340abee717a5dced6b8638ef065ef86a4ce35024c392199d90970df4ded",
-      "after_sha256": "9e1aedd6cdb61ca1d2697b7480bdd1740663532ab04fc921a539a26ac3375bd7",
+      "before_sha256": "9e1aedd6cdb61ca1d2697b7480bdd1740663532ab04fc921a539a26ac3375bd7",
+      "after_sha256": "13d23fbf0a0ebf603c2048a6e19197f20155d6d96ec1737df37426f8d6ec4711",
       "owners": {
         "@document": {
-          "before": "ecfbe340abee717a5dced6b8638ef065ef86a4ce35024c392199d90970df4ded",
-          "after": "9e1aedd6cdb61ca1d2697b7480bdd1740663532ab04fc921a539a26ac3375bd7"
+          "before": "9e1aedd6cdb61ca1d2697b7480bdd1740663532ab04fc921a539a26ac3375bd7",
+          "after": "13d23fbf0a0ebf603c2048a6e19197f20155d6d96ec1737df37426f8d6ec4711"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "7c6a810db538c723a272ff7b6a5fc21ab23e90b69cc779844b86673d00de087b",
-      "after_sha256": "60cfa241900b4407b4f8e610d456fe1337b0e33f6b77f49372d48e8985e460c8",
+      "before_sha256": "60cfa241900b4407b4f8e610d456fe1337b0e33f6b77f49372d48e8985e460c8",
+      "after_sha256": "c53533eba8e5fc3ca7dd1c59b462b49b85bf8531214514948a6d77dbaf31c91e",
       "owners": {
         "@document": {
-          "before": "7c6a810db538c723a272ff7b6a5fc21ab23e90b69cc779844b86673d00de087b",
-          "after": "60cfa241900b4407b4f8e610d456fe1337b0e33f6b77f49372d48e8985e460c8"
+          "before": "60cfa241900b4407b4f8e610d456fe1337b0e33f6b77f49372d48e8985e460c8",
+          "after": "c53533eba8e5fc3ca7dd1c59b462b49b85bf8531214514948a6d77dbaf31c91e"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "4ec2b8310e74c0ed833d7bb05b0b6b5b01fdfcdac584d9e84c120f1c0d5a267c",
-      "after_sha256": "41a5fe006cb79a1f039957bb76fb062059b84cdcbf34d8151369bcfa8731b655",
+      "before_sha256": "41a5fe006cb79a1f039957bb76fb062059b84cdcbf34d8151369bcfa8731b655",
+      "after_sha256": "cb1dc84fc3d77ddf6db25c6652e20e2410d9e012e09f2750598a478d2df3a11b",
       "owners": {
         "@document": {
-          "before": "4ec2b8310e74c0ed833d7bb05b0b6b5b01fdfcdac584d9e84c120f1c0d5a267c",
-          "after": "41a5fe006cb79a1f039957bb76fb062059b84cdcbf34d8151369bcfa8731b655"
+          "before": "41a5fe006cb79a1f039957bb76fb062059b84cdcbf34d8151369bcfa8731b655",
+          "after": "cb1dc84fc3d77ddf6db25c6652e20e2410d9e012e09f2750598a478d2df3a11b"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "73f9c3563ea4232449eb3d20759f84391c452a48a0fae4f79cedecf507226e92",
-      "after_sha256": "9f3bf85a63e59564783b18430cbd61bfd1e9fa4c056fbf837d6d2354dfb8b497",
+      "before_sha256": "9f3bf85a63e59564783b18430cbd61bfd1e9fa4c056fbf837d6d2354dfb8b497",
+      "after_sha256": "86be54a1f4d678067f76ba04f6cd8063541a12b367b0bced7e06e3e6565ac33a",
       "owners": {
         "@document": {
-          "before": "73f9c3563ea4232449eb3d20759f84391c452a48a0fae4f79cedecf507226e92",
-          "after": "9f3bf85a63e59564783b18430cbd61bfd1e9fa4c056fbf837d6d2354dfb8b497"
+          "before": "9f3bf85a63e59564783b18430cbd61bfd1e9fa4c056fbf837d6d2354dfb8b497",
+          "after": "86be54a1f4d678067f76ba04f6cd8063541a12b367b0bced7e06e3e6565ac33a"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "ebc1abe51f2ad4fa9a49b6e528279154f7892f041adf750d07039ff2ecc3b5f9",
-      "after_sha256": "a05d9f7d73403550d94dbc379d771bf438f3afc37ab7bab4e9d414dca777ecfb",
+      "before_sha256": "a05d9f7d73403550d94dbc379d771bf438f3afc37ab7bab4e9d414dca777ecfb",
+      "after_sha256": "b063b28ebc9875b4f0d507c1784774bf8196007b2dba5ce8d33a76c4a56750f2",
       "owners": {
         "@document": {
-          "before": "ebc1abe51f2ad4fa9a49b6e528279154f7892f041adf750d07039ff2ecc3b5f9",
-          "after": "a05d9f7d73403550d94dbc379d771bf438f3afc37ab7bab4e9d414dca777ecfb"
+          "before": "a05d9f7d73403550d94dbc379d771bf438f3afc37ab7bab4e9d414dca777ecfb",
+          "after": "b063b28ebc9875b4f0d507c1784774bf8196007b2dba5ce8d33a76c4a56750f2"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "c1f23c4bc65b2c9f2757caa33e000058f9e972cc4937cbec9cd1e405a36e7c1d",
-      "after_sha256": "d275df452972843a84ebe71823b1ed4c2269abfbc8fc1a214935ca77a22a5034",
+      "before_sha256": "d275df452972843a84ebe71823b1ed4c2269abfbc8fc1a214935ca77a22a5034",
+      "after_sha256": "01cae434a8aa5ebaa3a69733ecb7e23495a13607c7305b52be11277bd8eed560",
       "owners": {
         "@document": {
-          "before": "c1f23c4bc65b2c9f2757caa33e000058f9e972cc4937cbec9cd1e405a36e7c1d",
-          "after": "d275df452972843a84ebe71823b1ed4c2269abfbc8fc1a214935ca77a22a5034"
+          "before": "d275df452972843a84ebe71823b1ed4c2269abfbc8fc1a214935ca77a22a5034",
+          "after": "01cae434a8aa5ebaa3a69733ecb7e23495a13607c7305b52be11277bd8eed560"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "1bd62699258552384754396ee166a58ad46e357bdbc5f40bbb4df59c93e9de46",
-      "after_sha256": "a1914306c888f8f0c1579dd0d398a009f80f7a55674745948a8b016e3d1b173b",
+      "before_sha256": "a1914306c888f8f0c1579dd0d398a009f80f7a55674745948a8b016e3d1b173b",
+      "after_sha256": "4c95ee507f5c39dc5e3c4d99fbd02523362d9d9350fcf63d89026f5c4dbc1594",
       "owners": {
         "@document": {
-          "before": "1bd62699258552384754396ee166a58ad46e357bdbc5f40bbb4df59c93e9de46",
-          "after": "a1914306c888f8f0c1579dd0d398a009f80f7a55674745948a8b016e3d1b173b"
+          "before": "a1914306c888f8f0c1579dd0d398a009f80f7a55674745948a8b016e3d1b173b",
+          "after": "4c95ee507f5c39dc5e3c4d99fbd02523362d9d9350fcf63d89026f5c4dbc1594"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "205447d758c04f7758773e08b1001322684aedd0ab11e47ffc45aa4f782a7210",
-      "after_sha256": "02460f400e2750bde59235190d937d90ebd60d69a426e704fe6f6a9f5b54fd84",
+      "before_sha256": "02460f400e2750bde59235190d937d90ebd60d69a426e704fe6f6a9f5b54fd84",
+      "after_sha256": "bad343fe5dbfeff6346a0300236cc5ecc80736d5015a41a86fc23ba62a4925a9",
       "owners": {
         "@document": {
-          "before": "205447d758c04f7758773e08b1001322684aedd0ab11e47ffc45aa4f782a7210",
-          "after": "02460f400e2750bde59235190d937d90ebd60d69a426e704fe6f6a9f5b54fd84"
+          "before": "02460f400e2750bde59235190d937d90ebd60d69a426e704fe6f6a9f5b54fd84",
+          "after": "bad343fe5dbfeff6346a0300236cc5ecc80736d5015a41a86fc23ba62a4925a9"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "298c2124f671609959dada56d15c07d9801eec5cca1bd144d6ef2951eacd1448",
-      "after_sha256": "656198e6e6bd0bf34079453aa287a983e231f3910658e4109436b03f4edd1558",
+      "before_sha256": "656198e6e6bd0bf34079453aa287a983e231f3910658e4109436b03f4edd1558",
+      "after_sha256": "1ba7d2435c890edabe6c925d5903bad40ba5793d1deddfeac8381e93c5f85eec",
       "owners": {
         "@document": {
-          "before": "298c2124f671609959dada56d15c07d9801eec5cca1bd144d6ef2951eacd1448",
-          "after": "656198e6e6bd0bf34079453aa287a983e231f3910658e4109436b03f4edd1558"
+          "before": "656198e6e6bd0bf34079453aa287a983e231f3910658e4109436b03f4edd1558",
+          "after": "1ba7d2435c890edabe6c925d5903bad40ba5793d1deddfeac8381e93c5f85eec"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "4f926ffdea0a712278a3d0404d14f584c64281fb510d2eb9b9eb6ab02b4faa9d",
-      "after_sha256": "686faab18adfb16206183e2391acf357413006513792a026a85ad4fc3ee6d7ce",
+      "before_sha256": "686faab18adfb16206183e2391acf357413006513792a026a85ad4fc3ee6d7ce",
+      "after_sha256": "2b229b3701f0a11e4a80392a1dbbe9901f9c9ed74ff261bc010330edc9f2ec4e",
       "owners": {
         "@document": {
-          "before": "4f926ffdea0a712278a3d0404d14f584c64281fb510d2eb9b9eb6ab02b4faa9d",
-          "after": "686faab18adfb16206183e2391acf357413006513792a026a85ad4fc3ee6d7ce"
+          "before": "686faab18adfb16206183e2391acf357413006513792a026a85ad4fc3ee6d7ce",
+          "after": "2b229b3701f0a11e4a80392a1dbbe9901f9c9ed74ff261bc010330edc9f2ec4e"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "5f40f1ee78f804d8b2cfbb2fdee1915bc41149af5ed03f3b040061701370ac44",
-      "after_sha256": "e2687d465e29cdf4150dd1c969d396e65dd9f1b81df0ee4cdab2cc484aa79ac3",
+      "before_sha256": "e2687d465e29cdf4150dd1c969d396e65dd9f1b81df0ee4cdab2cc484aa79ac3",
+      "after_sha256": "2d0af1e1a65f0357bbc0eab11f590d434ed59961261d2d3e581ea9e33b8a6677",
       "owners": {
         "@document": {
-          "before": "5f40f1ee78f804d8b2cfbb2fdee1915bc41149af5ed03f3b040061701370ac44",
-          "after": "e2687d465e29cdf4150dd1c969d396e65dd9f1b81df0ee4cdab2cc484aa79ac3"
+          "before": "e2687d465e29cdf4150dd1c969d396e65dd9f1b81df0ee4cdab2cc484aa79ac3",
+          "after": "2d0af1e1a65f0357bbc0eab11f590d434ed59961261d2d3e581ea9e33b8a6677"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "85f184c5e870af8ca23a00fd59ac4694af355a33cd074bd59a4adb95357d409b",
-      "after_sha256": "e844666e2fe33ee85704916995315fb6614b9e0ad0b5ac7d16abdefbd1d97553",
+      "before_sha256": "e844666e2fe33ee85704916995315fb6614b9e0ad0b5ac7d16abdefbd1d97553",
+      "after_sha256": "d1d5e3ede44dc13148319619a2a1bce72ef733f464fc8cc23322e0751662d1f1",
       "owners": {
         "@document": {
-          "before": "85f184c5e870af8ca23a00fd59ac4694af355a33cd074bd59a4adb95357d409b",
-          "after": "e844666e2fe33ee85704916995315fb6614b9e0ad0b5ac7d16abdefbd1d97553"
+          "before": "e844666e2fe33ee85704916995315fb6614b9e0ad0b5ac7d16abdefbd1d97553",
+          "after": "d1d5e3ede44dc13148319619a2a1bce72ef733f464fc8cc23322e0751662d1f1"
         }
       }
     },
     "conformance/typescript/src/contract.ts": {
-      "before_sha256": "9157b755d266262b012c90597bff6f144eca79b6cbd5f60a7ef1ac646a3c18e2",
-      "after_sha256": "be80773078e5461180dd27629bb97f8ce3b1ce1c1a7e856b8e700f9da98dcf3e",
+      "before_sha256": "be80773078e5461180dd27629bb97f8ce3b1ce1c1a7e856b8e700f9da98dcf3e",
+      "after_sha256": "d2a3f2c99c2a070daf90c020d12743b385b41b075a1fb5c0f54f87bcb2b12b4a",
       "owners": {
         "@document": {
-          "before": "9157b755d266262b012c90597bff6f144eca79b6cbd5f60a7ef1ac646a3c18e2",
-          "after": "be80773078e5461180dd27629bb97f8ce3b1ce1c1a7e856b8e700f9da98dcf3e"
+          "before": "be80773078e5461180dd27629bb97f8ce3b1ce1c1a7e856b8e700f9da98dcf3e",
+          "after": "d2a3f2c99c2a070daf90c020d12743b385b41b075a1fb5c0f54f87bcb2b12b4a"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "ac05e16e88d0a130cfe3204f4df8e0f6e3335023da6c5a01453e855c6eef4bf1",
-      "after_sha256": "bd2021222599a4ca7035e432b04d6cfb507119b4bbc1d3992ff910f962b9618b",
+      "before_sha256": "bd2021222599a4ca7035e432b04d6cfb507119b4bbc1d3992ff910f962b9618b",
+      "after_sha256": "8d052bfa2f7a47d2ca3aebd3d92b5d7d48bd5764bf9fcad708b90edd1ca1c6e1",
       "owners": {
         "@document": {
-          "before": "ac05e16e88d0a130cfe3204f4df8e0f6e3335023da6c5a01453e855c6eef4bf1",
-          "after": "bd2021222599a4ca7035e432b04d6cfb507119b4bbc1d3992ff910f962b9618b"
+          "before": "bd2021222599a4ca7035e432b04d6cfb507119b4bbc1d3992ff910f962b9618b",
+          "after": "8d052bfa2f7a47d2ca3aebd3d92b5d7d48bd5764bf9fcad708b90edd1ca1c6e1"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "9bc2d126582b5a316a22c73d712b0920d28b975fdfc2cd82324be596632be367",
-      "after_sha256": "a01713fa92c3740f1da78da52f73f4cb2d9cd7c48b4c7899abe8ed850de58288",
+      "before_sha256": "a01713fa92c3740f1da78da52f73f4cb2d9cd7c48b4c7899abe8ed850de58288",
+      "after_sha256": "45504cd19791f6c689ba16b92051de759dd417e63241c4e88da794692610f7b6",
       "owners": {
         "@document": {
-          "before": "9bc2d126582b5a316a22c73d712b0920d28b975fdfc2cd82324be596632be367",
-          "after": "a01713fa92c3740f1da78da52f73f4cb2d9cd7c48b4c7899abe8ed850de58288"
+          "before": "a01713fa92c3740f1da78da52f73f4cb2d9cd7c48b4c7899abe8ed850de58288",
+          "after": "45504cd19791f6c689ba16b92051de759dd417e63241c4e88da794692610f7b6"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "f57742cd2f4a354d67aa2a670f606439308df44fc4b09cfe10220e78010671c9",
-      "after_sha256": "fcf4ffed83ce423c6d503945473b43a385b37a7bacee843d0ade1579c2104c42",
+      "before_sha256": "fcf4ffed83ce423c6d503945473b43a385b37a7bacee843d0ade1579c2104c42",
+      "after_sha256": "a8350f5a1c6ff203b2eabd52fe8d3e795a5ac5e7f455088d1b6ee00cd39676d6",
       "owners": {
         "@document": {
-          "before": "f57742cd2f4a354d67aa2a670f606439308df44fc4b09cfe10220e78010671c9",
-          "after": "fcf4ffed83ce423c6d503945473b43a385b37a7bacee843d0ade1579c2104c42"
+          "before": "fcf4ffed83ce423c6d503945473b43a385b37a7bacee843d0ade1579c2104c42",
+          "after": "a8350f5a1c6ff203b2eabd52fe8d3e795a5ac5e7f455088d1b6ee00cd39676d6"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "17623f88b708eeb4b0e4d9b476db9db7aafd2ae94f23633b303b33d1184e9b54",
-      "after_sha256": "b7743f87a105f4b7b148e69f6491b420306d7ae50ac50a18f1425c5cec92b448",
+      "before_sha256": "b7743f87a105f4b7b148e69f6491b420306d7ae50ac50a18f1425c5cec92b448",
+      "after_sha256": "fb164d98afcb37bb59235296d36549bf0665cf088385ccd09a7c734d57e9c83f",
       "owners": {
         "@document": {
-          "before": "17623f88b708eeb4b0e4d9b476db9db7aafd2ae94f23633b303b33d1184e9b54",
-          "after": "b7743f87a105f4b7b148e69f6491b420306d7ae50ac50a18f1425c5cec92b448"
+          "before": "b7743f87a105f4b7b148e69f6491b420306d7ae50ac50a18f1425c5cec92b448",
+          "after": "fb164d98afcb37bb59235296d36549bf0665cf088385ccd09a7c734d57e9c83f"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "24f658b2c298b36e895067f8c6c618fda39338592f149929b635e5f133d100de",
-      "after_sha256": "022a7db263a31708fe5e8a868eb04449ddcdd5cb44d788c8979e96c119ac83ac",
+      "before_sha256": "022a7db263a31708fe5e8a868eb04449ddcdd5cb44d788c8979e96c119ac83ac",
+      "after_sha256": "78c35f3a7371050fc64c5eab38728f1e3274a8e8a43aa6e2e3dfb574a4c377eb",
       "owners": {
         "@document": {
-          "before": "24f658b2c298b36e895067f8c6c618fda39338592f149929b635e5f133d100de",
-          "after": "022a7db263a31708fe5e8a868eb04449ddcdd5cb44d788c8979e96c119ac83ac"
+          "before": "022a7db263a31708fe5e8a868eb04449ddcdd5cb44d788c8979e96c119ac83ac",
+          "after": "78c35f3a7371050fc64c5eab38728f1e3274a8e8a43aa6e2e3dfb574a4c377eb"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "24c84abee30410250ce7d06521dd4c22ec5881de2c8fb3f45614214c98237728",
-      "after_sha256": "e705706d532556b26e7f95a02ccb6d8eb8ca5391dcd52a22befe7f808a918700",
+      "before_sha256": "e705706d532556b26e7f95a02ccb6d8eb8ca5391dcd52a22befe7f808a918700",
+      "after_sha256": "61ddf441eab6657d307a463a5ca98546c42267298ca2dead1d94a03febba4dcd",
       "owners": {
         "@document": {
-          "before": "24c84abee30410250ce7d06521dd4c22ec5881de2c8fb3f45614214c98237728",
-          "after": "e705706d532556b26e7f95a02ccb6d8eb8ca5391dcd52a22befe7f808a918700"
+          "before": "e705706d532556b26e7f95a02ccb6d8eb8ca5391dcd52a22befe7f808a918700",
+          "after": "61ddf441eab6657d307a463a5ca98546c42267298ca2dead1d94a03febba4dcd"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "0e1adfb1978b2bf0b3e06d0fa74f491e64120025c4c09b33611538670f4ae6c7",
-      "after_sha256": "c614dd6c8d44eae536da6ac7fa62566dceddfd0aab5348be6d08333b9e3a950d",
+      "before_sha256": "c614dd6c8d44eae536da6ac7fa62566dceddfd0aab5348be6d08333b9e3a950d",
+      "after_sha256": "80b975ae5c01a5d996aaa0c8396053ae17a3af59864e873921d39ed162898234",
       "owners": {
         "@document": {
-          "before": "0e1adfb1978b2bf0b3e06d0fa74f491e64120025c4c09b33611538670f4ae6c7",
-          "after": "c614dd6c8d44eae536da6ac7fa62566dceddfd0aab5348be6d08333b9e3a950d"
+          "before": "c614dd6c8d44eae536da6ac7fa62566dceddfd0aab5348be6d08333b9e3a950d",
+          "after": "80b975ae5c01a5d996aaa0c8396053ae17a3af59864e873921d39ed162898234"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "456ba8fd16a6d2794ba282f59788cb06a1261dde9a3bff82c545501f75b24d47",
-      "after_sha256": "7f56f323a896869eb93f52bfbc020c1d4e9540cbe8ecd65f992f17902b91f22b",
+      "before_sha256": "7f56f323a896869eb93f52bfbc020c1d4e9540cbe8ecd65f992f17902b91f22b",
+      "after_sha256": "dd24d05bb6671661d3c0c09ba48e3982c0a36b0c15b21c036803c7442815a404",
       "owners": {
         "@document": {
-          "before": "456ba8fd16a6d2794ba282f59788cb06a1261dde9a3bff82c545501f75b24d47",
-          "after": "7f56f323a896869eb93f52bfbc020c1d4e9540cbe8ecd65f992f17902b91f22b"
+          "before": "7f56f323a896869eb93f52bfbc020c1d4e9540cbe8ecd65f992f17902b91f22b",
+          "after": "dd24d05bb6671661d3c0c09ba48e3982c0a36b0c15b21c036803c7442815a404"
         }
       }
     },
-    "contracts/migrations/44.3.18-to-44.3.19.md": {
+    "contracts/migrations/44.3.19-to-44.3.20.md": {
       "before_sha256": null,
-      "after_sha256": "e295c61ad50e153e88869b3841224cbcb31240ac552c23c9bedf9d1ee9effa04",
+      "after_sha256": "f2321266a6a2e368eab41dd0e145e73e82093f431bf1cd78ec5a3cc71beb5c89",
       "owners": {
         "@document": {
           "before": null,
-          "after": "e295c61ad50e153e88869b3841224cbcb31240ac552c23c9bedf9d1ee9effa04"
+          "after": "f2321266a6a2e368eab41dd0e145e73e82093f431bf1cd78ec5a3cc71beb5c89"
         }
       }
     },
     "contracts/openapi.yaml": {
-      "before_sha256": "7ad0bd607ef69a6656635d60abc1f3e7cca3c32f0ea33b5aabff2ff54cf41cdf",
-      "after_sha256": "adcec48255a1de9bf3cd11752e62286853844549c3613327c16be657fc7d1b96",
+      "before_sha256": "adcec48255a1de9bf3cd11752e62286853844549c3613327c16be657fc7d1b96",
+      "after_sha256": "d64f393876a0324f01210695d7d3fda37caab923a9bfb336ef520d746ee77880",
       "owners": {
         "@document": {
-          "before": "7ad0bd607ef69a6656635d60abc1f3e7cca3c32f0ea33b5aabff2ff54cf41cdf",
-          "after": "adcec48255a1de9bf3cd11752e62286853844549c3613327c16be657fc7d1b96"
+          "before": "adcec48255a1de9bf3cd11752e62286853844549c3613327c16be657fc7d1b96",
+          "after": "d64f393876a0324f01210695d7d3fda37caab923a9bfb336ef520d746ee77880"
         }
       }
     },
-    "data/source_audits/order133/source.audit.json": {
+    "data/source_audits/order134/historical-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "a6523d8ce143427c3f1de49ba3f5d7f30ab69b265addc35a0dfdfe9e941eb55e",
+      "after_sha256": "cf1cea73926ed18974aed95ddd60c0d5831a8f9e0e1e90ed17049a3f2c8e7b4f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a6523d8ce143427c3f1de49ba3f5d7f30ab69b265addc35a0dfdfe9e941eb55e"
+          "after": "cf1cea73926ed18974aed95ddd60c0d5831a8f9e0e1e90ed17049a3f2c8e7b4f"
+        }
+      }
+    },
+    "data/source_audits/order134/historical/large_model_restrictions.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "432346937c4c9900f312bb5b52f9ba54256289033ebfdf607e537317e7513921",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "432346937c4c9900f312bb5b52f9ba54256289033ebfdf607e537317e7513921"
+        }
+      }
+    },
+    "data/source_audits/order134/source.audit.json": {
+      "before_sha256": null,
+      "after_sha256": "a98b56f6a56b58cd9eddd8ddc304f2bd1ae3cacad147b6afa1878799d1306494",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "a98b56f6a56b58cd9eddd8ddc304f2bd1ae3cacad147b6afa1878799d1306494"
+        }
+      }
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "before_sha256": "a5c6064d3ae4abdea510e1b6150d6b2a876e54b1fdfd8a4917e22dd01bfcc043",
+      "after_sha256": "22f5f39b4bfefc91d07089edaf5c53cee77ed37b436139041275c5999134d1da",
+      "owners": {
+        "@document": {
+          "before": "a5c6064d3ae4abdea510e1b6150d6b2a876e54b1fdfd8a4917e22dd01bfcc043",
+          "after": "22f5f39b4bfefc91d07089edaf5c53cee77ed37b436139041275c5999134d1da"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "d1d3712dc3ff39e1473f38994c7729f012c7a580da53d4ed99512e5bb3a82b38",
-      "after_sha256": "0ad969f0038de881a788dc663e6b8112e8f844a42e92e15c700e91b196a43f08",
+      "before_sha256": "0ad969f0038de881a788dc663e6b8112e8f844a42e92e15c700e91b196a43f08",
+      "after_sha256": "28a35a878558e56cba4058516987ecadb018856b73dc390d384e1ed0d56118af",
       "owners": {
         "@document": {
-          "before": "d1d3712dc3ff39e1473f38994c7729f012c7a580da53d4ed99512e5bb3a82b38",
-          "after": "0ad969f0038de881a788dc663e6b8112e8f844a42e92e15c700e91b196a43f08"
+          "before": "0ad969f0038de881a788dc663e6b8112e8f844a42e92e15c700e91b196a43f08",
+          "after": "28a35a878558e56cba4058516987ecadb018856b73dc390d384e1ed0d56118af"
         }
       }
     },
-    "docs/ORDER_133_SCOPE_PLAN.md": {
+    "docs/ORDER_134_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "ec709114e66642e317c19bd552080c6923d903009f31c24d7d5a1ba84bb9ec2a",
+      "after_sha256": "73499b875c2f1e4fbde93da19e07e03564197dd5b3263e5088a305534dc96b70",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ec709114e66642e317c19bd552080c6923d903009f31c24d7d5a1ba84bb9ec2a"
+          "after": "73499b875c2f1e4fbde93da19e07e03564197dd5b3263e5088a305534dc96b70"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "fd0594444448560f7138667f18f270e2daa543c68fcabe620076c98804d264fa",
-      "after_sha256": "f3ec2efd7e745478a27f606513a56c1653f029f2b8bd2d9dcd521218c3444214",
+      "before_sha256": "f3ec2efd7e745478a27f606513a56c1653f029f2b8bd2d9dcd521218c3444214",
+      "after_sha256": "0f124285f7d5662d03ecad0490c6c7559d8240c02140868c2d85850bddc59db4",
       "owners": {
         "@document": {
-          "before": "fd0594444448560f7138667f18f270e2daa543c68fcabe620076c98804d264fa",
-          "after": "f3ec2efd7e745478a27f606513a56c1653f029f2b8bd2d9dcd521218c3444214"
+          "before": "f3ec2efd7e745478a27f606513a56c1653f029f2b8bd2d9dcd521218c3444214",
+          "after": "0f124285f7d5662d03ecad0490c6c7559d8240c02140868c2d85850bddc59db4"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "f039dd99aff9e9ade89068a1346ce22ef0c3a20705e9e790eb3e3ea4fb8a7a32",
-      "after_sha256": "41cb1b131ede4961cd40a23a73f2f0cdd7acad8658046d9e6ac5d91e4c708d1c",
+      "before_sha256": "41cb1b131ede4961cd40a23a73f2f0cdd7acad8658046d9e6ac5d91e4c708d1c",
+      "after_sha256": "6b52a98279258a8feb81f8cfd32e3ecf34994ef6a8d7771b5ebf92411d3d851c",
       "owners": {
         "@document": {
-          "before": "f039dd99aff9e9ade89068a1346ce22ef0c3a20705e9e790eb3e3ea4fb8a7a32",
-          "after": "41cb1b131ede4961cd40a23a73f2f0cdd7acad8658046d9e6ac5d91e4c708d1c"
+          "before": "41cb1b131ede4961cd40a23a73f2f0cdd7acad8658046d9e6ac5d91e4c708d1c",
+          "after": "6b52a98279258a8feb81f8cfd32e3ecf34994ef6a8d7771b5ebf92411d3d851c"
         }
       }
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
-      "before_sha256": "9d1867e082f2a60a0307f13181eee5e8638d395bb14bf34895f18d04e0c42535",
-      "after_sha256": "6d099f4cb2753e8b7db50f9a282ffb674ddd3bdb58d59a2a651fe440578a11a3",
+      "before_sha256": "6d099f4cb2753e8b7db50f9a282ffb674ddd3bdb58d59a2a651fe440578a11a3",
+      "after_sha256": "0d3a23e0109b30e7ce969db876b4a0b9186b44ee3685f183dd5bbdc913257bbb",
       "owners": {
         "@module": {
-          "before": "4e4ab2cfa5ff28533e489e4aec02e591c065063565bbe7d75d9f2e6c1d18c617",
-          "after": "a71e397d1dc74354b2e5a7560843c7e220b87a7e2287d90b7f16dee44c06ff36"
+          "before": "a71e397d1dc74354b2e5a7560843c7e220b87a7e2287d90b7f16dee44c06ff36",
+          "after": "5b0592ac8210d09b6c12b826f14544c5cbdd298a780cacf361890b5c7097ac11"
         }
       }
     },
-    "src/warhammer40k_core/core/datasheet.py": {
-      "before_sha256": "0fd6348ea0c9e42f999f1628f2b98262803e006a529398b4dac4ee687cbad200",
-      "after_sha256": "749906592d0d3a7468afc7e3e4ce85ba5406ee633ef608eb8835b2e8017f9d42",
-      "owners": {
-        "@module": {
-          "before": "8710d8b132130ee4e8dd45668c2942878ab1bb50c7350195fc1ca564b1753d96",
-          "after": "e4d87e6add0ff4735324e2514eaeab7d93ca0b026405d8b3037b57b14c946f5d"
-        },
-        "DatasheetDefinition.__post_init__": {
-          "before": "7508f04804ba7b951fa0b0b41a8ae52d7e9a4fef88d8058573d48e29590cdf85",
-          "after": "901b5ea7567b9f8fbdbe8728c06dd163ad9c28237047bb82c2928c2822a263d3"
-        }
-      }
-    },
-    "src/warhammer40k_core/core/datasheet_identity.py": {
-      "before_sha256": "e3aeb985db557fe42ca8adc5771929a31c1276cfa87710f40231cd521b7a38c3",
-      "after_sha256": "3cbaded74c2fa3045cba6ca655225789a9b33783fee80ac95097ebefa02e5558",
-      "owners": {
-        "@module": {
-          "before": "4ce885141be5a07a98ec6728c99532e3866acb97cd01f898ed7e9d834238037b",
-          "after": "87f08f7aa86c873aaf312ae0fdb16489e751977d9494e248d3c739b4deb634b4"
-        },
-        "effective_datasheet_keywords": {
-          "before": null,
-          "after": "ea4c95e3a2ad99403b64cbd70c64377b19b0f92db61c74e8585083d501c545c9"
-        }
-      }
-    },
-    "src/warhammer40k_core/core/keyword_membership.py": {
-      "before_sha256": "b355f5479f86e363625a797a7a886c4c66811168ecf18e3b0c119ea19ab7633a",
-      "after_sha256": "edfcb85fff479eeeb61b10de237228793f460a22454e15ee8a68b3bc88104717",
-      "owners": {
-        "@module": {
-          "before": "abe0e76d4625ea4fe5d1b21fa7472e9c809b658d444fb4e69aa7e3c1445316e1",
-          "after": "bbe89179fb9da81cec055819e5c15f94007d933f9b71129b491504e418774198"
-        },
-        "exclusive_name_keywords": {
-          "before": "9e7733b19ad47b65b47a6da81322dde53cf518497dca6e6fe81a14b9fdf47629",
-          "after": "d277a97e747f3d3276337b8c858498944edac179fd75be782ec0bc8537562501"
-        },
-        "keyword_inventory_contains": {
-          "before": "cf0b0d56e878cfe7e3876dd33632e991ec15bc1dd38fdd282fa8ddf98019ff45",
-          "after": "7df3e9c744ce648f0101040054d975eddba001975ae033c61cad5859b8f9e061"
-        }
-      }
-    },
-    "src/warhammer40k_core/core/keyword_numbers.py": {
+    "src/warhammer40k_core/engine/large_model_deployment_restrictions.py": {
       "before_sha256": null,
-      "after_sha256": "b73fa759643ead1e7e73686ca19b99b0ada48ad4c85867e45e8d6e90508a1dc9",
+      "after_sha256": "deefaa0acf0e98b9839481b3bc0e9e98ed456dbb8054a6c439b5c37b5b2659da",
       "owners": {
         "@module": {
           "before": null,
-          "after": "fee6ca41e4f13a22bcee5e9f3ba7f79e869632855438d04282f317d4fd8ac18c"
+          "after": "368e6787bca626d5a296e2321137e9f58d851292a949f8780468c75fe482e35c"
         },
-        "keyword_number_identity": {
+        "DeploymentRestrictionPayload": {
           "before": null,
-          "after": "91fbb5778ffce0a73870f3fc72276ffbb73ff6ef0ba352fe5b645b424a7574d3"
+          "after": "77fc9ff5391b9f10bc358ad6f7bc36c7f2e72d171ddb6297cdee18ed740291b7"
         },
-        "keyword_number_spellings": {
+        "conditional_deployment_prevents_activity": {
           "before": null,
-          "after": "6f701f306ba6b7653bdef0fc870274a2524c23216b7af86e37dc490c895cac34"
+          "after": "310058d712af5340d1b1029207d52abb31b70cee1516ea738e092f3e3947f239"
+        },
+        "deployment_restriction_payload": {
+          "before": null,
+          "after": "101641b3df16cf3267019df8499074d3c142e9df5c04ceb0bebba31f6724b4f2"
+        },
+        "record_conditional_deployment_restriction": {
+          "before": null,
+          "after": "a4d36290ff91ea194b9b7d397a69ad881a6533ce4d8a486c759fcd852947269a"
         }
       }
     },
-    "src/warhammer40k_core/core/model_keywords.py": {
-      "before_sha256": "6fedff27c48855866f6c29230a8cd34ae58c4d60fba76c03cbc652ff814c3649",
-      "after_sha256": "22188d80818cbfffe0332525839c335cc90e2ec6af6aadef0a90aad1c8093a65",
+    "src/warhammer40k_core/engine/large_model_restrictions.py": {
+      "before_sha256": "432346937c4c9900f312bb5b52f9ba54256289033ebfdf607e537317e7513921",
+      "after_sha256": "73f587a912fe2e2942602a05b642ffbb5452d4d8c84409d82b90261d894a175d",
       "owners": {
-        "@module": {
-          "before": "9fb481099cd61ebce2331c4beb2962092918e04bf3622fcece98613ce91afe60",
-          "after": "88377a3a492b35251f060b67e2eadb1697b60df197a3a0ec9289ff02a531cc80"
-        },
-        "ModelKeywordAssignment": {
-          "before": "8785294e15ced4d5e4f85c38dd0b988e719a1547949290f310f2e71878406324",
-          "after": "9cdd893d9c4aba137a42fc5a694296137d7eaec31422354c75f9a9139d845db7"
-        },
-        "ModelKeywordAssignment.__post_init__": {
-          "before": "d74f7c141524927b11d5f42a786e1230ae8cfb63c9b18c5f3697f74eb784e896",
-          "after": "617cf6e215aff3986cc96c21818886dc831ef0fb45ecb71a4112bd0c28d2e9bf"
-        },
-        "model_keyword_assignment": {
-          "before": "77706489fa443c30582fce1b507ae28ced341a46b9e6cfc521726983c9ab50b8",
-          "after": "5a71fc6fffe1dbe3f7ade74308873936df4bcdc8e6a020e77d9a9e48121fb97f"
+        "large_model_activity_reason": {
+          "before": "e9a0f559a92cd63e690287073d7f7d84d57a288f954b44dd00fe8ac8199cda11",
+          "after": "152faacae000c1d5fec41783dd94264821090e99565495f69d90afa44cb20d59"
         }
       }
     },
-    "src/warhammer40k_core/engine/army_mustering.py": {
-      "before_sha256": "f46d35b7fa0e89f8de3f99360662954371e5b17f7c5b993b66e50f4c0fbd86c0",
-      "after_sha256": "4ca230cace66cd337c225dd8fca53d283740918e247a9f28f28bdc810a49dc18",
+    "src/warhammer40k_core/engine/rules_unit_effects.py": {
+      "before_sha256": "0e56fa386b568cd8d900202c24f558a7fec2f1634f357ea847398e218219344a",
+      "after_sha256": "548273a553622c9a2838838691646d737cde55acfeb42f0d9ed16c5515340ef0",
       "owners": {
-        "@module": {
-          "before": "f36199482e4c442d0fd7673c2fe9a4dece28538b04dd4a22a5522def252ead2a",
-          "after": "b5ebb31893d600d05f28ad372561399f77f0156ba7b7cff12cdc1378ed66c538"
-        },
-        "_canonical_keyword": {
-          "before": "3e4df701950ae921a1b672e3581da7f434104258208815cf22b74695f6a99df1",
-          "after": "b9c86f86acee8d46e017519753ff9a762ed9521853767ae2973d4e9b88bb354e"
+        "validate_persisting_effects": {
+          "before": "4994d8d8e2295f2fd0d328e967a453efc0bc1a3f8f7227267a093908943cce53",
+          "after": "4bdeb09d5f7b539dbe6092052b484a2bd3a266f3e99e07e7465fd344c23ac7b3"
         }
       }
     },
-    "src/warhammer40k_core/engine/catalog_model_scope.py": {
-      "before_sha256": "a47e2d2986627ba0b8c8e017e490cfba3bacd56f0f363db1c52e481556d81e60",
-      "after_sha256": "c806f7be22ed51453a13316e2f269337ca6c1be9cb0f0f76d4ac32ad629311ed",
-      "owners": {
-        "@module": {
-          "before": "a2f46be34e89efa9408d41066e08b6b433102e66d64e898c099364e0e44fce4d",
-          "after": "42e0ef15e3c0889526125d4777fe9c7b38ad5bdea2edf653147017c3b5cd4628"
-        },
-        "scoped_roll_model_ids_for_effect": {
-          "before": "ed7d2581d92db1fb78f41fa1ccf04b45120c76447ab8c2b1cc26e480385255ae",
-          "after": "416b194760483b84ecc8a07f7dd62e52ccabde09a6becfe84d6a7727805440ed"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/model_keyword_grants.py": {
-      "before_sha256": "db71ba1577ef1668ecc67dc2fcdb290b6f27e5cab60ac0784d3dfafd0f1a7dc0",
-      "after_sha256": "9ad4a4de99da4959c72f912ede48658e0a398adc784c5748bab64c19a827bf44",
-      "owners": {
-        "grant_unit_keywords": {
-          "before": "ae57c9d79de8887b70919357ca690c4de38ffaf9e2a21bffba66b06f579ac51c",
-          "after": "f79b2e3a07b7b3fbb9561d5dd5470f812a425e3a068e345ab6e10cff79457673"
-        },
-        "unit_with_attached_role_evidence": {
-          "before": "6fd21d642746452447d814f87ad67210968ad22df2ad2ca7c832a18f612e173b",
-          "after": "acc990f843e8a3400643a3bb41fbe3b248e83e1ca8154e299e1abb2e88b28673"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/roster_bearer_validation.py": {
-      "before_sha256": "eb237ffc8500f12e97f3ac54a4bd51526f1ccc142b0e91870b4ea03bacd1cc17",
-      "after_sha256": "12899e9972591bce9ce5fc14cc4381651a9ab22b54f900c8172ccc15b7c7272d",
-      "owners": {
-        "apply_warlord_keyword_if_selected": {
-          "before": "3242054937ef12c0d31793cd67584aba825b013a83118bf96496f513b29e8ac0",
-          "after": "dc8eb9c87593860f75286513b445b4fd09ebfb56b4a382924782f57c989887e1"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/unit_factory.py": {
-      "before_sha256": "2c74adbd0e779a726416e65710c7d9227d0545cfbd18dc63aebcf928915fe2cb",
-      "after_sha256": "9f79236e4ee94c3daa9f62a8c5bb032a721d5a1676ed1a17d50a21c422853c82",
-      "owners": {
-        "ModelInstance.faction_keywords": {
-          "before": "407a969bb0f56680807a88ff0bb3af0cfb21f8277cb1d5f785227370cd4f7266",
-          "after": "bc1832cef8fce6a09d32c2598d309ebc0e387f964d9c3d4c1fbbb934c9e90397"
-        },
-        "ModelInstance.keywords": {
-          "before": "72434c8393ed25f011d05aed22101f5eea32a0a71ffcab684eccf6f6892327d3",
-          "after": "2f20d5f66fb1bbc116f5929cf87adb35c4931b446ea0f549eeaed54f9a2bffbd"
-        },
-        "UnitFactory.instantiate_materialized_model": {
-          "before": "275feff4e1d2aaed0ded518e98c4bf52c20eece377a11397d70e8a6fa580acaf",
-          "after": "54ca3abd0ab8fda246ca63c3280df64e90851c48edcf167c54d2d35ec382c17c"
-        },
-        "_instantiate_models_for_profile": {
-          "before": "f24a00e38503b934b5119b9379f23e0be32ef68ec7ad96add93a8f9610caf0a2",
-          "after": "50aff103af4369284845279f6156d2df63f0de37333faf95792cac03ef30eb77"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/rule_keyword_sequences.py": {
-      "before_sha256": "2f53648714e8791cc749e242dfa327846bcc98f3ae5c6545cde46ca5be4cf36f",
-      "after_sha256": "c9158e12a0706d5fe564d4a7da8bf905057f08dcbfa0c3b36213ea92fae78e63",
-      "owners": {
-        "@module": {
-          "before": "d8d38b564dba9e325b1b9d5579548f6d08b5396c5bb14d72d95906ddd9228154",
-          "after": "5640eae164a241bc88404cc0a857a29dbb837995e17921f892eca034d82527b4"
-        },
-        "_longest_source_keyword_prefix": {
-          "before": "d3f4ae4790a4b7c3b1bb183b8f15615518b9b9fb646a285e7b5561ec6b708c60",
-          "after": "65521d24594ba654f0a9b4a79cb9c639b99949188448c730c164cd61ea3e84c9"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/rule_token_normalization.py": {
-      "before_sha256": "3de95501a8f36ead9ca93378919053d20d52f461ed2c4af55608662c311d4cd9",
-      "after_sha256": "5520455159f2fe6c0d7ff1baf121cad7da39d9ffa639c166d9c18347fc0de4e9",
-      "owners": {
-        "@module": {
-          "before": "96133fe505bd8630d3f00706e6b49385dd94ec1097c1c20f4c1be460887ce367",
-          "after": "eeaa48d8398ddd8b5201b2cc3649b60ce843c6f9f67e4ace7d80de1b3dc41e1b"
-        },
-        "keyword_token": {
-          "before": "8ee2113d44abc0bf49790ade7fc2c637e12b2869e7e6bb96333423a50e563319",
-          "after": "133407582ae2e8b3a55eb4b22ec202af24186906b7a8eef85957a3eeef28489e"
-        },
-        "singular_keyword_token": {
-          "before": "753067eb6199e6704bba42106578684a77280ce4f87a84f3279e7ae4085119bc",
-          "after": "c52fe05c2dbf25eca51ba4f30f31744b48b55c71024fc6cc4bcab8bf0ba47a5e"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/selected_target_parser.py": {
-      "before_sha256": "c806275c3174f83fecde68e9808af4d9fe8208c4f9bc9b3cd56eca5f506646aa",
-      "after_sha256": "6aee8355dd3def0461766d27c8c2e54a74654572b09c040a92a5ab8de5a24c0c",
-      "owners": {
-        "@module": {
-          "before": "0732a3deded0af091ee9ef01c37d7475c2ae6a103acdbb137e255a34da8eed23",
-          "after": "73a178098b4cd9e6a21ea186fe8f40a1d58354827b5e5e9d5052b1b943ae8c3c"
-        },
-        "_keyword_sequence_parameter_pairs": {
-          "before": "f36caca1720d930db97906fa4ce604d81ec83f82e5d7b3be39c0d1c0f4ee3817",
-          "after": null
-        },
-        "_keyword_sequence_tokens": {
-          "before": "bf89cbc52be117d3e76268fe6b671c4cfd43841490bbed51c9ee9065cec1bb3e",
-          "after": null
-        },
-        "_keyword_token": {
-          "before": "cf05c4038c5977ce960db10a4f56ce29d2d7f52c55f8bd7ef2554f5270a04f1e",
-          "after": null
-        },
-        "_longest_source_keyword_prefix": {
-          "before": "d3f4ae4790a4b7c3b1bb183b8f15615518b9b9fb646a285e7b5561ec6b708c60",
-          "after": null
-        },
-        "_split_source_keyword_sequence": {
-          "before": "8fdd89198f8828fd9a046dee2ce5cabd5267dd742efbe7a942b10300e8f14ef8",
-          "after": null
-        },
-        "selected_target_spec_from_text": {
-          "before": "ffef293da2b0e238cddc57a40b51ff287a89d9d23fe8515214f8948d10518878",
-          "after": "01485946354de99dd8fc2b0a53893411918e11e6e35718140a1fcd7baf680b6c"
-        }
-      }
-    },
-    "tests/code_quality/test_order133_source_authority.py": {
+    "tests/code_quality/test_order134_source_authority.py": {
       "before_sha256": null,
-      "after_sha256": "9df5d5c2d59e371afa425a6769d278e6108944b83fd38e3bfd9eb53426b93a2f",
+      "after_sha256": "0454746e5f36c08cbe82eceb227ffaa3df925566de1392ed41b0d8430fb906d1",
       "owners": {
         "@module": {
           "before": null,
-          "after": "cb4956c921ceb3175ec0ba16714b147c7d32c8ec4994ed9443ce4c5b1409a7a5"
+          "after": "031cca293982abda41ddb0259b8d4aa1b65b4ed74ef8d9f59d532ff0c237da86"
         },
-        "test_declared_number_vocabulary_provenance_matches_literal_runtime_table": {
+        "test_order134_source_and_historical_pins_remain_exact": {
           "before": null,
-          "after": "7d490fbc9cdfa4c94843f4b5385cb1f74084029a87792578a8fa11fe2b854ee9"
-        },
-        "test_number_identity_is_shared_at_source_and_catalog_owners": {
-          "before": null,
-          "after": "b9abbf99e116197eb50b87282d1716f8480c341f10491925e52025c4648461b8"
-        },
-        "test_selected_number_source_and_original_evidence_remain_exact": {
-          "before": null,
-          "after": "f57d08d676f59aca78d70200138ea97cc227c349ca7da14434f49b339ac8b226"
+          "after": "026767b76cac5aacfd7c25d2f8ad55b1de8c795ebfff69d37c22795f67d6ce86"
         }
       }
     },
-    "tests/order133_helpers.py": {
+    "tests/order134_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "b364629720ab9c91e59619d5b15f382b7c83d5911610b0d88ebcf8afc71b1df0",
+      "after_sha256": "c8782137fad59de44c6887050d712eb6ef38ce690f49b73a7f2898a2d5b3c686",
       "owners": {
         "@module": {
           "before": null,
-          "after": "3177aae424de15cc6101b1c1be001688a20baca5230d8221d7795df2c661430a"
+          "after": "4f01f771f65ff6b3aabc231e690b0896768a1307ebb237edd5180d548609b373"
         },
-        "advance_to_number_keyword_selection": {
+        "conditional_deployment_session": {
           "before": null,
-          "after": "42392daaf9b5ba8a850188d3450d1ee4f8a22566c9e84b625b2e0cb8a59aa064"
-        },
-        "number_keyword_session": {
-          "before": null,
-          "after": "33e7cfce3de38a048e7f6223bc8da52024f1e30b80cf9ecd2e62d9d6d1f903d7"
-        },
-        "number_keyword_text": {
-          "before": null,
-          "after": "4efd51b729aa7509682a11f4222aae8bef8471cdbd128de8106c6ec1d357c22a"
+          "after": "f0e76883a9b1fc88676a9234a11dabc1cf40b31aa5e575ea1cc70147e55f5086"
         }
       }
     },
-    "tests/unit/test_order133_keyword_materialization.py": {
+    "tests/unit/test_order134_deployment_restrictions.py": {
       "before_sha256": null,
-      "after_sha256": "3f0df00ab38357f4728b4a3e89248bb0990a1d4280dc3f22d57e92a1d0726695",
+      "after_sha256": "1f6a2b513f353d91b6fc1cad24646420ce17eb247d4719fd74723a5937e1e847",
       "owners": {
         "@module": {
           "before": null,
-          "after": "17aa2d47c771d1a4a74fd9de1a2f0ab7260769eb7c01d392587ab4932de6e599"
+          "after": "8fb2bcba12a51af9393c82a716bf40a74095725c8b7bff87bc17d94504562ca4"
         },
-        "catalog_with_specialist_keyword": {
+        "test_conditional_checkpoint_facade_restore_fork_views_events_replay_continuation": {
           "before": null,
-          "after": "e51a7d8b2b8766a71fbc1ea87e2d0fa8085979b8d1ac00ca7e3e6d65fdd67c91"
+          "after": "05a7dfa42a913059958010815620e83e8b0c33b7d41f0601aa80a7f9878fa0d6"
         },
-        "selection_for_catalog": {
+        "test_conditional_effect_envelope_rejects_malformed_restore": {
           "before": null,
-          "after": "0601aac6e444e2d18ebbc0423689b8a6d8b73b7bef5691f3e01d65ac316d5ba2"
+          "after": "1a08486dff77b49632f8b912753bdbab4009259fb41347b930d5eb75bc2336b6"
         },
-        "test_distinct_owner_labels_do_not_acquire_inferred_number_aliases": {
+        "test_conditional_seam_invalid_context_is_atomic": {
           "before": null,
-          "after": "c9e68ace38f86f295c3abfea72b58f36da968dd1ad0d7f68759f7c823687d118"
+          "after": "4c728e370491e83316769f9506b6610089dfc03918fd2bc6a3fb5a2b5432efe7"
         },
-        "test_plural_beast_uses_native_geometry_on_muster_and_materialization": {
+        "test_constructed_condition_shared_consumers_and_actual_turn_expiry": {
           "before": null,
-          "after": "b289db69a34715068a93aa807c1c3832308027d3aff59e31d707a7afddbaccf9"
+          "after": "e66610ac97cfac64049be481bedddd4dd20d558987034c8ff76a08196c13229e"
         },
-        "test_plural_raw_catalog_keeps_model_ownership_and_rederives_on_load": {
+        "test_pregame_seam_creates_no_first_turn_effect": {
           "before": null,
-          "after": "f6ec5eccd857aa0ec79c7f2d35955ce80aecbb5807d033169e1fe1c96449a246"
-        },
-        "test_runtime_grants_and_mustering_preserve_raw_provenance": {
-          "before": null,
-          "after": "207ed503e609416f4faa61eacab8df90066fcd1fd02b37813454b376192e6e72"
-        }
-      }
-    },
-    "tests/unit/test_order133_keyword_numbers.py": {
-      "before_sha256": null,
-      "after_sha256": "8f4bf08d8af9bf9d13dbb86e5475f1e6f8b7abc45066fbf4b6d6b40e85a0b638",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "3f38da8348e4bbf2e2c01db0e2d6906080652bd95998576edd6b17c0c5468144"
-        },
-        "assert_role_views": {
-          "before": null,
-          "after": "e4670ab8889a09d9209993aeea87395973ab788c8b009dbe901b80c2ab03e14a"
-        },
-        "test_catalog_loaded_selection_survives_full_lifecycle_continuations": {
-          "before": null,
-          "after": "de4c4d5d1e442d258909db07289c7d1ab9e1547ff1199e5f4c688bcb86f9f588"
-        },
-        "test_plural_adjacent_sequence_consumes_literal_alias_before_next_keyword": {
-          "before": null,
-          "after": "00e7c324301e95290508226ad54a63c83140d1c7e5223df2e0fa33415a784def"
-        },
-        "test_source_number_spellings_preserve_declared_runtime_token": {
-          "before": null,
-          "after": "01526211642904bb82bc218a3f5f29d0fb95dcb1793a7510f51cbfe21db70f88"
-        },
-        "test_unknown_and_invariant_tokens_are_not_stemmed": {
-          "before": null,
-          "after": "b8497b6dcdf80323f076763a38d927dafd71cd7ffec28be2d49f3bce786ff138"
+          "after": "e8303180e7223f3d2e77a8df17959b43eb27b5120c12103aec23a812a8e6befd"
         }
       }
     }
@@ -646,9 +446,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -656,9 +456,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -666,9 +466,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -676,9 +476,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -686,9 +486,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -696,9 +496,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -706,9 +506,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -716,9 +516,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -726,9 +526,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -736,9 +536,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -746,9 +546,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -756,9 +556,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -766,153 +566,181 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "conformance/typescript/src/contract.ts": {
       "category": "rule_semantics",
       "operations": [
-        "order133-contract-publication"
+        "order134-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
-        "order133-contract-publication"
+        "order134-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
-        "order133-contract-publication"
+        "order134-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
-        "order133-contract-publication"
+        "order134-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
-        "order133-contract-publication"
+        "order134-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "order133-contract-publication"
+        "order134-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "order133-contract-publication"
+        "order134-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
-        "order133-contract-publication"
+        "order134-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "order133-contract-publication"
+        "order134-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
-    "contracts/migrations/44.3.18-to-44.3.19.md": {
+    "contracts/migrations/44.3.19-to-44.3.20.md": {
       "category": "rule_semantics",
       "operations": [
-        "order133-contract-publication"
+        "order134-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "contracts/openapi.yaml": {
       "category": "rule_semantics",
       "operations": [
-        "order133-contract-publication"
+        "order134-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
-    "data/source_audits/order133/source.audit.json": {
+    "data/source_audits/order134/historical-inputs.json": {
       "category": "rule_semantics",
       "operations": [
-        "order133-source-evidence"
+        "order134-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+    },
+    "data/source_audits/order134/historical/large_model_restrictions.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order134-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+    },
+    "data/source_audits/order134/source.audit.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order134-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
-    "docs/ORDER_133_SCOPE_PLAN.md": {
+    "docs/ORDER_134_SCOPE_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -920,187 +748,77 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
       "operations": [
-        "order133-keyword-number-identity"
+        "order134-conditional-deployment-restriction"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
-    "src/warhammer40k_core/core/datasheet.py": {
+    "src/warhammer40k_core/engine/large_model_deployment_restrictions.py": {
       "category": "rule_semantics",
       "operations": [
-        "order133-keyword-number-identity"
+        "order134-conditional-deployment-restriction"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
-    "src/warhammer40k_core/core/datasheet_identity.py": {
+    "src/warhammer40k_core/engine/large_model_restrictions.py": {
       "category": "rule_semantics",
       "operations": [
-        "order133-keyword-number-identity"
+        "order134-conditional-deployment-restriction"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
-    "src/warhammer40k_core/core/keyword_membership.py": {
+    "src/warhammer40k_core/engine/rules_unit_effects.py": {
       "category": "rule_semantics",
       "operations": [
-        "order133-keyword-number-identity"
+        "order134-conditional-deployment-restriction"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
-    "src/warhammer40k_core/core/keyword_numbers.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order133-keyword-number-identity"
-      ],
-      "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
-    },
-    "src/warhammer40k_core/core/model_keywords.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order133-keyword-number-identity"
-      ],
-      "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
-    },
-    "src/warhammer40k_core/engine/army_mustering.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order133-keyword-number-identity"
-      ],
-      "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
-    },
-    "src/warhammer40k_core/engine/catalog_model_scope.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order133-keyword-number-identity"
-      ],
-      "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
-    },
-    "src/warhammer40k_core/engine/model_keyword_grants.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order133-keyword-number-identity"
-      ],
-      "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
-    },
-    "src/warhammer40k_core/engine/roster_bearer_validation.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order133-keyword-number-identity"
-      ],
-      "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
-    },
-    "src/warhammer40k_core/engine/unit_factory.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order133-keyword-number-identity"
-      ],
-      "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
-    },
-    "src/warhammer40k_core/rules/rule_keyword_sequences.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order133-keyword-number-identity"
-      ],
-      "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
-    },
-    "src/warhammer40k_core/rules/rule_token_normalization.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order133-keyword-number-identity"
-      ],
-      "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
-    },
-    "src/warhammer40k_core/rules/selected_target_parser.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order133-keyword-number-identity"
-      ],
-      "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
-    },
-    "tests/code_quality/test_order133_source_authority.py": {
+    "tests/code_quality/test_order134_source_authority.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
-    "tests/order133_helpers.py": {
+    "tests/order134_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "order133-regressions"
+        "order134-regressions"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
-    "tests/unit/test_order133_keyword_materialization.py": {
+    "tests/unit/test_order134_deployment_restrictions.py": {
       "category": "rule_semantics",
       "operations": [
-        "order133-regressions"
+        "order134-regressions"
       ],
       "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
-    },
-    "tests/unit/test_order133_keyword_numbers.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order133-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
-      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
-      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+      "rationale": "Selected conditional deployment restriction infrastructure and explicitly constructed conditional native checkpoint controls; in-turn gameplay certification remains open.",
+      "source_obligation": "P03L/C03-12, Core rule:03:03.02.02:1 blocks2-4, obligations02/03: conditional oversized deployment-turn movement/charge/ranged restrictions. User approved infrastructure with in-turn gameplay certification OPEN pending a grant and admitted consumer. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded conditional infrastructure adds a typed existing persistent effect and one shared activity lookup, with an empty-effect fast path. It retains finite native actions, identity lineage, expiration, geometry admission and persistence/replay schemas. No new deployment permission or consumer is admitted. Quiet serial current-runtime smoke plus existing live semantic/work/cache checks remain required; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     }
   },
   "milestone": "ordinary",

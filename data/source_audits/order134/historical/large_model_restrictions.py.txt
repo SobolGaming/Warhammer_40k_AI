@@ -24,12 +24,6 @@ def large_model_activity_reason(
         or activity not in large_model_source.SETUP_POLICY.restricted_activities
     ):
         return None
-    from warhammer40k_core.engine.large_model_deployment_restrictions import (
-        conditional_deployment_prevents_activity,
-    )
-
-    if conditional_deployment_prevents_activity(state=state, unit_instance_id=unit_instance_id):
-        return "large_model_setup_turn_restriction"
     for reserve in state.reserve_states:
         if (
             reserve.large_model_exception_used

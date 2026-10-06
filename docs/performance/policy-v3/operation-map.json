@@ -5337,6 +5337,78 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order134-conditional-deployment-restriction": {
+      "paths": [
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/engine/large_model_deployment_restrictions.py",
+        "src/warhammer40k_core/engine/large_model_restrictions.py",
+        "src/warhammer40k_core/engine/rules_unit_effects.py"
+      ],
+      "owners": [
+        "@module",
+        "DeploymentRestrictionPayload",
+        "conditional_deployment_prevents_activity",
+        "deployment_restriction_payload",
+        "large_model_activity_reason",
+        "record_conditional_deployment_restriction",
+        "validate_persisting_effects"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order134-regressions": {
+      "paths": [
+        "tests/order134_helpers.py",
+        "tests/unit/test_order134_deployment_restrictions.py"
+      ],
+      "owners": [
+        "@module",
+        "conditional_deployment_session",
+        "test_conditional_checkpoint_facade_restore_fork_views_events_replay_continuation",
+        "test_conditional_effect_envelope_rejects_malformed_restore",
+        "test_conditional_seam_invalid_context_is_atomic",
+        "test_constructed_condition_shared_consumers_and_actual_turn_expiry",
+        "test_pregame_seam_creates_no_first_turn_effect"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order134-source-evidence": {
+      "paths": [
+        "data/source_audits/order134/historical-inputs.json",
+        "data/source_audits/order134/historical/large_model_restrictions.py.txt",
+        "data/source_audits/order134/source.audit.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order134-contract-publication": {
+      "paths": [
+        "conformance/typescript/src/contract.ts",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/migrations/44.3.19-to-44.3.20.md",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

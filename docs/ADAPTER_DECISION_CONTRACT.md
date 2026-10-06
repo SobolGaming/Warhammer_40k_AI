@@ -1,5 +1,14 @@
 # Adapter Decision Contract
 
+## Order134: conditional oversized deployment restrictions
+
+Contract44.3.20 publishes the conditional restriction infrastructure through
+existing persistent effects and native finite activity choices. No decision,
+proposal, visibility or envelope shape is added. Constructed qualifying checkpoints
+exercise valid restore, forks, role views and exact replay; they do not admit an
+in-turn deployment provider. Gameplay certification remains open pending a granting
+rule and consumer. See [Order134](ORDER_134_SCOPE_PLAN.md).
+
 ## Order124: nested attack reroll conditions
 
 Contract44.3.10 carries the selected Core nested reroll through the existing
