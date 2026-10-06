@@ -1,8 +1,8 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d4c3630ee203e6ed640e4580905ecbf842fbde240709e9a75e58f7120c5be6ac",
-  "operation_map_sha256": "110ecad6abd7999cf7dadda09a6ac0a46492b8f4f818c188339d4212d54d2bd8",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:95029c48e2f9b95fe3ba4d7092af9c8605b454f7625af2bb002ec8b037f7738f",
+  "operation_map_sha256": "c0f8de48ce2a7b4c5f75565f829e15748bcc99ea510eed6d062f6ad89c895ce9",
   "changes": {
     ".gitattributes": {
       "before_sha256": "88d544855d697dc5ad1f0a5f899a0ee30038d253f57593c4a38fd813edcd85ac",
@@ -16,131 +16,131 @@
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "112a2b7ef1920c3f05553b2ef86bfb4379e018caf2412c545e6de383b361bfe3",
-      "after_sha256": "96ec99dceb7777e785a55c7ae38599d0eaf1398e70d24f0487f5f1c5dd8988c0",
+      "after_sha256": "3e8a53c31864d6b1802d82f9641cc211698237455772a6095eff6b13a387b049",
       "owners": {
         "@document": {
           "before": "112a2b7ef1920c3f05553b2ef86bfb4379e018caf2412c545e6de383b361bfe3",
-          "after": "96ec99dceb7777e785a55c7ae38599d0eaf1398e70d24f0487f5f1c5dd8988c0"
+          "after": "3e8a53c31864d6b1802d82f9641cc211698237455772a6095eff6b13a387b049"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "a7e1545ead1c601721757973e3ee912ef666fc45dc30da0f576ef62a899fee25",
-      "after_sha256": "f7439f8fc57368cd3ba87e6f3fea16a626f7aebe289dee6adc307cffd3d92462",
+      "after_sha256": "8039c86da3e74c5fb412550c6353c3967ae7e8d0c1dd8aa29ef91cdd656fce75",
       "owners": {
         "@document": {
           "before": "a7e1545ead1c601721757973e3ee912ef666fc45dc30da0f576ef62a899fee25",
-          "after": "f7439f8fc57368cd3ba87e6f3fea16a626f7aebe289dee6adc307cffd3d92462"
+          "after": "8039c86da3e74c5fb412550c6353c3967ae7e8d0c1dd8aa29ef91cdd656fce75"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "ab91e382e69b1b341a88e1660a7021c6e9303835d25c32ddee52f5861993989a",
-      "after_sha256": "02b68739e8b7f5addda7473287f31f7ec6031572b24952885e2c45f5689085f7",
+      "after_sha256": "888f837e6452ebb210faeb930954b3bab18e637da6c781509f05d2d46f581a3a",
       "owners": {
         "@document": {
           "before": "ab91e382e69b1b341a88e1660a7021c6e9303835d25c32ddee52f5861993989a",
-          "after": "02b68739e8b7f5addda7473287f31f7ec6031572b24952885e2c45f5689085f7"
+          "after": "888f837e6452ebb210faeb930954b3bab18e637da6c781509f05d2d46f581a3a"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "22e6156bcae7f6d8e0ba4d2697b934dc15cb820e08e81e4e727f867758ebb099",
-      "after_sha256": "890d5fe0e9048fa429ccc93e6178ffb718c387ce3f8a1dbbfc7b5ad09ae26001",
+      "after_sha256": "f13cc0e17502bfd0937bfcb5f25af9971294ec61a9733fa0c2c1b9502dcee110",
       "owners": {
         "@document": {
           "before": "22e6156bcae7f6d8e0ba4d2697b934dc15cb820e08e81e4e727f867758ebb099",
-          "after": "890d5fe0e9048fa429ccc93e6178ffb718c387ce3f8a1dbbfc7b5ad09ae26001"
+          "after": "f13cc0e17502bfd0937bfcb5f25af9971294ec61a9733fa0c2c1b9502dcee110"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "b9bdb65df37a80618b63d07e573f3f3d70ce59eef943be02cef2fc87ac048d31",
-      "after_sha256": "c885c907dac8052398d2074ff2dfa6930381a498e191c326bf4b8c412f21cb22",
+      "after_sha256": "bb6e9e22d9448c28503ca35d254889018654f8a012840474960ac03f2c323114",
       "owners": {
         "@document": {
           "before": "b9bdb65df37a80618b63d07e573f3f3d70ce59eef943be02cef2fc87ac048d31",
-          "after": "c885c907dac8052398d2074ff2dfa6930381a498e191c326bf4b8c412f21cb22"
+          "after": "bb6e9e22d9448c28503ca35d254889018654f8a012840474960ac03f2c323114"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "093cacebb539f19ea8d80484f7c4ece8f57f9132a47d1241970feace842d3e80",
-      "after_sha256": "f0547f5d9dbfce4c2cba86c60fa07258201d824500a6130ba627452504985b00",
+      "after_sha256": "6740781088b8ee1b3c6d326639ba133ecef87b77117c303631ad9542e38cd902",
       "owners": {
         "@document": {
           "before": "093cacebb539f19ea8d80484f7c4ece8f57f9132a47d1241970feace842d3e80",
-          "after": "f0547f5d9dbfce4c2cba86c60fa07258201d824500a6130ba627452504985b00"
+          "after": "6740781088b8ee1b3c6d326639ba133ecef87b77117c303631ad9542e38cd902"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "22784180e94178a5c3bde75b944a9a0856857a5963458c19a5fc26261e3f22ef",
-      "after_sha256": "bcc1ca92feffd5c85516d19f00bd38a3fe7d324300d96eed02dffaff7eb7dbdc",
+      "after_sha256": "1ac203386e35d9302853e8c3f88a0bae4f88cf12b97a76fcaeb5a226c188e0d2",
       "owners": {
         "@document": {
           "before": "22784180e94178a5c3bde75b944a9a0856857a5963458c19a5fc26261e3f22ef",
-          "after": "bcc1ca92feffd5c85516d19f00bd38a3fe7d324300d96eed02dffaff7eb7dbdc"
+          "after": "1ac203386e35d9302853e8c3f88a0bae4f88cf12b97a76fcaeb5a226c188e0d2"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "f7525bf892f33e9b6d36da02ad9b6f9dfcdbb1c56e91563efb1bfa469a2f0a10",
-      "after_sha256": "4ffc65c1d4d40cdef4658ffba47acaa69d670db61b09ea6cc9b6909926e30546",
+      "after_sha256": "c881b82c324f339c7f1e98c7d6838b4282804fd08d63f4bd72706c4df4167fc7",
       "owners": {
         "@document": {
           "before": "f7525bf892f33e9b6d36da02ad9b6f9dfcdbb1c56e91563efb1bfa469a2f0a10",
-          "after": "4ffc65c1d4d40cdef4658ffba47acaa69d670db61b09ea6cc9b6909926e30546"
+          "after": "c881b82c324f339c7f1e98c7d6838b4282804fd08d63f4bd72706c4df4167fc7"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "a2d215523148199f378d69051d118575e558e9b8dbfc7d96a7cbc73f82a2d9ab",
-      "after_sha256": "92c821ec76171d40e2b86e5eb36f98d887ad6793e274f0bfd2bcb9942b7ae6d8",
+      "after_sha256": "5d05487979de7d3a170118510eeb1b1d7fa088f5bacd3f5671534cc5bcacf260",
       "owners": {
         "@document": {
           "before": "a2d215523148199f378d69051d118575e558e9b8dbfc7d96a7cbc73f82a2d9ab",
-          "after": "92c821ec76171d40e2b86e5eb36f98d887ad6793e274f0bfd2bcb9942b7ae6d8"
+          "after": "5d05487979de7d3a170118510eeb1b1d7fa088f5bacd3f5671534cc5bcacf260"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "b1d4baf03c35381668e72286f36c4bb176df77c3b06a258e44a425acc85e6c84",
-      "after_sha256": "cc37008627eb2b422925917e2b4fa0b8b23e15f237e0de068342c14cbf24a2f6",
+      "after_sha256": "a7854f5a4a20c1cb24d1352426284058c454e4e9f34951c2ac13670c9ac8f9c6",
       "owners": {
         "@document": {
           "before": "b1d4baf03c35381668e72286f36c4bb176df77c3b06a258e44a425acc85e6c84",
-          "after": "cc37008627eb2b422925917e2b4fa0b8b23e15f237e0de068342c14cbf24a2f6"
+          "after": "a7854f5a4a20c1cb24d1352426284058c454e4e9f34951c2ac13670c9ac8f9c6"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "ced6491a90d076fb388f4e73eee6b23c402837dfe1020df356fe884e16a9a91d",
-      "after_sha256": "78d76b3742fe23180c7203abe47f852dfa33e83a357539e26cad2af86be6a453",
+      "after_sha256": "2ab52e98b34a7a8a7af489b575e4bc9148550ace3c60748c2f083885ac8acb7f",
       "owners": {
         "@document": {
           "before": "ced6491a90d076fb388f4e73eee6b23c402837dfe1020df356fe884e16a9a91d",
-          "after": "78d76b3742fe23180c7203abe47f852dfa33e83a357539e26cad2af86be6a453"
+          "after": "2ab52e98b34a7a8a7af489b575e4bc9148550ace3c60748c2f083885ac8acb7f"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "7911f00da647f91cb73ca78005ec6beb0cb75c550ca2097dc98e8d73aa996040",
-      "after_sha256": "7a15813c442211baa654c1025c5437aecaf562261d415cce2e6623dce3f21c57",
+      "after_sha256": "35c34ce70adcb1bc28e60314e3943dc2c46d387086e9acc444e73d530f6134a5",
       "owners": {
         "@document": {
           "before": "7911f00da647f91cb73ca78005ec6beb0cb75c550ca2097dc98e8d73aa996040",
-          "after": "7a15813c442211baa654c1025c5437aecaf562261d415cce2e6623dce3f21c57"
+          "after": "35c34ce70adcb1bc28e60314e3943dc2c46d387086e9acc444e73d530f6134a5"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "e982ab71b85ff44fd1ebd3021b91945d7c1f83eab20b48ed6c704eaf95f4ebb9",
-      "after_sha256": "02bd70905c9a332145824932af5098f47649673e7bf9a42c577ec727f772b3b1",
+      "after_sha256": "ac7e0853e87cafc9542496cbafb8ff743d060965b4a9fd0b9375c61ec6779847",
       "owners": {
         "@document": {
           "before": "e982ab71b85ff44fd1ebd3021b91945d7c1f83eab20b48ed6c704eaf95f4ebb9",
-          "after": "02bd70905c9a332145824932af5098f47649673e7bf9a42c577ec727f772b3b1"
+          "after": "ac7e0853e87cafc9542496cbafb8ff743d060965b4a9fd0b9375c61ec6779847"
         }
       }
     },
@@ -156,81 +156,81 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "0ba8c1fbcb6546dd50841f92be83717427da7da26af5d467071fd69e5a7d43d7",
-      "after_sha256": "8ee11ed75f6d24b5e9095975b8709da981606ff0a169271b50da2d9a5b82d572",
+      "after_sha256": "31198890e14d2e39f24635bd9a26fda5731012e1be4abc635611db32f9d9a257",
       "owners": {
         "@document": {
           "before": "0ba8c1fbcb6546dd50841f92be83717427da7da26af5d467071fd69e5a7d43d7",
-          "after": "8ee11ed75f6d24b5e9095975b8709da981606ff0a169271b50da2d9a5b82d572"
+          "after": "31198890e14d2e39f24635bd9a26fda5731012e1be4abc635611db32f9d9a257"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "8d69551f8031e9390099e688046a6fbca500665cb497cb5bb72dcc0cbaa5d459",
-      "after_sha256": "75469af42ee20de4a973e15e14df1c4fd20358155e847b29d57079dc1f23a70c",
+      "after_sha256": "a8b8e0136f52a4865c2d4066d17363ec2ce2854678a4d04eee3a7b763fd8fa91",
       "owners": {
         "@document": {
           "before": "8d69551f8031e9390099e688046a6fbca500665cb497cb5bb72dcc0cbaa5d459",
-          "after": "75469af42ee20de4a973e15e14df1c4fd20358155e847b29d57079dc1f23a70c"
+          "after": "a8b8e0136f52a4865c2d4066d17363ec2ce2854678a4d04eee3a7b763fd8fa91"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "103361ecd65629772bcb945e5f28abcf69aa9b312f5c41c0f4ee5273586e7a2a",
-      "after_sha256": "e8c4f2728c24a784a74cccf8337d15b64f321f70e6b7d8c2bc35729cee3bebc7",
+      "after_sha256": "71d5debc0f7877311617120f01fc0b481d50401e0d9422a3b4fbfe9964885c2e",
       "owners": {
         "@document": {
           "before": "103361ecd65629772bcb945e5f28abcf69aa9b312f5c41c0f4ee5273586e7a2a",
-          "after": "e8c4f2728c24a784a74cccf8337d15b64f321f70e6b7d8c2bc35729cee3bebc7"
+          "after": "71d5debc0f7877311617120f01fc0b481d50401e0d9422a3b4fbfe9964885c2e"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "011870e5ddb9bc06d7ac28241eb56e8ea2755d9603b7a6c8b8bb5438e8cd8127",
-      "after_sha256": "ad9a280498e9dff558d3cef38d940f1a6e3c56610889186f2161fe01aff20d20",
+      "after_sha256": "ef5d94ab4f6971c954324d128513c0f1651081626f9f211ed9284e5e0938be58",
       "owners": {
         "@document": {
           "before": "011870e5ddb9bc06d7ac28241eb56e8ea2755d9603b7a6c8b8bb5438e8cd8127",
-          "after": "ad9a280498e9dff558d3cef38d940f1a6e3c56610889186f2161fe01aff20d20"
+          "after": "ef5d94ab4f6971c954324d128513c0f1651081626f9f211ed9284e5e0938be58"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "ae25dbc587842a49caa4b0830aab7dcd2900317820e5cc38d8542f24bc99d3cf",
-      "after_sha256": "80301d3e88fecb3522341b7d319a6251853b82e95753e12b28b9fe8da5dc77eb",
+      "after_sha256": "60b4449ce6c3d0688cf2900f97863d82cbf5db8560bae4a8863b79a6ddb5d3cd",
       "owners": {
         "@document": {
           "before": "ae25dbc587842a49caa4b0830aab7dcd2900317820e5cc38d8542f24bc99d3cf",
-          "after": "80301d3e88fecb3522341b7d319a6251853b82e95753e12b28b9fe8da5dc77eb"
+          "after": "60b4449ce6c3d0688cf2900f97863d82cbf5db8560bae4a8863b79a6ddb5d3cd"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "07f246f84a6631877f01c5bd3cf21bdbc3023ff44ee1963278c306366062f297",
-      "after_sha256": "4933d461da24514e1115ea9d576d2eef2608ab8f95ea273cd55066841b363e2d",
+      "after_sha256": "6872807c80f162f40048e80f6c0341fc580834baf4b51d2e8a1456fd732ffb73",
       "owners": {
         "@document": {
           "before": "07f246f84a6631877f01c5bd3cf21bdbc3023ff44ee1963278c306366062f297",
-          "after": "4933d461da24514e1115ea9d576d2eef2608ab8f95ea273cd55066841b363e2d"
+          "after": "6872807c80f162f40048e80f6c0341fc580834baf4b51d2e8a1456fd732ffb73"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "45654255cedebce057494e8b78adeec09bd5b7bdebbd3204ff60c0b2e638a473",
-      "after_sha256": "fa7de7063c6503c66bfcfbbfbc04e09292324a01847c974011c409c4fd39a803",
+      "after_sha256": "712d81ea4c3cfc6577dd87cca2782f81516d993d8104d85c75872762ccc78869",
       "owners": {
         "@document": {
           "before": "45654255cedebce057494e8b78adeec09bd5b7bdebbd3204ff60c0b2e638a473",
-          "after": "fa7de7063c6503c66bfcfbbfbc04e09292324a01847c974011c409c4fd39a803"
+          "after": "712d81ea4c3cfc6577dd87cca2782f81516d993d8104d85c75872762ccc78869"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "599ceda68bac79b1c5757e33950650042a25833afb7280adeb32339e82298f68",
-      "after_sha256": "946f45b3e17431b857e8243a8a57628dbb3c17762f30b5b27b9903226ac26cec",
+      "after_sha256": "f11e6d2a625dd1cf411ccde1c787d2b89eb14a1e89f001bbfb8e995acea14ee6",
       "owners": {
         "@document": {
           "before": "599ceda68bac79b1c5757e33950650042a25833afb7280adeb32339e82298f68",
-          "after": "946f45b3e17431b857e8243a8a57628dbb3c17762f30b5b27b9903226ac26cec"
+          "after": "f11e6d2a625dd1cf411ccde1c787d2b89eb14a1e89f001bbfb8e995acea14ee6"
         }
       }
     },
@@ -284,6 +284,16 @@
         }
       }
     },
+    "data/source_audits/order135/baseline/src/warhammer40k_core/core/visibility_records.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "e363b4ffb72b32d0379531f59a823e43164e0238aae2c1fcde769196063c25e0",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e363b4ffb72b32d0379531f59a823e43164e0238aae2c1fcde769196063c25e0"
+        }
+      }
+    },
     "data/source_audits/order135/baseline/src/warhammer40k_core/engine/attack_sequence_hazardous.py.txt": {
       "before_sha256": null,
       "after_sha256": "183dce3a3a0bf31af18f28fd7472829b7e71e207d46692bc65b60f623419c7ab",
@@ -291,6 +301,16 @@
         "@document": {
           "before": null,
           "after": "183dce3a3a0bf31af18f28fd7472829b7e71e207d46692bc65b60f623419c7ab"
+        }
+      }
+    },
+    "data/source_audits/order135/baseline/src/warhammer40k_core/engine/decision.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "e35d0695c3ce4a7a0b0aae8790f2107c6092c48f1741b983025f50545181f68e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e35d0695c3ce4a7a0b0aae8790f2107c6092c48f1741b983025f50545181f68e"
         }
       }
     },
@@ -426,11 +446,11 @@
     },
     "data/source_audits/order135/current-bindings.json": {
       "before_sha256": null,
-      "after_sha256": "41f0ba60f128485fe694db8988f8f79fbc38a7144c4580007f89bfc0cb384472",
+      "after_sha256": "81e3d6be6a49edd9b073f737ff9b947a8bb6bd2319852d4340edc5be0420eba0",
       "owners": {
         "@document": {
           "before": null,
-          "after": "41f0ba60f128485fe694db8988f8f79fbc38a7144c4580007f89bfc0cb384472"
+          "after": "81e3d6be6a49edd9b073f737ff9b947a8bb6bd2319852d4340edc5be0420eba0"
         }
       }
     },
@@ -446,11 +466,11 @@
     },
     "data/source_audits/order135/current-inventory.json": {
       "before_sha256": null,
-      "after_sha256": "a615ee6244de7c04496ebfdec021884c8ec178bcca0c2f2458a20c71617cb547",
+      "after_sha256": "e43b037eb10d1c9c445b90de09d923ff52e4439e601201384881ffcd8965a091",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a615ee6244de7c04496ebfdec021884c8ec178bcca0c2f2458a20c71617cb547"
+          "after": "e43b037eb10d1c9c445b90de09d923ff52e4439e601201384881ffcd8965a091"
         }
       }
     },
@@ -466,11 +486,31 @@
     },
     "data/source_audits/order135/historical-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "9d8d6afeb8d1865de55c2770394d6ae936cbb9658b71992220f1edc9c23e9704",
+      "after_sha256": "d0ab55bde2151b3ec0a6909851c259572f920f414032e9c4bbe0cc21e23a5c43",
       "owners": {
         "@document": {
           "before": null,
-          "after": "9d8d6afeb8d1865de55c2770394d6ae936cbb9658b71992220f1edc9c23e9704"
+          "after": "d0ab55bde2151b3ec0a6909851c259572f920f414032e9c4bbe0cc21e23a5c43"
+        }
+      }
+    },
+    "data/source_audits/order135/los-rng-base-control.json": {
+      "before_sha256": null,
+      "after_sha256": "fdcc1dfb394b71385bbdc9d818c05df941dced475e92210fbf1e414688a8865e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "fdcc1dfb394b71385bbdc9d818c05df941dced475e92210fbf1e414688a8865e"
+        }
+      }
+    },
+    "data/source_audits/order135/los-rng-compatibility-approval.json": {
+      "before_sha256": null,
+      "after_sha256": "bd9546d4629e76cb8bb10e2645cbd5a2ed367b2f60db687dc06f4ac7b52bbbb4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "bd9546d4629e76cb8bb10e2645cbd5a2ed367b2f60db687dc06f4ac7b52bbbb4"
         }
       }
     },
@@ -536,81 +576,81 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "28a35a878558e56cba4058516987ecadb018856b73dc390d384e1ed0d56118af",
-      "after_sha256": "c45666706c9c408945a38a42cf383dd673fcc91286412962bd8027e67919d21a",
+      "after_sha256": "3af1254dfdbcce5183ef7b7ec973eda464266c112ab520801978dfe4227fd775",
       "owners": {
         "@document": {
           "before": "28a35a878558e56cba4058516987ecadb018856b73dc390d384e1ed0d56118af",
-          "after": "c45666706c9c408945a38a42cf383dd673fcc91286412962bd8027e67919d21a"
+          "after": "3af1254dfdbcce5183ef7b7ec973eda464266c112ab520801978dfe4227fd775"
         }
       }
     },
     "docs/ORDER_135_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "8d3496159dcb91ca7776c8437a396923fbdc7ec0a2be187776ceee46aacea24d",
+      "after_sha256": "56cbf2a4c8e2dcb75dfb6a7f04eca2752d76b162e3c8fb400391e890e3579ed1",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8d3496159dcb91ca7776c8437a396923fbdc7ec0a2be187776ceee46aacea24d"
+          "after": "56cbf2a4c8e2dcb75dfb6a7f04eca2752d76b162e3c8fb400391e890e3579ed1"
         }
       }
     },
     "docs/performance/current/order135-movement-01.json": {
       "before_sha256": null,
-      "after_sha256": "57db56334ddb415b083a96ddc283c1f34678a6980475585b7b6b9925b6de80a8",
+      "after_sha256": "0e4a6be98d9cf040580258f1f8cc2e13e726c8947b79e2748c1f367ae30c5855",
       "owners": {
         "@document": {
           "before": null,
-          "after": "57db56334ddb415b083a96ddc283c1f34678a6980475585b7b6b9925b6de80a8"
+          "after": "0e4a6be98d9cf040580258f1f8cc2e13e726c8947b79e2748c1f367ae30c5855"
         }
       }
     },
     "docs/performance/current/order135-reconstruction-01.json": {
       "before_sha256": null,
-      "after_sha256": "0db616d2653f0309a7a409ad41a9252cfab22bde30ff736ba908bc5b7495eba0",
+      "after_sha256": "6e13b92ec5e98298608ec00a873c3ee1dbfa0cf129f1971a60c6a143c43fc004",
       "owners": {
         "@document": {
           "before": null,
-          "after": "0db616d2653f0309a7a409ad41a9252cfab22bde30ff736ba908bc5b7495eba0"
+          "after": "6e13b92ec5e98298608ec00a873c3ee1dbfa0cf129f1971a60c6a143c43fc004"
         }
       }
     },
     "docs/performance/current/order135-setup-01.json": {
       "before_sha256": null,
-      "after_sha256": "5e694a55ae9e3b0e33937489b4ab185b1721bbafd78d60f9ed62fe7b3f7eaf15",
+      "after_sha256": "ff3e740427f4c1d2f8d8842a7492d65b36efa5afd19cdc1f6dada783365666b9",
       "owners": {
         "@document": {
           "before": null,
-          "after": "5e694a55ae9e3b0e33937489b4ab185b1721bbafd78d60f9ed62fe7b3f7eaf15"
+          "after": "ff3e740427f4c1d2f8d8842a7492d65b36efa5afd19cdc1f6dada783365666b9"
         }
       }
     },
     "docs/performance/current/order135-visibility-01.json": {
       "before_sha256": null,
-      "after_sha256": "b6e0928ea2c49d19678b9a128455b1ce557659d0fff00ba8e9f6fed9b442f005",
+      "after_sha256": "3fc6a64549ee2ffd248baf462de34643312598232451d158a284f8d25ae2c488",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b6e0928ea2c49d19678b9a128455b1ce557659d0fff00ba8e9f6fed9b442f005"
+          "after": "3fc6a64549ee2ffd248baf462de34643312598232451d158a284f8d25ae2c488"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "778c735979c21189e31ca9a48db2f4737bdea37e8d6daafcbd0ce2ab21b2c5c7",
-      "after_sha256": "de303509652a75b6d049429d438273b49f0753a83ebf612bf2ea885e87abad95",
+      "after_sha256": "edd63e266d8a901f94ee0859675f991ce0b4febbc7614fd48c35cc0f8942ba0b",
       "owners": {
         "@document": {
           "before": "778c735979c21189e31ca9a48db2f4737bdea37e8d6daafcbd0ce2ab21b2c5c7",
-          "after": "de303509652a75b6d049429d438273b49f0753a83ebf612bf2ea885e87abad95"
+          "after": "edd63e266d8a901f94ee0859675f991ce0b4febbc7614fd48c35cc0f8942ba0b"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "e12e89353a8216c74faba83d6d13afc0333cd06096ea6177bda7a9d565f4cd2c",
-      "after_sha256": "4acbe60abda013fa68c984cc97ab106948d2b5e50b44d6110604b1ff49066a37",
+      "after_sha256": "981d7987bfdd96c433a7cfeca18a2e930557d4abb29c5405ba4e4ef9ebb385a8",
       "owners": {
         "@document": {
           "before": "e12e89353a8216c74faba83d6d13afc0333cd06096ea6177bda7a9d565f4cd2c",
-          "after": "4acbe60abda013fa68c984cc97ab106948d2b5e50b44d6110604b1ff49066a37"
+          "after": "981d7987bfdd96c433a7cfeca18a2e930557d4abb29c5405ba4e4ef9ebb385a8"
         }
       }
     },
@@ -626,11 +666,11 @@
     },
     "src/warhammer40k_core/core/visibility.py": {
       "before_sha256": "912d675f133d3266aa67ddf667042a74bbe17eb9b2e73e757a2260f13d7c4b47",
-      "after_sha256": "98cd88d400ab1085b2411e0e3dd4ae3efdde7d63f8189e4e700f4b92231bb5d7",
+      "after_sha256": "1c22dfbcfcf8a5ba2f8967ad4c218a4d3800e6cab1e6e7718c3f3d0fff3fc876",
       "owners": {
         "@module": {
           "before": "bb611706294c7fb1913853c87448829c64df0627634278ee5e41f2d6b66b047b",
-          "after": "5df29a8ff8717afd637d2f620c0e75d8f9809616702e08cb7f20a7ffef8534a0"
+          "after": "80f92efae38e3836568d3d1e1aa0229e5a2634bf9eeaca51f550700a8d5a624c"
         },
         "TerrainVisibilityContext": {
           "before": "5b0c53d180c43c6387d730e3004c0d64b2d4a9f8669571568e539dbcc51c2a4d",
@@ -644,9 +684,17 @@
           "before": "8269a06e4ca110f0436fa64c5c2554d137c4da879d713d579f5e79ce1f29c841",
           "after": "584dd7866babd7dc362e1da98a61bd612bc8c634d806e29403f798e21a07a4f2"
         },
+        "TerrainVisibilityContext._resolve_line_of_sight": {
+          "before": "bb6458cd899c38e954a5ee0b46e6ffccadb8e872b8e53f179544cdf1e2a36d55",
+          "after": "1f7f59d9698d03771e8ea866671dd53bbb786815b746bb0b666cf60802ba8e8d"
+        },
         "TerrainVisibilityContext._resolve_model_line_of_sight": {
           "before": "8c55c29be36f6c5f96385938b06d83cba842f80e13f5e6fe178f131c1ef81727",
-          "after": "6462cdb4e1943b40d730d04e3080015b8a5c94765bfb1e6e095e00cc10accd86"
+          "after": "31073e5aa5e0f5b07bdb6461eea16def3808026fe7dc00127cca478fb35d557c"
+        },
+        "TerrainVisibilityContext._rng_compatibility_projection": {
+          "before": null,
+          "after": "e39ee0c823ad866ab14a7948dfc0f4bef37cb911e37e48b641d9e361f191c12d"
         },
         "TerrainVisibilityContext.from_payload": {
           "before": "b6991590ffcb38d12c75407bfd9a466c57e1e119a2fa62d81c1dfe8d131c9503",
@@ -671,6 +719,82 @@
         "_physical_obstacle_entries": {
           "before": "6a9dec5365dae31069138032bff4244a6c3325b7b1ff721fc0879eae14d40d8b",
           "after": "478d63928166eda99189c3dd132dde5dcdab78e5efc0348602cbb988acfada8e"
+        }
+      }
+    },
+    "src/warhammer40k_core/core/visibility_records.py": {
+      "before_sha256": "e363b4ffb72b32d0379531f59a823e43164e0238aae2c1fcde769196063c25e0",
+      "after_sha256": "e2a71abb55875689d4604828d9fa8487f459244c9f7673f3f7508383f006eb68",
+      "owners": {
+        "@module": {
+          "before": "659dd1afcf908b4f363fb5add689194e31a95b1b8e91dcec2eb2cb8c19339a60",
+          "after": "0c4fe0b41c12a9f3f23bd2f95718e54bac2c613bfb7e8ea0c5322b1ac9459c21"
+        },
+        "LineOfSightWitness": {
+          "before": "7c911e453e289f56678d67ebfde1be0194b30b698242de69f83e5eb1f5bcff7c",
+          "after": "4ea79d6c6e5b70805c3b7e542093741f31c249aea7747d225d65713b187298f4"
+        },
+        "LineOfSightWitness.__post_init__": {
+          "before": "1cf4355dcc66a0fa2763b9ee6b43ebfdab654da715b151bca23ea12ee6fe4488",
+          "after": "f902e153251046b18fc4cd9edd4e09bbefe8895d20b001edf091c850a0dcabab"
+        },
+        "LineOfSightWitness.from_payload": {
+          "before": "b5760d073e503b2bc669ab70dabe5db51636dd3f9001a8ab31917ad72c2ded31",
+          "after": "a6490b4fec9662d54b6fc2cac4648ae8db799136690825c8db3b9449359ebe8b"
+        },
+        "LineOfSightWitness.from_records": {
+          "before": "89a43f43dd200e093ad3b54a57bd433aef319e15a3d973d535f65951eebd50d4",
+          "after": "8f86657edbe58b3711f88d20f56f56e4198dd03fe0c52e5a5419a1fd3ee08d02"
+        },
+        "LineOfSightWitness.to_payload": {
+          "before": "e77b350ab01743af6ed0f8e9f42b5b55f2bf6d0559a12ae96e970865ad6f6b47",
+          "after": "0efc80815d7afcf84ce41efbe83ce0a733fc44fdfadd1b83df4eeb82c9e8686a"
+        },
+        "LineOfSightWitnessPayload": {
+          "before": "ced1817d71fc49286e385a35db5ad50484f3437098777bcc45da6f4430a13f75",
+          "after": "9c4cbe89248710ce69cca04638eb5919c12b70bbc12fa3edc3454133e111a82f"
+        }
+      }
+    },
+    "src/warhammer40k_core/core/visibility_rng_projection.py": {
+      "before_sha256": null,
+      "after_sha256": "180e85c868972bd07b4835e394939f6a2073c1868ee8166a8aab8456c723d597",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "8248f947598e787b243686092fb1981481025e1f2a72814b75c46af00d32d810"
+        },
+        "VisibilityRngPairPayload": {
+          "before": null,
+          "after": "d83f27fcebda10748571faefbe9e036a9b1d39903dd3d3c897e9f126e1f0e68f"
+        },
+        "VisibilityRngProjection": {
+          "before": null,
+          "after": "0278b6b71821a85f6f9a5234a0a3f86a78a84132e829c16cb630f8dfc96882dd"
+        },
+        "VisibilityRngProjection.__post_init__": {
+          "before": null,
+          "after": "7f1dd1d8e10c4d89852d6db82a83ce8202ffd0ad781eb65b702296cb6d50a741"
+        },
+        "VisibilityRngProjection.from_payload": {
+          "before": null,
+          "after": "7f8065a6342c4f8372ef757cfe55c83ea5fd5d154548c661f388db9b753b3787"
+        },
+        "VisibilityRngProjection.to_payload": {
+          "before": null,
+          "after": "a5bd9e71dd50d66149943e427ad1e30107cfb2890679a4de7a34a487aa319d36"
+        },
+        "VisibilityRngProjectionPayload": {
+          "before": null,
+          "after": "5d5fe5f0b7e15fe0a5b6946b64e335ab47d1e0ee0b6c5b707ec8f3f251e865cd"
+        },
+        "_fingerprint": {
+          "before": null,
+          "after": "a7fc78b889a66c112620351750867c83489909b6ad0043110699c5153399cdf5"
+        },
+        "legacy_scalar_input_fingerprint": {
+          "before": null,
+          "after": "dcc47dfdf57b80a586d793b6b6d4207076c4db617c2c38fa268bd264dbe39e1b"
         }
       }
     },
@@ -703,6 +827,24 @@
         "battlefield_visibility_context": {
           "before": null,
           "after": "5576aa452a4d51c2a83139235f77d4c8d579101cf9a86c1ba7723ecf3f8f590f"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/decision.py": {
+      "before_sha256": "e35d0695c3ce4a7a0b0aae8790f2107c6092c48f1741b983025f50545181f68e",
+      "after_sha256": "cc8c83ac5e76077e31461b481f9e4f606e03348facf992653be5ee95a3591525",
+      "owners": {
+        "@module": {
+          "before": "6503c4f18f4f5b1dd474a461fe1eac4ce3fb158ce30c275fcd1be58c65a97736",
+          "after": "2ec5dcfc44f7ea3614f9e0b52dea6ce23efdd57bd846fc57005e6340ef273196"
+        },
+        "_legacy_los_rng_payload": {
+          "before": null,
+          "after": "f16a705db669fac29b4b28344b6cc0c18d5240b1fffba2b093ca66d1bfaf07e2"
+        },
+        "_without_rng_history_neutral_metadata": {
+          "before": "ad1bbf7447a3fb2a1a21b7b68c884a8af414b5ba547e571733f058ca76a13ed0",
+          "after": "71323262194734408e3494b200174169b946cdfab5539ed097da181323c571c7"
         }
       }
     },
@@ -794,7 +936,7 @@
     },
     "src/warhammer40k_core/geometry/physical_visibility.py": {
       "before_sha256": null,
-      "after_sha256": "ffdcd8632a5bace002b52988d1b6140e63a4f2c2e2d4165f561b9e3c50cef889",
+      "after_sha256": "45fb0aac8f54b6613688e9724510ac4da618232f8a0b3428557fabdddf50ed41",
       "owners": {
         "@module": {
           "before": null,
@@ -840,10 +982,6 @@
           "before": null,
           "after": "25953a0e1ca37edd9e18a91b83b98a28a271571a37bacdb8f05fa47094328f65"
         },
-        "_fingerprint": {
-          "before": null,
-          "after": "c0a61ea3d226e8e8aa3152c9f97816c62bbf37798ef08eb422a1396fb6ee8557"
-        },
         "_reduce": {
           "before": null,
           "after": "b65de76a7fe2503d2a70064a6c16541e52ce6e09be17997c776cf1d7fe9fbe34"
@@ -860,13 +998,17 @@
           "before": null,
           "after": "c8c94048c759850cab2d975304f1611e76a6ed8bba3aa21985af1e67dc8c0c22"
         },
+        "physical_visibility_fingerprint": {
+          "before": null,
+          "after": "4efb1d6a24333cd9c1bbfe27bc8423cf70b0d2fdc2f9efd9eeacba65967daede"
+        },
         "resolve_physical_visibility": {
           "before": null,
           "after": "a024c2cf566a44e8809e5a2c630451d9b66c616b3b034317e12ce9e2e764c115"
         },
         "resolve_physical_visibility_uncached": {
           "before": null,
-          "after": "978d7ff501ed56f698df96ca415301c8d57badb953f1194eb3246c4ffdcf2181"
+          "after": "f971b021a48c53172012ee8c021146e9ce5b0f3969c566daa49b8d143ba7d136"
         }
       }
     },
@@ -1102,6 +1244,20 @@
         }
       }
     },
+    "tests/order135_rng_helpers.py": {
+      "before_sha256": null,
+      "after_sha256": "9f1b7af8d9e8f12e6a1bbad0e0a61a6ab36b4d8ac0ff190f9eab669a2fb11857",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "dda1785c35b8ad9b1e7f9282407cd0e6c1fb963b7cc791688299706b07ca5ed2"
+        },
+        "native_scalar_shooting_request": {
+          "before": null,
+          "after": "d954b9fcc8f0e676eec147e39e5b28ba6d4bfdeb63cf062c7d578ac69153c985"
+        }
+      }
+    },
     "tests/order135_visibility_helpers.py": {
       "before_sha256": null,
       "after_sha256": "a76ed0c2a35ef4cb6da86676a96beddf69ed3b5678d9515cd881bea43f5d21f4",
@@ -1198,6 +1354,36 @@
         }
       }
     },
+    "tests/unit/test_order135_visibility_rng_projection.py": {
+      "before_sha256": null,
+      "after_sha256": "04469a4f36421efcae429c514d1573ff1fccb3d3ab60dec3a4eca9a42c1f5556",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "8fab8b443aa74bab9c1a5503e7e2cab57b6cd0be4db3de82cf0a67b6a89fcc14"
+        },
+        "_context": {
+          "before": null,
+          "after": "d7e36a8b4ff874712ce97d08560a4d945972ed9f217ee387e2623b00c17cdf0c"
+        },
+        "test_changed_physical_domains_have_no_legacy_rng_projection": {
+          "before": null,
+          "after": "027346dd0f3b0bbfe25fd993cdf08e909e3aa59fa479af26bc38985b7f08b101"
+        },
+        "test_native_scalar_projection_preserves_pending_completed_save_fork_and_replay": {
+          "before": null,
+          "after": "5518b56901f66e129e75825998000e1dc70b474b3480ffdb7207c8f341c7a2f3"
+        },
+        "test_projection_is_strict_and_bound_to_fresh_authoritative_witness": {
+          "before": null,
+          "after": "263dc90e2938930223ab4a60290d891d41dcb6331f11d3e3e140da5fd9bfe963"
+        },
+        "test_scalar_projection_matches_actual_base_token_and_keeps_current_authority": {
+          "before": null,
+          "after": "9c43186e33f2dffb0de448731ac45a2b4e87c37cae014033594233e1a8eccaae"
+        }
+      }
+    },
     "tools/build_core_other_concepts_source.py": {
       "before_sha256": "a8187b17f7b75d10dd9ba9967a5eb1d0e35aea94fbe9fa9493ef00b6e963ab2e",
       "after_sha256": "e5e88e9de40fadde7abad38e72ed5228b5748e7b9f5209132ef0898d5f1a9b2a",
@@ -1218,7 +1404,7 @@
     },
     "tools/core_rules_order135_audit.py": {
       "before_sha256": null,
-      "after_sha256": "6e0c12800220b4d16aa8ba00a8fd0032f76e5331f82a3cefae9390d55654310f",
+      "after_sha256": "6b753aa7f6055ea38e80efe031120133f35ce881875e10f36195f21c1efd6aac",
       "owners": {
         "@module": {
           "before": null,
@@ -1266,7 +1452,7 @@
         },
         "build": {
           "before": null,
-          "after": "0b99cbef2c8d32ee6f763eb6faec5822b6017f1f173f7e4aa117e83baadba2e9"
+          "after": "e613bfbf4bddede249e2269b48b27275e7867586ff5a17ea340a5c874a3d8e80"
         },
         "main": {
           "before": null,
@@ -1280,11 +1466,11 @@
     },
     "tools/core_rules_order97_history.py": {
       "before_sha256": "6d6d7f647bb1a72b9dbf06fdd14cba4c44450d0ae255d1830bd2d058872b44e2",
-      "after_sha256": "4bbcf44f020f53905ca435cc2a26caeeb233047ee93ecaf050ad58321822ab8a",
+      "after_sha256": "1dd4e756fe6293015bf2e3a01d9a8d40b403baaffb25692f592cab5ec9884470",
       "owners": {
         "@module": {
           "before": "861a3a726383a528578edf18e83d77d2edb906bcb00105f8e96f2b217b20507e",
-          "after": "7cf64c8fb7adb261eb9be2eddb1353066025d0f25cb50b6616c4470f29d0f5a0"
+          "after": "2c57c022bee2be2fe2da390f13104717bb4ad62c6648acae35e873233412484f"
         },
         "historical_evidence_path": {
           "before": "db4f3e81fe1e819d7519a77d5263559265e7a3b1e00157f5a11c77d29194bf67",
@@ -1574,7 +1760,27 @@
       "source_obligation": "PFINAL/CAUDIT-01 all25-category source/owner/facade audit plus approved complete maintained-mirror Visibility battlefield-edge FAQ: clip outgoing origins only, retain incoming physical endpoints, union self-surfaces and same-point cover causality. Qualified source/provider history is immutable.",
       "unchanged_work": "Preserve the same native finite/parameterized submissions, geometric corridor width, range/setup/movement rules, source grants/lifetimes and exact persistence/replay schemas. Physical input/fingerprint/solver/query work changes receive matched actual BASE/head visibility, movement, setup and cache reconstruction samples. Development-only inventory and source records do not add a gameplay path. Current smoke and every live semantic/work/cache gate remain required; no comprehensive or full-game performance certification is claimed."
     },
+    "data/source_audits/order135/baseline/src/warhammer40k_core/core/visibility_records.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order135-current-source-audit"
+      ],
+      "selected_families": [],
+      "rationale": "Order135 complete current Core clause audit and explicitly approved physical-union visibility/battlefield-edge source repair; algorithm/hot/cache selectors retain full matched-family obligations.",
+      "source_obligation": "PFINAL/CAUDIT-01 all25-category source/owner/facade audit plus approved complete maintained-mirror Visibility battlefield-edge FAQ: clip outgoing origins only, retain incoming physical endpoints, union self-surfaces and same-point cover causality. Qualified source/provider history is immutable.",
+      "unchanged_work": "Preserve the same native finite/parameterized submissions, geometric corridor width, range/setup/movement rules, source grants/lifetimes and exact persistence/replay schemas. Physical input/fingerprint/solver/query work changes receive matched actual BASE/head visibility, movement, setup and cache reconstruction samples. Development-only inventory and source records do not add a gameplay path. Current smoke and every live semantic/work/cache gate remain required; no comprehensive or full-game performance certification is claimed."
+    },
     "data/source_audits/order135/baseline/src/warhammer40k_core/engine/attack_sequence_hazardous.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "order135-current-source-audit"
+      ],
+      "selected_families": [],
+      "rationale": "Order135 complete current Core clause audit and explicitly approved physical-union visibility/battlefield-edge source repair; algorithm/hot/cache selectors retain full matched-family obligations.",
+      "source_obligation": "PFINAL/CAUDIT-01 all25-category source/owner/facade audit plus approved complete maintained-mirror Visibility battlefield-edge FAQ: clip outgoing origins only, retain incoming physical endpoints, union self-surfaces and same-point cover causality. Qualified source/provider history is immutable.",
+      "unchanged_work": "Preserve the same native finite/parameterized submissions, geometric corridor width, range/setup/movement rules, source grants/lifetimes and exact persistence/replay schemas. Physical input/fingerprint/solver/query work changes receive matched actual BASE/head visibility, movement, setup and cache reconstruction samples. Development-only inventory and source records do not add a gameplay path. Current smoke and every live semantic/work/cache gate remain required; no comprehensive or full-game performance certification is claimed."
+    },
+    "data/source_audits/order135/baseline/src/warhammer40k_core/engine/decision.py.txt": {
       "category": "rule_semantics",
       "operations": [
         "order135-current-source-audit"
@@ -1764,6 +1970,26 @@
       "source_obligation": "PFINAL/CAUDIT-01 all25-category source/owner/facade audit plus approved complete maintained-mirror Visibility battlefield-edge FAQ: clip outgoing origins only, retain incoming physical endpoints, union self-surfaces and same-point cover causality. Qualified source/provider history is immutable.",
       "unchanged_work": "Preserve the same native finite/parameterized submissions, geometric corridor width, range/setup/movement rules, source grants/lifetimes and exact persistence/replay schemas. Physical input/fingerprint/solver/query work changes receive matched actual BASE/head visibility, movement, setup and cache reconstruction samples. Development-only inventory and source records do not add a gameplay path. Current smoke and every live semantic/work/cache gate remain required; no comprehensive or full-game performance certification is claimed."
     },
+    "data/source_audits/order135/los-rng-base-control.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order135-current-source-audit"
+      ],
+      "selected_families": [],
+      "rationale": "Order135 complete current Core clause audit and explicitly approved physical-union visibility/battlefield-edge source repair; algorithm/hot/cache selectors retain full matched-family obligations.",
+      "source_obligation": "PFINAL/CAUDIT-01 all25-category source/owner/facade audit plus approved complete maintained-mirror Visibility battlefield-edge FAQ: clip outgoing origins only, retain incoming physical endpoints, union self-surfaces and same-point cover causality. Qualified source/provider history is immutable.",
+      "unchanged_work": "Preserve the same native finite/parameterized submissions, geometric corridor width, range/setup/movement rules, source grants/lifetimes and exact persistence/replay schemas. Physical input/fingerprint/solver/query work changes receive matched actual BASE/head visibility, movement, setup and cache reconstruction samples. Development-only inventory and source records do not add a gameplay path. Current smoke and every live semantic/work/cache gate remain required; no comprehensive or full-game performance certification is claimed."
+    },
+    "data/source_audits/order135/los-rng-compatibility-approval.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order135-current-source-audit"
+      ],
+      "selected_families": [],
+      "rationale": "Order135 complete current Core clause audit and explicitly approved physical-union visibility/battlefield-edge source repair; algorithm/hot/cache selectors retain full matched-family obligations.",
+      "source_obligation": "PFINAL/CAUDIT-01 all25-category source/owner/facade audit plus approved complete maintained-mirror Visibility battlefield-edge FAQ: clip outgoing origins only, retain incoming physical endpoints, union self-surfaces and same-point cover causality. Qualified source/provider history is immutable.",
+      "unchanged_work": "Preserve the same native finite/parameterized submissions, geometric corridor width, range/setup/movement rules, source grants/lifetimes and exact persistence/replay schemas. Physical input/fingerprint/solver/query work changes receive matched actual BASE/head visibility, movement, setup and cache reconstruction samples. Development-only inventory and source records do not add a gameplay path. Current smoke and every live semantic/work/cache gate remain required; no comprehensive or full-game performance certification is claimed."
+    },
     "data/source_audits/order135/retained-current-sources.json": {
       "category": "rule_semantics",
       "operations": [
@@ -1910,6 +2136,32 @@
       "source_obligation": "PFINAL/CAUDIT-01 all25-category source/owner/facade audit plus approved complete maintained-mirror Visibility battlefield-edge FAQ: clip outgoing origins only, retain incoming physical endpoints, union self-surfaces and same-point cover causality. Qualified source/provider history is immutable.",
       "unchanged_work": "Preserve the same native finite/parameterized submissions, geometric corridor width, range/setup/movement rules, source grants/lifetimes and exact persistence/replay schemas. Physical input/fingerprint/solver/query work changes receive matched actual BASE/head visibility, movement, setup and cache reconstruction samples. Development-only inventory and source records do not add a gameplay path. Current smoke and every live semantic/work/cache gate remain required; no comprehensive or full-game performance certification is claimed."
     },
+    "src/warhammer40k_core/core/visibility_records.py": {
+      "category": "hot_query_or_data_structure",
+      "operations": [
+        "order135-visibility-hot-consumers",
+        "visibility-query"
+      ],
+      "selected_families": [
+        "visibility"
+      ],
+      "rationale": "Order135 complete current Core clause audit and explicitly approved physical-union visibility/battlefield-edge source repair; algorithm/hot/cache selectors retain full matched-family obligations.",
+      "source_obligation": "PFINAL/CAUDIT-01 all25-category source/owner/facade audit plus approved complete maintained-mirror Visibility battlefield-edge FAQ: clip outgoing origins only, retain incoming physical endpoints, union self-surfaces and same-point cover causality. Qualified source/provider history is immutable.",
+      "unchanged_work": "Preserve the same native finite/parameterized submissions, geometric corridor width, range/setup/movement rules, source grants/lifetimes and exact persistence/replay schemas. Physical input/fingerprint/solver/query work changes receive matched actual BASE/head visibility, movement, setup and cache reconstruction samples. Development-only inventory and source records do not add a gameplay path. Current smoke and every live semantic/work/cache gate remain required; no comprehensive or full-game performance certification is claimed."
+    },
+    "src/warhammer40k_core/core/visibility_rng_projection.py": {
+      "category": "hot_query_or_data_structure",
+      "operations": [
+        "order135-visibility-hot-consumers",
+        "visibility-query"
+      ],
+      "selected_families": [
+        "visibility"
+      ],
+      "rationale": "Order135 complete current Core clause audit and explicitly approved physical-union visibility/battlefield-edge source repair; algorithm/hot/cache selectors retain full matched-family obligations.",
+      "source_obligation": "PFINAL/CAUDIT-01 all25-category source/owner/facade audit plus approved complete maintained-mirror Visibility battlefield-edge FAQ: clip outgoing origins only, retain incoming physical endpoints, union self-surfaces and same-point cover causality. Qualified source/provider history is immutable.",
+      "unchanged_work": "Preserve the same native finite/parameterized submissions, geometric corridor width, range/setup/movement rules, source grants/lifetimes and exact persistence/replay schemas. Physical input/fingerprint/solver/query work changes receive matched actual BASE/head visibility, movement, setup and cache reconstruction samples. Development-only inventory and source records do not add a gameplay path. Current smoke and every live semantic/work/cache gate remain required; no comprehensive or full-game performance certification is claimed."
+    },
     "src/warhammer40k_core/engine/attack_sequence_hazardous.py": {
       "category": "hot_query_or_data_structure",
       "operations": [
@@ -1923,6 +2175,18 @@
       "unchanged_work": "Preserve the same native finite/parameterized submissions, geometric corridor width, range/setup/movement rules, source grants/lifetimes and exact persistence/replay schemas. Physical input/fingerprint/solver/query work changes receive matched actual BASE/head visibility, movement, setup and cache reconstruction samples. Development-only inventory and source records do not add a gameplay path. Current smoke and every live semantic/work/cache gate remain required; no comprehensive or full-game performance certification is claimed."
     },
     "src/warhammer40k_core/engine/battlefield_visibility_context.py": {
+      "category": "hot_query_or_data_structure",
+      "operations": [
+        "order135-visibility-hot-consumers"
+      ],
+      "selected_families": [
+        "visibility"
+      ],
+      "rationale": "Order135 complete current Core clause audit and explicitly approved physical-union visibility/battlefield-edge source repair; algorithm/hot/cache selectors retain full matched-family obligations.",
+      "source_obligation": "PFINAL/CAUDIT-01 all25-category source/owner/facade audit plus approved complete maintained-mirror Visibility battlefield-edge FAQ: clip outgoing origins only, retain incoming physical endpoints, union self-surfaces and same-point cover causality. Qualified source/provider history is immutable.",
+      "unchanged_work": "Preserve the same native finite/parameterized submissions, geometric corridor width, range/setup/movement rules, source grants/lifetimes and exact persistence/replay schemas. Physical input/fingerprint/solver/query work changes receive matched actual BASE/head visibility, movement, setup and cache reconstruction samples. Development-only inventory and source records do not add a gameplay path. Current smoke and every live semantic/work/cache gate remain required; no comprehensive or full-game performance certification is claimed."
+    },
+    "src/warhammer40k_core/engine/decision.py": {
       "category": "hot_query_or_data_structure",
       "operations": [
         "order135-visibility-hot-consumers"
@@ -2098,6 +2362,16 @@
       "source_obligation": "PFINAL/CAUDIT-01 all25-category source/owner/facade audit plus approved complete maintained-mirror Visibility battlefield-edge FAQ: clip outgoing origins only, retain incoming physical endpoints, union self-surfaces and same-point cover causality. Qualified source/provider history is immutable.",
       "unchanged_work": "Preserve the same native finite/parameterized submissions, geometric corridor width, range/setup/movement rules, source grants/lifetimes and exact persistence/replay schemas. Physical input/fingerprint/solver/query work changes receive matched actual BASE/head visibility, movement, setup and cache reconstruction samples. Development-only inventory and source records do not add a gameplay path. Current smoke and every live semantic/work/cache gate remain required; no comprehensive or full-game performance certification is claimed."
     },
+    "tests/order135_rng_helpers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order135-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Order135 complete current Core clause audit and explicitly approved physical-union visibility/battlefield-edge source repair; algorithm/hot/cache selectors retain full matched-family obligations.",
+      "source_obligation": "PFINAL/CAUDIT-01 all25-category source/owner/facade audit plus approved complete maintained-mirror Visibility battlefield-edge FAQ: clip outgoing origins only, retain incoming physical endpoints, union self-surfaces and same-point cover causality. Qualified source/provider history is immutable.",
+      "unchanged_work": "Preserve the same native finite/parameterized submissions, geometric corridor width, range/setup/movement rules, source grants/lifetimes and exact persistence/replay schemas. Physical input/fingerprint/solver/query work changes receive matched actual BASE/head visibility, movement, setup and cache reconstruction samples. Development-only inventory and source records do not add a gameplay path. Current smoke and every live semantic/work/cache gate remain required; no comprehensive or full-game performance certification is claimed."
+    },
     "tests/order135_visibility_helpers.py": {
       "category": "rule_semantics",
       "operations": [
@@ -2129,6 +2403,16 @@
       "unchanged_work": "Preserve the same native finite/parameterized submissions, geometric corridor width, range/setup/movement rules, source grants/lifetimes and exact persistence/replay schemas. Physical input/fingerprint/solver/query work changes receive matched actual BASE/head visibility, movement, setup and cache reconstruction samples. Development-only inventory and source records do not add a gameplay path. Current smoke and every live semantic/work/cache gate remain required; no comprehensive or full-game performance certification is claimed."
     },
     "tests/unit/test_order135_visibility_facade.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order135-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Order135 complete current Core clause audit and explicitly approved physical-union visibility/battlefield-edge source repair; algorithm/hot/cache selectors retain full matched-family obligations.",
+      "source_obligation": "PFINAL/CAUDIT-01 all25-category source/owner/facade audit plus approved complete maintained-mirror Visibility battlefield-edge FAQ: clip outgoing origins only, retain incoming physical endpoints, union self-surfaces and same-point cover causality. Qualified source/provider history is immutable.",
+      "unchanged_work": "Preserve the same native finite/parameterized submissions, geometric corridor width, range/setup/movement rules, source grants/lifetimes and exact persistence/replay schemas. Physical input/fingerprint/solver/query work changes receive matched actual BASE/head visibility, movement, setup and cache reconstruction samples. Development-only inventory and source records do not add a gameplay path. Current smoke and every live semantic/work/cache gate remain required; no comprehensive or full-game performance certification is claimed."
+    },
+    "tests/unit/test_order135_visibility_rng_projection.py": {
       "category": "rule_semantics",
       "operations": [
         "order135-regressions"

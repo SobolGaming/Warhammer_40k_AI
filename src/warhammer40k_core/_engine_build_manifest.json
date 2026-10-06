@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d4c3630ee203e6ed640e4580905ecbf842fbde240709e9a75e58f7120c5be6ac",
-  "fingerprint": "d4c3630ee203e6ed640e4580905ecbf842fbde240709e9a75e58f7120c5be6ac",
-  "resource_count": 3095,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:95029c48e2f9b95fe3ba4d7092af9c8605b454f7625af2bb002ec8b037f7738f",
+  "fingerprint": "95029c48e2f9b95fe3ba4d7092af9c8605b454f7625af2bb002ec8b037f7738f",
+  "resource_count": 3096,
   "resources": [
     {
       "byte_length": 113,
@@ -605,14 +605,19 @@
       "sha256": "fd90d5e2b66650fac7ef96bce33f34f13b13ce9a9e62bdefe8d3ca4fc3a19dee"
     },
     {
-      "byte_length": 40142,
+      "byte_length": 43437,
       "path": "warhammer40k_core/core/visibility.py",
-      "sha256": "98cd88d400ab1085b2411e0e3dd4ae3efdde7d63f8189e4e700f4b92231bb5d7"
+      "sha256": "1c22dfbcfcf8a5ba2f8967ad4c218a4d3800e6cab1e6e7718c3f3d0fff3fc876"
     },
     {
-      "byte_length": 43423,
+      "byte_length": 45114,
       "path": "warhammer40k_core/core/visibility_records.py",
-      "sha256": "e363b4ffb72b32d0379531f59a823e43164e0238aae2c1fcde769196063c25e0"
+      "sha256": "e2a71abb55875689d4604828d9fa8487f459244c9f7673f3f7508383f006eb68"
+    },
+    {
+      "byte_length": 4485,
+      "path": "warhammer40k_core/core/visibility_rng_projection.py",
+      "sha256": "180e85c868972bd07b4835e394939f6a2073c1868ee8166a8aab8456c723d597"
     },
     {
       "byte_length": 4135,
@@ -2145,9 +2150,9 @@
       "sha256": "fef1b39dc738c27b863c642b17c6d35e0029cbf504857543110de1101efcdf76"
     },
     {
-      "byte_length": 43475,
+      "byte_length": 44873,
       "path": "warhammer40k_core/engine/decision.py",
-      "sha256": "e35d0695c3ce4a7a0b0aae8790f2107c6092c48f1741b983025f50545181f68e"
+      "sha256": "cc8c83ac5e76077e31461b481f9e4f606e03348facf992653be5ee95a3591525"
     },
     {
       "byte_length": 3459,
@@ -13460,9 +13465,9 @@
       "sha256": "24ff60d49eb1de4e873d38946c5d3d5793f3c0073b8d16e35b4823c1c6b9daa0"
     },
     {
-      "byte_length": 12639,
+      "byte_length": 12691,
       "path": "warhammer40k_core/geometry/physical_visibility.py",
-      "sha256": "ffdcd8632a5bace002b52988d1b6140e63a4f2c2e2d4165f561b9e3c50cef889"
+      "sha256": "45fb0aac8f54b6613688e9724510ac4da618232f8a0b3428557fabdddf50ed41"
     },
     {
       "byte_length": 15337,

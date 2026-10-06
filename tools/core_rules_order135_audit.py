@@ -423,6 +423,10 @@ def build(root: Path = ROOT) -> dict[str, Any]:
         "visibility_source_registration": visibility_source_registration(root),
         "conditional_core_acceptance": _read(root, AUDIT / "conditional-core-acceptance.json"),
         "approved_visibility_scope": _read(root, AUDIT / "visibility-scope-approval.json"),
+        "approved_los_rng_compatibility": _read(
+            root, AUDIT / "los-rng-compatibility-approval.json"
+        ),
+        "authentic_base_rng_control": _read(root, AUDIT / "los-rng-base-control.json"),
         "retained_baseline_consumer_report": (
             root / AUDIT / "current-consumer-dispositions.md"
         ).read_text(),

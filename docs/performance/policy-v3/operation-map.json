@@ -5416,8 +5416,11 @@
     },
     "order135-visibility-hot-consumers": {
       "paths": [
+        "src/warhammer40k_core/core/visibility_records.py",
+        "src/warhammer40k_core/core/visibility_rng_projection.py",
         "src/warhammer40k_core/engine/attack_sequence_hazardous.py",
         "src/warhammer40k_core/engine/battlefield_visibility_context.py",
+        "src/warhammer40k_core/engine/decision.py",
         "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/thousand_sons/army_rule.py",
         "src/warhammer40k_core/engine/hidden_detection.py",
         "src/warhammer40k_core/engine/obscuring_model_cover.py",
@@ -5453,7 +5456,9 @@
         "data/source_audits/order135/baseline/docs/ADAPTER_DECISION_CONTRACT.md.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/_engine_build_manifest.json.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/core/visibility.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/core/visibility_records.py.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/engine/attack_sequence_hazardous.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/decision.py.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/thousand_sons/army_rule.py.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/engine/hidden_detection.py.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/engine/obscuring_model_cover.py.txt",
@@ -5472,6 +5477,8 @@
         "data/source_audits/order135/current-inventory.json",
         "data/source_audits/order135/current-source-qualifications.md",
         "data/source_audits/order135/historical-inputs.json",
+        "data/source_audits/order135/los-rng-base-control.json",
+        "data/source_audits/order135/los-rng-compatibility-approval.json",
         "data/source_audits/order135/retained-current-sources.json",
         "data/source_audits/order135/selected-inputs.json",
         "data/source_audits/order135/source-reconciliation.json",
@@ -5490,10 +5497,12 @@
     },
     "order135-regressions": {
       "paths": [
+        "tests/order135_rng_helpers.py",
         "tests/order135_visibility_helpers.py",
         "tests/unit/test_order135_objective_overlap.py",
         "tests/unit/test_order135_physical_visibility.py",
-        "tests/unit/test_order135_visibility_facade.py"
+        "tests/unit/test_order135_visibility_facade.py",
+        "tests/unit/test_order135_visibility_rng_projection.py"
       ],
       "owners": [
         "*"

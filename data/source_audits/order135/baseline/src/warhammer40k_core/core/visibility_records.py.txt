@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import NotRequired, Self, TypedDict, TypeGuard, cast
+from typing import Self, TypedDict, TypeGuard, cast
 
 from warhammer40k_core.core.ruleset_descriptor import (
     CoverEffect,
@@ -16,10 +16,6 @@ from warhammer40k_core.core.ruleset_descriptor import (
     terrain_feature_kind_from_token,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.core.visibility_rng_projection import (
-    VisibilityRngProjection,
-    VisibilityRngProjectionPayload,
-)
 from warhammer40k_core.geometry.continuous_visibility import (
     ContinuousVisibilityEvidence,
     ContinuousVisibilityPayload,
@@ -462,7 +458,6 @@ class LineOfSightWitnessPayload(TypedDict):
     unit_visible: bool
     unit_fully_visible: bool
     model_records: list[ModelLineOfSightRecordPayload]
-    rng_compatibility_projection: NotRequired[VisibilityRngProjectionPayload]
 
 
 class BenefitOfCoverResultPayload(TypedDict):
@@ -547,7 +542,6 @@ class LineOfSightWitness:
     unit_visible: bool
     unit_fully_visible: bool
     model_records: tuple[ModelLineOfSightRecord, ...]
-    rng_compatibility_projection: VisibilityRngProjection | None = None
 
     def __post_init__(self) -> None:
         if (
@@ -612,12 +606,6 @@ class LineOfSightWitness:
         record_target_ids = tuple(record.target_model_id for record in records)
         if record_target_ids != self.target_model_ids:
             raise GeometryError("LineOfSightWitness model_records must match target_model_ids.")
-        projection = self.rng_compatibility_projection
-        if projection is not None:
-            if type(projection) is not VisibilityRngProjection:
-                raise GeometryError("LineOfSightWitness requires a typed LOS RNG projection.")
-            if tuple(target for target, _ in projection.pairs) != self.target_model_ids:
-                raise GeometryError("LOS RNG projection pairs must match exact ordered targets.")
         visible_ids = tuple(record.target_model_id for record in records if record.model_visible)
         fully_visible_ids = tuple(
             record.target_model_id for record in records if record.model_fully_visible
@@ -642,7 +630,6 @@ class LineOfSightWitness:
         los_cache_key: str,
         observer_model_id: str,
         model_records: tuple[ModelLineOfSightRecord, ...],
-        rng_compatibility_projection: VisibilityRngProjection | None = None,
     ) -> Self:
         records = _validate_model_los_record_tuple(
             "LineOfSightWitness model_records",
@@ -663,7 +650,6 @@ class LineOfSightWitness:
             unit_visible=any(record.model_visible for record in records),
             unit_fully_visible=all(record.model_fully_visible for record in records),
             model_records=records,
-            rng_compatibility_projection=rng_compatibility_projection,
         )
 
     def all_blocker_records(self) -> tuple[VisibilityBlockerRecord, ...]:
@@ -672,7 +658,7 @@ class LineOfSightWitness:
         )
 
     def to_payload(self) -> LineOfSightWitnessPayload:
-        payload: LineOfSightWitnessPayload = {
+        return {
             "context_fingerprint": self.context_fingerprint,
             "ruleset_descriptor_hash": self.ruleset_descriptor_hash,
             "los_cache_key": self.los_cache_key,
@@ -684,18 +670,9 @@ class LineOfSightWitness:
             "unit_fully_visible": self.unit_fully_visible,
             "model_records": [record.to_payload() for record in self.model_records],
         }
-        if self.rng_compatibility_projection is not None:
-            payload["rng_compatibility_projection"] = self.rng_compatibility_projection.to_payload()
-        return payload
 
     @classmethod
     def from_payload(cls, payload: LineOfSightWitnessPayload) -> Self:
-        allowed_fields = set(LineOfSightWitnessPayload.__annotations__)
-        required_fields = allowed_fields - {"rng_compatibility_projection"}
-        if type(cast(object, payload)) is not dict or not (
-            required_fields <= set(payload) <= allowed_fields
-        ):
-            raise GeometryError("Invalid LineOfSightWitness payload fields.")
         return cls(
             context_fingerprint=payload["context_fingerprint"],
             ruleset_descriptor_hash=payload["ruleset_descriptor_hash"],
@@ -708,11 +685,6 @@ class LineOfSightWitness:
             unit_fully_visible=payload["unit_fully_visible"],
             model_records=tuple(
                 ModelLineOfSightRecord.from_payload(record) for record in payload["model_records"]
-            ),
-            rng_compatibility_projection=(
-                None
-                if "rng_compatibility_projection" not in payload
-                else VisibilityRngProjection.from_payload(payload["rng_compatibility_projection"])
             ),
         )
 

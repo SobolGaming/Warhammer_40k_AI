@@ -131,7 +131,7 @@ def _reduce(prisms: tuple[VisibilityPrism, ...]) -> tuple[VisibilityPrism, ...]:
     )
 
 
-def _fingerprint(
+def physical_visibility_fingerprint(
     observers: tuple[VisibilityPrism, ...],
     targets: tuple[VisibilityPrism, ...],
     any_blockers: tuple[VisibilityPrism, ...],
@@ -225,7 +225,9 @@ def resolve_physical_visibility_uncached(
 ) -> ContinuousVisibilityEvidence:
     if not observers or not targets:
         raise GeometryError("Physical visibility requires nonempty observer and target unions.")
-    fingerprint = _fingerprint(observers, targets, any_blockers, full_blockers, bounds)
+    fingerprint = physical_visibility_fingerprint(
+        observers, targets, any_blockers, full_blockers, bounds
+    )
     origins, destinations = _reduce(observers), _reduce(targets)
     if len(origins) == len(destinations) == 1 and (bounds is None or bounds.encloses(origins[0])):
         return replace(

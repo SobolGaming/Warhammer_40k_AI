@@ -1,0 +1,12 @@
+{
+  "status": "explicitly-approved",
+  "source_thread_id": "01a0efa7-1ce0-70b0-a637-75c1615f80ef",
+  "question_time": "2026-10-06T23:09:00+00:00",
+  "question_message": "Sentinel_4eb3511f6910819192100d8308fbdb78",
+  "question": "The visibility repair changes recorded evidence, which also changes deterministic dice results in an existing regression. Keeping that regression intact needs a narrow compatibility rule: preserve the old dice input only where visibility geometry is genuinely unchanged, while retaining the new authoritative evidence. The repository requires explicit approval for compatibility shims. May I add this one, with matching live-game and save/replay checks?",
+  "answer_time": "2026-10-06T23:18:00+00:00",
+  "answer_message": "Sentinel_4d71efcdf8488191bd17bbcc845e1e4d",
+  "answer": "Yes",
+  "scope": "Typed/versioned LOS-only RNG projection for genuinely unchanged scalar, unclipped physical domains. Derive authentic legacy context/pair hashes from actual authoritative geometry; substitute only derived visibility metadata in copied RNG normalization. Retain complete current stored bounds/body authority and all gameplay predicates/choices. Strict exact witness validation and identical live/save/replay normalization. Composite/clipped changed geometry retains current RNG authority.",
+  "qualification": "No other compatibility behavior, weakened original tests/budgets/source evidence, granting-rule permission or provider certification. Order136 remains UNSELECTED."
+}

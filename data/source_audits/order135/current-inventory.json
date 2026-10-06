@@ -1,5 +1,17 @@
 {
   "acceptance": "Re-audit all 25 categories after every implementation PR merges. Require a complete rule-clause/FAQ → immutable source observation → engine owner → facade regression inventory, including older operative updates, all v931/v946 obligations, reopened certification findings and cross-category lifetimes. Verify exact source fingerprints, semantics, adapters, replay and visibility before claiming compliance. Include the September 10 review dispositions, resolved C12-04/C18-07 evidence, Heavy movement history, and explicit Normal Move, objective-control-first and Action-interruption consumer checks.",
+  "approved_los_rng_compatibility": {
+    "answer": "Yes",
+    "answer_message": "Sentinel_4d71efcdf8488191bd17bbcc845e1e4d",
+    "answer_time": "2026-10-06T23:18:00+00:00",
+    "qualification": "No other compatibility behavior, weakened original tests/budgets/source evidence, granting-rule permission or provider certification. Order136 remains UNSELECTED.",
+    "question": "The visibility repair changes recorded evidence, which also changes deterministic dice results in an existing regression. Keeping that regression intact needs a narrow compatibility rule: preserve the old dice input only where visibility geometry is genuinely unchanged, while retaining the new authoritative evidence. The repository requires explicit approval for compatibility shims. May I add this one, with matching live-game and save/replay checks?",
+    "question_message": "Sentinel_4eb3511f6910819192100d8308fbdb78",
+    "question_time": "2026-10-06T23:09:00+00:00",
+    "scope": "Typed/versioned LOS-only RNG projection for genuinely unchanged scalar, unclipped physical domains. Derive authentic legacy context/pair hashes from actual authoritative geometry; substitute only derived visibility metadata in copied RNG normalization. Retain complete current stored bounds/body authority and all gameplay predicates/choices. Strict exact witness validation and identical live/save/replay normalization. Composite/clipped changed geometry retains current RNG authority.",
+    "source_thread_id": "01a0efa7-1ce0-70b0-a637-75c1615f80ef",
+    "status": "explicitly-approved"
+  },
   "approved_visibility_scope": {
     "bounded_scope": "Shared complete physical-body incoming visibility and exact outgoing battlefield clipping; full visibility, cover causality, witnesses, cache/context, blocker bodies, existing consumers, generated contracts, native shooting, persistence, fork, viewer/event projections and exact replay. Register retained approved-provider FAQ audit fingerprint authority before runtime adoption.",
     "qualification": "No fabricated official provider, faction or native consumer certification; complete Core audit and all unchanged delivery gates remain required. Other material gaps require a reproduced acceptance violation and an explicit scope decision.",
@@ -38,6 +50,345 @@
       "original tests/assertions/branches/ceilings",
       "source archives/pins"
     ]
+  },
+  "authentic_base_rng_control": {
+    "base": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+    "context": {
+      "dynamic_model_blockers": [],
+      "los_cache_key": "los:order135-rng-control",
+      "observer_keywords": [],
+      "observer_model": {
+        "base": {
+          "kind": "circular",
+          "length": null,
+          "radius": 0.5,
+          "width": null
+        },
+        "model_id": "observer",
+        "pose": {
+          "facing": {
+            "degrees": 0.0
+          },
+          "position": {
+            "x": 2.0,
+            "y": 2.0,
+            "z": 0.0
+          }
+        },
+        "volume": {
+          "height": 2.0
+        }
+      },
+      "ruleset_descriptor_hash": "ac8517bdc3c11a11ef7c9e61c48b51af72d398ba682baa246c749f8ebd4ec873",
+      "target_model_keywords": [
+        {
+          "keywords": [],
+          "model_id": "target"
+        }
+      ],
+      "target_models": [
+        {
+          "base": {
+            "kind": "circular",
+            "length": null,
+            "radius": 0.5,
+            "width": null
+          },
+          "model_id": "target",
+          "pose": {
+            "facing": {
+              "degrees": 0.0
+            },
+            "position": {
+              "x": 8.0,
+              "y": 2.0,
+              "z": 0.0
+            }
+          },
+          "volume": {
+            "height": 2.0
+          }
+        }
+      ],
+      "terrain_areas": [],
+      "terrain_features": [],
+      "terrain_visibility_policy": {
+        "cover_effect": "attacker_bs_modifier",
+        "cover_policy": {
+          "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+          "cover_effect": "attacker_bs_modifier",
+          "grants_benefit_of_cover": true,
+          "non_stacking": true,
+          "requires_not_fully_visible": true,
+          "requires_visible_target": true
+        },
+        "feature_policies": [
+          {
+            "aircraft_uses_true_los_through_feature": false,
+            "blocks_full_visibility_through_footprint": false,
+            "blocks_model_visibility_through_footprint": false,
+            "cover_policy": {
+              "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+              "cover_effect": "attacker_bs_modifier",
+              "grants_benefit_of_cover": true,
+              "non_stacking": true,
+              "requires_not_fully_visible": true,
+              "requires_visible_target": true
+            },
+            "line_of_sight_policy": "true_line_of_sight",
+            "terrain_feature_kind": "armoured_containers",
+            "towering_uses_true_los_through_feature": false,
+            "towering_uses_true_los_when_wholly_within_feature": false,
+            "uses_true_los_when_observer_wholly_within_feature": false,
+            "uses_true_los_when_target_intersects_feature": false
+          },
+          {
+            "aircraft_uses_true_los_through_feature": false,
+            "blocks_full_visibility_through_footprint": false,
+            "blocks_model_visibility_through_footprint": false,
+            "cover_policy": {
+              "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+              "cover_effect": "attacker_bs_modifier",
+              "grants_benefit_of_cover": true,
+              "non_stacking": true,
+              "requires_not_fully_visible": true,
+              "requires_visible_target": true
+            },
+            "line_of_sight_policy": "true_line_of_sight",
+            "terrain_feature_kind": "barricade_and_fuel_pipes",
+            "towering_uses_true_los_through_feature": false,
+            "towering_uses_true_los_when_wholly_within_feature": false,
+            "uses_true_los_when_observer_wholly_within_feature": false,
+            "uses_true_los_when_target_intersects_feature": false
+          },
+          {
+            "aircraft_uses_true_los_through_feature": false,
+            "blocks_full_visibility_through_footprint": false,
+            "blocks_model_visibility_through_footprint": false,
+            "cover_policy": {
+              "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+              "cover_effect": "attacker_bs_modifier",
+              "grants_benefit_of_cover": true,
+              "non_stacking": true,
+              "requires_not_fully_visible": true,
+              "requires_visible_target": true
+            },
+            "line_of_sight_policy": "true_line_of_sight",
+            "terrain_feature_kind": "battlefield_debris_and_statuary",
+            "towering_uses_true_los_through_feature": false,
+            "towering_uses_true_los_when_wholly_within_feature": false,
+            "uses_true_los_when_observer_wholly_within_feature": false,
+            "uses_true_los_when_target_intersects_feature": false
+          },
+          {
+            "aircraft_uses_true_los_through_feature": false,
+            "blocks_full_visibility_through_footprint": false,
+            "blocks_model_visibility_through_footprint": false,
+            "cover_policy": {
+              "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+              "cover_effect": "attacker_bs_modifier",
+              "grants_benefit_of_cover": true,
+              "non_stacking": true,
+              "requires_not_fully_visible": true,
+              "requires_visible_target": true
+            },
+            "line_of_sight_policy": "true_line_of_sight",
+            "terrain_feature_kind": "crater_and_rubble",
+            "towering_uses_true_los_through_feature": false,
+            "towering_uses_true_los_when_wholly_within_feature": false,
+            "uses_true_los_when_observer_wholly_within_feature": false,
+            "uses_true_los_when_target_intersects_feature": false
+          },
+          {
+            "aircraft_uses_true_los_through_feature": false,
+            "blocks_full_visibility_through_footprint": false,
+            "blocks_model_visibility_through_footprint": false,
+            "cover_policy": {
+              "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+              "cover_effect": "attacker_bs_modifier",
+              "grants_benefit_of_cover": true,
+              "non_stacking": true,
+              "requires_not_fully_visible": true,
+              "requires_visible_target": true
+            },
+            "line_of_sight_policy": "true_line_of_sight",
+            "terrain_feature_kind": "debris_and_statuary",
+            "towering_uses_true_los_through_feature": false,
+            "towering_uses_true_los_when_wholly_within_feature": false,
+            "uses_true_los_when_observer_wholly_within_feature": false,
+            "uses_true_los_when_target_intersects_feature": false
+          },
+          {
+            "aircraft_uses_true_los_through_feature": false,
+            "blocks_full_visibility_through_footprint": false,
+            "blocks_model_visibility_through_footprint": false,
+            "cover_policy": {
+              "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+              "cover_effect": "attacker_bs_modifier",
+              "grants_benefit_of_cover": true,
+              "non_stacking": true,
+              "requires_not_fully_visible": true,
+              "requires_visible_target": true
+            },
+            "line_of_sight_policy": "true_line_of_sight",
+            "terrain_feature_kind": "hills",
+            "towering_uses_true_los_through_feature": false,
+            "towering_uses_true_los_when_wholly_within_feature": false,
+            "uses_true_los_when_observer_wholly_within_feature": false,
+            "uses_true_los_when_target_intersects_feature": false
+          },
+          {
+            "aircraft_uses_true_los_through_feature": false,
+            "blocks_full_visibility_through_footprint": false,
+            "blocks_model_visibility_through_footprint": false,
+            "cover_policy": {
+              "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+              "cover_effect": "attacker_bs_modifier",
+              "grants_benefit_of_cover": true,
+              "non_stacking": true,
+              "requires_not_fully_visible": true,
+              "requires_visible_target": true
+            },
+            "line_of_sight_policy": "true_line_of_sight",
+            "terrain_feature_kind": "hills_and_sealed_buildings",
+            "towering_uses_true_los_through_feature": false,
+            "towering_uses_true_los_when_wholly_within_feature": false,
+            "uses_true_los_when_observer_wholly_within_feature": false,
+            "uses_true_los_when_target_intersects_feature": false
+          },
+          {
+            "aircraft_uses_true_los_through_feature": false,
+            "blocks_full_visibility_through_footprint": false,
+            "blocks_model_visibility_through_footprint": false,
+            "cover_policy": {
+              "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+              "cover_effect": "attacker_bs_modifier",
+              "grants_benefit_of_cover": true,
+              "non_stacking": true,
+              "requires_not_fully_visible": true,
+              "requires_visible_target": true
+            },
+            "line_of_sight_policy": "true_line_of_sight",
+            "terrain_feature_kind": "industrial_structures",
+            "towering_uses_true_los_through_feature": false,
+            "towering_uses_true_los_when_wholly_within_feature": false,
+            "uses_true_los_when_observer_wholly_within_feature": false,
+            "uses_true_los_when_target_intersects_feature": false
+          },
+          {
+            "aircraft_uses_true_los_through_feature": true,
+            "blocks_full_visibility_through_footprint": true,
+            "blocks_model_visibility_through_footprint": true,
+            "cover_policy": {
+              "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+              "cover_effect": "attacker_bs_modifier",
+              "grants_benefit_of_cover": true,
+              "non_stacking": true,
+              "requires_not_fully_visible": true,
+              "requires_visible_target": true
+            },
+            "line_of_sight_policy": "area_obscuring",
+            "terrain_feature_kind": "ruins",
+            "towering_uses_true_los_through_feature": false,
+            "towering_uses_true_los_when_wholly_within_feature": true,
+            "uses_true_los_when_observer_wholly_within_feature": true,
+            "uses_true_los_when_target_intersects_feature": true
+          },
+          {
+            "aircraft_uses_true_los_through_feature": false,
+            "blocks_full_visibility_through_footprint": false,
+            "blocks_model_visibility_through_footprint": false,
+            "cover_policy": {
+              "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+              "cover_effect": "attacker_bs_modifier",
+              "grants_benefit_of_cover": true,
+              "non_stacking": true,
+              "requires_not_fully_visible": true,
+              "requires_visible_target": true
+            },
+            "line_of_sight_policy": "true_line_of_sight",
+            "terrain_feature_kind": "sealed_buildings",
+            "towering_uses_true_los_through_feature": false,
+            "towering_uses_true_los_when_wholly_within_feature": false,
+            "uses_true_los_when_observer_wholly_within_feature": false,
+            "uses_true_los_when_target_intersects_feature": false
+          },
+          {
+            "aircraft_uses_true_los_through_feature": true,
+            "blocks_full_visibility_through_footprint": true,
+            "blocks_model_visibility_through_footprint": false,
+            "cover_policy": {
+              "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true,
+              "cover_effect": "attacker_bs_modifier",
+              "grants_benefit_of_cover": true,
+              "non_stacking": true,
+              "requires_not_fully_visible": true,
+              "requires_visible_target": true
+            },
+            "line_of_sight_policy": "dense_cover",
+            "terrain_feature_kind": "woods",
+            "towering_uses_true_los_through_feature": true,
+            "towering_uses_true_los_when_wholly_within_feature": false,
+            "uses_true_los_when_observer_wholly_within_feature": true,
+            "uses_true_los_when_target_intersects_feature": false
+          }
+        ],
+        "hidden_detection_range_inches": 15.0,
+        "hidden_gone_to_ground_detection_penalty_inches": 3.0,
+        "hidden_lost_after_shooting": true,
+        "hidden_requires_keywords": [
+          "BEAST",
+          "INFANTRY",
+          "SWARM"
+        ],
+        "hidden_requires_terrain_area_occupancy": true,
+        "hidden_supported": true
+      },
+      "terrain_volumes": []
+    },
+    "qualification": "Actual BASE producer control for declared synthetic scalar geometry; not provider measurement certification.",
+    "rng_history_token": "{\"context_fingerprint\":\"1caf41829e4cda28c6e2868b2d4e2b70a32499d3df760661360d9841df45d508\",\"fully_visible_model_ids\":[\"target\"],\"los_cache_key\":\"los:order135-rng-control\",\"model_records\":[{\"blocker_records\":[],\"evidence\":{\"algorithm_id\":\"continuous-analytic-prism-visibility:1\",\"checked_witness_count\":0,\"clear_corridor\":null,\"full_visibility_proof\":\"clear_enclosure\",\"hidden_target_part\":null,\"input_fingerprint\":\"4b2f8ee0a9400119b9264581c62d185242cdd20b22ff1af653fb7cb4e03b3619\",\"model_fully_visible\":true,\"model_visible\":true,\"visibility_proof\":\"clear_enclosure\"},\"model_fully_visible\":true,\"model_visible\":true,\"target_model_id\":\"target\"}],\"observer_model_id\":\"observer\",\"ruleset_descriptor_hash\":\"ac8517bdc3c11a11ef7c9e61c48b51af72d398ba682baa246c749f8ebd4ec873\",\"target_model_ids\":[\"target\"],\"unit_fully_visible\":true,\"unit_visible\":true,\"visible_model_ids\":[\"target\"]}",
+    "source_sha256": {
+      "src/warhammer40k_core/core/visibility.py": "912d675f133d3266aa67ddf667042a74bbe17eb9b2e73e757a2260f13d7c4b47",
+      "src/warhammer40k_core/engine/decision.py": "e35d0695c3ce4a7a0b0aae8790f2107c6092c48f1741b983025f50545181f68e",
+      "src/warhammer40k_core/geometry/continuous_visibility.py": "f1a7b388dd4707f94f0b16603a6972b35b9ef31734272c3fbdb60505992564ed"
+    },
+    "witness": {
+      "context_fingerprint": "1caf41829e4cda28c6e2868b2d4e2b70a32499d3df760661360d9841df45d508",
+      "fully_visible_model_ids": [
+        "target"
+      ],
+      "los_cache_key": "los:order135-rng-control",
+      "model_records": [
+        {
+          "blocker_records": [],
+          "evidence": {
+            "algorithm_id": "continuous-analytic-prism-visibility:1",
+            "checked_witness_count": 0,
+            "clear_corridor": null,
+            "full_visibility_proof": "clear_enclosure",
+            "hidden_target_part": null,
+            "input_fingerprint": "4b2f8ee0a9400119b9264581c62d185242cdd20b22ff1af653fb7cb4e03b3619",
+            "model_fully_visible": true,
+            "model_visible": true,
+            "visibility_proof": "clear_enclosure"
+          },
+          "model_fully_visible": true,
+          "model_visible": true,
+          "target_model_id": "target"
+        }
+      ],
+      "observer_model_id": "observer",
+      "ruleset_descriptor_hash": "ac8517bdc3c11a11ef7c9e61c48b51af72d398ba682baa246c749f8ebd4ec873",
+      "target_model_ids": [
+        "target"
+      ],
+      "unit_fully_visible": true,
+      "unit_visible": true,
+      "visible_model_ids": [
+        "target"
+      ]
+    }
   },
   "base": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
   "complete_current_source_packages": {
@@ -42235,12 +42586,16 @@
       "sha256": "df76e5eabc49459ab4212efaf55935eeaf7a71d097990685393ea3f988439dfe"
     },
     "src/warhammer40k_core/core/visibility.py": {
-      "bytes": 40142,
-      "sha256": "98cd88d400ab1085b2411e0e3dd4ae3efdde7d63f8189e4e700f4b92231bb5d7"
+      "bytes": 43437,
+      "sha256": "1c22dfbcfcf8a5ba2f8967ad4c218a4d3800e6cab1e6e7718c3f3d0fff3fc876"
     },
     "src/warhammer40k_core/core/visibility_records.py": {
-      "bytes": 43423,
-      "sha256": "e363b4ffb72b32d0379531f59a823e43164e0238aae2c1fcde769196063c25e0"
+      "bytes": 45114,
+      "sha256": "e2a71abb55875689d4604828d9fa8487f459244c9f7673f3f7508383f006eb68"
+    },
+    "src/warhammer40k_core/core/visibility_rng_projection.py": {
+      "bytes": 4485,
+      "sha256": "180e85c868972bd07b4835e394939f6a2073c1868ee8166a8aab8456c723d597"
     },
     "src/warhammer40k_core/core/weapon_profiles.py": {
       "bytes": 57156,
@@ -42383,8 +42738,8 @@
       "sha256": "d9c01cb2b7c264d459e3ab36d091c344d58663f5eca96c9da6e944c895f3653e"
     },
     "src/warhammer40k_core/engine/decision.py": {
-      "bytes": 43475,
-      "sha256": "e35d0695c3ce4a7a0b0aae8790f2107c6092c48f1741b983025f50545181f68e"
+      "bytes": 44873,
+      "sha256": "cc8c83ac5e76077e31461b481f9e4f606e03348facf992653be5ee95a3591525"
     },
     "src/warhammer40k_core/engine/deployment.py": {
       "bytes": 58291,
@@ -42811,8 +43166,8 @@
       "sha256": "9b23a84f5b9ae7bde4bf917663c40f718acd75f365120933806fad3202dc783b"
     },
     "src/warhammer40k_core/geometry/physical_visibility.py": {
-      "bytes": 12639,
-      "sha256": "ffdcd8632a5bace002b52988d1b6140e63a4f2c2e2d4165f561b9e3c50cef889"
+      "bytes": 12691,
+      "sha256": "45fb0aac8f54b6613688e9724510ac4da618232f8a0b3428557fabdddf50ed41"
     },
     "src/warhammer40k_core/geometry/shapely_backend.py": {
       "bytes": 27093,
@@ -43081,6 +43436,10 @@
     "tests/unit/test_order135_visibility_facade.py": {
       "bytes": 5818,
       "sha256": "cc915572cd651e0429f2a31373d783aee9a32be6e4a19e831e95b79ca556a0d3"
+    },
+    "tests/unit/test_order135_visibility_rng_projection.py": {
+      "bytes": 7580,
+      "sha256": "04469a4f36421efcae429c514d1573ff1fccb3d3ab60dec3a4eca9a42c1f5556"
     },
     "tests/unit/test_order36_sequencing.py": {
       "bytes": 59800,
@@ -44888,7 +45247,13 @@
         "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext",
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/__init__.py:source_packages",
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/__init__.py:battlefield_edge_source_package",
-        "src/warhammer40k_core/rules/source_authority_registry.py:SourceAuthorityScopeRegistry.all_source_packages"
+        "src/warhammer40k_core/rules/source_authority_registry.py:SourceAuthorityScopeRegistry.all_source_packages",
+        "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext._rng_compatibility_projection",
+        "src/warhammer40k_core/core/visibility_records.py:LineOfSightWitness",
+        "src/warhammer40k_core/core/visibility_rng_projection.py:VisibilityRngProjection",
+        "src/warhammer40k_core/core/visibility_rng_projection.py:legacy_scalar_input_fingerprint",
+        "src/warhammer40k_core/engine/decision.py:_legacy_los_rng_payload",
+        "src/warhammer40k_core/engine/decision.py:DiceRollManager._seed_existing_event_history"
       ],
       "current_test_nodes": [
         "tests/unit/test_order135_physical_visibility.py::test_body_overhang_is_an_incoming_endpoint_but_not_an_outgoing_origin",
@@ -44910,7 +45275,11 @@
         "tests/code_quality/test_order135_current_core_audit.py::test_order135_current_source_registration_rejects_catalog_drift_and_cross_scope",
         "tests/code_quality/test_order135_current_core_audit.py::test_order135_current_source_transcription_must_match_authenticated_catalog",
         "tests/code_quality/test_order135_current_core_audit.py::test_complete_current_packet_rejects_self_consistent_replacement",
-        "tests/code_quality/test_order135_current_core_audit.py::test_every_engine_visibility_context_uses_authoritative_battlefield_factory"
+        "tests/code_quality/test_order135_current_core_audit.py::test_every_engine_visibility_context_uses_authoritative_battlefield_factory",
+        "tests/unit/test_order135_visibility_rng_projection.py::test_scalar_projection_matches_actual_base_token_and_keeps_current_authority",
+        "tests/unit/test_order135_visibility_rng_projection.py::test_changed_physical_domains_have_no_legacy_rng_projection",
+        "tests/unit/test_order135_visibility_rng_projection.py::test_projection_is_strict_and_bound_to_fresh_authoritative_witness",
+        "tests/unit/test_order135_visibility_rng_projection.py::test_native_scalar_projection_preserves_pending_completed_save_fork_and_replay"
       ],
       "owners": [
         "src/warhammer40k_core/geometry/physical_visibility.py:resolve_physical_visibility",
@@ -44918,14 +45287,22 @@
         "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext",
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/__init__.py:source_packages",
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/__init__.py:battlefield_edge_source_package",
-        "src/warhammer40k_core/rules/source_authority_registry.py:SourceAuthorityScopeRegistry.all_source_packages"
+        "src/warhammer40k_core/rules/source_authority_registry.py:SourceAuthorityScopeRegistry.all_source_packages",
+        "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext._rng_compatibility_projection",
+        "src/warhammer40k_core/core/visibility_records.py:LineOfSightWitness",
+        "src/warhammer40k_core/core/visibility_rng_projection.py:VisibilityRngProjection",
+        "src/warhammer40k_core/core/visibility_rng_projection.py:legacy_scalar_input_fingerprint",
+        "src/warhammer40k_core/engine/decision.py:_legacy_los_rng_payload",
+        "src/warhammer40k_core/engine/decision.py:DiceRollManager._seed_existing_event_history"
       ],
       "qualification": "Approved V963-VISIBILITY repair with actual retained maintained-mirror observation and native catalog ingress; analytical body dimensions remain synthetic/source-linked geometry, not official miniature measurements.",
+      "rng_compatibility_qualification": "Explicitly approved typed/versioned unchanged-scalar-only RNG projection. Current complete physical/bounds evidence remains authoritative; changed composite/clipped geometry retains current RNG metadata. Live/save/fork/replay and authentic BASE token are bound, never implied by static presence.",
       "runtime_pass_claimed": false,
       "test_files": [
         "tests/unit/test_order135_physical_visibility.py",
         "tests/unit/test_order135_visibility_facade.py",
-        "tests/code_quality/test_order135_current_core_audit.py"
+        "tests/code_quality/test_order135_current_core_audit.py",
+        "tests/unit/test_order135_visibility_rng_projection.py"
       ]
     },
     {
@@ -45054,14 +45431,29 @@
       "symbol_ast_sha256": "60a2080555af08bcbf10b738f0a3cde6f0dfbfec8c350ee09c938895bdfb8ed0"
     },
     "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext": {
-      "file_sha256": "98cd88d400ab1085b2411e0e3dd4ae3efdde7d63f8189e4e700f4b92231bb5d7",
+      "file_sha256": "1c22dfbcfcf8a5ba2f8967ad4c218a4d3800e6cab1e6e7718c3f3d0fff3fc876",
       "resolved_path": "src/warhammer40k_core/core/visibility.py",
-      "symbol_ast_sha256": "1183404db23cc16eacdc6b4c21597125522966fd377ee2601d14ca2122aed21e"
+      "symbol_ast_sha256": "47ac845eada492ccf8f8061122b39c1fa8075a30f1ec28c118329508f20957de"
+    },
+    "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext._rng_compatibility_projection": {
+      "file_sha256": "1c22dfbcfcf8a5ba2f8967ad4c218a4d3800e6cab1e6e7718c3f3d0fff3fc876",
+      "resolved_path": "src/warhammer40k_core/core/visibility.py",
+      "symbol_ast_sha256": "e39ee0c823ad866ab14a7948dfc0f4bef37cb911e37e48b641d9e361f191c12d"
     },
     "src/warhammer40k_core/core/visibility_records.py:LineOfSightWitness": {
-      "file_sha256": "e363b4ffb72b32d0379531f59a823e43164e0238aae2c1fcde769196063c25e0",
+      "file_sha256": "e2a71abb55875689d4604828d9fa8487f459244c9f7673f3f7508383f006eb68",
       "resolved_path": "src/warhammer40k_core/core/visibility_records.py",
-      "symbol_ast_sha256": "74625304714ce3b340c1c294788245c6f6e95df1fe01a8f7bb672bb72a12b292"
+      "symbol_ast_sha256": "551b2fa787ce756b5d63f4d3368bd7c22898dd59201610cc1002955f5d5904c8"
+    },
+    "src/warhammer40k_core/core/visibility_rng_projection.py:VisibilityRngProjection": {
+      "file_sha256": "180e85c868972bd07b4835e394939f6a2073c1868ee8166a8aab8456c723d597",
+      "resolved_path": "src/warhammer40k_core/core/visibility_rng_projection.py",
+      "symbol_ast_sha256": "f81d27a6d9bbb26822b242b904599bfb627506de5e4097deca47bee20746e6ad"
+    },
+    "src/warhammer40k_core/core/visibility_rng_projection.py:legacy_scalar_input_fingerprint": {
+      "file_sha256": "180e85c868972bd07b4835e394939f6a2073c1868ee8166a8aab8456c723d597",
+      "resolved_path": "src/warhammer40k_core/core/visibility_rng_projection.py",
+      "symbol_ast_sha256": "dcc47dfdf57b80a586d793b6b6d4207076c4db617c2c38fa268bd264dbe39e1b"
     },
     "src/warhammer40k_core/core/weapon_profiles.py:WeaponProfile": {
       "file_sha256": "e9b84259dfd9ca6eea4e60db445440a8d97a115587362e0b71f1ab29a99c6a95",
@@ -45364,9 +45756,19 @@
       "symbol_ast_sha256": "16ca89a34ba09d8f2318ce39419c9384d5d48f7fa589f75a4c7e004f152bb90b"
     },
     "src/warhammer40k_core/engine/decision.py:DiceRollManager": {
-      "file_sha256": "e35d0695c3ce4a7a0b0aae8790f2107c6092c48f1741b983025f50545181f68e",
+      "file_sha256": "cc8c83ac5e76077e31461b481f9e4f606e03348facf992653be5ee95a3591525",
       "resolved_path": "src/warhammer40k_core/engine/decision.py",
       "symbol_ast_sha256": "8ae5413723de083673d39da3484565381724766acd8a76c66f3b39f5ada181ec"
+    },
+    "src/warhammer40k_core/engine/decision.py:DiceRollManager._seed_existing_event_history": {
+      "file_sha256": "cc8c83ac5e76077e31461b481f9e4f606e03348facf992653be5ee95a3591525",
+      "resolved_path": "src/warhammer40k_core/engine/decision.py",
+      "symbol_ast_sha256": "738372b6a63f7105a3ab8ace714c273b6b37fa2b9cc5da61c4651b421d92fbe7"
+    },
+    "src/warhammer40k_core/engine/decision.py:_legacy_los_rng_payload": {
+      "file_sha256": "cc8c83ac5e76077e31461b481f9e4f606e03348facf992653be5ee95a3591525",
+      "resolved_path": "src/warhammer40k_core/engine/decision.py",
+      "symbol_ast_sha256": "f16a705db669fac29b4b28344b6cc0c18d5240b1fffba2b093ca66d1bfaf07e2"
     },
     "src/warhammer40k_core/engine/deployment.py:resolve_deployment_placement": {
       "file_sha256": "e4266d07aaaaac8f7dda6d47b91e322768fa442fcd089bf1d64374110c88875f",
@@ -46254,7 +46656,7 @@
       "symbol_ast_sha256": "76785011f6a4ee78f2ecd148be6d2ec2f0128aa3d454d8bbe75f4bf6fecec30a"
     },
     "src/warhammer40k_core/geometry/physical_visibility.py:resolve_physical_visibility": {
-      "file_sha256": "ffdcd8632a5bace002b52988d1b6140e63a4f2c2e2d4165f561b9e3c50cef889",
+      "file_sha256": "45fb0aac8f54b6613688e9724510ac4da618232f8a0b3428557fabdddf50ed41",
       "resolved_path": "src/warhammer40k_core/geometry/physical_visibility.py",
       "symbol_ast_sha256": "a024c2cf566a44e8809e5a2c630451d9b66c616b3b034317e12ce9e2e764c115"
     },
@@ -107837,6 +108239,66 @@
       "resolved_path": "tests/unit/test_order135_visibility_facade.py",
       "runtime_pass_claimed": false,
       "symbol_ast_sha256": "c9ced318d34ec4f342a013a1af5dcc8ffab93b920907d935b71637f11527eb24"
+    },
+    "tests/unit/test_order135_visibility_rng_projection.py::test_changed_physical_domains_have_no_legacy_rng_projection": {
+      "assertion_mode": "inline",
+      "assertions": [
+        "assert witness.rng_compatibility_projection is None",
+        "assert 'rng_compatibility_projection' not in witness.to_payload()",
+        "assert LineOfSightWitness.from_payload(witness.to_payload()) == witness",
+        "assert witness.context_fingerprint in _rng_payload_history_token(validate_json_value(witness.to_payload()))"
+      ],
+      "complete_current_body": "@pytest.mark.parametrize('subject', ['observer', 'target', 'blocker', 'clipped'])\ndef test_changed_physical_domains_have_no_legacy_rng_projection(subject: str) -> None:\n    context = _context()\n    body = ModelBodyPart('body', CircularBase(1), 0, 0, 0, 2, 'analytical:body')\n    if subject == 'observer':\n        context = replace(context, observer_model=replace(context.observer_model, body_parts=(body,)))\n    elif subject == 'target':\n        context = replace(context, target_models=(replace(context.target_models[0], body_parts=(body,)),))\n    elif subject == 'blocker':\n        blocker = replace(context.target_models[0], model_id='blocker', pose=Pose.at(10, 10), body_parts=(body,))\n        context = replace(context, dynamic_model_blockers=(blocker,))\n    else:\n        context = replace(context, observer_model=replace(context.observer_model, pose=Pose.at(0, 2)))\n    witness = context.resolve_line_of_sight()\n    assert witness.rng_compatibility_projection is None\n    assert 'rng_compatibility_projection' not in witness.to_payload()\n    assert LineOfSightWitness.from_payload(witness.to_payload()) == witness\n    assert witness.context_fingerprint in _rng_payload_history_token(validate_json_value(witness.to_payload()))",
+      "file_sha256": "04469a4f36421efcae429c514d1573ff1fccb3d3ab60dec3a4eca9a42c1f5556",
+      "resolved_path": "tests/unit/test_order135_visibility_rng_projection.py",
+      "runtime_pass_claimed": false,
+      "symbol_ast_sha256": "027346dd0f3b0bbfe25fd993cdf08e909e3aa59fa479af26bc38985b7f08b101"
+    },
+    "tests/unit/test_order135_visibility_rng_projection.py::test_native_scalar_projection_preserves_pending_completed_save_fork_and_replay": {
+      "assertion_mode": "inline",
+      "assertions": [
+        "assert candidates",
+        "assert all((LineOfSightWitness.from_payload(cast(LineOfSightWitnessPayload, row['line_of_sight_witness'])).rng_compatibility_projection is not None for row in candidates))",
+        "assert any((event.event_type == 'dice_rolled' for event in session.lifecycle.decision_controller.event_log.records))",
+        "assert recovered.to_persistence_payload() == forked.to_persistence_payload() == session.to_persistence_payload()",
+        "assert accepted.status_kind is not LifecycleStatusKind.INVALID, accepted.to_payload()"
+      ],
+      "complete_current_body": "def test_native_scalar_projection_preserves_pending_completed_save_fork_and_replay() -> None:\n    session, request = native_scalar_shooting_request()\n    proposal = _proposal_from_request(request=request, target_unit_id='army-beta:scalar')\n    proposal_request = cast(dict[str, object], cast(dict[str, object], request.payload)['proposal_request'])\n    candidates = cast(list[dict[str, object]], proposal_request['target_candidates'])\n    assert candidates\n    assert all((LineOfSightWitness.from_payload(cast(LineOfSightWitnessPayload, row['line_of_sight_witness'])).rng_compatibility_projection is not None for row in candidates))\n    assert_checkpoint(session)\n    checkpoint = json.loads(json.dumps(session.to_persistence_payload()))\n    recovered = LocalGameSession.from_persistence_payload(checkpoint)\n    forked = session.fork()\n    for current in (session, recovered, forked):\n        accepted = current.submit_parameterized_payload(request_id=request.request_id, result_id='order135-rng:declaration', payload=validate_json_value(proposal.to_payload()))\n        assert accepted.status_kind is not LifecycleStatusKind.INVALID, accepted.to_payload()\n        for _ in range(40):\n            if any((event.event_type == 'attack_sequence_completed' for event in current.lifecycle.decision_controller.event_log.records)):\n                break\n            submit_fixture_request(current, pending_request(current))\n        else:\n            raise AssertionError('Native scalar attack did not complete.')\n    assert any((event.event_type == 'dice_rolled' for event in session.lifecycle.decision_controller.event_log.records))\n    assert recovered.to_persistence_payload() == forked.to_persistence_payload() == session.to_persistence_payload()\n    assert_checkpoint(session)",
+      "file_sha256": "04469a4f36421efcae429c514d1573ff1fccb3d3ab60dec3a4eca9a42c1f5556",
+      "resolved_path": "tests/unit/test_order135_visibility_rng_projection.py",
+      "runtime_pass_claimed": false,
+      "symbol_ast_sha256": "5518b56901f66e129e75825998000e1dc70b474b3480ffdb7207c8f341c7a2f3"
+    },
+    "tests/unit/test_order135_visibility_rng_projection.py::test_projection_is_strict_and_bound_to_fresh_authoritative_witness": {
+      "assertion_mode": "inline",
+      "assertions": [
+        "with pytest.raises(GeometryError):\n    context.benefit_of_cover(LineOfSightWitness.from_payload(cast(LineOfSightWitnessPayload, payload)))"
+      ],
+      "complete_current_body": "@pytest.mark.parametrize('change', ['missing', 'hash', 'target', 'version', 'extra'])\ndef test_projection_is_strict_and_bound_to_fresh_authoritative_witness(change: str) -> None:\n    context = _context()\n    payload = json.loads(json.dumps(context.resolve_line_of_sight().to_payload()))\n    if change == 'missing':\n        del payload['rng_compatibility_projection']\n    elif change == 'hash':\n        payload['rng_compatibility_projection']['context_fingerprint'] = '0' * 64\n    elif change == 'target':\n        payload['rng_compatibility_projection']['pairs'][0]['target_model_id'] = 'different-target'\n    elif change == 'version':\n        payload['rng_compatibility_projection']['version'] = 'unapproved:2'\n    else:\n        payload['rng_compatibility_projection']['unknown'] = True\n    with pytest.raises(GeometryError):\n        context.benefit_of_cover(LineOfSightWitness.from_payload(cast(LineOfSightWitnessPayload, payload)))",
+      "file_sha256": "04469a4f36421efcae429c514d1573ff1fccb3d3ab60dec3a4eca9a42c1f5556",
+      "resolved_path": "tests/unit/test_order135_visibility_rng_projection.py",
+      "runtime_pass_claimed": false,
+      "symbol_ast_sha256": "263dc90e2938930223ab4a60290d891d41dcb6331f11d3e3e140da5fd9bfe963"
+    },
+    "tests/unit/test_order135_visibility_rng_projection.py::test_scalar_projection_matches_actual_base_token_and_keeps_current_authority": {
+      "assertion_mode": "inline",
+      "assertions": [
+        "assert witness.rng_compatibility_projection is not None",
+        "assert payload['context_fingerprint'] != baseline['witness']['context_fingerprint']",
+        "assert payload['model_records'][0]['evidence']['algorithm_id'].endswith(':2')",
+        "assert payload['model_records'][0]['evidence']['input_fingerprint'] != baseline['witness']['model_records'][0]['evidence']['input_fingerprint']",
+        "assert _rng_payload_history_token(validate_json_value(payload)) == baseline['rng_history_token']",
+        "assert LineOfSightWitness.from_payload(json.loads(json.dumps(payload))) == witness",
+        "assert witness.to_payload() == payload",
+        "assert alternate.context_fingerprint != witness.context_fingerprint",
+        "assert alternate.model_records[0].evidence.input_fingerprint != witness.model_records[0].evidence.input_fingerprint",
+        "assert _rng_payload_history_token(validate_json_value(alternate.to_payload())) == baseline['rng_history_token']"
+      ],
+      "complete_current_body": "def test_scalar_projection_matches_actual_base_token_and_keeps_current_authority() -> None:\n    baseline = json.loads((ROOT / 'data/source_audits/order135/los-rng-base-control.json').read_text())\n    context = _context()\n    witness = context.resolve_line_of_sight()\n    payload = witness.to_payload()\n    assert witness.rng_compatibility_projection is not None\n    assert payload['context_fingerprint'] != baseline['witness']['context_fingerprint']\n    assert payload['model_records'][0]['evidence']['algorithm_id'].endswith(':2')\n    assert payload['model_records'][0]['evidence']['input_fingerprint'] != baseline['witness']['model_records'][0]['evidence']['input_fingerprint']\n    assert _rng_payload_history_token(validate_json_value(payload)) == baseline['rng_history_token']\n    assert LineOfSightWitness.from_payload(json.loads(json.dumps(payload))) == witness\n    assert witness.to_payload() == payload\n    altered_bounds = replace(context, battlefield_bounds=BattlefieldVisibilityBounds(Fraction(0), Fraction(0), Fraction(14), Fraction(12)))\n    alternate = altered_bounds.resolve_line_of_sight()\n    assert alternate.context_fingerprint != witness.context_fingerprint\n    assert alternate.model_records[0].evidence.input_fingerprint != witness.model_records[0].evidence.input_fingerprint\n    assert _rng_payload_history_token(validate_json_value(alternate.to_payload())) == baseline['rng_history_token']",
+      "file_sha256": "04469a4f36421efcae429c514d1573ff1fccb3d3ab60dec3a4eca9a42c1f5556",
+      "resolved_path": "tests/unit/test_order135_visibility_rng_projection.py",
+      "runtime_pass_claimed": false,
+      "symbol_ast_sha256": "9c43186e33f2dffb0de448731ac45a2b4e87c37cae014033594233e1a8eccaae"
     },
     "tests/unit/test_order36_sequencing.py::test_all_four_tiers_give_each_owner_their_own_choices": {
       "assertion_mode": "inline",

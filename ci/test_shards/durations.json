@@ -111,6 +111,7 @@
     "tests/unit/test_order135_objective_overlap.py": 7.234,
     "tests/unit/test_order135_physical_visibility.py": 16.657,
     "tests/unit/test_order135_visibility_facade.py": 58.007,
+    "tests/unit/test_order135_visibility_rng_projection.py": 44.761,
     "tests/unit/test_order36_sequencing.py": 250.154,
     "tests/unit/test_order36_timing_authority.py": 216.625,
     "tests/unit/test_order51_flight.py": 172.73,
@@ -329,77 +330,78 @@
         "1402886578470348485d0ad0f82d8db9d9d5748d007711514a5099c33669f654",
         "2b7bdea4cd71f8a7d7d955f92da7a7f8bb3a4295a07925241852b3d336a48bad",
         "31fe8a595e09c738a3710dc33ec790a7fd21e4acaa388a8e699531a5c73c8f01",
+        "3485a888a61e38ed7f86a66eabd4b7341be92e142734de39e6ae16418fa4947c",
         "6bc406af456cfae56f7084f54aecc22b9fd62e827a839f0d3023334c24a70573",
         "9980095baa224979ab4744a997a05718c12e4d68ee604348269cc93c191711b0"
       ],
-      "source": "PROVISIONAL ONLY: exact predecessor BASE70b0c0b43774f81d67753b0e3f830b38f1b178ff complete11119-case local profile plus12 new focused cases; same Windows host. This mixed-revision balancing input is NOT current aggregate pass credit or final timing metadata; replace after COMPLETE current passing cohort.",
-      "test_cases": 11131,
-      "test_files": 322
+      "source": "PROVISIONAL ONLY: authenticated predecessor profile plus Order135 focused cases, including11 approved LOS RNG projection controls. Mixed revisions are NOT current complete-cohort pass credit; final timing metadata requires COMPLETE passing current cohort.",
+      "test_cases": 11142,
+      "test_files": 323
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 5119.473,
+      "duration_seconds": 5123.206,
       "shard_id": 1,
-      "test_file_count": 26
+      "test_file_count": 25
     },
     {
-      "duration_seconds": 5119.509,
+      "duration_seconds": 5123.209,
       "shard_id": 2,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 5119.475,
+      "duration_seconds": 5123.203,
       "shard_id": 3,
-      "test_file_count": 27
-    },
-    {
-      "duration_seconds": 5119.504,
-      "shard_id": 4,
-      "test_file_count": 27
-    },
-    {
-      "duration_seconds": 5119.509,
-      "shard_id": 5,
-      "test_file_count": 26
-    },
-    {
-      "duration_seconds": 5119.474,
-      "shard_id": 6,
-      "test_file_count": 27
-    },
-    {
-      "duration_seconds": 5119.507,
-      "shard_id": 7,
-      "test_file_count": 26
-    },
-    {
-      "duration_seconds": 5119.469,
-      "shard_id": 8,
       "test_file_count": 28
     },
     {
-      "duration_seconds": 5119.468,
+      "duration_seconds": 5123.234,
+      "shard_id": 4,
+      "test_file_count": 26
+    },
+    {
+      "duration_seconds": 5123.242,
+      "shard_id": 5,
+      "test_file_count": 27
+    },
+    {
+      "duration_seconds": 5123.203,
+      "shard_id": 6,
+      "test_file_count": 28
+    },
+    {
+      "duration_seconds": 5123.2,
+      "shard_id": 7,
+      "test_file_count": 28
+    },
+    {
+      "duration_seconds": 5123.205,
+      "shard_id": 8,
+      "test_file_count": 27
+    },
+    {
+      "duration_seconds": 5123.201,
       "shard_id": 9,
       "test_file_count": 27
     },
     {
-      "duration_seconds": 5119.493,
+      "duration_seconds": 5123.201,
       "shard_id": 10,
-      "test_file_count": 26
+      "test_file_count": 27
     },
     {
-      "duration_seconds": 5119.473,
+      "duration_seconds": 5123.239,
       "shard_id": 11,
       "test_file_count": 27
     },
     {
-      "duration_seconds": 5119.467,
+      "duration_seconds": 5123.239,
       "shard_id": 12,
-      "test_file_count": 29
+      "test_file_count": 27
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 61433.821
+  "total_test_duration_seconds": 61478.582
 }

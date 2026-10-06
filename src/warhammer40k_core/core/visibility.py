@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import lru_cache
 from typing import Self, TypedDict, cast
 
@@ -71,11 +71,20 @@ from warhammer40k_core.core.visibility_records import (
 from warhammer40k_core.core.visibility_records import (
     visibility_blocker_kind_from_token as visibility_blocker_kind_from_token,
 )
+from warhammer40k_core.core.visibility_rng_projection import (
+    VisibilityRngProjection,
+    legacy_scalar_input_fingerprint,
+)
+from warhammer40k_core.geometry.continuous_visibility import (
+    resolve_visibility_pair,
+    resolve_visibility_pair_uncached,
+)
 from warhammer40k_core.geometry.physical_visibility import (
     BattlefieldVisibilityBounds,
     BattlefieldVisibilityBoundsPayload,
     physical_model_visibility_prisms,
     physical_source_group_obscures,
+    physical_visibility_fingerprint,
     resolve_physical_visibility,
     resolve_physical_visibility_uncached,
 )
@@ -123,6 +132,7 @@ from warhammer40k_core.geometry.visibility_query import (
     VisibilityResultPayload as VisibilityResultPayload,
 )
 from warhammer40k_core.geometry.visibility_shapes import (
+    model_visibility_prism,
     terrain_visibility_prism,
 )
 from warhammer40k_core.geometry.volume import Model, ModelPayload
@@ -337,7 +347,45 @@ class TerrainVisibilityContext:
             los_cache_key=self.los_cache_key,
             observer_model_id=self.observer_model.model_id,
             model_records=records,
+            rng_compatibility_projection=self._rng_compatibility_projection(
+                terrain_area_feature_ids
+            ),
         )
+
+    def _rng_compatibility_projection(
+        self, terrain_area_feature_ids: frozenset[str]
+    ) -> VisibilityRngProjection | None:
+        models = (self.observer_model, *self.target_models, *self.dynamic_model_blockers)
+        if any(model.body_parts for model in models):
+            return None
+        observer = model_visibility_prism(self.observer_model)
+        if self.battlefield_bounds is not None and not self.battlefield_bounds.encloses(observer):
+            return None
+        # Only this proven inactive clipping permits the authentic legacy
+        # context encoding. The current stored context still includes bounds.
+        legacy_payload = {
+            key: value for key, value in self.to_payload().items() if key != "battlefield_bounds"
+        }
+        legacy_context = hashlib.sha256(
+            json.dumps(
+                legacy_payload, sort_keys=True, separators=(",", ":"), allow_nan=False
+            ).encode("utf-8")
+        ).hexdigest()
+        pairs: list[tuple[str, str]] = []
+        for target in self.target_models:
+            entries = self._obstacle_entries(target, terrain_area_feature_ids)
+            pairs.append(
+                (
+                    target.model_id,
+                    legacy_scalar_input_fingerprint(
+                        observer,
+                        model_visibility_prism(target),
+                        tuple(prism for prism, record in entries if record.blocks_model_visibility),
+                        tuple(prism for prism, record in entries if record.blocks_full_visibility),
+                    ),
+                )
+            )
+        return VisibilityRngProjection(legacy_context, tuple(pairs))
 
     def benefit_of_cover(self, witness: LineOfSightWitness) -> BenefitOfCoverResult:
         self._validate_witness(witness)
@@ -475,18 +523,39 @@ class TerrainVisibilityContext:
         use_result_cache: bool = True,
     ) -> ModelLineOfSightRecord:
         entries = self._obstacle_entries(target_model, terrain_area_feature_ids)
-        resolver = (
-            resolve_physical_visibility
-            if use_result_cache
-            else resolve_physical_visibility_uncached
-        )
-        evidence = resolver(
-            physical_model_visibility_prisms(self.observer_model),
-            physical_model_visibility_prisms(target_model),
-            tuple(prism for prism, record in entries if record.blocks_model_visibility),
-            tuple(prism for prism, record in entries if record.blocks_full_visibility),
-            self.battlefield_bounds,
-        )
+        observers = physical_model_visibility_prisms(self.observer_model)
+        targets = physical_model_visibility_prisms(target_model)
+        any_blockers = tuple(prism for prism, record in entries if record.blocks_model_visibility)
+        full_blockers = tuple(prism for prism, record in entries if record.blocks_full_visibility)
+        # The established scalar cache remains authoritative for an actual
+        # singleton physical domain with no observer clipping. Composite unions
+        # and clipped observers retain the complete physical solver and cache.
+        if len(observers) == len(targets) == 1 and (
+            self.battlefield_bounds is None or self.battlefield_bounds.encloses(observers[0])
+        ):
+            scalar_resolver = (
+                resolve_visibility_pair if use_result_cache else resolve_visibility_pair_uncached
+            )
+            evidence = replace(
+                scalar_resolver(
+                    model_visibility_prism(self.observer_model),
+                    model_visibility_prism(target_model),
+                    any_blockers,
+                    full_blockers,
+                ),
+                input_fingerprint=physical_visibility_fingerprint(
+                    observers, targets, any_blockers, full_blockers, self.battlefield_bounds
+                ),
+            )
+        else:
+            resolver = (
+                resolve_physical_visibility
+                if use_result_cache
+                else resolve_physical_visibility_uncached
+            )
+            evidence = resolver(
+                observers, targets, any_blockers, full_blockers, self.battlefield_bounds
+            )
         records = tuple(
             sorted({record for _, record in entries}, key=visibility_blocker_record_sort_key)
         )

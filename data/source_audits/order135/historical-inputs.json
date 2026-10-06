@@ -128,6 +128,22 @@
       "bytes": 16145,
       "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
       "git_path": "tools/build_core_other_concepts_source.py"
+    },
+    {
+      "path": "src/warhammer40k_core/core/visibility_records.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/core/visibility_records.py.txt",
+      "bytes": 43423,
+      "sha256": "e363b4ffb72b32d0379531f59a823e43164e0238aae2c1fcde769196063c25e0",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/core/visibility_records.py"
+    },
+    {
+      "path": "src/warhammer40k_core/engine/decision.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/engine/decision.py.txt",
+      "bytes": 43475,
+      "sha256": "e35d0695c3ce4a7a0b0aae8790f2107c6092c48f1741b983025f50545181f68e",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/engine/decision.py"
     }
   ],
   "qualification": "Original source/archive pins are immutable; appended current FAQ authority has distinct identity."

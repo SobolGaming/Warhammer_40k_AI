@@ -85,3 +85,17 @@ replay and visibility. Exact unchanged-tree evidence may bind passing checks;
 actual fresh audit findings and both independent assessments must be retained.
 The completion packet carries full source inputs and successor scope UNSELECTED.
 No implementation of a successor is authorized.
+
+The user explicitly approved the narrow LOS deterministic-RNG compatibility
+projection on October6 at23:18UTC in response to the exact23:09UTC question.
+The complete question/answer is retained in
+`data/source_audits/order135/los-rng-compatibility-approval.json`. Only genuinely
+unchanged scalar geometry with unclipped outgoing origins and no declared body
+components (including dynamic blockers) receives authentic legacy context/pair
+hashes in a separately typed/versioned projection. The current stored witness
+retains complete body/bounds fingerprints and predicates; fresh context equality
+validates the projection, and identical pure copied normalization handles live
+and restored RNG histories. Composite/clipped changed geometry keeps current
+RNG authority. Original regression assertions and budgets are unchanged. Native
+configuration-to-shooting checks include pending/completed saves, forks and exact
+replay without injected state or dice. This grants no other compatibility scope.
