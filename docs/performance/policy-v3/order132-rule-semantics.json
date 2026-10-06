@@ -1,0 +1,35 @@
+{
+  "base": "f054b52fe912875bfe425cf875de3756294b5c7b",
+  "changes": {
+    "src/warhammer40k_core/geometry/measurement.py": {
+      "before_sha256": "8d174a6fd88d5ecdd7b464042fab3d80f81acb663638a30f5e5e4df074a203ed",
+      "after_sha256": "72014601daddcae014788d9773be39560f1748082270f91aecea8c8979cc07bf",
+      "owners": {
+        "DistanceMeasurementContext._support_base_wholly_within": {
+          "before": "e6e2374ab07699a00a978536589e4d106a35598fa0265947af9237260a99251b",
+          "after": "856aa6469b9e8b6600709c4cd3952c708f30f3860a77945eee63ce049c4385cb"
+        },
+        "_circular_whole_distance": {
+          "before": null,
+          "after": "da830ed2b6a317db6528d756bf968fb4345886d92a8bfa5f3b28f58376754ed4"
+        },
+        "_closest_gap_cover": {
+          "before": "f4ce6ac881b2f1733b8f8b824f19c25430a669f6a8f5af1c25f681aa8a512718",
+          "after": "f54d7aff1efa14b7eda422170992401d8ce1d9bf6fad21bab795aa5894cc9bdd"
+        },
+        "_sources_cover_footprint": {
+          "before": "be982b26e56c6eca71bdbadb4ec758c83da39eacc91e0b8a4368c5fa20d09c42",
+          "after": "3f1131788fc8ca718bcf79c649480455394ed5c7843aadb1947f56fbd9a4ac7c"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "src/warhammer40k_core/geometry/measurement.py": [
+      "geometry-search"
+    ]
+  },
+  "authority": "Owner-approved bounded repairs use quiet serial current-runtime smoke and exact-base assessment; detailed comparisons apply to intended performance work or demonstrated serious regression. This exact source/owner hash scope preserves all mandatory operation mappings and numerical/live checks.",
+  "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
+  "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+}

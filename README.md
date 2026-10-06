@@ -1,3 +1,7 @@
+Order132 / P18K restores inclusive circular Rapid/Tactical disembark distance
+through shared geometry, preserving setup, continuation, persistence and replay.
+See [source and scope](docs/ORDER_132_SCOPE_PLAN.md).
+
 Order126 / P03G preserves physical model movement order across shared Movement,
 Scout, Charge, Fight and triggered consumers, including attached units. See
 [source and scope](docs/ORDER_126_SCOPE_PLAN.md).
