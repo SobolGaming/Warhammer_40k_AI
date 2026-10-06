@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6e8dbaf786008b595f2f93bba3213edc1328e1ee8626e3a61e32e4eac2251eb4",
-  "fingerprint": "6e8dbaf786008b595f2f93bba3213edc1328e1ee8626e3a61e32e4eac2251eb4",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:00215581416c4a7d8487de36fed4dfe07d61aded88c3667bc03bb7f20ced3998",
+  "fingerprint": "00215581416c4a7d8487de36fed4dfe07d61aded88c3667bc03bb7f20ced3998",
   "resource_count": 3083,
   "resources": [
     {
@@ -1210,9 +1210,9 @@
       "sha256": "e9b7d652328dff786b4f3894f9a092abb5ae04ec586936dbb09fac8faf8b7a3a"
     },
     {
-      "byte_length": 2040,
+      "byte_length": 2150,
       "path": "warhammer40k_core/engine/casualty_coherency_restore.py",
-      "sha256": "d9d9640b3d729d0e69c909f8955f88385b2698d163ba720c5d45f61ce4c36722"
+      "sha256": "78e062d588754edc360cc5a51994dda94452f6f0bd5f438d83ddab92d14dd5e4"
     },
     {
       "byte_length": 3559,
@@ -10230,9 +10230,9 @@
       "sha256": "546b87af37cf2ab8707ec2acdfc3e96f84b062fcc73ba046b28e44770c8d49df"
     },
     {
-      "byte_length": 301998,
+      "byte_length": 302384,
       "path": "warhammer40k_core/engine/game_state.py",
-      "sha256": "6b680d77eff1d41dddf3e23687e0a3fb3c8c10fcae181ecab8f702523b61c240"
+      "sha256": "be128a034dad11a94c7f7bf024540a72d68a5033a1074fd2db0977fa6bd309ab"
     },
     {
       "byte_length": 11532,
@@ -10720,9 +10720,9 @@
       "sha256": "0cc667fb87747201bc2c1674fb300f4021c354229ced82d2e1c8cda6de28fc9d"
     },
     {
-      "byte_length": 2039,
+      "byte_length": 1526,
       "path": "warhammer40k_core/engine/mission_cleanup_boundary.py",
-      "sha256": "97bb637f9d327f2e4a54c12cde8634f5f0105bdb7f6dee1acfd91aa06d8b4d02"
+      "sha256": "9d6dc801abf6db033cdb86d28782f7e279ac0702154e7a2bd0da56f98dac6676"
     },
     {
       "byte_length": 56296,
@@ -12305,9 +12305,9 @@
       "sha256": "cc360b32b7f8e39278abd1ab57c3cd62acd13ae63b69800ad3152223ce18e703"
     },
     {
-      "byte_length": 9843,
+      "byte_length": 11677,
       "path": "warhammer40k_core/engine/rule_model_destruction_unplaced.py",
-      "sha256": "a33c94b2bce0f1367c14c86cc943f1885679d7007df2cafa35c3c1698a5f998b"
+      "sha256": "4e1d44fe02f4fe42c798bce2ac11c1da478da2c563c59d9432659d1afdbf5e4c"
     },
     {
       "byte_length": 9093,

@@ -20,6 +20,9 @@ zero. Physical history reconstructs that death rather than retaining living
 off-battlefield models. Authentic casualty gaps can remain incoherent until the
 mandatory end-turn cleanup; setup and unaffected units retain coherency checks.
 Destruction producers and shared departure provenance remain authenticated.
+The existing rule-destruction host owns the explicit coherency reaction exception;
+GameState applies physical replacement through its mutator and retains cleanup
+tracking. Restore coherency checks use an immutable projection of unaffected units.
 
 Catalog controls explicitly supply W9/W10 at the fixture catalog boundary.
 The native Be'lakor control preserves the admitted W20 datasheet, keywords,

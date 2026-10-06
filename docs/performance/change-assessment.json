@@ -1,8 +1,8 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "010573378e25e32e7ff4d79265c59f1865d5351a",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6e8dbaf786008b595f2f93bba3213edc1328e1ee8626e3a61e32e4eac2251eb4",
-  "operation_map_sha256": "4275b8ecf5ad9d2d39f9711fc6876618f078feb813c060bc5559c9cb87c02c87",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:00215581416c4a7d8487de36fed4dfe07d61aded88c3667bc03bb7f20ced3998",
+  "operation_map_sha256": "d675c6ad052e4c099ae19b248a27733be2e9c08df37c41537cefbbe02079424a",
   "changes": {
     "ci/test_shards/durations.json": {
       "before_sha256": "0aaff9eaea4721367be5f2b336c09971a1f4652b4fa43a2c7948284d2736569d",
@@ -146,81 +146,81 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "2cb5560c616ad3cbfd1f1bb1c4ca9252413ae64e67a5f624077ff1299f137581",
-      "after_sha256": "4810615b1f6bc3ec6921416fa73a41dd7a0bac199925d4e2e49205f7e3444ab9",
+      "after_sha256": "1a8211a3be3e1a41156b8c3404394667519554c2acc569e7cd89362c17980dbe",
       "owners": {
         "@document": {
           "before": "2cb5560c616ad3cbfd1f1bb1c4ca9252413ae64e67a5f624077ff1299f137581",
-          "after": "4810615b1f6bc3ec6921416fa73a41dd7a0bac199925d4e2e49205f7e3444ab9"
+          "after": "1a8211a3be3e1a41156b8c3404394667519554c2acc569e7cd89362c17980dbe"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "df9d9cbe063069807d8be4d4f4e792b3ee5e44c14cfb1c35ba32ee5fcf65ad97",
-      "after_sha256": "81ba733e32dfd65082d1be11dd8888669fc73e74eb7ff3e6308d36970aee5d3b",
+      "after_sha256": "f5c589b1e056161eba4253057a10f3127e351da1d06b74ed06decc8f9517390f",
       "owners": {
         "@document": {
           "before": "df9d9cbe063069807d8be4d4f4e792b3ee5e44c14cfb1c35ba32ee5fcf65ad97",
-          "after": "81ba733e32dfd65082d1be11dd8888669fc73e74eb7ff3e6308d36970aee5d3b"
+          "after": "f5c589b1e056161eba4253057a10f3127e351da1d06b74ed06decc8f9517390f"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "ddf5f1d40d0c5f3a326fe95e199b8752e79820cfa12d40f4fc08020732561307",
-      "after_sha256": "03a7e184233ca6214683f9e9ab98b1b1e462f98f3041ad428c9d633cf1d204b3",
+      "after_sha256": "2f26135417152bd78abd723eef374f58d6b0a8b461f959ebc4ef7ef555bbe748",
       "owners": {
         "@document": {
           "before": "ddf5f1d40d0c5f3a326fe95e199b8752e79820cfa12d40f4fc08020732561307",
-          "after": "03a7e184233ca6214683f9e9ab98b1b1e462f98f3041ad428c9d633cf1d204b3"
+          "after": "2f26135417152bd78abd723eef374f58d6b0a8b461f959ebc4ef7ef555bbe748"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "472afeb9a4b09bafdcebc8418578b76d1c4caed010d66bec1007509b4a219502",
-      "after_sha256": "12965c0c9e5123edb2e5128c2c12799230cdf796167cc0a78ada766153d0a840",
+      "after_sha256": "af55878e534f77d02c5cc72855f318610d1f1a85bcd9290af9a7bb85ad06c0a0",
       "owners": {
         "@document": {
           "before": "472afeb9a4b09bafdcebc8418578b76d1c4caed010d66bec1007509b4a219502",
-          "after": "12965c0c9e5123edb2e5128c2c12799230cdf796167cc0a78ada766153d0a840"
+          "after": "af55878e534f77d02c5cc72855f318610d1f1a85bcd9290af9a7bb85ad06c0a0"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "f972bbcf3123458ddf4dce50aecbfa280f6ca2f01a139f40419e3797ff6c70c4",
-      "after_sha256": "5e014ecd335f43ae277d4ea419ae3ae76e270fd3846e9976410ba09f9f0fe881",
+      "after_sha256": "6734061f502ae90d651479ae7cfb0133848026a114b08a4c5d91d265347f44b5",
       "owners": {
         "@document": {
           "before": "f972bbcf3123458ddf4dce50aecbfa280f6ca2f01a139f40419e3797ff6c70c4",
-          "after": "5e014ecd335f43ae277d4ea419ae3ae76e270fd3846e9976410ba09f9f0fe881"
+          "after": "6734061f502ae90d651479ae7cfb0133848026a114b08a4c5d91d265347f44b5"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "388d6159734675edd84e7691854d8b65340e3a3d4032b0c86239c3e7f3fcac59",
-      "after_sha256": "c0d26da5e54e7c23169a9c6ab0ddce146b9408de27729aef51f99a1d3cdf09a2",
+      "after_sha256": "1fd32bac60fb13f15f63be2c961426b09c468612002a6a0d814b21436a9124a6",
       "owners": {
         "@document": {
           "before": "388d6159734675edd84e7691854d8b65340e3a3d4032b0c86239c3e7f3fcac59",
-          "after": "c0d26da5e54e7c23169a9c6ab0ddce146b9408de27729aef51f99a1d3cdf09a2"
+          "after": "1fd32bac60fb13f15f63be2c961426b09c468612002a6a0d814b21436a9124a6"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "780eee7caf6e489bce2a4b8470b139b6ac62b91126c38283891ff0c844c3cd2c",
-      "after_sha256": "efde278e8796406e843adcf0d4681736ed97eb33590db7875539acd964f49561",
+      "after_sha256": "99ae4ce32196b12db1aefdf6726942896092336911d403feb78b2efb73f338fe",
       "owners": {
         "@document": {
           "before": "780eee7caf6e489bce2a4b8470b139b6ac62b91126c38283891ff0c844c3cd2c",
-          "after": "efde278e8796406e843adcf0d4681736ed97eb33590db7875539acd964f49561"
+          "after": "99ae4ce32196b12db1aefdf6726942896092336911d403feb78b2efb73f338fe"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "1c2411356260bdd79d77496e6116e41526b47fa820b62f8bc5ede20e82eb5629",
-      "after_sha256": "b6122c241a42198fab9f138b59e765143f2fd85dd4d4e36eedfa2edd37e13abc",
+      "after_sha256": "080c6698420b5a2d467e4371997a97e7ac9abea5f5bfb66f5788a67a4321eed8",
       "owners": {
         "@document": {
           "before": "1c2411356260bdd79d77496e6116e41526b47fa820b62f8bc5ede20e82eb5629",
-          "after": "b6122c241a42198fab9f138b59e765143f2fd85dd4d4e36eedfa2edd37e13abc"
+          "after": "080c6698420b5a2d467e4371997a97e7ac9abea5f5bfb66f5788a67a4321eed8"
         }
       }
     },
@@ -276,31 +276,31 @@
     },
     "docs/ORDER_130_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "cfe57aba510043d98c7b7646637c199a89318e3c27fb1cbea80cadfcbf4e95c5",
+      "after_sha256": "1b8ca368c4414ce3d864ab4f7f6489f6b1b4ae370815e9bce145c7a4809f4ddf",
       "owners": {
         "@document": {
           "before": null,
-          "after": "cfe57aba510043d98c7b7646637c199a89318e3c27fb1cbea80cadfcbf4e95c5"
+          "after": "1b8ca368c4414ce3d864ab4f7f6489f6b1b4ae370815e9bce145c7a4809f4ddf"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "d0156ff6120213a38e8300d2f46d7a8cf23a1544ba3e236f5c7703db0d663a21",
-      "after_sha256": "bf8d48140c094b4160255972af5168519d94787671723ec63300db40b4b99707",
+      "after_sha256": "2f820ad533cabe204ba544718ade1d3e098c88de19718278d139c1453aed3c27",
       "owners": {
         "@document": {
           "before": "d0156ff6120213a38e8300d2f46d7a8cf23a1544ba3e236f5c7703db0d663a21",
-          "after": "bf8d48140c094b4160255972af5168519d94787671723ec63300db40b4b99707"
+          "after": "2f820ad533cabe204ba544718ade1d3e098c88de19718278d139c1453aed3c27"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "c6e5c16cc3d8e0cfe8fd3e4ead3914c2db84eed66024d02ee8430776e693c24e",
-      "after_sha256": "7f61192a51851f0ff476d7b484423ebdf4e75ce20d57dc1c12d9af734747a3f0",
+      "after_sha256": "4a6fbcbcb9529d2b9e6eb9bf7feea2dbf671cc26dfc31aad1ad69e5d673bc8b2",
       "owners": {
         "@document": {
           "before": "c6e5c16cc3d8e0cfe8fd3e4ead3914c2db84eed66024d02ee8430776e693c24e",
-          "after": "7f61192a51851f0ff476d7b484423ebdf4e75ce20d57dc1c12d9af734747a3f0"
+          "after": "4a6fbcbcb9529d2b9e6eb9bf7feea2dbf671cc26dfc31aad1ad69e5d673bc8b2"
         }
       }
     },
@@ -316,15 +316,15 @@
     },
     "src/warhammer40k_core/engine/casualty_coherency_restore.py": {
       "before_sha256": null,
-      "after_sha256": "d9d9640b3d729d0e69c909f8955f88385b2698d163ba720c5d45f61ce4c36722",
+      "after_sha256": "78e062d588754edc360cc5a51994dda94452f6f0bd5f438d83ddab92d14dd5e4",
       "owners": {
         "@module": {
           "before": null,
-          "after": "95a9cc660f9e798d7bdceb38c69d885e068dadf34a88d67349d1083626c8e39a"
+          "after": "df11a05571daf1147fcc588e1797ddbc4977c00fcb603879b5317083b955a7e1"
         },
         "scenario_for_required_restore_coherency": {
           "before": null,
-          "after": "c380d7639ca27c742d6dd6c2cdea602e32a635065ba52730fdce622bcfa24463"
+          "after": "d4a94b6dcaba74bd4a330b07af174a7eec3f94358c5c7375940489d4c2d33c00"
         }
       }
     },
@@ -344,7 +344,7 @@
     },
     "src/warhammer40k_core/engine/game_state.py": {
       "before_sha256": "395047d5c2b242d66f7c0923d00e08d6d4efea10c21975bdf6c909b652eab37f",
-      "after_sha256": "6b680d77eff1d41dddf3e23687e0a3fb3c8c10fcae181ecab8f702523b61c240",
+      "after_sha256": "be128a034dad11a94c7f7bf024540a72d68a5033a1074fd2db0977fa6bd309ab",
       "owners": {
         "@module": {
           "before": "cc2f3bcd0d2adfa56f178e98365055e537866ba048c05f2cfa8728babfb484e9",
@@ -352,7 +352,7 @@
         },
         "GameState.resolve_end_turn_cleanup_boundary": {
           "before": "8f93f8e04d8e2c9025227f722f4bd86c06b68cdcd8eb5354b43f8ed599096a26",
-          "after": "f7623956c130d7be86560f72240d8483611fdbb5bac9084ed809a6d3d7818e51"
+          "after": "5a842a1e8a801f97d37176206fdd8392f7aa85adbef627a55318052d3b628dd4"
         }
       }
     },
@@ -372,15 +372,15 @@
     },
     "src/warhammer40k_core/engine/mission_cleanup_boundary.py": {
       "before_sha256": null,
-      "after_sha256": "97bb637f9d327f2e4a54c12cde8634f5f0105bdb7f6dee1acfd91aa06d8b4d02",
+      "after_sha256": "9d6dc801abf6db033cdb86d28782f7e279ac0702154e7a2bd0da56f98dac6676",
       "owners": {
         "@module": {
           "before": null,
-          "after": "61eb6a857b804fb8489a3ff1177c727a3cebc74554b3842b765e957d2ac65e98"
+          "after": "7cffb03389b029568c397a5077b5e920bd3305a8073038dfa3e22b7832389da8"
         },
         "resolve_mission_cleanup_boundary": {
           "before": null,
-          "after": "b67f8ecb99e9b9aee43c30707b1e92202b9cd77687a7c15e66a043573fc5082e"
+          "after": "f58b4133143dd9d4e7152078c2a0b572d9b00b0e3142d8b3eaf0c957617eb2d4"
         }
       }
     },
@@ -391,6 +391,20 @@
         "_no_trigger_destroyed_departure_ids": {
           "before": "9175aed6dbc0b12f5d3a98d98fa0ab0d3e10f048a0a28784026ae3ef221ea5ed",
           "after": "72c0986527808f11b3bb6a3e62fe16a4a20982394597281dd54a9517d999a44b"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/rule_model_destruction_unplaced.py": {
+      "before_sha256": "a33c94b2bce0f1367c14c86cc943f1885679d7007df2cafa35c3c1698a5f998b",
+      "after_sha256": "4e1d44fe02f4fe42c798bce2ac11c1da478da2c563c59d9432659d1afdbf5e4c",
+      "owners": {
+        "@module": {
+          "before": "06e309a737566acdaf64e88eb431d9d8ab0ac846e23d6ad5e8eec278a014cc87",
+          "after": "16bc640fff4803b7b4d2d6f677d163517bcc42c8e855393e412313598ce32df0"
+        },
+        "destroy_end_turn_coherency_models": {
+          "before": null,
+          "after": "155790501985fa87d52719db8e9f0e6de97da3eab85b4e1f6df94e487d2efaa9"
         }
       }
     },
@@ -953,6 +967,16 @@
       "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
     },
     "src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order130-model-mission-history"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
+      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
+      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+    },
+    "src/warhammer40k_core/engine/rule_model_destruction_unplaced.py": {
       "category": "rule_semantics",
       "operations": [
         "order130-model-mission-history"

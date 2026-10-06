@@ -5474,8 +5474,14 @@ class GameState:
         from warhammer40k_core.engine.mission_cleanup_boundary import (
             resolve_mission_cleanup_boundary,
         )
+        from warhammer40k_core.engine.primary_unit_destruction_tracking import (
+            record_primary_unit_destructions_for_end_turn_cleanup,
+        )
 
-        resolve_mission_cleanup_boundary(state=self, completed_phase=completed_phase)
+        cleanup = resolve_mission_cleanup_boundary(state=self, completed_phase=completed_phase)
+        record_primary_unit_destructions_for_end_turn_cleanup(state=self, cleanup=cleanup)
+        self.end_turn_cleanup_states.append(cleanup)
+        self.end_turn_cleanup_states.sort(key=lambda row: row.cleanup_id)
 
     def _resolve_unarrived_reserve_destruction_boundary(self, *, end_of_battle: bool) -> None:
         from warhammer40k_core.engine.reserve_lifetime_boundary import resolve_boundary
