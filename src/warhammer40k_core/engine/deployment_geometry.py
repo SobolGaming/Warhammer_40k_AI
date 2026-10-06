@@ -26,7 +26,10 @@ from warhammer40k_core.engine.endpoint_placement import (
     terrain_endpoint_placement_violation,
 )
 from warhammer40k_core.engine.game_state import GameState
-from warhammer40k_core.engine.large_model_setup import oversized_deployment_violation
+from warhammer40k_core.engine.large_model_setup import (
+    deployment_body_containment,
+    oversized_deployment_violation,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView
 from warhammer40k_core.geometry import shapely_backend
@@ -82,6 +85,31 @@ def append_geometry_violations(
             )
             for zone in deployment_zones
         )
+        if model.body_parts and (in_deployment_zone or all_infiltrators):
+            body_in_zone, body_in_field = deployment_body_containment(
+                model=model,
+                zones=deployment_zones,
+                width=battlefield_state.battlefield_width_inches,
+                depth=battlefield_state.battlefield_depth_inches,
+                unrestricted_zone=all_infiltrators,
+            )
+            if not body_in_field:
+                violations.append(
+                    DeploymentPlacementViolation(
+                        violation_code=DeploymentPlacementViolationCode.BATTLEFIELD_EDGE_CROSSED,
+                        message="Avoidable model-body overhang crosses the battlefield edge.",
+                        model_instance_id=model.model_id,
+                    )
+                )
+            if not body_in_zone:
+                any_outside_zone = True
+                violations.append(
+                    DeploymentPlacementViolation(
+                        violation_code=DeploymentPlacementViolationCode.DEPLOYMENT_ZONE_VIOLATION,
+                        message="The whole model can fit in the deployment zone without overhang.",
+                        model_instance_id=model.model_id,
+                    )
+                )
         if not in_deployment_zone and not all_infiltrators:
             reason = oversized_deployment_violation(
                 model=model,

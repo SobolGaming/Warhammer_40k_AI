@@ -1,434 +1,560 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "459a086d0ac164a0738dc710531b119febf5af53",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d0aecfca55ad5dcc58edbdc9c06763af659aa1eeb584a5ea75b22950e2984735",
-  "operation_map_sha256": "fcdc9416592d30e5389e89252b43d3d19c19863106ca253cbed10aa38831faae",
+  "base": "447d5c34a4fba4ce1605cb494de7badb5304af3e",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d5daea012745c1e3b6b9d93a9a8903ec58c943b64bf78164783262f31beea607",
+  "operation_map_sha256": "56c1a50428dd4fd079e7e693c1b6900976ca25de3888c0ebb47b44d6a357f942",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "1938adbae5b23e32d882707540e9da62afa6e1bcf8614704322099fd7d675f50",
-      "after_sha256": "f9c75d2a9a8c1820f6a7f8ebf99d823095df820be2d728b236f5b517868723e7",
+      "before_sha256": "f9c75d2a9a8c1820f6a7f8ebf99d823095df820be2d728b236f5b517868723e7",
+      "after_sha256": "67740fed911fe41c119d3cff61d44d7e6d9a50bad878e14341dd8ff7ef6d57f8",
       "owners": {
         "@document": {
-          "before": "1938adbae5b23e32d882707540e9da62afa6e1bcf8614704322099fd7d675f50",
-          "after": "f9c75d2a9a8c1820f6a7f8ebf99d823095df820be2d728b236f5b517868723e7"
+          "before": "f9c75d2a9a8c1820f6a7f8ebf99d823095df820be2d728b236f5b517868723e7",
+          "after": "67740fed911fe41c119d3cff61d44d7e6d9a50bad878e14341dd8ff7ef6d57f8"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "e24a18f6a75864f55d958552cc1ee0afe06c0bd1886a4f31a198ef1e61d2179c",
-      "after_sha256": "59ab1727f8109f085f303da397f58579e977c4c04b9147782b2eada1657eed25",
+      "before_sha256": "59ab1727f8109f085f303da397f58579e977c4c04b9147782b2eada1657eed25",
+      "after_sha256": "29724008cb7709c665603b25731d22a4ffaaa8b0db16b9fd36fbe9b69e449575",
       "owners": {
         "@document": {
-          "before": "e24a18f6a75864f55d958552cc1ee0afe06c0bd1886a4f31a198ef1e61d2179c",
-          "after": "59ab1727f8109f085f303da397f58579e977c4c04b9147782b2eada1657eed25"
+          "before": "59ab1727f8109f085f303da397f58579e977c4c04b9147782b2eada1657eed25",
+          "after": "29724008cb7709c665603b25731d22a4ffaaa8b0db16b9fd36fbe9b69e449575"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "7103eff1ee6280ae2024f7bcd096e8e66c545b9173969d52e867791c0ceacd4b",
-      "after_sha256": "a677395cd8a3f4f30729b27da7b2a395d8e26f7940e8d3673980871290967e54",
+      "before_sha256": "a677395cd8a3f4f30729b27da7b2a395d8e26f7940e8d3673980871290967e54",
+      "after_sha256": "176f32171217f2b546fcaed43bc5eb873219f863a2f23d89abc32f3dbc58514b",
       "owners": {
         "@document": {
-          "before": "7103eff1ee6280ae2024f7bcd096e8e66c545b9173969d52e867791c0ceacd4b",
-          "after": "a677395cd8a3f4f30729b27da7b2a395d8e26f7940e8d3673980871290967e54"
+          "before": "a677395cd8a3f4f30729b27da7b2a395d8e26f7940e8d3673980871290967e54",
+          "after": "176f32171217f2b546fcaed43bc5eb873219f863a2f23d89abc32f3dbc58514b"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "3ffd6ceeb55f8764812999643a6c0f8f78dc7767def306b5072dd0b94d3bdf7e",
-      "after_sha256": "5d189877dced7b6258952011352c04a52fb5ce4d8ad71a8e9b98ee4a6a620fbf",
+      "before_sha256": "5d189877dced7b6258952011352c04a52fb5ce4d8ad71a8e9b98ee4a6a620fbf",
+      "after_sha256": "b6a2ab0f4c8e7989ac6b8b576216e4afcf526ab9cf8721a93db9576b6d4c13b5",
       "owners": {
         "@document": {
-          "before": "3ffd6ceeb55f8764812999643a6c0f8f78dc7767def306b5072dd0b94d3bdf7e",
-          "after": "5d189877dced7b6258952011352c04a52fb5ce4d8ad71a8e9b98ee4a6a620fbf"
+          "before": "5d189877dced7b6258952011352c04a52fb5ce4d8ad71a8e9b98ee4a6a620fbf",
+          "after": "b6a2ab0f4c8e7989ac6b8b576216e4afcf526ab9cf8721a93db9576b6d4c13b5"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "1067e7e8a787116616e81755dbd070100c3f5ab16b2e7bbb0ed18563bc92a701",
-      "after_sha256": "fb3dcd2a3fdea81d2bb5bea8b77120606f62786a037917d9ef8bde2e542dfa1f",
+      "before_sha256": "fb3dcd2a3fdea81d2bb5bea8b77120606f62786a037917d9ef8bde2e542dfa1f",
+      "after_sha256": "123d75dc7953882f4298d88a51d179fdc78aea97a25e0aaa1f14b63f5d774d3f",
       "owners": {
         "@document": {
-          "before": "1067e7e8a787116616e81755dbd070100c3f5ab16b2e7bbb0ed18563bc92a701",
-          "after": "fb3dcd2a3fdea81d2bb5bea8b77120606f62786a037917d9ef8bde2e542dfa1f"
+          "before": "fb3dcd2a3fdea81d2bb5bea8b77120606f62786a037917d9ef8bde2e542dfa1f",
+          "after": "123d75dc7953882f4298d88a51d179fdc78aea97a25e0aaa1f14b63f5d774d3f"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "f120ff5d9b49fb3452570d1c9137dcec0607051d24d6c16c77075d6422021425",
-      "after_sha256": "a7f23594c0e44815f2a5288828af3a935386bf33547c9644f65a7e0a32ac0d30",
+      "before_sha256": "a7f23594c0e44815f2a5288828af3a935386bf33547c9644f65a7e0a32ac0d30",
+      "after_sha256": "778e4cf5e9b67fe0690fd779b3e3e8631c2e2dfa09c04177c03bf9c1557f1293",
       "owners": {
         "@document": {
-          "before": "f120ff5d9b49fb3452570d1c9137dcec0607051d24d6c16c77075d6422021425",
-          "after": "a7f23594c0e44815f2a5288828af3a935386bf33547c9644f65a7e0a32ac0d30"
+          "before": "a7f23594c0e44815f2a5288828af3a935386bf33547c9644f65a7e0a32ac0d30",
+          "after": "778e4cf5e9b67fe0690fd779b3e3e8631c2e2dfa09c04177c03bf9c1557f1293"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "ed2c5670497227bfd0c81e47c6a9efcff12160552d97db6f15b2fde4c1475422",
-      "after_sha256": "fb040b663db44067fbdd7e9aa62a663698287317a164e498b24e6bbe47c2eb12",
+      "before_sha256": "fb040b663db44067fbdd7e9aa62a663698287317a164e498b24e6bbe47c2eb12",
+      "after_sha256": "c72f3147d88f2e2bb2ed225dfe6936e4a9364d47368a8bec6eeb3b047a5f2795",
       "owners": {
         "@document": {
-          "before": "ed2c5670497227bfd0c81e47c6a9efcff12160552d97db6f15b2fde4c1475422",
-          "after": "fb040b663db44067fbdd7e9aa62a663698287317a164e498b24e6bbe47c2eb12"
+          "before": "fb040b663db44067fbdd7e9aa62a663698287317a164e498b24e6bbe47c2eb12",
+          "after": "c72f3147d88f2e2bb2ed225dfe6936e4a9364d47368a8bec6eeb3b047a5f2795"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "b875814f7cadb2e88d8c148457aff0b9d649e735098bee0d576ccf4efa428d5f",
-      "after_sha256": "4f4729629f7665dd1279f1d92611576dfb253ab5c00a02e26dcab0ab37dae389",
+      "before_sha256": "4f4729629f7665dd1279f1d92611576dfb253ab5c00a02e26dcab0ab37dae389",
+      "after_sha256": "a1ad398d272e7dc356b6e2ea42ea6a9bc97939e138e92335f322ee458bd6bea8",
       "owners": {
         "@document": {
-          "before": "b875814f7cadb2e88d8c148457aff0b9d649e735098bee0d576ccf4efa428d5f",
-          "after": "4f4729629f7665dd1279f1d92611576dfb253ab5c00a02e26dcab0ab37dae389"
+          "before": "4f4729629f7665dd1279f1d92611576dfb253ab5c00a02e26dcab0ab37dae389",
+          "after": "a1ad398d272e7dc356b6e2ea42ea6a9bc97939e138e92335f322ee458bd6bea8"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "41bc628d8cb1ec4d6d3984366cd241187ed40c713600c154838839c271fc912a",
-      "after_sha256": "71936a22fded82d09195ffd4ddbbf41e7a96a1a8a1c4bdab7c902a19ab6f93d8",
+      "before_sha256": "71936a22fded82d09195ffd4ddbbf41e7a96a1a8a1c4bdab7c902a19ab6f93d8",
+      "after_sha256": "295a6b6868ff209798ec1ba06e531cf2444b5c496bb69d291071b4bd071a9057",
       "owners": {
         "@document": {
-          "before": "41bc628d8cb1ec4d6d3984366cd241187ed40c713600c154838839c271fc912a",
-          "after": "71936a22fded82d09195ffd4ddbbf41e7a96a1a8a1c4bdab7c902a19ab6f93d8"
+          "before": "71936a22fded82d09195ffd4ddbbf41e7a96a1a8a1c4bdab7c902a19ab6f93d8",
+          "after": "295a6b6868ff209798ec1ba06e531cf2444b5c496bb69d291071b4bd071a9057"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "99aad1709e0a5b5b44b70d21083794f423ea5f10d631c9a7da03ff1dbb77858b",
-      "after_sha256": "c4928b2600543e7b0c9f25dd634ca4e8a52a5054c05bb64dc06b7d7b57e1c9e9",
+      "before_sha256": "c4928b2600543e7b0c9f25dd634ca4e8a52a5054c05bb64dc06b7d7b57e1c9e9",
+      "after_sha256": "f85bfd7525a8f878974b4773b25209d10c3b4a4eb19b2092a2672aef5c28b868",
       "owners": {
         "@document": {
-          "before": "99aad1709e0a5b5b44b70d21083794f423ea5f10d631c9a7da03ff1dbb77858b",
-          "after": "c4928b2600543e7b0c9f25dd634ca4e8a52a5054c05bb64dc06b7d7b57e1c9e9"
+          "before": "c4928b2600543e7b0c9f25dd634ca4e8a52a5054c05bb64dc06b7d7b57e1c9e9",
+          "after": "f85bfd7525a8f878974b4773b25209d10c3b4a4eb19b2092a2672aef5c28b868"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "3943b77a8a809a0bb8c063411cbe01f58b02637c4c11e6504c076ced8945b5cc",
-      "after_sha256": "047a917323fe3e67ea6c707365df3f39c61a06abf22a1fbf05c66a708f68c974",
+      "before_sha256": "047a917323fe3e67ea6c707365df3f39c61a06abf22a1fbf05c66a708f68c974",
+      "after_sha256": "b9bc2629cd3f9bb7b59ffa2ebad9ba0ced848cd08ffb670ad3f5bbf20674c202",
       "owners": {
         "@document": {
-          "before": "3943b77a8a809a0bb8c063411cbe01f58b02637c4c11e6504c076ced8945b5cc",
-          "after": "047a917323fe3e67ea6c707365df3f39c61a06abf22a1fbf05c66a708f68c974"
+          "before": "047a917323fe3e67ea6c707365df3f39c61a06abf22a1fbf05c66a708f68c974",
+          "after": "b9bc2629cd3f9bb7b59ffa2ebad9ba0ced848cd08ffb670ad3f5bbf20674c202"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "97e3ee765115fe76b9de6c927f77e2f17ddb1717dfaa15facabf9007fa332bbf",
-      "after_sha256": "26b612565a17c2585cf3c9dbda972532a34d7df595dbaae587000d1acdc8abef",
+      "before_sha256": "26b612565a17c2585cf3c9dbda972532a34d7df595dbaae587000d1acdc8abef",
+      "after_sha256": "3ac782662a2ee12935a99d642a7d85634abb140ccaa02f54290b06d17b43e973",
       "owners": {
         "@document": {
-          "before": "97e3ee765115fe76b9de6c927f77e2f17ddb1717dfaa15facabf9007fa332bbf",
-          "after": "26b612565a17c2585cf3c9dbda972532a34d7df595dbaae587000d1acdc8abef"
+          "before": "26b612565a17c2585cf3c9dbda972532a34d7df595dbaae587000d1acdc8abef",
+          "after": "3ac782662a2ee12935a99d642a7d85634abb140ccaa02f54290b06d17b43e973"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "28ff6f6e0abbbab4cafc43d79e0332db344bc19c6d45fd8be546525e802e21a1",
-      "after_sha256": "596c34b2503068160a52c31fa8dbbfa46458c3f4001d413698fda24210e94d2c",
+      "before_sha256": "596c34b2503068160a52c31fa8dbbfa46458c3f4001d413698fda24210e94d2c",
+      "after_sha256": "6c9a4a79c57373c8b2e22b064f52782a50cfb88aed765f0fb81b6aefb48fc385",
       "owners": {
         "@document": {
-          "before": "28ff6f6e0abbbab4cafc43d79e0332db344bc19c6d45fd8be546525e802e21a1",
-          "after": "596c34b2503068160a52c31fa8dbbfa46458c3f4001d413698fda24210e94d2c"
+          "before": "596c34b2503068160a52c31fa8dbbfa46458c3f4001d413698fda24210e94d2c",
+          "after": "6c9a4a79c57373c8b2e22b064f52782a50cfb88aed765f0fb81b6aefb48fc385"
         }
       }
     },
     "conformance/typescript/src/contract.ts": {
-      "before_sha256": "fe6a05a86fb8743837c011bea1c953e308e8fa8e24b16a1296ea9d7d6c23cff7",
-      "after_sha256": "739056b6306b86292edbdce1795249d3a557d43cc045525501424630b334fe5e",
+      "before_sha256": "739056b6306b86292edbdce1795249d3a557d43cc045525501424630b334fe5e",
+      "after_sha256": "779362a6e83a17c12399eb1be6f5869d5e98b9c2893123addd9f87cf979c50fc",
       "owners": {
         "@document": {
-          "before": "fe6a05a86fb8743837c011bea1c953e308e8fa8e24b16a1296ea9d7d6c23cff7",
-          "after": "739056b6306b86292edbdce1795249d3a557d43cc045525501424630b334fe5e"
+          "before": "739056b6306b86292edbdce1795249d3a557d43cc045525501424630b334fe5e",
+          "after": "779362a6e83a17c12399eb1be6f5869d5e98b9c2893123addd9f87cf979c50fc"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "725619e6cdf03545d1a0f5d6ba020935c512d21e854c1bf7b76a05c294fbc1bd",
-      "after_sha256": "a47c8b19a562029374707f9dad5f93e92aad6e9e1aa44f138bfbbe0bb4cbcf3a",
+      "before_sha256": "a47c8b19a562029374707f9dad5f93e92aad6e9e1aa44f138bfbbe0bb4cbcf3a",
+      "after_sha256": "d613702d05a63c4e6c7699b2405b862c15a3c8a33209a15c497d9735ff36e31e",
       "owners": {
         "@document": {
-          "before": "725619e6cdf03545d1a0f5d6ba020935c512d21e854c1bf7b76a05c294fbc1bd",
-          "after": "a47c8b19a562029374707f9dad5f93e92aad6e9e1aa44f138bfbbe0bb4cbcf3a"
+          "before": "a47c8b19a562029374707f9dad5f93e92aad6e9e1aa44f138bfbbe0bb4cbcf3a",
+          "after": "d613702d05a63c4e6c7699b2405b862c15a3c8a33209a15c497d9735ff36e31e"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "a70b16f956e553f95fc2c62b842b56cabfcbca9556dbc3206873edd25111745a",
-      "after_sha256": "b43624a5179a19506192deb7a94a60b1ba651db521490fab0771027b4ba4645a",
+      "before_sha256": "b43624a5179a19506192deb7a94a60b1ba651db521490fab0771027b4ba4645a",
+      "after_sha256": "d1a5cf7c49c0b5aff92cba601548700158ae388f935b956fa0df67bf3c7da2c7",
       "owners": {
         "@document": {
-          "before": "a70b16f956e553f95fc2c62b842b56cabfcbca9556dbc3206873edd25111745a",
-          "after": "b43624a5179a19506192deb7a94a60b1ba651db521490fab0771027b4ba4645a"
+          "before": "b43624a5179a19506192deb7a94a60b1ba651db521490fab0771027b4ba4645a",
+          "after": "d1a5cf7c49c0b5aff92cba601548700158ae388f935b956fa0df67bf3c7da2c7"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "29acf5a95a5cc69b0005a6a55e8ab85ea64cd3980fd61931a5fcb933b693d469",
-      "after_sha256": "00f65baab496e8fdafd3c1ad5f18a10fb8c06d397d103ce749111348313ab7ec",
+      "before_sha256": "00f65baab496e8fdafd3c1ad5f18a10fb8c06d397d103ce749111348313ab7ec",
+      "after_sha256": "30809e73a98317838931e36b2620dcc73d208d18db2e4e1ec4892b7bcaa1b64c",
       "owners": {
         "@document": {
-          "before": "29acf5a95a5cc69b0005a6a55e8ab85ea64cd3980fd61931a5fcb933b693d469",
-          "after": "00f65baab496e8fdafd3c1ad5f18a10fb8c06d397d103ce749111348313ab7ec"
+          "before": "00f65baab496e8fdafd3c1ad5f18a10fb8c06d397d103ce749111348313ab7ec",
+          "after": "30809e73a98317838931e36b2620dcc73d208d18db2e4e1ec4892b7bcaa1b64c"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "c65b5a274ef19fa5870d445137b9c562723a300eb6cacb0abdb0b88413820a28",
-      "after_sha256": "6fb5dc0a4c4d8336bd150ec35fcb3ee9f231651ad8d5a3288c1c5899c0f88e8d",
+      "before_sha256": "6fb5dc0a4c4d8336bd150ec35fcb3ee9f231651ad8d5a3288c1c5899c0f88e8d",
+      "after_sha256": "07f13511e771f47e6fbad8e9659a7b40d18adc81d5f3613a1bd337d7de03af09",
       "owners": {
         "@document": {
-          "before": "c65b5a274ef19fa5870d445137b9c562723a300eb6cacb0abdb0b88413820a28",
-          "after": "6fb5dc0a4c4d8336bd150ec35fcb3ee9f231651ad8d5a3288c1c5899c0f88e8d"
+          "before": "6fb5dc0a4c4d8336bd150ec35fcb3ee9f231651ad8d5a3288c1c5899c0f88e8d",
+          "after": "07f13511e771f47e6fbad8e9659a7b40d18adc81d5f3613a1bd337d7de03af09"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "4db62bb260f89992a3936a067cf8a30482084b7c73f53f90cc427e3f0e9a1b42",
-      "after_sha256": "82da73da406fd54339bbe66bd3f00b84579928c223b263bd9a7aaabeee3feb1c",
+      "before_sha256": "82da73da406fd54339bbe66bd3f00b84579928c223b263bd9a7aaabeee3feb1c",
+      "after_sha256": "435087bf9e186e1921e8e57fe7cd83df9b2b9c0fa95ec618093adbe35ae7f1a6",
       "owners": {
         "@document": {
-          "before": "4db62bb260f89992a3936a067cf8a30482084b7c73f53f90cc427e3f0e9a1b42",
-          "after": "82da73da406fd54339bbe66bd3f00b84579928c223b263bd9a7aaabeee3feb1c"
+          "before": "82da73da406fd54339bbe66bd3f00b84579928c223b263bd9a7aaabeee3feb1c",
+          "after": "435087bf9e186e1921e8e57fe7cd83df9b2b9c0fa95ec618093adbe35ae7f1a6"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "497fc35411a2aed6f7846668a5fa318df9b51153343177fcc798d1d83355e25e",
-      "after_sha256": "52d78a9bfc115f1357d0822a8768f11fa7ec62d78a779fb91d706d229d9c19ac",
+      "before_sha256": "52d78a9bfc115f1357d0822a8768f11fa7ec62d78a779fb91d706d229d9c19ac",
+      "after_sha256": "0ecb7c6f20e7f001eaa0be68f043339f9f65051b0f2bc50c7cb4591598d6ed4f",
       "owners": {
         "@document": {
-          "before": "497fc35411a2aed6f7846668a5fa318df9b51153343177fcc798d1d83355e25e",
-          "after": "52d78a9bfc115f1357d0822a8768f11fa7ec62d78a779fb91d706d229d9c19ac"
+          "before": "52d78a9bfc115f1357d0822a8768f11fa7ec62d78a779fb91d706d229d9c19ac",
+          "after": "0ecb7c6f20e7f001eaa0be68f043339f9f65051b0f2bc50c7cb4591598d6ed4f"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "324e17bcc32c8cfd2090f9bcc050a7e3a9a66a4d6258a80ec5b8f36002cdb6de",
-      "after_sha256": "372fab842b1d9967f2b07cdbcb8272f615712baece09556dd9cf1f064f243b70",
+      "before_sha256": "372fab842b1d9967f2b07cdbcb8272f615712baece09556dd9cf1f064f243b70",
+      "after_sha256": "ece6567fbf66126402d6af61424c41a42e6fa88233005bb83ee8664629835fc8",
       "owners": {
         "@document": {
-          "before": "324e17bcc32c8cfd2090f9bcc050a7e3a9a66a4d6258a80ec5b8f36002cdb6de",
-          "after": "372fab842b1d9967f2b07cdbcb8272f615712baece09556dd9cf1f064f243b70"
+          "before": "372fab842b1d9967f2b07cdbcb8272f615712baece09556dd9cf1f064f243b70",
+          "after": "ece6567fbf66126402d6af61424c41a42e6fa88233005bb83ee8664629835fc8"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "c1c6b615f8f3316d03b9e80fb3eb91a63d9061e519ebc09fc4006b6663a4617d",
-      "after_sha256": "e988e77b250bde4f581b65559417cc13604165eb6e7f75dbb6a54dae74df2be8",
+      "before_sha256": "e988e77b250bde4f581b65559417cc13604165eb6e7f75dbb6a54dae74df2be8",
+      "after_sha256": "5507640a763dec30309967da659d0ea38aeea5f013a3b4db26d1c6c0762aeb14",
       "owners": {
         "@document": {
-          "before": "c1c6b615f8f3316d03b9e80fb3eb91a63d9061e519ebc09fc4006b6663a4617d",
-          "after": "e988e77b250bde4f581b65559417cc13604165eb6e7f75dbb6a54dae74df2be8"
+          "before": "e988e77b250bde4f581b65559417cc13604165eb6e7f75dbb6a54dae74df2be8",
+          "after": "5507640a763dec30309967da659d0ea38aeea5f013a3b4db26d1c6c0762aeb14"
         }
       }
     },
-    "contracts/migrations/44.3.12-to-44.3.13.md": {
+    "contracts/migrations/44.3.13-to-44.3.14.md": {
       "before_sha256": null,
-      "after_sha256": "99c7aa8225e60b98ab51a7c3f0c08b64fcf0131ef1e1586376e4683c78d525c5",
+      "after_sha256": "7209ea7f84b7277bf52fae6d9f86504470b6640b7668889fd99e897b60363c6a",
       "owners": {
         "@document": {
           "before": null,
-          "after": "99c7aa8225e60b98ab51a7c3f0c08b64fcf0131ef1e1586376e4683c78d525c5"
+          "after": "7209ea7f84b7277bf52fae6d9f86504470b6640b7668889fd99e897b60363c6a"
         }
       }
     },
     "contracts/openapi.yaml": {
-      "before_sha256": "19ae0523aa99f59505175646d5a665239edfeab5363f29064a0e82291bedd3f1",
-      "after_sha256": "00800b278138bcf28b20da4527a0b248a8643c41331585c83fe8d27b07eb233f",
+      "before_sha256": "00800b278138bcf28b20da4527a0b248a8643c41331585c83fe8d27b07eb233f",
+      "after_sha256": "75494d3b31b7c3b7cfb01cada17475d8d10c7c5e2e2108e450fe3a81a1fcefed",
       "owners": {
         "@document": {
-          "before": "19ae0523aa99f59505175646d5a665239edfeab5363f29064a0e82291bedd3f1",
-          "after": "00800b278138bcf28b20da4527a0b248a8643c41331585c83fe8d27b07eb233f"
+          "before": "00800b278138bcf28b20da4527a0b248a8643c41331585c83fe8d27b07eb233f",
+          "after": "75494d3b31b7c3b7cfb01cada17475d8d10c7c5e2e2108e450fe3a81a1fcefed"
         }
       }
     },
-    "data/source_audits/order127/source.audit.json": {
+    "data/source_audits/order128/source.audit.json": {
       "before_sha256": null,
-      "after_sha256": "a42fa36bedfdfecac535c5b0596876e184c6a9e8231955eaf3796cca7fb98ac5",
+      "after_sha256": "5dd1f6650e0a19590559536eb65191ad971de955fe853329d30b9d501e423e2d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a42fa36bedfdfecac535c5b0596876e184c6a9e8231955eaf3796cca7fb98ac5"
+          "after": "5dd1f6650e0a19590559536eb65191ad971de955fe853329d30b9d501e423e2d"
         }
       }
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "0cbe69bfdca6a8afb87502382c3c998e3fdadc990580e0e4391e36bb7e687a3d",
-      "after_sha256": "c0844eefb9165e82fe1f4113aa31614193d9716bd23d3463d5ce68f64652f180",
+      "before_sha256": "c0844eefb9165e82fe1f4113aa31614193d9716bd23d3463d5ce68f64652f180",
+      "after_sha256": "0166091ac0b96d94ee0c465b22ad7538a9c0b1e2be66a2a517763da15f7736d4",
       "owners": {
         "@document": {
-          "before": "0cbe69bfdca6a8afb87502382c3c998e3fdadc990580e0e4391e36bb7e687a3d",
-          "after": "c0844eefb9165e82fe1f4113aa31614193d9716bd23d3463d5ce68f64652f180"
+          "before": "c0844eefb9165e82fe1f4113aa31614193d9716bd23d3463d5ce68f64652f180",
+          "after": "0166091ac0b96d94ee0c465b22ad7538a9c0b1e2be66a2a517763da15f7736d4"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "8cb4cc6439354752b6cb21f154734c78013fa56f914caecd8b4fe918d99d8e22",
-      "after_sha256": "c5c5efd889f809da87153057a527964d375011a0c931ee42e34a8811e47fe65d",
+      "before_sha256": "c5c5efd889f809da87153057a527964d375011a0c931ee42e34a8811e47fe65d",
+      "after_sha256": "ac9bceec3575370411b528cbbab8c38ffe4c7c186161ad2d76e11fc97782d818",
       "owners": {
         "@document": {
-          "before": "8cb4cc6439354752b6cb21f154734c78013fa56f914caecd8b4fe918d99d8e22",
-          "after": "c5c5efd889f809da87153057a527964d375011a0c931ee42e34a8811e47fe65d"
+          "before": "c5c5efd889f809da87153057a527964d375011a0c931ee42e34a8811e47fe65d",
+          "after": "ac9bceec3575370411b528cbbab8c38ffe4c7c186161ad2d76e11fc97782d818"
         }
       }
     },
-    "docs/ORDER_127_SCOPE_PLAN.md": {
+    "docs/ORDER_128_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "4c5a0929b7eea10de75f6bf6b6d4478b87824aa8d210e060b9ac7db88bb67d6e",
+      "after_sha256": "09439b9444342d4e3058c7a893d6d2692789f803977006c1cfa5f2357694bfb9",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4c5a0929b7eea10de75f6bf6b6d4478b87824aa8d210e060b9ac7db88bb67d6e"
+          "after": "09439b9444342d4e3058c7a893d6d2692789f803977006c1cfa5f2357694bfb9"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "b7939bb663009b4f4be523e588ca661a7310e1eafdb288e864db2782b76c629b",
-      "after_sha256": "6a90731336ec4af6a4e696b5a02d8ee8f98c1dd4efc4430a4b345664c231f683",
+      "before_sha256": "6a90731336ec4af6a4e696b5a02d8ee8f98c1dd4efc4430a4b345664c231f683",
+      "after_sha256": "ad420af5d6bf40410682d416d80748cb2701db1b885038b7292456b367415180",
       "owners": {
         "@document": {
-          "before": "b7939bb663009b4f4be523e588ca661a7310e1eafdb288e864db2782b76c629b",
-          "after": "6a90731336ec4af6a4e696b5a02d8ee8f98c1dd4efc4430a4b345664c231f683"
+          "before": "6a90731336ec4af6a4e696b5a02d8ee8f98c1dd4efc4430a4b345664c231f683",
+          "after": "ad420af5d6bf40410682d416d80748cb2701db1b885038b7292456b367415180"
+        }
+      }
+    },
+    "docs/performance/policy-v3/order128-rule-semantics.json": {
+      "before_sha256": null,
+      "after_sha256": "f5038460302958373a6a0047e872539a2c23835caa437425d243c13023eb76bb",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f5038460302958373a6a0047e872539a2c23835caa437425d243c13023eb76bb"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "05f64654c4245e2181e5647d5a77b6a9129dfcf56eb263dfa0e522d0f20f4eda",
-      "after_sha256": "f35493e8b34b63a245605f0682c67b1f67a85029fab538fc3850aa2110c1bf5c",
+      "before_sha256": "f35493e8b34b63a245605f0682c67b1f67a85029fab538fc3850aa2110c1bf5c",
+      "after_sha256": "66aee9f5ffeaeb3cc792edc18260dfbdcd71659d5ce6dbe0a122ca24b5357ba4",
       "owners": {
         "@document": {
-          "before": "05f64654c4245e2181e5647d5a77b6a9129dfcf56eb263dfa0e522d0f20f4eda",
-          "after": "f35493e8b34b63a245605f0682c67b1f67a85029fab538fc3850aa2110c1bf5c"
+          "before": "f35493e8b34b63a245605f0682c67b1f67a85029fab538fc3850aa2110c1bf5c",
+          "after": "66aee9f5ffeaeb3cc792edc18260dfbdcd71659d5ce6dbe0a122ca24b5357ba4"
         }
       }
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
-      "before_sha256": "9d2b9e83b65d9f7ad94520622e84764e705456045d2e6ff9259e6f637c3bcd78",
-      "after_sha256": "d6bbb31099e557baf17fec16bac655cbd7ee3301778c7bfffa307ad06ca38227",
+      "before_sha256": "d6bbb31099e557baf17fec16bac655cbd7ee3301778c7bfffa307ad06ca38227",
+      "after_sha256": "2f8c99f6e9a182099f7fe5fd24e0a21084e9b2353fbb7345038a85543445ede6",
       "owners": {
         "@module": {
-          "before": "1e5dc46585c89f421df93ff4605fca1ffe4d9b6200c047e20c38b4a0ec2eb5dc",
-          "after": "47435526bb397a41cf5f5ccb4558531b092a218fe47230e63d31b06b0ca77ffa"
+          "before": "47435526bb397a41cf5f5ccb4558531b092a218fe47230e63d31b06b0ca77ffa",
+          "after": "88b2a0740009d71a373a84fe99368b70c50e63d6a6a4c43da47e7e2539c6da71"
         }
       }
     },
-    "src/warhammer40k_core/engine/prebattle.py": {
-      "before_sha256": "9196429c672020be365eb1e2191033c29c5203501602bcecf0c5991e518d98bf",
-      "after_sha256": "0a77659401e46370215bd2617616cb1d636f5733fa6bf3288a835a005b2272f6",
+    "src/warhammer40k_core/engine/deployment_geometry.py": {
+      "before_sha256": "8404f6fa45aa1a55e670a982609ca8bff7d6b33d82d4ef4971de28b2fae40e27",
+      "after_sha256": "e3eb1851835eeef4f0b88bf443cf74fcd47257e7024fb06044777c602145deee",
       "owners": {
         "@module": {
-          "before": "09646b7402937f777113e31e0d9fcdba25444872a40e25f1dbec8bc2684f5954",
-          "after": "083efc9ec8d9af2f6a4a3adeb49ebb444a1409d8be55bbf9dd3b921ce3249e97"
+          "before": "aafb72a1d3de871a8c9cacf99dbc003eaeea5ddbb28f0e7830280afa1dbea13a",
+          "after": "639b15fc198676afd34ba1d64e24532123a531a16b7b728ee9b466dee8b52a48"
         },
-        "PreBattleViolationCode": {
-          "before": "b9bd9488be2efd7078f2a8b0e3cfa64534d69b262214710f1f3d545dae84f983",
-          "after": "78d44f24d6cedff49bb77a4476463fa4c23525175b69eb48af2e43567f7d8338"
-        },
-        "_resolve_prebattle_placement": {
-          "before": "bd483857919341fa3fc06588c8c27b5e7be25aaae1dfbe17761f1495205f7f5d",
-          "after": "1db77dacd3a934e5ab391c2ee43a7cd6c52afbc4a2fac87e2487ead3850ae161"
-        },
-        "_validate_placement_models": {
-          "before": "d381f088d96d851248fa9a569082a68d2b39217724950b544ac521d2f2f91ebc",
-          "after": null
+        "append_geometry_violations": {
+          "before": "4092af7986030dc82e5ec38f652a33af185daccd29cfa8f843a19966ff2e17f8",
+          "after": "2ca96edb2ed5d5bc61eb8b76b46c681f9a6be7a835a4f5c7f0254b79e8e975ad"
         }
       }
     },
-    "src/warhammer40k_core/engine/prebattle_setup_geometry.py": {
-      "before_sha256": "734163adf9211572c095ccf93f99ef1fa7c37fe51de2a3bd7d474c55a495671a",
-      "after_sha256": "e5f8bf6f22bd72aee3dd1d3fd05954cbaed16e46db2ceece61ad563a56876bde",
+    "src/warhammer40k_core/engine/large_model_setup.py": {
+      "before_sha256": "02e2ff541760b97130100ef9c142211f198e81726a7ce92c74092cfe75742f10",
+      "after_sha256": "68ea3dcec2666fdb47a9da250e7373d244ef5cfb7d657c3c2b96320d8aba44df",
       "owners": {
         "@module": {
-          "before": "2c2e5f3ed5428e9fa3dd84d424d050ab7e17351428815231a6110c7469eadbbf",
-          "after": "16f2922fb1bebb3123997d8a53b33fdd91617ea1f9f6831656ab7d1e6080f85c"
+          "before": "c1d81ec95a5ca3224ef87736daac53286c4f9a39664892a9f365a4a4ab29f903",
+          "after": "a498dbcc6e9034d9a9e8bfc8e9dd9ad3162d7f63edba4ccdbf162011a1312d54"
         },
-        "_validate_placement_models": {
+        "battlefield_region": {
           "before": null,
-          "after": "d381f088d96d851248fa9a569082a68d2b39217724950b544ac521d2f2f91ebc"
+          "after": "2e0883f6f8c0ecc3ff445435d91535fc428039d552eb60769d7c2a91ca430c5c"
         },
-        "append_redeploy_geometry_violations": {
+        "deployment_body_containment": {
           "before": null,
-          "after": "b6a68a8bca20fb67f4b748785333c25626461e27fa03fed3c939b25863332047"
-        },
-        "validate_prebattle_placement": {
-          "before": null,
-          "after": "d151c3631eb3c6d6a81cc1cc8c8bb940e13e63f84656a806bfe8ca99a761bb7b"
+          "after": "c95613fdf44055bf2efc9bf8dcee8f280e898f0276c54fdc85a90ff67489baa8"
         }
       }
     },
-    "tests/code_quality/test_order127_source_authority.py": {
+    "src/warhammer40k_core/engine/reserve_arrival_resolution.py": {
+      "before_sha256": "fbdbfcb3772da838768ef003e08c44c4f2ad4c60d8414985f550cac8afb91787",
+      "after_sha256": "5db1ae79206cdc4f4d92b1523f892fd75d9ae213ef4eda7e6d2c6331e340f2ce",
+      "owners": {
+        "resolve_reserve_arrival": {
+          "before": "0884403277221b280dacc0d120ca0dfacd47e530f8c969c77048bb90765811a0",
+          "after": "2167447ca85951fc1d8d340679975aa8758f87ae9d7f28f1713acd266a791004"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/reserve_setup_geometry.py": {
+      "before_sha256": "7be2dba5f9781a5e4a742b66b2d829fe9ab8aba51c4999773b36e27c33a35fc0",
+      "after_sha256": "8ac5765c0eabe5a1a46b4447b1944d8a33a3ce4d2a5abba9d1059c502643de5c",
+      "owners": {
+        "append_reserve_body_violations": {
+          "before": null,
+          "after": "e0960f6ae5857c769a7be7b5d14c3c215402fefbc14e9771ab638d3908127ba4"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/setup_circle_fit.py": {
       "before_sha256": null,
-      "after_sha256": "e2c194d32d5bb30b99727517a61e191d293d1b012ab632ed6066a8f300ba8edf",
+      "after_sha256": "b3a0197538860da18e8b172594a2d5c008612dd69962045d35e0c1348f5657d9",
       "owners": {
         "@module": {
           "before": null,
-          "after": "4bb27dc697433808959a63b58b747c6ffe98e611f57a527c5502aba263aab05b"
+          "after": "9f53619fcc8e65c38216eebb16649114ffe8a30ef983a7f9ef9ee869fd63dc5a"
         },
-        "test_order127_selected_obligation_and_original_pins_remain_exact": {
+        "circle_containment": {
           "before": null,
-          "after": "24684958f9afad63954cf9f4f823c1cc341bb93c7bdbd1eba99f55777b2dfbd2"
+          "after": "0348f1f94a4a86dcad8d0472c40f334d11f4cb88fcefd727a4c1f15a7ff3d39c"
+        },
+        "circle_outside_convex_polygon": {
+          "before": null,
+          "after": "29cbb245128e60b46e290e87e56d1d92b60d8859280ddc125e4df61d357521ee"
         }
       }
     },
-    "tests/integration/test_order127_infiltrators_redeploy.py": {
+    "src/warhammer40k_core/geometry/setup_fit.py": {
+      "before_sha256": "27b034eaffc97898a5b9e1275ffc6b8d76623939157f53c18a9532e90676613d",
+      "after_sha256": "1b80654b6a8271823c957b188ea64f4b89a75b6cfb6425397bc5af9b5369e68c",
+      "owners": {
+        "@module": {
+          "before": "f44914bbc358fb771992a1517652e4bad3f83d153ebac7147ce74ec10088b4a1",
+          "after": "ddc6ba6252ac9d2fee5f1bb4c87da1953206b1f9e51108aec618c6197a667f36"
+        },
+        "_fit": {
+          "before": null,
+          "after": "72c5225367b2e14a8d426e0d0e50ef5ece72d1ca4de4ffed2a8b50d6860bcc09"
+        },
+        "_shape_containment": {
+          "before": null,
+          "after": "b0045c3522aa77b90181e529fc598425db17a6af7ce2348f69b2e017dcb3efd9"
+        },
+        "model_fits_regions": {
+          "before": null,
+          "after": "a94c73f997ab7d175b3b453fd97e915e6c1bd9ac9bf0089864bf641f54e19fa9"
+        },
+        "model_wholly_within_regions": {
+          "before": null,
+          "after": "8b38de4fa08ab6afc657baa62405b69a24e5d12b12b190d5c10a5a262d4c8478"
+        }
+      }
+    },
+    "tests/code_quality/test_order128_source_authority.py": {
       "before_sha256": null,
-      "after_sha256": "ffdfdcb004e3a9fc3cfcf629dfe3f759ee5dfd997fa9580be425f7499e00846f",
+      "after_sha256": "a4753408c08a036e4234a4676f4b60b152a821d6eba2b1d90768dfe9f1f384b2",
       "owners": {
         "@module": {
           "before": null,
-          "after": "c4d0f1b678c110a9b7f46f70d39b0125ff66a991eb628450fd889596a63a151d"
+          "after": "8ecc29b9420d70d63f538fbc8663b2927a7a45a741a8cd9f91a9f9367c4be81a"
+        },
+        "test_order128_selected_blocks_and_original_source_archives_remain_exact": {
+          "before": null,
+          "after": "98b308631f916819bd3ec5d745ad17414de1a399cd814e1b518c28a7c78e81d3"
+        }
+      }
+    },
+    "tests/integration/test_order128_setup_overhang.py": {
+      "before_sha256": null,
+      "after_sha256": "c7db2cdfae537a71b61ef1546bbbb7bc1c6d6465552688f50384b6679ab16442",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "e2bec7ec62373d45cd278017f9c85b5984e1603ebcf09e9f85e4a342d2789e3d"
+        },
+        "test_body_exception_keeps_base_and_submission_boundaries_atomic": {
+          "before": null,
+          "after": "efd9f853819bd669a6d97571061001f0401238508c19242d7bdf7bb17902f3bd"
+        },
+        "test_catalog_deployment_body_fit_atomic_retry_restore_fork_views_events_replay": {
+          "before": null,
+          "after": "3110c39dc0d00a328c68b3871a33ba9b5e48f10076aa6cd9d34a661615a48e07"
+        },
+        "test_catalog_strategic_reserve_whole_body_fit_and_impossible_exception": {
+          "before": null,
+          "after": "ff1e07d8cd4c2d975ea34b40398c47465faea3258ca292cce74141292474e8d8"
+        },
+        "test_cutout_zone_legal_impossible_body_fit_and_avoidable_retry": {
+          "before": null,
+          "after": "733bce75f2205fd56a565f6d159809cc1349b85007eb3ab0a380225a4f8d629d"
+        },
+        "test_normal_catalog_redeploy_consumes_body_fit_authority": {
+          "before": null,
+          "after": "6a3410987a87918c04c774762009a11a93e3f525b56586fd68eec0396139da48"
+        }
+      }
+    },
+    "tests/order128_helpers.py": {
+      "before_sha256": null,
+      "after_sha256": "35e12fa1083f1d2db71b19ab570b0c91be4faa6e245f2cff948a1f4618896c41",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "5d7e1a3545bc97dd6f2593e095fa9759228297f0c250e3b0f521e3eb296177ef"
         },
         "assert_checkpoint": {
           "before": null,
-          "after": "9141b3ac1942b6de22c66adbcc0d3caef7dc14b887c14e0b7ef54a77d226399d"
+          "after": "e1a383bfa4d347d7fcb08ac994a86a5f7e68083de3d22ae95cfb158f1a6ee0b7"
         },
-        "test_attached_redeploy_requires_infiltrators_on_every_component": {
+        "deployment_session": {
           "before": null,
-          "after": "a7a6a9c6f91e45d0aa3aa2828d95f4eefa4cb3a6967439ad1637f26ba2e5971d"
+          "after": "3da7e91a0ca607ce0015ea4e89e39725e886b6ee2cd0c9fee7c1522d338349cd"
         },
-        "test_catalog_infiltrator_geometry_rejection_preserves_state_and_retry": {
+        "evidence": {
           "before": null,
-          "after": "1af862653571e2d44dee941279e064d73e5f2c38a2c0404d73fe2f710f858b52"
-        },
-        "test_catalog_infiltrators_redeploy_outside_zone_restores_and_replays": {
-          "before": null,
-          "after": "c1eef71bfb0fefa6bc551abb96dab104b4a22ffcda9157a94298c3ac4db56bb8"
-        },
-        "test_catalog_noninfiltrators_remain_zone_bound_and_invalid_placement_is_atomic": {
-          "before": null,
-          "after": "4f6abac079c457fee4d4f8e3a7cfc6833aa39faeb607b67f77e8a05f68ac9efa"
-        }
-      }
-    },
-    "tests/order127_helpers.py": {
-      "before_sha256": null,
-      "after_sha256": "59d72d877d305f410db43026040e151f3dd40b24eae816bac525d5f7a4583684",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "97760384845ea03c8ccee5e8d3f828a30d41174f458463157c564c1fdc67731c"
-        },
-        "_start_redeploy": {
-          "before": null,
-          "after": "a94e74fcbaa2e7b50f31ec582641970c772daad5d562766f080a67cb9879ccb0"
-        },
-        "canonical_attached_redeploy_session": {
-          "before": null,
-          "after": "5815e274936beaff1730c64b25164e065a02880ea9a34120f4cacc1d39d25916"
-        },
-        "redeploy_catalog": {
-          "before": null,
-          "after": "b8b8ab0a421530d5db9cd4957d3684d0023b196c27b9739c8802d9ceb5b6f2f2"
-        },
-        "redeploy_payload": {
-          "before": null,
-          "after": "6146c8161e4f4f30eb47caa8a03641336973df37831661d11c8580ef37e57bd5"
+          "after": "08bad95a0943dc045702a902c5e58f467d9f932f5996a746e1f5c22082899d6e"
         },
         "redeploy_session": {
           "before": null,
-          "after": "a9c2b7f3eb1216aa42fe572d1c222873012c7d5f833f2ad4e0366c1be16e1f9c"
+          "after": "ca3ae65d13013ac1ff248b9068fc4386dfc475fc285838ab8c3cf8630786885b"
+        },
+        "reserve_session": {
+          "before": null,
+          "after": "db050eb337da484c1c345d0250eba0ddb85a41e28bc307e183d9d1e3c1bb1eef"
+        },
+        "setup_config": {
+          "before": null,
+          "after": "c8ac0f6003004862db119ec9de522d5db4839fa4fa26275c7c10d9580b73600f"
+        }
+      }
+    },
+    "tests/unit/test_order128_setup_model_fit.py": {
+      "before_sha256": null,
+      "after_sha256": "40e210b73becd766b11bb8c2c218f2be2c7e638706a32dfbd2ee074f6416bf8f",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "d3eb75e0bcd945c9f900aab7cc2907bd68270e32186533617fbfc1d34211649c"
+        },
+        "test_cardinal_boundary_contact_is_wholly_contained": {
+          "before": null,
+          "after": "ee6fb22dcccee7b931916f3fa7524212589250d858bb57bae8ce51bb7c492db5"
+        },
+        "test_circular_body_concave_cutout_preserves_decomposition_seams": {
+          "before": null,
+          "after": "97e8f4838d63eb5d41b0d89406246f3004c4a88fa55dfd93e6ea54baadb5cba4"
+        },
+        "test_circular_body_polygon_cutout_edge_corner_and_interior": {
+          "before": null,
+          "after": "ed75d376271c588827d6246f6f47cf682d29995ff9d953b5c491e76db4f2ebb5"
+        },
+        "test_compound_parts_require_one_common_pose_not_independent_fits": {
+          "before": null,
+          "after": "757ba842e2bac15e42e327f92d6d351c887333085112f91ebcaf8ef28457abd7"
+        },
+        "test_concentric_cutout_fit_preserves_largest_base_or_body": {
+          "before": null,
+          "after": "211399b89e38228f831737dcbcbaedad848a641def63cfa85468b146e422836a"
+        },
+        "test_impossible_zone_fit_does_not_excuse_avoidable_battlefield_overhang": {
+          "before": null,
+          "after": "290afb99be1d0365e8ec1496942e7e9ee402174fe7e7fbd9327507d438f18922"
+        },
+        "test_original_avoidable_overhang_probe_rejects_and_ordinary_fit_survives": {
+          "before": null,
+          "after": "02a03b1ea05c148acf80979fd44f6427697a2dd6e662b87c280ea6f5a1c367c0"
+        },
+        "test_whole_model_fit_searches_all_rotations_and_preserves_offset": {
+          "before": null,
+          "after": "84026befb22ce668ac88b017c196b9cc8029a998ad4dafdd1225718be3920db3"
+        }
+      }
+    },
+    "tools/performance_policy.py": {
+      "before_sha256": "b2df639cb46a2cc1f706457c87bd2c2c44b4ecd19a3c38fab7f6c366c7576394",
+      "after_sha256": "f098cc41ff54f4f486e0e89e829666e0166c4410c08b643ac298f0af73750e21",
+      "owners": {
+        "@module": {
+          "before": "8df47be7044c807f823afb716ed1ec586d66cb5fdfcd47c507afc00cef2c5f79",
+          "after": "4e788e20a2573c77efb2d23447d51d60eb7eaf9da157dab8db44c5641093e163"
+        },
+        "_order128_smoke_operations": {
+          "before": null,
+          "after": "806eec037c1cd4c31a7b5f4435756cf659374dd1955e5398474c6638e09402ec"
+        },
+        "validate_assessment": {
+          "before": "4d296c04cd0434356b9a933584c1157b654cfa19c75f92195f0f64935f10a394",
+          "after": "03c5667fd24eadccd1d38cddfa0358588379161310e9b683cfae76bf43161806"
         }
       }
     }
@@ -440,9 +566,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -450,9 +576,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -460,9 +586,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -470,9 +596,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -480,9 +606,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -490,9 +616,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -500,9 +626,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -510,9 +636,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -520,9 +646,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -530,9 +656,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -540,9 +666,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -550,9 +676,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -560,161 +686,169 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "conformance/typescript/src/contract.ts": {
       "category": "rule_semantics",
       "operations": [
-        "order127-contract-publication"
+        "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
-        "order127-contract-publication"
+        "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
-        "order127-contract-publication"
+        "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
-        "order127-contract-publication"
+        "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
-        "order127-contract-publication"
+        "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "order127-contract-publication"
+        "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "order127-contract-publication"
+        "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
-        "order127-contract-publication"
+        "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "order127-contract-publication"
+        "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
-    "contracts/migrations/44.3.12-to-44.3.13.md": {
+    "contracts/migrations/44.3.13-to-44.3.14.md": {
       "category": "rule_semantics",
       "operations": [
-        "order127-contract-publication"
+        "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "contracts/openapi.yaml": {
       "category": "rule_semantics",
       "operations": [
-        "order127-contract-publication"
+        "order128-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
-    "data/source_audits/order127/source.audit.json": {
+    "data/source_audits/order128/source.audit.json": {
       "category": "rule_semantics",
       "operations": [
-        "order127-source-evidence"
+        "order128-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
-    "docs/ORDER_127_SCOPE_PLAN.md": {
+    "docs/ORDER_128_SCOPE_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
+    },
+    "docs/performance/policy-v3/order128-rule-semantics.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -722,67 +856,129 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
       "operations": [
-        "order127-redeploy-validation"
+        "order128-whole-model-setup"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
-    "src/warhammer40k_core/engine/prebattle.py": {
+    "src/warhammer40k_core/engine/deployment_geometry.py": {
       "category": "rule_semantics",
       "operations": [
-        "order127-redeploy-validation"
+        "order128-whole-model-setup"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
-    "src/warhammer40k_core/engine/prebattle_setup_geometry.py": {
+    "src/warhammer40k_core/engine/large_model_setup.py": {
       "category": "rule_semantics",
       "operations": [
-        "order127-redeploy-validation"
+        "order128-whole-model-setup"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
-    "tests/code_quality/test_order127_source_authority.py": {
+    "src/warhammer40k_core/engine/reserve_arrival_resolution.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order128-whole-model-setup"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
+    },
+    "src/warhammer40k_core/engine/reserve_setup_geometry.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order128-whole-model-setup"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
+    },
+    "src/warhammer40k_core/geometry/setup_circle_fit.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "geometry-search",
+        "order128-whole-model-setup"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
+    },
+    "src/warhammer40k_core/geometry/setup_fit.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "geometry-search",
+        "order128-whole-model-setup"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
+    },
+    "tests/code_quality/test_order128_source_authority.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
-    "tests/integration/test_order127_infiltrators_redeploy.py": {
+    "tests/integration/test_order128_setup_overhang.py": {
       "category": "rule_semantics",
       "operations": [
-        "order127-regressions"
+        "order128-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     },
-    "tests/order127_helpers.py": {
+    "tests/order128_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "order127-regressions"
+        "order128-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded source-backed Infiltrators redeployment permission, shared normal geometry authority, actual catalog/facade acceptance and truthful unchanged historical sources.",
-      "source_obligation": "Selected immutable Core rule:03:03.02.03:1 obligation03 block1 requires redeployment to use normal setup rules including Infiltrators on all models. Retained facade diagnostic proves the Core consumer omission. Actual source-backed Rangers and Prince Yriel catalog paths exercise the generic consumer; no named provider defect or admission/certification claim.",
-      "unchanged_work": "The normal redeploy validation branch delegates to the existing initial deployment geometry and typed ability query, translating diagnostics only. Existing enemy distance, geometry, terrain, overlap, coherency and physical ownership validators remain. No search algorithm, cache, serializer/replay algorithm, dependency, workload or RNG change; no deliberate performance optimization or demonstrated serious regression. Quiet serial current-runtime smoke and every live semantic/work/source gate remain required. Order128 full-model fit work is excluded."
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
+    },
+    "tests/unit/test_order128_setup_model_fit.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order128-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
+    },
+    "tools/performance_policy.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order128-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded whole-model setup fit including reproduced legal cutout-path repair, shared catalog facade acceptance, exact original source evidence and unchanged delivery gates.",
+      "source_obligation": "Immutable Core rule:03:03.02.02:1 blocks5/9, obligations04/09, require whole-model containment unless physically impossible, preserving deployment base containment and Strategic Reserves enemy distance. Original diagnostic and four source pins remain byte-exact; synthetic analytical measurements are labelled and do not certify providers.",
+      "unchanged_work": "The exact analytic setup-fit owner constrains one common translated/rotated support base and all body parts. Frozen1 independent review reproduced a normal legal impossible-fit deployment stalled in polygon-cutout containment. The unchanged base-only oracle also stalled on the exact translated disk query; smaller-origin controls do not prove an exact-input regression. The scoped rules repair uses exact finite disk support and edge/vertex separation from each convex cutout part, retaining tangency, concave cutout interiors, every coupled part, required base region/contact and quantified fallback for other shapes. It is required to return correct rules answers on that supported setup path, not deliberate performance optimization. Owner-approved bounded rule semantics retains quiet serial current-runtime smoke, exact assessment and live work/semantic/cache checks. No detailed numerical comparison, historical budget refresh or full-game certification is claimed."
     }
   },
   "milestone": "ordinary",

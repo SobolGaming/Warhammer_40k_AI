@@ -11,7 +11,9 @@ from fractions import Fraction
 from functools import lru_cache
 
 from warhammer40k_core.geometry.base import BaseShape, CircularBase, OvalBase, RectangularBase
+from warhammer40k_core.geometry.model_body import ModelBodyPart
 from warhammer40k_core.geometry.pose import GeometryError
+from warhammer40k_core.geometry.setup_circle_fit import circle_containment
 from warhammer40k_core.geometry.visibility_algebra import (
     Formula,
     RealTerm,
@@ -25,6 +27,7 @@ from warhammer40k_core.geometry.visibility_algebra import (
     variable,
 )
 from warhammer40k_core.geometry.visibility_exact import RationalPolygon, convex_polygon_parts
+from warhammer40k_core.geometry.volume import Model
 
 type Polygon = tuple[tuple[float, float], ...]
 type Circle = tuple[float, float, float]
@@ -167,3 +170,160 @@ def base_fits_regions(base: BaseShape, setup_regions: tuple[Region, ...]) -> boo
     return decide(
         both(orientation, quantified("forall", ("u", "v"), implies(in_base, in_region))), names
     )
+
+
+def _shape_containment(
+    base: BaseShape,
+    x: RealTerm,
+    y: RealTerm,
+    c: RealTerm,
+    s: RealTerm,
+    regions: tuple[Region, ...],
+) -> Formula:
+    if isinstance(base, CircularBase):
+        a = b = Fraction(str(base.radius))
+        c, s = term(1), term(0)
+    elif isinstance(base, OvalBase | RectangularBase):
+        a, b = Fraction(str(base.length)) / 2, Fraction(str(base.width)) / 2
+    else:
+        raise GeometryError("Unsupported whole-model setup shape.")
+    polygons, holes, circles = regions[0]
+    if isinstance(base, CircularBase) and len(regions) == 1:
+        finite = circle_containment(x, y, a, polygons, holes, circles)
+        if finite is not None:
+            return finite
+    parts = convex_polygon_parts(_rational_polygon(polygons[0])) if len(polygons) == 1 else ()
+    if len(regions) == 1 and len(parts) == 1 and not holes and not circles:
+        constraints: list[Formula] = []
+        for p, q in zip(parts[0], (*parts[0][1:], parts[0][0]), strict=True):
+            dx, dy = q[0] - p[0], q[1] - p[1]
+            margin = term(dx) * (y - p[1]) - term(dy) * (x - p[0])
+            u = (term(dx) * s - term(dy) * c) * a
+            v = (term(dx) * c + term(dy) * s) * b
+            if isinstance(base, RectangularBase):
+                constraints.extend(margin.ge(u * i + v * j) for i in (-1, 1) for j in (-1, 1))
+            else:
+                constraints.extend((margin.ge(0), (margin * margin).ge(u * u + v * v)))
+        return both(*constraints)
+    u, v = variable("u"), variable("v")
+    in_shape = (
+        both(u.ge(-a), u.le(a), v.ge(-b), v.le(b))
+        if isinstance(base, RectangularBase)
+        else ((u * b) ** 2 + (v * a) ** 2).le((a * b) ** 2)
+    )
+    return quantified(
+        "forall",
+        ("u", "v"),
+        implies(
+            in_shape,
+            either(
+                *(
+                    _region_membership(x + c * u - s * v, y + s * u + c * v, region)
+                    for region in regions
+                )
+            ),
+        ),
+    )
+
+
+@lru_cache(maxsize=512)
+def _fit(
+    base: BaseShape,
+    body: tuple[ModelBodyPart, ...],
+    regions: tuple[Region, ...],
+    base_regions: tuple[Region, ...],
+    base_contact: tuple[float, float, float] | None,
+) -> bool:
+    if not body and regions == base_regions and base_contact is None:
+        return base_fits_regions(base, regions)
+    regions = _irredundant_regions(regions)
+    base_regions = _irredundant_regions(base_regions)
+    x, y, c, s = (variable(name) for name in ("x", "y", "c", "s"))
+    names: tuple[str, ...] = ("x", "y", "c", "s")
+    orientation = (c * c + s * s).eq(1)
+    if isinstance(base, CircularBase) and all(
+        isinstance(part.base, CircularBase) and part.offset_x_inches == part.offset_y_inches == 0
+        for part in body
+    ):
+        c, s = term(1), term(0)
+        names = ("x", "y")
+        orientation = c.eq(1)
+    constraints = [orientation, _shape_containment(base, x, y, c, s, base_regions)]
+    constraints.append(_shape_containment(base, x, y, c, s, regions))
+    if base_contact is not None:
+        nx, ny, bound = (Fraction(str(value)) for value in base_contact)
+        if isinstance(base, CircularBase):
+            constraints.append((term(bound) - x * nx - y * ny).eq(Fraction(str(base.radius))))
+        elif isinstance(base, OvalBase | RectangularBase):
+            margin = term(bound) - x * nx - y * ny
+            u = (c * nx + s * ny) * (Fraction(str(base.length)) / 2)
+            v = (-s * nx + c * ny) * (Fraction(str(base.width)) / 2)
+            if isinstance(base, RectangularBase):
+                supports = tuple(u * i + v * j for i in (-1, 1) for j in (-1, 1))
+                constraints.extend(margin.ge(support) for support in supports)
+                constraints.append(either(*(margin.eq(support) for support in supports)))
+            else:
+                constraints.extend((margin.ge(0), (margin * margin).eq(u * u + v * v)))
+        else:
+            raise GeometryError("Unsupported whole-model setup contact shape.")
+    for part in body:
+        ox, oy = Fraction(str(part.offset_x_inches)), Fraction(str(part.offset_y_inches))
+        constraints.append(
+            _shape_containment(
+                part.base,
+                x + c * ox - s * oy,
+                y + s * ox + c * oy,
+                c,
+                s,
+                regions,
+            )
+        )
+    return decide(both(*constraints), names)
+
+
+def model_fits_regions(
+    model: Model,
+    regions: tuple[Region, ...],
+    *,
+    base_regions: tuple[Region, ...] | None = None,
+    base_contact: tuple[float, float, float] | None = None,
+) -> bool:
+    required_base_regions = regions if base_regions is None else base_regions
+    if (
+        not regions
+        or not required_base_regions
+        or any(not region[0] for region in (*regions, *required_base_regions))
+    ):
+        raise GeometryError("Whole-model setup fit requires nonempty regions.")
+    return _fit(model.base, model.body_parts, regions, required_base_regions, base_contact)
+
+
+def model_wholly_within_regions(model: Model, regions: tuple[Region, ...]) -> bool:
+    """Check the actual pose with the same analytic containment predicates."""
+    import math
+
+    if not regions or any(not region[0] for region in regions):
+        raise GeometryError("Whole-model setup containment requires nonempty regions.")
+    x, y = term(Fraction(str(model.pose.position.x))), term(Fraction(str(model.pose.position.y)))
+    degrees = model.pose.facing.degrees % 360
+    cardinal = {0.0: (1, 0), 90.0: (0, 1), 180.0: (-1, 0), 270.0: (0, -1)}
+    if degrees in cardinal:
+        cosine, sine = cardinal[degrees]
+        c, s = term(cosine), term(sine)
+    else:
+        angle = math.radians(degrees)
+        c, s = term(Fraction(str(math.cos(angle)))), term(Fraction(str(math.sin(angle))))
+    constraints = [_shape_containment(model.base, x, y, c, s, regions)]
+    for part in model.body_parts:
+        ox, oy = Fraction(str(part.offset_x_inches)), Fraction(str(part.offset_y_inches))
+        constraints.append(
+            _shape_containment(
+                part.base,
+                x + c * ox - s * oy,
+                y + s * ox + c * oy,
+                c,
+                s,
+                regions,
+            )
+        )
+    return decide(both(*constraints), ())

@@ -1,0 +1,181 @@
+{
+  "order": 128,
+  "started": true,
+  "scope": "P03I/C03-09; 03.02.02-obligation-04 and 03.02.02-obligation-09",
+  "selected_source": {
+    "row_id": "rule:03:03.02.02:1",
+    "category": "03",
+    "locator": "03.02.02",
+    "title": "Setting Up Large Models",
+    "occurrence": 1,
+    "source_sha256": "910af631243255d6f41c6eb1c64fabad2de8e7999528fbcf837883fcce10d169",
+    "blocks": [
+      {
+        "ordinal": 1,
+        "kind": "text",
+        "sha256": "30ff07cd8257373f04601a530ea72bbb1b2ff67ef93fe35343b04da8d8475dc6",
+        "value": "If a model cannot meet all of its set up restrictions because it is too large, consult the relevant section below:"
+      },
+      {
+        "ordinal": 2,
+        "kind": "text",
+        "sha256": "c3767fbc0392427a5b67bb2ec5ea32761d4ddde1c6f299c08985225ee6533f94",
+        "value": "\u0005During Deployment:\u0006 If a model is so large that its base cannot physically be set up wholly within your deployment zone, it must be set up so that it is touching your battlefield edge. During a turn in which such a large model is set up on the battlefield, that model\u2019s unit cannot do any of the following:"
+      },
+      {
+        "ordinal": 3,
+        "kind": "text",
+        "sha256": "f3caec085b254a314eade071617ae95c05f4e558aa25eefcbb05f307221c6004",
+        "value": "\u2022 Make a \u0005normal/advance/fall-back/charge move\u0006."
+      },
+      {
+        "ordinal": 4,
+        "kind": "text",
+        "sha256": "f1eef65b33b8ddb1f49dccc0fc81d19efb92c02ae7591b4da9182829de4510e7",
+        "value": "\u2022 Make any attacks with ranged weapons."
+      },
+      {
+        "ordinal": 5,
+        "kind": "text",
+        "sha256": "f59794a4519d7ba3b86a00180823cbb4bc1bdb1b80030b278130dd5ff77fcf86",
+        "value": "Some large models, typically \u0003Aircraft\u0004, have wings and other parts that extend significantly beyond their base. Such models can overhang a deployment zone if it is not possible to set them up otherwise, but when setting them up, their base must still be wholly within that deployment zone."
+      },
+      {
+        "ordinal": 6,
+        "kind": "text",
+        "sha256": "828452cdad23b1b8d8182a6cdb4125ef636e4e7f23fac74dc6095e459eb546e3",
+        "value": "\u0005From Strategic Reserves:\u0006 If a model is so large that its base cannot physically be set up wholly within the distance required of the battlefield edge, it must be set up so that it is touching a battlefield edge. During a turn in which such a large model is set up on the battlefield (excluding \u0003AIRCRAFT\u0004 models), that model\u2019s unit cannot do any of the following:"
+      },
+      {
+        "ordinal": 7,
+        "kind": "text",
+        "sha256": "cc211e95bac9e280b11ae21db75943a9eb3f02fa37bdfa27cd45020c72f4a1fa",
+        "value": "normal/advance/fall-back/charge move."
+      },
+      {
+        "ordinal": 8,
+        "kind": "text",
+        "sha256": "3854c84c493ff2d358202fe6f3fcef9399d6979c29dc6b9cf09918c7f733bddd",
+        "value": "Make any attacks with ranged weapons."
+      },
+      {
+        "ordinal": 9,
+        "kind": "text",
+        "sha256": "a92c3c6abb464a2090c7dff1820387523629e812704a9a549aa5b88722a4f5d1",
+        "value": "Some large models, typically \u0003Aircraft\u0004, have wings and other parts that extend significantly beyond their base. Such models can overhang a battlefield edge if it is not possible to set them up otherwise, but when setting them up, they must still be more than 8\" away from all enemy units."
+      },
+      {
+        "ordinal": 10,
+        "kind": "text",
+        "sha256": "1cd9d5a122a30c0f6e53e7b9bd791cc439d6c80c563443c5d72951c1410b05cb",
+        "value": "\u0005Disembarking from a Transport:\u0006 When a unit disembarks from a \u0003Transport\u0004, it must be set up wholly within 3\" of that model. If a disembarking model is so large that it is not possible to set it up wholly within 3\" (typically because it is itself larger than 3\" in all directions), set that model up with its base within 1\" of that \u0003Transport\u0004\u2019s base (or hull), and not \u0005engaged\u0006 with any enemy units."
+      }
+    ],
+    "selected_provider": "Game Datamissions",
+    "historical_source_row_sha256": "4f88ed512d55c8ece4fe108889e82336e61a38b7b78e27c5a2d14b7ceec606e3",
+    "review_category": "03"
+  },
+  "selected_literal_blocks": [
+    {
+      "ordinal": 5,
+      "kind": "text",
+      "sha256": "f59794a4519d7ba3b86a00180823cbb4bc1bdb1b80030b278130dd5ff77fcf86",
+      "value": "Some large models, typically \u0003Aircraft\u0004, have wings and other parts that extend significantly beyond their base. Such models can overhang a deployment zone if it is not possible to set them up otherwise, but when setting them up, their base must still be wholly within that deployment zone."
+    },
+    {
+      "ordinal": 9,
+      "kind": "text",
+      "sha256": "a92c3c6abb464a2090c7dff1820387523629e812704a9a549aa5b88722a4f5d1",
+      "value": "Some large models, typically \u0003Aircraft\u0004, have wings and other parts that extend significantly beyond their base. Such models can overhang a battlefield edge if it is not possible to set them up otherwise, but when setting them up, they must still be more than 8\" away from all enemy units."
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "03.02.02-obligation-04",
+      "source_blocks": [
+        5
+      ],
+      "summary": "Model overhang beyond a deployment zone is allowed only if otherwise impossible.",
+      "owners": [
+        "src/warhammer40k_core/engine/deployment_geometry.py:append_geometry_violations"
+      ],
+      "evidence": [],
+      "qualifications": [
+        "Evidence gap: The authoritative deployment geometry owner accepts an eight-inch body overhanging the zone and battlefield although its entire body fits at y10. This directly proves deployment; reserve ingress needs the same full-body/impossibility audit before claiming its corresponding clause. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding avoidable-setup-body-overhang."
+      ]
+    },
+    {
+      "requirement_id": "03.02.02-obligation-09",
+      "source_blocks": [
+        9
+      ],
+      "summary": "Reserve model overhang beyond the battlefield is allowed only if otherwise impossible.",
+      "owners": [
+        "src/warhammer40k_core/engine/large_model_setup.py:oversized_deployment_violation",
+        "src/warhammer40k_core/engine/reserves.py:resolve_reserve_arrival",
+        "src/warhammer40k_core/engine/transports.py:resolve_disembark"
+      ],
+      "evidence": [],
+      "qualifications": [
+        "Evidence gap: The authoritative deployment geometry owner accepts an eight-inch body overhanging the zone and battlefield although its entire body fits at y10. This directly proves deployment; reserve ingress needs the same full-body/impossibility audit before claiming its corresponding clause. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding avoidable-setup-body-overhang."
+      ]
+    }
+  ],
+  "retained_diagnostic": {
+    "finding": "avoidable-setup-body-overhang",
+    "source_ref": "03.02.02",
+    "requirement_ids": [
+      "03.02.02-obligation-04",
+      "03.02.02-obligation-09"
+    ],
+    "expected": "reject body overhang where an ordinary complete-body placement exists",
+    "observed": [],
+    "base_radius_inches": 2.362204724409449,
+    "body_radius_inches": 4.0,
+    "proposed_y": 2.5,
+    "ordinary_fit_y": 10,
+    "owner": "src/warhammer40k_core/engine/deployment_geometry.py:append_geometry_violations",
+    "scope": "The authoritative deployment geometry owner accepts an eight-inch body overhanging the zone and battlefield although its entire body fits at y10. This directly proves deployment; reserve ingress needs the same full-body/impossibility audit before claiming its corresponding clause."
+  },
+  "diagnostic_locator": "tests/order97_gap_probes_01_08.py:637:avoidable_setup_body_overhang_observation",
+  "pinned_git_blob_sha256": {
+    "data/source_audits/order97/selected-sources.json": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+    "data/source_audits/order97/categories/03.json": "1e5f98b23d3e0dbad9cfcff967c54b02aae899c93cfa500528d6c65b6d7d3cbe",
+    "data/source_audits/order97/observed_gaps_01_08.json": "93d0f121e578099c7c52155131668d8706fbc7689afe5fa8ac1267228e107bde",
+    "tests/order97_gap_probes_01_08.py": "e4e908605e084a8106e0aab42f52fb425f2c6f4ff5705c639ddad29c5ca762cc"
+  },
+  "shared_consumer_note": "Order127 normal redeployment now delegates to deployment_geometry.append_geometry_violations; keep that shared consumer in the selected geometry-owner audit. Scout reserve setup remains separate.",
+  "base": "447d5c34a4fba4ce1605cb494de7badb5304af3e",
+  "tree": "ac726111e6632aed00fbbe60720a96a8c71e7e23",
+  "baseline_verified": true,
+  "checkout": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-05\\task-10\\order128",
+  "truthfulness": "The retained Core deployment diagnostic identifies base-only containment. Canonical vehicle/monster deployment and Strategic Reserves plus the existing source-backed Prince Yriel redeploy ability consume explicit synthetic analytical body geometry and catalog bases. These are not named provider physical measurements, defects, admission changes or certification.",
+  "excluded": [
+    "Other source obligations",
+    "Disembark exceptions",
+    "Coordinated hand-edited-history hardening"
+  ],
+  "acceptance": "Shared whole-model setup fit and geometric impossible-fit proof; retained base restrictions, enemy separation, physical ownership, terrain/overlap/objectives/coherency; atomic proposals, legal retry, engine-generated pending/rejected/completed JSON persistence, independent fork, both players/all roles/views/events and exact replay.",
+  "baseline_diagnostic_boundary": "Whole-model fit and only genuine impossible-fit exception across deployment and reserve setup; preserved diagnostic demonstrates deployment and leaves shared reserve counterpart for same geometry-owner audit. No Order128 implementation performed.",
+  "handoff_roadmap_row": "| 128 | P03I | C03-09 | Order 97 identifies the source/consumer gap documented in its pinned evidence. | Setup accepts avoidable body overhang because it tests support bases against the deployment region. Apply the selected whole-model fit and only its genuine impossible-fit exception across deployment and reserve setup; the retained probe demonstrates deployment and explicitly leaves the shared reserve counterpart for the same geometry-owner audit. | Selected Order 97 clauses: 03.02.02-obligation-04; 03.02.02-obligation-09. Full literal blocks and owner links are in the [inventory](ORDER_97_EVIDENCE_REPORT.md). | PEVIDENCE | IMPLEMENTATION-GAP |",
+  "boundary": "Implemented shared whole-model fit and proven geometric impossible-fit exception across deployment, normal redeployment and Strategic Reserves; deployment base containment and reserve enemy distance stay mandatory. Other obligations and disembark expansion are excluded.",
+  "review_repair": {
+    "failed_head": "5f19ecf2c68163a0fa6d0b2acc1fec64db7a4756",
+    "normal_entry": "Engine-generated LocalGameSession submit_deployment_placement request000006 for catalog core-vehicle-monster with catalog120mm support base and declared synthetic8-inch circular body.",
+    "zone": "[0,14]x[18,32] minus polygon [6,8]x[18,32]",
+    "legal_pose": [
+      11,
+      25,
+      0
+    ],
+    "impact": "Base is wholly in one width-six arm; body cannot fit either arm and is wholly on the field, but the legal impossible-fit exception exceeded60-second watchdog in compound proof.",
+    "qualification": "Exact unchanged base oracle for body-equivalent radius4 disk also exceeded30-second watchdog. Earlier smaller-origin controls are analogous, not exact-input regression proof. Frozen1 aggregate and insufficient largest-disk candidate runs remain unqualified outside repo.",
+    "implementation": "geometry.setup_circle_fit supplies exact finite disk outer support and separation from cutout edges/vertex normal cones, intersected across convex hole parts. Circle cutouts use radius-sum separation. Common base/body pose, offsets, required base region/contact and other-shape quantified fallback remain; original base-fit/membership predicates unchanged.",
+    "controls": [
+      "tests/unit/test_order128_setup_model_fit.py::test_concentric_cutout_fit_preserves_largest_base_or_body",
+      "tests/unit/test_order128_setup_model_fit.py::test_circular_body_polygon_cutout_edge_corner_and_interior",
+      "tests/unit/test_order128_setup_model_fit.py::test_circular_body_concave_cutout_preserves_decomposition_seams",
+      "tests/integration/test_order128_setup_overhang.py::test_cutout_zone_legal_impossible_body_fit_and_avoidable_retry"
+    ]
+  }
+}

@@ -15,6 +15,85 @@ from warhammer40k_core.engine.reserves import (
 from warhammer40k_core.geometry.volume import Model
 
 
+def append_reserve_body_violations(
+    *,
+    violations: list[ReservePlacementViolation],
+    models: tuple[Model, ...],
+    width: float,
+    depth: float,
+    qualifying_edges: tuple[BattlefieldEdge, ...],
+    strategic_rule: StrategicReserveRule,
+    exceptions: tuple[LargeModelReservePlacementException, ...],
+) -> None:
+    from warhammer40k_core.engine.large_model_setup import battlefield_region
+    from warhammer40k_core.engine.phase import GameLifecycleError
+    from warhammer40k_core.geometry.setup_fit import model_fits_regions, model_wholly_within_regions
+    from warhammer40k_core.geometry.visibility_algebra import VisibilityComputationError
+
+    field = (battlefield_region(width, depth),)
+    from warhammer40k_core.geometry.setup_fit import Region
+
+    horizontal_band = min(strategic_rule.edge_distance_inches, width)
+    vertical_band = min(strategic_rule.edge_distance_inches, depth)
+    band = vertical_band
+    by_edge: dict[BattlefieldEdge, Region] = {
+        BattlefieldEdge.SOUTH: ((((0.0, 0.0), (width, 0.0), (width, band), (0.0, band)),), (), ()),
+        BattlefieldEdge.NORTH: (
+            (((0.0, depth - band), (width, depth - band), (width, depth), (0.0, depth)),),
+            (),
+            (),
+        ),
+        BattlefieldEdge.WEST: (
+            (((0.0, 0.0), (horizontal_band, 0.0), (horizontal_band, depth), (0.0, depth)),),
+            (),
+            (),
+        ),
+        BattlefieldEdge.EAST: (
+            (
+                (
+                    (width - horizontal_band, 0.0),
+                    (width, 0.0),
+                    (width, depth),
+                    (width - horizontal_band, depth),
+                ),
+            ),
+            (),
+            (),
+        ),
+    }
+    contacts = {
+        BattlefieldEdge.SOUTH: (0.0, -1.0, 0.0),
+        BattlefieldEdge.NORTH: (0.0, 1.0, depth),
+        BattlefieldEdge.WEST: (-1.0, 0.0, 0.0),
+        BattlefieldEdge.EAST: (1.0, 0.0, width),
+    }
+    for model in models:
+        if not model.body_parts or model_wholly_within_regions(model, field):
+            continue
+        try:
+            exception = next(
+                (row for row in exceptions if row.model_instance_id == model.model_id), None
+            )
+            fits = (
+                model_fits_regions(model, field, base_contact=contacts[exception.battlefield_edge])
+                if exception is not None
+                else any(
+                    model_fits_regions(model, field, base_regions=(by_edge[edge],))
+                    for edge in qualifying_edges
+                )
+            )
+        except VisibilityComputationError as exc:
+            raise GameLifecycleError("Whole-model reserve fit computation is unresolved.") from exc
+        if fits:
+            violations.append(
+                ReservePlacementViolation(
+                    violation_code=ReservePlacementViolationCode.BATTLEFIELD_EDGE_CROSSED,
+                    message="The whole model can fit on the battlefield without body overhang.",
+                    model_instance_id=model.model_id,
+                )
+            )
+
+
 def append_strategic_reserves_edge_violations(
     *,
     violations: list[ReservePlacementViolation],
