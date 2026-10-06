@@ -16,131 +16,131 @@
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "21e90fab324d88a08296479038e796a92a95b5e8188ac0d6d313109c51ca1d8e",
-      "after_sha256": "4bb7b1c3d54dd9dfe2773d08e1dc7b49a769217a0bc89b389fdb06598f95280e",
+      "after_sha256": "5774dc7adb3313468e37a7b5e3129b665ffeea03736ca943a139ee51966ed820",
       "owners": {
         "@document": {
           "before": "21e90fab324d88a08296479038e796a92a95b5e8188ac0d6d313109c51ca1d8e",
-          "after": "4bb7b1c3d54dd9dfe2773d08e1dc7b49a769217a0bc89b389fdb06598f95280e"
+          "after": "5774dc7adb3313468e37a7b5e3129b665ffeea03736ca943a139ee51966ed820"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "5c87cf008d6b01d88e648a6ef7372861cf8b20481c79925314e87b769235c13c",
-      "after_sha256": "1da09b91938e9703f0c663b4dbe22163e9e5540bd995f9ff45f629dbf235c502",
+      "after_sha256": "ecfbe340abee717a5dced6b8638ef065ef86a4ce35024c392199d90970df4ded",
       "owners": {
         "@document": {
           "before": "5c87cf008d6b01d88e648a6ef7372861cf8b20481c79925314e87b769235c13c",
-          "after": "1da09b91938e9703f0c663b4dbe22163e9e5540bd995f9ff45f629dbf235c502"
+          "after": "ecfbe340abee717a5dced6b8638ef065ef86a4ce35024c392199d90970df4ded"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "35705952593362a85637002a066fd2df605f4dc127f8c484d6a5606ebc7f0225",
-      "after_sha256": "806c4a927bc1c425b88c4e4f0f3bc2f02c5b05532e04cc2ef6dbc3f7f09d5e39",
+      "after_sha256": "7c6a810db538c723a272ff7b6a5fc21ab23e90b69cc779844b86673d00de087b",
       "owners": {
         "@document": {
           "before": "35705952593362a85637002a066fd2df605f4dc127f8c484d6a5606ebc7f0225",
-          "after": "806c4a927bc1c425b88c4e4f0f3bc2f02c5b05532e04cc2ef6dbc3f7f09d5e39"
+          "after": "7c6a810db538c723a272ff7b6a5fc21ab23e90b69cc779844b86673d00de087b"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "4189c5ee039f079874362d61b6b78e416237de3fe3ec8e7fc36102d9d3af2b93",
-      "after_sha256": "51f81ab23db2859afaa85c4d58b18f215d926dd54483fb21da3efea3cb72a5b0",
+      "after_sha256": "4ec2b8310e74c0ed833d7bb05b0b6b5b01fdfcdac584d9e84c120f1c0d5a267c",
       "owners": {
         "@document": {
           "before": "4189c5ee039f079874362d61b6b78e416237de3fe3ec8e7fc36102d9d3af2b93",
-          "after": "51f81ab23db2859afaa85c4d58b18f215d926dd54483fb21da3efea3cb72a5b0"
+          "after": "4ec2b8310e74c0ed833d7bb05b0b6b5b01fdfcdac584d9e84c120f1c0d5a267c"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "0415397d7f63454c91720cc252a6e0e324d261eeab69f83b185da05919a7b924",
-      "after_sha256": "b2c7a04a4549c64b3cacc3e8ac33516042dc2cae778bb5d3873d745cd30af661",
+      "after_sha256": "73f9c3563ea4232449eb3d20759f84391c452a48a0fae4f79cedecf507226e92",
       "owners": {
         "@document": {
           "before": "0415397d7f63454c91720cc252a6e0e324d261eeab69f83b185da05919a7b924",
-          "after": "b2c7a04a4549c64b3cacc3e8ac33516042dc2cae778bb5d3873d745cd30af661"
+          "after": "73f9c3563ea4232449eb3d20759f84391c452a48a0fae4f79cedecf507226e92"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "24b62ccd04d17fec5afb9725644f60a59ed652763b521ab6f47ca1b0ae7e2f23",
-      "after_sha256": "5ca1a7023a4c2304aad45b804844c9905939076adc04977d19b82e0b74a24927",
+      "after_sha256": "ebc1abe51f2ad4fa9a49b6e528279154f7892f041adf750d07039ff2ecc3b5f9",
       "owners": {
         "@document": {
           "before": "24b62ccd04d17fec5afb9725644f60a59ed652763b521ab6f47ca1b0ae7e2f23",
-          "after": "5ca1a7023a4c2304aad45b804844c9905939076adc04977d19b82e0b74a24927"
+          "after": "ebc1abe51f2ad4fa9a49b6e528279154f7892f041adf750d07039ff2ecc3b5f9"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "39ec6baf6ad21535f291e3c624200aafbcca2e0ac7a46ee0dfe5aefeeccf07dd",
-      "after_sha256": "1672d5b7818b9d570b9b887dc83291285f6df12168ceb6d63a02259b5177e25e",
+      "after_sha256": "c1f23c4bc65b2c9f2757caa33e000058f9e972cc4937cbec9cd1e405a36e7c1d",
       "owners": {
         "@document": {
           "before": "39ec6baf6ad21535f291e3c624200aafbcca2e0ac7a46ee0dfe5aefeeccf07dd",
-          "after": "1672d5b7818b9d570b9b887dc83291285f6df12168ceb6d63a02259b5177e25e"
+          "after": "c1f23c4bc65b2c9f2757caa33e000058f9e972cc4937cbec9cd1e405a36e7c1d"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "a7e34222b6783b6ecde59940719f48e82659b0420f58eea0cf6ebd104b2de666",
-      "after_sha256": "8ef19e25e1d58798eac9d17f42536d2608296cce462fb9a4cda66fc8859a6ecd",
+      "after_sha256": "1bd62699258552384754396ee166a58ad46e357bdbc5f40bbb4df59c93e9de46",
       "owners": {
         "@document": {
           "before": "a7e34222b6783b6ecde59940719f48e82659b0420f58eea0cf6ebd104b2de666",
-          "after": "8ef19e25e1d58798eac9d17f42536d2608296cce462fb9a4cda66fc8859a6ecd"
+          "after": "1bd62699258552384754396ee166a58ad46e357bdbc5f40bbb4df59c93e9de46"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "42152173c2d6d3707f08cabf7111bdb4b467678b4941bf3e5d50da3aafb04ecd",
-      "after_sha256": "1c36b48cd17169130a021865091f835e69f801be1a2d99eae837f9c3503a6a3a",
+      "after_sha256": "205447d758c04f7758773e08b1001322684aedd0ab11e47ffc45aa4f782a7210",
       "owners": {
         "@document": {
           "before": "42152173c2d6d3707f08cabf7111bdb4b467678b4941bf3e5d50da3aafb04ecd",
-          "after": "1c36b48cd17169130a021865091f835e69f801be1a2d99eae837f9c3503a6a3a"
+          "after": "205447d758c04f7758773e08b1001322684aedd0ab11e47ffc45aa4f782a7210"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "451f5ba117a9b1841d0f0c08796c6104ce4b40e474e1e13f6cfe607b0a41cab5",
-      "after_sha256": "acfd20bb5a79a21a49724f7a08dad93eed47f34326af5a4235fec5b3742f9ff9",
+      "after_sha256": "298c2124f671609959dada56d15c07d9801eec5cca1bd144d6ef2951eacd1448",
       "owners": {
         "@document": {
           "before": "451f5ba117a9b1841d0f0c08796c6104ce4b40e474e1e13f6cfe607b0a41cab5",
-          "after": "acfd20bb5a79a21a49724f7a08dad93eed47f34326af5a4235fec5b3742f9ff9"
+          "after": "298c2124f671609959dada56d15c07d9801eec5cca1bd144d6ef2951eacd1448"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "6f12dba22d5e5d056fecbbcf57a3acfbb9f6f4fe987ed68c4387ccb044ba3681",
-      "after_sha256": "c5101777c14964341f81cd34dc78d1b9f5a3d3622909fc4262d38f0bbc0c9ca5",
+      "after_sha256": "4f926ffdea0a712278a3d0404d14f584c64281fb510d2eb9b9eb6ab02b4faa9d",
       "owners": {
         "@document": {
           "before": "6f12dba22d5e5d056fecbbcf57a3acfbb9f6f4fe987ed68c4387ccb044ba3681",
-          "after": "c5101777c14964341f81cd34dc78d1b9f5a3d3622909fc4262d38f0bbc0c9ca5"
+          "after": "4f926ffdea0a712278a3d0404d14f584c64281fb510d2eb9b9eb6ab02b4faa9d"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "9c81cc04b37684659909cbe88ceb10224b29e2a4718dfa9f24e8a0bab6dc72e6",
-      "after_sha256": "dbd83c6c2c11dae8a4c5fec28f065df7b2b915d0f793fde6b42234843320e112",
+      "after_sha256": "5f40f1ee78f804d8b2cfbb2fdee1915bc41149af5ed03f3b040061701370ac44",
       "owners": {
         "@document": {
           "before": "9c81cc04b37684659909cbe88ceb10224b29e2a4718dfa9f24e8a0bab6dc72e6",
-          "after": "dbd83c6c2c11dae8a4c5fec28f065df7b2b915d0f793fde6b42234843320e112"
+          "after": "5f40f1ee78f804d8b2cfbb2fdee1915bc41149af5ed03f3b040061701370ac44"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "a0bf1f9dccbd825b3f21ef486645b7106b156de601653da444e230ad084af532",
-      "after_sha256": "5c145c370b5cb9b4d427f2d6f1d3bdf7d8ea4d0a49c5a273ec7fbc22ece369d0",
+      "after_sha256": "85f184c5e870af8ca23a00fd59ac4694af355a33cd074bd59a4adb95357d409b",
       "owners": {
         "@document": {
           "before": "a0bf1f9dccbd825b3f21ef486645b7106b156de601653da444e230ad084af532",
-          "after": "5c145c370b5cb9b4d427f2d6f1d3bdf7d8ea4d0a49c5a273ec7fbc22ece369d0"
+          "after": "85f184c5e870af8ca23a00fd59ac4694af355a33cd074bd59a4adb95357d409b"
         }
       }
     },
@@ -734,6 +734,14 @@
       "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
       "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
     },
+    "docs/performance/policy-v3/order132-rule-semantics.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Exact source and changed-owner hash binding for the approved bounded repair assessment.",
+      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
+      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+    },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
       "operations": [
@@ -800,14 +808,6 @@
       ],
       "selected_families": [],
       "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
-    },
-    "docs/performance/policy-v3/order132-rule-semantics.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Exact source and changed-owner hash binding for the approved bounded repair assessment.",
       "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
       "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
     }
