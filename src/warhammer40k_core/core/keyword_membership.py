@@ -2,6 +2,7 @@
 
 from collections.abc import Callable, Iterable
 
+from warhammer40k_core.core.keyword_numbers import keyword_number_identity
 from warhammer40k_core.core.model_keywords import ModelKeywordAssignment
 from warhammer40k_core.core.validation import canonical_keyword_token
 
@@ -14,13 +15,17 @@ def keyword_inventory_contains(
     normalizer: Callable[[str], str],
     ordinary_keywords: Iterable[str] = (),
 ) -> bool:
-    normalized_query = normalizer(keyword)
+    normalized_query = keyword_number_identity(normalizer(keyword))
     inventory = frozenset(keywords)
     names = frozenset(name_keywords).difference(ordinary_keywords)
     native = canonical_keyword_token(keyword.strip())
-    if native in inventory.intersection(names):
+    if keyword_number_identity(native) in {
+        keyword_number_identity(stored) for stored in inventory.intersection(names)
+    }:
         return True
-    conventional = {normalizer(stored) for stored in inventory.difference(names)}
+    conventional = {
+        keyword_number_identity(normalizer(stored)) for stored in inventory.difference(names)
+    }
     return normalized_query in conventional
 
 
@@ -43,4 +48,7 @@ def exclusive_name_keywords(assignments: Iterable[ModelKeywordAssignment]) -> tu
                 )
             )
         )
-    return tuple(sorted(names.difference(ordinary)))
+    ordinary_identities = {keyword_number_identity(keyword) for keyword in ordinary}
+    return tuple(
+        sorted(name for name in names if keyword_number_identity(name) not in ordinary_identities)
+    )

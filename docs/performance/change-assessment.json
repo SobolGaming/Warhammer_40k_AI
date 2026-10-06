@@ -1,474 +1,654 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "f054b52fe912875bfe425cf875de3756294b5c7b",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8c258ba0f30da86118cf345f48d387f9a91d9cdac1373a867db64766fd88b52e",
-  "operation_map_sha256": "1c47ed790c3d9624dd09254134d4b4c374dbdf1cb6e9cd6121712e1741c13b9c",
+  "base": "56fabeae7a645e1c138b85a8877a994fa93339ec",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4dc9d828cac21d568fc4ff81b5a65e8e767e372a67cf9212c19c329a68408766",
+  "operation_map_sha256": "fc9b83d00dcf636a751a7de211ca5cbd72604f9e1ed09f4d824985f564ae9a7f",
   "changes": {
-    "README.md": {
-      "before_sha256": "5ec94a03258d3dd4d28406bf17628428562bd83ff2c49b21625bf11d49b44005",
-      "after_sha256": "4021fde93437b8d32b3275e026be51a8547b34eec57b6a8d83d8f826726f93f4",
-      "owners": {
-        "@document": {
-          "before": "5ec94a03258d3dd4d28406bf17628428562bd83ff2c49b21625bf11d49b44005",
-          "after": "4021fde93437b8d32b3275e026be51a8547b34eec57b6a8d83d8f826726f93f4"
-        }
-      }
-    },
     "ci/test_shards/durations.json": {
-      "before_sha256": "21e90fab324d88a08296479038e796a92a95b5e8188ac0d6d313109c51ca1d8e",
-      "after_sha256": "5774dc7adb3313468e37a7b5e3129b665ffeea03736ca943a139ee51966ed820",
+      "before_sha256": "5774dc7adb3313468e37a7b5e3129b665ffeea03736ca943a139ee51966ed820",
+      "after_sha256": "68c850ae2c53e677e3b2794b6b4b36653887f2b08bf67690008ad92f576027a5",
       "owners": {
         "@document": {
-          "before": "21e90fab324d88a08296479038e796a92a95b5e8188ac0d6d313109c51ca1d8e",
-          "after": "5774dc7adb3313468e37a7b5e3129b665ffeea03736ca943a139ee51966ed820"
+          "before": "5774dc7adb3313468e37a7b5e3129b665ffeea03736ca943a139ee51966ed820",
+          "after": "68c850ae2c53e677e3b2794b6b4b36653887f2b08bf67690008ad92f576027a5"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "5c87cf008d6b01d88e648a6ef7372861cf8b20481c79925314e87b769235c13c",
-      "after_sha256": "ecfbe340abee717a5dced6b8638ef065ef86a4ce35024c392199d90970df4ded",
+      "before_sha256": "ecfbe340abee717a5dced6b8638ef065ef86a4ce35024c392199d90970df4ded",
+      "after_sha256": "9e1aedd6cdb61ca1d2697b7480bdd1740663532ab04fc921a539a26ac3375bd7",
       "owners": {
         "@document": {
-          "before": "5c87cf008d6b01d88e648a6ef7372861cf8b20481c79925314e87b769235c13c",
-          "after": "ecfbe340abee717a5dced6b8638ef065ef86a4ce35024c392199d90970df4ded"
+          "before": "ecfbe340abee717a5dced6b8638ef065ef86a4ce35024c392199d90970df4ded",
+          "after": "9e1aedd6cdb61ca1d2697b7480bdd1740663532ab04fc921a539a26ac3375bd7"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "35705952593362a85637002a066fd2df605f4dc127f8c484d6a5606ebc7f0225",
-      "after_sha256": "7c6a810db538c723a272ff7b6a5fc21ab23e90b69cc779844b86673d00de087b",
+      "before_sha256": "7c6a810db538c723a272ff7b6a5fc21ab23e90b69cc779844b86673d00de087b",
+      "after_sha256": "60cfa241900b4407b4f8e610d456fe1337b0e33f6b77f49372d48e8985e460c8",
       "owners": {
         "@document": {
-          "before": "35705952593362a85637002a066fd2df605f4dc127f8c484d6a5606ebc7f0225",
-          "after": "7c6a810db538c723a272ff7b6a5fc21ab23e90b69cc779844b86673d00de087b"
+          "before": "7c6a810db538c723a272ff7b6a5fc21ab23e90b69cc779844b86673d00de087b",
+          "after": "60cfa241900b4407b4f8e610d456fe1337b0e33f6b77f49372d48e8985e460c8"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "4189c5ee039f079874362d61b6b78e416237de3fe3ec8e7fc36102d9d3af2b93",
-      "after_sha256": "4ec2b8310e74c0ed833d7bb05b0b6b5b01fdfcdac584d9e84c120f1c0d5a267c",
+      "before_sha256": "4ec2b8310e74c0ed833d7bb05b0b6b5b01fdfcdac584d9e84c120f1c0d5a267c",
+      "after_sha256": "41a5fe006cb79a1f039957bb76fb062059b84cdcbf34d8151369bcfa8731b655",
       "owners": {
         "@document": {
-          "before": "4189c5ee039f079874362d61b6b78e416237de3fe3ec8e7fc36102d9d3af2b93",
-          "after": "4ec2b8310e74c0ed833d7bb05b0b6b5b01fdfcdac584d9e84c120f1c0d5a267c"
+          "before": "4ec2b8310e74c0ed833d7bb05b0b6b5b01fdfcdac584d9e84c120f1c0d5a267c",
+          "after": "41a5fe006cb79a1f039957bb76fb062059b84cdcbf34d8151369bcfa8731b655"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "0415397d7f63454c91720cc252a6e0e324d261eeab69f83b185da05919a7b924",
-      "after_sha256": "73f9c3563ea4232449eb3d20759f84391c452a48a0fae4f79cedecf507226e92",
+      "before_sha256": "73f9c3563ea4232449eb3d20759f84391c452a48a0fae4f79cedecf507226e92",
+      "after_sha256": "9f3bf85a63e59564783b18430cbd61bfd1e9fa4c056fbf837d6d2354dfb8b497",
       "owners": {
         "@document": {
-          "before": "0415397d7f63454c91720cc252a6e0e324d261eeab69f83b185da05919a7b924",
-          "after": "73f9c3563ea4232449eb3d20759f84391c452a48a0fae4f79cedecf507226e92"
+          "before": "73f9c3563ea4232449eb3d20759f84391c452a48a0fae4f79cedecf507226e92",
+          "after": "9f3bf85a63e59564783b18430cbd61bfd1e9fa4c056fbf837d6d2354dfb8b497"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "24b62ccd04d17fec5afb9725644f60a59ed652763b521ab6f47ca1b0ae7e2f23",
-      "after_sha256": "ebc1abe51f2ad4fa9a49b6e528279154f7892f041adf750d07039ff2ecc3b5f9",
+      "before_sha256": "ebc1abe51f2ad4fa9a49b6e528279154f7892f041adf750d07039ff2ecc3b5f9",
+      "after_sha256": "a05d9f7d73403550d94dbc379d771bf438f3afc37ab7bab4e9d414dca777ecfb",
       "owners": {
         "@document": {
-          "before": "24b62ccd04d17fec5afb9725644f60a59ed652763b521ab6f47ca1b0ae7e2f23",
-          "after": "ebc1abe51f2ad4fa9a49b6e528279154f7892f041adf750d07039ff2ecc3b5f9"
+          "before": "ebc1abe51f2ad4fa9a49b6e528279154f7892f041adf750d07039ff2ecc3b5f9",
+          "after": "a05d9f7d73403550d94dbc379d771bf438f3afc37ab7bab4e9d414dca777ecfb"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "39ec6baf6ad21535f291e3c624200aafbcca2e0ac7a46ee0dfe5aefeeccf07dd",
-      "after_sha256": "c1f23c4bc65b2c9f2757caa33e000058f9e972cc4937cbec9cd1e405a36e7c1d",
+      "before_sha256": "c1f23c4bc65b2c9f2757caa33e000058f9e972cc4937cbec9cd1e405a36e7c1d",
+      "after_sha256": "d275df452972843a84ebe71823b1ed4c2269abfbc8fc1a214935ca77a22a5034",
       "owners": {
         "@document": {
-          "before": "39ec6baf6ad21535f291e3c624200aafbcca2e0ac7a46ee0dfe5aefeeccf07dd",
-          "after": "c1f23c4bc65b2c9f2757caa33e000058f9e972cc4937cbec9cd1e405a36e7c1d"
+          "before": "c1f23c4bc65b2c9f2757caa33e000058f9e972cc4937cbec9cd1e405a36e7c1d",
+          "after": "d275df452972843a84ebe71823b1ed4c2269abfbc8fc1a214935ca77a22a5034"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "a7e34222b6783b6ecde59940719f48e82659b0420f58eea0cf6ebd104b2de666",
-      "after_sha256": "1bd62699258552384754396ee166a58ad46e357bdbc5f40bbb4df59c93e9de46",
+      "before_sha256": "1bd62699258552384754396ee166a58ad46e357bdbc5f40bbb4df59c93e9de46",
+      "after_sha256": "a1914306c888f8f0c1579dd0d398a009f80f7a55674745948a8b016e3d1b173b",
       "owners": {
         "@document": {
-          "before": "a7e34222b6783b6ecde59940719f48e82659b0420f58eea0cf6ebd104b2de666",
-          "after": "1bd62699258552384754396ee166a58ad46e357bdbc5f40bbb4df59c93e9de46"
+          "before": "1bd62699258552384754396ee166a58ad46e357bdbc5f40bbb4df59c93e9de46",
+          "after": "a1914306c888f8f0c1579dd0d398a009f80f7a55674745948a8b016e3d1b173b"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "42152173c2d6d3707f08cabf7111bdb4b467678b4941bf3e5d50da3aafb04ecd",
-      "after_sha256": "205447d758c04f7758773e08b1001322684aedd0ab11e47ffc45aa4f782a7210",
+      "before_sha256": "205447d758c04f7758773e08b1001322684aedd0ab11e47ffc45aa4f782a7210",
+      "after_sha256": "02460f400e2750bde59235190d937d90ebd60d69a426e704fe6f6a9f5b54fd84",
       "owners": {
         "@document": {
-          "before": "42152173c2d6d3707f08cabf7111bdb4b467678b4941bf3e5d50da3aafb04ecd",
-          "after": "205447d758c04f7758773e08b1001322684aedd0ab11e47ffc45aa4f782a7210"
+          "before": "205447d758c04f7758773e08b1001322684aedd0ab11e47ffc45aa4f782a7210",
+          "after": "02460f400e2750bde59235190d937d90ebd60d69a426e704fe6f6a9f5b54fd84"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "451f5ba117a9b1841d0f0c08796c6104ce4b40e474e1e13f6cfe607b0a41cab5",
-      "after_sha256": "298c2124f671609959dada56d15c07d9801eec5cca1bd144d6ef2951eacd1448",
+      "before_sha256": "298c2124f671609959dada56d15c07d9801eec5cca1bd144d6ef2951eacd1448",
+      "after_sha256": "656198e6e6bd0bf34079453aa287a983e231f3910658e4109436b03f4edd1558",
       "owners": {
         "@document": {
-          "before": "451f5ba117a9b1841d0f0c08796c6104ce4b40e474e1e13f6cfe607b0a41cab5",
-          "after": "298c2124f671609959dada56d15c07d9801eec5cca1bd144d6ef2951eacd1448"
+          "before": "298c2124f671609959dada56d15c07d9801eec5cca1bd144d6ef2951eacd1448",
+          "after": "656198e6e6bd0bf34079453aa287a983e231f3910658e4109436b03f4edd1558"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "6f12dba22d5e5d056fecbbcf57a3acfbb9f6f4fe987ed68c4387ccb044ba3681",
-      "after_sha256": "4f926ffdea0a712278a3d0404d14f584c64281fb510d2eb9b9eb6ab02b4faa9d",
+      "before_sha256": "4f926ffdea0a712278a3d0404d14f584c64281fb510d2eb9b9eb6ab02b4faa9d",
+      "after_sha256": "686faab18adfb16206183e2391acf357413006513792a026a85ad4fc3ee6d7ce",
       "owners": {
         "@document": {
-          "before": "6f12dba22d5e5d056fecbbcf57a3acfbb9f6f4fe987ed68c4387ccb044ba3681",
-          "after": "4f926ffdea0a712278a3d0404d14f584c64281fb510d2eb9b9eb6ab02b4faa9d"
+          "before": "4f926ffdea0a712278a3d0404d14f584c64281fb510d2eb9b9eb6ab02b4faa9d",
+          "after": "686faab18adfb16206183e2391acf357413006513792a026a85ad4fc3ee6d7ce"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "9c81cc04b37684659909cbe88ceb10224b29e2a4718dfa9f24e8a0bab6dc72e6",
-      "after_sha256": "5f40f1ee78f804d8b2cfbb2fdee1915bc41149af5ed03f3b040061701370ac44",
+      "before_sha256": "5f40f1ee78f804d8b2cfbb2fdee1915bc41149af5ed03f3b040061701370ac44",
+      "after_sha256": "e2687d465e29cdf4150dd1c969d396e65dd9f1b81df0ee4cdab2cc484aa79ac3",
       "owners": {
         "@document": {
-          "before": "9c81cc04b37684659909cbe88ceb10224b29e2a4718dfa9f24e8a0bab6dc72e6",
-          "after": "5f40f1ee78f804d8b2cfbb2fdee1915bc41149af5ed03f3b040061701370ac44"
+          "before": "5f40f1ee78f804d8b2cfbb2fdee1915bc41149af5ed03f3b040061701370ac44",
+          "after": "e2687d465e29cdf4150dd1c969d396e65dd9f1b81df0ee4cdab2cc484aa79ac3"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "a0bf1f9dccbd825b3f21ef486645b7106b156de601653da444e230ad084af532",
-      "after_sha256": "85f184c5e870af8ca23a00fd59ac4694af355a33cd074bd59a4adb95357d409b",
+      "before_sha256": "85f184c5e870af8ca23a00fd59ac4694af355a33cd074bd59a4adb95357d409b",
+      "after_sha256": "e844666e2fe33ee85704916995315fb6614b9e0ad0b5ac7d16abdefbd1d97553",
       "owners": {
         "@document": {
-          "before": "a0bf1f9dccbd825b3f21ef486645b7106b156de601653da444e230ad084af532",
-          "after": "85f184c5e870af8ca23a00fd59ac4694af355a33cd074bd59a4adb95357d409b"
+          "before": "85f184c5e870af8ca23a00fd59ac4694af355a33cd074bd59a4adb95357d409b",
+          "after": "e844666e2fe33ee85704916995315fb6614b9e0ad0b5ac7d16abdefbd1d97553"
         }
       }
     },
     "conformance/typescript/src/contract.ts": {
-      "before_sha256": "afe020aabc418eb1319e0c37e4d6e68e07679f16be75fdb5ece6d43ad310f2dc",
-      "after_sha256": "9157b755d266262b012c90597bff6f144eca79b6cbd5f60a7ef1ac646a3c18e2",
+      "before_sha256": "9157b755d266262b012c90597bff6f144eca79b6cbd5f60a7ef1ac646a3c18e2",
+      "after_sha256": "be80773078e5461180dd27629bb97f8ce3b1ce1c1a7e856b8e700f9da98dcf3e",
       "owners": {
         "@document": {
-          "before": "afe020aabc418eb1319e0c37e4d6e68e07679f16be75fdb5ece6d43ad310f2dc",
-          "after": "9157b755d266262b012c90597bff6f144eca79b6cbd5f60a7ef1ac646a3c18e2"
+          "before": "9157b755d266262b012c90597bff6f144eca79b6cbd5f60a7ef1ac646a3c18e2",
+          "after": "be80773078e5461180dd27629bb97f8ce3b1ce1c1a7e856b8e700f9da98dcf3e"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "45621d66bd60dca0d62c1bf832eb16a1eb6e519c422b033f1250165b56fdd376",
-      "after_sha256": "ac05e16e88d0a130cfe3204f4df8e0f6e3335023da6c5a01453e855c6eef4bf1",
+      "before_sha256": "ac05e16e88d0a130cfe3204f4df8e0f6e3335023da6c5a01453e855c6eef4bf1",
+      "after_sha256": "bd2021222599a4ca7035e432b04d6cfb507119b4bbc1d3992ff910f962b9618b",
       "owners": {
         "@document": {
-          "before": "45621d66bd60dca0d62c1bf832eb16a1eb6e519c422b033f1250165b56fdd376",
-          "after": "ac05e16e88d0a130cfe3204f4df8e0f6e3335023da6c5a01453e855c6eef4bf1"
+          "before": "ac05e16e88d0a130cfe3204f4df8e0f6e3335023da6c5a01453e855c6eef4bf1",
+          "after": "bd2021222599a4ca7035e432b04d6cfb507119b4bbc1d3992ff910f962b9618b"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "538431a7eac8458edf2b11ca8062f5f34d2ef309c62ddd7a7955f0b12717f305",
-      "after_sha256": "9bc2d126582b5a316a22c73d712b0920d28b975fdfc2cd82324be596632be367",
+      "before_sha256": "9bc2d126582b5a316a22c73d712b0920d28b975fdfc2cd82324be596632be367",
+      "after_sha256": "a01713fa92c3740f1da78da52f73f4cb2d9cd7c48b4c7899abe8ed850de58288",
       "owners": {
         "@document": {
-          "before": "538431a7eac8458edf2b11ca8062f5f34d2ef309c62ddd7a7955f0b12717f305",
-          "after": "9bc2d126582b5a316a22c73d712b0920d28b975fdfc2cd82324be596632be367"
+          "before": "9bc2d126582b5a316a22c73d712b0920d28b975fdfc2cd82324be596632be367",
+          "after": "a01713fa92c3740f1da78da52f73f4cb2d9cd7c48b4c7899abe8ed850de58288"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "b57a36ddaf782a72f04d142e67b03fd1b413f3977fff3d09a22141677f384992",
-      "after_sha256": "f57742cd2f4a354d67aa2a670f606439308df44fc4b09cfe10220e78010671c9",
+      "before_sha256": "f57742cd2f4a354d67aa2a670f606439308df44fc4b09cfe10220e78010671c9",
+      "after_sha256": "fcf4ffed83ce423c6d503945473b43a385b37a7bacee843d0ade1579c2104c42",
       "owners": {
         "@document": {
-          "before": "b57a36ddaf782a72f04d142e67b03fd1b413f3977fff3d09a22141677f384992",
-          "after": "f57742cd2f4a354d67aa2a670f606439308df44fc4b09cfe10220e78010671c9"
+          "before": "f57742cd2f4a354d67aa2a670f606439308df44fc4b09cfe10220e78010671c9",
+          "after": "fcf4ffed83ce423c6d503945473b43a385b37a7bacee843d0ade1579c2104c42"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "318c4684c11ce46841c44f42cc3b2336efc50c2b3a121966411b5a96dfd78552",
-      "after_sha256": "17623f88b708eeb4b0e4d9b476db9db7aafd2ae94f23633b303b33d1184e9b54",
+      "before_sha256": "17623f88b708eeb4b0e4d9b476db9db7aafd2ae94f23633b303b33d1184e9b54",
+      "after_sha256": "b7743f87a105f4b7b148e69f6491b420306d7ae50ac50a18f1425c5cec92b448",
       "owners": {
         "@document": {
-          "before": "318c4684c11ce46841c44f42cc3b2336efc50c2b3a121966411b5a96dfd78552",
-          "after": "17623f88b708eeb4b0e4d9b476db9db7aafd2ae94f23633b303b33d1184e9b54"
+          "before": "17623f88b708eeb4b0e4d9b476db9db7aafd2ae94f23633b303b33d1184e9b54",
+          "after": "b7743f87a105f4b7b148e69f6491b420306d7ae50ac50a18f1425c5cec92b448"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "51f5f9212b32cb27f7ec8a3052b0c29a48af7dcc415ffab4c3393b4b243a9845",
-      "after_sha256": "24f658b2c298b36e895067f8c6c618fda39338592f149929b635e5f133d100de",
+      "before_sha256": "24f658b2c298b36e895067f8c6c618fda39338592f149929b635e5f133d100de",
+      "after_sha256": "022a7db263a31708fe5e8a868eb04449ddcdd5cb44d788c8979e96c119ac83ac",
       "owners": {
         "@document": {
-          "before": "51f5f9212b32cb27f7ec8a3052b0c29a48af7dcc415ffab4c3393b4b243a9845",
-          "after": "24f658b2c298b36e895067f8c6c618fda39338592f149929b635e5f133d100de"
+          "before": "24f658b2c298b36e895067f8c6c618fda39338592f149929b635e5f133d100de",
+          "after": "022a7db263a31708fe5e8a868eb04449ddcdd5cb44d788c8979e96c119ac83ac"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "d440a9b3261659c0753e32390b1840fd4fa3636b4b236a06b00e421498afc1ae",
-      "after_sha256": "24c84abee30410250ce7d06521dd4c22ec5881de2c8fb3f45614214c98237728",
+      "before_sha256": "24c84abee30410250ce7d06521dd4c22ec5881de2c8fb3f45614214c98237728",
+      "after_sha256": "e705706d532556b26e7f95a02ccb6d8eb8ca5391dcd52a22befe7f808a918700",
       "owners": {
         "@document": {
-          "before": "d440a9b3261659c0753e32390b1840fd4fa3636b4b236a06b00e421498afc1ae",
-          "after": "24c84abee30410250ce7d06521dd4c22ec5881de2c8fb3f45614214c98237728"
+          "before": "24c84abee30410250ce7d06521dd4c22ec5881de2c8fb3f45614214c98237728",
+          "after": "e705706d532556b26e7f95a02ccb6d8eb8ca5391dcd52a22befe7f808a918700"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "3516040db7fd156c1e5a57d07b135eb62289dc4c14b3c5acb386b34eb830a61d",
-      "after_sha256": "0e1adfb1978b2bf0b3e06d0fa74f491e64120025c4c09b33611538670f4ae6c7",
+      "before_sha256": "0e1adfb1978b2bf0b3e06d0fa74f491e64120025c4c09b33611538670f4ae6c7",
+      "after_sha256": "c614dd6c8d44eae536da6ac7fa62566dceddfd0aab5348be6d08333b9e3a950d",
       "owners": {
         "@document": {
-          "before": "3516040db7fd156c1e5a57d07b135eb62289dc4c14b3c5acb386b34eb830a61d",
-          "after": "0e1adfb1978b2bf0b3e06d0fa74f491e64120025c4c09b33611538670f4ae6c7"
+          "before": "0e1adfb1978b2bf0b3e06d0fa74f491e64120025c4c09b33611538670f4ae6c7",
+          "after": "c614dd6c8d44eae536da6ac7fa62566dceddfd0aab5348be6d08333b9e3a950d"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "518fa873b443077c057ac258632033fec26f6e01094124b62fee5e296940a6a1",
-      "after_sha256": "456ba8fd16a6d2794ba282f59788cb06a1261dde9a3bff82c545501f75b24d47",
+      "before_sha256": "456ba8fd16a6d2794ba282f59788cb06a1261dde9a3bff82c545501f75b24d47",
+      "after_sha256": "7f56f323a896869eb93f52bfbc020c1d4e9540cbe8ecd65f992f17902b91f22b",
       "owners": {
         "@document": {
-          "before": "518fa873b443077c057ac258632033fec26f6e01094124b62fee5e296940a6a1",
-          "after": "456ba8fd16a6d2794ba282f59788cb06a1261dde9a3bff82c545501f75b24d47"
+          "before": "456ba8fd16a6d2794ba282f59788cb06a1261dde9a3bff82c545501f75b24d47",
+          "after": "7f56f323a896869eb93f52bfbc020c1d4e9540cbe8ecd65f992f17902b91f22b"
         }
       }
     },
-    "contracts/migrations/44.3.17-to-44.3.18.md": {
+    "contracts/migrations/44.3.18-to-44.3.19.md": {
       "before_sha256": null,
-      "after_sha256": "e92c1d080cbdbbbe9c1cbe9466d4bc400ab5b5a3cbca6620501ff419c3433568",
+      "after_sha256": "e295c61ad50e153e88869b3841224cbcb31240ac552c23c9bedf9d1ee9effa04",
       "owners": {
         "@document": {
           "before": null,
-          "after": "e92c1d080cbdbbbe9c1cbe9466d4bc400ab5b5a3cbca6620501ff419c3433568"
+          "after": "e295c61ad50e153e88869b3841224cbcb31240ac552c23c9bedf9d1ee9effa04"
         }
       }
     },
     "contracts/openapi.yaml": {
-      "before_sha256": "3e8db9dc00d7c374e9e17d57d23b27875bf14edf5d17c7d9f716f9d936f0ac48",
-      "after_sha256": "7ad0bd607ef69a6656635d60abc1f3e7cca3c32f0ea33b5aabff2ff54cf41cdf",
+      "before_sha256": "7ad0bd607ef69a6656635d60abc1f3e7cca3c32f0ea33b5aabff2ff54cf41cdf",
+      "after_sha256": "adcec48255a1de9bf3cd11752e62286853844549c3613327c16be657fc7d1b96",
       "owners": {
         "@document": {
-          "before": "3e8db9dc00d7c374e9e17d57d23b27875bf14edf5d17c7d9f716f9d936f0ac48",
-          "after": "7ad0bd607ef69a6656635d60abc1f3e7cca3c32f0ea33b5aabff2ff54cf41cdf"
+          "before": "7ad0bd607ef69a6656635d60abc1f3e7cca3c32f0ea33b5aabff2ff54cf41cdf",
+          "after": "adcec48255a1de9bf3cd11752e62286853844549c3613327c16be657fc7d1b96"
         }
       }
     },
-    "data/source_audits/order132/source.audit.json": {
+    "data/source_audits/order133/source.audit.json": {
       "before_sha256": null,
-      "after_sha256": "8ee67d8c912c2b2d1a7a8691d0a0a036c2b38de98f697ad66a15f224efa1f7ad",
+      "after_sha256": "a6523d8ce143427c3f1de49ba3f5d7f30ab69b265addc35a0dfdfe9e941eb55e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8ee67d8c912c2b2d1a7a8691d0a0a036c2b38de98f697ad66a15f224efa1f7ad"
+          "after": "a6523d8ce143427c3f1de49ba3f5d7f30ab69b265addc35a0dfdfe9e941eb55e"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "f578183e2d739da628375b13abf0a2adee18940980ab2b15b488875921d9a6a6",
-      "after_sha256": "d1d3712dc3ff39e1473f38994c7729f012c7a580da53d4ed99512e5bb3a82b38",
+      "before_sha256": "d1d3712dc3ff39e1473f38994c7729f012c7a580da53d4ed99512e5bb3a82b38",
+      "after_sha256": "0ad969f0038de881a788dc663e6b8112e8f844a42e92e15c700e91b196a43f08",
       "owners": {
         "@document": {
-          "before": "f578183e2d739da628375b13abf0a2adee18940980ab2b15b488875921d9a6a6",
-          "after": "d1d3712dc3ff39e1473f38994c7729f012c7a580da53d4ed99512e5bb3a82b38"
+          "before": "d1d3712dc3ff39e1473f38994c7729f012c7a580da53d4ed99512e5bb3a82b38",
+          "after": "0ad969f0038de881a788dc663e6b8112e8f844a42e92e15c700e91b196a43f08"
         }
       }
     },
-    "docs/ORDER_132_SCOPE_PLAN.md": {
+    "docs/ORDER_133_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "4a4dea7f38c0cf2b80e29c572005f0e166e90896ee9aba12ffb615efd41cda40",
+      "after_sha256": "ec709114e66642e317c19bd552080c6923d903009f31c24d7d5a1ba84bb9ec2a",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4a4dea7f38c0cf2b80e29c572005f0e166e90896ee9aba12ffb615efd41cda40"
+          "after": "ec709114e66642e317c19bd552080c6923d903009f31c24d7d5a1ba84bb9ec2a"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "c70604f2b36361c239a8f86b5781c8a090533dabdec2f42dd38421eed3799414",
-      "after_sha256": "fd0594444448560f7138667f18f270e2daa543c68fcabe620076c98804d264fa",
+      "before_sha256": "fd0594444448560f7138667f18f270e2daa543c68fcabe620076c98804d264fa",
+      "after_sha256": "f3ec2efd7e745478a27f606513a56c1653f029f2b8bd2d9dcd521218c3444214",
       "owners": {
         "@document": {
-          "before": "c70604f2b36361c239a8f86b5781c8a090533dabdec2f42dd38421eed3799414",
-          "after": "fd0594444448560f7138667f18f270e2daa543c68fcabe620076c98804d264fa"
-        }
-      }
-    },
-    "docs/performance/policy-v3/order132-rule-semantics.json": {
-      "before_sha256": null,
-      "after_sha256": "7c81f377d5cd281a172f5bfb57eb7e2113b5bedd9741420b79cd8a505c6e44f9",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "7c81f377d5cd281a172f5bfb57eb7e2113b5bedd9741420b79cd8a505c6e44f9"
+          "before": "fd0594444448560f7138667f18f270e2daa543c68fcabe620076c98804d264fa",
+          "after": "f3ec2efd7e745478a27f606513a56c1653f029f2b8bd2d9dcd521218c3444214"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "1a6835919c3973c3a02318fa4a498010dfc2652647ae36efe7a373f92cbd0a0b",
-      "after_sha256": "f039dd99aff9e9ade89068a1346ce22ef0c3a20705e9e790eb3e3ea4fb8a7a32",
+      "before_sha256": "f039dd99aff9e9ade89068a1346ce22ef0c3a20705e9e790eb3e3ea4fb8a7a32",
+      "after_sha256": "41cb1b131ede4961cd40a23a73f2f0cdd7acad8658046d9e6ac5d91e4c708d1c",
       "owners": {
         "@document": {
-          "before": "1a6835919c3973c3a02318fa4a498010dfc2652647ae36efe7a373f92cbd0a0b",
-          "after": "f039dd99aff9e9ade89068a1346ce22ef0c3a20705e9e790eb3e3ea4fb8a7a32"
+          "before": "f039dd99aff9e9ade89068a1346ce22ef0c3a20705e9e790eb3e3ea4fb8a7a32",
+          "after": "41cb1b131ede4961cd40a23a73f2f0cdd7acad8658046d9e6ac5d91e4c708d1c"
         }
       }
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
-      "before_sha256": "0fb6e27ad402fede1d9e668e6e3da70cb276a2c39d404251eaffd83b9ec40060",
-      "after_sha256": "9d1867e082f2a60a0307f13181eee5e8638d395bb14bf34895f18d04e0c42535",
+      "before_sha256": "9d1867e082f2a60a0307f13181eee5e8638d395bb14bf34895f18d04e0c42535",
+      "after_sha256": "6d099f4cb2753e8b7db50f9a282ffb674ddd3bdb58d59a2a651fe440578a11a3",
       "owners": {
         "@module": {
-          "before": "a4fb43387b8db8f7cc6127781f914cd51ce059459f7a88ec249b154c57c6b886",
-          "after": "4e4ab2cfa5ff28533e489e4aec02e591c065063565bbe7d75d9f2e6c1d18c617"
+          "before": "4e4ab2cfa5ff28533e489e4aec02e591c065063565bbe7d75d9f2e6c1d18c617",
+          "after": "a71e397d1dc74354b2e5a7560843c7e220b87a7e2287d90b7f16dee44c06ff36"
         }
       }
     },
-    "src/warhammer40k_core/geometry/measurement.py": {
-      "before_sha256": "8d174a6fd88d5ecdd7b464042fab3d80f81acb663638a30f5e5e4df074a203ed",
-      "after_sha256": "72014601daddcae014788d9773be39560f1748082270f91aecea8c8979cc07bf",
+    "src/warhammer40k_core/core/datasheet.py": {
+      "before_sha256": "0fd6348ea0c9e42f999f1628f2b98262803e006a529398b4dac4ee687cbad200",
+      "after_sha256": "749906592d0d3a7468afc7e3e4ce85ba5406ee633ef608eb8835b2e8017f9d42",
       "owners": {
-        "DistanceMeasurementContext._support_base_wholly_within": {
-          "before": "e6e2374ab07699a00a978536589e4d106a35598fa0265947af9237260a99251b",
-          "after": "856aa6469b9e8b6600709c4cd3952c708f30f3860a77945eee63ce049c4385cb"
+        "@module": {
+          "before": "8710d8b132130ee4e8dd45668c2942878ab1bb50c7350195fc1ca564b1753d96",
+          "after": "e4d87e6add0ff4735324e2514eaeab7d93ca0b026405d8b3037b57b14c946f5d"
         },
-        "_circular_whole_distance": {
-          "before": null,
-          "after": "da830ed2b6a317db6528d756bf968fb4345886d92a8bfa5f3b28f58376754ed4"
-        },
-        "_closest_gap_cover": {
-          "before": "f4ce6ac881b2f1733b8f8b824f19c25430a669f6a8f5af1c25f681aa8a512718",
-          "after": "f54d7aff1efa14b7eda422170992401d8ce1d9bf6fad21bab795aa5894cc9bdd"
-        },
-        "_sources_cover_footprint": {
-          "before": "be982b26e56c6eca71bdbadb4ec758c83da39eacc91e0b8a4368c5fa20d09c42",
-          "after": "3f1131788fc8ca718bcf79c649480455394ed5c7843aadb1947f56fbd9a4ac7c"
+        "DatasheetDefinition.__post_init__": {
+          "before": "7508f04804ba7b951fa0b0b41a8ae52d7e9a4fef88d8058573d48e29590cdf85",
+          "after": "901b5ea7567b9f8fbdbe8728c06dd163ad9c28237047bb82c2928c2822a263d3"
         }
       }
     },
-    "tests/code_quality/test_order132_source_authority.py": {
+    "src/warhammer40k_core/core/datasheet_identity.py": {
+      "before_sha256": "e3aeb985db557fe42ca8adc5771929a31c1276cfa87710f40231cd521b7a38c3",
+      "after_sha256": "3cbaded74c2fa3045cba6ca655225789a9b33783fee80ac95097ebefa02e5558",
+      "owners": {
+        "@module": {
+          "before": "4ce885141be5a07a98ec6728c99532e3866acb97cd01f898ed7e9d834238037b",
+          "after": "87f08f7aa86c873aaf312ae0fdb16489e751977d9494e248d3c739b4deb634b4"
+        },
+        "effective_datasheet_keywords": {
+          "before": null,
+          "after": "ea4c95e3a2ad99403b64cbd70c64377b19b0f92db61c74e8585083d501c545c9"
+        }
+      }
+    },
+    "src/warhammer40k_core/core/keyword_membership.py": {
+      "before_sha256": "b355f5479f86e363625a797a7a886c4c66811168ecf18e3b0c119ea19ab7633a",
+      "after_sha256": "edfcb85fff479eeeb61b10de237228793f460a22454e15ee8a68b3bc88104717",
+      "owners": {
+        "@module": {
+          "before": "abe0e76d4625ea4fe5d1b21fa7472e9c809b658d444fb4e69aa7e3c1445316e1",
+          "after": "bbe89179fb9da81cec055819e5c15f94007d933f9b71129b491504e418774198"
+        },
+        "exclusive_name_keywords": {
+          "before": "9e7733b19ad47b65b47a6da81322dde53cf518497dca6e6fe81a14b9fdf47629",
+          "after": "d277a97e747f3d3276337b8c858498944edac179fd75be782ec0bc8537562501"
+        },
+        "keyword_inventory_contains": {
+          "before": "cf0b0d56e878cfe7e3876dd33632e991ec15bc1dd38fdd282fa8ddf98019ff45",
+          "after": "7df3e9c744ce648f0101040054d975eddba001975ae033c61cad5859b8f9e061"
+        }
+      }
+    },
+    "src/warhammer40k_core/core/keyword_numbers.py": {
       "before_sha256": null,
-      "after_sha256": "218bf5b0f04f8356e32fa855faaec2388d54bee0227ccb5a1088c2c6936bef4f",
+      "after_sha256": "b73fa759643ead1e7e73686ca19b99b0ada48ad4c85867e45e8d6e90508a1dc9",
       "owners": {
         "@module": {
           "before": null,
-          "after": "8ecc29b9420d70d63f538fbc8663b2927a7a45a741a8cd9f91a9f9367c4be81a"
+          "after": "fee6ca41e4f13a22bcee5e9f3ba7f79e869632855438d04282f317d4fd8ac18c"
         },
-        "test_selected_disembark_source_and_original_evidence_remain_exact": {
+        "keyword_number_identity": {
           "before": null,
-          "after": "3496565424c3f50258f80cbabd7fcc0e0d0747cbc910a760229bd4df5b96d104"
+          "after": "91fbb5778ffce0a73870f3fc72276ffbb73ff6ef0ba352fe5b645b424a7574d3"
+        },
+        "keyword_number_spellings": {
+          "before": null,
+          "after": "6f701f306ba6b7653bdef0fc870274a2524c23216b7af86e37dc490c895cac34"
         }
       }
     },
-    "tests/order132_disembark_helpers.py": {
+    "src/warhammer40k_core/core/model_keywords.py": {
+      "before_sha256": "6fedff27c48855866f6c29230a8cd34ae58c4d60fba76c03cbc652ff814c3649",
+      "after_sha256": "22188d80818cbfffe0332525839c335cc90e2ec6af6aadef0a90aad1c8093a65",
+      "owners": {
+        "@module": {
+          "before": "9fb481099cd61ebce2331c4beb2962092918e04bf3622fcece98613ce91afe60",
+          "after": "88377a3a492b35251f060b67e2eadb1697b60df197a3a0ec9289ff02a531cc80"
+        },
+        "ModelKeywordAssignment": {
+          "before": "8785294e15ced4d5e4f85c38dd0b988e719a1547949290f310f2e71878406324",
+          "after": "9cdd893d9c4aba137a42fc5a694296137d7eaec31422354c75f9a9139d845db7"
+        },
+        "ModelKeywordAssignment.__post_init__": {
+          "before": "d74f7c141524927b11d5f42a786e1230ae8cfb63c9b18c5f3697f74eb784e896",
+          "after": "617cf6e215aff3986cc96c21818886dc831ef0fb45ecb71a4112bd0c28d2e9bf"
+        },
+        "model_keyword_assignment": {
+          "before": "77706489fa443c30582fce1b507ae28ced341a46b9e6cfc521726983c9ab50b8",
+          "after": "5a71fc6fffe1dbe3f7ade74308873936df4bcdc8e6a020e77d9a9e48121fb97f"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/army_mustering.py": {
+      "before_sha256": "f46d35b7fa0e89f8de3f99360662954371e5b17f7c5b993b66e50f4c0fbd86c0",
+      "after_sha256": "4ca230cace66cd337c225dd8fca53d283740918e247a9f28f28bdc810a49dc18",
+      "owners": {
+        "@module": {
+          "before": "f36199482e4c442d0fd7673c2fe9a4dece28538b04dd4a22a5522def252ead2a",
+          "after": "b5ebb31893d600d05f28ad372561399f77f0156ba7b7cff12cdc1378ed66c538"
+        },
+        "_canonical_keyword": {
+          "before": "3e4df701950ae921a1b672e3581da7f434104258208815cf22b74695f6a99df1",
+          "after": "b9c86f86acee8d46e017519753ff9a762ed9521853767ae2973d4e9b88bb354e"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/catalog_model_scope.py": {
+      "before_sha256": "a47e2d2986627ba0b8c8e017e490cfba3bacd56f0f363db1c52e481556d81e60",
+      "after_sha256": "c806f7be22ed51453a13316e2f269337ca6c1be9cb0f0f76d4ac32ad629311ed",
+      "owners": {
+        "@module": {
+          "before": "a2f46be34e89efa9408d41066e08b6b433102e66d64e898c099364e0e44fce4d",
+          "after": "42e0ef15e3c0889526125d4777fe9c7b38ad5bdea2edf653147017c3b5cd4628"
+        },
+        "scoped_roll_model_ids_for_effect": {
+          "before": "ed7d2581d92db1fb78f41fa1ccf04b45120c76447ab8c2b1cc26e480385255ae",
+          "after": "416b194760483b84ecc8a07f7dd62e52ccabde09a6becfe84d6a7727805440ed"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/model_keyword_grants.py": {
+      "before_sha256": "db71ba1577ef1668ecc67dc2fcdb290b6f27e5cab60ac0784d3dfafd0f1a7dc0",
+      "after_sha256": "9ad4a4de99da4959c72f912ede48658e0a398adc784c5748bab64c19a827bf44",
+      "owners": {
+        "grant_unit_keywords": {
+          "before": "ae57c9d79de8887b70919357ca690c4de38ffaf9e2a21bffba66b06f579ac51c",
+          "after": "f79b2e3a07b7b3fbb9561d5dd5470f812a425e3a068e345ab6e10cff79457673"
+        },
+        "unit_with_attached_role_evidence": {
+          "before": "6fd21d642746452447d814f87ad67210968ad22df2ad2ca7c832a18f612e173b",
+          "after": "acc990f843e8a3400643a3bb41fbe3b248e83e1ca8154e299e1abb2e88b28673"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/roster_bearer_validation.py": {
+      "before_sha256": "eb237ffc8500f12e97f3ac54a4bd51526f1ccc142b0e91870b4ea03bacd1cc17",
+      "after_sha256": "12899e9972591bce9ce5fc14cc4381651a9ab22b54f900c8172ccc15b7c7272d",
+      "owners": {
+        "apply_warlord_keyword_if_selected": {
+          "before": "3242054937ef12c0d31793cd67584aba825b013a83118bf96496f513b29e8ac0",
+          "after": "dc8eb9c87593860f75286513b445b4fd09ebfb56b4a382924782f57c989887e1"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/unit_factory.py": {
+      "before_sha256": "2c74adbd0e779a726416e65710c7d9227d0545cfbd18dc63aebcf928915fe2cb",
+      "after_sha256": "9f79236e4ee94c3daa9f62a8c5bb032a721d5a1676ed1a17d50a21c422853c82",
+      "owners": {
+        "ModelInstance.faction_keywords": {
+          "before": "407a969bb0f56680807a88ff0bb3af0cfb21f8277cb1d5f785227370cd4f7266",
+          "after": "bc1832cef8fce6a09d32c2598d309ebc0e387f964d9c3d4c1fbbb934c9e90397"
+        },
+        "ModelInstance.keywords": {
+          "before": "72434c8393ed25f011d05aed22101f5eea32a0a71ffcab684eccf6f6892327d3",
+          "after": "2f20d5f66fb1bbc116f5929cf87adb35c4931b446ea0f549eeaed54f9a2bffbd"
+        },
+        "UnitFactory.instantiate_materialized_model": {
+          "before": "275feff4e1d2aaed0ded518e98c4bf52c20eece377a11397d70e8a6fa580acaf",
+          "after": "54ca3abd0ab8fda246ca63c3280df64e90851c48edcf167c54d2d35ec382c17c"
+        },
+        "_instantiate_models_for_profile": {
+          "before": "f24a00e38503b934b5119b9379f23e0be32ef68ec7ad96add93a8f9610caf0a2",
+          "after": "50aff103af4369284845279f6156d2df63f0de37333faf95792cac03ef30eb77"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/rule_keyword_sequences.py": {
+      "before_sha256": "2f53648714e8791cc749e242dfa327846bcc98f3ae5c6545cde46ca5be4cf36f",
+      "after_sha256": "c9158e12a0706d5fe564d4a7da8bf905057f08dcbfa0c3b36213ea92fae78e63",
+      "owners": {
+        "@module": {
+          "before": "d8d38b564dba9e325b1b9d5579548f6d08b5396c5bb14d72d95906ddd9228154",
+          "after": "5640eae164a241bc88404cc0a857a29dbb837995e17921f892eca034d82527b4"
+        },
+        "_longest_source_keyword_prefix": {
+          "before": "d3f4ae4790a4b7c3b1bb183b8f15615518b9b9fb646a285e7b5561ec6b708c60",
+          "after": "65521d24594ba654f0a9b4a79cb9c639b99949188448c730c164cd61ea3e84c9"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/rule_token_normalization.py": {
+      "before_sha256": "3de95501a8f36ead9ca93378919053d20d52f461ed2c4af55608662c311d4cd9",
+      "after_sha256": "5520455159f2fe6c0d7ff1baf121cad7da39d9ffa639c166d9c18347fc0de4e9",
+      "owners": {
+        "@module": {
+          "before": "96133fe505bd8630d3f00706e6b49385dd94ec1097c1c20f4c1be460887ce367",
+          "after": "eeaa48d8398ddd8b5201b2cc3649b60ce843c6f9f67e4ace7d80de1b3dc41e1b"
+        },
+        "keyword_token": {
+          "before": "8ee2113d44abc0bf49790ade7fc2c637e12b2869e7e6bb96333423a50e563319",
+          "after": "133407582ae2e8b3a55eb4b22ec202af24186906b7a8eef85957a3eeef28489e"
+        },
+        "singular_keyword_token": {
+          "before": "753067eb6199e6704bba42106578684a77280ce4f87a84f3279e7ae4085119bc",
+          "after": "c52fe05c2dbf25eca51ba4f30f31744b48b55c71024fc6cc4bcab8bf0ba47a5e"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/selected_target_parser.py": {
+      "before_sha256": "c806275c3174f83fecde68e9808af4d9fe8208c4f9bc9b3cd56eca5f506646aa",
+      "after_sha256": "6aee8355dd3def0461766d27c8c2e54a74654572b09c040a92a5ab8de5a24c0c",
+      "owners": {
+        "@module": {
+          "before": "0732a3deded0af091ee9ef01c37d7475c2ae6a103acdbb137e255a34da8eed23",
+          "after": "73a178098b4cd9e6a21ea186fe8f40a1d58354827b5e5e9d5052b1b943ae8c3c"
+        },
+        "_keyword_sequence_parameter_pairs": {
+          "before": "f36caca1720d930db97906fa4ce604d81ec83f82e5d7b3be39c0d1c0f4ee3817",
+          "after": null
+        },
+        "_keyword_sequence_tokens": {
+          "before": "bf89cbc52be117d3e76268fe6b671c4cfd43841490bbed51c9ee9065cec1bb3e",
+          "after": null
+        },
+        "_keyword_token": {
+          "before": "cf05c4038c5977ce960db10a4f56ce29d2d7f52c55f8bd7ef2554f5270a04f1e",
+          "after": null
+        },
+        "_longest_source_keyword_prefix": {
+          "before": "d3f4ae4790a4b7c3b1bb183b8f15615518b9b9fb646a285e7b5561ec6b708c60",
+          "after": null
+        },
+        "_split_source_keyword_sequence": {
+          "before": "8fdd89198f8828fd9a046dee2ce5cabd5267dd742efbe7a942b10300e8f14ef8",
+          "after": null
+        },
+        "selected_target_spec_from_text": {
+          "before": "ffef293da2b0e238cddc57a40b51ff287a89d9d23fe8515214f8948d10518878",
+          "after": "01485946354de99dd8fc2b0a53893411918e11e6e35718140a1fcd7baf680b6c"
+        }
+      }
+    },
+    "tests/code_quality/test_order133_source_authority.py": {
       "before_sha256": null,
-      "after_sha256": "56994e03f24571c36422464d140aa9c9af8385cbcbffc4c7b8923552dad5f1f5",
+      "after_sha256": "9df5d5c2d59e371afa425a6769d278e6108944b83fd38e3bfd9eb53426b93a2f",
       "owners": {
         "@module": {
           "before": null,
-          "after": "77b41c7b8fae8d76cb4a4426bda3213d8aa452a3b063a03d026ea4dd9212994e"
+          "after": "cb4956c921ceb3175ec0ba16714b147c7d32c8ec4994ed9443ce4c5b1409a7a5"
         },
-        "boundary_placement": {
+        "test_declared_number_vocabulary_provenance_matches_literal_runtime_table": {
           "before": null,
-          "after": "f562ced7ec56e59e8e6f0bf6ce0ad330fa9a7d97ddc473b1a71681c0788d8279"
+          "after": "7d490fbc9cdfa4c94843f4b5385cb1f74084029a87792578a8fa11fe2b854ee9"
         },
-        "boundary_proposal": {
+        "test_number_identity_is_shared_at_source_and_catalog_owners": {
           "before": null,
-          "after": "85b4b2a0d386738c34608c195e0f5e97e392fb306e992f300b7d02d9c523db28"
+          "after": "b9abbf99e116197eb50b87282d1716f8480c341f10491925e52025c4648461b8"
         },
-        "boundary_session": {
+        "test_selected_number_source_and_original_evidence_remain_exact": {
           "before": null,
-          "after": "806ba33a41c84163193c89d6383373a825eda44f2722a8275a4cf2b642fb5f47"
-        },
-        "move_transport": {
-          "before": null,
-          "after": "a18707d0d31312f8800de073ca8fb5a7be17b835f73490146d1d3a9fe5e8eab9"
-        },
-        "move_unit": {
-          "before": null,
-          "after": "aedcd433942144d8db71d270c18b9d5b1bac6fdc283d6964a5fa85abe690b518"
-        },
-        "select_options": {
-          "before": null,
-          "after": "5065341deb8c26753dc63fe7547424c133fabe6a39c559b77bbe1b7a8774bf9e"
+          "after": "f57d08d676f59aca78d70200138ea97cc227c349ca7da14434f49b339ac8b226"
         }
       }
     },
-    "tests/unit/test_order132_disembark_distance.py": {
+    "tests/order133_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "f33934ec38e87ec77cdca6c268590076141c3dc9fe2f330a73247e8644d48055",
+      "after_sha256": "b364629720ab9c91e59619d5b15f382b7c83d5911610b0d88ebcf8afc71b1df0",
       "owners": {
         "@module": {
           "before": null,
-          "after": "f457562bdbc8a9f7c02403de4098f4dd521e27f95558f180331241eb72053c87"
+          "after": "3177aae424de15cc6101b1c1be001688a20baca5230d8221d7795df2c661430a"
         },
-        "test_circular_frame_parts_keep_whole_height_and_horizontal_rules": {
+        "advance_to_number_keyword_selection": {
           "before": null,
-          "after": "0f0ce913b4cd7ed3e90002b0c95328bb4d288297ae45df5d3a3388e9ac566eea"
+          "after": "42392daaf9b5ba8a850188d3450d1ee4f8a22566c9e84b625b2e0cb8a59aa064"
         },
-        "test_every_disembark_distance_band_uses_each_transport_model": {
+        "number_keyword_session": {
           "before": null,
-          "after": "9ea58252e3cb7f59dfd5092b6be6df7e9f4899be00cd5eebc3e0a6c7681413ca"
+          "after": "33e7cfce3de38a048e7f6223bc8da52024f1e30b80cf9ecd2e62d9d6d1f903d7"
         },
-        "test_facade_invalid_atomicity_retry_restore_fork_views_events_replay": {
+        "number_keyword_text": {
           "before": null,
-          "after": "7f8cf40714094c1a4dde6854c9400242d51ffc903b102cc1b501b05389007c5f"
-        },
-        "test_large_coordinate_roundoff_cannot_authorize_material_outside_gap": {
-          "before": null,
-          "after": "136c4a1f22f4b97eb3f82419e5c1788c37771ff08984194c5ab6ab56c448281b"
-        },
-        "test_marker_context_shared_with_cult_ambush_keeps_inclusive_boundary": {
-          "before": null,
-          "after": "51eb1601873e7a631db9f61e8e360178b6c9c3381d9c04e002c6cdb176cdd4d5"
-        },
-        "test_retained_probe_now_accepts_inclusive_boundary": {
-          "before": null,
-          "after": "2e9cf0486ef0ef7d0b2e258a259ec4040067b6a970197236205606b6cc06b8d7"
-        },
-        "test_shared_disk_geometry_uses_analytic_radii": {
-          "before": null,
-          "after": "5e652658662c2e8b4e0d414dcee7a10e7a2d370a843e72cdff3ff4901a7f6556"
+          "after": "4efd51b729aa7509682a11f4222aae8bef8471cdbd128de8106c6ec1d357c22a"
         }
       }
     },
-    "tools/performance_policy.py": {
-      "before_sha256": "b4be750ef29ba52ea3445583ae75cc767f3e18022fe82d11756e381a2887200b",
-      "after_sha256": "d0102426e4b04483736489699e2baddcb9027b11c1a6b18de4f823a84a6d07a6",
+    "tests/unit/test_order133_keyword_materialization.py": {
+      "before_sha256": null,
+      "after_sha256": "3f0df00ab38357f4728b4a3e89248bb0990a1d4280dc3f22d57e92a1d0726695",
       "owners": {
         "@module": {
-          "before": "f0a82556c4d920d3551a899b1c93bd37d7daae598635a1a84735627bee789554",
-          "after": "f75cf87c7839e89c0671d27ef588d3d0ba91dc4f53b84e71e69ccac091493619"
-        },
-        "_order132_smoke_operations": {
           "before": null,
-          "after": "aa3deaf82ea9cfc59bce3b5cff4d7ac38ccf7b2ddfbc9d61d3eaab5a173dba95"
+          "after": "17aa2d47c771d1a4a74fd9de1a2f0ab7260769eb7c01d392587ab4932de6e599"
         },
-        "validate_assessment": {
-          "before": "1f90f2d3c69d0cef61100c1bd2b6c1a8d8abccbd9bb23aa277e17b7fbd1d02d2",
-          "after": "e792b5995f6c605d710f6597197365c9cbc29fed406e8f34bac73e69bd7577e8"
+        "catalog_with_specialist_keyword": {
+          "before": null,
+          "after": "e51a7d8b2b8766a71fbc1ea87e2d0fa8085979b8d1ac00ca7e3e6d65fdd67c91"
+        },
+        "selection_for_catalog": {
+          "before": null,
+          "after": "0601aac6e444e2d18ebbc0423689b8a6d8b73b7bef5691f3e01d65ac316d5ba2"
+        },
+        "test_distinct_owner_labels_do_not_acquire_inferred_number_aliases": {
+          "before": null,
+          "after": "c9e68ace38f86f295c3abfea72b58f36da968dd1ad0d7f68759f7c823687d118"
+        },
+        "test_plural_beast_uses_native_geometry_on_muster_and_materialization": {
+          "before": null,
+          "after": "b289db69a34715068a93aa807c1c3832308027d3aff59e31d707a7afddbaccf9"
+        },
+        "test_plural_raw_catalog_keeps_model_ownership_and_rederives_on_load": {
+          "before": null,
+          "after": "f6ec5eccd857aa0ec79c7f2d35955ce80aecbb5807d033169e1fe1c96449a246"
+        },
+        "test_runtime_grants_and_mustering_preserve_raw_provenance": {
+          "before": null,
+          "after": "207ed503e609416f4faa61eacab8df90066fcd1fd02b37813454b376192e6e72"
+        }
+      }
+    },
+    "tests/unit/test_order133_keyword_numbers.py": {
+      "before_sha256": null,
+      "after_sha256": "8f4bf08d8af9bf9d13dbb86e5475f1e6f8b7abc45066fbf4b6d6b40e85a0b638",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "3f38da8348e4bbf2e2c01db0e2d6906080652bd95998576edd6b17c0c5468144"
+        },
+        "assert_role_views": {
+          "before": null,
+          "after": "e4670ab8889a09d9209993aeea87395973ab788c8b009dbe901b80c2ab03e14a"
+        },
+        "test_catalog_loaded_selection_survives_full_lifecycle_continuations": {
+          "before": null,
+          "after": "de4c4d5d1e442d258909db07289c7d1ab9e1547ff1199e5f4c688bcb86f9f588"
+        },
+        "test_plural_adjacent_sequence_consumes_literal_alias_before_next_keyword": {
+          "before": null,
+          "after": "00e7c324301e95290508226ad54a63c83140d1c7e5223df2e0fa33415a784def"
+        },
+        "test_source_number_spellings_preserve_declared_runtime_token": {
+          "before": null,
+          "after": "01526211642904bb82bc218a3f5f29d0fb95dcb1793a7510f51cbfe21db70f88"
+        },
+        "test_unknown_and_invariant_tokens_are_not_stemmed": {
+          "before": null,
+          "after": "b8497b6dcdf80323f076763a38d927dafd71cd7ffec28be2d49f3bce786ff138"
         }
       }
     }
   },
   "rows": {
-    "README.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
-    },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
       "operations": [
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -476,9 +656,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -486,9 +666,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -496,9 +676,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -506,9 +686,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -516,9 +696,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -526,9 +706,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -536,9 +716,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -546,9 +726,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -556,9 +736,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -566,9 +746,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -576,9 +756,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -586,161 +766,153 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "conformance/typescript/src/contract.ts": {
       "category": "rule_semantics",
       "operations": [
-        "order132-contract-publication"
+        "order133-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
-        "order132-contract-publication"
+        "order133-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
-        "order132-contract-publication"
+        "order133-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
-        "order132-contract-publication"
+        "order133-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
-        "order132-contract-publication"
+        "order133-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "order132-contract-publication"
+        "order133-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "order132-contract-publication"
+        "order133-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
-        "order132-contract-publication"
+        "order133-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "order132-contract-publication"
+        "order133-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
-    "contracts/migrations/44.3.17-to-44.3.18.md": {
+    "contracts/migrations/44.3.18-to-44.3.19.md": {
       "category": "rule_semantics",
       "operations": [
-        "order132-contract-publication"
+        "order133-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "contracts/openapi.yaml": {
       "category": "rule_semantics",
       "operations": [
-        "order132-contract-publication"
+        "order133-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
-    "data/source_audits/order132/source.audit.json": {
+    "data/source_audits/order133/source.audit.json": {
       "category": "rule_semantics",
       "operations": [
-        "order132-source-evidence"
+        "order133-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
-    "docs/ORDER_132_SCOPE_PLAN.md": {
+    "docs/ORDER_133_SCOPE_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
-    },
-    "docs/performance/policy-v3/order132-rule-semantics.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Exact source and changed-owner hash binding for the approved bounded repair assessment.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -748,68 +920,187 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
       "operations": [
-        "order132-circular-containment"
+        "order133-keyword-number-identity"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
-    "src/warhammer40k_core/geometry/measurement.py": {
+    "src/warhammer40k_core/core/datasheet.py": {
       "category": "rule_semantics",
       "operations": [
-        "geometry-search",
-        "order132-circular-containment"
+        "order133-keyword-number-identity"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
-    "tests/code_quality/test_order132_source_authority.py": {
+    "src/warhammer40k_core/core/datasheet_identity.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order133-keyword-number-identity"
+      ],
+      "selected_families": [],
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+    },
+    "src/warhammer40k_core/core/keyword_membership.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order133-keyword-number-identity"
+      ],
+      "selected_families": [],
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+    },
+    "src/warhammer40k_core/core/keyword_numbers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order133-keyword-number-identity"
+      ],
+      "selected_families": [],
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+    },
+    "src/warhammer40k_core/core/model_keywords.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order133-keyword-number-identity"
+      ],
+      "selected_families": [],
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+    },
+    "src/warhammer40k_core/engine/army_mustering.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order133-keyword-number-identity"
+      ],
+      "selected_families": [],
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+    },
+    "src/warhammer40k_core/engine/catalog_model_scope.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order133-keyword-number-identity"
+      ],
+      "selected_families": [],
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+    },
+    "src/warhammer40k_core/engine/model_keyword_grants.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order133-keyword-number-identity"
+      ],
+      "selected_families": [],
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+    },
+    "src/warhammer40k_core/engine/roster_bearer_validation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order133-keyword-number-identity"
+      ],
+      "selected_families": [],
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+    },
+    "src/warhammer40k_core/engine/unit_factory.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order133-keyword-number-identity"
+      ],
+      "selected_families": [],
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+    },
+    "src/warhammer40k_core/rules/rule_keyword_sequences.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order133-keyword-number-identity"
+      ],
+      "selected_families": [],
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+    },
+    "src/warhammer40k_core/rules/rule_token_normalization.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order133-keyword-number-identity"
+      ],
+      "selected_families": [],
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+    },
+    "src/warhammer40k_core/rules/selected_target_parser.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order133-keyword-number-identity"
+      ],
+      "selected_families": [],
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
+    },
+    "tests/code_quality/test_order133_source_authority.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
-    "tests/order132_disembark_helpers.py": {
+    "tests/order133_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "order132-regressions"
+        "order133-regressions"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
-    "tests/unit/test_order132_disembark_distance.py": {
+    "tests/unit/test_order133_keyword_materialization.py": {
       "category": "rule_semantics",
       "operations": [
-        "order132-regressions"
+        "order133-regressions"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     },
-    "tools/performance_policy.py": {
+    "tests/unit/test_order133_keyword_numbers.py": {
       "category": "rule_semantics",
       "operations": [
-        "order132-source-evidence"
+        "order133-regressions"
       ],
       "selected_families": [],
-      "rationale": "Selected inclusive circular disembark distance through shared measurement and real facade controls, preserving source and delivery gates.",
-      "source_obligation": "P18K/C18-12, rule:18:18.04:1 literal blocks7/15, 18.04-rapid-tactical-distance: each circular passenger wholly within the inclusive three-inch Rapid/Tactical setup band. Original source archives, 2.99/3.01 assertions and probes remain exact.",
-      "unchanged_work": "The bounded source rule repair replaces polygon-buffer comparisons with authoritative circular center/radius containment in the existing shared measurement owner. Existing single-source circular FRAME and marker queries share it; noncircular and cooperating union algorithms, eligibility, oversized-base, physical placement, continuation and persistence schemas remain unchanged. Quiet serial current-runtime smoke and all original live semantic/work/cache checks apply under the sequential remediation policy. This is rule correctness work; no intended performance optimization, demonstrated severe regression or full-game performance certification is claimed."
+      "rationale": "Selected shared canonical number identities and real unit/model/facade controls with unchanged source and delivery boundaries.",
+      "source_obligation": "P02O/C02-15, Core rule:02:02.05.01:1 block11, 02.05.01-obligation-12: singular/plural instances of a keyword have the same canonical identity, distinct from owner-label aliases. Original source archives and every predecessor test/assertion remain exact.",
+      "unchanged_work": "This bounded rule repair adds declared lexical number identity at existing source/catalog boundaries and shared query membership. It consolidates duplicate source sequence parsing and retains unit/model ownership, finite facade choices, modifier mutation, continuation and existing persistence/replay schemas. No search, cache, serializer, workload or dependency algorithm is changed. Quiet serial current-runtime smoke plus original live semantic/work/cache checks remain required under the sequential policy; no intended optimization, demonstrated severe regression or full-game certification is claimed."
     }
   },
   "milestone": "ordinary",

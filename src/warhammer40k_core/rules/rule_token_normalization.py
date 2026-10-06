@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import re
 
+from warhammer40k_core.core.keyword_numbers import keyword_number_identity
 from warhammer40k_core.rules.rule_ir import RuleIRError
 
 
 def keyword_token(value: str) -> str:
-    return value.strip().upper().replace(" ", "_").replace("-", "_")
+    return keyword_number_identity(value.strip().upper().replace(" ", "_").replace("-", "_"))
 
 
 def keyword_any_tokens(value: str) -> tuple[str, ...]:
@@ -57,6 +58,4 @@ def singular_keyword_token(value: str) -> str:
     token = keyword_token(value)
     if token == "TITANIC_MODELS":
         return "TITANIC"
-    if token in {"CHARACTERS", "MONSTERS", "VEHICLES"}:
-        return token[:-1]
     return token

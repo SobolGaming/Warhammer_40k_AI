@@ -240,11 +240,11 @@ class ModelInstance:
 
     @property
     def keywords(self) -> tuple[str, ...]:
-        return self.keyword_assignment.keywords
+        return self.keyword_assignment.effective_keywords
 
     @property
     def faction_keywords(self) -> tuple[str, ...]:
-        return self.keyword_assignment.faction_keywords
+        return self.keyword_assignment.effective_faction_keywords
 
     @property
     def datasheet_name_keywords(self) -> tuple[str, ...]:
@@ -698,7 +698,7 @@ class UnitFactory:
             characteristics=profile.characteristics,
             base_size=profile.base_size,
             geometry=_model_geometry_for_profile(
-                keywords=assignment.keywords,
+                keywords=assignment.effective_keywords,
                 profile=profile,
                 geometry_record=self._catalog_model_geometry(profile.model_profile_id),
             ),
@@ -743,7 +743,7 @@ def _instantiate_models_for_profile(
     starting_wounds = None if isinstance(wounds, RandomProfileValue) else wounds.final
     source_ids = _merge_source_ids(datasheet.source_ids, profile.source_ids)
     geometry = _model_geometry_for_profile(
-        keywords=keyword_assignment.keywords,
+        keywords=keyword_assignment.effective_keywords,
         profile=profile,
         geometry_record=geometry_record,
     )

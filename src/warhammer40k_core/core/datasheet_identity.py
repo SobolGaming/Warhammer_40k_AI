@@ -1,10 +1,15 @@
 """Normalize catalog identity once, independently of runtime display names."""
 
+from warhammer40k_core.core.keyword_numbers import keyword_number_identity
 from warhammer40k_core.core.validation import (
     IdentifierValidator,
     ValidationErrorFactory,
     canonical_keyword_token,
 )
+
+
+def effective_datasheet_keywords(keywords: tuple[str, ...], name_keyword: str) -> tuple[str, ...]:
+    return tuple(sorted({name_keyword, *(keyword_number_identity(k) for k in keywords)}))
 
 
 def normalized_datasheet_identity(
