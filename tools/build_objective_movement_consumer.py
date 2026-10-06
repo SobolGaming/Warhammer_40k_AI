@@ -7,8 +7,10 @@ import hashlib
 import json
 from pathlib import Path
 
+from warhammer40k_core.rules.objective_approach_parser import compile_objective_approach_clauses
 from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
-from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
+from warhammer40k_core.rules.rule_ir import RuleIR
+from warhammer40k_core.rules.rule_parser import RULE_PARSER_VERSION
 from warhammer40k_core.rules.source_data import RuleSourceText
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,15 +40,25 @@ def build() -> dict[str, object]:
     )
     profiles = native["profiles"]
     profile = next(row for row in profiles if row["source_id"] == SOURCE_ID)
-    rule = compile_rule_source_text(
-        RuleSourceText.from_raw(
-            source_id=SOURCE_ID,
-            raw_text=profile["effect_descriptor"],
-            objective_scope=ObjectiveRuleScope.CORE_RULES,
-        ),
-        source_keyword_sequence_parts=("IRONKIN STEELJACKS",),
+    source = RuleSourceText.from_raw(
+        source_id=SOURCE_ID,
+        raw_text=profile["effect_descriptor"],
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
     )
-    assert rule.rule_ir.is_supported
+    # Compile only this reconciled overlay. Historical archive generators retain
+    # their original parser and byte-exact outputs, including load-only rows.
+    clauses = compile_objective_approach_clauses(
+        source_id=source.source_id, normalized_text=source.normalized_text
+    )
+    assert clauses is not None, "Selected objective consumer text no longer matches."
+    rule = RuleIR(
+        rule_id=source.source_id,
+        source_id=source.source_id,
+        normalized_text=source.normalized_text,
+        parser_version=RULE_PARSER_VERSION,
+        clauses=clauses,
+    )
+    assert rule.is_supported
     return {
         "schema_version": "core-objective-movement-consumer-v1",
         "selected_core": core,
@@ -54,7 +66,7 @@ def build() -> dict[str, object]:
         "consumer_profile_sha256": hashlib.sha256(
             json.dumps(profile, sort_keys=True, separators=(",", ":")).encode()
         ).hexdigest(),
-        "rule_ir": rule.rule_ir.to_payload(),
+        "rule_ir": rule.to_payload(),
         "required_name_keyword": "IRONKIN STEELJACKS",
         "requires_opponent_turn": True,
         "target_forbidden_if_within_engagement_range": True,

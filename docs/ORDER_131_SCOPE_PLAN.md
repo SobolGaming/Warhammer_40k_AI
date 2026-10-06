@@ -14,7 +14,9 @@ owner and assertions remain unchanged.
 
 The retained Cogitated Need instruction supplies an applicable consumer. A new
 reproducible source overlay preserves its original source row, timing, CP and
-target identity, and compiles its exact effect into ordinary RuleIR. Existing
+target identity, and compiles its exact effect into ordinary RuleIR only at this
+overlay's data boundary. The historical general parser and archive generators
+retain their original behavior and byte-exact outputs. Existing
 Stratagem timing, targeting and CP owners request the shared triggered Normal move.
 The native activation archive remains exact; Synaptic Goading stays load-only.
 

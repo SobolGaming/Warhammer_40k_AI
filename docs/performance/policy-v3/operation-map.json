@@ -5036,8 +5036,7 @@
         "src/warhammer40k_core/geometry/objective_path_proof.py",
         "src/warhammer40k_core/rules/objective_approach_parser.py",
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_objective_movement_consumer_2026_10.json",
-        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_objective_movement_consumer_2026_10.py",
-        "src/warhammer40k_core/rules/specialized_rule_parser.py"
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_objective_movement_consumer_2026_10.py"
       ],
       "owners": [
         "@document",
@@ -5075,7 +5074,6 @@
         "apply_proposal_decision",
         "apply_triggered_movement_distance_reroll_decision",
         "compile_objective_approach_clauses",
-        "compile_specialized_rule_clauses",
         "core_movement_end_candidates",
         "endpoint_excluded_by_coherency",
         "objective_approach_choice",
