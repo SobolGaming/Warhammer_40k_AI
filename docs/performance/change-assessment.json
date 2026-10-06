@@ -532,7 +532,7 @@
     },
     "tests/code_quality/test_order133_source_authority.py": {
       "before_sha256": null,
-      "after_sha256": "292365e752b1499937155f48daeca7cdf89a40a1048c92f2d07a322dd13bfe06",
+      "after_sha256": "9df5d5c2d59e371afa425a6769d278e6108944b83fd38e3bfd9eb53426b93a2f",
       "owners": {
         "@module": {
           "before": null,
@@ -540,7 +540,7 @@
         },
         "test_declared_number_vocabulary_provenance_matches_literal_runtime_table": {
           "before": null,
-          "after": "fdbf038c0b89c9dea70ba6714857fb34fef3323b333eff0bd7a59ae2a70cdb86"
+          "after": "7d490fbc9cdfa4c94843f4b5385cb1f74084029a87792578a8fa11fe2b854ee9"
         },
         "test_number_identity_is_shared_at_source_and_catalog_owners": {
           "before": null,

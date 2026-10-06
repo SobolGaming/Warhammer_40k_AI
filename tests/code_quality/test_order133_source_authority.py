@@ -44,14 +44,18 @@ def test_declared_number_vocabulary_provenance_matches_literal_runtime_table() -
     assert table["BEASTS"] == "BEAST"
     assert "CRUSADER" not in table
     assert "CRUSADERS" not in table
-    rows = json.loads(
-        (
-            ROOT
-            / (
-                "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_keywords.json"
-            )
-        ).read_bytes()
-    )["rows"]
+    vocabulary_paths = [
+        path
+        for path in audit["pinned_git_blob_sha256"]
+        if Path(path).name == "Datasheets_keywords.json"
+    ]
+    assert len(vocabulary_paths) == 1
+    vocabulary_path = ROOT / vocabulary_paths[0]
+    assert (
+        hashlib.sha256(vocabulary_path.read_bytes()).hexdigest()
+        == (audit["pinned_git_blob_sha256"][vocabulary_paths[0]])
+    )
+    rows = json.loads(vocabulary_path.read_bytes())["rows"]
     observed = Counter(row["fields"]["keyword"].upper() for row in rows)
     for record in records:
         assert record["observed_alias_rows"] == observed[record["alias"]]
