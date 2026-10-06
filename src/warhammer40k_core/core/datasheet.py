@@ -28,6 +28,7 @@ from warhammer40k_core.core.datasheet_ability import (
     DatasheetAbilityDescriptor as DatasheetAbilityDescriptor,
 )
 from warhammer40k_core.core.datasheet_composition import validate_unit_composition_counts
+from warhammer40k_core.core.datasheet_identity import effective_datasheet_keywords as _effective
 from warhammer40k_core.core.datasheet_identity import normalized_datasheet_identity
 from warhammer40k_core.core.random_profile_values import (
     ProfileCharacteristicValue,
@@ -1060,7 +1061,7 @@ class DatasheetDefinition:
         if type(self.keywords) is not DatasheetKeywordSet:
             raise DatasheetCatalogError("DatasheetDefinition keywords must be a keyword set.")
         object.__setattr__(
-            self, "effective_keywords", tuple(sorted({*self.keywords.keywords, name_keyword}))
+            self, "effective_keywords", _effective(self.keywords.keywords, name_keyword)
         )
         model_profiles = _validate_model_profile_tuple(
             "DatasheetDefinition model_profiles",

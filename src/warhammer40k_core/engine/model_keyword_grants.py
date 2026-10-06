@@ -26,7 +26,7 @@ def grant_unit_keywords(
                 model,
                 keyword_assignment=replace(
                     model.keyword_assignment,
-                    keywords=tuple(sorted({*model.keywords, *keywords})),
+                    keywords=tuple(sorted({*model.keyword_assignment.keywords, *keywords})),
                     name_is_ordinary_keyword=(
                         model.keyword_assignment.name_is_ordinary_keyword
                         or model.keyword_assignment.name_keyword in keywords
@@ -76,7 +76,7 @@ def unit_with_attached_role_evidence(
                 source_ids=tuple(sorted({*model.source_ids, *evidence})),
                 keyword_assignment=replace(
                     model.keyword_assignment,
-                    keywords=tuple(sorted({*model.keywords, "ATTACHED_UNIT"})),
+                    keywords=tuple(sorted({*model.keyword_assignment.keywords, "ATTACHED_UNIT"})),
                     source_ids=tuple(sorted({*model.keyword_assignment.source_ids, *evidence})),
                 ),
             )

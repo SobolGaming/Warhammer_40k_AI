@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from warhammer40k_core.core.keyword_numbers import keyword_number_spellings
 from warhammer40k_core.rules.rule_ir import RuleIRError, RuleParameterValue
 from warhammer40k_core.rules.rule_token_normalization import keyword_token as _keyword_token
 
@@ -63,7 +64,12 @@ def _longest_source_keyword_prefix(
     *,
     source_keyword_sequence_parts: tuple[str, ...],
 ) -> str | None:
-    for keyword in source_keyword_sequence_parts:
+    spellings = {
+        spelling
+        for keyword in source_keyword_sequence_parts
+        for spelling in keyword_number_spellings(keyword)
+    }
+    for keyword in sorted(spellings, key=lambda token: (-len(token), token)):
         if value == keyword or value.startswith(f"{keyword} "):
             return keyword
     return None

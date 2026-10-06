@@ -10,6 +10,7 @@ from warhammer40k_core.core.datasheet import (
     DatasheetMusteringOption,
     DatasheetMusteringOptionEffectKind,
 )
+from warhammer40k_core.core.keyword_numbers import keyword_number_identity
 from warhammer40k_core.core.validation import (
     IdentifierValidator,
     ValidationErrorFactory,
@@ -73,6 +74,8 @@ class ModelKeywordAssignment:
     materialization_descriptor_id: str | None = None
     name_keyword: str | None = field(default=None, compare=False)
     name_is_ordinary_keyword: bool = field(default=False, compare=False)
+    effective_keywords: tuple[str, ...] = field(init=False, compare=False)
+    effective_faction_keywords: tuple[str, ...] = field(init=False, compare=False)
 
     def __post_init__(self) -> None:
         if self.materialization_descriptor_id is not None:
@@ -107,6 +110,21 @@ class ModelKeywordAssignment:
             if native not in self.keywords:
                 raise ModelKeywordError("Model keyword name identity must occur in its inventory.")
             object.__setattr__(self, "name_keyword", native)
+        for name in ("keywords", "faction_keywords"):
+            object.__setattr__(
+                self,
+                "effective_" + name,
+                tuple(
+                    sorted(
+                        {keyword_number_identity(token) for token in getattr(self, name)}
+                        | (
+                            {self.name_keyword}
+                            if name == "keywords" and self.name_keyword
+                            else set()
+                        )
+                    )
+                ),
+            )
 
     def to_payload(self) -> ModelKeywordAssignmentPayload:
         payload: ModelKeywordAssignmentPayload = {
@@ -241,7 +259,7 @@ def model_keyword_assignment(
     return ModelKeywordAssignment(
         datasheet_id=datasheet.datasheet_id,
         model_profile_id=model_profile_id,
-        keywords=datasheet.effective_keywords,
+        keywords=tuple(sorted({*datasheet.keywords.keywords, datasheet.name_keyword})),
         faction_keywords=datasheet.keywords.faction_keywords,
         source_ids=tuple(sorted({*datasheet.source_ids, *profile.source_ids})),
         name_keyword=datasheet.name_keyword,

@@ -5228,6 +5228,115 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order133-keyword-number-identity": {
+      "paths": [
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/core/datasheet.py",
+        "src/warhammer40k_core/core/datasheet_identity.py",
+        "src/warhammer40k_core/core/keyword_membership.py",
+        "src/warhammer40k_core/core/keyword_numbers.py",
+        "src/warhammer40k_core/core/model_keywords.py",
+        "src/warhammer40k_core/engine/army_mustering.py",
+        "src/warhammer40k_core/engine/catalog_model_scope.py",
+        "src/warhammer40k_core/engine/model_keyword_grants.py",
+        "src/warhammer40k_core/engine/roster_bearer_validation.py",
+        "src/warhammer40k_core/engine/unit_factory.py",
+        "src/warhammer40k_core/rules/rule_keyword_sequences.py",
+        "src/warhammer40k_core/rules/rule_token_normalization.py",
+        "src/warhammer40k_core/rules/selected_target_parser.py"
+      ],
+      "owners": [
+        "@module",
+        "DatasheetDefinition.__post_init__",
+        "ModelInstance.faction_keywords",
+        "ModelInstance.keywords",
+        "ModelKeywordAssignment",
+        "ModelKeywordAssignment.__post_init__",
+        "UnitFactory.instantiate_materialized_model",
+        "_canonical_keyword",
+        "_instantiate_models_for_profile",
+        "_keyword_sequence_parameter_pairs",
+        "_keyword_sequence_tokens",
+        "_keyword_token",
+        "_longest_source_keyword_prefix",
+        "_split_source_keyword_sequence",
+        "apply_warlord_keyword_if_selected",
+        "effective_datasheet_keywords",
+        "exclusive_name_keywords",
+        "grant_unit_keywords",
+        "keyword_inventory_contains",
+        "keyword_number_identity",
+        "keyword_number_spellings",
+        "keyword_token",
+        "model_keyword_assignment",
+        "scoped_roll_model_ids_for_effect",
+        "selected_target_spec_from_text",
+        "singular_keyword_token",
+        "unit_with_attached_role_evidence"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order133-regressions": {
+      "paths": [
+        "tests/order133_helpers.py",
+        "tests/unit/test_order133_keyword_materialization.py",
+        "tests/unit/test_order133_keyword_numbers.py"
+      ],
+      "owners": [
+        "@module",
+        "advance_to_number_keyword_selection",
+        "assert_role_views",
+        "catalog_with_specialist_keyword",
+        "number_keyword_session",
+        "number_keyword_text",
+        "selection_for_catalog",
+        "test_catalog_loaded_selection_survives_full_lifecycle_continuations",
+        "test_distinct_owner_labels_do_not_acquire_inferred_number_aliases",
+        "test_plural_adjacent_sequence_consumes_literal_alias_before_next_keyword",
+        "test_plural_beast_uses_native_geometry_on_muster_and_materialization",
+        "test_plural_raw_catalog_keeps_model_ownership_and_rederives_on_load",
+        "test_runtime_grants_and_mustering_preserve_raw_provenance",
+        "test_source_number_spellings_preserve_declared_runtime_token",
+        "test_unknown_and_invariant_tokens_are_not_stemmed"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order133-source-evidence": {
+      "paths": [
+        "data/source_audits/order133/source.audit.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order133-contract-publication": {
+      "paths": [
+        "conformance/typescript/src/contract.ts",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/migrations/44.3.18-to-44.3.19.md",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

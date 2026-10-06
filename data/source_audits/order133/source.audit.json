@@ -1,0 +1,316 @@
+{
+  "order": 133,
+  "started": true,
+  "scope": "P02O/C02-15; 02.05.01-obligation-12",
+  "selected_source": {
+    "row_id": "rule:02:02.05.01:1",
+    "category": "02",
+    "locator": "02.05.01",
+    "title": "Using Keywords & Mixed Keywords in Units",
+    "occurrence": 1,
+    "source_sha256": "48df8363e95ed138f1cf0af5f99b0cf159fc9a66d8141bae3c5e87ac2ad899ef",
+    "blocks": [
+      {
+        "ordinal": 1,
+        "kind": "text",
+        "sha256": "fbd269ac5e31c1a60ffb508a720bdc2a0fe34d93cb776f6eba9a6ef91d61aa6e",
+        "value": "When using keywords, the following points apply:"
+      },
+      {
+        "ordinal": 2,
+        "kind": "text",
+        "sha256": "cd5a551d353de0b4c29ed46c31929eef51de2cf3b4bac652e856404e39ccc6f2",
+        "value": "• A unit has all the keywords of all models in that unit. A model only has its own keywords."
+      },
+      {
+        "ordinal": 3,
+        "kind": "text",
+        "sha256": "3d0d53efedbd7defb3ad7ba0797343e9b68e697ccca7a7c464175a48e80f2033",
+        "value": "• If a rule specifies that it applies to a unit with a keyword, it applies to a unit which includes one or more models with that keyword."
+      },
+      {
+        "ordinal": 4,
+        "kind": "text",
+        "sha256": "083913006c59b36c093ac2dcbdeaba990045375651a813fa6a431058777bfb60",
+        "value": "• If a rule specifies that it applies to a model with a keyword, it only applies to a model with that keyword."
+      },
+      {
+        "ordinal": 5,
+        "kind": "text",
+        "sha256": "7ab0b77ab1dc7ce10b8b9fd6aaa72b25ae76a0e651bc41d56e4bb447800aecb7",
+        "value": "• If a rule specifies that it applies to ‘non-\u0003Keyword\u0004’ models/units, it only applies to models/units that do not have that keyword. For example, if a rule applies to non-\u0003Vehicle\u0004 units, it only applies to units that do not have the \u0003Vehicle\u0004 keyword."
+      },
+      {
+        "ordinal": 6,
+        "kind": "text",
+        "sha256": "e82cfed961d633cc06623e03c8a830dfc14d67f19d28c9885cf19a920e0fcca0",
+        "value": "• Some units can contain models that have different keywords. While this is the case, such a unit is considered to have all of the keywords of all of its models, and so is affected by any rule that applies to units with any of those keywords. Remember that attacks are made against units, not models."
+      },
+      {
+        "ordinal": 7,
+        "kind": "text",
+        "sha256": "1443e3ef5f01968e29f55ef61df03f71e45b7347511db6e6bd8be5926e75ba67",
+        "value": "• If a rule only applies to models with a specific keyword, then it instead only applies to models in such a unit that have the correct keyword."
+      },
+      {
+        "ordinal": 8,
+        "kind": "text",
+        "sha256": "3b890049f17247a3e8788fe4ad12362692c5bc85f021ecec9afdb8688e7f2262",
+        "value": "• A rule with a comma-separated list of keywords, or a series of keywords separated by slashes ('/'), or two keywords separated by the word ‘or’ (e.g. ‘an \u0003Immortals\u0004, \u0003Deathmarks\u0004 or \u0003Lychguard\u0004 unit’) refers to a model/unit that has any one of those keywords."
+      },
+      {
+        "ordinal": 9,
+        "kind": "text",
+        "sha256": "42a72bf3c5ca60d0ebaa0ab0eb0527ebe0384687b8f190f15a0ecf196780c2b5",
+        "value": "• A rule with multiple adjacent keywords (e.g. ‘an \u0003Aeldari Guardians\u0004 unit’) only refers to a model/unit that has all of those keywords."
+      },
+      {
+        "ordinal": 10,
+        "kind": "text",
+        "sha256": "94f8ace125b168d39248817067356869ef2eba3eaaa108a27a5421c332c5a0df",
+        "value": "• Some older rules use keywords without specifying model or unit: for example, \u0003MONSTER/VEHICLE\u0004 or \u0003TRANSPORT\u0004. These rules refer to units with those keywords."
+      },
+      {
+        "ordinal": 11,
+        "kind": "text",
+        "sha256": "b9a8f1937d717a0e7e7d6b1e185d5efb0f64aa5918396d6fcf574956c4d8bc31",
+        "value": "• Singular and plural instances of the same keyword function in the same way."
+      }
+    ],
+    "selected_provider": "Game Datamissions",
+    "historical_source_row_sha256": "b52aa983a704ed44503636e301f8125e828ce2701fb09ffa0d774d7cec98296b",
+    "review_category": "02"
+  },
+  "selected_literal_blocks": [
+    {
+      "ordinal": 11,
+      "kind": "text",
+      "sha256": "b9a8f1937d717a0e7e7d6b1e185d5efb0f64aa5918396d6fcf574956c4d8bc31",
+      "value": "• Singular and plural instances of the same keyword function in the same way."
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "02.05.01-obligation-12",
+      "source_blocks": [
+        11
+      ],
+      "summary": "Singular and plural spellings identify the same canonical keyword.",
+      "owners": [
+        "src/warhammer40k_core/rules/rule_keyword_sequences.py:keyword_sequence_tokens",
+        "src/warhammer40k_core/engine/rule_target_resolution.py:unit_has_required_keywords"
+      ],
+      "evidence": [],
+      "qualifications": [
+        "Gameplay gap: keyword-sequence normalization preserves distinct CHARACTER and CHARACTERS tokens, and the real unit target gate rejects the plural while accepting the singular on the same CHARACTER model. The pinned keyword probe exercises the keyword itself, not pluralized model-owner labels. Resolve singular/plural aliases at the source boundary and retain canonical runtime identity."
+      ]
+    }
+  ],
+  "roadmap_row": "| 133 | P02O | C02-15 | Order 97 identifies the source/consumer gap documented in its pinned evidence. | Singular and plural keyword spellings normalize to different identities and the real typed unit gate rejects the plural of a present singular keyword. Normalize source-backed number aliases at the catalog/RuleIR boundary, preserve canonical runtime tokens and test both spellings through actual model/unit rule consumers; do not confuse model-owner label matching with keyword identity. | Selected Order 97 clauses: 02.05.01-obligation-12. Full literal blocks and owner links are in the [inventory](ORDER_97_EVIDENCE_REPORT.md). | PEVIDENCE | IMPLEMENTATION-GAP |",
+  "acceptance": "Normalize source-backed singular/plural keyword identities at the catalog/RuleIR boundary while preserving canonical runtime tokens. Prove both spellings through real model/unit keyword consumers and required facade, persistence, fork, view, event and exact replay paths. Preserve original source archives/probes/assertions and distinguish owner-label matching from keyword identity. Stay within the selected obligation; expansion requires an explicit decision.",
+  "boundary": "P02O/C02-15; 02.05.01-obligation-12 only. Declared lexical number identities, not an English stemmer, owner-label alias or new named-provider admission. Exact source vocabulary still bounds implicit subject grammar; unknown spellings remain distinct and unsupported grammar remains diagnostic.",
+  "base": "56fabeae7a645e1c138b85a8877a994fa93339ec",
+  "tree": "c8bd6f13e561ddae207218145ab23aa77af8ad8f",
+  "baseline_verified": true,
+  "declared_number_identities": [
+    {
+      "alias": "ASPECT WARRIORS",
+      "canonical": "ASPECT WARRIOR",
+      "observed_alias_rows": 8,
+      "observed_canonical_rows": 7,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "BATTLESUITS",
+      "canonical": "BATTLESUIT",
+      "observed_alias_rows": 0,
+      "observed_canonical_rows": 18,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "BEASTS",
+      "canonical": "BEAST",
+      "observed_alias_rows": 14,
+      "observed_canonical_rows": 21,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "BURROWERS",
+      "canonical": "BURROWER",
+      "observed_alias_rows": 4,
+      "observed_canonical_rows": 4,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "CHARACTERS",
+      "canonical": "CHARACTER",
+      "observed_alias_rows": 0,
+      "observed_canonical_rows": 685,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "DAEMONS",
+      "canonical": "DAEMON",
+      "observed_alias_rows": 0,
+      "observed_canonical_rows": 161,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "DEATHMARK",
+      "canonical": "DEATHMARKS",
+      "observed_alias_rows": 0,
+      "observed_canonical_rows": 1,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "DEDICATED TRANSPORTS",
+      "canonical": "DEDICATED TRANSPORT",
+      "observed_alias_rows": 0,
+      "observed_canonical_rows": 70,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "EPIC HEROES",
+      "canonical": "EPIC HERO",
+      "observed_alias_rows": 0,
+      "observed_canonical_rows": 222,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "FORTIFICATIONS",
+      "canonical": "FORTIFICATION",
+      "observed_alias_rows": 0,
+      "observed_canonical_rows": 45,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "GRENADE",
+      "canonical": "GRENADES",
+      "observed_alias_rows": 0,
+      "observed_canonical_rows": 580,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "GUARDIAN",
+      "canonical": "GUARDIANS",
+      "observed_alias_rows": 0,
+      "observed_canonical_rows": 2,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "HELLFLAYERS",
+      "canonical": "HELLFLAYER",
+      "observed_alias_rows": 1,
+      "observed_canonical_rows": 1,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "IMMORTAL",
+      "canonical": "IMMORTALS",
+      "observed_alias_rows": 0,
+      "observed_canonical_rows": 1,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "JUMP PACKS",
+      "canonical": "JUMP PACK",
+      "observed_alias_rows": 15,
+      "observed_canonical_rows": 53,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "MONSTERS",
+      "canonical": "MONSTER",
+      "observed_alias_rows": 0,
+      "observed_canonical_rows": 113,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "PSYKERS",
+      "canonical": "PSYKER",
+      "observed_alias_rows": 0,
+      "observed_canonical_rows": 184,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "SWARMS",
+      "canonical": "SWARM",
+      "observed_alias_rows": 0,
+      "observed_canonical_rows": 13,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "TERMINATORS",
+      "canonical": "TERMINATOR",
+      "observed_alias_rows": 1,
+      "observed_canonical_rows": 68,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "TRANSPORTS",
+      "canonical": "TRANSPORT",
+      "observed_alias_rows": 0,
+      "observed_canonical_rows": 318,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "VEHICLES",
+      "canonical": "VEHICLE",
+      "observed_alias_rows": 0,
+      "observed_canonical_rows": 1048,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "WALKERS",
+      "canonical": "WALKER",
+      "observed_alias_rows": 0,
+      "observed_canonical_rows": 239,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    },
+    {
+      "alias": "WARLOCKS",
+      "canonical": "WARLOCK",
+      "observed_alias_rows": 2,
+      "observed_canonical_rows": 1,
+      "canonical_authority": "Retained native runtime/source vocabulary; BEAST remains the existing movement/geometry token.",
+      "alias_authority": "Selected Core block11 licenses these reviewed lexical number spellings; zero observed alias rows denote a spelling control, not provider support."
+    }
+  ],
+  "number_vocabulary_boundary": "This hand-reviewed finite identity table covers the source examples, established conventional category identities and unambiguous both-observed number pairs. It is not a generated English inflector. CRUSADER and CRUSADERS identify different source owners (Land Raider Crusader and Crusaders), so they are not inferred aliases. Invariant and undeclared words remain distinct; no catalog/provider expansion is implied.",
+  "pinned_git_blob_sha256": {
+    "data/source_audits/order97/selected-sources.json": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+    "data/source_audits/order97/categories/02.json": "fe5d38f1e501e35e03bf1da51ee7a7e6ede785a9d2c0847488b87e068d04bfbf",
+    "data/source_audits/order97/observed_gaps_01_08.json": "93d0f121e578099c7c52155131668d8706fbc7689afe5fa8ac1267228e107bde",
+    "tests/order97_gap_probes_01_08.py": "e4e908605e084a8106e0aab42f52fb425f2c6f4ff5705c639ddad29c5ca762cc",
+    "tests/order97_gap_probes_keywords.py": "7c6dfbc6c9ac0b4eb2395f4c68eed3f2f6d4e98e3231e6ce212aec22b6fa6aaa",
+    "tests/unit/test_order125_implicit_subjects.py": "66a1448e8780ba08714e522400738dfbc9416a8e069452b09876b76e5251a332",
+    "tests/order125_helpers.py": "21accbfb57177db677bfa2afc421616415969a6ccc271e5085c3abb3f1ffc7e3",
+    "tests/unit/test_order123_datasheet_identity.py": "9d44670f795a758e4501bbd661b1cf919cdd4c6c02c509c7c601fd1ddc024031",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_keywords.json": "697a2656222bf4dfd1f933f2e8bfd4dff0b37ed19abdd3f8e345b3afe2540531",
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/datasheet_keyword_lexicon_2026_06_14.py": "ca7c4912fed50bf5bff520da7d7c0c72b6e120f8ae5db4f65c8f703b91f229ef"
+  },
+  "consumer_path": "Source RuleIR keyword conversion and source-vocabulary segmentation -> catalog identity and eager effective model assignments -> unit/model queries, both factory geometry paths, grants, mustering, materialization and reloaded assignments -> shared keyword membership -> real unit target eligibility and model roll scope -> catalog-loaded finite selected target -> persisting modifier -> native phase expiry, facade persistence/fork/role views/events/exact replay. Raw catalog/model source facts and payloads remain literal; derived identity fields are recomputed and not serialized.",
+  "provider_qualification": "The canonical fixture demonstrates the number-identity failure. No omitted alias by an official named provider, full faction/game support, arbitrary inflection or universal history-tamper certification is claimed. Raw source inventories and Order97 probes remain immutable."
+}

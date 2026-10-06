@@ -9,6 +9,7 @@ from warhammer40k_core.core.datasheet import (
     DatasheetMusteringOptionEffectKind,
 )
 from warhammer40k_core.core.faction import FactionDefinition
+from warhammer40k_core.core.keyword_numbers import keyword_number_identity
 from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
 from warhammer40k_core.core.ruleset import RulesetError, RulesetId, RulesetIdPayload
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -2702,7 +2703,9 @@ def _datasheet_is_belakor(datasheet: DatasheetDefinition) -> bool:
 
 
 def _canonical_keyword(keyword: str) -> str:
-    return _validate_identifier("keyword", keyword).upper().replace("_", " ")
+    return keyword_number_identity(
+        _validate_identifier("keyword", keyword).upper().replace("_", " ")
+    )
 
 
 def _canonical_name(value: str) -> str:
