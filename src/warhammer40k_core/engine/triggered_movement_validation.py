@@ -13,13 +13,13 @@ def validate_non_negative_int(field_name: str, value: object) -> int:
     return value
 
 
-def validate_positive_number(field_name: str, value: object) -> float:
+def validate_positive_number(field_name: str, value: object, *, allow_zero: bool = False) -> float:
     if not isinstance(value, int | float) or type(value) is bool:
         raise GameLifecycleError(f"{field_name} must be a number.")
     number = float(value)
     if not math.isfinite(number):
         raise GameLifecycleError(f"{field_name} must be finite.")
-    if number <= 0.0:
+    if number < 0.0 or (number == 0.0 and not allow_zero):
         raise GameLifecycleError(f"{field_name} must be positive.")
     return number
 

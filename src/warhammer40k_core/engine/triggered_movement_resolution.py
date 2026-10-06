@@ -82,6 +82,7 @@ def resolve_triggered_movement(
     take_to_the_skies: bool = False,
     move_keyword_choice: JsonValue = None,
     surge_target_unit_instance_id: str | None = None,
+    objective_approach_id: str | None = None,
 ) -> TriggeredMovementResolution:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Triggered movement requires a BattlefieldScenario.")
@@ -192,6 +193,21 @@ def resolve_triggered_movement(
                 aircraft_policy.to_payload()
             )
         model = scenario.model_instance_for_placement(placement)
+        model_budget = maximum_distance
+        if (
+            descriptor.objective_constraint is not None
+            and descriptor.objective_constraint.movement_budgets
+        ):
+            budgets = dict(descriptor.objective_constraint.movement_budgets)
+            if placement.model_instance_id not in budgets:
+                raise GameLifecycleError(
+                    "Objective approach lost a physical model movement budget."
+                )
+            model_budget = max(
+                0.0,
+                budgets[placement.model_instance_id]
+                - (descriptor.max_distance_inches - maximum_distance),
+            )
         moving_model = geometry_model_for_placement(model=model, placement=placement)
         model_poses = path_witness.poses_for_model(placement.model_instance_id)
         model_witness = PathWitness.for_paths(((placement.model_instance_id, model_poses),))
@@ -281,7 +297,7 @@ def resolve_triggered_movement(
                     if model_id != placement.model_instance_id
                     and model_id not in retained_model_ids
                 ),
-                movement_distance_budget_inches=maximum_distance,
+                movement_distance_budget_inches=model_budget,
             ),
         )
         path_result = path_context.validate()
@@ -313,7 +329,7 @@ def resolve_triggered_movement(
             validate_json_value(
                 {
                     "model_instance_id": placement.model_instance_id,
-                    "movement_inches": maximum_distance,
+                    "movement_inches": model_budget,
                     "start_pose": placement.pose.to_payload(),
                     "end_pose": path_witness.final_pose_for_model(
                         placement.model_instance_id
@@ -362,6 +378,33 @@ def resolve_triggered_movement(
             )
             for code in endpoint_codes
         )
+    objective_rows: list[JsonValue] = []
+    if (
+        descriptor.objective_constraint is not None
+        and not restriction_violations
+        and all(row.is_valid for row in path_validation_results)
+        and all(row.is_valid for row in terrain_path_legality_results)
+        and coherency_result.is_coherent
+    ):
+        from warhammer40k_core.engine.objective_movement_constraint import (
+            validate_objective_approach_endpoints,
+        )
+
+        objective_rows, objective_codes = validate_objective_approach_endpoints(
+            scenario=scenario,
+            ruleset=ruleset_descriptor,
+            constraint=descriptor.objective_constraint,
+            selected_id=objective_approach_id,
+            attempted=attempted_placement,
+            contexts=tuple(model_contexts),
+        )
+        restriction_violations += tuple(
+            TriggeredMovementViolation(
+                violation_code=TriggeredMovementViolationCode(code),
+                message="Objective approach mandatory endpoint requirement was not satisfied.",
+            )
+            for code in objective_codes
+        )
     from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
     from warhammer40k_core.engine.take_to_the_skies import flight_choice_context
 
@@ -391,6 +434,11 @@ def resolve_triggered_movement(
     if is_surge:
         movement_payload["surge_target_unit_instance_id"] = target_id
         movement_payload["surge_model_endpoints"] = endpoint_rows
+    if descriptor.objective_constraint is not None:
+        movement_payload["objective_approach_id"] = descriptor.objective_constraint.objective(
+            objective_approach_id
+        ).objective_id
+        movement_payload["objective_model_endpoints"] = objective_rows
     if aircraft_policies:
         movement_payload["aircraft_movement_policies"] = dict(sorted(aircraft_policies.items()))
     if restriction_violations:

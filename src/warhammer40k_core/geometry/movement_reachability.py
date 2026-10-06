@@ -17,13 +17,20 @@ from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.base import CircularBase, base_distance
 from warhammer40k_core.geometry.base_contact_proof import endpoint_excluded_by_bodies
 from warhammer40k_core.geometry.endpoint_support import endpoint_support_elevations
-from warhammer40k_core.geometry.movement_endpoint_proof import endpoint_excluded_by_terrain
+from warhammer40k_core.geometry.movement_endpoint_proof import (
+    endpoint_excluded_by_coherency,
+    endpoint_excluded_by_terrain,
+)
+from warhammer40k_core.geometry.objective_endpoint_proof import objective_endpoint_excluded
 from warhammer40k_core.geometry.pathing import (
     PathValidationContext,
     PathWitness,
     TerrainPathLegalityContext,
 )
-from warhammer40k_core.geometry.physical_model import collision_geometry_is_rotation_invariant
+from warhammer40k_core.geometry.physical_model import (
+    collision_geometry_is_rotation_invariant,
+    models_overlap_physically,
+)
 from warhammer40k_core.geometry.polygons import Point2D, triangulate_polygon
 from warhammer40k_core.geometry.pose import GeometryError, Pose, validate_finite_number
 from warhammer40k_core.geometry.volume import Model
@@ -42,6 +49,7 @@ class MovementGoal:
     vertical_inches: float = 0.0
     z_inches: float = 0.0
     range_inches: float | None = None
+    spatial_region_range_inches: float | None = None
 
     def __post_init__(self) -> None:
         if sum((bool(self.models), bool(self.polygons), self.disk is not None)) != 1:
@@ -56,6 +64,11 @@ class MovementGoal:
             raise GeometryError("A spatial range goal requires models and nonnegative range.")
         for polygon in self.polygons:
             triangulate_polygon(polygon)
+        if self.spatial_region_range_inches is not None and (
+            self.models
+            or validate_finite_number("spatial region range", self.spatial_region_range_inches) < 0
+        ):
+            raise GeometryError("Spatial region range requires an objective footprint.")
 
     def contains(self, model: Model) -> bool:
         subjects = model.rules_distance_subjects()
@@ -78,11 +91,27 @@ class MovementGoal:
         if self.disk is not None:
             pose, base = self.disk
             gap = max(bottom - pose.position.z, pose.position.z - top, 0.0)
+            if self.spatial_region_range_inches is not None:
+                return (
+                    math.hypot(gap, base_distance(model.base, model.pose, base, pose))
+                    <= self.spatial_region_range_inches
+                )
             return (
                 gap <= self.vertical_inches
                 and base_distance(model.base, model.pose, base, pose) <= self.horizontal_inches
             )
         gap = max(bottom - self.z_inches, self.z_inches - top, 0.0)
+        if self.spatial_region_range_inches is not None:
+            return any(
+                math.hypot(
+                    gap,
+                    shapely_backend.base_footprint_distance_to_polygon(
+                        model.base, model.pose, polygon
+                    ),
+                )
+                <= self.spatial_region_range_inches
+                for polygon in self.polygons
+            )
         return gap <= self.vertical_inches and any(
             shapely_backend.base_footprint_distance_to_polygon(model.base, model.pose, polygon)
             <= self.horizontal_inches
@@ -92,6 +121,17 @@ class MovementGoal:
     def distance_lower_bound(
         self, model: Model, *, ignores_vertical_distance: bool = False
     ) -> float:
+        if self.spatial_region_range_inches is not None:
+            physical = replace(
+                self, spatial_region_range_inches=None, horizontal_inches=0, vertical_inches=0
+            )
+            return max(
+                0.0,
+                physical.distance_lower_bound(
+                    model, ignores_vertical_distance=ignores_vertical_distance
+                )
+                - self.spatial_region_range_inches,
+            )
         if model.measures_every_part and model.body_parts:
             return _anchored_measurement_lower_bound(
                 self, model, ignores_vertical_distance=ignores_vertical_distance
@@ -381,6 +421,7 @@ class MovementReachabilityQuery:
     coherency_all_models_distance_inches: float | None = None
     closer_target_groups: tuple[tuple[Model, ...], ...] = ()
     required_if_reachable_goals: tuple[MovementGoal, ...] = ()
+    prove_coherent_endpoint_exclusion: bool = False
 
     def __post_init__(self) -> None:
         if self.path_context.moving_model != self.terrain_context.moving_model:
@@ -504,6 +545,10 @@ def _cached_reachability(query: MovementReachabilityQuery) -> MovementReachabili
         ),
     ):
         return MovementReachabilityResult(None, 0, MovementReachabilityStatus.ENDPOINT_UNREACHABLE)
+    if query.prove_coherent_endpoint_exclusion and endpoint_excluded_by_coherency(query):
+        return MovementReachabilityResult(None, 0, MovementReachabilityStatus.ENDPOINT_UNREACHABLE)
+    if query.prove_coherent_endpoint_exclusion and objective_endpoint_excluded(query):
+        return MovementReachabilityResult(None, 0, MovementReachabilityStatus.ENDPOINT_UNREACHABLE)
     nodes = _navigation_poses(query)
     start = source.pose
     queue: list[tuple[float, float, int, tuple[Pose, ...]]] = [(0.0, 0.0, -1, (start,))]
@@ -566,6 +611,10 @@ def _goal_satisfied(query: MovementReachabilityQuery, model: Model) -> bool:
 
 
 def _endpoint_satisfies(query: MovementReachabilityQuery, model: Model) -> bool:
+    if query.prove_coherent_endpoint_exclusion and any(
+        models_overlap_physically(model, peer) for peer in query.coherent_models
+    ):
+        return False
     if not _goal_satisfied(query, model) or any(
         not goal.contains(model) for goal in query.required_goals
     ):

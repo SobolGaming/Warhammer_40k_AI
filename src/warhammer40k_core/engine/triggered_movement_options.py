@@ -71,6 +71,16 @@ def triggered_movement_unit_selection_options(
                 ),
             )
         )
+    if descriptor.objective_constraint is not None:
+        from warhammer40k_core.engine.objective_movement_constraint import (
+            objective_approach_options,
+        )
+
+        options = list(
+            objective_approach_options(
+                constraint=descriptor.objective_constraint, options=tuple(options)
+            )
+        )
     if descriptor.movement_kind is TriggeredMovementKind.SURGE:
         from warhammer40k_core.engine.surge_choices import surge_target_options
 

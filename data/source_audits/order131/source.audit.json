@@ -1,0 +1,97 @@
+{
+  "order": 131,
+  "started": true,
+  "scope": "P01L/C01-12; 01.04.03-obligation-06",
+  "selected_source": {
+    "row_id": "rule:01:01.04.03:1",
+    "category": "01",
+    "locator": "01.04.03",
+    "title": "As Close As Possible",
+    "occurrence": 1,
+    "source_sha256": "0d9cbb45d59f4f90f0c0c34a2dedc6dbaf360ea7c9e602c21dc5807499706771",
+    "blocks": [
+      {
+        "ordinal": 1,
+        "kind": "text",
+        "sha256": "28be25cd2aaf2f0d6b42b5c4ad90468b2cdccd190cb17cbe1ddeda49d7dde813",
+        "value": "If a rule instructs you to move a model as close as possible to a unit or model you must end that model’s move in base contact with that unit or model if its move is sufficient to do so without breaking any other restrictions (such as \u0005coherency\u0006), or as close as you can achieve if its move is not sufficient."
+      },
+      {
+        "ordinal": 2,
+        "kind": "text",
+        "sha256": "d5071d4bf8f5cbbd3ed739ba9d54092abc5aa34893a67a0f53881e50e7dab25f",
+        "value": "• If a model is already as close as possible to a unit or model when it is instructed to make a move as close as possible towards a unit or model, that model cannot be moved, but still counts as having made the move in question."
+      },
+      {
+        "ordinal": 3,
+        "kind": "text",
+        "sha256": "625ebcc664f19bb30b9bfd3385e99b4b044160876b21dc6c7cb20fbbe9090084",
+        "value": "If a rule instructs you to move a model as close as possible to an \u0005objective\u0006 you must end that model’s move within range of an \u0005objective\u0006 if its move is sufficient to do so without breaking any other restrictions (such as \u0005coherency\u0006), or as close as you can achieve if its move is not sufficient."
+      },
+      {
+        "ordinal": 4,
+        "kind": "text",
+        "sha256": "9b17d3597a20c02ec402356717d0a5cf3a844a862ef36ceea88e7d3d77d6ef1a",
+        "value": "• If that model is already within range of an \u0005objective\u0006 it can move up to the \u0005maximum distance\u0006 of that move but must end its move still within range of that \u0005objective\u0006."
+      }
+    ],
+    "selected_provider": "Game Datamissions",
+    "historical_source_row_sha256": "1f376772c6bf85c4cfd5de6489ed60f3a0f96fb97068853a36a476e3e0a77001",
+    "review_category": "01"
+  },
+  "selected_literal_blocks": [
+    {
+      "ordinal": 3,
+      "kind": "text",
+      "sha256": "625ebcc664f19bb30b9bfd3385e99b4b044160876b21dc6c7cb20fbbe9090084",
+      "value": "If a rule instructs you to move a model as close as possible to an \u0005objective\u0006 you must end that model’s move within range of an \u0005objective\u0006 if its move is sufficient to do so without breaking any other restrictions (such as \u0005coherency\u0006), or as close as you can achieve if its move is not sufficient."
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "01.04.03-obligation-06",
+      "source_blocks": [
+        3
+      ],
+      "summary": "If objective range is unattainable, the move reaches the closest legal endpoint.",
+      "evidence": [
+        "tests/unit/test_order131_objective_movement.py",
+        "tests/unit/test_order131_objective_endpoint_geometry.py",
+        "tests/code_quality/test_order131_source_authority.py"
+      ],
+      "qualifications": [
+        "Source gap: C01-12/P01L records that no real source-linked Core movement constraint and consumer implements the general as-close-as-possible objective fallback. The accepted Consolidation consumer is not a counterexample: selected 12.08 explicitly requires only a closer endpoint when objective range is unreachable, not the closest endpoint. Cogitated Need and Synaptic Goading contain objective as-close wording in load-only faction activation data; those placeholders do not establish Core execution. A real applicable source-linked consumer and witnessed closest-endpoint proof are required before certification."
+      ],
+      "owners_at_handoff": [
+        "src/warhammer40k_core/engine/movement_proposals.py:MovementProposalRequest",
+        "src/warhammer40k_core/engine/consolidation_model_constraints.py:consolidation_model_violation"
+      ],
+      "owners": [
+        "src/warhammer40k_core/engine/objective_movement_constraint.py",
+        "src/warhammer40k_core/engine/objective_movement_stratagem_consumer.py",
+        "src/warhammer40k_core/engine/triggered_movement_resolution.py",
+        "src/warhammer40k_core/geometry/objective_endpoint_proof.py",
+        "src/warhammer40k_core/geometry/objective_path_proof.py"
+      ]
+    }
+  ],
+  "pinned_git_blob_sha256": {
+    "data/source_audits/order97/selected-sources.json": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+    "data/source_audits/order97/categories/01.json": "b988ad059b69a868ed48e6d6462dac701fe3daf9cb5be85e0f060ed365a53c52",
+    "data/source_audits/order97/observed_gaps_01_08.json": "93d0f121e578099c7c52155131668d8706fbc7689afe5fa8ac1267228e107bde",
+    "tests/order97_gap_probes_01_08.py": "e4e908605e084a8106e0aab42f52fb425f2c6f4ff5705c639ddad29c5ca762cc"
+  },
+  "boundary": "P01L/C01-12 obligation06 only. One retained instruction binds a typed objective constraint through shared Normal movement; Consolidation 12.08 and Synaptic Goading remain unchanged.",
+  "base": "5fbde3291e10b0a71fb50c64735e6b8a04cd29e0",
+  "tree": "3756f7277d4620dd7a084212165be3abbcff85e7",
+  "baseline_verified": true,
+  "consumer": {
+    "source_id": "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:leagues-of-votann:hearthfyre-arsenal:000010452007",
+    "artifact": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_objective_movement_consumer_2026_10.json",
+    "entry_path": "configured catalog -> end opponent Movement sequencing -> generic Stratagem target/CP -> triggered finite objective selection -> shared complete PathWitness validation",
+    "qualification": "The retained Cogitated Need instruction is the real source-linked consumer. Acceptance configures canonical fixture characteristics/geometry and faction/detachment admission explicitly. No reconciled Votann roster provider or whole-faction certification is claimed."
+  },
+  "acceptance": "Prove reachable range and unreachable closest legal endpoint with complete witnesses, real facade rejection/retry, CP/source identity, genuine engine checkpoint persistence, independent fork, both players/all roles, viewer events and deterministic replay. Preserve archives, assertions, branches, thresholds and Consolidation closer-only fallback.",
+  "roadmap_row_at_handoff": "| 131 | P01L | C01-12 | Order 97 identifies the source/consumer gap documented in its pinned evidence. | Establish a real source-backed as-close-as-possible objective movement consumer and its typed closest-legal endpoint constraint. The selected Core definition has no authenticated active consumer in this inventory; Consolidation explicitly requires only closer when unreachable, and load-only faction placeholders cannot certify this stronger rule. Preserve that distinction and prove reachable/unreachable geometry, full witnesses and replay. | Selected Order 97 clauses: 01.04.03-obligation-06. Full literal blocks and owner links are in the [inventory](ORDER_97_EVIDENCE_REPORT.md). | PEVIDENCE | SOURCE-GOVERNANCE |",
+  "evidence_qualification": "These are implementation and control references. Passing final local/hosted gates and exact-head independent reviews are recorded separately in durable delivery evidence; no gate success is inferred from these references."
+}

@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import math
 from fractions import Fraction
+from itertools import combinations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.geometry.base import CircularBase, OvalBase, RectangularBase
@@ -28,9 +29,53 @@ from warhammer40k_core.geometry.visibility_algebra import (
 from warhammer40k_core.geometry.volume import Model
 
 if TYPE_CHECKING:
-    from warhammer40k_core.geometry.movement_reachability import MovementGoal
+    from warhammer40k_core.geometry.movement_reachability import (
+        MovementGoal,
+        MovementReachabilityQuery,
+    )
 
 _SLACK = Fraction(1, 100_000_000)
+
+
+def endpoint_excluded_by_coherency(query: MovementReachabilityQuery) -> bool:
+    """Prove exclusion in a continuous superset of coherent endpoints.
+
+    Peer facings stay fixed; the mover can have every facing. Circumscribed
+    measurement radii relax both footprints, while the translation ball relaxes
+    every legal witnessed path. SAT is inconclusive and never grants a move.
+    """
+    if not query.coherent_models:
+        return False
+    source = query.path_context.moving_model
+    budget = query.path_context.movement_distance_budget_inches
+    if budget is None:
+        raise GeometryError("Coherent endpoint proof requires a movement budget.")
+    x, y, z = (variable(name) for name in ("coherent_x", "coherent_y", "coherent_z"))
+    position = source.pose.position
+    distance = (x - rational(position.x)) ** 2 + (y - rational(position.y)) ** 2
+    if not query.path_context.ignores_vertical_distance:
+        distance = distance + (z - rational(position.z)) ** 2
+    radius, height = _measurement_reach(source)
+    neighbors: list[Formula] = []
+    for peer in query.coherent_models:
+        peer_radius, peer_height = _measurement_reach(peer)
+        p = peer.pose.position
+        reach = radius + peer_radius + rational(query.coherency_horizontal_inches)
+        vertical = rational(query.coherency_vertical_inches)
+        neighbors.append(
+            both(
+                ((x - rational(p.x)) ** 2 + (y - rational(p.y)) ** 2).le(reach**2),
+                z.le(rational(p.z) + peer_height + vertical),
+                (z + height).ge(rational(p.z) - vertical),
+            )
+        )
+    count = min(query.coherency_neighbor_count, len(neighbors))
+    formula = both(
+        distance.le((rational(budget) + _SLACK) ** 2),
+        _goal_region(source, query.goal, x, y, z),
+        either(*(both(*group) for group in combinations(neighbors, count))),
+    )
+    return not decide(formula, ("coherent_x", "coherent_y", "coherent_z"))
 
 
 def endpoint_excluded_by_terrain(
@@ -130,6 +175,8 @@ def _goal_region(
         goal.horizontal_inches if goal.range_inches is None else goal.range_inches
     )
     vertical = rational(goal.vertical_inches if goal.range_inches is None else goal.range_inches)
+    if goal.spatial_region_range_inches is not None:
+        horizontal = vertical = rational(goal.spatial_region_range_inches)
 
     def region(cx: float, cy: float, extent: Fraction, bottom: float, top: float) -> Formula:
         return both(

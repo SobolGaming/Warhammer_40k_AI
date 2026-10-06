@@ -1,614 +1,774 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "010573378e25e32e7ff4d79265c59f1865d5351a",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:00215581416c4a7d8487de36fed4dfe07d61aded88c3667bc03bb7f20ced3998",
-  "operation_map_sha256": "d675c6ad052e4c099ae19b248a27733be2e9c08df37c41537cefbbe02079424a",
+  "base": "5fbde3291e10b0a71fb50c64735e6b8a04cd29e0",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5a878a859db1a8f05f34691c5f5e4fc251f0870baf881bc96ce8cb17e7c3ea48",
+  "operation_map_sha256": "e273a5fa5c56289807d94db2249b60db3fa920ba2bec26ffedb48729fe1fb945",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "0aaff9eaea4721367be5f2b336c09971a1f4652b4fa43a2c7948284d2736569d",
-      "after_sha256": "b42a0544f2bd7d07e87da50e3df13401b60018dd44131943acef3324ba8d4112",
+      "before_sha256": "b42a0544f2bd7d07e87da50e3df13401b60018dd44131943acef3324ba8d4112",
+      "after_sha256": "21e90fab324d88a08296479038e796a92a95b5e8188ac0d6d313109c51ca1d8e",
       "owners": {
         "@document": {
-          "before": "0aaff9eaea4721367be5f2b336c09971a1f4652b4fa43a2c7948284d2736569d",
-          "after": "b42a0544f2bd7d07e87da50e3df13401b60018dd44131943acef3324ba8d4112"
+          "before": "b42a0544f2bd7d07e87da50e3df13401b60018dd44131943acef3324ba8d4112",
+          "after": "21e90fab324d88a08296479038e796a92a95b5e8188ac0d6d313109c51ca1d8e"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "d56422d3ba75a4035169ec5e37148a2483cbdb7127e060b846202107e80c6408",
-      "after_sha256": "754b2d21f2077572850844f3b2c37746e8a6172ca20f2a3d9e489cdadfb68c39",
+      "before_sha256": "754b2d21f2077572850844f3b2c37746e8a6172ca20f2a3d9e489cdadfb68c39",
+      "after_sha256": "5c87cf008d6b01d88e648a6ef7372861cf8b20481c79925314e87b769235c13c",
       "owners": {
         "@document": {
-          "before": "d56422d3ba75a4035169ec5e37148a2483cbdb7127e060b846202107e80c6408",
-          "after": "754b2d21f2077572850844f3b2c37746e8a6172ca20f2a3d9e489cdadfb68c39"
+          "before": "754b2d21f2077572850844f3b2c37746e8a6172ca20f2a3d9e489cdadfb68c39",
+          "after": "5c87cf008d6b01d88e648a6ef7372861cf8b20481c79925314e87b769235c13c"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "2fa51c68b4e270638c3f8eeeb0ce183a228e291bf6f25535bf6e6e5795450987",
-      "after_sha256": "d430c5d46cee407bdbaf683c9160cba790e997e163abc16509158faf83e421f5",
+      "before_sha256": "d430c5d46cee407bdbaf683c9160cba790e997e163abc16509158faf83e421f5",
+      "after_sha256": "35705952593362a85637002a066fd2df605f4dc127f8c484d6a5606ebc7f0225",
       "owners": {
         "@document": {
-          "before": "2fa51c68b4e270638c3f8eeeb0ce183a228e291bf6f25535bf6e6e5795450987",
-          "after": "d430c5d46cee407bdbaf683c9160cba790e997e163abc16509158faf83e421f5"
+          "before": "d430c5d46cee407bdbaf683c9160cba790e997e163abc16509158faf83e421f5",
+          "after": "35705952593362a85637002a066fd2df605f4dc127f8c484d6a5606ebc7f0225"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "d42be7f08d458611e7cb21a8c00f62d58718d8348ed90e13bfd0cfe15ff8845e",
-      "after_sha256": "d56d23f61219c68f01543bee0fa56d3e5b877586656489beb2881c66a733c445",
+      "before_sha256": "d56d23f61219c68f01543bee0fa56d3e5b877586656489beb2881c66a733c445",
+      "after_sha256": "4189c5ee039f079874362d61b6b78e416237de3fe3ec8e7fc36102d9d3af2b93",
       "owners": {
         "@document": {
-          "before": "d42be7f08d458611e7cb21a8c00f62d58718d8348ed90e13bfd0cfe15ff8845e",
-          "after": "d56d23f61219c68f01543bee0fa56d3e5b877586656489beb2881c66a733c445"
+          "before": "d56d23f61219c68f01543bee0fa56d3e5b877586656489beb2881c66a733c445",
+          "after": "4189c5ee039f079874362d61b6b78e416237de3fe3ec8e7fc36102d9d3af2b93"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "dd72380de8d864c7002d80c409282044fd7e38d8e90ff0b417075c5652e0fe88",
-      "after_sha256": "2aa8b96be8269f1724105ce5eaac1d80f792b63a452f36ad30a2fa0cb1c022fc",
+      "before_sha256": "2aa8b96be8269f1724105ce5eaac1d80f792b63a452f36ad30a2fa0cb1c022fc",
+      "after_sha256": "0415397d7f63454c91720cc252a6e0e324d261eeab69f83b185da05919a7b924",
       "owners": {
         "@document": {
-          "before": "dd72380de8d864c7002d80c409282044fd7e38d8e90ff0b417075c5652e0fe88",
-          "after": "2aa8b96be8269f1724105ce5eaac1d80f792b63a452f36ad30a2fa0cb1c022fc"
+          "before": "2aa8b96be8269f1724105ce5eaac1d80f792b63a452f36ad30a2fa0cb1c022fc",
+          "after": "0415397d7f63454c91720cc252a6e0e324d261eeab69f83b185da05919a7b924"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "d8a03b90405dba46206fc16fade03dede75754c83b1b9012a01f5c5014a6478f",
-      "after_sha256": "4720bec76e22226940eecf5c70bdddeec889f532d82e78abd40a9a27f14449ea",
+      "before_sha256": "4720bec76e22226940eecf5c70bdddeec889f532d82e78abd40a9a27f14449ea",
+      "after_sha256": "24b62ccd04d17fec5afb9725644f60a59ed652763b521ab6f47ca1b0ae7e2f23",
       "owners": {
         "@document": {
-          "before": "d8a03b90405dba46206fc16fade03dede75754c83b1b9012a01f5c5014a6478f",
-          "after": "4720bec76e22226940eecf5c70bdddeec889f532d82e78abd40a9a27f14449ea"
+          "before": "4720bec76e22226940eecf5c70bdddeec889f532d82e78abd40a9a27f14449ea",
+          "after": "24b62ccd04d17fec5afb9725644f60a59ed652763b521ab6f47ca1b0ae7e2f23"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "a8b39426a004024c70c905d692f75f638403d26ed827b4e0bd572fff62e2911a",
-      "after_sha256": "f4d48923ecd444448af75ef46cc24493f5370068b5315ddce02f09724e769442",
+      "before_sha256": "f4d48923ecd444448af75ef46cc24493f5370068b5315ddce02f09724e769442",
+      "after_sha256": "39ec6baf6ad21535f291e3c624200aafbcca2e0ac7a46ee0dfe5aefeeccf07dd",
       "owners": {
         "@document": {
-          "before": "a8b39426a004024c70c905d692f75f638403d26ed827b4e0bd572fff62e2911a",
-          "after": "f4d48923ecd444448af75ef46cc24493f5370068b5315ddce02f09724e769442"
+          "before": "f4d48923ecd444448af75ef46cc24493f5370068b5315ddce02f09724e769442",
+          "after": "39ec6baf6ad21535f291e3c624200aafbcca2e0ac7a46ee0dfe5aefeeccf07dd"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "53ded17b9354bdc3d148f6572cd0fc9c777652778e5b4e478af46ac3206d3616",
-      "after_sha256": "b6b207a943129fd2e08315351666696a3368546197090518d02fb7f55f739745",
+      "before_sha256": "b6b207a943129fd2e08315351666696a3368546197090518d02fb7f55f739745",
+      "after_sha256": "a7e34222b6783b6ecde59940719f48e82659b0420f58eea0cf6ebd104b2de666",
       "owners": {
         "@document": {
-          "before": "53ded17b9354bdc3d148f6572cd0fc9c777652778e5b4e478af46ac3206d3616",
-          "after": "b6b207a943129fd2e08315351666696a3368546197090518d02fb7f55f739745"
+          "before": "b6b207a943129fd2e08315351666696a3368546197090518d02fb7f55f739745",
+          "after": "a7e34222b6783b6ecde59940719f48e82659b0420f58eea0cf6ebd104b2de666"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "ce5aca206d41a1e972a95ec3767fbfdcab619e340e0fabe8ae43a706c71cf29e",
-      "after_sha256": "168dbd3dda7b372086ad9b92c35861f3aac1624511c53fddb3a6783fdc7a7e31",
+      "before_sha256": "168dbd3dda7b372086ad9b92c35861f3aac1624511c53fddb3a6783fdc7a7e31",
+      "after_sha256": "42152173c2d6d3707f08cabf7111bdb4b467678b4941bf3e5d50da3aafb04ecd",
       "owners": {
         "@document": {
-          "before": "ce5aca206d41a1e972a95ec3767fbfdcab619e340e0fabe8ae43a706c71cf29e",
-          "after": "168dbd3dda7b372086ad9b92c35861f3aac1624511c53fddb3a6783fdc7a7e31"
+          "before": "168dbd3dda7b372086ad9b92c35861f3aac1624511c53fddb3a6783fdc7a7e31",
+          "after": "42152173c2d6d3707f08cabf7111bdb4b467678b4941bf3e5d50da3aafb04ecd"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "0b786813a2990bc58c25b3bba217e9ac1fcaba4e6ed631e536a7e25fcb87c049",
-      "after_sha256": "f34975be6dc3d26eb3e90dc2342abaee815ceef6f0c74230dee5248d463ff730",
+      "before_sha256": "f34975be6dc3d26eb3e90dc2342abaee815ceef6f0c74230dee5248d463ff730",
+      "after_sha256": "451f5ba117a9b1841d0f0c08796c6104ce4b40e474e1e13f6cfe607b0a41cab5",
       "owners": {
         "@document": {
-          "before": "0b786813a2990bc58c25b3bba217e9ac1fcaba4e6ed631e536a7e25fcb87c049",
-          "after": "f34975be6dc3d26eb3e90dc2342abaee815ceef6f0c74230dee5248d463ff730"
+          "before": "f34975be6dc3d26eb3e90dc2342abaee815ceef6f0c74230dee5248d463ff730",
+          "after": "451f5ba117a9b1841d0f0c08796c6104ce4b40e474e1e13f6cfe607b0a41cab5"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "676c7fd2fe47dfa1e2247b8989a88a3219576a17c290eb85411f4b1ad44eb9da",
-      "after_sha256": "96a938bd17d3bcb77b83475ff2ed8a42adedb96e307b5d98f1992314dfcb6181",
+      "before_sha256": "96a938bd17d3bcb77b83475ff2ed8a42adedb96e307b5d98f1992314dfcb6181",
+      "after_sha256": "6f12dba22d5e5d056fecbbcf57a3acfbb9f6f4fe987ed68c4387ccb044ba3681",
       "owners": {
         "@document": {
-          "before": "676c7fd2fe47dfa1e2247b8989a88a3219576a17c290eb85411f4b1ad44eb9da",
-          "after": "96a938bd17d3bcb77b83475ff2ed8a42adedb96e307b5d98f1992314dfcb6181"
+          "before": "96a938bd17d3bcb77b83475ff2ed8a42adedb96e307b5d98f1992314dfcb6181",
+          "after": "6f12dba22d5e5d056fecbbcf57a3acfbb9f6f4fe987ed68c4387ccb044ba3681"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "0fb7fdf068946d9819595c5a40a21f018edc64fc59700ea82e4ac195ebd278a6",
-      "after_sha256": "e183633f4ae215b0bfc5e9d3d582b139256ed40d389f9046e1cc6bf15853014e",
+      "before_sha256": "e183633f4ae215b0bfc5e9d3d582b139256ed40d389f9046e1cc6bf15853014e",
+      "after_sha256": "9c81cc04b37684659909cbe88ceb10224b29e2a4718dfa9f24e8a0bab6dc72e6",
       "owners": {
         "@document": {
-          "before": "0fb7fdf068946d9819595c5a40a21f018edc64fc59700ea82e4ac195ebd278a6",
-          "after": "e183633f4ae215b0bfc5e9d3d582b139256ed40d389f9046e1cc6bf15853014e"
+          "before": "e183633f4ae215b0bfc5e9d3d582b139256ed40d389f9046e1cc6bf15853014e",
+          "after": "9c81cc04b37684659909cbe88ceb10224b29e2a4718dfa9f24e8a0bab6dc72e6"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "571f134e656e388f01cc98f8fe6a04df647f2a3253babbec40291d139d4f28d7",
-      "after_sha256": "ee17438aa9e24e6f2bb5e7df99b59eff552d02d27dbdace36b4faa0aadeebaa2",
+      "before_sha256": "ee17438aa9e24e6f2bb5e7df99b59eff552d02d27dbdace36b4faa0aadeebaa2",
+      "after_sha256": "a0bf1f9dccbd825b3f21ef486645b7106b156de601653da444e230ad084af532",
       "owners": {
         "@document": {
-          "before": "571f134e656e388f01cc98f8fe6a04df647f2a3253babbec40291d139d4f28d7",
-          "after": "ee17438aa9e24e6f2bb5e7df99b59eff552d02d27dbdace36b4faa0aadeebaa2"
+          "before": "ee17438aa9e24e6f2bb5e7df99b59eff552d02d27dbdace36b4faa0aadeebaa2",
+          "after": "a0bf1f9dccbd825b3f21ef486645b7106b156de601653da444e230ad084af532"
         }
       }
     },
     "conformance/typescript/src/contract.ts": {
-      "before_sha256": "031e8bb2c3a75f9eba66d5dd5784646ce78fb0c81a17eea549b3789146335c88",
-      "after_sha256": "ca1ee048f1088c71452bb1ee27053e4b8721f7bf645a079a45ed3f8402f67443",
+      "before_sha256": "ca1ee048f1088c71452bb1ee27053e4b8721f7bf645a079a45ed3f8402f67443",
+      "after_sha256": "afe020aabc418eb1319e0c37e4d6e68e07679f16be75fdb5ece6d43ad310f2dc",
       "owners": {
         "@document": {
-          "before": "031e8bb2c3a75f9eba66d5dd5784646ce78fb0c81a17eea549b3789146335c88",
-          "after": "ca1ee048f1088c71452bb1ee27053e4b8721f7bf645a079a45ed3f8402f67443"
+          "before": "ca1ee048f1088c71452bb1ee27053e4b8721f7bf645a079a45ed3f8402f67443",
+          "after": "afe020aabc418eb1319e0c37e4d6e68e07679f16be75fdb5ece6d43ad310f2dc"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "2cb5560c616ad3cbfd1f1bb1c4ca9252413ae64e67a5f624077ff1299f137581",
-      "after_sha256": "1a8211a3be3e1a41156b8c3404394667519554c2acc569e7cd89362c17980dbe",
+      "before_sha256": "1a8211a3be3e1a41156b8c3404394667519554c2acc569e7cd89362c17980dbe",
+      "after_sha256": "45621d66bd60dca0d62c1bf832eb16a1eb6e519c422b033f1250165b56fdd376",
       "owners": {
         "@document": {
-          "before": "2cb5560c616ad3cbfd1f1bb1c4ca9252413ae64e67a5f624077ff1299f137581",
-          "after": "1a8211a3be3e1a41156b8c3404394667519554c2acc569e7cd89362c17980dbe"
+          "before": "1a8211a3be3e1a41156b8c3404394667519554c2acc569e7cd89362c17980dbe",
+          "after": "45621d66bd60dca0d62c1bf832eb16a1eb6e519c422b033f1250165b56fdd376"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "df9d9cbe063069807d8be4d4f4e792b3ee5e44c14cfb1c35ba32ee5fcf65ad97",
-      "after_sha256": "f5c589b1e056161eba4253057a10f3127e351da1d06b74ed06decc8f9517390f",
+      "before_sha256": "f5c589b1e056161eba4253057a10f3127e351da1d06b74ed06decc8f9517390f",
+      "after_sha256": "538431a7eac8458edf2b11ca8062f5f34d2ef309c62ddd7a7955f0b12717f305",
       "owners": {
         "@document": {
-          "before": "df9d9cbe063069807d8be4d4f4e792b3ee5e44c14cfb1c35ba32ee5fcf65ad97",
-          "after": "f5c589b1e056161eba4253057a10f3127e351da1d06b74ed06decc8f9517390f"
+          "before": "f5c589b1e056161eba4253057a10f3127e351da1d06b74ed06decc8f9517390f",
+          "after": "538431a7eac8458edf2b11ca8062f5f34d2ef309c62ddd7a7955f0b12717f305"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "ddf5f1d40d0c5f3a326fe95e199b8752e79820cfa12d40f4fc08020732561307",
-      "after_sha256": "2f26135417152bd78abd723eef374f58d6b0a8b461f959ebc4ef7ef555bbe748",
+      "before_sha256": "2f26135417152bd78abd723eef374f58d6b0a8b461f959ebc4ef7ef555bbe748",
+      "after_sha256": "b57a36ddaf782a72f04d142e67b03fd1b413f3977fff3d09a22141677f384992",
       "owners": {
         "@document": {
-          "before": "ddf5f1d40d0c5f3a326fe95e199b8752e79820cfa12d40f4fc08020732561307",
-          "after": "2f26135417152bd78abd723eef374f58d6b0a8b461f959ebc4ef7ef555bbe748"
+          "before": "2f26135417152bd78abd723eef374f58d6b0a8b461f959ebc4ef7ef555bbe748",
+          "after": "b57a36ddaf782a72f04d142e67b03fd1b413f3977fff3d09a22141677f384992"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "472afeb9a4b09bafdcebc8418578b76d1c4caed010d66bec1007509b4a219502",
-      "after_sha256": "af55878e534f77d02c5cc72855f318610d1f1a85bcd9290af9a7bb85ad06c0a0",
+      "before_sha256": "af55878e534f77d02c5cc72855f318610d1f1a85bcd9290af9a7bb85ad06c0a0",
+      "after_sha256": "318c4684c11ce46841c44f42cc3b2336efc50c2b3a121966411b5a96dfd78552",
       "owners": {
         "@document": {
-          "before": "472afeb9a4b09bafdcebc8418578b76d1c4caed010d66bec1007509b4a219502",
-          "after": "af55878e534f77d02c5cc72855f318610d1f1a85bcd9290af9a7bb85ad06c0a0"
+          "before": "af55878e534f77d02c5cc72855f318610d1f1a85bcd9290af9a7bb85ad06c0a0",
+          "after": "318c4684c11ce46841c44f42cc3b2336efc50c2b3a121966411b5a96dfd78552"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "f972bbcf3123458ddf4dce50aecbfa280f6ca2f01a139f40419e3797ff6c70c4",
-      "after_sha256": "6734061f502ae90d651479ae7cfb0133848026a114b08a4c5d91d265347f44b5",
+      "before_sha256": "6734061f502ae90d651479ae7cfb0133848026a114b08a4c5d91d265347f44b5",
+      "after_sha256": "51f5f9212b32cb27f7ec8a3052b0c29a48af7dcc415ffab4c3393b4b243a9845",
       "owners": {
         "@document": {
-          "before": "f972bbcf3123458ddf4dce50aecbfa280f6ca2f01a139f40419e3797ff6c70c4",
-          "after": "6734061f502ae90d651479ae7cfb0133848026a114b08a4c5d91d265347f44b5"
+          "before": "6734061f502ae90d651479ae7cfb0133848026a114b08a4c5d91d265347f44b5",
+          "after": "51f5f9212b32cb27f7ec8a3052b0c29a48af7dcc415ffab4c3393b4b243a9845"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "388d6159734675edd84e7691854d8b65340e3a3d4032b0c86239c3e7f3fcac59",
-      "after_sha256": "1fd32bac60fb13f15f63be2c961426b09c468612002a6a0d814b21436a9124a6",
+      "before_sha256": "1fd32bac60fb13f15f63be2c961426b09c468612002a6a0d814b21436a9124a6",
+      "after_sha256": "d440a9b3261659c0753e32390b1840fd4fa3636b4b236a06b00e421498afc1ae",
       "owners": {
         "@document": {
-          "before": "388d6159734675edd84e7691854d8b65340e3a3d4032b0c86239c3e7f3fcac59",
-          "after": "1fd32bac60fb13f15f63be2c961426b09c468612002a6a0d814b21436a9124a6"
+          "before": "1fd32bac60fb13f15f63be2c961426b09c468612002a6a0d814b21436a9124a6",
+          "after": "d440a9b3261659c0753e32390b1840fd4fa3636b4b236a06b00e421498afc1ae"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "780eee7caf6e489bce2a4b8470b139b6ac62b91126c38283891ff0c844c3cd2c",
-      "after_sha256": "99ae4ce32196b12db1aefdf6726942896092336911d403feb78b2efb73f338fe",
+      "before_sha256": "99ae4ce32196b12db1aefdf6726942896092336911d403feb78b2efb73f338fe",
+      "after_sha256": "3516040db7fd156c1e5a57d07b135eb62289dc4c14b3c5acb386b34eb830a61d",
       "owners": {
         "@document": {
-          "before": "780eee7caf6e489bce2a4b8470b139b6ac62b91126c38283891ff0c844c3cd2c",
-          "after": "99ae4ce32196b12db1aefdf6726942896092336911d403feb78b2efb73f338fe"
+          "before": "99ae4ce32196b12db1aefdf6726942896092336911d403feb78b2efb73f338fe",
+          "after": "3516040db7fd156c1e5a57d07b135eb62289dc4c14b3c5acb386b34eb830a61d"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "1c2411356260bdd79d77496e6116e41526b47fa820b62f8bc5ede20e82eb5629",
-      "after_sha256": "080c6698420b5a2d467e4371997a97e7ac9abea5f5bfb66f5788a67a4321eed8",
+      "before_sha256": "080c6698420b5a2d467e4371997a97e7ac9abea5f5bfb66f5788a67a4321eed8",
+      "after_sha256": "518fa873b443077c057ac258632033fec26f6e01094124b62fee5e296940a6a1",
       "owners": {
         "@document": {
-          "before": "1c2411356260bdd79d77496e6116e41526b47fa820b62f8bc5ede20e82eb5629",
-          "after": "080c6698420b5a2d467e4371997a97e7ac9abea5f5bfb66f5788a67a4321eed8"
+          "before": "080c6698420b5a2d467e4371997a97e7ac9abea5f5bfb66f5788a67a4321eed8",
+          "after": "518fa873b443077c057ac258632033fec26f6e01094124b62fee5e296940a6a1"
         }
       }
     },
-    "contracts/migrations/44.3.15-to-44.3.16.md": {
+    "contracts/migrations/44.3.16-to-44.3.17.md": {
       "before_sha256": null,
-      "after_sha256": "38a75d3fcd6b799784d6145ee265f3c83755b3fdbe3b47762f3f67718f4a53f6",
+      "after_sha256": "fe9bb5d0bad5c1ddcc907637367601717e81f8d850c31e92f89293cd3da7309e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "38a75d3fcd6b799784d6145ee265f3c83755b3fdbe3b47762f3f67718f4a53f6"
+          "after": "fe9bb5d0bad5c1ddcc907637367601717e81f8d850c31e92f89293cd3da7309e"
         }
       }
     },
     "contracts/openapi.yaml": {
-      "before_sha256": "8c4c3e06803c692c22f5d5345a1c71678c0415e72f5385a84fe6068e3a0e8562",
-      "after_sha256": "da04ae439030a64374ea98f7f9a9018366de4788fbfa41ac94d6ea4b2c09754c",
+      "before_sha256": "da04ae439030a64374ea98f7f9a9018366de4788fbfa41ac94d6ea4b2c09754c",
+      "after_sha256": "3e8db9dc00d7c374e9e17d57d23b27875bf14edf5d17c7d9f716f9d936f0ac48",
       "owners": {
         "@document": {
-          "before": "8c4c3e06803c692c22f5d5345a1c71678c0415e72f5385a84fe6068e3a0e8562",
-          "after": "da04ae439030a64374ea98f7f9a9018366de4788fbfa41ac94d6ea4b2c09754c"
+          "before": "da04ae439030a64374ea98f7f9a9018366de4788fbfa41ac94d6ea4b2c09754c",
+          "after": "3e8db9dc00d7c374e9e17d57d23b27875bf14edf5d17c7d9f716f9d936f0ac48"
         }
       }
     },
-    "data/source_audits/order130/source.audit.json": {
+    "data/source_audits/order131/source.audit.json": {
       "before_sha256": null,
-      "after_sha256": "86b582cd4cabfa5fba52040380fa70145517136a4fd6f3dc4722533942c32913",
+      "after_sha256": "e3b809966b0a0a647ba53d05e5f8047a9fbe0e61061cb1dd82c06f9d2f941e9d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "86b582cd4cabfa5fba52040380fa70145517136a4fd6f3dc4722533942c32913"
-        }
-      }
-    },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "5a9674cc23c79756f01c002dcce943a0d67ce0d2d7e739e9f2eaf036c6a60022",
-      "after_sha256": "a5c6064d3ae4abdea510e1b6150d6b2a876e54b1fdfd8a4917e22dd01bfcc043",
-      "owners": {
-        "@document": {
-          "before": "5a9674cc23c79756f01c002dcce943a0d67ce0d2d7e739e9f2eaf036c6a60022",
-          "after": "a5c6064d3ae4abdea510e1b6150d6b2a876e54b1fdfd8a4917e22dd01bfcc043"
+          "after": "e3b809966b0a0a647ba53d05e5f8047a9fbe0e61061cb1dd82c06f9d2f941e9d"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "6b24d2a27409091cd4a273ea258ac8cb1a51f71873dad47c344ec0d0274d8256",
-      "after_sha256": "258e0a42fb421ce8c312c132386f91a29c70b34272003cc2fe0164f5e227d488",
+      "before_sha256": "258e0a42fb421ce8c312c132386f91a29c70b34272003cc2fe0164f5e227d488",
+      "after_sha256": "f578183e2d739da628375b13abf0a2adee18940980ab2b15b488875921d9a6a6",
       "owners": {
         "@document": {
-          "before": "6b24d2a27409091cd4a273ea258ac8cb1a51f71873dad47c344ec0d0274d8256",
-          "after": "258e0a42fb421ce8c312c132386f91a29c70b34272003cc2fe0164f5e227d488"
+          "before": "258e0a42fb421ce8c312c132386f91a29c70b34272003cc2fe0164f5e227d488",
+          "after": "f578183e2d739da628375b13abf0a2adee18940980ab2b15b488875921d9a6a6"
         }
       }
     },
-    "docs/ORDER_130_SCOPE_PLAN.md": {
+    "docs/ORDER_131_SCOPE_PLAN.md": {
       "before_sha256": null,
-      "after_sha256": "1b8ca368c4414ce3d864ab4f7f6489f6b1b4ae370815e9bce145c7a4809f4ddf",
+      "after_sha256": "94877fabf623067c4e35c2b5b347ba07dba8dd8ebe81a34f6275c3fb866ea647",
       "owners": {
         "@document": {
           "before": null,
-          "after": "1b8ca368c4414ce3d864ab4f7f6489f6b1b4ae370815e9bce145c7a4809f4ddf"
+          "after": "94877fabf623067c4e35c2b5b347ba07dba8dd8ebe81a34f6275c3fb866ea647"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "d0156ff6120213a38e8300d2f46d7a8cf23a1544ba3e236f5c7703db0d663a21",
-      "after_sha256": "2f820ad533cabe204ba544718ade1d3e098c88de19718278d139c1453aed3c27",
+      "before_sha256": "2f820ad533cabe204ba544718ade1d3e098c88de19718278d139c1453aed3c27",
+      "after_sha256": "c70604f2b36361c239a8f86b5781c8a090533dabdec2f42dd38421eed3799414",
       "owners": {
         "@document": {
-          "before": "d0156ff6120213a38e8300d2f46d7a8cf23a1544ba3e236f5c7703db0d663a21",
-          "after": "2f820ad533cabe204ba544718ade1d3e098c88de19718278d139c1453aed3c27"
+          "before": "2f820ad533cabe204ba544718ade1d3e098c88de19718278d139c1453aed3c27",
+          "after": "c70604f2b36361c239a8f86b5781c8a090533dabdec2f42dd38421eed3799414"
+        }
+      }
+    },
+    "docs/performance/policy-v3/order131-rule-semantics.json": {
+      "before_sha256": null,
+      "after_sha256": "caa0b156a38cb3798e220e43cf6774e47b76307fa0477858e9a1b09009b73aa3",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "caa0b156a38cb3798e220e43cf6774e47b76307fa0477858e9a1b09009b73aa3"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "c6e5c16cc3d8e0cfe8fd3e4ead3914c2db84eed66024d02ee8430776e693c24e",
-      "after_sha256": "4a6fbcbcb9529d2b9e6eb9bf7feea2dbf671cc26dfc31aad1ad69e5d673bc8b2",
+      "before_sha256": "4a6fbcbcb9529d2b9e6eb9bf7feea2dbf671cc26dfc31aad1ad69e5d673bc8b2",
+      "after_sha256": "1a6835919c3973c3a02318fa4a498010dfc2652647ae36efe7a373f92cbd0a0b",
       "owners": {
         "@document": {
-          "before": "c6e5c16cc3d8e0cfe8fd3e4ead3914c2db84eed66024d02ee8430776e693c24e",
-          "after": "4a6fbcbcb9529d2b9e6eb9bf7feea2dbf671cc26dfc31aad1ad69e5d673bc8b2"
+          "before": "4a6fbcbcb9529d2b9e6eb9bf7feea2dbf671cc26dfc31aad1ad69e5d673bc8b2",
+          "after": "1a6835919c3973c3a02318fa4a498010dfc2652647ae36efe7a373f92cbd0a0b"
         }
       }
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
-      "before_sha256": "e6817660c5e538d94b9f96621424503b7ec62a9b6c6c50f15b2d2ce1bd49d428",
-      "after_sha256": "819d30f309299c389288c175ca265c2f0f0e6be21260dbd4fbe922e9fbd88a0f",
+      "before_sha256": "819d30f309299c389288c175ca265c2f0f0e6be21260dbd4fbe922e9fbd88a0f",
+      "after_sha256": "0fb6e27ad402fede1d9e668e6e3da70cb276a2c39d404251eaffd83b9ec40060",
       "owners": {
         "@module": {
-          "before": "0fc4d1404a7834a2fa84142aea9a260950aec27ab34a5a3a4710d9a31ada13b4",
-          "after": "7c362992e14d69887bfa406e5b511015c8fdc4a29bcdf156de3973c23e3e9ada"
+          "before": "7c362992e14d69887bfa406e5b511015c8fdc4a29bcdf156de3973c23e3e9ada",
+          "after": "a4fb43387b8db8f7cc6127781f914cd51ce059459f7a88ec249b154c57c6b886"
         }
       }
     },
-    "src/warhammer40k_core/engine/casualty_coherency_restore.py": {
+    "src/warhammer40k_core/engine/core_movement_end_sequencing.py": {
+      "before_sha256": "9a1e96ddd396c2c3968c558001aebd6c63dca2960c9fdec9fdafa020e9153f8e",
+      "after_sha256": "71efb64afc84a4114e4230536c8567ba434832770d38733e4860f85ba910d1eb",
+      "owners": {
+        "core_movement_end_candidates": {
+          "before": "de3c65e0d79cd68c71e72a5b10748b32ac0e27f9fcb591a58e3f590e02b2f249",
+          "after": "3696e511cb99e33de022f9d7fbc258695bf9a04617010be5f7b50cf9775e546d"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/faction_content/stratagem_activation.py": {
+      "before_sha256": "0692a2a33f563742c35c9986e83df93b35f59717e2f7648d14d0dd7e949bbbfa",
+      "after_sha256": "1587e4fddad750aa5546a96a5d3b0de4662ffdd84ecb56fc12307a7e16ae990b",
+      "owners": {
+        "_record_for_phase": {
+          "before": "0396c2de83ce8ac64d8d3ff54efa490b09c8663d9697f4051dce2b129a896026",
+          "after": "d173e9a30f6d2ebea2efa01bfc8e0e0f52bf77cd4eaf562db63dce455b3a9e3d"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/objective_movement_constraint.py": {
       "before_sha256": null,
-      "after_sha256": "78e062d588754edc360cc5a51994dda94452f6f0bd5f438d83ddab92d14dd5e4",
+      "after_sha256": "02e084730913310b0c0d1e28b033311b585f34324c830ce5b8988997f555e891",
       "owners": {
         "@module": {
           "before": null,
-          "after": "df11a05571daf1147fcc588e1797ddbc4977c00fcb603879b5317083b955a7e1"
+          "after": "502ba0defab4bddcb7179dc080b9a5bf563c9003f4d4fd0206906141624836ec"
         },
-        "scenario_for_required_restore_coherency": {
+        "ObjectiveMovementConstraint": {
           "before": null,
-          "after": "d4a94b6dcaba74bd4a330b07af174a7eec3f94358c5c7375940489d4c2d33c00"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/fight_model_authority_history.py": {
-      "before_sha256": "a1b449c2928df40055b0a419ed8ec7b5fa0ed281e7dcf6430ab7a0d24faf5777",
-      "after_sha256": "16a2b349785bc5cfca1baa6dc0ea49bfba354edcb124dbe54cd0a1ddf173380e",
-      "owners": {
-        "@module": {
-          "before": "1dda77b7ed2d57113132995a4ea5c57a17261da4ffa0bfc7af2ffaf1b0cb5c75",
-          "after": "d3ed254a0b07569cfaed68b0672a35b5da2a9958cd0254dad4c5e83ebb1c1c1c"
+          "after": "0b644d8f5dc1399a79d7d941a08b8907e03c504915f0684f67e72a69f7513c6c"
         },
-        "_authority_mutations_by_event_index": {
-          "before": "2ba3774568fbec9f8e9b9d2580c531b1374edfe004b48a981fd702778adaeb99",
-          "after": "37d5b8754a998c0d0be1c45038626059ffd6ce6e28cfb08cd98b08e3259bc589"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/game_state.py": {
-      "before_sha256": "395047d5c2b242d66f7c0923d00e08d6d4efea10c21975bdf6c909b652eab37f",
-      "after_sha256": "be128a034dad11a94c7f7bf024540a72d68a5033a1074fd2db0977fa6bd309ab",
-      "owners": {
-        "@module": {
-          "before": "cc2f3bcd0d2adfa56f178e98365055e537866ba048c05f2cfa8728babfb484e9",
-          "after": "9df0f48b8718e666236c0b0366e9b25ee4003b7d89f59e070082b3d19be47ae1"
+        "ObjectiveMovementConstraint.__post_init__": {
+          "before": null,
+          "after": "a3278145f3f43ee86dae6ffe14437f843fab4198e20d3956fab68ea4e708d6c0"
         },
-        "GameState.resolve_end_turn_cleanup_boundary": {
-          "before": "8f93f8e04d8e2c9025227f722f4bd86c06b68cdcd8eb5354b43f8ed599096a26",
-          "after": "5a842a1e8a801f97d37176206fdd8392f7aa85adbef627a55318052d3b628dd4"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/lifecycle_restore_consistency.py": {
-      "before_sha256": "c5b4361ba088c115697e65e8e289928f6272884cf886308a99772df69a61a54a",
-      "after_sha256": "123d76e52a0a78805136fec2a33c69e3a049ffd1efe30db2e9951459efff4b29",
-      "owners": {
-        "@module": {
-          "before": "876d711b936c0910fab69fc997d556e5b07085005ccda68dd9af52832f95990c",
-          "after": "863089ba0a4fe1e1386b289bc2ba1039974cc237e4550c6b480393d450371cfc"
+        "ObjectiveMovementConstraint.from_payload": {
+          "before": null,
+          "after": "b7f73809c8e7b96fc9968e6a4ca6aaec51bcafd6370ede4a3e4111fae066f086"
         },
-        "_validate_battlefield_state_consistency": {
-          "before": "94854aeefe942cb0b8e51a188774d7d8c3267bf35acb80113827f31270e67ad2",
-          "after": "5e68136e4aacbf8f8763edbfff259d562702fc130757346cd48211ede70877d8"
+        "ObjectiveMovementConstraint.objective": {
+          "before": null,
+          "after": "6df43b5ad1384a517d2a84b764462da42efcd6f135c9fc74fc6bae635255d23f"
+        },
+        "ObjectiveMovementConstraint.to_payload": {
+          "before": null,
+          "after": "952342542b082809b99d8203649314779ed6fddb6cc19933a697706709f490ad"
+        },
+        "ObjectiveMovementConstraintPayload": {
+          "before": null,
+          "after": "0737f68f27a3ff6cee9756ab29a265f0ec0c9dc57fbbb4d6474cab43ba77aef2"
+        },
+        "objective_approach_choice": {
+          "before": null,
+          "after": "c56c303ab0ea26a52e209c5c4e40ea035dcb5988512d3f948e8e8dd32ea104e3"
+        },
+        "objective_approach_context": {
+          "before": null,
+          "after": "5c8f98102e0a41e1068c3b6a95af3523dae52528cf387c627fd8e635d2a2d1d8"
+        },
+        "objective_approach_options": {
+          "before": null,
+          "after": "4700d79830a855387d1d4fa77e101f21d87ada3f257839c90d5ba6b207b330e6"
+        },
+        "objective_endpoint_evidence": {
+          "before": null,
+          "after": "83a1ace463c329cf96f6c9481ecf5ebf6ff8f9b79a3412faaf918aa182896254"
+        },
+        "objective_goal": {
+          "before": null,
+          "after": "165d39571574f0e495488d022d6cec1d58d14c7572c673396c7fb936f164675d"
+        },
+        "validate_objective_approach_endpoints": {
+          "before": null,
+          "after": "c5937a0431cac4d12e3dbadef7f4fedd48d4cc6c7cc470d53f54eb20ea7493a5"
         }
       }
     },
-    "src/warhammer40k_core/engine/mission_cleanup_boundary.py": {
+    "src/warhammer40k_core/engine/objective_movement_stratagem_consumer.py": {
       "before_sha256": null,
-      "after_sha256": "9d6dc801abf6db033cdb86d28782f7e279ac0702154e7a2bd0da56f98dac6676",
+      "after_sha256": "fef9f598dfba2b6d63905044d96d3311ef17d0cadc0b6fa319f40b4fcdf5c23f",
       "owners": {
         "@module": {
           "before": null,
-          "after": "7cffb03389b029568c397a5077b5e920bd3305a8073038dfa3e22b7832389da8"
+          "after": "dbb54d5a1659eaa1eb32157ff36e31dbe6ca0786ac37c9280db4135a4bf1225d"
         },
-        "resolve_mission_cleanup_boundary": {
+        "objective_constraint_for_effect": {
           "before": null,
-          "after": "f58b4133143dd9d4e7152078c2a0b572d9b00b0e3142d8b3eaf0c957617eb2d4"
+          "after": "f8d239e961189d4898fd25976e25bde66d9d3146df01aa5949fb9dedfafcab4a"
+        },
+        "objective_movement_consumer_record": {
+          "before": null,
+          "after": "f4ba7bace94264fde206514fe9d92ee149e35a2f671c88a3545d5f8b87081ff1"
         }
       }
     },
-    "src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py": {
-      "before_sha256": "3a996c6b5282b3664eb3c17a0220482fb3a75438108b7c9d43f3cb0a64f45d42",
-      "after_sha256": "7df434b15f175cc8486dbc765a7badc3f6c2ff7b6d1fab54bf72419c9269ff57",
+    "src/warhammer40k_core/engine/stratagems_eligibility.py": {
+      "before_sha256": "b9e163ee4566d2834c7c4b6881721b3dd06fc2bb8abb68fe366766a5b5379243",
+      "after_sha256": "2b17251e3410a97af082a2b2c61e7e7e7fdf556eba8f5ba6b86603712957a888",
       "owners": {
-        "_no_trigger_destroyed_departure_ids": {
-          "before": "9175aed6dbc0b12f5d3a98d98fa0ab0d3e10f048a0a28784026ae3ef221ea5ed",
-          "after": "72c0986527808f11b3bb6a3e62fe16a4a20982394597281dd54a9517d999a44b"
+        "_generic_rule_ir_stratagem_unavailable_reason": {
+          "before": "8fb79ae1a78c41c26080e3d237ca0ee7cf9ffab5e9c2c716d306548a4825fc7a",
+          "after": "09e12554643d99e25b1e42a5752c24d6f82015ed952e2fc420eaf067d702c88a"
         }
       }
     },
-    "src/warhammer40k_core/engine/rule_model_destruction_unplaced.py": {
-      "before_sha256": "a33c94b2bce0f1367c14c86cc943f1885679d7007df2cafa35c3c1698a5f998b",
-      "after_sha256": "4e1d44fe02f4fe42c798bce2ac11c1da478da2c563c59d9432659d1afdbf5e4c",
+    "src/warhammer40k_core/engine/stratagems_generic_rule_ir.py": {
+      "before_sha256": "a3840efde1c485c96cfe65d3306230965428d56b9007d08c08ede151831de074",
+      "after_sha256": "ce75eb35682daa0ffbaedb60eae17dd77eef9206bd4dddd49a8c64a40d33e2d9",
+      "owners": {
+        "_apply_generic_rule_ir_stratagem_handler": {
+          "before": "b9c0f37bbf0a87e864d86b68601fbda3d6a92a69b32d23c723eed0826cad6eee",
+          "after": "7e4d0c9c399a47d1e21d521255484b56677bc19e32618c6bfc69fc2069d1f736"
+        },
+        "_request_generic_triggered_normal_move": {
+          "before": "6457f1f107a561adff451df7787be7895968e6a0641d338712b5941bfa4b218a",
+          "after": "c6d28af4f676dc5f879ed48e4481f0ea88288291d0091ae71279add0fc34eb59"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/triggered_movement.py": {
+      "before_sha256": "23f1af80dad387ee97aab5e8bd4cd973f82b8dca419212f809c66e36e2348373",
+      "after_sha256": "758a7a09b48bbfaceb698acba47fedd345723cfb7043422e401d256a3c166e2c",
       "owners": {
         "@module": {
-          "before": "06e309a737566acdaf64e88eb431d9d8ab0ac846e23d6ad5e8eec278a014cc87",
-          "after": "16bc640fff4803b7b4d2d6f677d163517bcc42c8e855393e412313598ce32df0"
+          "before": "bcec3b263282218d4ee9bde6dc30b2362d99a33ca2277117cfcf2f08d3338673",
+          "after": "9993b6e9a7c2c2a2964ef2e76ceefcf5db9eeade8d75416998be3d583e9b07ba"
         },
-        "destroy_end_turn_coherency_models": {
-          "before": null,
-          "after": "155790501985fa87d52719db8e9f0e6de97da3eab85b4e1f6df94e487d2efaa9"
+        "TriggeredMovementDescriptor": {
+          "before": "3bf7e456813d59b6bc32718e049ac3702d3e8364e64fd9530d8d0260b703fbf7",
+          "after": "95cc9a41ddc3e027886aeb9dc013878df2d001f4d21458732b9826891753fa37"
+        },
+        "TriggeredMovementDescriptor.__post_init__": {
+          "before": "b4b100cf6341bf31f1f96b039f6f40151a3a7ae2414bcad5cbd7df84340b271e",
+          "after": "1e0d3d40202360831a16b5169cd2530f1eeabf93c987f1cfe2a05479c098a45a"
+        },
+        "TriggeredMovementDescriptor.from_payload": {
+          "before": "4bfb8199fe254514db39bb7e0225e5f12d8bc8ffee4b92d2a5fadf295a110bc4",
+          "after": "eb6b7a59e025d6fc17efb608955ea66c7907726cf7bbf23bc457d904aa7b0f67"
+        },
+        "TriggeredMovementDescriptor.to_payload": {
+          "before": "050f16907f1220e278a0b9a62d81be0baf5a655e341f1e60538ebd5d9ca815a8",
+          "after": "5fbdff6ab506ef34bbc04e11c907c4f1d87e2950a3aa8aaba8f88d5417892611"
+        },
+        "TriggeredMovementDescriptorPayload": {
+          "before": "f23462df63f7e8086754d929928b2bb56e64cc0e2335c308d844e853e2d7be2d",
+          "after": "453ae92e4aba6a7c8577c844049f3b80a1032faf3ac466408594a954cf64282d"
+        },
+        "TriggeredMovementViolationCode": {
+          "before": "1868635465f56b4affdb7483e446e3ab1b0a3c1e695ad26588a42fc6081e1855",
+          "after": "210178af303a86684f7e9073afe94448c364bdec66c4d7f337c1264e6cc00093"
         }
       }
     },
-    "src/warhammer40k_core/engine/secondary_model_destruction_history.py": {
+    "src/warhammer40k_core/engine/triggered_movement_handler_impl.py": {
+      "before_sha256": "e8446cdd935194b0ff3666400b4128a66b743271ebb2ef039af9acda2f93d132",
+      "after_sha256": "b98481ea3501feb6b424f3ffa4fd1e4d399d980045d1592cda78b7cd7f5efeef",
+      "owners": {
+        "@module": {
+          "before": "9cad41ca559a5fe31438fa9d71967bde0d294f3c51b56c5ac79ae1787dabb3c3",
+          "after": "9029f0fa00bd7eca5be352ce80a7446d28fbbac9074dc87358dce01ccaf5e32f"
+        },
+        "apply_decision": {
+          "before": "9d6a0e7bd300e5568753a3cf96a872f3f7a31cfcba626cde2e9069c7afac8e30",
+          "after": "c715a485356acde84c053068eda4bfa0a22a3a19c2dc5f4f670a7694c7418c6f"
+        },
+        "apply_proposal_decision": {
+          "before": "0427ef0c385b5f37bfaf4ebf5757e092b249d95cb9fe3b4a8b9410ab9c46339c",
+          "after": "2c2a174490da84c25899efda90f9f8c338fffeb702d0a7dba6e70a6415c792d8"
+        },
+        "request_from_state": {
+          "before": "9ef4250cc1acc474a963457e2c0ad83148c03ae3825877713a1b34dba577c82a",
+          "after": "07a7f8ba668df1fd41134dec292abf21ba56206e7bcf7514d65375c9b95aef14"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/triggered_movement_options.py": {
+      "before_sha256": "ebda269e0ad04ec661e4ff40e4b03831003d323f3337379fb192f1d5eab8c23c",
+      "after_sha256": "7da22ce1e06c1991a08a2d7e7eaf0a97a1cbb19d5d2332e232b572dee1aa6fd3",
+      "owners": {
+        "triggered_movement_unit_selection_options": {
+          "before": "5ea84ff4ac5f4235a7fc63b1c4bda3bc69e4da8cb5c11d4ea5a36577cab26eb3",
+          "after": "698576fde21623198274348d4813b2ec246fc7a6134d6064a3412747d2040466"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/triggered_movement_resolution.py": {
+      "before_sha256": "057f38645dd9b2137f29126a1a531157e6fc1f02917010ae865308d1530baab7",
+      "after_sha256": "8d505b8e5ade816396c69fc354360a451a2a6d822023d3645aef8f776013ed6a",
+      "owners": {
+        "resolve_triggered_movement": {
+          "before": "381d4e8dfb365e68c95bfb41d98311baf90e9f13b9c70f5561d4633a6530cf65",
+          "after": "bbdd14f2189167f463d9b940992df459e3633d539d979170ef60688945aee789"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/triggered_movement_selection.py": {
+      "before_sha256": "85b02722eab5b65db3ff1ca2fcadfda9faf415747629c55d30bf212bc722cd04",
+      "after_sha256": "43987da3bfeb05956cbc03026236747d99c07ed367da55665e15236590b6a2b5",
+      "owners": {
+        "@module": {
+          "before": "ffedd8727ef3226197f061e5d46db041e06af17b1f76629875ce970b21d40e75",
+          "after": "279f51d01c6329f643d6ea7d3586ab2c2cb0047dc642209d899c82340e929c5c"
+        },
+        "_apply_triggered_movement_unit_selection_decision": {
+          "before": "d50db13cfff53f84cec9a0bfecb202a1baae4b838866cf6a64f010ff1c222d82",
+          "after": "fee7b9ac848e94d1408f1f00f99356e7d1f5d5dff660ba466c0e5905bb73d9c8"
+        },
+        "apply_triggered_movement_distance_reroll_decision": {
+          "before": "cded18c8d30ad8385eaa1c42536fed80a152df2dcc101c6b342bf3046c6358b8",
+          "after": "dca2159ea78d5ac1a734ca7c04a87be0facda3e4ea3215f5ea5e69013cc9f59a"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/triggered_movement_validation.py": {
+      "before_sha256": "08aee3eb7034a862746076d82411d07899308006574deccc293021c4caf5c4d0",
+      "after_sha256": "ff480e3430491d31a00ac152620ac5d445e4ea3e6a1f06dcf7f6d7762bf6f853",
+      "owners": {
+        "validate_positive_number": {
+          "before": "0e2136dbd65986b4930ed7d402d3b59d50cfea48c847b1ee52a1b60b1e508ab9",
+          "after": "4ed9d37363eb320f53a9450941a4a5798d78664ad1f2e814e49fa6512e775249"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/movement_endpoint_proof.py": {
+      "before_sha256": "b899f809088b0fa9ec7d308c1e6a7f90f280f122b4d54084c8ecef7d0572a151",
+      "after_sha256": "1a58d8673b3dae812c74bbe2348ab8e1267857b78213adc52ac8cbaf406b65bd",
+      "owners": {
+        "@module": {
+          "before": "13238e5642c33c6bde16574539c28b634778cc79df364f58b6b40eb407bada64",
+          "after": "cad0ac9d4a12401202e1c7adf3656b0136330c9b7b635feb7ae0a8d410f60002"
+        },
+        "_goal_region": {
+          "before": "2fe79c2257759e84bd81cdcfae84d3ff1dd678e60eb002f7a4795184dd85618b",
+          "after": "4e333931739a2166448dd9687d327b177e5ed9bfb17755c2fddbc95987f89db8"
+        },
+        "endpoint_excluded_by_coherency": {
+          "before": null,
+          "after": "2561d09e1bd6053caf310e39dd5dcfe640fc300b57c92cdb041084e4c9df7b60"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/movement_reachability.py": {
+      "before_sha256": "d90edd91ae16dc6e3e17f2dff61e33ec68db175fd11ccefdd71faa8e2011e878",
+      "after_sha256": "ef0e8da95c2219e4ee1ae92c069613499fe033856119ca098ca479d7fadb64b8",
+      "owners": {
+        "@module": {
+          "before": "b38f1f40d91f5c2620e1fdf186e1458fd9a31ac4ef701b43d23732cccf1353b2",
+          "after": "6ae4b79faa5303a60cd86025eaa5effbcf39fc0f12d55c8dc7b3308b5dd43629"
+        },
+        "MovementGoal": {
+          "before": "44ca95f135110af6577493f07cd8fe3ea54a6b8aebb1ac4411da655b6ce8710e",
+          "after": "8235f1c348a1b57ec4e1a10e33947f3fd3b3492f5c672922a46f1f97151a5355"
+        },
+        "MovementGoal.__post_init__": {
+          "before": "5050cc6487da26bfb140a21cf600533ab912805952849c9b7047c301c13cd009",
+          "after": "b08b0a22790a16168b7740e97751603de6684d96e55d761ddde50b8c6c94411d"
+        },
+        "MovementGoal.contains": {
+          "before": "bfcadd43dfdde8250b48a79df3e1dcfbcfcf1b559f0f232c796521da6fefec18",
+          "after": "2c8ca2197d0fead7198bd2fe514b644307f3d4bd9169ece733182372a138f206"
+        },
+        "MovementGoal.distance_lower_bound": {
+          "before": "196d71feafdb63922d8393ee0e6f127f13ef423b16c0cc42ca45310810419c90",
+          "after": "b629005b955e5f7fb5758287d51d62215c506a2021d1f7724e94393460e54941"
+        },
+        "MovementReachabilityQuery": {
+          "before": "18c5579215beb049f5e7eaaf0b1591adb4e55678ccc05eb0ad29a26ee41e947d",
+          "after": "6f7c579fb1a12c82f7efd3c939800f6741a770fb8dad68365009bf4349a26c30"
+        },
+        "_cached_reachability": {
+          "before": "23588c0ac6ff4a5c97627254f8b33b384cee0f9d6163adbc0682307c8fe063c2",
+          "after": "be8743a7001dae9efb7401bc149df9a5b82d981103f12c9652914918e00e80f9"
+        },
+        "_endpoint_satisfies": {
+          "before": "35d7bc07f2420e9ea89b6b3e094a09521cf504c011f1617692d137d315b8523c",
+          "after": "286f819b84ee7b427d82c3c88f0fd4ab85d0dfc28f33c5682370fbcb019edaa2"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/objective_endpoint_proof.py": {
       "before_sha256": null,
-      "after_sha256": "7757f1c2e11907b6c38d43ff3f4bb9517442b2496af402e747d6aa8e1f69a864",
+      "after_sha256": "df2887140f3bc372574b1f831251b5f22fd437abd45ae40501051e6401016d21",
       "owners": {
         "@module": {
           "before": null,
-          "after": "63538a1d10b81a2728f1bd4ce77d2180d753391585399d12cb43105cea6717df"
+          "after": "c3d6505c7ed48581905dce7184dd057080fb98b71ee36e4331b03dd7c5562bde"
         },
-        "SecondaryModelDestructionState": {
+        "_clear": {
           "before": null,
-          "after": "5c9e551a5580bcc3d95b8f4d2e20d714f7877f7d910e7657896d22e6612be724"
+          "after": "3855afd86230f6acaf962c8789c477ce2f7622fa461af4bd31a09dfa8e889b31"
         },
-        "SecondaryModelDestructionState.__post_init__": {
+        "_gap": {
           "before": null,
-          "after": "5b27a7fbe1bef045404746b4530b11e13c33bb6ff9e46cb1fa157b9868af9b58"
+          "after": "dabdbccd2c6376757437578fc36396bb87cd55f4fc5c796712a0ef14ef285763"
         },
-        "SecondaryModelDestructionState.from_payload": {
+        "_parts": {
           "before": null,
-          "after": "f91b455ce625e08af1997fc89e1c546d590a7cc48d72c610ebea18d004962422"
+          "after": "0aec41d8d174412664e9e9e91024e1792925ed15633a9dc0bc95cf0a2b98b655"
         },
-        "SecondaryModelDestructionState.to_payload": {
+        "objective_endpoint_excluded": {
           "before": null,
-          "after": "35cb09f8be5dee7750dd1eaf4874b6974d7b3aa9a795f780f89c9ef5ea205cf4"
-        },
-        "SecondaryModelDestructionStatePayload": {
-          "before": null,
-          "after": "b89809a98869248bd45d848f83ce15634e3e3afbb6476e0e7b00bdc940d062ff"
-        },
-        "_context_key": {
-          "before": null,
-          "after": "7192c697dfffecc24bae01a10db74a5ef491554a6c81967a4cef5ae084a88599"
-        },
-        "secondary_model_destructions_for_boundary": {
-          "before": null,
-          "after": "38fccacc50a1442f2d6f7a7fefd29687d07c78a2f875ab667dd5f54035e68258"
-        },
-        "validate_secondary_model_destruction_boundary_history": {
-          "before": null,
-          "after": "e628d4b78b088642e3a0415c337a1c65d39c8f4f4788a981596d9bcbc0625140"
+          "after": "1dda9dca7d686f8791ce90890964f9a514f94a22a2474cf98ee7e3cc20682bce"
         }
       }
     },
-    "src/warhammer40k_core/engine/secondary_scoring_conditions.py": {
-      "before_sha256": "c3b9df2ed63377c10b774e1bbc528637de87e6129cd7d6d968906de00226cdcb",
-      "after_sha256": "090a9ea69ba032af50350b9e093d238bd839bc8b984eb5da414631b411de49d9",
-      "owners": {
-        "@module": {
-          "before": "9ca9bbdda578697cb10a9c266c8038466112bbc2229d9efdc099c0895fd4afc5",
-          "after": "71fff5693b4ce98023d1dd1e0a25fce64cbb4f35cd94501d56baf0c46894b90c"
-        },
-        "SecondaryScoringConditionContext": {
-          "before": "6bbf1d75f5b20760b60bfe17295edf2e6e6f4ae6485a79705c7a7608802d0705",
-          "after": "2c2c1b846de179944a2a6506e9be81481855fd329f20c150f5e514a742808573"
-        },
-        "_destroyed_character_models_this_turn": {
-          "before": "af08d6682249d11135717bdf6f2a905ad9ee8002c637a32879e3c59b61917d63",
-          "after": "bb6f03e63ce856f1a7cb1d3a2b03cc4587134901d4ba3c1e38d608f2e6d3dfc5"
-        },
-        "_enemy_character_model_ids_destroyed_during_battle": {
-          "before": "0ea1f6de3f631ff1b243f7b6b3a654a59f1e1da3821b30af26a66a7c8328f72c",
-          "after": "ee40ef78310e4cf2201e67964bee0c055996ead27972ff1d59aa494306ab49b7"
-        },
-        "_enemy_destroyed_models": {
-          "before": null,
-          "after": "0acae7d177d9c5625562b39770b9e0e05141a5a60a52c0afd75f032c452f2389"
-        },
-        "evaluate_secondary_scoring_condition": {
-          "before": "37dac264c4716b663469b5843d111dc0463535441b9c563cab631b58a5ddab53",
-          "after": "39e6dfd9696958422e5a912c34a907b19b0a4e0e601512aa539f30070615c648"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/secondary_scoring_context.py": {
-      "before_sha256": "6ffb68d563c37808c4062b217764223aa67c7ac4a39579bcf326222811128e2f",
-      "after_sha256": "0728c46c438bb8a4b314696e6473b33f359ceaa053802cab7087f86d013cd392",
-      "owners": {
-        "@module": {
-          "before": "448491e0980950e919b6f88a9e48bac215e88f80c44717a03da2bd633e242cc0",
-          "after": "f3724ac2cb7bbf9d36157424b18640d5e951d571043c9fb8c98ddd40e241362d"
-        },
-        "secondary_scoring_condition_context_from_state": {
-          "before": "72d41366358527ce6d12fbb8b8fb27052da7973cb7e6270421a39f145fa7639c",
-          "after": "97716c929a066721793d645cadcbbaf5f934cd6cf95fb17ccacb18dd5c291170"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/secondary_scoring_state_evidence.py": {
-      "before_sha256": "56270907c11acc8df6895c0029b4b749099aefb3af949ab5b673cafb8586134e",
-      "after_sha256": "b7bbc2e866ed3f160e2d0ea4a765dd3472e23af4bdf34e5e1b48c98dca0bf933",
-      "owners": {
-        "@module": {
-          "before": "657edeccf79dc6c857d72a00630939fe0205dcb6fd20ca3ab8837c6715bd5e76",
-          "after": "6355cced8e464518e5e52e3bc1c656f9385d88872850c4001e695ad6dc6382fc"
-        },
-        "SecondaryScoringStateEvidence": {
-          "before": "4a7962fb7ddc574b784f82c98b537e2d1ddbea870d07f76eaf36ff807134d170",
-          "after": "70f8c7bf3230b67bf6c2e401e81336db70cdfbb794765d0684b9cd29a78b1581"
-        },
-        "SecondaryScoringStateEvidence.create": {
-          "before": "b3797eef2dba69149dde8b375f085b614cf09878aed91afbc09c50a1535b91e2",
-          "after": "14332502c0092228cf741dd9a11175afda6c881ce6411593abd3c5b8807f2d7a"
-        },
-        "SecondaryScoringStateEvidence.from_payload": {
-          "before": "c995ab4cf067c8c6955254e5d16b89bc4a8310195786b60ba000e276ce51d1e8",
-          "after": "b0d8935181c68b9650d8550918f351aef4e7fead2ff1598d1e408f10f99575c0"
-        },
-        "SecondaryScoringStateEvidence.to_payload": {
-          "before": "35d6076dc02fac848913c874fe8debec114a2669abf0021911cae68296a25e14",
-          "after": "b96b7d24f3432f6dc7b8e9b643e1125e5fe1a230487bb9b1ee30856a7c3e79b9"
-        },
-        "SecondaryScoringStateEvidencePayload": {
-          "before": "247c112b26dd81a26e6338ce33d23d218b5fa1ecb24a45156f8757c3ee7a02de",
-          "after": "fbc0352c4b939f478e75fdfdf1b83c6c3c2d40683f271c6aec017f026d8fbe0f"
-        },
-        "build_secondary_scoring_state_evidence": {
-          "before": "3ea133e634892c1dc9efdacc93387f6800e6a5440e9301456917128417a57ff4",
-          "after": "7f879e35447993eb837f51726fc650783076752a79cd978d87588953468ae135"
-        },
-        "secondary_scoring_condition_context_from_evidence": {
-          "before": "d20cf9cbf9d44e8443489bfaea80b980ed65c7af049a0268b7f5ea538e7ca426",
-          "after": "7d454e40e4833ee389b6b903864ba9bce36c2efb9685f5397a59e55649d0abb6"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/secondary_scoring_state_evidence_authority.py": {
-      "before_sha256": "308b256642d395bdc34eb0176f0c6cf826f74582da0ad2b6f2e194dbdffd335b",
-      "after_sha256": "c009505689d7e31b9f98b5ec67f80e0fe92812ab125fd812b19181c6a8eaed5d",
-      "owners": {
-        "@module": {
-          "before": "690711557a85a6dfa8d1d18554c70356a92451b70b9a1d622a548ba6656fffca",
-          "after": "d2ad33726404747e08e7ac7a94330e2a2897213d7068e8cdf91d1fa5639dda7c"
-        },
-        "validate_secondary_scoring_state_evidence_authority": {
-          "before": "c8a70b768556597e17d0f57f01c566a7e81d73d1cb1850b9b3e323d205805919",
-          "after": "9c5cb34e259adb33f59af57cd67bac12870287a49114867de4ee8233ab38f576"
-        }
-      }
-    },
-    "tests/code_quality/test_order130_source_authority.py": {
+    "src/warhammer40k_core/geometry/objective_path_proof.py": {
       "before_sha256": null,
-      "after_sha256": "8485953e5e6e89a00307279fad7afcb0bcd726aca3835abdc4758684503191f6",
+      "after_sha256": "d8e9f55dcc397014215f058d4e9864ec15c97ec67f72aeeeccf1202b64ca02cd",
       "owners": {
         "@module": {
           "before": null,
-          "after": "8ecc29b9420d70d63f538fbc8663b2927a7a45a741a8cd9f91a9f9367c4be81a"
+          "after": "e959c200dea48fd234d63352c9bbfc5fa7de4b6675cc6a6b0d08cf8001c4d0e2"
         },
-        "test_order130_selected_faq_and_original_source_archives_remain_exact": {
+        "_through_forbidden": {
           "before": null,
-          "after": "a035c4a4d576805bdbb46c8332ec332b7cb556047dbf1390e52fde53968d6b36"
+          "after": "bcb14ca30d3623fc0c5f47728d829900a098097c407702826ddb2566b4ff03e0"
+        },
+        "objective_path_bounds": {
+          "before": null,
+          "after": "ba118e3d70e0f60d4fe3ccc09dc39f6ff6798561bfb11d5c176f52d66007305f"
         }
       }
     },
-    "tests/order130_helpers.py": {
+    "src/warhammer40k_core/rules/objective_approach_parser.py": {
       "before_sha256": null,
-      "after_sha256": "d171f612448ef3b4aca115dd2f94993226fd1f7158872b64022c4b27e6eefd7e",
+      "after_sha256": "4c8aaa9ea038fe137422c27023857cacb77cf611d6b9c84d58abc14ef6f6c443",
       "owners": {
         "@module": {
           "before": null,
-          "after": "c9d32b089fbba9141d43b2e2772cf376de010b8f4016f3439599034caa365381"
+          "after": "5f1e9295d54811cd43cafbb1baeb04c209e1ca29b6f51abed1b02c663ef76104"
         },
-        "assert_destruction_checkpoint": {
+        "compile_objective_approach_clauses": {
           "before": null,
-          "after": "1271493419766908c65981c9d3aad7c4590fb8eedbb0003704167c1503dbb189"
-        },
-        "destruction_session": {
-          "before": null,
-          "after": "0d61a031a9346e8a84148fa01834d1f99fba7018ca786f2179aab3013a075e9b"
-        },
-        "finish_turn": {
-          "before": null,
-          "after": "f08e0d4fdbaae80b4d758246ba42c5fd23d10e07061539685ccc4a4db1ceaae6"
-        },
-        "native_destruction_session": {
-          "before": null,
-          "after": "f1e7c4e6a53e0fd994f4751a06c0b639c56a1f115de50c4ebdbddf5887fb2cea"
-        },
-        "session_from_casualty_checkpoint": {
-          "before": null,
-          "after": "0799871af2e0b25b719b193b4c049ac5bdc496a977a1d568f572645984a08c1f"
-        },
-        "unaffected_unit_with_invalid_coherency_payload": {
-          "before": null,
-          "after": "c7696286074f8e965e32d98c4d2efb61e19c02f374d66df0d1ff8188258b07f2"
+          "after": "917d3f46a3904ae98e6df1a27bb310fa47b39a6f7ad7596797b05c9603f6c9c7"
         }
       }
     },
-    "tests/unit/test_order130_model_mission_destruction.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_objective_movement_consumer_2026_10.json": {
       "before_sha256": null,
-      "after_sha256": "f16c2257397f9f0f0957f24d1f8f688aebfe1359484ba4cee78774c755a634a1",
+      "after_sha256": "2b209f552268e8d7d43dadfef4070eabe3d753ddbdb46a9ae7d1b83472b16b94",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2b209f552268e8d7d43dadfef4070eabe3d753ddbdb46a9ae7d1b83472b16b94"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_objective_movement_consumer_2026_10.py": {
+      "before_sha256": null,
+      "after_sha256": "4c839b116092ba0e4957f35c8dc1d5587a1eab053c51ad69e369f91ee0604fdc",
       "owners": {
         "@module": {
           "before": null,
-          "after": "a8f2f33d55b3db5466b330f5d0676cebbea05c15a6dbdce896ebfdb59c4dc3a3"
-        },
-        "test_native_w20_casualty_uses_the_same_model_scoring_history_once": {
+          "after": "30018a7ad2622a5e8e9245f3d6a50f900b7eb4adf17e75c3a4c7b2a49c69ecf4"
+        }
+      }
+    },
+    "tests/code_quality/test_order131_source_authority.py": {
+      "before_sha256": null,
+      "after_sha256": "5aa65552c026138f6ca389b26eb34f5480b7af43fba69c0b665d1c6df5d164e8",
+      "owners": {
+        "@module": {
           "before": null,
-          "after": "ad5fa3f02ef8260aa62a6966b5d4d838d2467c39d95d80caefb4d377298e3859"
+          "after": "f1619db9f9934ff05de7ce45ab1b43607daf643f6bcf2dfe66a1aac3279e53bc"
         },
-        "test_surviving_unit_coherency_casualty_scores_per_model": {
+        "test_selected_objective_source_and_archives_remain_exact": {
           "before": null,
-          "after": "594430d6d55534ac1ae9fe4be2f78a5295cc20689c1d446a774f01cf29e7294a"
+          "after": "46195638ceaa702bc8919ed80f8aca8b248d69a846a97b32cd645f588f7464fa"
+        }
+      }
+    },
+    "tests/order131_helpers.py": {
+      "before_sha256": null,
+      "after_sha256": "3721afe70246088e23b40690f5ac3b89e454139a9626a0405fe6065519106d74",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "a0a07c5db7df56b7dfffacf55a53fef8199f34b2bfc034080f2c37bdb94f9037"
+        },
+        "objective_session": {
+          "before": null,
+          "after": "afa8ba00d4e7602dc528e9418c29879f897a8253f42cbe389341a5c17eb4b943"
+        },
+        "request_objective_move": {
+          "before": null,
+          "after": "7f8cee0ee95c738b4edc4c9ddbe3691a880de942de2943e7d288f3ec5d75c45d"
+        }
+      }
+    },
+    "tests/unit/test_order131_objective_endpoint_geometry.py": {
+      "before_sha256": null,
+      "after_sha256": "70f91e1a2f7409b6a6bd2fbabe8f8808f8a9f3565d0db638d83f1d61e5af5164",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "88ba6484ce592c979422e017c5321a6a85ea8ab1aa2018179522a409e5b9a65b"
+        },
+        "test_continuous_wall_endpoint_proof_requires_a_legal_full_witness": {
+          "before": null,
+          "after": "2c303f880ba85eeae4dd25c6d4d84e63aa5b3e9d28d03a6145ad31eb93addfac"
+        }
+      }
+    },
+    "tests/unit/test_order131_objective_movement.py": {
+      "before_sha256": null,
+      "after_sha256": "8cece3259d9a14562c8328d9e37e8a3f8b3359b5a32fc8a9a3008f1fe9a0e512",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "79f2c165a91eef1609fd88a8015d5c26351a7a7b2390144c9daa9dfff207618d"
+        },
+        "_submit": {
+          "before": null,
+          "after": "f9fa61c10be640de5f92c8a72dcbb4f9cb418b9f9efb1cad616791fee85c7b1a"
+        },
+        "test_source_consumer_facade_retry_persistence_fork_views_events_replay": {
+          "before": null,
+          "after": "715bc351a4da710b4e7eaf237c2218287ddb160f97cc2110e840ae5b84cd1f2d"
+        }
+      }
+    },
+    "tools/build_objective_movement_consumer.py": {
+      "before_sha256": null,
+      "after_sha256": "729ab9efde4f3d51580ebb722d2102b1233395111420e1f2a07a7a5d9a6b0324",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "12c9ae185ddf643f4e13309562000e3ef0d96146cf85bac8c30fd1c36c4e5e49"
+        },
+        "build": {
+          "before": null,
+          "after": "e6c0ba09a4e7d19dae9ed440ecfc5a0379bd85c7c15fcc0f73c85b43e139e29d"
+        },
+        "main": {
+          "before": null,
+          "after": "23bc2a06110963ba4330be5b741e4cd2eccfedbab0f4b6d8bf91bce876b00ae2"
+        }
+      }
+    },
+    "tools/performance_policy.py": {
+      "before_sha256": "f098cc41ff54f4f486e0e89e829666e0166c4410c08b643ac298f0af73750e21",
+      "after_sha256": "b4be750ef29ba52ea3445583ae75cc767f3e18022fe82d11756e381a2887200b",
+      "owners": {
+        "@module": {
+          "before": "4e788e20a2573c77efb2d23447d51d60eb7eaf9da157dab8db44c5641093e163",
+          "after": "f0a82556c4d920d3551a899b1c93bd37d7daae598635a1a84735627bee789554"
+        },
+        "_order131_smoke_operations": {
+          "before": null,
+          "after": "eeb3a22061ace957b3e33b822926da3aa66c41857fb5a0e43b25b51eda7d5124"
+        },
+        "validate_assessment": {
+          "before": "03c5667fd24eadccd1d38cddfa0358588379161310e9b683cfae76bf43161806",
+          "after": "1f90f2d3c69d0cef61100c1bd2b6c1a8d8abccbd9bb23aa277e17b7fbd1d02d2"
         }
       }
     }
@@ -620,9 +780,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -630,9 +790,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -640,9 +800,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -650,9 +810,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -660,9 +820,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -670,9 +830,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -680,9 +840,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -690,9 +850,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -700,9 +860,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -710,9 +870,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -720,9 +880,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -730,9 +890,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -740,161 +900,161 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "conformance/typescript/src/contract.ts": {
       "category": "rule_semantics",
       "operations": [
-        "order130-contract-publication"
+        "order131-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
-        "order130-contract-publication"
+        "order131-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
-        "order130-contract-publication"
+        "order131-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
-        "order130-contract-publication"
+        "order131-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
-        "order130-contract-publication"
+        "order131-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "order130-contract-publication"
+        "order131-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "order130-contract-publication"
+        "order131-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
-        "order130-contract-publication"
+        "order131-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "order130-contract-publication"
+        "order131-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
-    "contracts/migrations/44.3.15-to-44.3.16.md": {
+    "contracts/migrations/44.3.16-to-44.3.17.md": {
       "category": "rule_semantics",
       "operations": [
-        "order130-contract-publication"
+        "order131-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "contracts/openapi.yaml": {
       "category": "rule_semantics",
       "operations": [
-        "order130-contract-publication"
+        "order131-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
-    "data/source_audits/order130/source.audit.json": {
+    "data/source_audits/order131/source.audit.json": {
       "category": "rule_semantics",
       "operations": [
-        "order130-source-evidence"
+        "order131-source-evidence"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
-    },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
-    "docs/ORDER_130_SCOPE_PLAN.md": {
+    "docs/ORDER_131_SCOPE_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
+    },
+    "docs/performance/policy-v3/order131-rule-semantics.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Exact source and changed-owner hash binding for the approved bounded repair assessment.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -902,167 +1062,272 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
       "operations": [
-        "order130-model-mission-history"
+        "order131-objective-approach"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
-    "src/warhammer40k_core/engine/casualty_coherency_restore.py": {
+    "src/warhammer40k_core/engine/core_movement_end_sequencing.py": {
       "category": "rule_semantics",
       "operations": [
-        "order130-model-mission-history"
+        "order131-objective-approach"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
-    "src/warhammer40k_core/engine/fight_model_authority_history.py": {
+    "src/warhammer40k_core/engine/faction_content/stratagem_activation.py": {
       "category": "rule_semantics",
       "operations": [
-        "order130-model-mission-history"
+        "order131-objective-approach"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
-    "src/warhammer40k_core/engine/game_state.py": {
+    "src/warhammer40k_core/engine/objective_movement_constraint.py": {
       "category": "rule_semantics",
       "operations": [
-        "order130-model-mission-history"
+        "order131-objective-approach"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
-    "src/warhammer40k_core/engine/lifecycle_restore_consistency.py": {
+    "src/warhammer40k_core/engine/objective_movement_stratagem_consumer.py": {
       "category": "rule_semantics",
       "operations": [
-        "order130-model-mission-history"
+        "order131-objective-approach"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
-    "src/warhammer40k_core/engine/mission_cleanup_boundary.py": {
+    "src/warhammer40k_core/engine/stratagems_eligibility.py": {
       "category": "rule_semantics",
       "operations": [
-        "order130-model-mission-history"
+        "order131-objective-approach"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
-    "src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py": {
+    "src/warhammer40k_core/engine/stratagems_generic_rule_ir.py": {
       "category": "rule_semantics",
       "operations": [
-        "order130-model-mission-history"
+        "order131-objective-approach"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
-    "src/warhammer40k_core/engine/rule_model_destruction_unplaced.py": {
+    "src/warhammer40k_core/engine/triggered_movement.py": {
       "category": "rule_semantics",
       "operations": [
-        "order130-model-mission-history"
+        "order131-objective-approach"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
-    "src/warhammer40k_core/engine/secondary_model_destruction_history.py": {
+    "src/warhammer40k_core/engine/triggered_movement_handler_impl.py": {
       "category": "rule_semantics",
       "operations": [
-        "order130-model-mission-history"
+        "order131-objective-approach"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
-    "src/warhammer40k_core/engine/secondary_scoring_conditions.py": {
+    "src/warhammer40k_core/engine/triggered_movement_options.py": {
       "category": "rule_semantics",
       "operations": [
-        "order130-model-mission-history"
+        "order131-objective-approach"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
-    "src/warhammer40k_core/engine/secondary_scoring_context.py": {
+    "src/warhammer40k_core/engine/triggered_movement_resolution.py": {
       "category": "rule_semantics",
       "operations": [
-        "order130-model-mission-history"
+        "order131-objective-approach"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
-    "src/warhammer40k_core/engine/secondary_scoring_state_evidence.py": {
+    "src/warhammer40k_core/engine/triggered_movement_selection.py": {
       "category": "rule_semantics",
       "operations": [
-        "order130-model-mission-history"
+        "order131-objective-approach"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
-    "src/warhammer40k_core/engine/secondary_scoring_state_evidence_authority.py": {
+    "src/warhammer40k_core/engine/triggered_movement_validation.py": {
       "category": "rule_semantics",
       "operations": [
-        "order130-model-mission-history"
+        "order131-objective-approach"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
-    "tests/code_quality/test_order130_source_authority.py": {
+    "src/warhammer40k_core/geometry/movement_endpoint_proof.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "geometry-search",
+        "order131-objective-approach"
+      ],
+      "selected_families": [],
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
+    },
+    "src/warhammer40k_core/geometry/movement_reachability.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "cache-policy",
+        "geometry-search",
+        "order131-objective-approach"
+      ],
+      "selected_families": [],
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
+    },
+    "src/warhammer40k_core/geometry/objective_endpoint_proof.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "geometry-search",
+        "order131-objective-approach"
+      ],
+      "selected_families": [],
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
+    },
+    "src/warhammer40k_core/geometry/objective_path_proof.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "geometry-search",
+        "order131-objective-approach"
+      ],
+      "selected_families": [],
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
+    },
+    "src/warhammer40k_core/rules/objective_approach_parser.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order131-objective-approach"
+      ],
+      "selected_families": [],
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_objective_movement_consumer_2026_10.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order131-objective-approach"
+      ],
+      "selected_families": [],
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_objective_movement_consumer_2026_10.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order131-objective-approach"
+      ],
+      "selected_families": [],
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
+    },
+    "tests/code_quality/test_order131_source_authority.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
-    "tests/order130_helpers.py": {
+    "tests/order131_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "order130-regressions"
+        "order131-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     },
-    "tests/unit/test_order130_model_mission_destruction.py": {
+    "tests/unit/test_order131_objective_endpoint_geometry.py": {
       "category": "rule_semantics",
       "operations": [
-        "order130-regressions"
+        "order131-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded shared per-model mission destruction and turn-end cleanup rule semantics, shared native/catalog facade controls and unchanged source and delivery gates.",
-      "source_obligation": "P03K/C03-11 FAQ 904b8b36-09f0-4449-a9c3-45892664ef60 obligation01 only: models destroyed for coherency count toward mission objectives. Original source assertions and pins remain exact.",
-      "unchanged_work": "Existing shared destruction occurrences retain physical ownership and turn context. Bounded per-model projection feeds existing secondary objectives without inventing unit completions. Coherency physical death and authenticated pending cleanup restore use existing history. No new search, cache or measurement workload; quiet serial current-runtime smoke and existing semantic/work/cache checks apply under the sequential remediation policy."
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
+    },
+    "tests/unit/test_order131_objective_movement.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order131-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
+    },
+    "tools/build_objective_movement_consumer.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order131-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
+    },
+    "tools/performance_policy.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order131-source-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Selected source-directed closest-objective movement through shared playable lifecycle, truthful configured facade controls and preserved source/delivery gates.",
+      "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+      "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
     }
   },
   "milestone": "ordinary",

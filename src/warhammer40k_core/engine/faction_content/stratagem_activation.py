@@ -64,7 +64,11 @@ def _record_for_phase(
 ) -> StratagemCatalogRecord:
     phase = None if phase_token == "any" else battle_phase_kind_from_token(phase_token)
     phase_suffix = "any" if phase is None else phase.value
-    return StratagemCatalogRecord(
+    from warhammer40k_core.engine.objective_movement_stratagem_consumer import (
+        objective_movement_consumer_record,
+    )
+
+    record = StratagemCatalogRecord(
         record_id=(
             f"{faction_stratagem_activation_2026_27.SOURCE_PACKAGE_ID}:"
             f"{profile.profile_id}:phase:{phase_suffix}"
@@ -107,3 +111,4 @@ def _record_for_phase(
         detachment_id=profile.detachment_id,
         disabled=False,
     )
+    return objective_movement_consumer_record(record)

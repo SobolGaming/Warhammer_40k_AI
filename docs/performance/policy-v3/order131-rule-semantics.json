@@ -1,0 +1,123 @@
+{
+  "base": "5fbde3291e10b0a71fb50c64735e6b8a04cd29e0",
+  "changes": {
+    "src/warhammer40k_core/geometry/movement_endpoint_proof.py": {
+      "before_sha256": "b899f809088b0fa9ec7d308c1e6a7f90f280f122b4d54084c8ecef7d0572a151",
+      "after_sha256": "1a58d8673b3dae812c74bbe2348ab8e1267857b78213adc52ac8cbaf406b65bd",
+      "owners": {
+        "@module": {
+          "before": "13238e5642c33c6bde16574539c28b634778cc79df364f58b6b40eb407bada64",
+          "after": "cad0ac9d4a12401202e1c7adf3656b0136330c9b7b635feb7ae0a8d410f60002"
+        },
+        "_goal_region": {
+          "before": "2fe79c2257759e84bd81cdcfae84d3ff1dd678e60eb002f7a4795184dd85618b",
+          "after": "4e333931739a2166448dd9687d327b177e5ed9bfb17755c2fddbc95987f89db8"
+        },
+        "endpoint_excluded_by_coherency": {
+          "before": null,
+          "after": "2561d09e1bd6053caf310e39dd5dcfe640fc300b57c92cdb041084e4c9df7b60"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/movement_reachability.py": {
+      "before_sha256": "d90edd91ae16dc6e3e17f2dff61e33ec68db175fd11ccefdd71faa8e2011e878",
+      "after_sha256": "ef0e8da95c2219e4ee1ae92c069613499fe033856119ca098ca479d7fadb64b8",
+      "owners": {
+        "@module": {
+          "before": "b38f1f40d91f5c2620e1fdf186e1458fd9a31ac4ef701b43d23732cccf1353b2",
+          "after": "6ae4b79faa5303a60cd86025eaa5effbcf39fc0f12d55c8dc7b3308b5dd43629"
+        },
+        "MovementGoal": {
+          "before": "44ca95f135110af6577493f07cd8fe3ea54a6b8aebb1ac4411da655b6ce8710e",
+          "after": "8235f1c348a1b57ec4e1a10e33947f3fd3b3492f5c672922a46f1f97151a5355"
+        },
+        "MovementGoal.__post_init__": {
+          "before": "5050cc6487da26bfb140a21cf600533ab912805952849c9b7047c301c13cd009",
+          "after": "b08b0a22790a16168b7740e97751603de6684d96e55d761ddde50b8c6c94411d"
+        },
+        "MovementGoal.contains": {
+          "before": "bfcadd43dfdde8250b48a79df3e1dcfbcfcf1b559f0f232c796521da6fefec18",
+          "after": "2c8ca2197d0fead7198bd2fe514b644307f3d4bd9169ece733182372a138f206"
+        },
+        "MovementGoal.distance_lower_bound": {
+          "before": "196d71feafdb63922d8393ee0e6f127f13ef423b16c0cc42ca45310810419c90",
+          "after": "b629005b955e5f7fb5758287d51d62215c506a2021d1f7724e94393460e54941"
+        },
+        "MovementReachabilityQuery": {
+          "before": "18c5579215beb049f5e7eaaf0b1591adb4e55678ccc05eb0ad29a26ee41e947d",
+          "after": "6f7c579fb1a12c82f7efd3c939800f6741a770fb8dad68365009bf4349a26c30"
+        },
+        "_cached_reachability": {
+          "before": "23588c0ac6ff4a5c97627254f8b33b384cee0f9d6163adbc0682307c8fe063c2",
+          "after": "be8743a7001dae9efb7401bc149df9a5b82d981103f12c9652914918e00e80f9"
+        },
+        "_endpoint_satisfies": {
+          "before": "35d7bc07f2420e9ea89b6b3e094a09521cf504c011f1617692d137d315b8523c",
+          "after": "286f819b84ee7b427d82c3c88f0fd4ab85d0dfc28f33c5682370fbcb019edaa2"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/objective_endpoint_proof.py": {
+      "before_sha256": null,
+      "after_sha256": "df2887140f3bc372574b1f831251b5f22fd437abd45ae40501051e6401016d21",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "c3d6505c7ed48581905dce7184dd057080fb98b71ee36e4331b03dd7c5562bde"
+        },
+        "_clear": {
+          "before": null,
+          "after": "3855afd86230f6acaf962c8789c477ce2f7622fa461af4bd31a09dfa8e889b31"
+        },
+        "_gap": {
+          "before": null,
+          "after": "dabdbccd2c6376757437578fc36396bb87cd55f4fc5c796712a0ef14ef285763"
+        },
+        "_parts": {
+          "before": null,
+          "after": "0aec41d8d174412664e9e9e91024e1792925ed15633a9dc0bc95cf0a2b98b655"
+        },
+        "objective_endpoint_excluded": {
+          "before": null,
+          "after": "1dda9dca7d686f8791ce90890964f9a514f94a22a2474cf98ee7e3cc20682bce"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/objective_path_proof.py": {
+      "before_sha256": null,
+      "after_sha256": "d8e9f55dcc397014215f058d4e9864ec15c97ec67f72aeeeccf1202b64ca02cd",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "e959c200dea48fd234d63352c9bbfc5fa7de4b6675cc6a6b0d08cf8001c4d0e2"
+        },
+        "_through_forbidden": {
+          "before": null,
+          "after": "bcb14ca30d3623fc0c5f47728d829900a098097c407702826ddb2566b4ff03e0"
+        },
+        "objective_path_bounds": {
+          "before": null,
+          "after": "ba118e3d70e0f60d4fe3ccc09dc39f6ff6798561bfb11d5c176f52d66007305f"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "src/warhammer40k_core/geometry/movement_endpoint_proof.py": [
+      "geometry-search"
+    ],
+    "src/warhammer40k_core/geometry/movement_reachability.py": [
+      "cache-policy",
+      "geometry-search"
+    ],
+    "src/warhammer40k_core/geometry/objective_endpoint_proof.py": [
+      "geometry-search"
+    ],
+    "src/warhammer40k_core/geometry/objective_path_proof.py": [
+      "geometry-search"
+    ]
+  },
+  "authority": "Owner-approved bounded repairs use quiet serial current-runtime smoke and exact-base assessment; detailed comparisons apply to intended performance work or demonstrated serious regression. This exact source/owner hash scope preserves all mandatory operation mappings and numerical/live checks.",
+  "source_obligation": "P01L/C01-12, rule:01:01.04.03:1 literal block3 and obligation06: one applicable Cogitated Need consumer must reach objective range when legal, otherwise the closest legal endpoint. Consolidation requires only closer and remains unchanged; original source archives, assertions and pins remain exact.",
+  "unchanged_work": "The selected rule requires per-model endpoint obligations through existing witnessed triggered Normal movement, source targeting, CP, path, terrain, sequential occupancy, coherency and replay owners. Continuous negative endpoint certificates relax paths and never invent a positive move. Quiet serial current-runtime smoke, exact-base owner assessment and all original live semantic/work/cache checks apply under the sequential remediation policy. This is required rule behavior, not deliberate performance optimization; no severe matched regression or full-game performance certification is claimed."
+}

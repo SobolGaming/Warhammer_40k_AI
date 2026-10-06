@@ -141,6 +141,7 @@ def _apply_generic_rule_ir_stratagem_handler(
             definition=definition,
             use_record=use_record,
             rule_result=rule_result,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
     if _rule_execution_result_grants_strategic_reserves_placement(rule_result.effect_payloads):
         _request_generic_rule_ir_strategic_reserves_placement(
@@ -979,6 +980,7 @@ def _request_generic_out_of_phase_shooting(
 
 def _request_generic_triggered_normal_move(
     *,
+    runtime_modifier_registry: RuntimeModifierRegistry | None,
     state: GameState,
     decisions: DecisionController,
     context: StratagemEligibilityContext,
@@ -1003,13 +1005,27 @@ def _request_generic_triggered_normal_move(
         rule_result.effect_payloads,
         ability="triggered_normal_move",
     )
-    roll_payload, max_distance = _generic_triggered_move_distance_roll(
+    from warhammer40k_core.engine.objective_movement_stratagem_consumer import (
+        objective_constraint_for_effect,
+    )
+
+    objective_constraint = objective_constraint_for_effect(
         state=state,
-        decisions=decisions,
-        definition=definition,
-        use_record=use_record,
+        unit_instance_id=moving_unit_id,
         effect_payload=effect_payload,
-        moving_unit_id=moving_unit_id,
+        runtime_modifiers=runtime_modifier_registry,
+    )
+    roll_payload, max_distance = (
+        (None, max(budget for _, budget in objective_constraint.movement_budgets))
+        if objective_constraint is not None
+        else _generic_triggered_move_distance_roll(
+            state=state,
+            decisions=decisions,
+            definition=definition,
+            use_record=use_record,
+            effect_payload=effect_payload,
+            moving_unit_id=moving_unit_id,
+        )
     )
     source_step = _optional_rule_effect_string_parameter(effect_payload, "source_step")
     if source_step is None:
@@ -1045,6 +1061,7 @@ def _request_generic_triggered_normal_move(
             default=False,
         ),
         optional=_optional_rule_effect_bool_parameter(effect_payload, "optional", default=True),
+        objective_constraint=objective_constraint,
     )
     replay_effect_kind = _optional_rule_effect_string_parameter(
         effect_payload, "replay_effect_kind"

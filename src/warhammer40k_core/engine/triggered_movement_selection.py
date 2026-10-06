@@ -20,6 +20,7 @@ from warhammer40k_core.engine.movement_proposals import (
     MovementProposalRequest,
     ProposalKind,
 )
+from warhammer40k_core.engine.objective_movement_constraint import objective_approach_context
 from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage, LifecycleStatus
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.surge_choices import surge_choice_context
@@ -251,6 +252,7 @@ def _apply_triggered_movement_unit_selection_decision(  # pyright: ignore[report
             permission=selected_unit.distance_reroll_permission,
             extra_payload={
                 **surge_choice_context(payload, descriptor),
+                **objective_approach_context(payload, descriptor.objective_constraint),
                 "context_kind": TRIGGERED_MOVEMENT_DISTANCE_REROLL_CONTEXT_KIND,
                 "descriptor": validate_json_value(descriptor.to_payload()),
                 "selected_unit": validate_json_value(selected_unit.to_payload()),
@@ -309,6 +311,7 @@ def _apply_triggered_movement_unit_selection_decision(  # pyright: ignore[report
         movement_phase_action=TRIGGERED_MOVEMENT_PROPOSAL_ACTION,
         context={
             **surge_choice_context(payload, descriptor),
+            **objective_approach_context(payload, descriptor.objective_constraint),
             "context_kind": TRIGGERED_MOVEMENT_PROPOSAL_CONTEXT_KIND,
             "descriptor": validate_json_value(descriptor.to_payload()),
             "selected_unit": validate_json_value(selected_unit.to_payload()),
@@ -450,6 +453,7 @@ def apply_triggered_movement_distance_reroll_decision(
         movement_phase_action=TRIGGERED_MOVEMENT_PROPOSAL_ACTION,
         context={
             **surge_choice_context(payload, descriptor),
+            **objective_approach_context(payload, descriptor.objective_constraint),
             "context_kind": TRIGGERED_MOVEMENT_PROPOSAL_CONTEXT_KIND,
             "descriptor": validate_json_value(updated_descriptor.to_payload()),
             "selected_unit": validate_json_value(selected_unit.to_payload()),
