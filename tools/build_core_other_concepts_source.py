@@ -5,9 +5,11 @@ import argparse
 import copy
 import hashlib
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 ARTIFACT_PATH = (
     ROOT
     / "src"
@@ -240,8 +242,93 @@ def _p06c_supplement() -> tuple[
     )
 
 
+def _order135_supplement(
+    previous_evidence: dict[str, object],
+) -> tuple[dict[str, object], dict[str, object], dict[str, object]]:
+    from tools.core_rules_order84_capture import capture_literals
+
+    audit = json.loads(
+        (ROOT / "data/source_audits/order135/visibility-source.audit.json").read_bytes()
+    )
+    (row,) = audit["rows"]
+    capture = (ROOT / row["capture_artifact_path"]).read_bytes()
+    if (
+        hashlib.sha256(capture).hexdigest()
+        != "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026"
+    ):
+        raise ValueError("Order135 complete source capture drifted.")
+    records = [
+        r
+        for r in capture_literals(capture.decode())["faqs"]
+        if r["id"] == "9638115f-b94b-4d05-ba62-df9fba2805ac"
+    ]
+    if records != [audit["selected_record"]]:
+        raise ValueError("Order135 selected FAQ differs from the authenticated capture.")
+    text = (
+        "VISIBILITY BATTLEFIELD EDGE FAQ\nQ: "
+        + records[0]["question"]
+        + "\nA: "
+        + records[0]["answer"]
+    )
+    observation = dict(row)
+    observation_hash = observation.pop("source_observation_sha256")
+    if (
+        _sha256_text(text) != row["transcription_sha256"]
+        or _sha256_payload(observation) != observation_hash
+    ):
+        raise ValueError("Order135 observation/transcription hash drifted.")
+    consumers = [
+        "warhammer40k_core.geometry.physical_visibility:resolve_physical_visibility",
+        "warhammer40k_core.engine.battlefield_visibility_context:battlefield_visibility_context",
+        "warhammer40k_core.core.visibility:TerrainVisibilityContext.resolve_line_of_sight",
+    ]
+    rule = {
+        "rule_id": "visibility-battlefield-edge-faq",
+        "source_id": row["rule_source_id"],
+        "section_id": "06.01 FAQ",
+        "section_heading": "VISIBILITY BATTLEFIELD EDGE FAQ",
+        "source_text": text,
+        "transcription_sha256": row["transcription_sha256"],
+        "load_support_status": "loaded",
+        "semantic_execution_status": "executable_engine_runtime",
+        "runtime_consumer_ids": consumers,
+    }
+    evidence = copy.deepcopy(previous_evidence)
+    evidence.update(
+        evidence_id="order135-visibility-mirror-2026-10-01:battlefield-edge-faq",
+        rule_source_id=row["rule_source_id"],
+        review_audit_id=audit["audit_id"],
+        review_audit_row_id=row["row_id"],
+        review_audit_source_observation_sha256=observation_hash,
+        source_title="Game Datamissions 06.01 FAQ VISIBILITY BATTLEFIELD EDGE FAQ",
+        source_url=row["source_url"],
+        observed_at=row["observed_at"],
+        app_version=None,
+        app_build=None,
+        capture_artifact_path=None,
+        capture_sha256=None,
+        transcription_sha256=row["transcription_sha256"],
+        runtime_consumer_ids=consumers,
+        observation_sha256="",
+    )
+    evidence["observation_sha256"] = _evidence_observation_sha256(evidence)
+    review = _evidence_rows(
+        rule_id="visibility-battlefield-edge-faq",
+        rule_source_id=str(row["rule_source_id"]),
+        section_id="06.01 FAQ",
+        section_heading="VISIBILITY BATTLEFIELD EDGE FAQ",
+        observed_at=str(row["observed_at"]),
+        transcription_sha256=str(row["transcription_sha256"]),
+        runtime_consumer_ids=consumers,
+    )[0]
+    review["evidence_id"] = "order135-visibility-source-review:battlefield-edge-faq"
+    review["observation_sha256"] = _evidence_observation_sha256(review)
+    return rule, review, evidence
+
+
 def build_payload() -> dict[str, object]:
     supplemental_rules, supplemental_evidence, _audit = _p06c_supplement()
+    edge_rule, edge_review, edge_evidence = _order135_supplement(supplemental_evidence[-1])
     visibility_transcription_sha256 = _sha256_text(VISIBILITY_SOURCE_TEXT)
     mortal_wounds_transcription_sha256 = _sha256_text(MORTAL_WOUNDS_SOURCE_TEXT)
     payload: dict[str, object] = {
@@ -279,6 +366,7 @@ def build_payload() -> dict[str, object]:
                 "runtime_consumer_ids": MORTAL_WOUNDS_RUNTIME_CONSUMER_IDS,
             },
             *supplemental_rules,
+            edge_rule,
         ],
         "evidence": [
             *_evidence_rows(
@@ -300,6 +388,8 @@ def build_payload() -> dict[str, object]:
                 runtime_consumer_ids=MORTAL_WOUNDS_RUNTIME_CONSUMER_IDS,
             ),
             *supplemental_evidence,
+            edge_review,
+            edge_evidence,
         ],
         "superseded_records": [
             {

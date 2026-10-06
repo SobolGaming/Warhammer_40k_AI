@@ -3,8 +3,8 @@ from __future__ import annotations
 from warhammer40k_core.core.modifiers import resolve_targeting_range
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.terrain_areas import PlacedTerrainArea
-from warhammer40k_core.core.visibility import TerrainVisibilityContext
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
+from warhammer40k_core.engine.battlefield_visibility_context import battlefield_visibility_context
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView
 from warhammer40k_core.engine.shooting_model_blockers import shooting_dynamic_model_blockers
@@ -67,6 +67,7 @@ def hidden_detection_eligible_target_model_ids(
                 not target_made_recent_ranged_attacks
                 and visibility_policy.hidden_gone_to_ground_detection_penalty_inches > 0.0
                 and _target_model_has_gone_to_ground_against_attacker(
+                    scenario=scenario,
                     ruleset_descriptor=ruleset_descriptor,
                     attacker_unit=attacker_unit,
                     attacker_model=attacker_model,
@@ -91,6 +92,7 @@ def hidden_detection_eligible_target_model_ids(
 
 def _target_model_has_gone_to_ground_against_attacker(
     *,
+    scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     attacker_unit: UnitInstance,
     attacker_model: Model,
@@ -103,7 +105,8 @@ def _target_model_has_gone_to_ground_against_attacker(
 ) -> bool:
     # Core 13.11.01 requires intervening dense-feature concealment, not occupancy.
     # Ordinary terrain-derived Hidden eligibility is owned separately by terrain_hidden.
-    context = TerrainVisibilityContext.from_ruleset_descriptor(
+    context = battlefield_visibility_context(
+        scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         los_cache_key=visibility_cache_key,
         observer_model=attacker_model,

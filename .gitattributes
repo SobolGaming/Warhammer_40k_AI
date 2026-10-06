@@ -1,2 +1,5 @@
 # Raw-byte hashes must identify the same committed JSON bytes on every platform.
 *.json text eol=lf
+# Authenticated retained packets keep their original byte representation.
+data/source_audits/order135/retained-current-sources.json -text
+data/source_audits/order135/source-reconciliation.json -text

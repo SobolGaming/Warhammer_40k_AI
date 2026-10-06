@@ -256,9 +256,71 @@
       "source_url": "https://game-datamissions.com/11th/rules/changelog",
       "transcription_sha256": "7ad46ec389adfa76cc3d0e3d763f6237835ae60a4264fbca52d48a97b79911ed",
       "verification_status": "authoritative_app_mirror"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "unverified_transcription_only",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "order135-visibility-source-review:battlefield-edge-faq",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "load_support_status": "loaded",
+      "observation_sha256": "e41a2b79f8337a0f0c1b1ad8c79fb095d77ac32a441d39c5c537c582d9b9cc80",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": null,
+      "provider_name": "CORE V2 Source Review",
+      "provider_non_affiliation_recorded": false,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-rules:other-concepts:visibility-battlefield-edge-faq",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.geometry.physical_visibility:resolve_physical_visibility",
+        "warhammer40k_core.engine.battlefield_visibility_context:battlefield_visibility_context",
+        "warhammer40k_core.core.visibility:TerrainVisibilityContext.resolve_line_of_sight"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Repository",
+      "source_title": "Reviewed transcription of 06.01 FAQ Visibility Battlefield Edge Faq",
+      "source_url": null,
+      "transcription_sha256": "80db6d90793920dac05771755f577d058ebda044071656f38d173bd22d5cad0a",
+      "verification_status": "unverified"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "project_authoritative_app_mirror",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "order135-visibility-mirror-2026-10-01:battlefield-edge-faq",
+      "evidence_kind": "third_party_mirror",
+      "load_support_status": "loaded",
+      "observation_sha256": "f525217fd3e6a156589e92a8074bb38af24220477518e10b99088c60717806a1",
+      "observed_at": "2026-10-01T12:04:31.127429+00:00",
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "provider_name": "Game Datamissions",
+      "provider_non_affiliation_recorded": true,
+      "review_audit_id": "order135-visibility-battlefield-edge-maintained-app-mirror-2026-10-01",
+      "review_audit_row_id": "faq:9638115f-b94b-4d05-ba62-df9fba2805ac:current-observation",
+      "review_audit_source_observation_sha256": "a4f0a819a082ecaa335f33766c6d3b84e1b227a6c2badd66059c47ab5e6228d1",
+      "rule_source_id": "gw-11e-core-rules:other-concepts:visibility-battlefield-edge-faq",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.geometry.physical_visibility:resolve_physical_visibility",
+        "warhammer40k_core.engine.battlefield_visibility_context:battlefield_visibility_context",
+        "warhammer40k_core.core.visibility:TerrainVisibilityContext.resolve_line_of_sight"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Web",
+      "source_title": "Game Datamissions 06.01 FAQ VISIBILITY BATTLEFIELD EDGE FAQ",
+      "source_url": "https://game-datamissions.com/11th/rules/core-rules",
+      "transcription_sha256": "80db6d90793920dac05771755f577d058ebda044071656f38d173bd22d5cad0a",
+      "verification_status": "authoritative_app_mirror"
     }
   ],
-  "package_hash": "215059ed938a096ef038f67db15dcf82f9437e07a0e8c0b5140634777c15ee38",
+  "package_hash": "758313fd9d1228b5625472d9559f6624afff4eb6a3e87094f98f4a6e5a13b3ca",
   "rules": [
     {
       "load_support_status": "loaded",
@@ -323,6 +385,21 @@
       "source_id": "gw-11e-core-rules:other-concepts:visibility-any-part-faq",
       "source_text": "When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them?\nLine of sight is drawn from any part of the observing model to any part of the model being observed.",
       "transcription_sha256": "7ad46ec389adfa76cc3d0e3d763f6237835ae60a4264fbca52d48a97b79911ed"
+    },
+    {
+      "load_support_status": "loaded",
+      "rule_id": "visibility-battlefield-edge-faq",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.geometry.physical_visibility:resolve_physical_visibility",
+        "warhammer40k_core.engine.battlefield_visibility_context:battlefield_visibility_context",
+        "warhammer40k_core.core.visibility:TerrainVisibilityContext.resolve_line_of_sight"
+      ],
+      "section_heading": "VISIBILITY BATTLEFIELD EDGE FAQ",
+      "section_id": "06.01 FAQ",
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_id": "gw-11e-core-rules:other-concepts:visibility-battlefield-edge-faq",
+      "source_text": "VISIBILITY BATTLEFIELD EDGE FAQ\nQ: When a model overhangs the edge of the battlefield, how does that affect its visibility?\nA: That model's controlling player can draw line of sight from any part of that model that is not overhanging the edge of the battlefield. Their opponent can draw line of sight to any part of that model.",
+      "transcription_sha256": "80db6d90793920dac05771755f577d058ebda044071656f38d173bd22d5cad0a"
     }
   ],
   "source_document": {

@@ -1,0 +1,178 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "visibility",
+  "workload_id": "order78-gone-to-ground-v2",
+  "base_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d4c3630ee203e6ed640e4580905ecbf842fbde240709e9a75e58f7120c5be6ac",
+  "head_input_digest": "1ae867c6193286a5133e575e04bc417d32b7da448602d747bee90bd74076b1de",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:110f573cc70342f09c3102916f918a54a64f7b50f0966cdbdb51eba2b6de970e",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 137327259648,
+      "logical_cpus": 64,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "fdf2689406de0469904b7af9d24c8e15246e29eb31c37503b0e0fdd8b6b80f1d",
+    "fixture_sha256": "7d25d17a19c3c4a166007bb9f48b323f21220d72641753683195e29b082e3922",
+    "samples": {
+      "dense-outside": [
+        0.1477904999628663,
+        0.09502430004067719,
+        0.1102885000873357,
+        0.10099499998614192,
+        0.09453879995271564,
+        0.09391609998419881,
+        0.1048004999756813
+      ],
+      "dense-inside": [
+        0.14739049994386733,
+        0.10606639995239675,
+        0.09396259998902678,
+        0.0938776999246329,
+        0.09689320018514991,
+        0.09638380003161728,
+        0.0945214000530541
+      ],
+      "attached-outside": [
+        0.27180269989185035,
+        0.18801339995115995,
+        0.19003130006603897,
+        0.19684590003453195,
+        0.1941170000936836,
+        0.19126460002735257,
+        0.18621430010534823
+      ],
+      "light-outside": [
+        0.06618539988994598,
+        0.06199499987997115,
+        0.061950699891895056,
+        0.06236410001292825,
+        0.06277170008979738,
+        0.061906500020995736,
+        0.061179500073194504
+      ],
+      "not-hidden": [
+        0.06029379996471107,
+        0.059758600080385804,
+        0.059034699806943536,
+        0.05913150007836521,
+        0.06524479994550347,
+        0.06431220006197691,
+        0.059789800085127354
+      ],
+      "fully-visible": [
+        0.02497130003757775,
+        0.022844999795779586,
+        0.022370700025931,
+        0.022622199961915612,
+        0.022556199925020337,
+        0.023082199972122908,
+        0.022650000173598528
+      ],
+      "associated-policy-only-woods": [
+        0.1416659001260996,
+        0.10044539999216795,
+        0.09893720014952123,
+        0.09816189995035529,
+        0.10064400010742247,
+        0.10573099995963275,
+        0.09922700002789497
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d4c3630ee203e6ed640e4580905ecbf842fbde240709e9a75e58f7120c5be6ac",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 137327259648,
+      "logical_cpus": 64,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "fdf2689406de0469904b7af9d24c8e15246e29eb31c37503b0e0fdd8b6b80f1d",
+    "fixture_sha256": "7d25d17a19c3c4a166007bb9f48b323f21220d72641753683195e29b082e3922",
+    "samples": {
+      "dense-outside": [
+        0.22370920004323125,
+        0.09649010002613068,
+        0.10764199984259903,
+        0.09933739993721247,
+        0.09774330002255738,
+        0.09881060011684895,
+        0.09574460005387664
+      ],
+      "dense-inside": [
+        0.17738590016961098,
+        0.09514789981767535,
+        0.10394879989326,
+        0.09554550005123019,
+        0.09589529992081225,
+        0.09608689998276532,
+        0.09603660018183291
+      ],
+      "attached-outside": [
+        0.28324869996868074,
+        0.1936643999069929,
+        0.19573070015758276,
+        0.19210270000621676,
+        0.19164650002494454,
+        0.21709769987501204,
+        0.2245372999459505
+      ],
+      "light-outside": [
+        0.07357969996519387,
+        0.07042380003258586,
+        0.0636245000641793,
+        0.06412759982049465,
+        0.06292900000698864,
+        0.06329290010035038,
+        0.0630555001553148
+      ],
+      "not-hidden": [
+        0.06092150020413101,
+        0.060441300040110946,
+        0.05962980003096163,
+        0.05976770003326237,
+        0.05997979990206659,
+        0.06175450002774596,
+        0.05971010006032884
+      ],
+      "fully-visible": [
+        0.02528100018389523,
+        0.023889899952337146,
+        0.023171199951320887,
+        0.023227399913594127,
+        0.02330740005709231,
+        0.02776680001989007,
+        0.02360059996135533
+      ],
+      "associated-policy-only-woods": [
+        0.14363850001245737,
+        0.09919730015099049,
+        0.1005579000338912,
+        0.10101249977014959,
+        0.10036580008454621,
+        0.10029689990915358,
+        0.10003319988027215
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": [
+    "Prior 62 Windows V963 refresh reports retained 14 failed inequalities in Order78/83/101, also reproduced on unchanged main7f45. Those failures remain historical failures; no passing status is inferred from these new bounded comparisons.",
+    "Preserved evidence: Library libfile_cb02a09ce87881918dbe447a67a3e779 SHA2564f194b6edee3e31de9caa277ae1c292be278e79b93d4c5d4e79e46ca8ebf7344; original 492df01c559aef3df8f4848428a1cfa4506f477d checkpoint and exact bytes retained externally. Policy-pinned historical report files remain unchanged.",
+    "All prior Order103 numerical exception records and failed/interrupted development tests remain immutable; no historical failure or provider/full-game qualification receives current pass credit."
+  ]
+}

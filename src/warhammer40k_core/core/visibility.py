@@ -71,9 +71,13 @@ from warhammer40k_core.core.visibility_records import (
 from warhammer40k_core.core.visibility_records import (
     visibility_blocker_kind_from_token as visibility_blocker_kind_from_token,
 )
-from warhammer40k_core.geometry.continuous_visibility import (
-    resolve_visibility_pair,
-    resolve_visibility_pair_uncached,
+from warhammer40k_core.geometry.physical_visibility import (
+    BattlefieldVisibilityBounds,
+    BattlefieldVisibilityBoundsPayload,
+    physical_model_visibility_prisms,
+    physical_source_group_obscures,
+    resolve_physical_visibility,
+    resolve_physical_visibility_uncached,
 )
 from warhammer40k_core.geometry.pose import (
     GeometryError,
@@ -100,7 +104,6 @@ from warhammer40k_core.geometry.visibility_footprints import (
     model_within_visibility_polygons,
     polygon_visibility_prism,
 )
-from warhammer40k_core.geometry.visibility_occlusion import source_group_obscures
 from warhammer40k_core.geometry.visibility_query import (
     VisibilityMetrics as VisibilityMetrics,
 )
@@ -120,7 +123,6 @@ from warhammer40k_core.geometry.visibility_query import (
     VisibilityResultPayload as VisibilityResultPayload,
 )
 from warhammer40k_core.geometry.visibility_shapes import (
-    model_visibility_prism,
     terrain_visibility_prism,
 )
 from warhammer40k_core.geometry.volume import Model, ModelPayload
@@ -143,6 +145,7 @@ class TerrainVisibilityContextPayload(TypedDict):
     observer_keywords: list[str]
     target_model_keywords: list[ModelVisibilityKeywordsPayload]
     terrain_visibility_policy: TerrainVisibilityPolicyDescriptorPayload
+    battlefield_bounds: BattlefieldVisibilityBoundsPayload | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -158,8 +161,16 @@ class TerrainVisibilityContext:
     terrain_volumes: tuple[TerrainVolume, ...] = ()
     dynamic_model_blockers: tuple[Model, ...] = ()
     observer_keywords: tuple[str, ...] = ()
+    battlefield_bounds: BattlefieldVisibilityBounds | None = None
 
     def __post_init__(self) -> None:
+        if (
+            self.battlefield_bounds is not None
+            and type(self.battlefield_bounds) is not BattlefieldVisibilityBounds
+        ):
+            raise GeometryError(
+                "TerrainVisibilityContext battlefield_bounds must be typed exact bounds."
+            )
         object.__setattr__(
             self,
             "ruleset_descriptor_hash",
@@ -280,6 +291,7 @@ class TerrainVisibilityContext:
         terrain_volumes: tuple[TerrainVolume, ...] = (),
         dynamic_model_blockers: tuple[Model, ...] = (),
         observer_keywords: tuple[str, ...] = (),
+        battlefield_bounds: BattlefieldVisibilityBounds | None = None,
     ) -> Self:
         descriptor = _validate_ruleset_descriptor(ruleset_descriptor)
         return cls(
@@ -294,6 +306,7 @@ class TerrainVisibilityContext:
             terrain_volumes=terrain_volumes,
             dynamic_model_blockers=dynamic_model_blockers,
             observer_keywords=observer_keywords,
+            battlefield_bounds=battlefield_bounds,
         )
 
     def context_fingerprint(self) -> str:
@@ -392,11 +405,12 @@ class TerrainVisibilityContext:
             for prism, source in entries
             if source.blocks_full_visibility and source not in sources
         )
-        return source_group_obscures(
-            model_visibility_prism(self.observer_model),
-            model_visibility_prism(target),
+        return physical_source_group_obscures(
+            physical_model_visibility_prisms(self.observer_model),
+            physical_model_visibility_prisms(target),
             selected,
             remaining,
+            self.battlefield_bounds,
         )
 
     def to_payload(self) -> TerrainVisibilityContextPayload:
@@ -415,12 +429,18 @@ class TerrainVisibilityContext:
                 for model_id, keywords in self.target_model_keywords
             ],
             "terrain_visibility_policy": self.terrain_visibility_policy.to_payload(),
+            "battlefield_bounds": None
+            if self.battlefield_bounds is None
+            else self.battlefield_bounds.to_payload(),
         }
 
     @classmethod
     def from_payload(cls, payload: TerrainVisibilityContextPayload) -> Self:
         return cls(
             ruleset_descriptor_hash=payload["ruleset_descriptor_hash"],
+            battlefield_bounds=None
+            if payload["battlefield_bounds"] is None
+            else BattlefieldVisibilityBounds.from_payload(payload["battlefield_bounds"]),
             los_cache_key=payload["los_cache_key"],
             terrain_visibility_policy=TerrainVisibilityPolicyDescriptor.from_payload(
                 payload["terrain_visibility_policy"]
@@ -455,12 +475,17 @@ class TerrainVisibilityContext:
         use_result_cache: bool = True,
     ) -> ModelLineOfSightRecord:
         entries = self._obstacle_entries(target_model, terrain_area_feature_ids)
-        resolver = resolve_visibility_pair if use_result_cache else resolve_visibility_pair_uncached
+        resolver = (
+            resolve_physical_visibility
+            if use_result_cache
+            else resolve_physical_visibility_uncached
+        )
         evidence = resolver(
-            model_visibility_prism(self.observer_model),
-            model_visibility_prism(target_model),
+            physical_model_visibility_prisms(self.observer_model),
+            physical_model_visibility_prisms(target_model),
             tuple(prism for prism, record in entries if record.blocks_model_visibility),
             tuple(prism for prism, record in entries if record.blocks_full_visibility),
+            self.battlefield_bounds,
         )
         records = tuple(
             sorted({record for _, record in entries}, key=visibility_blocker_record_sort_key)
@@ -482,10 +507,11 @@ class TerrainVisibilityContext:
             )
         )
         observer, target = (
-            model_visibility_prism(self.observer_model),
-            model_visibility_prism(target_model),
+            physical_model_visibility_prisms(self.observer_model),
+            physical_model_visibility_prisms(target_model),
         )
-        lower, upper = min(observer.lower, target.lower), max(observer.upper, target.upper)
+        parts = (*observer, *target)
+        lower, upper = min(part.lower for part in parts), max(part.upper for part in parts)
         for feature in self.terrain_features:
             policy = feature_visibility_policy(self.terrain_visibility_policy, feature.feature_kind)
             # The associated area owns area obscuring and its intersection exceptions.
@@ -554,7 +580,9 @@ class TerrainVisibilityContext:
         return tuple(
             (prism, record)
             for prism, record in entries
-            if not corridors_clear_by_enclosure(observer, target, (prism,))
+            if not all(
+                corridors_clear_by_enclosure(o, t, (prism,)) for o in observer for t in target
+            )
         )
 
     def _cover_source_records(self, witness: LineOfSightWitness) -> tuple[CoverEvidenceRecord, ...]:
@@ -681,7 +709,7 @@ def _physical_obstacle_entries(
         ),
         *(
             (
-                model_visibility_prism(model),
+                prism,
                 VisibilityBlockerRecord(
                     blocker_kind=VisibilityBlockerKind.MODEL,
                     blocker_id=model.model_id,
@@ -691,6 +719,7 @@ def _physical_obstacle_entries(
                 ),
             )
             for model in models
+            for prism in physical_model_visibility_prisms(model)
         ),
     )
 

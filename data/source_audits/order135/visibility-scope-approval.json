@@ -1,0 +1,39 @@
+{
+  "status": "approved",
+  "scope_id": "V963-VISIBILITY",
+  "selected_order": "Order135 PFINAL/CAUDIT-01",
+  "transcript": [
+    {
+      "speaker": "Assistant",
+      "at": "2026-10-06T20:33:00Z",
+      "text": "The audit found a reproducible visibility bug: a legally placed model overhanging the battlefield edge can lose a valid incoming shot because its body is ignored. Using the full body also exposes an outgoing sightline from outside the battlefield. May I expand Order135 to fix these linked visibility checks and test their effects on shooting, cover, save/load and replay before finishing the Core audit?"
+    },
+    {
+      "speaker": "User",
+      "at": "2026-10-06T20:35:00Z",
+      "text": "Is the audit complete with just that one bug?"
+    },
+    {
+      "speaker": "Assistant",
+      "text": "Not yet. It’s the one confirmed bug so far, with linked incoming and outgoing visibility issues. The source inventory and static review are complete, but the full executable audit and final independent reviews haven’t run. The visibility repair is still awaiting your approval, so I can’t yet say it’s the only bug"
+    },
+    {
+      "speaker": "User",
+      "at": "2026-10-06T20:36:00Z",
+      "sentinel": "Sentinel_c71ddb901fec8191b17969a700bebe52",
+      "text": "Approved to expend scope"
+    }
+  ],
+  "bounded_scope": "Shared complete physical-body incoming visibility and exact outgoing battlefield clipping; full visibility, cover causality, witnesses, cache/context, blocker bodies, existing consumers, generated contracts, native shooting, persistence, fork, viewer/event projections and exact replay. Register retained approved-provider FAQ audit fingerprint authority before runtime adoption.",
+  "unchanged": [
+    "range",
+    "setup",
+    "movement",
+    "expiry",
+    "deployment grants",
+    "original tests/assertions/branches/ceilings",
+    "source archives/pins"
+  ],
+  "qualification": "No fabricated official provider, faction or native consumer certification; complete Core audit and all unchanged delivery gates remain required. Other material gaps require a reproduced acceptance violation and an explicit scope decision.",
+  "supersedes_pending_decision_only": "scope-decision-pending-status-02.json"
+}

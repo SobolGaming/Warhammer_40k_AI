@@ -42,7 +42,7 @@ from warhammer40k_core.geometry.visibility_witnesses import (
     target_part_candidates,
 )
 
-VISIBILITY_ALGORITHM_ID = "continuous-analytic-prism-visibility:1"
+VISIBILITY_ALGORITHM_ID = "continuous-analytic-prism-visibility:2"
 
 
 class ContinuousVisibilityPayload(TypedDict):
@@ -216,7 +216,7 @@ class ContinuousVisibilityEvidence:
         )
 
 
-def _prism_payload(prism: VisibilityPrism) -> list[object]:
+def prism_fingerprint_payload(prism: VisibilityPrism) -> list[object]:
     footprint = prism.footprint
     points = (
         (footprint.center, footprint.first_axis, footprint.second_axis)
@@ -239,10 +239,10 @@ def input_fingerprint(
 ) -> str:
     payload = [
         VISIBILITY_ALGORITHM_ID,
-        _prism_payload(observer),
-        _prism_payload(target),
-        [_prism_payload(b) for b in visibility_blockers],
-        [_prism_payload(b) for b in full_blockers],
+        prism_fingerprint_payload(observer),
+        prism_fingerprint_payload(target),
+        [prism_fingerprint_payload(b) for b in visibility_blockers],
+        [prism_fingerprint_payload(b) for b in full_blockers],
     ]
     return hashlib.sha256(
         json.dumps(payload, separators=(",", ":"), ensure_ascii=True).encode("ascii")

@@ -108,6 +108,9 @@
     "tests/unit/test_order133_keyword_materialization.py": 0.413,
     "tests/unit/test_order133_keyword_numbers.py": 495.553,
     "tests/unit/test_order134_deployment_restrictions.py": 53.961,
+    "tests/unit/test_order135_objective_overlap.py": 7.234,
+    "tests/unit/test_order135_physical_visibility.py": 16.657,
+    "tests/unit/test_order135_visibility_facade.py": 58.007,
     "tests/unit/test_order36_sequencing.py": 250.154,
     "tests/unit/test_order36_timing_authority.py": 216.625,
     "tests/unit/test_order51_flight.py": 172.73,
@@ -323,77 +326,80 @@
   "profiles": [
     {
       "junit_sha256": [
+        "1402886578470348485d0ad0f82d8db9d9d5748d007711514a5099c33669f654",
         "2b7bdea4cd71f8a7d7d955f92da7a7f8bb3a4295a07925241852b3d336a48bad",
-        "6bc406af456cfae56f7084f54aecc22b9fd62e827a839f0d3023334c24a70573"
+        "31fe8a595e09c738a3710dc33ec790a7fd21e4acaa388a8e699531a5c73c8f01",
+        "6bc406af456cfae56f7084f54aecc22b9fd62e827a839f0d3023334c24a70573",
+        "9980095baa224979ab4744a997a05718c12e4d68ee604348269cc93c191711b0"
       ],
-      "source": "Order134 complete corrected current cohort HEAD 73a01264f4f291614f42509ef4f5dd1d75a65ced, tree 98e17c95070b2a637d85aa90f9148a8c982cd002: all 11119 cases once, 16 serial polygon cases and remaining cases in 32 parallel workers, all phases/durations authenticated; no predecessor or focused timings. JUnit SHA256 serial 6bc406af456cfae56f7084f54aecc22b9fd62e827a839f0d3023334c24a70573; parallel 2b7bdea4cd71f8a7d7d955f92da7a7f8bb3a4295a07925241852b3d336a48bad.",
-      "test_cases": 11119,
-      "test_files": 319
+      "source": "PROVISIONAL ONLY: exact predecessor BASE70b0c0b43774f81d67753b0e3f830b38f1b178ff complete11119-case local profile plus12 new focused cases; same Windows host. This mixed-revision balancing input is NOT current aggregate pass credit or final timing metadata; replace after COMPLETE current passing cohort.",
+      "test_cases": 11131,
+      "test_files": 322
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 5112.66,
+      "duration_seconds": 5119.473,
       "shard_id": 1,
-      "test_file_count": 24
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 5112.671,
+      "duration_seconds": 5119.509,
       "shard_id": 2,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 5112.664,
+      "duration_seconds": 5119.475,
       "shard_id": 3,
-      "test_file_count": 26
+      "test_file_count": 27
     },
     {
-      "duration_seconds": 5112.655,
+      "duration_seconds": 5119.504,
       "shard_id": 4,
-      "test_file_count": 28
+      "test_file_count": 27
     },
     {
-      "duration_seconds": 5112.655,
+      "duration_seconds": 5119.509,
       "shard_id": 5,
-      "test_file_count": 28
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 5112.655,
+      "duration_seconds": 5119.474,
       "shard_id": 6,
-      "test_file_count": 26
+      "test_file_count": 27
     },
     {
-      "duration_seconds": 5112.68,
+      "duration_seconds": 5119.507,
       "shard_id": 7,
-      "test_file_count": 27
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 5112.653,
+      "duration_seconds": 5119.469,
       "shard_id": 8,
-      "test_file_count": 26
-    },
-    {
-      "duration_seconds": 5112.654,
-      "shard_id": 9,
-      "test_file_count": 26
-    },
-    {
-      "duration_seconds": 5112.653,
-      "shard_id": 10,
-      "test_file_count": 27
-    },
-    {
-      "duration_seconds": 5112.654,
-      "shard_id": 11,
       "test_file_count": 28
     },
     {
-      "duration_seconds": 5112.669,
-      "shard_id": 12,
+      "duration_seconds": 5119.468,
+      "shard_id": 9,
       "test_file_count": 27
+    },
+    {
+      "duration_seconds": 5119.493,
+      "shard_id": 10,
+      "test_file_count": 26
+    },
+    {
+      "duration_seconds": 5119.473,
+      "shard_id": 11,
+      "test_file_count": 27
+    },
+    {
+      "duration_seconds": 5119.467,
+      "shard_id": 12,
+      "test_file_count": 29
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 61351.923
+  "total_test_duration_seconds": 61433.821
 }

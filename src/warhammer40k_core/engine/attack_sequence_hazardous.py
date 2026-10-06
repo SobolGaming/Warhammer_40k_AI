@@ -1,6 +1,8 @@
 # ruff: noqa: E501,F401,F403,F405,I001
 # pyright: reportUnusedImport=false
 from __future__ import annotations
+
+from warhammer40k_core.engine.battlefield_visibility_context import battlefield_visibility_context
 from warhammer40k_core.engine.targetless_weapons import TargetlessWeapon
 
 from warhammer40k_core.engine.event_log import EventRecord
@@ -575,7 +577,8 @@ def _cover_for_allocated_model(
         observing_unit_id=attacking_unit_id,
         target_unit_id=pool.target_unit_instance_id,
     )
-    context = TerrainVisibilityContext.from_ruleset_descriptor(
+    context = battlefield_visibility_context(
+        scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         los_cache_key=shooting_visibility_cache_key(
             scenario=scenario,
@@ -647,7 +650,8 @@ def _fortification_cover_for_allocated_model(
             model=attacker_model,
             placement=attacker_placement,
         )
-        context = TerrainVisibilityContext.from_ruleset_descriptor(
+        context = battlefield_visibility_context(
+            scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             los_cache_key=shooting_visibility_cache_key(
                 scenario=scenario,

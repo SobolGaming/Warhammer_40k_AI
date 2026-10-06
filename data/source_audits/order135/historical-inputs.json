@@ -1,0 +1,134 @@
+{
+  "base": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+  "files": [
+    {
+      "path": "docs/ADAPTER_DECISION_CONTRACT.md",
+      "historical_path": "data/source_audits/order135/baseline/docs/ADAPTER_DECISION_CONTRACT.md.txt",
+      "bytes": 672343,
+      "sha256": "22f5f39b4bfefc91d07089edaf5c53cee77ed37b436139041275c5999134d1da",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "docs/ADAPTER_DECISION_CONTRACT.md"
+    },
+    {
+      "path": "src/warhammer40k_core/_engine_build_manifest.json",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/_engine_build_manifest.json.txt",
+      "bytes": 706458,
+      "sha256": "e12e89353a8216c74faba83d6d13afc0333cd06096ea6177bda7a9d565f4cd2c",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/_engine_build_manifest.json"
+    },
+    {
+      "path": "src/warhammer40k_core/core/visibility.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/core/visibility.py.txt",
+      "bytes": 38901,
+      "sha256": "912d675f133d3266aa67ddf667042a74bbe17eb9b2e73e757a2260f13d7c4b47",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/core/visibility.py"
+    },
+    {
+      "path": "src/warhammer40k_core/engine/attack_sequence_hazardous.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/engine/attack_sequence_hazardous.py.txt",
+      "bytes": 42004,
+      "sha256": "183dce3a3a0bf31af18f28fd7472829b7e71e207d46692bc65b60f623419c7ab",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/engine/attack_sequence_hazardous.py"
+    },
+    {
+      "path": "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/thousand_sons/army_rule.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/thousand_sons/army_rule.py.txt",
+      "bytes": 76008,
+      "sha256": "2a46a6ed983b3118519c716d1a43af665ef456d8640ba035e864c38f8c5b2d92",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/thousand_sons/army_rule.py"
+    },
+    {
+      "path": "src/warhammer40k_core/engine/hidden_detection.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/engine/hidden_detection.py.txt",
+      "bytes": 6172,
+      "sha256": "0acf5b9dac7487c11ce022a0e54701bdfe7a73d864d3d3b7e8e3be3b2a3244f3",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/engine/hidden_detection.py"
+    },
+    {
+      "path": "src/warhammer40k_core/engine/obscuring_model_cover.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/engine/obscuring_model_cover.py.txt",
+      "bytes": 7304,
+      "sha256": "e19a667436d0ec92af8636d31eb836a0d5e4b2bf3856171dfcc361dd399d8544",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/engine/obscuring_model_cover.py"
+    },
+    {
+      "path": "src/warhammer40k_core/engine/shooting_targets.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/engine/shooting_targets.py.txt",
+      "bytes": 58505,
+      "sha256": "70f8729c6f503aa3aaf42839a56c935f34707974d8a15a7ee2f218166d3259f9",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/engine/shooting_targets.py"
+    },
+    {
+      "path": "src/warhammer40k_core/geometry/continuous_visibility.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/geometry/continuous_visibility.py.txt",
+      "bytes": 15272,
+      "sha256": "f1a7b388dd4707f94f0b16603a6972b35b9ef31734272c3fbdb60505992564ed",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/geometry/continuous_visibility.py"
+    },
+    {
+      "path": "src/warhammer40k_core/geometry/visibility_formulas.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/geometry/visibility_formulas.py.txt",
+      "bytes": 20304,
+      "sha256": "57e5b162040a561f3133853870359137b07e6d3ed3b3847d4e087654e706eb57",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/geometry/visibility_formulas.py"
+    },
+    {
+      "path": "src/warhammer40k_core/rules/source_authority_registry.json",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/rules/source_authority_registry.json.txt",
+      "sha256": "282ad568ffb6a749351ef98d67c7f9a3c155ce0ed5326dcba3cb4855d997d7ec",
+      "bytes": 104550,
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/rules/source_authority_registry.json"
+    },
+    {
+      "path": "src/warhammer40k_core/rules/source_authority_registry.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/rules/source_authority_registry.py.txt",
+      "sha256": "0f7c062ee32f6388e98f8043d15dc15f77a0c1e8ebc61cc92875119d0241acc8",
+      "bytes": 25442,
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/rules/source_authority_registry.py"
+    },
+    {
+      "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/__init__.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/__init__.py.txt",
+      "sha256": "b4e38918b1b77d7f1f92908f35e1ef120e470aa2a1af6788f46e935e5b4dd369",
+      "bytes": 5657,
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/__init__.py"
+    },
+    {
+      "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/_artifacts.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/_artifacts.py.txt",
+      "sha256": "dd067eb457842e4584e7f1cd24e628c3d9d71d435f66a088250971da02232bf5",
+      "bytes": 10090,
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/_artifacts.py"
+    },
+    {
+      "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/artifacts/package.json",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/artifacts/package.json.txt",
+      "sha256": "a2fc98adb77bd14001798232710b218175b8dd318581dc151180521512207f86",
+      "bytes": 21579,
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/artifacts/package.json"
+    },
+    {
+      "path": "tools/build_core_other_concepts_source.py",
+      "historical_path": "data/source_audits/order135/baseline/tools/build_core_other_concepts_source.py.txt",
+      "sha256": "a8187b17f7b75d10dd9ba9967a5eb1d0e35aea94fbe9fa9493ef00b6e963ab2e",
+      "bytes": 16145,
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "tools/build_core_other_concepts_source.py"
+    }
+  ],
+  "qualification": "Original source/archive pins are immutable; appended current FAQ authority has distinct identity."
+}

@@ -573,3 +573,35 @@ def decide_full(
     observer: ModelDomain, target: ModelDomain, blockers: tuple[VisibilityPrism, ...]
 ) -> bool:
     return all(decide(formula) for formula in full_visibility_formulas(observer, target, blockers))
+
+
+def scaled_domain_membership(domain: ModelDomain, point: Point, scale: RealTerm) -> Formula:
+    """Membership without division, for a strictly positive homogeneous scale."""
+    displacement = (point[0] - scale * domain.center[0], point[1] - scale * domain.center[1])
+    a, b = domain.axes
+    determinant = a[0] * b[1] - a[1] * b[0]
+    u = displacement[0] * (b[1] / determinant) - displacement[1] * (b[0] / determinant)
+    v = displacement[1] * (a[0] / determinant) - displacement[0] * (a[1] / determinant)
+    footprint = (
+        (u * u + v * v).le(scale * scale)
+        if domain.curved
+        else both(u.ge(-scale), u.le(scale), v.ge(-scale), v.le(scale))
+    )
+    return both(footprint, point[2].ge(scale * domain.lower), point[2].le(scale * domain.upper))
+
+
+def target_surface_faces_origin(domain: ModelDomain, origin: Point, patch: TargetPatch) -> Formula:
+    """The original exact curved tangent/flat face/cap self-surface convention."""
+    return _self_visible(domain, origin, patch.point, patch.u, patch.v, patch.scale)
+
+
+def corridor_clear_condition(
+    origin: Point,
+    target: Point,
+    blockers: tuple[VisibilityPrism, ...],
+    scale: RealTerm,
+    *,
+    planar: bool,
+) -> tuple[Formula, tuple[str, ...]]:
+    """The shared nonvertical, one-millimeter external corridor predicate."""
+    return _clear(origin, target, blockers, scale, planar=planar)

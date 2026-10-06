@@ -1,5 +1,21 @@
 # Adapter Decision Contract
 
+## Order135: physical visibility and battlefield-edge origins
+
+Contract44.3.21 publishes shared physical visibility through existing shooting,
+cover, projection, event and persistence/replay surfaces. The support base and
+declared body components form the physical union; only outgoing origins are
+clipped to the inclusive battlefield boundary. Every gameplay context uses
+the engine-owned battlefield dimensions. Pure geometry contexts can explicitly
+remain unbounded. Visibility algorithm identity2 and complete input fingerprints
+bind these outcomes to the producing runtime. No decision or envelope family is
+added. The retained maintained-mirror FAQ and its authority qualification are
+recorded in `data/source_audits/order135/visibility-source.audit.json`.
+
+The October6 scope clarification accepts Order134's conditional Core restrictions
+while keeping admission of a faction deployment grant and its gameplay consumer
+separate. No in-turn deployment permission is inferred from this audit.
+
 ## Order134: conditional oversized deployment restrictions
 
 Contract44.3.20 publishes the conditional restriction infrastructure through
