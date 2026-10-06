@@ -100,6 +100,7 @@
     "tests/unit/test_order125_implicit_subjects.py": 402.977,
     "tests/unit/test_order126_sequential_movement.py": 396.815,
     "tests/unit/test_order128_setup_model_fit.py": 6.673,
+    "tests/unit/test_order129_flight_history.py": 385.683,
     "tests/unit/test_order36_sequencing.py": 249.366,
     "tests/unit/test_order36_timing_authority.py": 171.554,
     "tests/unit/test_order51_flight.py": 211.812,
@@ -316,76 +317,78 @@
     {
       "junit_sha256": [
         "0cbe117e799b184b07c0a6ce6c07f6dc3aba5b1f4f23fbf16c8757867d3c31a6",
-        "78e98164ddb45312ff03cda134813ec4a2a53f9f1432e7b500b7128e03fa53ad"
+        "78e98164ddb45312ff03cda134813ec4a2a53f9f1432e7b500b7128e03fa53ad",
+        "db19530a7f625ddbf131ed20a6f8deecd6fde971a8c518d2bec0015c4c634859",
+        "e83a1661365872b3bc9547248f25604ece76ff27e9bf2d5aa27974f573e64f9a"
       ],
-      "source": "Order128 complete corrected current cohort HEAD 317caa97048b891870c8301b881ae65668e7b3fe, tree 099adfed0f0814c5a57d5507dd63532049a48d47: all 10972 cases once, 16 serial polygon cases and remaining cases in 32 parallel workers, all phases/durations authenticated; no predecessor or focused timings. JUnit SHA256 serial 0cbe117e799b184b07c0a6ce6c07f6dc3aba5b1f4f23fbf16c8757867d3c31a6; parallel 78e98164ddb45312ff03cda134813ec4a2a53f9f1432e7b500b7128e03fa53ad.",
-      "test_cases": 10972,
-      "test_files": 311
+      "source": "Order129 provisional inventory: complete prior Order128 profile plus 11 successful current Fly and ordinary controls and two current FallBack controls. Complete current covered Order129 cohort replaces all provisional timings. Base b6e55e2dd3ca0a04169093e60060134febca528b",
+      "test_cases": 10985,
+      "test_files": 312
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 4961.22,
+      "duration_seconds": 4993.305,
       "shard_id": 1,
-      "test_file_count": 24
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 4961.154,
+      "duration_seconds": 4993.311,
       "shard_id": 2,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4961.151,
+      "duration_seconds": 4993.316,
       "shard_id": 3,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4961.159,
+      "duration_seconds": 4993.301,
       "shard_id": 4,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4961.15,
+      "duration_seconds": 4993.327,
       "shard_id": 5,
-      "test_file_count": 27
+      "test_file_count": 25
     },
     {
-      "duration_seconds": 4961.177,
+      "duration_seconds": 4993.331,
       "shard_id": 6,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4961.173,
+      "duration_seconds": 4993.341,
       "shard_id": 7,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4961.155,
+      "duration_seconds": 4993.326,
       "shard_id": 8,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4961.218,
+      "duration_seconds": 4993.303,
       "shard_id": 9,
-      "test_file_count": 26
+      "test_file_count": 27
     },
     {
-      "duration_seconds": 4961.216,
+      "duration_seconds": 4993.33,
       "shard_id": 10,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4961.209,
+      "duration_seconds": 4993.33,
       "shard_id": 11,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4961.151,
+      "duration_seconds": 4993.295,
       "shard_id": 12,
       "test_file_count": 27
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 59534.133
+  "total_test_duration_seconds": 59919.816
 }

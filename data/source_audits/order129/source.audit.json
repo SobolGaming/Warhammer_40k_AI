@@ -1,0 +1,88 @@
+{
+  "order": 129,
+  "started": true,
+  "scope": "P03J/C03-10; faq-e5941469-5653-49b2-919e-9c9246e811d4-obligation-01",
+  "roadmap_row": "| 129 | P03J | C03-10 | Order 97 identifies the source/consumer gap documented in its pinned evidence. | A legal witnessed Fly Advance crosses enemy Engagement Range and ends unengaged, but its exact facade checkpoint fails Advance-history restoration. Authenticate Fly movement modes in shared boundary history without weakening movement evidence, and cover restored projections and exact replay. | Selected Order 97 clauses: faq-e5941469-5653-49b2-919e-9c9246e811d4-obligation-01. Full literal blocks and owner links are in the [inventory](ORDER_97_EVIDENCE_REPORT.md). | PEVIDENCE | IMPLEMENTATION-GAP |",
+  "selected_source": {
+    "row_id": "faq:e5941469-5653-49b2-919e-9c9246e811d4",
+    "category": "FAQ",
+    "locator": "e5941469-5653-49b2-919e-9c9246e811d4",
+    "title": "FAQ 05",
+    "occurrence": 1,
+    "source_sha256": "819dd65da567f7dae1c13e61e2e2a43c02b1188d605f1458b3c5778eefe50b36",
+    "blocks": [
+      {
+        "ordinal": 1,
+        "kind": "question",
+        "sha256": "983945f93c3ca9467f81bea3870f40bc0964ceb668a43e64d1ddd6e643ce9917",
+        "value": "Does my model or unit become engaged while moving through a enemy units engagement range during a move?"
+      },
+      {
+        "ordinal": 2,
+        "kind": "answer",
+        "sha256": "b2cbc4e2e5545a6c43f6f8cc8f0e4766773fa6c83d238076313b6fa1e349caf6",
+        "value": "No"
+      }
+    ],
+    "selected_provider": "Game Datamissions",
+    "historical_source_row_sha256": "028655556a3ed2f8c57d4f6605ab183ffd403f7231353c53239f6ffde64c4c31",
+    "review_category": "03"
+  },
+  "selected_literal_blocks": [
+    {
+      "ordinal": 2,
+      "kind": "answer",
+      "sha256": "b2cbc4e2e5545a6c43f6f8cc8f0e4766773fa6c83d238076313b6fa1e349caf6",
+      "value": "No"
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "faq-e5941469-5653-49b2-919e-9c9246e811d4-obligation-01",
+      "source_blocks": [
+        2
+      ],
+      "summary": "Transiting an enemy Engagement Range does not itself establish engagement during a move.",
+      "owners": [
+        "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:validate_primary_mission_boundary_unit_history_authority"
+      ],
+      "evidence": [
+        {
+          "nodeid": "tests/unit/test_order97_movement_evidence.py::test_flying_transit_through_engagement_does_not_establish_engagement",
+          "role": "facade",
+          "assertion": "assert not unit_within_enemy_engagement_range(state=state, unit_instance_id='army-alpha:mover')",
+          "proves": "An accepted witnessed Fly Advance crosses an enemy Engagement Range and ends outside it; neither unit remains engaged."
+        }
+      ],
+      "qualifications": [
+        "Evidence gap: The accepted, witnessed Fly Advance passes transit and final engagement checks; its exact facade checkpoint fails Advance authority reconstruction. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding flying-advance-restore-authority."
+      ]
+    }
+  ],
+  "retained_diagnostic": {
+    "finding": "flying-advance-restore-authority",
+    "source_ref": "03.06",
+    "requirement_id": "faq-e5941469-5653-49b2-919e-9c9246e811d4-obligation-01",
+    "expected": "exact restore of accepted Fly Advance",
+    "observed": "Primary mission boundary Advance state lacks exact authority.",
+    "owner": "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:validate_primary_mission_boundary_unit_history_authority",
+    "scope": "The accepted, witnessed Fly Advance passes transit and final engagement checks; its exact facade checkpoint fails Advance authority reconstruction."
+  },
+  "diagnostic_locators": [
+    "tests/order97_gap_probes_01_08.py:210: def flying_advance_restore_observation() -> dict[str, object]:"
+  ],
+  "pinned_git_blob_sha256": {
+    "data/source_audits/order97/selected-sources.json": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+    "data/source_audits/order97/categories/03.json": "1e5f98b23d3e0dbad9cfcff967c54b02aae899c93cfa500528d6c65b6d7d3cbe",
+    "data/source_audits/order97/observed_gaps_01_08.json": "93d0f121e578099c7c52155131668d8706fbc7689afe5fa8ac1267228e107bde",
+    "tests/order97_gap_probes_01_08.py": "e4e908605e084a8106e0aab42f52fb425f2c6f4ff5705c639ddad29c5ca762cc"
+  },
+  "boundary": "P03J/C03-10 obligation01 only. Accepted movement proposals, modes and physical witnesses remain authoritative across existing turn-end cleanup; earlier restrictions remain. No source expansion.",
+  "base": "b6e55e2dd3ca0a04169093e60060134febca528b",
+  "tree": "e7d9676b671ab5e48d801e239324be7135303b93",
+  "baseline_verified": true,
+  "checkout": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-05\\task-12\\order129",
+  "truthfulness": "The original canonical fixture adds the FLY keyword explicitly. Native Be'lakor uses the admitted datasheet, native FLY keyword/wargear and reconciled catalog geometry. Mission setup explicitly broadens the fixture detachment force-disposition admission. No named-faction activation or physical provider certification is claimed.",
+  "acceptance": "Accepted witnessed Fly Advance crosses engagement and ends unengaged; preserve mode and physical evidence, legal/rejected proposals, pre-cleanup and post-cleanup checkpoint restore, independent fork, both players/all viewer roles/events and exact replay. Preserve the original assertions and archives.",
+  "observed_root_cause": "The retained facade advances automatically through turn-end cleanup. The resulting scoring-commit checkpoint correctly has empty Advance/Fall Back state; reconstruction still accumulates prior accepted action IDs. Flight is a separate movement mode, not a different action token."
+}

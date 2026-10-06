@@ -35,6 +35,16 @@ def validate_primary_mission_boundary_unit_history_authority(
         decision_records=decision_records,
         checkpoint=checkpoint,
     )
+    if _is_post_cleanup_scoring_checkpoint(
+        state=state,
+        event_records=event_records,
+        checkpoint_index=checkpoint_index,
+        checkpoint=checkpoint,
+    ):
+        # Accepted movement remains authenticated above. Turn-end scoring commits
+        # follow cleanup, unlike the earlier control and turn-end rule snapshots.
+        advanced_ids.clear()
+        fell_back_ids.clear()
     checkpoint_advanced_ids = _unit_ids_from_state_jsons(checkpoint.advanced_unit_state_jsons)
     checkpoint_fell_back_ids = _unit_ids_from_state_jsons(checkpoint.fell_back_unit_state_jsons)
     if advanced_ids != checkpoint_advanced_ids:
@@ -92,6 +102,49 @@ def _movement_history_ids(
         elif action == "fall_back":
             fell_back.add(unit_id)
     return advanced, fell_back
+
+
+def _is_post_cleanup_scoring_checkpoint(
+    *,
+    state: GameState,
+    event_records: tuple[EventRecord, ...],
+    checkpoint_index: int,
+    checkpoint: PrimaryMissionBoundaryCheckpoint,
+) -> bool:
+    from warhammer40k_core.engine.objective_control import ObjectiveControlTiming
+    from warhammer40k_core.engine.primary_scoring_commit_checkpoint import (
+        PRIMARY_SCORING_COMMIT_BOUNDARY_KIND,
+        PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT,
+    )
+
+    if checkpoint.boundary_kind != PRIMARY_SCORING_COMMIT_BOUNDARY_KIND:
+        return False
+    event = event_records[checkpoint_index]
+    payload = _event_payload(event, context="scoring commit")
+    if (
+        event.event_type != PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT
+        or payload.get("checkpoint") != checkpoint.to_payload()
+    ):
+        raise GameLifecycleError("Primary mission scoring commit checkpoint authority drifted.")
+    records = tuple(
+        record
+        for record in state.objective_control_records
+        if record.record_id == payload.get("objective_control_record_id")
+    )
+    if len(records) != 1:
+        raise GameLifecycleError("Primary mission scoring commit control authority drifted.")
+    if records[0].timing is not ObjectiveControlTiming.TURN_END:
+        return False
+    cleanups = tuple(
+        cleanup
+        for cleanup in state.end_turn_cleanup_states
+        if cleanup.battle_round == checkpoint.battle_round
+        and cleanup.active_player_id == checkpoint.active_player_id
+        and cleanup.phase == checkpoint.phase
+    )
+    if len(cleanups) != 1:
+        raise GameLifecycleError("Primary mission scoring commit turn cleanup authority drifted.")
+    return True
 
 
 def _validate_battle_shock_authority(

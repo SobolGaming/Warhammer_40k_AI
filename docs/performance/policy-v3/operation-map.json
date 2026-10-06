@@ -4838,6 +4838,76 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order129-flight-history": {
+      "paths": [
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/engine/movement_decision_authority.py",
+        "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py"
+      ],
+      "owners": [
+        "@module",
+        "_is_post_cleanup_scoring_checkpoint",
+        "validate_movement_completion_decision_authority",
+        "validate_primary_mission_boundary_unit_history_authority"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order129-regressions": {
+      "paths": [
+        "tests/order129_helpers.py",
+        "tests/unit/test_order129_flight_history.py"
+      ],
+      "owners": [
+        "@module",
+        "assert_flight_checkpoint",
+        "flight_proposal",
+        "native_flight_session",
+        "submit_flight",
+        "test_fall_back_modes_restore_after_the_same_native_turn_cleanup",
+        "test_fly_transit_pending_rejected_retry_and_post_cleanup_history",
+        "test_ground_advance_cannot_borrow_fly_transit_and_can_retry_away",
+        "test_ordinary_and_flight_modes_keep_complete_post_cleanup_authority",
+        "test_original_fly_transit_exact_checkpoint_restores_forks_and_replays",
+        "test_post_cleanup_commit_still_authenticates_movement_and_cleanup"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order129-source-evidence": {
+      "paths": [
+        "data/source_audits/order129/source.audit.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order129-contract-publication": {
+      "paths": [
+        "conformance/typescript/src/contract.ts",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/migrations/44.3.14-to-44.3.15.md",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

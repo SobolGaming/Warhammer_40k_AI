@@ -7698,3 +7698,9 @@ parameterized proposals and diagnostics for whole-model fit and proven
 impossible-fit body overhang. Atomic invalid submissions, retry, engine-owned
 placement records and viewer-scoped events retain the existing contract.
 No new decision family, proposal field or visibility rule is introduced.
+
+
+Order129 / Contract44.3.15 uses the existing finite movement action/flight choice,
+parameterized witnessed movement and scoring checkpoint families. Restore binds
+the accepted mode and retains turn actions before cleanup, then authenticates
+the existing post-cleanup scoring commit. No payload or visibility change.
