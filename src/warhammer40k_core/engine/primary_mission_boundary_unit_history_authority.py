@@ -142,9 +142,11 @@ def _is_post_cleanup_scoring_checkpoint(
         and cleanup.active_player_id == checkpoint.active_player_id
         and cleanup.phase == checkpoint.phase
     )
-    if len(cleanups) != 1:
+    if len(cleanups) > 1:
         raise GameLifecycleError("Primary mission scoring commit turn cleanup authority drifted.")
-    return True
+    # Supported state-backed scoring may commit before native cleanup.
+    # Its checkpoint still carries the authenticated turn-action restrictions.
+    return bool(cleanups)
 
 
 def _validate_battle_shock_authority(
