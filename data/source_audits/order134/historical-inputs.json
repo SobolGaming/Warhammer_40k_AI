@@ -1,0 +1,14 @@
+{
+  "order": 134,
+  "base_commit": "52f17e357ee900e1214c026246be3dedb73b5272",
+  "files": [
+    {
+      "path": "src/warhammer40k_core/engine/large_model_restrictions.py",
+      "historical_path": "data/source_audits/order134/historical/large_model_restrictions.py.txt",
+      "git_revision": "52f17e357ee900e1214c026246be3dedb73b5272",
+      "git_path": "src/warhammer40k_core/engine/large_model_restrictions.py",
+      "sha256": "432346937c4c9900f312bb5b52f9ba54256289033ebfdf607e537317e7513921",
+      "bytes": 2858
+    }
+  ]
+}

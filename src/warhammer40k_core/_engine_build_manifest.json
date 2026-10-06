@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4dc9d828cac21d568fc4ff81b5a65e8e767e372a67cf9212c19c329a68408766",
-  "fingerprint": "4dc9d828cac21d568fc4ff81b5a65e8e767e372a67cf9212c19c329a68408766",
-  "resource_count": 3091,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:110f573cc70342f09c3102916f918a54a64f7b50f0966cdbdb51eba2b6de970e",
+  "fingerprint": "110f573cc70342f09c3102916f918a54a64f7b50f0966cdbdb51eba2b6de970e",
+  "resource_count": 3092,
   "resources": [
     {
       "byte_length": 113,
@@ -62,7 +62,7 @@
     {
       "byte_length": 6285,
       "path": "warhammer40k_core/adapters/external_contract.py",
-      "sha256": "6d099f4cb2753e8b7db50f9a282ffb674ddd3bdb58d59a2a651fe440578a11a3"
+      "sha256": "0d3a23e0109b30e7ce969db876b4a0b9186b44ee3685f183dd5bbdc913257bbb"
     },
     {
       "byte_length": 2445,
@@ -10520,9 +10520,14 @@
       "sha256": "c0f4860137e746ab5a2486a2298c0d4a1dba72e8059d551eeefb47fa3ba1b17e"
     },
     {
-      "byte_length": 2858,
+      "byte_length": 7765,
+      "path": "warhammer40k_core/engine/large_model_deployment_restrictions.py",
+      "sha256": "e0123a6a0e61db060ce5b8a2c7ad63bf511a7431631f35531de1a475b11e462d"
+    },
+    {
+      "byte_length": 3143,
       "path": "warhammer40k_core/engine/large_model_restrictions.py",
-      "sha256": "432346937c4c9900f312bb5b52f9ba54256289033ebfdf607e537317e7513921"
+      "sha256": "73f587a912fe2e2942602a05b642ffbb5452d4d8c84409d82b90261d894a175d"
     },
     {
       "byte_length": 6053,
@@ -12340,9 +12345,9 @@
       "sha256": "ab1d8b482946aed79e3befd5409adae8f95e21f4e2e66155962e38ed6e6efc41"
     },
     {
-      "byte_length": 6525,
+      "byte_length": 6892,
       "path": "warhammer40k_core/engine/rules_unit_effects.py",
-      "sha256": "0e56fa386b568cd8d900202c24f558a7fec2f1634f357ea847398e218219344a"
+      "sha256": "0d0790424237ca7490074c9031f49dbf06d967285164e4e79bf4a809afe054fc"
     },
     {
       "byte_length": 4658,

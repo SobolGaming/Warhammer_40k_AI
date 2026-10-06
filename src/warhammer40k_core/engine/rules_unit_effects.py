@@ -122,6 +122,10 @@ def validate_persisting_effects(
 ) -> list[PersistingEffect]:
     from warhammer40k_core.engine.activity_restrictions import activity_restriction_payload
     from warhammer40k_core.engine.firing_deck_restrictions import firing_deck_restriction_payload
+    from warhammer40k_core.engine.large_model_deployment_restrictions import (
+        deployment_restriction_payload,
+        validate_deployment_restriction_identity,
+    )
 
     if not isinstance(effects, list):
         raise GameLifecycleError("GameState persisting_effects must be a list.")
@@ -146,6 +150,9 @@ def validate_persisting_effects(
             raise GameLifecycleError("GameState persisting_effects must be unique.")
         activity_restriction_payload(effect)
         firing_deck_restriction_payload(effect)
+        deployment = deployment_restriction_payload(effect)
+        if deployment is not None:
+            validate_deployment_restriction_identity(state=state, effect=effect, row=deployment)
         seen.add(effect.effect_id)
         validated.append(effect)
     from warhammer40k_core.engine.fights_first_native import validate_native_fights_first_effects

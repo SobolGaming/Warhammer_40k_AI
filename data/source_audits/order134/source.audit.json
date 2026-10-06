@@ -1,0 +1,198 @@
+{
+  "order": 134,
+  "started": true,
+  "scope": "P03L/C03-12; 03.02.02-obligation-02; 03.02.02-obligation-03",
+  "selected_source": {
+    "row_id": "rule:03:03.02.02:1",
+    "category": "03",
+    "locator": "03.02.02",
+    "title": "Setting Up Large Models",
+    "occurrence": 1,
+    "source_sha256": "910af631243255d6f41c6eb1c64fabad2de8e7999528fbcf837883fcce10d169",
+    "blocks": [
+      {
+        "ordinal": 1,
+        "kind": "text",
+        "sha256": "30ff07cd8257373f04601a530ea72bbb1b2ff67ef93fe35343b04da8d8475dc6",
+        "value": "If a model cannot meet all of its set up restrictions because it is too large, consult the relevant section below:"
+      },
+      {
+        "ordinal": 2,
+        "kind": "text",
+        "sha256": "c3767fbc0392427a5b67bb2ec5ea32761d4ddde1c6f299c08985225ee6533f94",
+        "value": "\u0005During Deployment:\u0006 If a model is so large that its base cannot physically be set up wholly within your deployment zone, it must be set up so that it is touching your battlefield edge. During a turn in which such a large model is set up on the battlefield, that model’s unit cannot do any of the following:"
+      },
+      {
+        "ordinal": 3,
+        "kind": "text",
+        "sha256": "f3caec085b254a314eade071617ae95c05f4e558aa25eefcbb05f307221c6004",
+        "value": "• Make a \u0005normal/advance/fall-back/charge move\u0006."
+      },
+      {
+        "ordinal": 4,
+        "kind": "text",
+        "sha256": "f1eef65b33b8ddb1f49dccc0fc81d19efb92c02ae7591b4da9182829de4510e7",
+        "value": "• Make any attacks with ranged weapons."
+      },
+      {
+        "ordinal": 5,
+        "kind": "text",
+        "sha256": "f59794a4519d7ba3b86a00180823cbb4bc1bdb1b80030b278130dd5ff77fcf86",
+        "value": "Some large models, typically \u0003Aircraft\u0004, have wings and other parts that extend significantly beyond their base. Such models can overhang a deployment zone if it is not possible to set them up otherwise, but when setting them up, their base must still be wholly within that deployment zone."
+      },
+      {
+        "ordinal": 6,
+        "kind": "text",
+        "sha256": "828452cdad23b1b8d8182a6cdb4125ef636e4e7f23fac74dc6095e459eb546e3",
+        "value": "\u0005From Strategic Reserves:\u0006 If a model is so large that its base cannot physically be set up wholly within the distance required of the battlefield edge, it must be set up so that it is touching a battlefield edge. During a turn in which such a large model is set up on the battlefield (excluding \u0003AIRCRAFT\u0004 models), that model’s unit cannot do any of the following:"
+      },
+      {
+        "ordinal": 7,
+        "kind": "text",
+        "sha256": "cc211e95bac9e280b11ae21db75943a9eb3f02fa37bdfa27cd45020c72f4a1fa",
+        "value": "normal/advance/fall-back/charge move."
+      },
+      {
+        "ordinal": 8,
+        "kind": "text",
+        "sha256": "3854c84c493ff2d358202fe6f3fcef9399d6979c29dc6b9cf09918c7f733bddd",
+        "value": "Make any attacks with ranged weapons."
+      },
+      {
+        "ordinal": 9,
+        "kind": "text",
+        "sha256": "a92c3c6abb464a2090c7dff1820387523629e812704a9a549aa5b88722a4f5d1",
+        "value": "Some large models, typically \u0003Aircraft\u0004, have wings and other parts that extend significantly beyond their base. Such models can overhang a battlefield edge if it is not possible to set them up otherwise, but when setting them up, they must still be more than 8\" away from all enemy units."
+      },
+      {
+        "ordinal": 10,
+        "kind": "text",
+        "sha256": "1cd9d5a122a30c0f6e53e7b9bd791cc439d6c80c563443c5d72951c1410b05cb",
+        "value": "\u0005Disembarking from a Transport:\u0006 When a unit disembarks from a \u0003Transport\u0004, it must be set up wholly within 3\" of that model. If a disembarking model is so large that it is not possible to set it up wholly within 3\" (typically because it is itself larger than 3\" in all directions), set that model up with its base within 1\" of that \u0003Transport\u0004’s base (or hull), and not \u0005engaged\u0006 with any enemy units."
+      }
+    ],
+    "selected_provider": "Game Datamissions",
+    "historical_source_row_sha256": "4f88ed512d55c8ece4fe108889e82336e61a38b7b78e27c5a2d14b7ceec606e3",
+    "review_category": "03"
+  },
+  "selected_literal_blocks": [
+    {
+      "ordinal": 3,
+      "kind": "text",
+      "sha256": "f3caec085b254a314eade071617ae95c05f4e558aa25eefcbb05f307221c6004",
+      "value": "• Make a \u0005normal/advance/fall-back/charge move\u0006."
+    },
+    {
+      "ordinal": 4,
+      "kind": "text",
+      "sha256": "f1eef65b33b8ddb1f49dccc0fc81d19efb92c02ae7591b4da9182829de4510e7",
+      "value": "• Make any attacks with ranged weapons."
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "03.02.02-obligation-02",
+      "source_blocks": [
+        3
+      ],
+      "summary": "An oversized deployment locks Normal, Advance, Fall Back, and Charge movement for that setup turn.",
+      "owners": [
+        "src/warhammer40k_core/engine/deployment.py:resolve_deployment_placement",
+        "src/warhammer40k_core/engine/large_model_restrictions.py:large_model_activity_reason"
+      ],
+      "evidence": [
+        {
+          "nodeid": "tests/unit/test_order97_movement_evidence.py::test_oversized_deployment_consumer_is_limited_to_pregame_setup",
+          "role": "semantic",
+          "assertion": "assert state.stage is GameLifecycleStage.SETUP",
+          "proves": "The canonical oversized deployment consumer runs during pregame setup."
+        },
+        {
+          "nodeid": "tests/unit/test_order97_movement_evidence.py::test_oversized_deployment_consumer_is_limited_to_pregame_setup",
+          "role": "semantic",
+          "assertion": "assert state.active_player_id is None",
+          "proves": "This accepted pregame setup is outside an active player turn and does not establish a first-turn lock."
+        },
+        {
+          "nodeid": "tests/unit/test_order97_movement_evidence.py::test_oversized_deployment_consumer_is_limited_to_pregame_setup",
+          "role": "semantic",
+          "assertion": "assert result.is_valid",
+          "proves": "The real deployment geometry owner accepts the oversized edge placement in its applicable setup stage."
+        },
+        {
+          "nodeid": "tests/unit/test_order97_movement_evidence.py::test_oversized_deployment_consumer_is_limited_to_pregame_setup",
+          "role": "invalid",
+          "assertion": "with pytest.raises(GameLifecycleError, match='Deployment placement requires setup stage'):\n    resolve_deployment_placement(state=state, ruleset_descriptor=state.runtime_ruleset_descriptor(), request=request, proposal=proposal)",
+          "proves": "The same deployment owner raises a typed error in BATTLE; this proves its current stage boundary, not execution of the conditional in-turn activity lock."
+        }
+      ],
+      "qualifications": [
+        "Source gap: C03-12/P03L. The cited test proves only the source/consumer boundary: the supported deployment owner accepts pregame setup and rejects BATTLE. As documented in Order 54, pregame deployment occurs outside player turns and creates no first-turn lock. The conditional deployment-turn activity restriction has no applicable authenticated in-turn deployment consumer; reconcile the source and owning path before certifying that branch. This is not a reproduced gameplay violation. The Strategic Reserves AIRCRAFT exemption does not certify or modify the deployment clause."
+      ]
+    },
+    {
+      "requirement_id": "03.02.02-obligation-03",
+      "source_blocks": [
+        4
+      ],
+      "summary": "An oversized deployment locks ranged attacks for that setup turn.",
+      "owners": [
+        "src/warhammer40k_core/engine/deployment.py:resolve_deployment_placement",
+        "src/warhammer40k_core/engine/large_model_restrictions.py:large_model_activity_reason"
+      ],
+      "evidence": [
+        {
+          "nodeid": "tests/unit/test_order97_movement_evidence.py::test_oversized_deployment_consumer_is_limited_to_pregame_setup",
+          "role": "semantic",
+          "assertion": "assert state.stage is GameLifecycleStage.SETUP",
+          "proves": "The canonical oversized deployment consumer runs during pregame setup."
+        },
+        {
+          "nodeid": "tests/unit/test_order97_movement_evidence.py::test_oversized_deployment_consumer_is_limited_to_pregame_setup",
+          "role": "semantic",
+          "assertion": "assert state.active_player_id is None",
+          "proves": "This accepted pregame setup is outside an active player turn and does not establish a first-turn lock."
+        },
+        {
+          "nodeid": "tests/unit/test_order97_movement_evidence.py::test_oversized_deployment_consumer_is_limited_to_pregame_setup",
+          "role": "semantic",
+          "assertion": "assert result.is_valid",
+          "proves": "The real deployment geometry owner accepts the oversized edge placement in its applicable setup stage."
+        },
+        {
+          "nodeid": "tests/unit/test_order97_movement_evidence.py::test_oversized_deployment_consumer_is_limited_to_pregame_setup",
+          "role": "invalid",
+          "assertion": "with pytest.raises(GameLifecycleError, match='Deployment placement requires setup stage'):\n    resolve_deployment_placement(state=state, ruleset_descriptor=state.runtime_ruleset_descriptor(), request=request, proposal=proposal)",
+          "proves": "The same deployment owner raises a typed error in BATTLE; this proves its current stage boundary, not execution of the conditional in-turn activity lock."
+        }
+      ],
+      "qualifications": [
+        "Source gap: C03-12/P03L. The cited test proves only the source/consumer boundary: the supported deployment owner accepts pregame setup and rejects BATTLE. As documented in Order 54, pregame deployment occurs outside player turns and creates no first-turn lock. The conditional deployment-turn activity restriction has no applicable authenticated in-turn deployment consumer; reconcile the source and owning path before certifying that branch. This is not a reproduced gameplay violation. The Strategic Reserves AIRCRAFT exemption does not certify or modify the deployment clause."
+      ]
+    }
+  ],
+  "roadmap_row": "| 134 | P03L | C03-12 | Order 97 identifies the source/consumer gap documented in its pinned evidence. | Reconcile conditional during-turn oversized deployment restrictions with the setup-only deployment owner. Preserve the Order54 convention that pregame deployment creates no first-turn lock, and do not borrow the Strategic Reserves AIRCRAFT exception. Establish an applicable source-linked in-turn consumer before certifying the conditional activity restrictions; the retained boundary test does not assert a current gameplay violation. | Selected Order 97 clauses: 03.02.02-obligation-02; 03.02.02-obligation-03. Full literal blocks and owner links are in the [inventory](ORDER_97_EVIDENCE_REPORT.md). | PEVIDENCE | SOURCE-GOVERNANCE |",
+  "pinned_canonical_bytes_sha256": {
+    "data/source_audits/order97/selected-sources.json": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+    "data/source_audits/order97/categories/03.json": "1e5f98b23d3e0dbad9cfcff967c54b02aae899c93cfa500528d6c65b6d7d3cbe",
+    "data/source_audits/order97/observed_gaps_01_08.json": "93d0f121e578099c7c52155131668d8706fbc7689afe5fa8ac1267228e107bde",
+    "tests/order97_gap_probes_01_08.py": "e4e908605e084a8106e0aab42f52fb425f2c6f4ff5705c639ddad29c5ca762cc",
+    "tests/unit/test_order97_movement_evidence.py": "8982c39453c49888d00e921361a7ee0ba30d1de0cc3141fdb7c2738b57dbc388",
+    "src/warhammer40k_core/engine/deployment.py": "e4266d07aaaaac8f7dda6d47b91e322768fa442fcd089bf1d64374110c88875f",
+    "src/warhammer40k_core/engine/large_model_restrictions.py": "432346937c4c9900f312bb5b52f9ba54256289033ebfdf607e537317e7513921"
+  },
+  "acceptance": "User-approved conditional infrastructure only: implement and test the selected deployment-turn movement/charge/ranged restrictions using shared persistent effects and activity consumers. Preserve pregame no-first-turn-lock and unchanged Strategic Reserves AIRCRAFT semantics. Leave playable in-turn gameplay certification OPEN until an authenticated granting rule and admitted consumer exist. Constructed conditional checkpoint tests must be labelled as such; no BATTLE deployment admission is added.",
+  "boundary": "P03L/C03-12, 03.02.02 obligations02/03 only. No granting rule, provider, deployment action, permission or generic placement family is admitted. Geometry and permission remain prerequisites for a future caller; this seam records an already-qualified condition, never qualifies or places models.",
+  "original_acceptance": "Reconcile conditional during-turn oversized deployment restrictions with the setup-only deployment owner. Preserve the Order54 convention that pregame deployment creates no first-turn lock, and do not borrow the Strategic Reserves AIRCRAFT exception. Establish an applicable source-linked in-turn consumer before certifying the conditional activity restrictions; the retained boundary test does not assert a current gameplay violation.",
+  "scope_revision_authorization": {
+    "assistant_question": "I recommend implementing and testing the conditional restrictions now, while explicitly leaving in-turn gameplay certification open until there’s a rule granting that deployment. Would you prefer that, or defer Order134 and continue to Order135?",
+    "user_answer": "yes, implement and test the conditional restriction now",
+    "date": "2026-10-06"
+  },
+  "base": "52f17e357ee900e1214c026246be3dedb73b5272",
+  "gameplay_certification": "OPEN: no retained admitted in-turn deployment grant/consumer. Existing deployment resolves SETUP only and continues to reject BATTLE.",
+  "conditional_evidence": "Constructed qualifying model/occasion contexts, then existing shared activity owners, native facade controls, valid persistence, isolated forks, viewer projections, events, exact checkpoint replay and native turn continuation. These are restriction-infrastructure evidence, not a source-backed in-turn deployment path.",
+  "preserved_input_mapping": {
+    "src/warhammer40k_core/engine/large_model_restrictions.py": "data/source_audits/order134/historical/large_model_restrictions.py.txt"
+  }
+}
