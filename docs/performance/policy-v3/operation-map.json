@@ -4871,6 +4871,7 @@
         "test_ground_advance_cannot_borrow_fly_transit_and_can_retry_away",
         "test_ordinary_and_flight_modes_keep_complete_post_cleanup_authority",
         "test_original_fly_transit_exact_checkpoint_restores_forks_and_replays",
+        "test_pending_movement_mode_omission_is_rejected_atomically",
         "test_post_cleanup_commit_still_authenticates_movement_and_cleanup"
       ],
       "families": [],

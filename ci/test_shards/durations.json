@@ -100,7 +100,7 @@
     "tests/unit/test_order125_implicit_subjects.py": 402.977,
     "tests/unit/test_order126_sequential_movement.py": 396.815,
     "tests/unit/test_order128_setup_model_fit.py": 6.673,
-    "tests/unit/test_order129_flight_history.py": 385.683,
+    "tests/unit/test_order129_flight_history.py": 406.885,
     "tests/unit/test_order36_sequencing.py": 249.366,
     "tests/unit/test_order36_timing_authority.py": 171.554,
     "tests/unit/test_order51_flight.py": 211.812,
@@ -318,77 +318,78 @@
       "junit_sha256": [
         "0cbe117e799b184b07c0a6ce6c07f6dc3aba5b1f4f23fbf16c8757867d3c31a6",
         "78e98164ddb45312ff03cda134813ec4a2a53f9f1432e7b500b7128e03fa53ad",
+        "bfecc4f72798cce5643114d0a4afcdbbbee22f7f0f5c176a3c06f6e276ff96dc",
         "db19530a7f625ddbf131ed20a6f8deecd6fde971a8c518d2bec0015c4c634859",
         "e83a1661365872b3bc9547248f25604ece76ff27e9bf2d5aa27974f573e64f9a"
       ],
-      "source": "Order129 provisional inventory: complete prior Order128 profile plus 11 successful current Fly and ordinary controls and two current FallBack controls. Complete current covered Order129 cohort replaces all provisional timings. Base b6e55e2dd3ca0a04169093e60060134febca528b",
-      "test_cases": 10985,
+      "source": "Order129 provisional inventory from retained complete prior Order128 profile, 13 successful scoped flight/ordinary/FallBack controls and two current atomic mode-omission controls. Complete current covered cohort will exclusively replace provisional timings. Base b6e55e2dd3ca0a04169093e60060134febca528b",
+      "test_cases": 10987,
       "test_files": 312
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 4993.305,
+      "duration_seconds": 4995.049,
       "shard_id": 1,
-      "test_file_count": 26
-    },
-    {
-      "duration_seconds": 4993.311,
-      "shard_id": 2,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4993.316,
+      "duration_seconds": 4995.043,
+      "shard_id": 2,
+      "test_file_count": 26
+    },
+    {
+      "duration_seconds": 4995.118,
       "shard_id": 3,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4993.301,
+      "duration_seconds": 4995.113,
       "shard_id": 4,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4993.327,
+      "duration_seconds": 4995.118,
       "shard_id": 5,
-      "test_file_count": 25
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 4993.331,
+      "duration_seconds": 4995.086,
       "shard_id": 6,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4993.341,
+      "duration_seconds": 4995.073,
       "shard_id": 7,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4993.326,
+      "duration_seconds": 4995.117,
       "shard_id": 8,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4993.303,
+      "duration_seconds": 4995.12,
       "shard_id": 9,
-      "test_file_count": 27
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 4993.33,
+      "duration_seconds": 4995.068,
       "shard_id": 10,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4993.33,
+      "duration_seconds": 4995.064,
       "shard_id": 11,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4993.295,
+      "duration_seconds": 4995.049,
       "shard_id": 12,
       "test_file_count": 27
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 59919.816
+  "total_test_duration_seconds": 59941.018
 }

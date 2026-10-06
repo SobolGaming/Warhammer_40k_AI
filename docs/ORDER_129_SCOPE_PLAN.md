@@ -13,8 +13,7 @@ accepted Advance from history and incorrectly demanded Advanced state there.
 The shared history owner still authenticates accepted proposals and witnesses,
 then recognizes the existing exact turn-end control and cleanup boundary.
 Earlier control/rule checkpoints retain restrictions. Accepted proposal mode
-is checked against the completion event using the existing typed ordinary-mode
-schema default; flight remains explicit.
+is checked against the completion event with the explicit mode required by existing proposal acceptance.
 
 Controls use the original canonical catalog fixture and the admitted Be'lakor
 native datasheet, FLY keyword, wargear and reconciled geometry. The native test

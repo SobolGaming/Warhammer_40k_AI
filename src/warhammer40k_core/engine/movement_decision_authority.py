@@ -424,11 +424,6 @@ def validate_movement_completion_decision_authority(
     validation = proposal.validation_result_for_request(proposal_request)
     if not validation.is_valid:
         raise GameLifecycleError("Primary mission movement proposal/result authority drifted.")
-    # The existing proposal contract permits omission for the ordinary action
-    # mode. A selected flight mode must remain explicit and byte-exact.
-    proposal_mode = proposal.movement_mode
-    if proposal_mode is None:
-        proposal_mode = "normal" if action == "normal_move" else action
     if (
         proposal_record.request.actor_id != payload.get("active_player_id")
         or proposal_record.result.actor_id != payload.get("active_player_id")
@@ -440,7 +435,7 @@ def validate_movement_completion_decision_authority(
         or proposal_request.movement_phase_action != action
         or proposal.unit_instance_id != unit_id
         or proposal.movement_phase_action != action
-        or payload.get("movement_mode") != proposal_mode
+        or payload.get("movement_mode") != proposal.movement_mode
         or payload.get("witness") != proposal.witness.to_payload()
     ):
         raise GameLifecycleError("Primary mission movement proposal semantics drifted.")

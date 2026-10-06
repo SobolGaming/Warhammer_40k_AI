@@ -132,3 +132,12 @@ def test_fall_back_modes_restore_after_the_same_native_turn_cleanup(flight: bool
     assert state.end_turn_cleanup_states
     assert not state.fell_back_unit_states
     assert_flight_checkpoint(session)
+
+
+@pytest.mark.parametrize("flight", [False, True])
+def test_pending_movement_mode_omission_is_rejected_atomically(flight: bool) -> None:
+    session, proposal = flight_proposal(flight=flight, transit=False)
+    before = session.to_persistence_payload()
+    status = submit_flight(session, replace(proposal, movement_mode=None), "omitted-mode")
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert session.to_persistence_payload() == before
