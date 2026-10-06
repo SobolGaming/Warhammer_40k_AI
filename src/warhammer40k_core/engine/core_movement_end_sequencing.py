@@ -106,6 +106,33 @@ def core_movement_end_candidates(
                 state=state, player_id=player, army_catalog=context.army_catalog
             ):
                 candidates.append(candidate)
+        window_id = f"generic-end-movement-round-{state.battle_round:02d}-player-{player}"
+        eligibility = StratagemEligibilityContext.from_state(
+            state=state,
+            player_id=player,
+            trigger_kind=TimingTriggerKind.END_PHASE,
+            timing_window_id=window_id,
+            trigger_payload={
+                "timing_window_id": window_id,
+                "trigger_window": "end_opponent_movement_phase",
+            },
+        )
+        candidates.extend(
+            stratagem_timing_candidates(
+                state=state,
+                decisions=decisions,
+                index=StratagemCatalogIndex.from_records(
+                    tuple(
+                        record
+                        for record in indexes[player].all_records()
+                        if record.definition.handler_id == GENERIC_RULE_IR_STRATAGEM_HANDLER_ID
+                    )
+                ),
+                context=eligibility,
+                cost_modifiers=cost_modifiers,
+                requested_event_type="end_opponent_movement_stratagem_requested",
+            )
+        )
         window_id = f"rapid-ingress-end-movement-round-{state.battle_round:02d}-player-{player}"
         eligibility = StratagemEligibilityContext.from_state(
             state=state,

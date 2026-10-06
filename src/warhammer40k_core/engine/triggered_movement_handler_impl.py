@@ -19,6 +19,7 @@ from warhammer40k_core.engine.movement_proposals import (
 from warhammer40k_core.engine.normal_move_history import (
     normal_move_turn_player_id,
 )
+from warhammer40k_core.engine.objective_movement_constraint import objective_approach_choice
 from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     GameLifecycleStage,
@@ -145,6 +146,7 @@ def request_from_state(
             take_to_the_skies=selected,
             move_keyword_choice=cast(dict[str, JsonValue], keyword_option.payload).get(CHOICE_KEY),
             surge_target_unit_instance_id=target_id,
+            objective_approach_id=objective_id,
             battle_round=state.battle_round,
             turn_player_id=normal_move_turn_player_id(state),
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
@@ -153,6 +155,11 @@ def request_from_state(
         for witness in candidate_witness_tuple
         for selected in selections
         for keyword_option in keyword_options
+        for objective_id in (
+            tuple(item.objective_id for item in descriptor.objective_constraint.objectives)
+            if descriptor.objective_constraint is not None
+            else (None,)
+        )
         for target_id in (
             closest_surge_targets(scenario=scenario, unit_instance_id=unit_instance_id)
             if descriptor.movement_kind is TriggeredMovementKind.SURGE
@@ -252,6 +259,7 @@ def apply_decision(
         take_to_the_skies=flight_selection(payload),
         move_keyword_choice=payload.get(CHOICE_KEY),
         surge_target_unit_instance_id=selected_surge_target(payload, descriptor),
+        objective_approach_id=objective_approach_choice(payload, descriptor.objective_constraint),
         battle_round=state.battle_round,
         turn_player_id=normal_move_turn_player_id(state),
         battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
@@ -386,6 +394,9 @@ def apply_proposal_decision(
         take_to_the_skies=flight_selection(proposal_request.context),
         move_keyword_choice=(proposal_request.context or {}).get(CHOICE_KEY),
         surge_target_unit_instance_id=selected_surge_target(proposal_request.context, descriptor),
+        objective_approach_id=objective_approach_choice(
+            proposal_request.context, descriptor.objective_constraint
+        ),
         battle_round=state.battle_round,
         turn_player_id=normal_move_turn_player_id(state),
         battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),

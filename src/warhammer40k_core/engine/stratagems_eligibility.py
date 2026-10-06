@@ -566,6 +566,17 @@ def _generic_rule_ir_stratagem_unavailable_reason(
     )
     if trigger_context_error is not None:
         return trigger_context_error
+    if _optional_generic_metadata_bool(effect_payload, key="requires_objective_marker"):
+        from warhammer40k_core.engine.objective_geometry_sources import mission_objective_geometries
+
+        if (
+            state.mission_setup is None
+            or state.battlefield_state is None
+            or not any(
+                objective.marker is not None for objective in mission_objective_geometries(state)
+            )
+        ):
+            return "stratagem_requires_objective_marker"
     if (
         _optional_generic_metadata_bool(effect_payload, key="requires_own_turn")
         and context.active_player_id != context.player_id

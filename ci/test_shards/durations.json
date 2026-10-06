@@ -102,6 +102,8 @@
     "tests/unit/test_order128_setup_model_fit.py": 6.766,
     "tests/unit/test_order129_flight_history.py": 451.282,
     "tests/unit/test_order130_model_mission_destruction.py": 264.234,
+    "tests/unit/test_order131_objective_endpoint_geometry.py": 0.626,
+    "tests/unit/test_order131_objective_movement.py": 591.957,
     "tests/unit/test_order36_sequencing.py": 250.482,
     "tests/unit/test_order36_timing_authority.py": 172.387,
     "tests/unit/test_order51_flight.py": 218.865,
@@ -318,76 +320,78 @@
     {
       "junit_sha256": [
         "0d81c02e07ae61f44c32db067a148421cd18c1e52510845bae7ad0dc1fa1b264",
-        "6d3fdd0e8ff4f2372336d0a303aefdbbef64ecb8dd8e8dcc29a40dbcc2bb9a5d"
+        "67bd73732db176c0f7e003b7dba16e506a3e46b8d4e489cfd90e5c1c9c9db9a8",
+        "6d3fdd0e8ff4f2372336d0a303aefdbbef64ecb8dd8e8dcc29a40dbcc2bb9a5d",
+        "cdf52b1ac891865ec365bf90e604330dd710705d29c38cedb16b71382bdabde8"
       ],
-      "source": "Order130 complete corrected current cohort HEAD 59c2858385f4ce83a1360adb5973fd1612e6b475, tree 93a80697f374b0b74e2c0d71b5ea21e0b7b34ce1: all 10996 cases once, 16 serial polygon cases and remaining cases in 32 parallel workers, all phases/durations authenticated; no predecessor or focused timings. JUnit SHA256 serial 6d3fdd0e8ff4f2372336d0a303aefdbbef64ecb8dd8e8dcc29a40dbcc2bb9a5d; parallel 0d81c02e07ae61f44c32db067a148421cd18c1e52510845bae7ad0dc1fa1b264.",
-      "test_cases": 10996,
-      "test_files": 313
+      "source": "Provisional scheduling profile only: retained authenticated Order130 complete cohort 8b97d1ca8a87ea736805c3c6f711925b8742e746 plus four retained unchanged-input Order131 facade candidate controls before the rotated-wall repair and sixteen current geometry controls. This mixed profile supplies no current complete-cohort pass or final timing credit; the complete current Order131 covered cohort must replace all durations before publication.",
+      "test_cases": 11016,
+      "test_files": 315
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 4987.538,
+      "duration_seconds": 5036.913,
       "shard_id": 1,
-      "test_file_count": 25
-    },
-    {
-      "duration_seconds": 4987.54,
-      "shard_id": 2,
-      "test_file_count": 24
-    },
-    {
-      "duration_seconds": 4987.526,
-      "shard_id": 3,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4987.551,
+      "duration_seconds": 5036.917,
+      "shard_id": 2,
+      "test_file_count": 25
+    },
+    {
+      "duration_seconds": 5036.912,
+      "shard_id": 3,
+      "test_file_count": 28
+    },
+    {
+      "duration_seconds": 5036.917,
       "shard_id": 4,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4987.52,
+      "duration_seconds": 5036.911,
       "shard_id": 5,
+      "test_file_count": 26
+    },
+    {
+      "duration_seconds": 5036.911,
+      "shard_id": 6,
+      "test_file_count": 26
+    },
+    {
+      "duration_seconds": 5036.918,
+      "shard_id": 7,
       "test_file_count": 25
     },
     {
-      "duration_seconds": 4987.523,
-      "shard_id": 6,
-      "test_file_count": 29
-    },
-    {
-      "duration_seconds": 4987.517,
-      "shard_id": 7,
+      "duration_seconds": 5036.91,
+      "shard_id": 8,
       "test_file_count": 27
     },
     {
-      "duration_seconds": 4987.518,
-      "shard_id": 8,
-      "test_file_count": 28
-    },
-    {
-      "duration_seconds": 4987.551,
+      "duration_seconds": 5036.909,
       "shard_id": 9,
-      "test_file_count": 26
+      "test_file_count": 27
     },
     {
-      "duration_seconds": 4987.538,
+      "duration_seconds": 5036.914,
       "shard_id": 10,
+      "test_file_count": 27
+    },
+    {
+      "duration_seconds": 5036.923,
+      "shard_id": 11,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 4987.52,
-      "shard_id": 11,
-      "test_file_count": 25
-    },
-    {
-      "duration_seconds": 4987.542,
+      "duration_seconds": 5036.912,
       "shard_id": 12,
       "test_file_count": 26
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 59850.384
+  "total_test_duration_seconds": 60442.967
 }

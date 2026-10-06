@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from warhammer40k_core.rules.nested_attack_reroll_parser import compile_nested_attack_reroll_clauses
+from warhammer40k_core.rules.objective_approach_parser import compile_objective_approach_clauses
 from warhammer40k_core.rules.post_shoot_charge_target_parser import (
     compile_post_shoot_charge_target_clauses,
 )
@@ -16,6 +17,11 @@ def compile_specialized_rule_clauses(
     source_id: str,
     normalized_text: str,
 ) -> tuple[RuleClause, ...] | None:
+    objective = compile_objective_approach_clauses(
+        source_id=source_id, normalized_text=normalized_text
+    )
+    if objective is not None:
+        return objective
     nested = compile_nested_attack_reroll_clauses(
         source_id=source_id, normalized_text=normalized_text
     )

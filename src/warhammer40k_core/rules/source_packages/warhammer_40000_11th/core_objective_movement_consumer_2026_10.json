@@ -1,0 +1,151 @@
+{
+  "schema_version": "core-objective-movement-consumer-v1",
+  "selected_core": {
+    "row_id": "rule:01:01.04.03:1",
+    "category": "01",
+    "locator": "01.04.03",
+    "title": "As Close As Possible",
+    "occurrence": 1,
+    "source_sha256": "0d9cbb45d59f4f90f0c0c34a2dedc6dbaf360ea7c9e602c21dc5807499706771",
+    "blocks": [
+      {
+        "ordinal": 1,
+        "kind": "text",
+        "sha256": "28be25cd2aaf2f0d6b42b5c4ad90468b2cdccd190cb17cbe1ddeda49d7dde813",
+        "value": "If a rule instructs you to move a model as close as possible to a unit or model you must end that model’s move in base contact with that unit or model if its move is sufficient to do so without breaking any other restrictions (such as \u0005coherency\u0006), or as close as you can achieve if its move is not sufficient."
+      },
+      {
+        "ordinal": 2,
+        "kind": "text",
+        "sha256": "d5071d4bf8f5cbbd3ed739ba9d54092abc5aa34893a67a0f53881e50e7dab25f",
+        "value": "• If a model is already as close as possible to a unit or model when it is instructed to make a move as close as possible towards a unit or model, that model cannot be moved, but still counts as having made the move in question."
+      },
+      {
+        "ordinal": 3,
+        "kind": "text",
+        "sha256": "625ebcc664f19bb30b9bfd3385e99b4b044160876b21dc6c7cb20fbbe9090084",
+        "value": "If a rule instructs you to move a model as close as possible to an \u0005objective\u0006 you must end that model’s move within range of an \u0005objective\u0006 if its move is sufficient to do so without breaking any other restrictions (such as \u0005coherency\u0006), or as close as you can achieve if its move is not sufficient."
+      },
+      {
+        "ordinal": 4,
+        "kind": "text",
+        "sha256": "9b17d3597a20c02ec402356717d0a5cf3a844a862ef36ceea88e7d3d77d6ef1a",
+        "value": "• If that model is already within range of an \u0005objective\u0006 it can move up to the \u0005maximum distance\u0006 of that move but must end its move still within range of that \u0005objective\u0006."
+      }
+    ],
+    "selected_provider": "Game Datamissions",
+    "historical_source_row_sha256": "1f376772c6bf85c4cfd5de6489ed60f3a0f96fb97068853a36a476e3e0a77001",
+    "review_category": "01"
+  },
+  "consumer_profile": {
+    "profile_id": "phase17s:stratagem:leagues-of-votann:hearthfyre-arsenal:000010452007",
+    "source_row_id": "stratagem:leagues-of-votann:hearthfyre-arsenal:000010452007",
+    "source_id": "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:leagues-of-votann:hearthfyre-arsenal:000010452007",
+    "faction_id": "leagues-of-votann",
+    "detachment_id": "hearthfyre-arsenal",
+    "stratagem_id": "000010452007",
+    "name": "COGITATED NEED",
+    "command_point_cost": 1,
+    "category": "strategic_ploy",
+    "when_descriptor": "End of your opponent's Movement phase.",
+    "target_descriptor": "One Ironkin Steeljacks unit from your army.",
+    "effect_descriptor": "Your unit can make a Normal move. When doing so, your unit must end that move as close as possible to the closest objective marker.",
+    "restrictions_descriptor": "matched play same stratagem per phase",
+    "trigger_kind": "end_phase",
+    "phase_tokens": [
+      "movement"
+    ],
+    "target_kind": "friendly_unit",
+    "target_policy_id": "friendly_unit",
+    "required_keywords": [],
+    "required_keywords_any": [],
+    "required_faction_keywords": [],
+    "excluded_keywords": [],
+    "excluded_faction_keywords": [],
+    "rule_ir_hash": "161698dff9e065899a986c015acbcf7e917d6c9dbcb5fe5f71206ae6b883141d"
+  },
+  "consumer_profile_sha256": "8ed36740b02499dfd70fd1a9a7f2e095c6233bc98d5c0082fc3dc38882e16260",
+  "rule_ir": {
+    "rule_id": "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:leagues-of-votann:hearthfyre-arsenal:000010452007",
+    "source_id": "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:leagues-of-votann:hearthfyre-arsenal:000010452007",
+    "normalized_text": "Your unit can make a Normal move. When doing so, your unit must end that move as close as possible to the closest objective marker.",
+    "parser_version": "phase17c-rule-parser-v4",
+    "schema_version": "phase17c-rule-ir-v1",
+    "clauses": [
+      {
+        "clause_id": "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:leagues-of-votann:hearthfyre-arsenal:000010452007:clause:1",
+        "template_id": "phase17c:grant-ability",
+        "source_span": {
+          "text": "Your unit can make a Normal move. When doing so, your unit must end that move as close as possible to the closest objective marker.",
+          "start": 0,
+          "end": 131
+        },
+        "trigger": null,
+        "conditions": [],
+        "target": {
+          "kind": "this_unit",
+          "source_span": {
+            "text": "Your unit can make a Normal move. When doing so, your unit must end that move as close as possible to the closest objective marker.",
+            "start": 0,
+            "end": 131
+          },
+          "parameters": []
+        },
+        "effects": [
+          {
+            "kind": "grant_ability",
+            "source_span": {
+              "text": "Your unit can make a Normal move. When doing so, your unit must end that move as close as possible to the closest objective marker.",
+              "start": 0,
+              "end": 131
+            },
+            "parameters": [
+              {
+                "key": "ability",
+                "value": "triggered_normal_move"
+              },
+              {
+                "key": "distance_kind",
+                "value": "normal_move_characteristic"
+              },
+              {
+                "key": "endpoint_constraint",
+                "value": "closest_legal_objective"
+              },
+              {
+                "key": "movement_kind",
+                "value": "triggered"
+              },
+              {
+                "key": "movement_mode",
+                "value": "normal"
+              },
+              {
+                "key": "objective_selection",
+                "value": "closest_marker"
+              },
+              {
+                "key": "one_per_phase",
+                "value": false
+              },
+              {
+                "key": "optional",
+                "value": true
+              }
+            ]
+          }
+        ],
+        "duration": null,
+        "unsupported_reason": null,
+        "diagnostics": []
+      }
+    ],
+    "diagnostics": [],
+    "ir_hash": "e1384e3fc51d19e46412b7a0a5dd5f6bf6ad2798579e18d0376447982bc98240"
+  },
+  "required_name_keyword": "IRONKIN STEELJACKS",
+  "requires_opponent_turn": true,
+  "target_forbidden_if_within_engagement_range": true,
+  "requires_objective_marker": true,
+  "scope": "One applicable consumer for 01.04.03-obligation-06; other faction rules remain unchanged."
+}

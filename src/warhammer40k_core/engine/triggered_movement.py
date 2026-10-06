@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import TYPE_CHECKING, Self, TypedDict, cast
+from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.dice import (
     DiceRollState,
@@ -37,6 +37,10 @@ from warhammer40k_core.engine.movement_proposals import (
     MovementProposalRequest,
     ProposalKind,
     ProposalValidationResult,
+)
+from warhammer40k_core.engine.objective_movement_constraint import (
+    ObjectiveMovementConstraint,
+    ObjectiveMovementConstraintPayload,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage, LifecycleStatus
 from warhammer40k_core.engine.physical_proposal_validation import (
@@ -87,9 +91,15 @@ class TriggeredMovementViolationCode(StrEnum):
     SURGE_ENGAGEMENT_NOT_REACHED = "surge_engagement_not_reached"
     SURGE_MAXIMUM_APPROACH_NOT_REACHED = "surge_maximum_approach_not_reached"
     SURGE_REACHABILITY_UNRESOLVED = "surge_reachability_unresolved"
+    OBJECTIVE_APPROACH_RANGE_NOT_REACHED = "objective_approach_range_not_reached"
+    OBJECTIVE_APPROACH_CLOSEST_ENDPOINT_NOT_REACHED = (
+        "objective_approach_closest_endpoint_not_reached"
+    )
+    OBJECTIVE_APPROACH_UNRESOLVED = "objective_approach_unresolved"
 
 
 class TriggeredMovementDescriptorPayload(TypedDict):
+    objective_constraint: NotRequired[ObjectiveMovementConstraintPayload]
     movement_kind: str
     source_rule_id: str
     trigger_timing: ReactionWindowPayload
@@ -141,6 +151,7 @@ class TriggeredMovementDescriptor:
     allow_within_engagement_range: bool = False
     one_per_phase: bool = True
     optional: bool = True
+    objective_constraint: ObjectiveMovementConstraint | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -163,6 +174,7 @@ class TriggeredMovementDescriptor:
             _validation.validate_positive_number(
                 "TriggeredMovementDescriptor max_distance_inches",
                 self.max_distance_inches,
+                allow_zero=self.objective_constraint is not None,
             ),
         )
         object.__setattr__(
@@ -199,6 +211,13 @@ class TriggeredMovementDescriptor:
             _validation.validate_bool("TriggeredMovementDescriptor optional", self.optional),
         )
 
+        if self.objective_constraint is not None and (
+            type(self.objective_constraint) is not ObjectiveMovementConstraint
+            or self.movement_kind is not TriggeredMovementKind.TRIGGERED
+            or self.movement_mode is not MovementMode.NORMAL
+        ):
+            raise GameLifecycleError("Objective approach requires a typed Normal move constraint.")
+
     @property
     def displacement_kind(self) -> ModelDisplacementKind:
         if self.movement_kind is TriggeredMovementKind.SURGE:
@@ -206,7 +225,7 @@ class TriggeredMovementDescriptor:
         return ModelDisplacementKind.TRIGGERED_MOVE
 
     def to_payload(self) -> TriggeredMovementDescriptorPayload:
-        return {
+        payload: TriggeredMovementDescriptorPayload = {
             "movement_kind": self.movement_kind.value,
             "source_rule_id": self.source_rule_id,
             "trigger_timing": self.trigger_timing.to_payload(),
@@ -217,6 +236,9 @@ class TriggeredMovementDescriptor:
             "one_per_phase": self.one_per_phase,
             "optional": self.optional,
         }
+        if self.objective_constraint is not None:
+            payload["objective_constraint"] = self.objective_constraint.to_payload()
+        return payload
 
     @classmethod
     def from_payload(cls, payload: TriggeredMovementDescriptorPayload) -> Self:
@@ -230,6 +252,9 @@ class TriggeredMovementDescriptor:
             allow_within_engagement_range=payload["allow_within_engagement_range"],
             one_per_phase=payload["one_per_phase"],
             optional=payload["optional"],
+            objective_constraint=None
+            if "objective_constraint" not in payload
+            else ObjectiveMovementConstraint.from_payload(payload["objective_constraint"]),
         )
 
 
