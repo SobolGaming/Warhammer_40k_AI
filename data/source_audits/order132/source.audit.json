@@ -1,0 +1,228 @@
+{
+  "order": 132,
+  "started": true,
+  "scope": "P18K/C18-12; 18.04-rapid-tactical-distance",
+  "selected_source": {
+    "row_id": "rule:18:18.04:1",
+    "category": "18",
+    "locator": "18.04",
+    "title": "Disembark Move",
+    "occurrence": 1,
+    "source_sha256": "ed5ace0412d4f87e7f436e64eb56f5081325cbc6b3c0a1dda347562c890144b9",
+    "blocks": [
+      {
+        "ordinal": 1,
+        "kind": "text",
+        "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+        "value": "\u000eEligible If"
+      },
+      {
+        "ordinal": 2,
+        "kind": "text",
+        "sha256": "327e2c8b2bfbdfb34feb6f2233d9d06b559fadf8d15c96ff3147b8bd0adfa7f7",
+        "value": "\u0001All\u0002 of the following apply to your unit:"
+      },
+      {
+        "ordinal": 3,
+        "kind": "text",
+        "sha256": "2641f7519e95c82f4cc156f0d0c0454f1573663b2ddd70b6ac81862792bd6bd4",
+        "value": "• Embarked within a \u0003TRANSPORT\u0004 model that is on the battlefield."
+      },
+      {
+        "ordinal": 4,
+        "kind": "text",
+        "sha256": "858e26c8aa849217d8b9db0ccb156d8a3997054d43070e099e384d0f37c9c975",
+        "value": "• Did not embark within that \u0003TRANSPORT\u0004 this phase."
+      },
+      {
+        "ordinal": 5,
+        "kind": "text",
+        "sha256": "e02813fa41a009338404be4fbd628522b80d4b9b342c9354de570ab15bc82cf9",
+        "value": "• That \u0003TRANSPORT\u0004 has not made an \u0005advance\u0006 or \u0005fall-back\u0006 move this phase."
+      },
+      {
+        "ordinal": 6,
+        "kind": "text",
+        "sha256": "246e8e2a3323d6176f0e973b99132e4dd0f3a2d32b6ea38914cf8871f1ba7bce",
+        "value": "\u000eSet-up Distance"
+      },
+      {
+        "ordinal": 7,
+        "kind": "text",
+        "sha256": "ef1e5dd9c32ad8c2f3df2681bf85bf8992eb52a1a857699db158fa3ab8561f3d",
+        "value": "- Rapid/Tactical Disembark: 3\""
+      },
+      {
+        "ordinal": 8,
+        "kind": "text",
+        "sha256": "dfa776925f6453fcfdf6cc3b8abf04fe939ba89d21432f901cffe98d195b5eb2",
+        "value": "- Combat Disembark: 6\""
+      },
+      {
+        "ordinal": 9,
+        "kind": "text",
+        "sha256": "71b6143d5f310205f6d72379853a67a7f27f18983ba7f07ef42b7255d7fca1ee",
+        "value": "\u000eBefore Moving"
+      },
+      {
+        "ordinal": 10,
+        "kind": "text",
+        "sha256": "48278d4f4dfd385d017e7ff32ba90b47948aa3cc22be15ca4f1b6097883e1d13",
+        "value": "Select \u0005disembark mode\u0006:"
+      },
+      {
+        "ordinal": 11,
+        "kind": "text",
+        "sha256": "5a016716ff8a6bb0b720bac7f4ece910fcb6d6321662091b557ce3060b1d450b",
+        "value": "• \u0005Rapid Disembark:\u0006 If that \u0003TRANSPORT\u0004 made a \u0005normal\u0006 or \u0005ingress move\u0006 this phase, you must select this mode."
+      },
+      {
+        "ordinal": 12,
+        "kind": "text",
+        "sha256": "07913b8e6ea8ead7c957aa803e86ccffa12bd72c6f0ce9f63eabffec61677a12",
+        "value": "• \u0005Tactical Disembark:\u0006 Otherwise, If that \u0003TRANSPORT\u0004 \u0005remained stationary\u0006 or has not yet been \u0005selected to move\u0006 this phase, and if you can set up your unit as described below, you must select this mode."
+      },
+      {
+        "ordinal": 13,
+        "kind": "text",
+        "sha256": "7fd3407ba95dfc7093076c11bf155eaf0204cf50327c98a04d21509a5d9a7538",
+        "value": "• \u0005Combat Disembark:\u0006Otherwise, you must select this mode. Make a \u0005hazard roll\u0006 for each model in your unit."
+      },
+      {
+        "ordinal": 14,
+        "kind": "text",
+        "sha256": "e71c12176330a1cb6bd961af93620cfe60c68b59704dac7bff9b61bc09d3c041",
+        "value": "\u000eWhile Moving"
+      },
+      {
+        "ordinal": 15,
+        "kind": "text",
+        "sha256": "fb8fc02ef60abc4a23376f06ff16b224d34f965c34013817a62618585563fc57",
+        "value": "Set up each model in your unit wholly within the \u0005set-up distance\u0006 of that \u0003TRANSPORT\u0004."
+      },
+      {
+        "ordinal": 16,
+        "kind": "text",
+        "sha256": "d63c42cdf5d4a964a0af124eb19d0efe162e94ad8553cc04081c37f0632c1635",
+        "value": "• \u0005Rapid Disembark:\u0006 If that \u0003TRANSPORT\u0004 made an \u0005ingress move\u0006 this turn, each model must follow the same rules that \u0003TRANSPORT\u0004 had to follow while resolving that move."
+      },
+      {
+        "ordinal": 17,
+        "kind": "text",
+        "sha256": "c02cabf3df732994735523c49ca7a0c125c4fac0c43dee5ffaca7c3ecffca34a",
+        "value": "• \u0005Combat Disembark:\u0006 Each model can be set up \u0005engaged\u0006 with one or more enemy units that \u0003TRANSPORT\u0004 is \u0005engaged\u0006 with."
+      },
+      {
+        "ordinal": 18,
+        "kind": "text",
+        "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+        "value": "\u000eEffect"
+      },
+      {
+        "ordinal": 19,
+        "kind": "text",
+        "sha256": "ef02c618a2220f1ea24ed599421dadd931e35924307b54fce16c6d7ffed9f942",
+        "value": "Your unit is set up as described in Set Up (03.02)"
+      },
+      {
+        "ordinal": 20,
+        "kind": "text",
+        "sha256": "93f7fc4c73f4450e9f798302b2574b0462ae4f1e7e6ad9d40f4c7e9d6026a315",
+        "value": "\u000eAfter Moving"
+      },
+      {
+        "ordinal": 21,
+        "kind": "text",
+        "sha256": "88cff389966c883cbbcec929dd6e4295203cd0981d74bc604988911713714ea7",
+        "value": "• \u0005Rapid Disembark:\u0006 Until the end of the turn, your unit is \u0001not\u0002 \u0005eligible to declare a charge\u0006."
+      },
+      {
+        "ordinal": 22,
+        "kind": "text",
+        "sha256": "049903545c9db34af68c65ce8b1ef0a5d4585bfdfd984470db0a9818f34b0c62",
+        "value": "• \u0005Tactical Disembark:\u0006 Select your unit to make a \u0005normal\u0006 or \u0005advance move\u0006."
+      },
+      {
+        "ordinal": 23,
+        "kind": "text",
+        "sha256": "2decde634c5ca07be667731781538ff1452b840f73144a99f739be8986c07f81",
+        "value": "• \u0005Combat Disembark:\u0006 Your unit is \u0005battle-shocked\u0006 and, until the end of the turn, it is \u0001not\u0002 \u0005eligible to declare a charge\u0006."
+      }
+    ],
+    "selected_provider": "Game Datamissions",
+    "historical_source_row_sha256": "2992a9b566f9e0d72685f909c6cac0c7180fc9a2196116c4ee78c0fb7aa67268",
+    "review_category": "18"
+  },
+  "selected_literal_blocks": [
+    {
+      "ordinal": 7,
+      "kind": "text",
+      "sha256": "ef1e5dd9c32ad8c2f3df2681bf85bf8992eb52a1a857699db158fa3ab8561f3d",
+      "value": "- Rapid/Tactical Disembark: 3\""
+    },
+    {
+      "ordinal": 15,
+      "kind": "text",
+      "sha256": "fb8fc02ef60abc4a23376f06ff16b224d34f965c34013817a62618585563fc57",
+      "value": "Set up each model in your unit wholly within the \u0005set-up distance\u0006 of that \u0003TRANSPORT\u0004."
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "18.04-rapid-tactical-distance",
+      "source_blocks": [
+        7,
+        15
+      ],
+      "summary": "Rapid and Tactical disembark place each model wholly within three inches of the transport.",
+      "owners": [
+        "src/warhammer40k_core/engine/transport_disembark_geometry.py:_model_wholly_within_any_transport_model",
+        "src/warhammer40k_core/engine/transports.py:_resolve_disembark"
+      ],
+      "evidence": [
+        {
+          "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_rapid_and_tactical_disembark_enforce_three_inch_setup_band",
+          "role": "semantic",
+          "assertion": "assert result.is_valid is (distance < 3.0), result.violations",
+          "proves": "Both Rapid and Tactical typed setup resolvers accept analytically wholly-within2.99inches and reject3.01inches."
+        },
+        {
+          "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_rapid_and_tactical_disembark_enforce_three_inch_setup_band",
+          "role": "invalid",
+          "assertion": "assert (TransportOperationViolationCode.DISEMBARK_DISTANCE in {violation.violation_code for violation in result.violations}) is (distance > 3.0)",
+          "proves": "The3.01-inch setup reports the exact DISEMBARK_DISTANCE diagnostic in both modes."
+        }
+      ],
+      "qualifications": [
+        "Evidence gap: Confirmed inclusive-boundary discrepancy: both Rapid and Tactical reject analytically exact3.0-inch circular-base containment with DISEMBARK_DISTANCE, despite accepting2.99inches. The shared owner uses buffered polygon approximations. Retained probe: probe_exact_disembark_band_boundary in tests/order97_gap_probes_18_25.py. Prerequisite: restore inclusive exact containment through the owning geometry abstraction and audit all disembark modes and other wholly-within callers; the bound positive tests deliberately claim only the verified interior/exterior cases."
+      ]
+    }
+  ],
+  "roadmap_row": "| 132 | P18K | C18-12 | Order 97 identifies the source/consumer gap documented in its pinned evidence. | Rapid and Tactical disembark reject an analytically wholly-within exact three-inch circular-base boundary because the shared containment owner buffers polygon approximations. Use the authoritative model geometry for inclusive containment and test exact, below and above boundaries across disembark modes, with facade invalid atomicity, restore and replay. | Selected Order 97 clauses: 18.04-rapid-tactical-distance. Full literal blocks and owner links are in the [inventory](ORDER_97_EVIDENCE_REPORT.md). | PEVIDENCE | IMPLEMENTATION-GAP |",
+  "acceptance": "Restore inclusive authoritative model geometry containment for the exact Rapid/Tactical three-inch setup boundary. Prove exact, below and above boundaries across disembark modes and affected shared wholly-within callers, real facade legal/invalid atomicity, genuine checkpoints/forks/views/events/restore/replay. Preserve all original interior/exterior evidence, assertions, source archives and ceilings; audit dependency impact without silently expanding the selected obligation.",
+  "boundary": "P18K/C18-12 only: inclusive circular Rapid/Tactical distance. Shared single-source circular containment also serves existing FRAME and marker consumers. No new source, disembark eligibility, oversized-base, noncircular or multiple-source-union policy is introduced.",
+  "base": "f054b52fe912875bfe425cf875de3756294b5c7b",
+  "tree": "4454ef00daae431c83460ff9be6741fb0b63ed57",
+  "baseline_verified": true,
+  "pinned_git_blob_sha256": {
+    "data/source_audits/order97/selected-sources.json": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+    "data/source_audits/order97/categories/18.json": "61fcaf841e2fd8a14b830423c867eacd8389ce44db7ed70faa6a377b92fb9837",
+    "data/source_audits/order97/gap_observations_18_25.json": "c7606514a2e04500313e8425c456612d1af0e0b87728b2848de3db368812223f",
+    "tests/order97_gap_probes_18_25.py": "7305e6f7a169289bb19cb2e88205fabb2e844b0a6f4abcccc85bb8a8a3719312",
+    "tests/unit/test_order97_semantic_evidence_18_25.py": "1a05ad0be9bbd580a6ec77f45a9c633bfb0767761be8403ce664bb40cd64e251",
+    "src/warhammer40k_core/engine/transports.py": "3487121ab241df312fa6fb797f828cb981959192e6cfb5b43d76e087e4f39041",
+    "src/warhammer40k_core/engine/transport_disembark_geometry.py": "5c3d6da3ef371144d7323d94ce034bc386a8405b389d5a875a1f482c32ef0f74"
+  },
+  "consumer_path": "Recorded real Movement choices -> parameterized disembark -> transports._resolve_disembark -> shared physical endpoint authority -> DistanceMeasurementContext -> analytic circular radii; accepted setup keeps engine-owned cargo, placement, movement continuation, events and exact-runtime persistence/replay.",
+  "dependency_audit": {
+    "runtime_callers": [
+      "engine/transport_disembark_geometry.py:_model_wholly_within_any_transport_model",
+      "engine/cult_ambush.py:resolve_cult_ambush_ingress_placement"
+    ],
+    "predicate_consumer": "geometry/measurement.py:DistancePredicateEvaluator.evaluate",
+    "bands": "Rapid, Tactical, Assault, Shock and Destroyed use existing three inches; Combat and Emergency use existing six inches. All retain shared endpoint authority and their original eligibility/effect policies.",
+    "numerics": "Circle containment uses center distance plus target radius versus source radius plus horizontal allowance. Eight ULPs at recorded coordinate/length scale account for translation and trigonometric pose arithmetic, capped at 32 measured-length ULPs so large coordinates cannot authorize material exterior gaps; measurable exterior offsets remain invalid. This does not substitute polygon resolution for a circular base.",
+    "limits": "Noncircular and cooperating multiple-source-union predicates retain existing behavior and tests; no universal geometry or named-provider certification is claimed."
+  }
+}
+

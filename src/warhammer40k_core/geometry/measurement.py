@@ -320,6 +320,15 @@ class DistanceMeasurementContext:
             if vertical_gap > distance:
                 return False
             horizontal_allowance = math.sqrt((distance * distance) - (vertical_gap * vertical_gap))
+            source_base, target_base = self._source_footprint(), self._target_footprint()
+            if type(source_base) is CircularBase and type(target_base) is CircularBase:
+                return _circular_whole_distance(
+                    source_base,
+                    self.source_pose,
+                    target_base,
+                    self.target_pose,
+                    horizontal_allowance,
+                )
             source_area = shapely_backend.footprint_for_base(
                 self._source_footprint(),
                 self.source_pose,
@@ -679,6 +688,38 @@ class _MeasurementPart:
     top: float
 
 
+def _circular_whole_distance(
+    source: CircularBase,
+    source_pose: Pose,
+    target: CircularBase,
+    target_pose: Pose,
+    allowance: float,
+) -> bool:
+    """Inclusive disk containment using radii, independent of polygon tessellation.
+
+    Poses formed by translated trigonometric offsets incur floating-point roundoff.
+    Eight coordinate ULPs bound that arithmetic, capped at 32 length ULPs so
+    large translated coordinates cannot turn a material exterior gap into a pass.
+    """
+    coordinates = (
+        source_pose.position.x,
+        source_pose.position.y,
+        target_pose.position.x,
+        target_pose.position.y,
+    )
+    center_distance = math.hypot(
+        target_pose.position.x - source_pose.position.x,
+        target_pose.position.y - source_pose.position.y,
+    )
+    outer_radius = center_distance + target.radius
+    limit = source.radius + allowance
+    roundoff = min(
+        8 * max(math.ulp(value) for value in (*coordinates, outer_radius, limit)),
+        32 * max(math.ulp(outer_radius), math.ulp(limit)),
+    )
+    return outer_radius <= limit + roundoff
+
+
 def _measurement_subjects(model: Model) -> tuple[Model, ...]:
     """FRAME subjects include the main prism when no extra body part is recorded."""
 
@@ -700,6 +741,27 @@ def _closest_gap_cover(
     horizontal_only: bool,
 ) -> bool:
     """Cover an ordinary support base using each source part's closest vertical gap."""
+
+    if (
+        len(sources) == 1
+        and type(sources[0].base) is CircularBase
+        and type(target.base) is CircularBase
+    ):
+        source = sources[0]
+        vertical = (
+            0.0
+            if horizontal_only
+            else _vertical_gap(source.bottom, source.top, target.bottom, target.top)
+        )
+        if vertical > distance_inches:
+            return False
+        return _circular_whole_distance(
+            cast(CircularBase, source.base),
+            source.pose,
+            target.base,
+            target.pose,
+            math.sqrt(distance_inches**2 - vertical**2),
+        )
 
     covered = None
     footprint = shapely_backend.footprint_for_base(target.base, target.pose)
@@ -752,6 +814,26 @@ def _sources_cover_footprint(
     *,
     height: float | None,
 ) -> bool:
+    if (
+        len(sources) == 1
+        and type(sources[0].base) is CircularBase
+        and type(target.base) is CircularBase
+    ):
+        source = sources[0]
+        vertical = (
+            0.0
+            if height is None
+            else _vertical_distance_to_interval(height, source.bottom, source.top)
+        )
+        if vertical > distance_inches:
+            return False
+        return _circular_whole_distance(
+            cast(CircularBase, source.base),
+            source.pose,
+            target.base,
+            target.pose,
+            math.sqrt(distance_inches**2 - vertical**2),
+        )
     covered = None
     for source in sources:
         if height is None:

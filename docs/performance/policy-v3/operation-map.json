@@ -5151,6 +5151,83 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order132-circular-containment": {
+      "paths": [
+        "src/warhammer40k_core/adapters/external_contract.py",
+        "src/warhammer40k_core/geometry/measurement.py"
+      ],
+      "owners": [
+        "@module",
+        "DistanceMeasurementContext._support_base_wholly_within",
+        "_circular_whole_distance",
+        "_closest_gap_cover",
+        "_sources_cover_footprint"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order132-regressions": {
+      "paths": [
+        "tests/order132_disembark_helpers.py",
+        "tests/unit/test_order132_disembark_distance.py"
+      ],
+      "owners": [
+        "@module",
+        "boundary_placement",
+        "boundary_proposal",
+        "boundary_session",
+        "move_transport",
+        "move_unit",
+        "select_options",
+        "test_circular_frame_parts_keep_whole_height_and_horizontal_rules",
+        "test_every_disembark_distance_band_uses_each_transport_model",
+        "test_facade_invalid_atomicity_retry_restore_fork_views_events_replay",
+        "test_large_coordinate_roundoff_cannot_authorize_material_outside_gap",
+        "test_marker_context_shared_with_cult_ambush_keeps_inclusive_boundary",
+        "test_retained_probe_now_accepts_inclusive_boundary",
+        "test_shared_disk_geometry_uses_analytic_radii"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order132-source-evidence": {
+      "paths": [
+        "data/source_audits/order132/source.audit.json",
+        "tools/performance_policy.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_order132_smoke_operations",
+        "validate_assessment"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order132-contract-publication": {
+      "paths": [
+        "conformance/typescript/src/contract.ts",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/migrations/44.3.17-to-44.3.18.md",
+        "contracts/openapi.yaml"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
