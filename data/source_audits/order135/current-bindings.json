@@ -857,6 +857,50 @@
         "src/warhammer40k_core/engine/phases/shooting_model.py:ShootingPhaseState.with_declaration",
         "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py:validate_primary_mission_shooting_event_decision_authority"
       ]
+    },
+    "15.12-window": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/stratagems_generic_metadata.py:stratagem_turn_unavailable_reason",
+        "src/warhammer40k_core/engine/stratagems_eligibility.py:_generic_rule_ir_stratagem_unavailable_reason",
+        "src/warhammer40k_core/engine/stratagems_selection.py:_stratagem_unavailable_reason",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems.py:core_stratagem_rows",
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_proposal_context_error",
+        "src/warhammer40k_core/engine/stratagems_apply.py:invalid_stratagem_target_proposal_status",
+        "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal",
+        "src/warhammer40k_core/engine/lifecycle.py:GameLifecycle.submit_decision",
+        "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_parameterized_payload",
+        "src/warhammer40k_core/engine/phases/fight.py:request_counteroffensive_if_available",
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_proposal_json_equal"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_counteroffensive_timing.py::test_core_counteroffensive_requires_opponent_fight_phase",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_core_counteroffensive_own_turn_rejection_is_atomic",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_own_turn_is_not_offered",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_opponent_turn_acceptance_persists",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_engine_admission_context_drift_preserves_queue_history_and_state",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_shared_turn_metadata_retains_strict_short_circuit_and_absent_active_semantics",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_actual_generic_source_retains_opponent_turn_availability",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_actual_carnival_source_retains_either_turn_availability",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_engine_admission_catalog_json_boolean_drift_is_atomic",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_engine_admission_context_json_kinds_preserve_valid_number_echo"
+      ],
+      "disposition": "Explicitly approved B02 opponent-Fight-phase Core timing; original clause and source fingerprint unchanged. Native both-direction dispatch, actual melee trigger, CP/effect/interrupt, save/fork/views/events/exact replay and continuation controls; qualified atomic engine-admission fixture. Static inventory alone is not certification.",
+      "qualification_reference": "data/source_audits/order135/b02-explicit-repair-approval.json",
+      "approved_shared_context_boundary_qualification": {
+        "approval_reference": "data/source_audits/order135/b03-explicit-repair-approval.json",
+        "documented_acceptance": "docs/ADAPTER_DECISION_CONTRACT.md:1904,1908",
+        "scope": "Exact typed request context equality before queue/history/events for supported live submissions; valid target/effect choices and earlier authoritative checks preserved.",
+        "reproduced_original_impact": "records99\u2192100/queue1\u21920/two acceptance-history events/exception, every game-state and CP/use/effect ledger unchanged CP5\u21925; malformed live-client input, no ordinary legal-play or edited-history claim, no executed BASE introduction claim.",
+        "current_controls": "Both-direction native context invalid leaves complete lifecycle unchanged, followed by exact legal retry,2CP/FightsFirst/interrupt/actual-melee continuation, save/load/fork/allprincipalviews/events/exact replay. Constructed domain context/metadata/Carnival controls qualified; no whole-provider certification."
+      },
+      "approved_b03_json_kind_qualification": {
+        "authority": "data/source_audits/order135/b03-type-safe-boundary-user-clarification.json",
+        "authority_sha256": "9f0961397527914f3b042603b6777440ecc5429d44af838dde94c2828e72ddc2",
+        "boundary": "Existing catalog/context checks, same positions and diagnostics before queue/history acceptance; recursive complete JSON-kind comparison distinguishes booleans/numbers while equal numeric representations and object key order remain accepted.",
+        "actual_local_entry": "Native Core pending request, only deep-copied submitted catalog flag true -> JSON 1. Actual late requires_opponent_turn must be a bool exception consumed queue1->0 and records99->100 with two acceptance events; every gameplay field/CP unchanged.",
+        "qualification": "Malformed live game-decision input; no unmodified legal-play failure, edited history, BASE execution, regression-introduction, or provider certification claim. No demonstrated native behavior-changing nested-context consumer is inferred.",
+        "controls": "Four qualified domain catalog cases plus two qualified nested-context JSON-kind/numeric echo cases. Native both-role malformed1/1.0 rejection precedes exact legal retry,2CP/effect/interrupt/actual-melee, persistence/fork/views/events/replay."
+      }
     }
   },
   "source_supersessions": {

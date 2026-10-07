@@ -1,0 +1,29 @@
+{
+  "schema": "order135-b02-explicit-bounded-repair-approval-v1",
+  "source_thread_id": "01a0efa7-1ce0-70b0-a637-75c1615f80ef",
+  "transcript_evidence": [
+    {
+      "role": "assistant",
+      "recorded_time": "Oct7 03:04 UTC",
+      "sentinel": "Sentinel_9e1ac36e1c248191bc1d6f3dc4bc3b9d",
+      "text": "The broader audit found a separate Core timing bug: Counter-offensive can be used during the player’s own Fight phase, spending 2 CP and granting Fights First when it shouldn’t. The visibility and empty-declaration fixes passed their independent checks. May I add the narrow Counter-offensive timing repair and its regression tests to Order135?"
+    },
+    {
+      "role": "user",
+      "recorded_time": "Oct7 11:31 UTC",
+      "sentinel": "Sentinel_d0a234a3be8481918041fc4d26b87a04",
+      "text": "yes"
+    }
+  ],
+  "approved_scope": "Enforce existing turn metadata through shared availability/admission; mark Core Counteroffensive opponent-turn-only according to Game Datamissions selected rule:15:15.12:1 /15.12-window; preserve Carnival timing and other existing restrictions; add genuine own-turn denial/atomicity and opponent-turn positive public/native regressions with required save/load/fork/views/events/exact replay and legal continuation; regenerate affected source/contract/catalog/runtime/support/inventory identity evidence.",
+  "excluded_scope": "No unrelated redesign or permission expansion; no unproven Core/Carnival same-handler ambiguity fix; no original test/assertion/branch/budget weakening; no new backwards-compatibility shim; no in-turn deployment permission; no Order136 selection or implementation.",
+  "frozen_predecessor": {
+    "head": "4c1ba9d7767389ab36841fe49b90cd90fa46ef23",
+    "tree": "8f1d612ca08c4e4faeaec22dbf47a6704331617f",
+    "base": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+    "current_passing_behavior_cases": 11153,
+    "current_passing_source_quality_cases": 1055,
+    "qualification": "All preserved frozen3 aggregates and reviewer results become historical for an executable B02 successor. Both raw BLOCKED reports, all failed/interrupted/probe/coverage-helper receipts and source archives/pins remain immutable. No executable successor pass credit from frozen3."
+  },
+  "execution_policy": "Root remains same sole implementation owner and SAME sole coding reviewer. SAME separate rules auditor arranged by parent renews from distinct complete exact canonical source packet. Both static only through full fresh prerequisites, quiet smoke, COMPLETE quality and all16 original polygons alone; explicit independently authenticated durable RELEASE then current complete covered remainder32workers and bounded probes. ALL current local gates and BOTH SAME exact-final CLEAN precede standing gated draft/publication/native ready20jobs25ZIP API-digest authentication/protected squash/fetched actual-main allblob proof; fresh actual-merged-main all25 read-only audit and both actual-main reviews before final Core closure. No automatic main or predecessor CI queries."
+}

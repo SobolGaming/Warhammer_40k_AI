@@ -60,3 +60,48 @@ Remaining V963 work is described in `coding-review-v963-static-01.md`: complete 
 Missing faction-provider activation alone is not a Core failure. Preserve Order119 reposition and Order120 Psychic provenance/conditional checkpoints as Core evidence with separate named-faction qualification. Likewise preserve the Order87/Order92 owner conventions instead of elevating them to official clarifications. Speculative coordinated edited-history hardening remains separately queued; no expansion was undertaken.
 
 Final review still requires the complete stable canonical source/owner/assertion/consumer packet, exact head/tree/base, prerequisite completion and explicit polygon RELEASE. This reviewer remains available for the same independent review.
+
+On October7 at12:07UTC the user expressly approved the narrow B03 shared live
+proposal-context validation correction. The original native malformed-client
+capture increased decision records99→100 and removed pending queue1→0 while
+adding decision_recorded/proposal_accepted events before stale_active_player.
+Every game-state field and CP/use/effect ledger stayed unchanged, CP5→5.
+This was not unmodified legal play or edited history; no BASE execution or
+regression-introduction claim is inferred from the BASE-identical owner.
+Complete exact question/yes is preserved in
+`data/source_audits/order135/b03-explicit-repair-approval.json`.
+The existing shared prevalidator now requires complete typed eligibility-context
+equality for all parameterized Stratagem handlers before queue/history acceptance,
+retaining identity/catalog/round/phase diagnostic ordering and request-state drift.
+Target binding/effect selection remain legal client choices; no schema, fallback,
+rollback design, provider mechanics or permission is introduced. Native malformed
+context rejection preserves the complete lifecycle, followed by legal retry and
+actual attacks/CP/effect/interrupt/persistence/fork/allprincipalviews/events/exact
+replay. Qualified domain fixtures additionally cover trigger/window/payload drift,
+strict turn metadata, actual generic source and Carnival either-turn availability.
+No original test/assertion/branch/budget or historical evidence is weakened.
+Full current gates and both SAME exact-final reviews remain required; source3
+results and all failed/blocked receipts remain historical, without successor credit.
+
+
+The complete subsequent user clarification expressly authorizes exact type-safe
+game-context validation at this same B03 boundary; its verbatim message is retained
+in `data/source_audits/order135/b03-type-safe-boundary-user-clarification.json`.
+A separate author native local control reproduced submitted catalog Boolean true
+changed only to JSON number1 passing Python equality, then raising the strict flag
+error after pending queue1->0, records99->100 and two acceptance events. Every
+gameplay field and CP remained unchanged. This malformed live-client boundary case
+is not an unmodified legal-play failure or edited-history scenario; no independent
+BASE execution or provider certification is claimed. The first diagnostic helper
+failed on saved queue shape; that failed receipt remains immutable without credit.
+The existing catalog and context comparisons now recursively distinguish JSON
+booleans from numbers, preserving complete fields, object key order independence,
+equal numeric representations such as1/1.0, existing diagnostic order, legal
+target/effect choices and authoritative request-state checks. No schema/parser,
+source registration, normalization, rollback or history design is added. Qualified
+nested-context controls test this JSON-kind boundary without claiming a native
+behavior-changing nested-context consumer. Both native role directions reject1
+and1.0 atomically, then perform the unchanged legal retry and actual fight with
+save/load/fork/views/events/exact replay. Earlier focused and performance epoch07
+results are historical after this executable/test change; fresh gates and both
+SAME exact-final CLEAN reviews remain mandatory.

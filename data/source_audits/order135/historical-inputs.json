@@ -168,6 +168,46 @@
       "sha256": "3c2649b2ee8be42d4618e193c0c78a658164259d7bfc1c3adda44368ceb6748e",
       "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
       "git_path": "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py"
+    },
+    {
+      "path": "src/warhammer40k_core/engine/stratagems_generic_metadata.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/engine/stratagems_generic_metadata.py.txt",
+      "bytes": 18367,
+      "sha256": "0c1b21ed00ba44d3b03c65118d755ed7112c5f13c3a01d9de9df1e4acfe5d5b7",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/engine/stratagems_generic_metadata.py"
+    },
+    {
+      "path": "src/warhammer40k_core/engine/stratagems_eligibility.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/engine/stratagems_eligibility.py.txt",
+      "bytes": 58384,
+      "sha256": "2b17251e3410a97af082a2b2c61e7e7e7fdf556eba8f5ba6b86603712957a888",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/engine/stratagems_eligibility.py"
+    },
+    {
+      "path": "src/warhammer40k_core/engine/stratagems_selection.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/engine/stratagems_selection.py.txt",
+      "bytes": 36193,
+      "sha256": "7558cc570bf8def72e7f05702303932cf4b605a0263132c2e5dffdff5452b80a",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/engine/stratagems_selection.py"
+    },
+    {
+      "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems.py.txt",
+      "bytes": 17102,
+      "sha256": "57b1f736db2bed8c2b77f0ab7d43f80ba5a1243ba10250a3e0967169702842ad",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems.py"
+    },
+    {
+      "path": "src/warhammer40k_core/engine/stratagems_geometry.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/engine/stratagems_geometry.py.txt",
+      "bytes": 42024,
+      "sha256": "8f4a7ab8ee522ad2047f0661ad0e129deff54808c3f4d3f358e788c63942668d",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/engine/stratagems_geometry.py"
     }
   ],
   "qualification": "Original source/archive pins are immutable; appended current FAQ authority has distinct identity."

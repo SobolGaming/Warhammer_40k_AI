@@ -47,29 +47,6 @@ REQUIRED_NON_EMPTY_TRIGGER_CONTEXT_KEYS_KEY = "required_non_empty_trigger_contex
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
-def stratagem_turn_unavailable_reason(
-    *,
-    definition: StratagemDefinition,
-    context: StratagemEligibilityContext,
-) -> str | None:
-    """Apply source-carried turn restrictions independently of effect handler."""
-    payload = definition.effect_payload
-    if not isinstance(payload, dict):
-        return None
-    for key, own_turn, reason in (
-        ("requires_own_turn", True, "stratagem_requires_own_turn"),
-        ("requires_opponent_turn", False, "stratagem_requires_opponent_turn"),
-    ):
-        required = payload.get(key)
-        if required is None:
-            continue
-        if type(required) is not bool:
-            raise GameLifecycleError(f"{key} must be a bool.")
-        if required and (context.active_player_id == context.player_id) is not own_turn:
-            return reason
-    return None
-
-
 def companion_unit_effect_selection(unit_instance_id: str) -> JsonValue:
     return {
         EFFECT_SELECTION_KIND_KEY: SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND,

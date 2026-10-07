@@ -5425,7 +5425,11 @@
         "src/warhammer40k_core/engine/hidden_detection.py",
         "src/warhammer40k_core/engine/obscuring_model_cover.py",
         "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py",
-        "src/warhammer40k_core/engine/shooting_targets.py"
+        "src/warhammer40k_core/engine/shooting_targets.py",
+        "src/warhammer40k_core/engine/stratagems_eligibility.py",
+        "src/warhammer40k_core/engine/stratagems_generic_metadata.py",
+        "src/warhammer40k_core/engine/stratagems_geometry.py",
+        "src/warhammer40k_core/engine/stratagems_selection.py"
       ],
       "owners": [
         "*"
@@ -5442,7 +5446,8 @@
         "src/warhammer40k_core/rules/source_authority_registry.py",
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/__init__.py",
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/_artifacts.py",
-        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/artifacts/package.json"
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/artifacts/package.json",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems.py"
       ],
       "owners": [
         "*"
@@ -5455,6 +5460,9 @@
       "paths": [
         ".gitattributes",
         "data/source_audits/order135/b01-explicit-repair-approval.json",
+        "data/source_audits/order135/b02-explicit-repair-approval.json",
+        "data/source_audits/order135/b03-explicit-repair-approval.json",
+        "data/source_audits/order135/b03-type-safe-boundary-user-clarification.json",
         "data/source_audits/order135/baseline/docs/ADAPTER_DECISION_CONTRACT.md.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/_engine_build_manifest.json.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/core/visibility.py.txt",
@@ -5468,6 +5476,10 @@
         "data/source_audits/order135/baseline/src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/engine/primary_mission_event_decision_authority.py.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/engine/shooting_targets.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/stratagems_eligibility.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/stratagems_generic_metadata.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/stratagems_geometry.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/stratagems_selection.py.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/geometry/continuous_visibility.py.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/geometry/visibility_formulas.py.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/rules/source_authority_registry.json.txt",
@@ -5475,6 +5487,7 @@
         "data/source_audits/order135/baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/__init__.py.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/_artifacts.py.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/artifacts/package.json.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems.py.txt",
         "data/source_audits/order135/baseline/tools/build_core_other_concepts_source.py.txt",
         "data/source_audits/order135/conditional-core-acceptance.json",
         "data/source_audits/order135/current-bindings.json",
@@ -5502,8 +5515,10 @@
     },
     "order135-regressions": {
       "paths": [
+        "tests/order135_counteroffensive_helpers.py",
         "tests/order135_rng_helpers.py",
         "tests/order135_visibility_helpers.py",
+        "tests/unit/test_order135_counteroffensive_timing.py",
         "tests/unit/test_order135_objective_overlap.py",
         "tests/unit/test_order135_physical_visibility.py",
         "tests/unit/test_order135_shooting_boundary.py",

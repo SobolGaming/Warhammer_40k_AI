@@ -438,6 +438,15 @@ def build(root: Path = ROOT) -> dict[str, Any]:
         "approved_b01_boundary_persistence_repair": _read(
             root, AUDIT / "b01-explicit-repair-approval.json"
         ),
+        "approved_b02_core_counteroffensive_timing_repair": _read(
+            root, AUDIT / "b02-explicit-repair-approval.json"
+        ),
+        "approved_b03_shared_live_context_boundary_repair": _read(
+            root, AUDIT / "b03-explicit-repair-approval.json"
+        ),
+        "approved_b03_type_safe_same_boundary_clarification": _read(
+            root, AUDIT / "b03-type-safe-boundary-user-clarification.json"
+        ),
         "retained_baseline_consumer_report": (
             root / AUDIT / "current-consumer-dispositions.md"
         ).read_text(),

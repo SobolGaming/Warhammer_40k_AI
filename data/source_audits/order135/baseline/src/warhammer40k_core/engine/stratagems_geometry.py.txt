@@ -829,25 +829,6 @@ def _proposal_from_result_payload(payload: JsonValue) -> StratagemTargetProposal
         return None
 
 
-def _proposal_json_equal(left: JsonValue, right: JsonValue) -> bool:
-    # JSON booleans and numbers are distinct; equal number spellings may round-trip.
-    if isinstance(left, bool) or isinstance(right, bool):
-        return type(left) is type(right) and left == right
-    if isinstance(left, dict):
-        return (
-            isinstance(right, dict)
-            and left.keys() == right.keys()
-            and all(_proposal_json_equal(value, right[key]) for key, value in left.items())
-        )
-    if isinstance(left, list):
-        return (
-            isinstance(right, list)
-            and len(left) == len(right)
-            and all(_proposal_json_equal(a, b) for a, b in zip(left, right, strict=True))
-        )
-    return left == right
-
-
 def _proposal_context_error(
     *,
     state: GameState,
@@ -862,18 +843,16 @@ def _proposal_context_error(
         return "wrong_context"
     if submitted_proposal.stratagem_id != request_proposal.stratagem_id:
         return "wrong_context"
-    if not _proposal_json_equal(
-        cast(JsonValue, submitted_proposal.catalog_record.to_payload()),
-        cast(JsonValue, request_proposal.catalog_record.to_payload()),
-    ):
+    if submitted_proposal.catalog_record != request_proposal.catalog_record:
         return "wrong_context"
     if submitted_proposal.battle_round != request_proposal.battle_round:
         return "stale_battle_round"
     if submitted_proposal.phase is not request_proposal.phase:
         return "stale_phase"
-    if not _proposal_json_equal(
-        cast(JsonValue, submitted_proposal.context.to_payload()),
-        cast(JsonValue, request_proposal.context.to_payload()),
+    if (
+        request_proposal.catalog_record.definition.handler_id
+        in (CORE_RAPID_INGRESS_HANDLER_ID, CORE_FIRE_OVERWATCH_HANDLER_ID)
+        and submitted_proposal.context != request_proposal.context
     ):
         return "wrong_context"
     return _context_state_drift(state=state, context=request_proposal.context)

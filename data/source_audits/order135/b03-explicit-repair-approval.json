@@ -1,0 +1,29 @@
+{
+  "schema": "order135-b03-explicit-bounded-repair-approval-v1",
+  "source_thread_id": "01a0efa7-1ce0-70b0-a637-75c1615f80ef",
+  "transcript_evidence": [
+    {
+      "role": "assistant",
+      "recorded_time": "Oct7 12:05 UTC",
+      "sentinel": "Sentinel_454cba2acce0819191b39982150417fb",
+      "text": "Counter-offensive’s timing fix passed its initial native tests. Those checks exposed a separate rejection bug: a malformed client submission is rejected only after it consumes the pending decision and records acceptance. CP and gameplay state stay unchanged. May I fix the shared validation order so this rejection leaves the decision queue and history unchanged too?"
+    },
+    {
+      "role": "user",
+      "recorded_time": "Oct7 12:07 UTC",
+      "sentinel": "Sentinel_4b9c7cff16b081919912f2ec538dbc7a",
+      "text": "yes"
+    }
+  ],
+  "approved_scope": "Apply the retained narrow shared typed request/submission eligibility-context equality correction in the existing parameterized Stratagem prevalidator before queue/history/event acceptance; rejected supported live-client submissions preserve decisions, pending queue, acceptance events and all gameplay. Preserve valid native submission/legal retry/current API/phase/turn/actor/source/target/effect checks. Add exact context-only malformed reproduction, valid positives and persistence/fork/player-role views/events/exact replay controls. Regenerate and validate the complete corrected Order135 successor.",
+  "excluded_scope": "No blanket validation redesign, new compatibility behavior, evidence removal, unrelated permission expansion, Core/Carnival same-handler selection redesign, original test/assertion/branch/budget weakening, in-turn deployment granting-rule certification, or Order136 selection/implementation.",
+  "preserved_original_finding": "Author reproduction and SAME coding reviewer complete static corroboration established records99→100, pending queue1→0, decision_recorded/stratagem_target_proposal_accepted events, then stale_active_player exception. All game-state fields and CP/use/effect ledgers unchanged, CP5→5. This is malformed live-client input from an engine-generated valid pending request, not unmodified normal legal-play failure or edited history. No executed BASE reproduction/introduction claim; malformed-path restore/replay/recovery was unproven.",
+  "approved_proposal": {
+    "path": "coding-review/b02-client-context-proposed-repair-01.patch",
+    "sha256": "91509a7a5345270e20d9599d8d624097f7016307d64f775501033ffd90ec99c6",
+    "target": "src/warhammer40k_core/engine/stratagems_geometry.py:_proposal_context_error"
+  },
+  "execution_policy": "SAME sole author and SAME sole gpt-6.1-sol/high coding reviewer plus separately arranged SAME rules auditor. Both STATIC ONLY through distinct exact canonical packet, all corrected source prerequisites, quiet smoke, COMPLETE source quality, all16 original polygons alone and explicit independently authenticated durable RELEASE; then bounded probes and complete current remainder32workers. Historical frozen3 gates/cohort have no changed-executable successor pass credit. BOTH SAME exact-final CLEAN and all local gates precede standing authorized draft/ready20jobs25ZIP authentication/strict protected squash/fetched sole-parent-base-tree-allblob proof/fresh actual-main all25 audit and both reviews. No automaticmain/predecessorCI queries, no136selection. Do not stop at focused pass or intermediate packet.",
+  "blocked_packet_sha256": "fda931568c4172107e4db3b560460172d07c54e7f0618595d284aed27c55db42",
+  "blocked_handoff_sha256": "a75b1df966945b59c7ee606a4425eb68f8ab669312c3bbdb6487f523c9e28f0d"
+}

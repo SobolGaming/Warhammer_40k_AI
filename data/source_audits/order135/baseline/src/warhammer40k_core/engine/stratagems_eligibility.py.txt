@@ -25,7 +25,6 @@ from warhammer40k_core.engine.stratagems_generic_metadata import (
     companion_selection_error,
     companion_unit_id_or_none,
     objective_selection_error,
-    stratagem_turn_unavailable_reason,
     unit_arrived_from_reserves_this_turn,
     unit_has_contextual_status,
 )
@@ -578,12 +577,16 @@ def _generic_rule_ir_stratagem_unavailable_reason(
             )
         ):
             return "stratagem_requires_objective_marker"
-    turn_error = stratagem_turn_unavailable_reason(
-        definition=definition,
-        context=context,
-    )
-    if turn_error is not None:
-        return turn_error
+    if (
+        _optional_generic_metadata_bool(effect_payload, key="requires_own_turn")
+        and context.active_player_id != context.player_id
+    ):
+        return "stratagem_requires_own_turn"
+    if (
+        _optional_generic_metadata_bool(effect_payload, key="requires_opponent_turn")
+        and context.active_player_id == context.player_id
+    ):
+        return "stratagem_requires_opponent_turn"
     target_unit_id = target_binding.target_unit_instance_id if target_binding is not None else None
     if (
         _optional_generic_metadata_bool(
