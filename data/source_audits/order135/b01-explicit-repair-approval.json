@@ -1,0 +1,10 @@
+{
+  "source_thread_id": "01a0efa7-1ce0-70b0-a637-75c1615f80ef",
+  "reported_bug": "An accepted legal empty/no-attack shooting declaration creates an engine-generated state that cannot be loaded or forked: reconstructed primary-mission boundary history counts the declaration as an actual shot although the live shooting owner records no shot for empty attack_pools.",
+  "transcript_evidence": {
+    "assistant": "Assistant, Oct7 00:25 UTC: 'The independent audit found another bug: a legal shooting declaration with no attacks creates a state that can’t be loaded or forked. The incoming visibility and cover checks passed. I’ve paused completion and sent the reproducible failure for diagnosis and repair within the approved scope'",
+    "user": "User, Oct7 00:33 UTC, Sentinel_0aa57eddae888191a5de63ed0c62d571: 'I approve fixing it'"
+  },
+  "authorized_scope": "Exact accepted empty/no-attack declaration versus actual typed attack-pool history in the shared boundary projector. Preserve all decision/proposal/source/causal/identity/phase/ineligible validation and positive actual-attack controls. No unrelated redesign or gate waiver.",
+  "qualification": "The affected projector owner is BASE-identical. No regression-introduction claim is established. All current source gates, complete quality, newly frozen complete behavior and both SAME independent reviews remain mandatory. Order136 remains UNSELECTED. Faction granting rule and admitted gameplay certification remain OPEN."
+}

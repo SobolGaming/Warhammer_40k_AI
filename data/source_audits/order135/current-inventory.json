@@ -1,5 +1,15 @@
 {
   "acceptance": "Re-audit all 25 categories after every implementation PR merges. Require a complete rule-clause/FAQ → immutable source observation → engine owner → facade regression inventory, including older operative updates, all v931/v946 obligations, reopened certification findings and cross-category lifetimes. Verify exact source fingerprints, semantics, adapters, replay and visibility before claiming compliance. Include the September 10 review dispositions, resolved C12-04/C18-07 evidence, Heavy movement history, and explicit Normal Move, objective-control-first and Action-interruption consumer checks.",
+  "approved_b01_boundary_persistence_repair": {
+    "authorized_scope": "Exact accepted empty/no-attack declaration versus actual typed attack-pool history in the shared boundary projector. Preserve all decision/proposal/source/causal/identity/phase/ineligible validation and positive actual-attack controls. No unrelated redesign or gate waiver.",
+    "qualification": "The affected projector owner is BASE-identical. No regression-introduction claim is established. All current source gates, complete quality, newly frozen complete behavior and both SAME independent reviews remain mandatory. Order136 remains UNSELECTED. Faction granting rule and admitted gameplay certification remain OPEN.",
+    "reported_bug": "An accepted legal empty/no-attack shooting declaration creates an engine-generated state that cannot be loaded or forked: reconstructed primary-mission boundary history counts the declaration as an actual shot although the live shooting owner records no shot for empty attack_pools.",
+    "source_thread_id": "01a0efa7-1ce0-70b0-a637-75c1615f80ef",
+    "transcript_evidence": {
+      "assistant": "Assistant, Oct7 00:25 UTC: 'The independent audit found another bug: a legal shooting declaration with no attacks creates a state that can’t be loaded or forked. The incoming visibility and cover checks passed. I’ve paused completion and sent the reproducible failure for diagnosis and repair within the approved scope'",
+      "user": "User, Oct7 00:33 UTC, Sentinel_0aa57eddae888191a5de63ed0c62d571: 'I approve fixing it'"
+    }
+  },
   "approved_los_rng_compatibility": {
     "answer": "Yes",
     "answer_message": "Sentinel_4d71efcdf8488191bd17bbcc845e1e4d",
@@ -42946,8 +42956,12 @@
       "sha256": "feb4f1287d736258b7f69a3eb65dbe36364b84bb30ff4f4836ab4cb75b7f6256"
     },
     "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py": {
-      "bytes": 10404,
-      "sha256": "1589d29362ef85186450713e04fb68f43b254daab2f89b954692df262b2cf6be"
+      "bytes": 11037,
+      "sha256": "08b70eaae779755768e6f2472569d1fc59c2268c6181f0cc9b5de8f786236912"
+    },
+    "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py": {
+      "bytes": 7714,
+      "sha256": "3c2649b2ee8be42d4618e193c0c78a658164259d7bfc1c3adda44368ceb6748e"
     },
     "src/warhammer40k_core/engine/primary_reserve_entry_provider.py": {
       "bytes": 57037,
@@ -43432,6 +43446,10 @@
     "tests/unit/test_order135_physical_visibility.py": {
       "bytes": 7741,
       "sha256": "b045754212c4d840de611a4b71c2db1167bb4da8011e3d76bae1d7f772cddd06"
+    },
+    "tests/unit/test_order135_shooting_boundary.py": {
+      "bytes": 10410,
+      "sha256": "d011631dec22c1b075c69b60d1a692d600994bd2aa3da7fa4b608841f797dd6d"
     },
     "tests/unit/test_order135_visibility_facade.py": {
       "bytes": 5818,
@@ -45220,6 +45238,7 @@
       ]
     },
     {
+      "boundary_persistence_repair_qualification": "Explicitly approved B01: accepted empty/no-attack and selected-targetless declarations remain completed selections without becoming shots in reconstructed boundary history. Only nonempty typed actual attack pools mark the unit as shot; all decision/proposal/source/causal/identity/phase/ineligible guards remain. BASE-identical old owner; no regression-introduction claim. Native scalar/physical last-shooter boundaries, saves/forks/all views/events/exact replay and positive actual-attack controls bind runtime behavior; static presence is not certification.",
       "category": "06",
       "complete_source": {
         "blocks": [
@@ -45253,7 +45272,10 @@
         "src/warhammer40k_core/core/visibility_rng_projection.py:VisibilityRngProjection",
         "src/warhammer40k_core/core/visibility_rng_projection.py:legacy_scalar_input_fingerprint",
         "src/warhammer40k_core/engine/decision.py:_legacy_los_rng_payload",
-        "src/warhammer40k_core/engine/decision.py:DiceRollManager._seed_existing_event_history"
+        "src/warhammer40k_core/engine/decision.py:DiceRollManager._seed_existing_event_history",
+        "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:_shooting_declaration_ids",
+        "src/warhammer40k_core/engine/phases/shooting_model.py:ShootingPhaseState.with_declaration",
+        "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py:validate_primary_mission_shooting_event_decision_authority"
       ],
       "current_test_nodes": [
         "tests/unit/test_order135_physical_visibility.py::test_body_overhang_is_an_incoming_endpoint_but_not_an_outgoing_origin",
@@ -45279,7 +45301,10 @@
         "tests/unit/test_order135_visibility_rng_projection.py::test_scalar_projection_matches_actual_base_token_and_keeps_current_authority",
         "tests/unit/test_order135_visibility_rng_projection.py::test_changed_physical_domains_have_no_legacy_rng_projection",
         "tests/unit/test_order135_visibility_rng_projection.py::test_projection_is_strict_and_bound_to_fresh_authoritative_witness",
-        "tests/unit/test_order135_visibility_rng_projection.py::test_native_scalar_projection_preserves_pending_completed_save_fork_and_replay"
+        "tests/unit/test_order135_visibility_rng_projection.py::test_native_scalar_projection_preserves_pending_completed_save_fork_and_replay",
+        "tests/unit/test_order135_shooting_boundary.py::test_last_shooter_without_attacks_preserves_boundary_save_fork_views_and_replay",
+        "tests/unit/test_order135_shooting_boundary.py::test_nonempty_native_attack_remains_shot_at_boundary",
+        "tests/unit/test_order135_shooting_boundary.py::test_boundary_shot_projection_requires_explicit_valid_attack_pools"
       ],
       "owners": [
         "src/warhammer40k_core/geometry/physical_visibility.py:resolve_physical_visibility",
@@ -45293,7 +45318,10 @@
         "src/warhammer40k_core/core/visibility_rng_projection.py:VisibilityRngProjection",
         "src/warhammer40k_core/core/visibility_rng_projection.py:legacy_scalar_input_fingerprint",
         "src/warhammer40k_core/engine/decision.py:_legacy_los_rng_payload",
-        "src/warhammer40k_core/engine/decision.py:DiceRollManager._seed_existing_event_history"
+        "src/warhammer40k_core/engine/decision.py:DiceRollManager._seed_existing_event_history",
+        "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:_shooting_declaration_ids",
+        "src/warhammer40k_core/engine/phases/shooting_model.py:ShootingPhaseState.with_declaration",
+        "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py:validate_primary_mission_shooting_event_decision_authority"
       ],
       "qualification": "Approved V963-VISIBILITY repair with actual retained maintained-mirror observation and native catalog ingress; analytical body dimensions remain synthetic/source-linked geometry, not official miniature measurements.",
       "rng_compatibility_qualification": "Explicitly approved typed/versioned unchanged-scalar-only RNG projection. Current complete physical/bounds evidence remains authoritative; changed composite/clipped geometry retains current RNG metadata. Live/save/fork/replay and authentic BASE token are bound, never implied by static presence.",
@@ -45302,7 +45330,8 @@
         "tests/unit/test_order135_physical_visibility.py",
         "tests/unit/test_order135_visibility_facade.py",
         "tests/code_quality/test_order135_current_core_audit.py",
-        "tests/unit/test_order135_visibility_rng_projection.py"
+        "tests/unit/test_order135_visibility_rng_projection.py",
+        "tests/unit/test_order135_shooting_boundary.py"
       ]
     },
     {
@@ -46130,6 +46159,11 @@
       "resolved_path": "src/warhammer40k_core/engine/phases/shooting_model.py",
       "symbol_ast_sha256": "279c8f04855e7a76d9c0dbe78ed58ffd9bff97f4a310f7c5def559e96268269c"
     },
+    "src/warhammer40k_core/engine/phases/shooting_model.py:ShootingPhaseState.with_declaration": {
+      "file_sha256": "a5c9e8d74aacd6df1088df91882f20499ef1a763f5581d72fd3d5b9cb49798b5",
+      "resolved_path": "src/warhammer40k_core/engine/phases/shooting_model.py",
+      "symbol_ast_sha256": "86b4c6fe4448ed7c9d4f4e806c1abfe99658847f7457f4a62c54cab47e659e14"
+    },
     "src/warhammer40k_core/engine/phases/shooting_targeting.py:_heavy_hit_roll_modifier_applies": {
       "file_sha256": "fd8e9eeb6079a2be86d813ac5dd8f5ca6a8076cd9e5ad0de2b675c357397f5a2",
       "resolved_path": "src/warhammer40k_core/engine/phases/shooting_targeting.py",
@@ -46180,10 +46214,20 @@
       "resolved_path": "src/warhammer40k_core/engine/prebattle_instance_selection.py",
       "symbol_ast_sha256": "161d9f3e821aca3d15d675faea80da604a9dfe1ec6188a5ea9a2d9639f3e9f04"
     },
+    "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:_shooting_declaration_ids": {
+      "file_sha256": "08b70eaae779755768e6f2472569d1fc59c2268c6181f0cc9b5de8f786236912",
+      "resolved_path": "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py",
+      "symbol_ast_sha256": "b5f403079783c08821d595c7a6ff0d7b654e0d1dec4afd40d98d93a53e9e2929"
+    },
     "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:validate_primary_mission_boundary_unit_history_authority": {
-      "file_sha256": "1589d29362ef85186450713e04fb68f43b254daab2f89b954692df262b2cf6be",
+      "file_sha256": "08b70eaae779755768e6f2472569d1fc59c2268c6181f0cc9b5de8f786236912",
       "resolved_path": "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py",
       "symbol_ast_sha256": "f7d5e06209f094370d4b99c31bedcef9d4a6f378dd2616fd47aefd0a93fada1b"
+    },
+    "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py:validate_primary_mission_shooting_event_decision_authority": {
+      "file_sha256": "3c2649b2ee8be42d4618e193c0c78a658164259d7bfc1c3adda44368ceb6748e",
+      "resolved_path": "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py",
+      "symbol_ast_sha256": "3790273fe88d700387fafa612d1740897975f5fe22be0f16161923458d9f9113"
     },
     "src/warhammer40k_core/engine/primary_reserve_entry_provider.py:validate_primary_reserve_entry_provider_registration": {
       "file_sha256": "d354b8f48d62a4e847e2b0497bfb88be825a4bc5f6869a8c79567d2c9996de3c",
@@ -63005,12 +63049,31 @@
     {
       "category": "04",
       "current_owners": [
-        "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+        "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal",
+        "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:_shooting_declaration_ids",
+        "src/warhammer40k_core/engine/phases/shooting_model.py:ShootingPhaseState.with_declaration",
+        "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py:validate_primary_mission_shooting_event_decision_authority"
       ],
       "current_source_disposition": null,
-      "current_successor": null,
+      "current_successor": {
+        "current_additional_owners": [
+          "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:_shooting_declaration_ids",
+          "src/warhammer40k_core/engine/phases/shooting_model.py:ShootingPhaseState.with_declaration",
+          "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py:validate_primary_mission_shooting_event_decision_authority"
+        ],
+        "current_test_nodes": [
+          "tests/unit/test_order135_shooting_boundary.py::test_last_shooter_without_attacks_preserves_boundary_save_fork_views_and_replay",
+          "tests/unit/test_order135_shooting_boundary.py::test_nonempty_native_attack_remains_shot_at_boundary",
+          "tests/unit/test_order135_shooting_boundary.py::test_boundary_shot_projection_requires_explicit_valid_attack_pools"
+        ],
+        "disposition": "Explicit B01 native actual-shot boundary persistence controls; no static runtime pass claim.",
+        "qualification_reference": "data/source_audits/order135/b01-explicit-repair-approval.json"
+      },
       "current_test_nodes": [
-        "tests/unit/test_order95_optional_shooting.py::test_decline_all_legal_targets_preserves_selection_without_shot"
+        "tests/unit/test_order95_optional_shooting.py::test_decline_all_legal_targets_preserves_selection_without_shot",
+        "tests/unit/test_order135_shooting_boundary.py::test_last_shooter_without_attacks_preserves_boundary_save_fork_views_and_replay",
+        "tests/unit/test_order135_shooting_boundary.py::test_nonempty_native_attack_remains_shot_at_boundary",
+        "tests/unit/test_order135_shooting_boundary.py::test_boundary_shot_projection_requires_explicit_valid_attack_pools"
       ],
       "original_evidence_dispositions": [
         {
@@ -64135,12 +64198,31 @@
     {
       "category": "04",
       "current_owners": [
-        "src/warhammer40k_core/engine/game_state.py:GameState"
+        "src/warhammer40k_core/engine/game_state.py:GameState",
+        "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:_shooting_declaration_ids",
+        "src/warhammer40k_core/engine/phases/shooting_model.py:ShootingPhaseState.with_declaration",
+        "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py:validate_primary_mission_shooting_event_decision_authority"
       ],
       "current_source_disposition": null,
-      "current_successor": null,
+      "current_successor": {
+        "current_additional_owners": [
+          "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:_shooting_declaration_ids",
+          "src/warhammer40k_core/engine/phases/shooting_model.py:ShootingPhaseState.with_declaration",
+          "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py:validate_primary_mission_shooting_event_decision_authority"
+        ],
+        "current_test_nodes": [
+          "tests/unit/test_order135_shooting_boundary.py::test_last_shooter_without_attacks_preserves_boundary_save_fork_views_and_replay",
+          "tests/unit/test_order135_shooting_boundary.py::test_nonempty_native_attack_remains_shot_at_boundary",
+          "tests/unit/test_order135_shooting_boundary.py::test_boundary_shot_projection_requires_explicit_valid_attack_pools"
+        ],
+        "disposition": "Explicit B01 native actual-shot boundary persistence controls; no static runtime pass claim.",
+        "qualification_reference": "data/source_audits/order135/b01-explicit-repair-approval.json"
+      },
       "current_test_nodes": [
-        "tests/unit/test_order95_optional_shooting.py::test_decline_all_legal_targets_preserves_selection_without_shot"
+        "tests/unit/test_order95_optional_shooting.py::test_decline_all_legal_targets_preserves_selection_without_shot",
+        "tests/unit/test_order135_shooting_boundary.py::test_last_shooter_without_attacks_preserves_boundary_save_fork_views_and_replay",
+        "tests/unit/test_order135_shooting_boundary.py::test_nonempty_native_attack_remains_shot_at_boundary",
+        "tests/unit/test_order135_shooting_boundary.py::test_boundary_shot_projection_requires_explicit_valid_attack_pools"
       ],
       "original_evidence_dispositions": [
         {
@@ -108206,6 +108288,66 @@
       "resolved_path": "tests/unit/test_order135_physical_visibility.py",
       "runtime_pass_claimed": false,
       "symbol_ast_sha256": "0a04c43b215eeb7323de41cb96e68429cf0f7eb432e824eba1413eaa55538791"
+    },
+    "tests/unit/test_order135_shooting_boundary.py::test_boundary_shot_projection_requires_explicit_valid_attack_pools": {
+      "assertion_mode": "inline",
+      "assertions": [
+        "assert status.decision_request is not None",
+        "assert status.decision_request is not None",
+        "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+        "assert state is not None",
+        "assert unit_id in checkpoint.shot_unit_instance_ids",
+        "with pytest.raises(GameLifecycleError, match='attack.pool|greater than zero'):\n    validate_primary_mission_boundary_unit_history_authority(state=state, event_records=changed, decision_records=tuple(decisions.records), checkpoint_index=len(changed), checkpoint=checkpoint)",
+        "assert state.shooting_phase_state is not None",
+        "assert unit_id in state.shooting_phase_state.shot_unit_ids",
+        "assert payload['attack_pools']"
+      ],
+      "complete_current_body": "@pytest.mark.parametrize('change', ['missing', 'none', 'object', 'item', 'zero_attacks'])\ndef test_boundary_shot_projection_requires_explicit_valid_attack_pools(change: str) -> None:\n    session = empty_shooting_session(reachable=True, spare=True)\n    request = pending_request(session)\n    status = session.submit_option(request_id=request.request_id, option_id=SHOOTER, result_id='order135-pool:unit')\n    assert status.decision_request is not None\n    request = status.decision_request\n    status = session.submit_option(request_id=request.request_id, option_id='normal', result_id='order135-pool:type')\n    assert status.decision_request is not None\n    request = status.decision_request\n    proposal = proposal_from_request(request=request, target_unit_id='army-beta:enemy')\n    status = session.submit_parameterized_payload(request_id=request.request_id, result_id='order135-pool:declaration', payload=validate_json_value(proposal.to_payload()))\n    assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()\n    state = session.lifecycle.state\n    assert state is not None\n    checkpoint = capture_primary_mission_boundary_checkpoint(state=state, boundary_kind='objective_control', player_id='player-a', runtime_modifier_registry=RuntimeModifierRegistry.empty())\n    decisions = session.lifecycle.decision_controller\n    unit_id = SHOOTER\n    events = decisions.event_log.records\n    validate_primary_mission_boundary_unit_history_authority(state=state, event_records=events, decision_records=tuple(decisions.records), checkpoint_index=len(events), checkpoint=checkpoint)\n    assert unit_id in checkpoint.shot_unit_instance_ids\n    declaration_index = next((index for index, event in enumerate(events) if event.event_type == 'shooting_declaration_accepted'))\n    event = events[declaration_index]\n    payload = json.loads(json.dumps(event.payload))\n    if change == 'missing':\n        del payload['attack_pools']\n    elif change == 'none':\n        payload['attack_pools'] = None\n    elif change == 'object':\n        payload['attack_pools'] = {}\n    elif change == 'item':\n        payload['attack_pools'] = [None]\n    else:\n        assert payload['attack_pools']\n        payload['attack_pools'][0]['attacks'] = 0\n    changed = (*events[:declaration_index], replace(event, payload=validate_json_value(payload)), *events[declaration_index + 1:])\n    with pytest.raises(GameLifecycleError, match='attack.pool|greater than zero'):\n        validate_primary_mission_boundary_unit_history_authority(state=state, event_records=changed, decision_records=tuple(decisions.records), checkpoint_index=len(changed), checkpoint=checkpoint)\n    assert state.shooting_phase_state is not None\n    assert unit_id in state.shooting_phase_state.shot_unit_ids",
+      "file_sha256": "d011631dec22c1b075c69b60d1a692d600994bd2aa3da7fa4b608841f797dd6d",
+      "resolved_path": "tests/unit/test_order135_shooting_boundary.py",
+      "runtime_pass_claimed": false,
+      "symbol_ast_sha256": "16a773f636658fd030552ccae1c3b838e0a9cd03a7fd07431cdf0389cdab5b4e"
+    },
+    "tests/unit/test_order135_shooting_boundary.py::test_last_shooter_without_attacks_preserves_boundary_save_fork_views_and_replay": {
+      "assertion_mode": "inline",
+      "assertions": [
+        "assert request.decision_type == 'submit_shooting_declaration'",
+        "assert session.lifecycle.state is not None",
+        "assert accepted.status_kind is not LifecycleStatusKind.INVALID, accepted.to_payload()",
+        "assert _shooting_boundaries(session, boundary_start)",
+        "assert len(declarations) == 1",
+        "assert declaration['attack_pools'] == []",
+        "assert declaration['ranged_attack_history_record'] is None",
+        "assert bool(declaration['weapons_without_attacks']) is selected_targetless",
+        "assert status.decision_request is not None",
+        "assert payload['declarations']",
+        "assert unit_id not in checkpoint.shot_unit_instance_ids"
+      ],
+      "complete_current_body": "@pytest.mark.parametrize('physical', [False, True])\n@pytest.mark.parametrize('selected_targetless', [False, True])\ndef test_last_shooter_without_attacks_preserves_boundary_save_fork_views_and_replay(physical: bool, selected_targetless: bool) -> None:\n    if physical:\n        session, request = edge_shooting_boundary()\n        status = session.submit_option(request_id=request.request_id, option_id='normal', result_id='order135-b01:normal')\n        assert status.decision_request is not None\n        request = status.decision_request\n        target = 'army-alpha:large'\n    else:\n        session, request = native_scalar_shooting_request()\n        target = 'army-beta:scalar'\n    assert request.decision_type == 'submit_shooting_declaration'\n    assert_checkpoint(session)\n    payload = json.loads(json.dumps(proposal_from_request(request=request, target_unit_id=target).to_payload()))\n    if selected_targetless:\n        assert payload['declarations']\n        for declaration in payload['declarations']:\n            declaration['target_unit_instance_id'] = None\n    else:\n        payload['declarations'] = []\n    unit_id = payload['unit_instance_id']\n    start = len(session.lifecycle.decision_controller.event_log.records)\n    assert session.lifecycle.state is not None\n    boundary_start = len(session.lifecycle.state.objective_control_record_authorities)\n    accepted = session.submit_parameterized_payload(request_id=request.request_id, result_id='order135-b01:decline-all-targets', payload=validate_json_value(payload))\n    assert accepted.status_kind is not LifecycleStatusKind.INVALID, accepted.to_payload()\n    session.advance_until_decision_or_terminal()\n    assert _shooting_boundaries(session, boundary_start)\n    declarations = tuple((event for event in session.lifecycle.decision_controller.event_log.records[start:] if event.event_type == 'shooting_declaration_accepted'))\n    assert len(declarations) == 1\n    declaration = cast(dict[str, object], declarations[0].payload)\n    assert declaration['attack_pools'] == []\n    assert declaration['ranged_attack_history_record'] is None\n    assert bool(declaration['weapons_without_attacks']) is selected_targetless\n    for checkpoint in _shooting_boundaries(session, boundary_start):\n        assert unit_id not in checkpoint.shot_unit_instance_ids\n    assert_checkpoint(session)",
+      "file_sha256": "d011631dec22c1b075c69b60d1a692d600994bd2aa3da7fa4b608841f797dd6d",
+      "resolved_path": "tests/unit/test_order135_shooting_boundary.py",
+      "runtime_pass_claimed": false,
+      "symbol_ast_sha256": "305f77e1458ecf4079ba56ef61b3adbea02d24fe0af235a1f13c33b3522496c5"
+    },
+    "tests/unit/test_order135_shooting_boundary.py::test_nonempty_native_attack_remains_shot_at_boundary": {
+      "assertion_mode": "inline",
+      "assertions": [
+        "assert payload['declarations']",
+        "assert session.lifecycle.state is not None",
+        "assert accepted.status_kind is not LifecycleStatusKind.INVALID, accepted.to_payload()",
+        "assert len(declarations) == 1",
+        "assert declaration['attack_pools']",
+        "assert declaration['ranged_attack_history_record'] is not None",
+        "assert any((event.event_type == 'attack_sequence_completed' for event in events))",
+        "assert any((event.event_type == 'dice_rolled' for event in events))",
+        "assert (wounds_lost == 0) is no_damage",
+        "assert unit_id in checkpoint.shot_unit_instance_ids"
+      ],
+      "complete_current_body": "@pytest.mark.parametrize(('weapon_index', 'no_damage'), [(0, False), (1, True)])\ndef test_nonempty_native_attack_remains_shot_at_boundary(weapon_index: int, no_damage: bool) -> None:\n    session, request = native_scalar_shooting_request()\n    payload = json.loads(json.dumps(proposal_from_request(request=request, target_unit_id='army-beta:scalar').to_payload()))\n    declaration = payload['declarations'][0]\n    offered = cast(dict[str, object], cast(dict[str, object], request.payload)['proposal_request'])\n    weapons = [row for row in cast(list[dict[str, object]], offered['available_weapons']) if row['wargear_id'] == declaration['wargear_id'] and row['weapon_profile_id'] == declaration['weapon_profile_id']]\n    selected = weapons[weapon_index]\n    declaration['attacker_model_instance_id'] = selected['model_instance_id']\n    declaration['weapon_instance_id'] = selected['weapon_instance_id']\n    payload['declarations'] = [declaration]\n    assert payload['declarations']\n    unit_id = payload['unit_instance_id']\n    assert session.lifecycle.state is not None\n    boundary_start = len(session.lifecycle.state.objective_control_record_authorities)\n    event_start = len(session.lifecycle.decision_controller.event_log.records)\n    accepted = session.submit_parameterized_payload(request_id=request.request_id, result_id='order135-b01:actual-one-attack', payload=validate_json_value(payload))\n    assert accepted.status_kind is not LifecycleStatusKind.INVALID, accepted.to_payload()\n    for _ in range(40):\n        session.advance_until_decision_or_terminal()\n        if _shooting_boundaries(session, boundary_start):\n            break\n        submit_fixture_request(session, pending_request(session))\n    else:\n        raise AssertionError('Actual native attack did not reach its Shooting boundary.')\n    events = session.lifecycle.decision_controller.event_log.records[event_start:]\n    declarations = tuple((event for event in events if event.event_type == 'shooting_declaration_accepted'))\n    assert len(declarations) == 1\n    declaration = cast(dict[str, object], declarations[0].payload)\n    assert declaration['attack_pools']\n    assert declaration['ranged_attack_history_record'] is not None\n    assert any((event.event_type == 'attack_sequence_completed' for event in events))\n    assert any((event.event_type == 'dice_rolled' for event in events))\n    wounds_lost = 0\n    for event in events:\n        if event.event_type == 'attack_sequence_step' and isinstance(event.payload, dict) and (event.payload.get('step') == 'damage'):\n            damage = cast(dict[str, object], event.payload['payload'])['damage_application']\n            if damage is not None:\n                wounds_lost += cast(int, cast(dict[str, object], damage)['wounds_lost'])\n    assert (wounds_lost == 0) is no_damage\n    for checkpoint in _shooting_boundaries(session, boundary_start):\n        assert unit_id in checkpoint.shot_unit_instance_ids\n    assert_checkpoint(session)",
+      "file_sha256": "d011631dec22c1b075c69b60d1a692d600994bd2aa3da7fa4b608841f797dd6d",
+      "resolved_path": "tests/unit/test_order135_shooting_boundary.py",
+      "runtime_pass_claimed": false,
+      "symbol_ast_sha256": "b58eec695f6b858e09e5bc7fcab2f26bdfafd78be26ce007be3f49762e03aee9"
     },
     "tests/unit/test_order135_visibility_facade.py::test_native_legal_edge_ingress_accepts_incoming_attack_with_cover_restore_and_replay": {
       "assertion_mode": "inline",

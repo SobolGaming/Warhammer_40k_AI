@@ -3,8 +3,8 @@
   "family": "movement",
   "workload_id": "order80-normal-move-occurrence-v1",
   "base_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
-  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:95029c48e2f9b95fe3ba4d7092af9c8605b454f7625af2bb002ec8b037f7738f",
-  "head_input_digest": "46c6d699edea45d05914e2f83e20b7a90d16dec3922982aae34a5651b3d38610",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bbe4430dac9bebeddfbe7b0d34fe015f50f015ed9cfc1d2ac27e3f47906861fb",
+  "head_input_digest": "f83839ccc779c96e48222992edbd75fe1bf4dcc1b2926fd76fd64fc5c490aada",
   "budget_profile": "current-change-relative-v1",
   "base": {
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:110f573cc70342f09c3102916f918a54a64f7b50f0966cdbdb51eba2b6de970e",
@@ -18,17 +18,17 @@
     },
     "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
     "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
-    "fixture_sha256": "1d4ac5aaf8576312c92ca56236d98f8e5a5d014e73188f5d3709384b0156282c",
+    "fixture_sha256": "562b7a50f82aa1d2fce2842cf69160ea01f08e01a305125a7f96160be37d00f1",
     "samples": {
       "finite": [
-        7.863320400007069,
-        7.875771300168708,
-        7.9110630000941455
+        7.2929545000661165,
+        7.265162599971518,
+        7.3360333000309765
       ],
       "parameterized": [
-        7.274963099975139,
-        7.4486024000216275,
-        7.486060699913651
+        6.905194399878383,
+        6.999891299987212,
+        7.002023400040343
       ]
     },
     "completed": true,
@@ -36,7 +36,7 @@
     "coverage": false
   },
   "head": {
-    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:95029c48e2f9b95fe3ba4d7092af9c8605b454f7625af2bb002ec8b037f7738f",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bbe4430dac9bebeddfbe7b0d34fe015f50f015ed9cfc1d2ac27e3f47906861fb",
     "host": {
       "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
       "memory_bytes": 137327259648,
@@ -47,17 +47,17 @@
     },
     "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
     "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
-    "fixture_sha256": "1d4ac5aaf8576312c92ca56236d98f8e5a5d014e73188f5d3709384b0156282c",
+    "fixture_sha256": "562b7a50f82aa1d2fce2842cf69160ea01f08e01a305125a7f96160be37d00f1",
     "samples": {
       "finite": [
-        8.009983400115743,
-        7.744806200033054,
-        7.98608410009183
+        7.5061385000590235,
+        7.3445671000517905,
+        7.190916300052777
       ],
       "parameterized": [
-        7.670400300063193,
-        7.353164499858394,
-        7.268859000178054
+        7.034518799977377,
+        6.954620800213888,
+        6.94314180011861
       ]
     },
     "completed": true,

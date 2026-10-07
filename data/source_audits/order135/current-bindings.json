@@ -829,6 +829,34 @@
       ],
       "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
       "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "04.02.01-obligation-03": {
+      "current_test_nodes": [
+        "tests/unit/test_order135_shooting_boundary.py::test_last_shooter_without_attacks_preserves_boundary_save_fork_views_and_replay",
+        "tests/unit/test_order135_shooting_boundary.py::test_nonempty_native_attack_remains_shot_at_boundary",
+        "tests/unit/test_order135_shooting_boundary.py::test_boundary_shot_projection_requires_explicit_valid_attack_pools"
+      ],
+      "disposition": "Explicit B01 native actual-shot boundary persistence controls; no static runtime pass claim.",
+      "qualification_reference": "data/source_audits/order135/b01-explicit-repair-approval.json",
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:_shooting_declaration_ids",
+        "src/warhammer40k_core/engine/phases/shooting_model.py:ShootingPhaseState.with_declaration",
+        "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py:validate_primary_mission_shooting_event_decision_authority"
+      ]
+    },
+    "04.03.04-obligation-04": {
+      "current_test_nodes": [
+        "tests/unit/test_order135_shooting_boundary.py::test_last_shooter_without_attacks_preserves_boundary_save_fork_views_and_replay",
+        "tests/unit/test_order135_shooting_boundary.py::test_nonempty_native_attack_remains_shot_at_boundary",
+        "tests/unit/test_order135_shooting_boundary.py::test_boundary_shot_projection_requires_explicit_valid_attack_pools"
+      ],
+      "disposition": "Explicit B01 native actual-shot boundary persistence controls; no static runtime pass claim.",
+      "qualification_reference": "data/source_audits/order135/b01-explicit-repair-approval.json",
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:_shooting_declaration_ids",
+        "src/warhammer40k_core/engine/phases/shooting_model.py:ShootingPhaseState.with_declaration",
+        "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py:validate_primary_mission_shooting_event_decision_authority"
+      ]
     }
   },
   "source_supersessions": {
@@ -907,16 +935,21 @@
         "src/warhammer40k_core/core/visibility_rng_projection.py:VisibilityRngProjection",
         "src/warhammer40k_core/core/visibility_rng_projection.py:legacy_scalar_input_fingerprint",
         "src/warhammer40k_core/engine/decision.py:_legacy_los_rng_payload",
-        "src/warhammer40k_core/engine/decision.py:DiceRollManager._seed_existing_event_history"
+        "src/warhammer40k_core/engine/decision.py:DiceRollManager._seed_existing_event_history",
+        "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:_shooting_declaration_ids",
+        "src/warhammer40k_core/engine/phases/shooting_model.py:ShootingPhaseState.with_declaration",
+        "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py:validate_primary_mission_shooting_event_decision_authority"
       ],
       "test_files": [
         "tests/unit/test_order135_physical_visibility.py",
         "tests/unit/test_order135_visibility_facade.py",
         "tests/code_quality/test_order135_current_core_audit.py",
-        "tests/unit/test_order135_visibility_rng_projection.py"
+        "tests/unit/test_order135_visibility_rng_projection.py",
+        "tests/unit/test_order135_shooting_boundary.py"
       ],
       "qualification": "Approved V963-VISIBILITY repair with actual retained maintained-mirror observation and native catalog ingress; analytical body dimensions remain synthetic/source-linked geometry, not official miniature measurements.",
-      "rng_compatibility_qualification": "Explicitly approved typed/versioned unchanged-scalar-only RNG projection. Current complete physical/bounds evidence remains authoritative; changed composite/clipped geometry retains current RNG metadata. Live/save/fork/replay and authentic BASE token are bound, never implied by static presence."
+      "rng_compatibility_qualification": "Explicitly approved typed/versioned unchanged-scalar-only RNG projection. Current complete physical/bounds evidence remains authoritative; changed composite/clipped geometry retains current RNG metadata. Live/save/fork/replay and authentic BASE token are bound, never implied by static presence.",
+      "boundary_persistence_repair_qualification": "Explicitly approved B01: accepted empty/no-attack and selected-targetless declarations remain completed selections without becoming shots in reconstructed boundary history. Only nonempty typed actual attack pools mark the unit as shot; all decision/proposal/source/causal/identity/phase/ineligible guards remain. BASE-identical old owner; no regression-introduction claim. Native scalar/physical last-shooter boundaries, saves/forks/all views/events/exact replay and positive actual-attack controls bind runtime behavior; static presence is not certification."
     },
     "3da822cb-4a7c-44d2-8a9d-b867b4c4aed8": {
       "category": "19",

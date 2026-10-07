@@ -144,6 +144,30 @@
       "sha256": "e35d0695c3ce4a7a0b0aae8790f2107c6092c48f1741b983025f50545181f68e",
       "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
       "git_path": "src/warhammer40k_core/engine/decision.py"
+    },
+    {
+      "path": "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py.txt",
+      "bytes": 10404,
+      "sha256": "1589d29362ef85186450713e04fb68f43b254daab2f89b954692df262b2cf6be",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py"
+    },
+    {
+      "path": "src/warhammer40k_core/engine/phases/shooting_model.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/engine/phases/shooting_model.py.txt",
+      "bytes": 48976,
+      "sha256": "a5c9e8d74aacd6df1088df91882f20499ef1a763f5581d72fd3d5b9cb49798b5",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/engine/phases/shooting_model.py"
+    },
+    {
+      "path": "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py",
+      "historical_path": "data/source_audits/order135/baseline/src/warhammer40k_core/engine/primary_mission_event_decision_authority.py.txt",
+      "bytes": 7714,
+      "sha256": "3c2649b2ee8be42d4618e193c0c78a658164259d7bfc1c3adda44368ceb6748e",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py"
     }
   ],
   "qualification": "Original source/archive pins are immutable; appended current FAQ authority has distinct identity."

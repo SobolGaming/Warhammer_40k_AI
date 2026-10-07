@@ -5424,6 +5424,7 @@
         "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/thousand_sons/army_rule.py",
         "src/warhammer40k_core/engine/hidden_detection.py",
         "src/warhammer40k_core/engine/obscuring_model_cover.py",
+        "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py",
         "src/warhammer40k_core/engine/shooting_targets.py"
       ],
       "owners": [
@@ -5453,6 +5454,7 @@
     "order135-current-source-audit": {
       "paths": [
         ".gitattributes",
+        "data/source_audits/order135/b01-explicit-repair-approval.json",
         "data/source_audits/order135/baseline/docs/ADAPTER_DECISION_CONTRACT.md.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/_engine_build_manifest.json.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/core/visibility.py.txt",
@@ -5462,6 +5464,9 @@
         "data/source_audits/order135/baseline/src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/thousand_sons/army_rule.py.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/engine/hidden_detection.py.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/engine/obscuring_model_cover.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/phases/shooting_model.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/primary_mission_event_decision_authority.py.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/engine/shooting_targets.py.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/geometry/continuous_visibility.py.txt",
         "data/source_audits/order135/baseline/src/warhammer40k_core/geometry/visibility_formulas.py.txt",
@@ -5501,6 +5506,7 @@
         "tests/order135_visibility_helpers.py",
         "tests/unit/test_order135_objective_overlap.py",
         "tests/unit/test_order135_physical_visibility.py",
+        "tests/unit/test_order135_shooting_boundary.py",
         "tests/unit/test_order135_visibility_facade.py",
         "tests/unit/test_order135_visibility_rng_projection.py"
       ],

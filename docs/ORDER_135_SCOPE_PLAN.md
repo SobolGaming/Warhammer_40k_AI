@@ -99,3 +99,22 @@ and restored RNG histories. Composite/clipped changed geometry keeps current
 RNG authority. Original regression assertions and budgets are unchanged. Native
 configuration-to-shooting checks include pending/completed saves, forks and exact
 replay without injected state or dice. This grants no other compatibility scope.
+
+The fresh independent audit reproduced B01 through ordinary legal last-shooter
+empty/no-attack declarations: live history correctly retained no shot, while the
+BASE-identical boundary projector counted every accepted declaration and rejected
+engine-generated saves/forks. Exact replay reproduced. The same coding reviewer
+confirmed the invariant, and the user explicitly approved fixing this reported
+bug on October7 at00:33UTC. Complete authority is retained in
+`data/source_audits/order135/b01-explicit-repair-approval.json`. The shared
+projector now validates explicit typed attack-pool inventory and adds the unit
+only for nonempty actual pools. Decision/proposal/source/causal validation, same
+game/round/player/phase checks, unit identity and ineligible-passenger inventory
+remain required even for empty pools. Weapon selection, One Shot, Hazardous,
+Firing Deck restrictions and activity completion keep their existing independent
+owners. Native last-shooter scalar/physical empty and all-targetless controls
+exercise genuine boundary history, JSON save/load, fork, all role views/events
+and exact replay; positive actual attacks remain shots even without damage. This
+adds no granting rule, gameplay permission, unrelated redesign or gate waiver.
+The interrupted frozen2 cohort is retained without complete or partial pass
+credit. Renewed exact-source validation and both SAME reviews remain mandatory.

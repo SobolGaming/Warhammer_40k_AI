@@ -110,6 +110,7 @@
     "tests/unit/test_order134_deployment_restrictions.py": 53.961,
     "tests/unit/test_order135_objective_overlap.py": 7.234,
     "tests/unit/test_order135_physical_visibility.py": 16.657,
+    "tests/unit/test_order135_shooting_boundary.py": 180.305,
     "tests/unit/test_order135_visibility_facade.py": 58.007,
     "tests/unit/test_order135_visibility_rng_projection.py": 44.761,
     "tests/unit/test_order36_sequencing.py": 250.154,
@@ -329,79 +330,82 @@
       "junit_sha256": [
         "1402886578470348485d0ad0f82d8db9d9d5748d007711514a5099c33669f654",
         "2b7bdea4cd71f8a7d7d955f92da7a7f8bb3a4295a07925241852b3d336a48bad",
+        "2f70457e78c35b8ffffc0a6341566cfad414ad224f0739fc0f4d54acb523fe0f",
         "31fe8a595e09c738a3710dc33ec790a7fd21e4acaa388a8e699531a5c73c8f01",
         "3485a888a61e38ed7f86a66eabd4b7341be92e142734de39e6ae16418fa4947c",
         "6bc406af456cfae56f7084f54aecc22b9fd62e827a839f0d3023334c24a70573",
-        "9980095baa224979ab4744a997a05718c12e4d68ee604348269cc93c191711b0"
+        "8bafa788629729eac7b208395ca47b7efb36b040f29ee97acb570917cc93335d",
+        "9980095baa224979ab4744a997a05718c12e4d68ee604348269cc93c191711b0",
+        "c88f4bf7b25b58ae7eee095753be0d1c9a18dc08a7d848dff3a27e0129edabef"
       ],
-      "source": "PROVISIONAL ONLY: authenticated predecessor profile plus Order135 focused cases, including11 approved LOS RNG projection controls. Mixed revisions are NOT current complete-cohort pass credit; final timing metadata requires COMPLETE passing current cohort.",
-      "test_cases": 11142,
-      "test_files": 323
+      "source": "PROVISIONAL ONLY: predecessor profile and unique focused Order135 cases including all11 B01 controls. No current complete-cohort pass credit; final timings require COMPLETE passing current cohort.",
+      "test_cases": 11153,
+      "test_files": 324
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 5123.206,
+      "duration_seconds": 5138.228,
       "shard_id": 1,
-      "test_file_count": 25
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 5123.209,
+      "duration_seconds": 5138.25,
       "shard_id": 2,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 5123.203,
+      "duration_seconds": 5138.229,
       "shard_id": 3,
+      "test_file_count": 27
+    },
+    {
+      "duration_seconds": 5138.231,
+      "shard_id": 4,
       "test_file_count": 28
     },
     {
-      "duration_seconds": 5123.234,
-      "shard_id": 4,
+      "duration_seconds": 5138.225,
+      "shard_id": 5,
+      "test_file_count": 28
+    },
+    {
+      "duration_seconds": 5138.258,
+      "shard_id": 6,
       "test_file_count": 26
     },
     {
-      "duration_seconds": 5123.242,
-      "shard_id": 5,
-      "test_file_count": 27
-    },
-    {
-      "duration_seconds": 5123.203,
-      "shard_id": 6,
-      "test_file_count": 28
-    },
-    {
-      "duration_seconds": 5123.2,
+      "duration_seconds": 5138.259,
       "shard_id": 7,
-      "test_file_count": 28
-    },
-    {
-      "duration_seconds": 5123.205,
-      "shard_id": 8,
       "test_file_count": 27
     },
     {
-      "duration_seconds": 5123.201,
+      "duration_seconds": 5138.23,
+      "shard_id": 8,
+      "test_file_count": 28
+    },
+    {
+      "duration_seconds": 5138.248,
       "shard_id": 9,
       "test_file_count": 27
     },
     {
-      "duration_seconds": 5123.201,
+      "duration_seconds": 5138.247,
       "shard_id": 10,
-      "test_file_count": 27
+      "test_file_count": 26
     },
     {
-      "duration_seconds": 5123.239,
+      "duration_seconds": 5138.249,
       "shard_id": 11,
       "test_file_count": 27
     },
     {
-      "duration_seconds": 5123.239,
+      "duration_seconds": 5138.233,
       "shard_id": 12,
-      "test_file_count": 27
+      "test_file_count": 28
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 61478.582
+  "total_test_duration_seconds": 61658.887
 }

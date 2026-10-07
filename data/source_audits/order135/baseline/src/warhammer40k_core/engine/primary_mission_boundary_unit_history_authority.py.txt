@@ -16,7 +16,6 @@ from warhammer40k_core.engine.primary_mission_event_decision_authority import (
     validate_primary_mission_movement_event_decision_authority,
     validate_primary_mission_shooting_event_decision_authority,
 )
-from warhammer40k_core.engine.weapon_declaration import RangedAttackPool, RangedAttackPoolPayload
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -198,21 +197,13 @@ def _shooting_declaration_ids(
             continue
         if payload.get("phase") != BattlePhase.SHOOTING.value:
             raise GameLifecycleError("Primary mission shooting history phase drifted.")
-        unit_id = _payload_string(payload, key="unit_instance_id", context="shooting declaration")
-        pools = payload.get("attack_pools")
-        if not isinstance(pools, list):
-            raise GameLifecycleError("Primary mission shooting attack-pool inventory is invalid.")
-        for pool in pools:
-            if not isinstance(pool, dict):
-                raise GameLifecycleError("Primary mission shooting attack pool is invalid.")
-            RangedAttackPool.from_payload(cast(RangedAttackPoolPayload, pool))
+        declared.add(
+            _payload_string(payload, key="unit_instance_id", context="shooting declaration")
+        )
         ineligible = payload.get("ineligible_unit_instance_ids")
         if not isinstance(ineligible, list) or any(type(value) is not str for value in ineligible):
             raise GameLifecycleError("Primary mission shooting causal inventory is invalid.")
         # Firing Deck restricts passengers; they did not themselves shoot.
-        # Accepted selection without attacks does not mark the unit as having shot.
-        if pools:
-            declared.add(unit_id)
     return declared
 
 

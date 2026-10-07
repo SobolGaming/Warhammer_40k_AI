@@ -363,7 +363,15 @@ def build(root: Path = ROOT) -> dict[str, Any]:
                         "original_requirement": requirement,
                         "selected_source_sha256": old_sources[rid]["source_sha256"],
                         "retained_current_source_sha256": current_sources[rid]["source_sha256"],
-                        "current_owners": [live.owner(o) for o in requirement["owners"]],
+                        "current_owners": [
+                            live.owner(o)
+                            for o in dict.fromkeys(
+                                [
+                                    *requirement["owners"],
+                                    *(successor or {}).get("current_additional_owners", []),
+                                ]
+                            )
+                        ],
                         "original_evidence_dispositions": evidence,
                         "current_test_nodes": list(dict.fromkeys(nodes)),
                         "current_successor": successor,
@@ -427,6 +435,9 @@ def build(root: Path = ROOT) -> dict[str, Any]:
             root, AUDIT / "los-rng-compatibility-approval.json"
         ),
         "authentic_base_rng_control": _read(root, AUDIT / "los-rng-base-control.json"),
+        "approved_b01_boundary_persistence_repair": _read(
+            root, AUDIT / "b01-explicit-repair-approval.json"
+        ),
         "retained_baseline_consumer_report": (
             root / AUDIT / "current-consumer-dispositions.md"
         ).read_text(),
