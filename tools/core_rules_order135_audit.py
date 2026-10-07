@@ -198,7 +198,7 @@ def visibility_source_registration(root: Path) -> dict[str, Any]:
         if isinstance(node, ast.FunctionDef) and node.name == "source_packages"
     ]
     if len(compositions) != 1 or [
-        ast.unparse(node.value)
+        ast.unparse(node.value) if node.value is not None else ""
         for node in ast.walk(compositions[0])
         if isinstance(node, ast.Return)
     ] != ["(source_package(), battlefield_edge_source_package())"]:

@@ -4,7 +4,7 @@
   "workload_id": "order80-normal-move-occurrence-v1",
   "base_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
   "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1038332b0378377be510e16386aca64f0350e24a954c106f2f875a69c3ecb93b",
-  "head_input_digest": "f1629b2ebf1313b6921c4acf59c43abea64170d8d4eeaca7e3e8c821be304dfe",
+  "head_input_digest": "780cd1cd084f2a176bf3e625dda6449b4230f34f2b6bd8840077450890604765",
   "budget_profile": "current-change-relative-v1",
   "base": {
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:110f573cc70342f09c3102916f918a54a64f7b50f0966cdbdb51eba2b6de970e",
@@ -21,14 +21,14 @@
     "fixture_sha256": "756756342c496dbad925de0ea8ce580debc1d9ba57cbbe57e6a8e9de4ad51c75",
     "samples": {
       "finite": [
-        7.315455400152132,
-        7.407110900152475,
-        7.306706300005317
+        7.251060499809682,
+        7.287194799864665,
+        7.213457999983802
       ],
       "parameterized": [
-        6.882805400062352,
-        7.034916500095278,
-        7.181147100171074
+        6.937540000071749,
+        6.945195400156081,
+        6.954600800061598
       ]
     },
     "completed": true,
@@ -50,14 +50,14 @@
     "fixture_sha256": "756756342c496dbad925de0ea8ce580debc1d9ba57cbbe57e6a8e9de4ad51c75",
     "samples": {
       "finite": [
-        7.367625700077042,
-        7.432624200126156,
-        7.218704700004309
+        7.336438700091094,
+        7.237128600012511,
+        7.2141589999664575
       ],
       "parameterized": [
-        7.1154916998930275,
-        6.99565689987503,
-        6.931178600061685
+        6.951147299958393,
+        6.8871913000475615,
+        6.947219100082293
       ]
     },
     "completed": true,
