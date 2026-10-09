@@ -250,7 +250,7 @@ def probe_attack_sequence_grant_retention() -> dict[str, object]:
             observations.append(
                 {
                     "attack_index": event.attack_index,
-                    "attack_count": 2,
+                    "attack_count": 3,
                     "grant_active": WeaponKeyword.LETHAL_HITS
                     in runtime.weapon_profile_modifier(context).keywords,
                     "surviving_target_models": len(
@@ -275,7 +275,7 @@ def probe_attack_sequence_grant_retention() -> dict[str, object]:
                     attacker=attacker,
                     defender=bodyguard,
                     weapon_profile=attack_profile,
-                    attacks=2,
+                    attacks=3,
                     target_unit_instance_id=view.unit_instance_id,
                 ),
             ),

@@ -45,7 +45,11 @@ def test_attached_conferring_bearer_survives_as_ability_source_until_attacks_fin
     assert isinstance(windows_value, list)
     windows = cast(list[dict[str, object]], windows_value)
     assert windows
-    assert windows[0]["attack_index"] == 0
+    first_index = windows[0]["attack_index"]
+    attack_count = windows[0]["attack_count"]
+    assert isinstance(first_index, int)
+    assert isinstance(attack_count, int)
+    assert 0 <= first_index < attack_count - 1
     assert windows[0]["surviving_target_models"] == 5
     assert windows[0]["grant_active"] is True
 

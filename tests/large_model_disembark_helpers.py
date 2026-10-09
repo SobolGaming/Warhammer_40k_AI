@@ -15,9 +15,14 @@ from warhammer40k_core.geometry.pose import Pose
 
 
 def large_disembark_session(
-    *, diameter: float = 5, modes: tuple[DisembarkModeKind, ...] = ()
+    *,
+    diameter: float = 5,
+    modes: tuple[DisembarkModeKind, ...] = (),
+    supported_carrier: bool = False,
 ) -> LocalGameSession:
-    return disembark_session(modes, oversized_base_diameter_inches=diameter)
+    return disembark_session(
+        modes, oversized_base_diameter_inches=diameter, supported_carrier=supported_carrier
+    )
 
 
 def large_disembark_config(config: GameConfig, *, diameter: float) -> GameConfig:

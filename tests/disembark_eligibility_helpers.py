@@ -45,6 +45,7 @@ def disembark_session(
     deep_strike_transport: bool = False,
     unit_poses: dict[str, tuple[Pose, ...]] | None = None,
     oversized_base_diameter_inches: float | None = None,
+    supported_carrier: bool = False,
 ) -> LocalGameSession:
     config = _config()
     alpha, beta = config.army_muster_requests
@@ -125,6 +126,16 @@ def disembark_session(
     if unit_poses is not None:
         for unit_id, poses in unit_poses.items():
             _replace_unit_poses(state, unit_instance_id=unit_id, poses=poses)
+    if supported_carrier:
+        from tests.order135_supported_transport_fixture_helpers import (
+            prepare_supported_carrier_fixture,
+        )
+        from warhammer40k_core.engine.damage_allocation import unit_by_id
+
+        prepare_supported_carrier_fixture(
+            state, unit_by_id(state=state, unit_instance_id=TRANSPORT_ID)
+        )
+        config = replace(config, mission_setup=state.mission_setup)
     decisions = DecisionController()
     if reserve_transport:
         from warhammer40k_core.engine.reserve_arrival_requirements import (

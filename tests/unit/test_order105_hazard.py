@@ -110,8 +110,11 @@ def test_attached_combat_hazard_counts_the_whole_unit(keyword: str, expected: in
         state=state, unit_instance_id=units["shooter"].unit_instance_id
     )
     transport = units["transport"]
+    from tests.order135_supported_transport_fixture_helpers import prepare_supported_carrier_fixture
+
+    prepare_supported_carrier_fixture(state, transport)
     transport_placement = _unit_placement_at(
-        transport, army_id="army-alpha", player_id="player-a", poses=(Pose.at(10, 10),)
+        transport, army_id="army-alpha", player_id="player-a", poses=(Pose.at(10, 10, 5.5),)
     )
     battlefield = state.battlefield_state.with_unit_placement(transport_placement)
     for component in rules_unit.components:
@@ -140,13 +143,13 @@ def test_attached_combat_hazard_counts_the_whole_unit(keyword: str, expected: in
                 units["shooter"],
                 army_id="army-alpha",
                 player_id="player-a",
-                poses=(Pose.at(11.6, 13), Pose.at(13, 13), Pose.at(14.4, 13)),
+                poses=(Pose.at(8.3, 12.7), Pose.at(9.7, 13), Pose.at(11.1, 13)),
             ),
             _unit_placement_at(
                 units["leader"],
                 army_id="army-alpha",
                 player_id="player-a",
-                poses=(Pose.at(15.6, 11.8),),
+                poses=(Pose.at(12.7, 11.5),),
             ),
         ),
     )

@@ -15,7 +15,6 @@ from warhammer40k_core.core.visibility import (
     BenefitOfCoverResult,
     LineOfSightWitness,
     LineOfSightWitnessPayload,
-    TerrainVisibilityContext,
 )
 from warhammer40k_core.core.weapon_profiles import (
     RangeProfileKind,
@@ -30,6 +29,7 @@ from warhammer40k_core.engine.battlefield_presence import (
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
 )
+from warhammer40k_core.engine.battlefield_visibility_context import battlefield_visibility_context
 from warhammer40k_core.engine.hidden_detection import hidden_detection_eligible_target_model_ids
 from warhammer40k_core.engine.lone_operative import (
     lone_operative_profile_for_rules_unit,
@@ -632,7 +632,8 @@ def unit_has_line_of_sight_to_target(
                 target_detection_range_bonus_inches=detection_range_bonus_inches,
             )
         )
-        context = TerrainVisibilityContext.from_ruleset_descriptor(
+        context = battlefield_visibility_context(
+            scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             los_cache_key=visibility_cache_key,
             observer_model=observer_model,
@@ -1183,7 +1184,8 @@ def _best_line_of_sight_range_evidence(
         )
         if not in_range_model_ids:
             continue
-        context = TerrainVisibilityContext.from_ruleset_descriptor(
+        context = battlefield_visibility_context(
+            scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             los_cache_key=visibility_cache_key,
             observer_model=attacker_model,

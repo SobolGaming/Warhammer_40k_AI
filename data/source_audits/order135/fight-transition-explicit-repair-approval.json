@@ -1,0 +1,23 @@
+{
+  "schema": "order135-fight-transition-explicit-scope-approval-v1",
+  "recorded_utc": "2026-10-08T02:27:01.928281+00:00",
+  "source_thread_id": "01a0efa7-1ce0-70b0-a637-75c1615f80ef",
+  "exact_parent_delegation": "Explicit human approval received for the narrow Fight transition turn-selection repair and its regression tests. Preserve this exact approval with the finding. Before edits, either finish the unchanged run or, to avoid wasting a full superseded cohort, safely stop only your verified owned remainder process tree and seal all partial receipts without pass/timing credit. Verify no owned workers survive before changing inputs. Coordinate the independent coding invariant review, then repair the minimal shared owner and authentic native persistence/replay regression in both player directions; retain all original assertions and unrelated paths. Renew affected identity/contracts/performance/source gates and complete required current validation, isolated16 and new explicit RELEASE plus both same reviewers. No other candidate repair scope is granted. Keep broad individual audit work moving independently. Report actual old-run disposition and new candidate when stable.",
+  "supplied_transcript": [
+    {
+      "role": "assistant",
+      "utc": "2026-10-08 02:21 UTC",
+      "message_id": "Sentinel_fd8cb05aff108191997d4e9174ff23ce",
+      "text": "The Counter-offensive fix passed independent native checks. The broader audit reproduced another Fight-phase bug: after the last Fights First unit finishes, the engine resets selection to the active player instead of giving the opponent the next activation.\n\nMay I add the narrow turn-selection repair and its regression tests? The current test run can finish unchanged while you decide"
+    },
+    {
+      "role": "user",
+      "utc": "2026-10-08 02:22 UTC",
+      "message_id": "Sentinel_08b2f1ff45ec81919aa5bbe2d3f3c56a",
+      "text": "yes"
+    }
+  ],
+  "provenance_limit": "Exact parent-supplied transcript retained; not an independently retrieved conversation export.",
+  "new_scope": "Narrow Fight transition turn-selection repair and regression tests only",
+  "publication_merge_authorized": false
+}

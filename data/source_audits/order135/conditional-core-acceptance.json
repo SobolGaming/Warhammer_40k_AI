@@ -1,0 +1,14 @@
+{
+  "schema": "order135-owner-acceptance-clarification-v1",
+  "assistant_question_utc": "2026-10-06T19:36:00Z",
+  "assistant_question": "Order135 is the final cross-rules audit. It can’t certify full closure while Order134’s in-turn deployment prerequisite remains open. I recommend completing the full audit and reporting that gap explicitly. Shall I proceed on that basis?",
+  "user_answer_utc": "2026-10-06T20:16:00Z",
+  "user_message_id": "Sentinel_0ebd9251c61881918a71b71413360d5e",
+  "user_answer": "The concept of \"in-turn deployment\" is not a core role, otherwise we would be aware of it. It might be a faction ability/rule, which is fine therefore how we scoped Order134 allowing for that. Given that, I don't think the \"core rule\" audit should remain open as it's not a core rule. There will be other rules that factions bring that are exceptions to core rules anyways that will need to be supported.",
+  "current_acceptance_effect": "Absence of an admitted in-turn deployment granting ability is not a Core audit blocker. Assess Order134 conditional restrictions and existing real consumers, persistence and replay. A future source-admitted faction or mission granting rule is a separate capability and integration obligation. Full Core closure remains contingent on all actual Core obligations, required gates and both exact-final reviews.",
+  "historical_evidence": "Order134 handoff, qualification and initial Order135 reports remain immutable issue-time evidence. This clarification supersedes the inference that absent granting permission itself prevents Core closure.",
+  "granting_rule_claimed": false,
+  "native_in_turn_deployment_consumer_claimed": false,
+  "gates_waived": false,
+  "certification_predetermined": false
+}

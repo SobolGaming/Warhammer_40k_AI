@@ -25,7 +25,7 @@ CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID = (
 )
 CORE_RULES_SOURCE_AUTHORITY_SCOPE: SourceAuthorityScope = "warhammer_40000_11th_core_rules"
 EXPECTED_SOURCE_AUTHORITY_REGISTRY_SHA256 = (
-    "282ad568ffb6a749351ef98d67c7f9a3c155ce0ed5326dcba3cb4855d997d7ec"
+    "edf82aee9e95868f91663feac79a174d5e738aaf1fd3c5b977462fe652364a59"
 )
 
 _REGISTRY_PATH = Path(__file__).with_name("source_authority_registry.json")
@@ -85,6 +85,11 @@ class SourceAuthorityScopeRegistry:
     legacy_observations: tuple[LegacyObservationAuthorization, ...]
     legacy_controlling_transcriptions: tuple[LegacyControllingTranscriptionAuthorization, ...]
     source_packages: tuple[SourcePackageAuthorization, ...]
+    source_package_extensions: tuple[SourcePackageAuthorization, ...]
+
+    def all_source_packages(self) -> tuple[SourcePackageAuthorization, ...]:
+        """Historical inventory and pinned, current source registrations."""
+        return self.source_packages + self.source_package_extensions
 
 
 @dataclass(frozen=True, slots=True)
@@ -240,7 +245,7 @@ class SourceAuthorityRegistry:
         package = next(
             (
                 candidate
-                for candidate in scope.source_packages
+                for candidate in scope.all_source_packages()
                 if (
                     candidate.namespace,
                     candidate.package_name,
@@ -320,6 +325,7 @@ def _scope(payload: dict[str, object]) -> SourceAuthorityScopeRegistry:
             "legacy_observations",
             "legacy_controlling_transcriptions",
             "source_packages",
+            "source_package_extensions",
         },
         context="scope",
     )
@@ -355,6 +361,15 @@ def _scope(payload: dict[str, object]) -> SourceAuthorityScopeRegistry:
         source_packages=tuple(
             _source_package(item)
             for item in _object_rows(row, "source_packages", context="source packages")
+        ),
+        source_package_extensions=tuple(
+            _source_package(item)
+            for item in _object_rows(
+                row,
+                "source_package_extensions",
+                context="source package extensions",
+                allow_empty=True,
+            )
         ),
     )
 
@@ -481,6 +496,10 @@ def _validate_registry_contents(registry: SourceAuthorityRegistry) -> None:
             raise SourceAuthorityRegistryError(
                 "Faction scope cannot authorize legacy controlling transcriptions."
             )
+        if faction_scope and scope.source_package_extensions:
+            raise SourceAuthorityRegistryError(
+                "Core source-package extensions cannot authorize faction sources."
+            )
         replacement_keys = tuple(
             (row.namespace, row.package_name, row.version, row.rule_source_id)
             for row in scope.legacy_controlling_transcriptions
@@ -519,8 +538,12 @@ def _validate_registry_contents(registry: SourceAuthorityRegistry) -> None:
             raise SourceAuthorityRegistryError(
                 "Legacy observation identities and hashes must be unique."
             )
+        if any(row.catalog_sha256 is None for row in scope.source_package_extensions):
+            raise SourceAuthorityRegistryError(
+                "Current source-package extensions require an exact catalog hash."
+            )
         package_ids = tuple(
-            (row.namespace, row.package_name, row.version) for row in scope.source_packages
+            (row.namespace, row.package_name, row.version) for row in scope.all_source_packages()
         )
         if len(package_ids) != len(set(package_ids)):
             raise SourceAuthorityRegistryError(
@@ -528,7 +551,7 @@ def _validate_registry_contents(registry: SourceAuthorityRegistry) -> None:
             )
         allowed_rule_source_ids = tuple(
             source_id
-            for package in scope.source_packages
+            for package in scope.all_source_packages()
             for source_id in package.allowed_rule_source_ids
         )
         if len(allowed_rule_source_ids) != len(set(allowed_rule_source_ids)):
@@ -542,7 +565,8 @@ def _validate_registry_contents(registry: SourceAuthorityRegistry) -> None:
                 "Legacy observations must name an authorized Core Rules source ID."
             )
         packages_by_identity = {
-            (row.namespace, row.package_name, row.version): row for row in scope.source_packages
+            (row.namespace, row.package_name, row.version): row
+            for row in scope.all_source_packages()
         }
         legacy_observations_by_source = {
             source_id: {

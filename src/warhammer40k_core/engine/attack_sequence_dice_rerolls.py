@@ -7,6 +7,7 @@ from warhammer40k_core.core.keyword_membership import keyword_inventory_contains
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.engine.intrinsic_attack_rerolls import intrinsic_wound_reroll_contexts
 from warhammer40k_core.engine.attack_modifier_evaluation import (
+    WoundModifierEvaluation,
     select_hit_modifiers,
     select_wound_modifiers,
 )
@@ -16,7 +17,7 @@ from warhammer40k_core.engine.random_profile_evaluation import evaluate_unit_pro
 from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
 from warhammer40k_core.engine.shooting_types import ShootingType
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from warhammer40k_core.engine.command_reroll_windows import (
     request_command_reroll_if_available as _request_command_reroll_for_attack_roll_if_available,
@@ -75,6 +76,7 @@ __all__ = (
     "_request_source_backed_save_reroll_if_available",
     "_request_source_backed_wound_reroll_if_available",
     "_roll_hit_and_wound",
+    "_roll_hit_step",
     "_roll_or_reuse_state",
     "_source_backed_attack_context_id_matches_active_pool",
     "_source_backed_attack_kind_for_phase",
@@ -88,7 +90,7 @@ __all__ = (
 )
 
 
-def _roll_hit_and_wound(
+def _roll_hit_step(
     *,
     state: GameState,
     decisions: DecisionController,
@@ -98,77 +100,100 @@ def _roll_hit_and_wound(
     stratagem_index: StratagemCatalogIndex | None,
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry,
-) -> tuple[AttackResolutionContextPayload | None, LifecycleStatus | None]:
-    pool = attack_sequence.current_pool()
+    hit_stage: Literal["prepare", "roll", "resolve"] = "resolve",
+    gathered_pool: RangedAttackPool | None = None,
+    prepared_hits: dict[
+        str, tuple[RangedAttackPool, PsychicAttackModifierIgnoreSelection | None, tuple[str, ...]]
+    ]
+    | None = None,
+    rolled_hits: dict[str, HitRoll] | None = None,
+) -> tuple[HitRoll | None, LifecycleStatus | None]:
+    pool = attack_sequence.current_pool() if gathered_pool is None else gathered_pool
     attack_context_id = attack_sequence.attack_context_id()
-    if attack_sequence.generated_hit_index == 0 and not has_weapon_keyword(
-        pool.weapon_profile, WeaponKeyword.TORRENT
-    ):
-        pool = evaluate_attack_weapon_profile(
-            pool=pool,
-            decisions=decisions,
-            manager=manager,
-            attack_context_id=attack_context_id,
-            player_id=attack_sequence.attacker_player_id,
-            characteristics=(Characteristic.BALLISTIC_SKILL, Characteristic.WEAPON_SKILL),
-        )
-    is_psychic_attack = is_psychic_weapon_profile(pool.weapon_profile)
     if attack_sequence.generated_hit_index == 0:
-        psychic_modifier_selection = _psychic_attack_modifier_ignore_selection_for_attack(
-            decisions=decisions,
-            attack_context_id=attack_context_id,
-        )
-        if psychic_modifier_selection is None or not psychic_modifier_selection.complete:
-            request = _psychic_attack_modifier_ignore_request(
+        prepared = None if prepared_hits is None else prepared_hits.get(attack_context_id)
+        if prepared is None:
+            if not has_weapon_keyword(pool.weapon_profile, WeaponKeyword.TORRENT):
+                pool = evaluate_attack_weapon_profile(
+                    pool=pool,
+                    decisions=decisions,
+                    manager=manager,
+                    attack_context_id=attack_context_id,
+                    player_id=attack_sequence.attacker_player_id,
+                    characteristics=(Characteristic.BALLISTIC_SKILL, Characteristic.WEAPON_SKILL),
+                )
+            psychic_modifier_selection = _psychic_attack_modifier_ignore_selection_for_attack(
+                decisions=decisions,
+                attack_context_id=attack_context_id,
+            )
+            if psychic_modifier_selection is None or not psychic_modifier_selection.complete:
+                request = _psychic_attack_modifier_ignore_request(
+                    state=state,
+                    pool=pool,
+                    attacker_player_id=attack_sequence.attacker_player_id,
+                    attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+                    attack_context_id=attack_context_id,
+                    source_phase=attack_sequence.source_phase,
+                    runtime_modifier_registry=runtime_modifier_registry,
+                    previous_selection=psychic_modifier_selection,
+                )
+                if request is not None:
+                    decisions.request_decision(request)
+                    return (
+                        None,
+                        LifecycleStatus.waiting_for_decision(
+                            stage=GameLifecycleStage.BATTLE,
+                            decision_request=request,
+                            payload={
+                                "phase": attack_sequence.source_phase.value,
+                                "phase_body_status": "psychic_attack_modifier_ignore_pending",
+                                "attack_context_id": attack_context_id,
+                                "weapon_profile_id": pool.weapon_profile_id,
+                            },
+                        ),
+                    )
+            ignored_modifier_ids: tuple[str, ...] = ()
+            if not is_psychic_weapon_profile(pool.weapon_profile) and not has_weapon_keyword(
+                pool.weapon_profile, WeaponKeyword.TORRENT
+            ):
+                ignored_modifier_ids, status = select_hit_modifiers(
+                    state=state,
+                    decisions=decisions,
+                    pool=pool,
+                    attack_context_id=attack_context_id,
+                    source_phase=attack_sequence.source_phase,
+                    registry=runtime_modifier_registry,
+                )
+                if status is not None:
+                    return None, status
+            if prepared_hits is not None:
+                prepared_hits[attack_context_id] = (
+                    pool,
+                    psychic_modifier_selection,
+                    ignored_modifier_ids,
+                )
+        else:
+            pool, psychic_modifier_selection, ignored_modifier_ids = prepared
+        is_psychic_attack = is_psychic_weapon_profile(pool.weapon_profile)
+        if hit_stage == "prepare":
+            return None, None
+        hit_roll = None if rolled_hits is None else rolled_hits.get(attack_context_id)
+        if hit_roll is None:
+            hit_roll = _roll_hit(
                 state=state,
+                manager=manager,
                 pool=pool,
                 attacker_player_id=attack_sequence.attacker_player_id,
-                attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
                 attack_context_id=attack_context_id,
                 source_phase=attack_sequence.source_phase,
                 runtime_modifier_registry=runtime_modifier_registry,
-                previous_selection=psychic_modifier_selection,
+                psychic_modifier_selection=psychic_modifier_selection,
+                ignored_modifier_ids=ignored_modifier_ids,
             )
-            if request is not None:
-                decisions.request_decision(request)
-                return (
-                    None,
-                    LifecycleStatus.waiting_for_decision(
-                        stage=GameLifecycleStage.BATTLE,
-                        decision_request=request,
-                        payload={
-                            "phase": attack_sequence.source_phase.value,
-                            "phase_body_status": "psychic_attack_modifier_ignore_pending",
-                            "attack_context_id": attack_context_id,
-                            "weapon_profile_id": pool.weapon_profile_id,
-                        },
-                    ),
-                )
-        ignored_modifier_ids: tuple[str, ...] = ()
-        if not is_psychic_attack and not has_weapon_keyword(
-            pool.weapon_profile, WeaponKeyword.TORRENT
-        ):
-            ignored_modifier_ids, status = select_hit_modifiers(
-                state=state,
-                decisions=decisions,
-                pool=pool,
-                attack_context_id=attack_context_id,
-                source_phase=attack_sequence.source_phase,
-                registry=runtime_modifier_registry,
-            )
-            if status is not None:
-                return None, status
-        hit_roll = _roll_hit(
-            state=state,
-            manager=manager,
-            pool=pool,
-            attacker_player_id=attack_sequence.attacker_player_id,
-            attack_context_id=attack_context_id,
-            source_phase=attack_sequence.source_phase,
-            runtime_modifier_registry=runtime_modifier_registry,
-            psychic_modifier_selection=psychic_modifier_selection,
-            ignored_modifier_ids=ignored_modifier_ids,
-        )
+            if rolled_hits is not None:
+                rolled_hits[attack_context_id] = hit_roll
+        if hit_stage == "roll":
+            return hit_roll, None
         status = _request_source_backed_hit_reroll_if_available(
             state=state,
             decisions=decisions,
@@ -285,6 +310,47 @@ def _roll_hit_and_wound(
         if attack_sequence.current_hit_roll is None:
             raise GameLifecycleError("Generated hit resolution requires a hit roll.")
         hit_roll = attack_sequence.current_hit_roll
+    return hit_roll, None
+
+
+def _roll_hit_and_wound(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    manager: DiceRollManager,
+    attack_sequence: AttackSequence,
+    hooks: AttackSequenceHooks,
+    stratagem_index: StratagemCatalogIndex | None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    wound_stage: Literal["prepare", "roll", "resolve"] = "resolve",
+    gathered_pool: RangedAttackPool | None = None,
+    finalized_hit: HitRoll | None = None,
+    prepared_wounds: dict[str, tuple[WoundModifierEvaluation, tuple[str, ...]]] | None = None,
+    rolled_wounds: dict[str, WoundRoll] | None = None,
+) -> tuple[AttackResolutionContextPayload | None, LifecycleStatus | None]:
+    pool = attack_sequence.current_pool() if gathered_pool is None else gathered_pool
+    attack_context_id = attack_sequence.attack_context_id()
+    is_psychic_attack = is_psychic_weapon_profile(pool.weapon_profile)
+    # The gathered owner supplies only results finalized earlier in this call.
+    # Nothing is retained across a pending decision or reconstructed from a client.
+    hit_roll = finalized_hit
+    if hit_roll is None:
+        hit_roll, status = _roll_hit_step(
+            state=state,
+            decisions=decisions,
+            manager=manager,
+            attack_sequence=attack_sequence,
+            hooks=hooks,
+            stratagem_index=stratagem_index,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+            runtime_modifier_registry=runtime_modifier_registry,
+            gathered_pool=gathered_pool,
+        )
+        if status is not None:
+            return None, status
+    if hit_roll is None:
+        raise GameLifecycleError("Completed Hit step requires its recorded result.")
     if not hit_roll.successful:
         return None, None
 
@@ -293,62 +359,77 @@ def _roll_hit_and_wound(
     )
     if status is not None:
         return None, status
+    wound_roll: WoundRoll | None
     if auto_wound:
         wound_roll = WoundRoll.auto_wound(strength=None, toughness=None, target_number=None)
     else:
-        pool = evaluate_attack_weapon_profile(
-            pool=pool,
-            decisions=decisions,
-            manager=manager,
-            attack_context_id=attack_context_id,
-            player_id=attack_sequence.attacker_player_id,
-            characteristics=(Characteristic.STRENGTH,),
-        )
-        toughness_context = allocation_context_for_unit(
-            state=state,
-            target_unit_instance_id=pool.target_unit_instance_id,
-        )
-        evaluate_unit_profile_characteristics(
-            state=state,
-            decisions=decisions,
-            unit_instance_id=pool.target_unit_instance_id,
-            scope_id=attack_context_id,
-            characteristics=(Characteristic.TOUGHNESS,),
-            dice_manager=manager,
-            model_instance_ids=(
-                toughness_context.attached_unit_bodyguard_model_ids
-                or toughness_context.alive_model_ids
-            ),
-        )
-        target_rules_unit = rules_unit_view_by_id(
-            state=state,
-            unit_instance_id=pool.target_unit_instance_id,
-        )
-        wound_evaluation = select_wound_modifiers(
-            state=state,
-            decisions=decisions,
-            pool=pool,
-            attack_context_id=attack_context_id,
-            source_phase=attack_sequence.source_phase,
-            registry=runtime_modifier_registry,
-        )
-        if wound_evaluation.pending_status is not None:
-            return None, wound_evaluation.pending_status
-        pool, toughness = wound_evaluation.pool, wound_evaluation.toughness
-        wound_roll = _roll_wound(
-            manager=manager,
-            pool=pool,
-            toughness=toughness,
-            attacker_player_id=attack_sequence.attacker_player_id,
-            attack_context_id=attack_context_id,
-            critical_threshold=_critical_wound_threshold(
-                state=state,
+        prepared = None if prepared_wounds is None else prepared_wounds.get(attack_context_id)
+        if prepared is None:
+            pool = evaluate_attack_weapon_profile(
                 pool=pool,
+                decisions=decisions,
+                manager=manager,
+                attack_context_id=attack_context_id,
+                player_id=attack_sequence.attacker_player_id,
+                characteristics=(Characteristic.STRENGTH,),
+            )
+            toughness_context = allocation_context_for_unit(
+                state=state,
+                target_unit_instance_id=pool.target_unit_instance_id,
+            )
+            evaluate_unit_profile_characteristics(
+                state=state,
+                decisions=decisions,
+                unit_instance_id=pool.target_unit_instance_id,
+                scope_id=attack_context_id,
+                characteristics=(Characteristic.TOUGHNESS,),
+                dice_manager=manager,
+                model_instance_ids=(
+                    toughness_context.attached_unit_bodyguard_model_ids
+                    or toughness_context.alive_model_ids
+                ),
+            )
+            target_keywords = rules_unit_view_by_id(
+                state=state,
+                unit_instance_id=pool.target_unit_instance_id,
+            ).keywords
+            wound_evaluation = select_wound_modifiers(
+                state=state,
+                decisions=decisions,
+                pool=pool,
+                attack_context_id=attack_context_id,
                 source_phase=attack_sequence.source_phase,
-                target_keywords=target_rules_unit.keywords,
-            ),
-            wound_modifier=wound_evaluation.modifier,
-        )
+                registry=runtime_modifier_registry,
+            )
+            if wound_evaluation.pending_status is not None:
+                return None, wound_evaluation.pending_status
+            if prepared_wounds is not None:
+                prepared_wounds[attack_context_id] = wound_evaluation, target_keywords
+        else:
+            wound_evaluation, target_keywords = prepared
+        pool, toughness = wound_evaluation.pool, wound_evaluation.toughness
+        if wound_stage == "prepare":
+            return None, None
+        wound_roll = None if rolled_wounds is None else rolled_wounds.get(attack_context_id)
+        if wound_roll is None:
+            wound_roll = _roll_wound(
+                manager=manager,
+                pool=pool,
+                toughness=toughness,
+                attacker_player_id=attack_sequence.attacker_player_id,
+                attack_context_id=attack_context_id,
+                critical_threshold=_critical_wound_threshold(
+                    state=state,
+                    pool=pool,
+                    source_phase=attack_sequence.source_phase,
+                    target_keywords=target_keywords,
+                ),
+                wound_modifier=wound_evaluation.modifier,
+            )
+            if rolled_wounds is not None:
+                rolled_wounds[attack_context_id] = wound_roll
+        if wound_stage == "roll":
+            return None, None
         status = _request_source_backed_wound_reroll_if_available(
             state=state,
             decisions=decisions,
@@ -395,7 +476,7 @@ def _roll_hit_and_wound(
             target_unit_instance_id=pool.target_unit_instance_id,
             weapon_profile_id=pool.weapon_profile_id,
             weapon_profile=pool.weapon_profile,
-            target_keywords=target_rules_unit.keywords,
+            target_keywords=target_keywords,
         )
         if override_request is not None:
             if wound_roll.roll_state is None:
@@ -416,6 +497,8 @@ def _roll_hit_and_wound(
                     },
                 ),
             )
+    if wound_stage != "resolve":
+        return None, None
     _emit_event(
         decisions=decisions,
         hooks=hooks,

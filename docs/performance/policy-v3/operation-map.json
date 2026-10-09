@@ -5413,6 +5413,343 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "order135-visibility-hot-consumers": {
+      "paths": [
+        "src/warhammer40k_core/core/visibility_records.py",
+        "src/warhammer40k_core/core/visibility_rng_projection.py",
+        "src/warhammer40k_core/engine/attack_sequence_hazardous.py",
+        "src/warhammer40k_core/engine/battlefield_visibility_context.py",
+        "src/warhammer40k_core/engine/decision.py",
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/thousand_sons/army_rule.py",
+        "src/warhammer40k_core/engine/hidden_detection.py",
+        "src/warhammer40k_core/engine/obscuring_model_cover.py",
+        "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py",
+        "src/warhammer40k_core/engine/shooting_targets.py",
+        "src/warhammer40k_core/engine/stratagems_eligibility.py",
+        "src/warhammer40k_core/engine/stratagems_generic_metadata.py",
+        "src/warhammer40k_core/engine/stratagems_geometry.py",
+        "src/warhammer40k_core/engine/stratagems_selection.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "visibility"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "order135-source-registration": {
+      "paths": [
+        "src/warhammer40k_core/rules/source_authority_registry.json",
+        "src/warhammer40k_core/rules/source_authority_registry.py",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/__init__.py",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/_artifacts.py",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/artifacts/package.json",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order135-current-source-audit": {
+      "paths": [
+        ".gitattributes",
+        "data/source_audits/order135/b01-explicit-repair-approval.json",
+        "data/source_audits/order135/b02-explicit-repair-approval.json",
+        "data/source_audits/order135/b03-explicit-repair-approval.json",
+        "data/source_audits/order135/b03-type-safe-boundary-user-clarification.json",
+        "data/source_audits/order135/b04-b05-explicit-repair-approval.json",
+        "data/source_audits/order135/baseline/docs/ADAPTER_DECISION_CONTRACT.md.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/_engine_build_manifest.json.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/core/visibility.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/core/visibility_records.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/attack_sequence_hazardous.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/decision.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/thousand_sons/army_rule.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/hidden_detection.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/obscuring_model_cover.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/phases/shooting_model.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/primary_mission_event_decision_authority.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/shooting_targets.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/stratagems_eligibility.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/stratagems_generic_metadata.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/stratagems_geometry.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/engine/stratagems_selection.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/geometry/continuous_visibility.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/geometry/visibility_formulas.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/rules/source_authority_registry.json.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/rules/source_authority_registry.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/__init__.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/_artifacts.py.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/artifacts/package.json.txt",
+        "data/source_audits/order135/baseline/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems.py.txt",
+        "data/source_audits/order135/baseline/tools/build_core_other_concepts_source.py.txt",
+        "data/source_audits/order135/conditional-core-acceptance.json",
+        "data/source_audits/order135/counter-band-explicit-repair-approval.json",
+        "data/source_audits/order135/current-bindings.json",
+        "data/source_audits/order135/current-consumer-dispositions.md",
+        "data/source_audits/order135/current-inventory.json",
+        "data/source_audits/order135/current-source-qualifications.md",
+        "data/source_audits/order135/d02-d03-explicit-repair-and-assertion-approval.json",
+        "data/source_audits/order135/d02-d03-regression-history/cutoff-and-publication-transcript.txt",
+        "data/source_audits/order135/d02-d03-regression-history/d02-fixture-exception-approval.txt",
+        "data/source_audits/order135/d02-d03-regression-history/d02-repair-approval.txt",
+        "data/source_audits/order135/d02-d03-regression-history/d03-five-test-exception-approval.txt",
+        "data/source_audits/order135/d02-d03-regression-history/d03-repair-approval.txt",
+        "data/source_audits/order135/d02-d03-regression-history/lethal_hits_helpers.py.txt",
+        "data/source_audits/order135/d02-d03-regression-history/test_lethal_hits.py.txt",
+        "data/source_audits/order135/d02-d03-regression-history/test_phase10q_transports.py.txt",
+        "data/source_audits/order135/d02-historical-inputs.json",
+        "data/source_audits/order135/fight-transition-explicit-repair-approval.json",
+        "data/source_audits/order135/final-fixture-historical-inputs.json",
+        "data/source_audits/order135/final-fixture-history/tests/core_stratagem_helpers.py.txt",
+        "data/source_audits/order135/final-fixture-history/tests/critical_hit_helpers.py.txt",
+        "data/source_audits/order135/final-fixture-history/tests/disembark_eligibility_helpers.py.txt",
+        "data/source_audits/order135/final-fixture-history/tests/large_model_disembark_helpers.py.txt",
+        "data/source_audits/order135/final-fixture-history/tests/order58_failed_save_damage_timing_helpers.py.txt",
+        "data/source_audits/order135/final-fixture-history/tests/order97_gap_probes_18_25.py.txt",
+        "data/source_audits/order135/final-fixture-history/tests/phase13b_shooting_declaration_helpers.py.txt",
+        "data/source_audits/order135/final-fixture-history/tests/unit/test_order101_setup_failure.py.txt",
+        "data/source_audits/order135/final-fixture-history/tests/unit/test_phase12c_core_stratagems.py.txt",
+        "data/source_audits/order135/final-quality-historical-inputs.json",
+        "data/source_audits/order135/final-quality-history/src/warhammer40k_core/engine/transport_disembark_geometry.py.txt",
+        "data/source_audits/order135/final-quality-history/src/warhammer40k_core/engine/transports.py.txt",
+        "data/source_audits/order135/historical-inputs.json",
+        "data/source_audits/order135/los-rng-base-control.json",
+        "data/source_audits/order135/los-rng-compatibility-approval.json",
+        "data/source_audits/order135/pass-explicit-repair-and-assertion-approval.json",
+        "data/source_audits/order135/pass-regression-history/original-pass-function.py.txt",
+        "data/source_audits/order135/pass-regression-history/test_phase15c_fight_order.py.txt",
+        "data/source_audits/order135/pr576-follow-up-inventory.json",
+        "data/source_audits/order135/pr576-historical-review-queue.json",
+        "data/source_audits/order135/retained-current-sources.json",
+        "data/source_audits/order135/selected-inputs.json",
+        "data/source_audits/order135/source-reconciliation.json",
+        "data/source_audits/order135/visibility-scope-approval.json",
+        "data/source_audits/order135/visibility-source.audit.json",
+        "tools/build_core_other_concepts_source.py",
+        "tools/core_rules_order135_audit.py",
+        "tools/core_rules_order97_history.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order135-regressions": {
+      "paths": [
+        "tests/core_stratagem_helpers.py",
+        "tests/critical_hit_helpers.py",
+        "tests/disembark_eligibility_helpers.py",
+        "tests/integration/test_order135_gathered_override.py",
+        "tests/integration/test_order135_gathered_psychic_preparation.py",
+        "tests/large_model_disembark_helpers.py",
+        "tests/lethal_hits_helpers.py",
+        "tests/lifecycle_submission_helpers.py",
+        "tests/order101_failed_setup_helpers.py",
+        "tests/order124_helpers.py",
+        "tests/order135_counteroffensive_helpers.py",
+        "tests/order135_fight_pass_helpers.py",
+        "tests/order135_fight_transition_helpers.py",
+        "tests/order135_gathered_step_helpers.py",
+        "tests/order135_override_helpers.py",
+        "tests/order135_rng_helpers.py",
+        "tests/order135_supported_transport_fixture_helpers.py",
+        "tests/order135_transport_helpers.py",
+        "tests/order135_visibility_helpers.py",
+        "tests/order58_failed_save_damage_timing_helpers.py",
+        "tests/order97_gap_probes_18_25.py",
+        "tests/phase13b_shooting_declaration_helpers.py",
+        "tests/precision_grouping_helpers.py",
+        "tests/random_melee_helpers.py",
+        "tests/unit/test_critical_hits.py",
+        "tests/unit/test_fire_overwatch.py",
+        "tests/unit/test_lethal_hits.py",
+        "tests/unit/test_order101_setup_failure.py",
+        "tests/unit/test_order105_hazard.py",
+        "tests/unit/test_order116_additional_mortals.py",
+        "tests/unit/test_order124_nested_conditions.py",
+        "tests/unit/test_order135_combat_tactical_feasibility.py",
+        "tests/unit/test_order135_counteroffensive_band.py",
+        "tests/unit/test_order135_counteroffensive_timing.py",
+        "tests/unit/test_order135_fight_pass.py",
+        "tests/unit/test_order135_fight_transition.py",
+        "tests/unit/test_order135_gathered_attack_steps.py",
+        "tests/unit/test_order135_gathered_wound_callback.py",
+        "tests/unit/test_order135_objective_overlap.py",
+        "tests/unit/test_order135_physical_visibility.py",
+        "tests/unit/test_order135_shooting_boundary.py",
+        "tests/unit/test_order135_tactical_setup_proof.py",
+        "tests/unit/test_order135_transport_boundaries.py",
+        "tests/unit/test_order135_visibility_facade.py",
+        "tests/unit/test_order135_visibility_rng_projection.py",
+        "tests/unit/test_order92_random_melee.py",
+        "tests/unit/test_phase10q_transports.py",
+        "tests/unit/test_phase11d_adapter_proposals.py",
+        "tests/unit/test_phase12c_core_stratagems.py",
+        "tests/unit/test_phase13b_shooting_declarations.py",
+        "tests/unit/test_phase15c_fight_order.py",
+        "tests/unit/test_phase15d_fight_resolution.py",
+        "tests/unit/test_phase17_emperors_children_daemon_prince.py",
+        "tests/unit/test_phase17_emperors_children_datasheet_overlay.py",
+        "tests/unit/test_phase17g_aeldari_army_rule.py",
+        "tests/unit/test_phase17g_drukhari_army_rule.py",
+        "tests/unit/test_precision_target_grouping.py",
+        "tests/unit/test_unit_abilities.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order135-contract-publication": {
+      "paths": [
+        "conformance/typescript/src/contract.ts",
+        "contracts/README.md",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/migrations/44.3.20-to-44.3.21.md",
+        "contracts/migrations/44.3.21-to-44.3.22.md",
+        "contracts/migrations/44.3.22-to-44.3.23.md",
+        "contracts/migrations/44.3.23-to-44.3.24.md",
+        "contracts/migrations/44.3.24-to-44.3.25.md",
+        "contracts/openapi.yaml",
+        "src/warhammer40k_core/adapters/external_contract.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order135-starting-cargo-restore": {
+      "paths": [
+        "src/warhammer40k_core/engine/transport_state_integrity.py"
+      ],
+      "owners": [
+        "@module",
+        "validate_transport_cargo_state_consistency"
+      ],
+      "families": [
+        "reconstruction"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "order135-counter-pregrant-eligibility": {
+      "paths": [
+        "src/warhammer40k_core/engine/fight_order.py",
+        "src/warhammer40k_core/engine/phases/fight.py",
+        "src/warhammer40k_core/engine/stratagems_geometry.py",
+        "src/warhammer40k_core/engine/stratagems_eligibility.py",
+        "src/warhammer40k_core/engine/stratagems_effect_handlers.py"
+      ],
+      "owners": [
+        "eligible_fight_contexts_for_player",
+        "request_counteroffensive_if_available",
+        "_counteroffensive_target_context_error",
+        "_handler_unavailable_reason",
+        "_apply_counteroffensive_handler"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order135-fight-transition-pass": {
+      "paths": [
+        "src/warhammer40k_core/engine/fight_order.py",
+        "src/warhammer40k_core/engine/phases/fight.py"
+      ],
+      "owners": [
+        "FightPhaseState.with_next_band",
+        "_advance_to_next_fight_request",
+        "_fight_contexts_for_eligible_units",
+        "_invalid_fight_pass_status",
+        "_otherwise_eligible_fight_units",
+        "eligible_pass_is_available"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "order135-gathered-attack-steps": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_reroll_dispatch.py",
+        "src/warhammer40k_core/engine/attack_sequence_dice_rerolls.py",
+        "src/warhammer40k_core/engine/attack_sequence_grouped_allocation.py",
+        "src/warhammer40k_core/engine/attack_sequence_psychic_modifiers.py",
+        "src/warhammer40k_core/engine/dice_result_override_history.py",
+        "src/warhammer40k_core/engine/dice_result_override_validation.py",
+        "src/warhammer40k_core/engine/dice_result_overrides.py",
+        "src/warhammer40k_core/engine/gathered_attack_dice.py",
+        "src/warhammer40k_core/engine/gathered_dice_occurrence.py",
+        "src/warhammer40k_core/engine/lethal_hits.py",
+        "src/warhammer40k_core/engine/lifecycle.py",
+        "src/warhammer40k_core/engine/lifecycle_attack_dispatch.py",
+        "src/warhammer40k_core/engine/lifecycle_attack_prevalidation.py",
+        "src/warhammer40k_core/engine/phases/shooting_decisions.py",
+        "src/warhammer40k_core/engine/psychic_modifier_validation.py",
+        "src/warhammer40k_core/engine/psychic_preparation.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "dice",
+        "dice_sustained"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "order135-tactical-exclusion": {
+      "paths": [
+        "src/warhammer40k_core/engine/tactical_setup_feasibility.py",
+        "src/warhammer40k_core/geometry/tactical_setup_proof.py",
+        "src/warhammer40k_core/engine/phases/movement_placement_proposals.py",
+        "src/warhammer40k_core/engine/phases/movement_rules_unit_disembark.py",
+        "src/warhammer40k_core/engine/phases/movement_transports.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "setup",
+        "reconstruction"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "order135-grouped-combat-decoding": {
+      "paths": [
+        "src/warhammer40k_core/engine/rules_unit_combat_payload.py",
+        "src/warhammer40k_core/engine/transports.py",
+        "src/warhammer40k_core/engine/fight_model_authority_history.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "reconstruction"
+      ],
+      "sensitive": true,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

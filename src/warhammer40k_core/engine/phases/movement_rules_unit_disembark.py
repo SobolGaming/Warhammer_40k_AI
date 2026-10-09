@@ -21,7 +21,7 @@ from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.emergency_disembark import (
     transport_hazard_mortal_wound_application_id,
 )
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.hazard import (
     CORE_HAZARD_ROLLS_RULE_ID,
     hazard_mortal_wounds_per_failed_roll,
@@ -249,6 +249,26 @@ class RulesUnitCombatDisembarkResolution:
     def mortal_wounds(self) -> int:
         return sum(roll.mortal_wounds for roll in self.model_rolls)
 
+    @property
+    def mortal_wound_count(self) -> int:
+        return self.mortal_wounds
+
+    @property
+    def player_id(self) -> str:
+        return self.placement.selection.player_id
+
+    @property
+    def battle_round(self) -> int:
+        return self.placement.selection.battle_round
+
+    @property
+    def unit_instance_id(self) -> str:
+        return self.placement.selection.unit_instance_id
+
+    @property
+    def transport_unit_instance_id(self) -> str:
+        return self.placement.selection.transport_unit_instance_id
+
     def to_payload(self) -> dict[str, JsonValue]:
         return {
             "placement": validate_json_value(self.placement.to_payload()),
@@ -351,6 +371,9 @@ def resolve_rules_unit_disembark(
                 unit=component_unit,
                 transport_placement=transport_placement,
                 objective_markers=objective_markers,
+                battlefield_width_inches=validation_scenario.battlefield_state.battlefield_width_inches,
+                battlefield_depth_inches=validation_scenario.battlefield_state.battlefield_depth_inches,
+                terrain_features=validation_scenario.battlefield_state.terrain_features,
             )
         violations.extend(
             violation
@@ -448,11 +471,28 @@ def resolve_rules_unit_combat_disembark(
     dice_manager: DiceRollManager,
     objective_markers: tuple[ObjectiveMarker, ...] = (),
 ) -> RulesUnitCombatDisembarkResolution:
+    from warhammer40k_core.engine.battlefield_state import UnitPlacement
+    from warhammer40k_core.engine.tactical_setup_feasibility import (
+        TacticalSetupOutcome,
+        tactical_setup_feasibility,
+    )
+
     if selection.disembark_mode is not DisembarkModeKind.COMBAT_DISEMBARK:
         raise GameLifecycleError("Rules-unit Combat Disembark requires Combat mode.")
     if type(dice_manager) is not DiceRollManager:
         raise GameLifecycleError("Rules-unit Combat Disembark requires DiceRollManager.")
-    tactical_resolution = resolve_rules_unit_disembark(
+    if type(transport_placement) is not UnitPlacement:
+        raise GameLifecycleError("Rules-unit Combat Disembark requires Transport placement.")
+    feasibility = tactical_setup_feasibility(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        cargo_state=cargo_state,
+        selection=selection,
+        rules_unit=rules_unit,
+        transport_placement=transport_placement,
+        objective_markers=objective_markers,
+    )
+    tactical_resolution = feasibility.witness or resolve_rules_unit_disembark(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         cargo_state=cargo_state,
@@ -472,10 +512,27 @@ def resolve_rules_unit_combat_disembark(
         selection=selection,
         rules_unit=rules_unit,
         transport_placement=transport_placement,
-        dice_manager=DiceRollManager(f"{selection.unit_instance_id}:combat-disembark-validation"),
+        dice_manager=None,
         objective_markers=objective_markers,
     )
-    if not validation_placement.is_valid or tactical_resolution.is_valid:
+    if feasibility.outcome is not TacticalSetupOutcome.IMPOSSIBLE:
+        validation_placement = replace(
+            validation_placement,
+            violations=(
+                *validation_placement.violations,
+                TransportOperationViolation(
+                    violation_code=TransportOperationViolationCode.COMBAT_DISEMBARK_TACTICAL_AVAILABLE,
+                    message=feasibility.reason,
+                    unit_instance_id=selection.unit_instance_id,
+                ),
+            ),
+            updated_cargo_state=None,
+            disembarked_unit_state=None,
+            transition_batch=None,
+        )
+    elif tactical_resolution.is_valid:
+        raise GameLifecycleError("Tactical impossibility proof contradicts a validated witness.")
+    if not validation_placement.is_valid:
         return RulesUnitCombatDisembarkResolution(
             placement=validation_placement,
             tactical_resolution=tactical_resolution,
@@ -508,7 +565,7 @@ def _resolve_rules_unit_combat_components(
     selection: RulesUnitDisembarkSelection,
     rules_unit: RulesUnitView,
     transport_placement: object,
-    dice_manager: DiceRollManager,
+    dice_manager: DiceRollManager | None,
     objective_markers: tuple[ObjectiveMarker, ...],
 ) -> tuple[
     RulesUnitDisembarkResolution,
@@ -538,28 +595,48 @@ def _resolve_rules_unit_combat_components(
             transport_movement_status=selection.transport_movement_status,
             restriction_overrides=selection.restriction_overrides,
         )
-        component_result = resolve_combat_disembark(
-            scenario=validation_scenario,
-            ruleset_descriptor=ruleset_descriptor,
-            cargo_state=active_cargo,
-            selection=physical_selection,
-            unit=component_by_id[component_placement.unit_instance_id],
-            transport_placement=transport_placement,
-            dice_manager=dice_manager,
-            objective_markers=objective_markers,
-        )
+        if dice_manager is None:
+            component_placement_result = resolve_disembark_internal(
+                scenario=validation_scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                cargo_state=active_cargo,
+                selection=physical_selection,
+                unit=component_by_id[component_placement.unit_instance_id],
+                transport_placement=transport_placement,
+                turn_player_id=selection.player_id,
+                require_started_phase_embarked=True,
+                battlefield_width_inches=validation_scenario.battlefield_state.battlefield_width_inches,
+                battlefield_depth_inches=validation_scenario.battlefield_state.battlefield_depth_inches,
+                terrain_features=validation_scenario.battlefield_state.terrain_features,
+                objective_markers=objective_markers,
+            )
+        else:
+            component_result = resolve_combat_disembark(
+                scenario=validation_scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                cargo_state=active_cargo,
+                selection=physical_selection,
+                unit=component_by_id[component_placement.unit_instance_id],
+                transport_placement=transport_placement,
+                dice_manager=dice_manager,
+                battlefield_width_inches=validation_scenario.battlefield_state.battlefield_width_inches,
+                battlefield_depth_inches=validation_scenario.battlefield_state.battlefield_depth_inches,
+                terrain_features=validation_scenario.battlefield_state.terrain_features,
+                objective_markers=objective_markers,
+            )
+            component_placement_result = component_result.placement
+            model_rolls.extend(
+                RulesUnitCombatDisembarkModelRoll(
+                    component_unit_instance_id=component_placement.unit_instance_id,
+                    roll=roll,
+                    mortal_wounds_per_failed_roll=mortal_wounds_per_failed_roll,
+                )
+                for roll in component_result.model_rolls
+            )
         violations.extend(
             violation
-            for violation in component_result.placement.violations
+            for violation in component_placement_result.violations
             if violation.violation_code is not TransportOperationViolationCode.UNIT_COHERENCY_BROKEN
-        )
-        model_rolls.extend(
-            RulesUnitCombatDisembarkModelRoll(
-                component_unit_instance_id=component_placement.unit_instance_id,
-                roll=roll,
-                mortal_wounds_per_failed_roll=mortal_wounds_per_failed_roll,
-            )
-            for roll in component_result.model_rolls
         )
         validation_scenario = BattlefieldScenario(
             armies=validation_scenario.armies,
@@ -858,28 +935,12 @@ def _rules_unit_combat_hazard_context(
         raise GameLifecycleError("Rules-unit Combat Disembark payload is invalid.")
     if combat_payload.get("mortal_wounds") != mortal_wounds:
         raise GameLifecycleError("Rules-unit Combat Disembark hazard total drift.")
-    placement = combat_payload.get("placement")
-    tactical = combat_payload.get("tactical_resolution")
-    model_rolls = combat_payload.get("model_rolls")
-    if not isinstance(placement, dict) or placement.get("is_valid") is not True:
-        raise GameLifecycleError("Rules-unit Combat Disembark placement payload drift.")
-    if not isinstance(tactical, dict) or tactical.get("is_valid") is not False:
-        raise GameLifecycleError("Rules-unit Combat Disembark tactical payload drift.")
-    if not isinstance(model_rolls, list):
-        raise GameLifecycleError("Rules-unit Combat Disembark model rolls are invalid.")
-    rolled_mortal_wounds = 0
-    for model_roll in model_rolls:
-        if not isinstance(model_roll, dict):
-            raise GameLifecycleError("Rules-unit Combat Disembark model roll is invalid.")
-        roll_mortal_wounds = model_roll.get("mortal_wounds")
-        if type(roll_mortal_wounds) is not int or roll_mortal_wounds < 0:
-            raise GameLifecycleError("Rules-unit Combat Disembark model mortal wounds drift.")
-        rolled_mortal_wounds += roll_mortal_wounds
-    if rolled_mortal_wounds != mortal_wounds:
-        raise GameLifecycleError("Rules-unit Combat Disembark model roll total drift.")
-    selection = placement.get("selection")
+    from warhammer40k_core.engine.rules_unit_combat_payload import rules_unit_combat_from_payload
+
+    decoded = rules_unit_combat_from_payload(combat_payload)
+    selection = decoded.placement.to_payload()["selection"]
     if not isinstance(selection, dict):
-        raise GameLifecycleError("Rules-unit Combat Disembark selection is invalid.")
+        raise GameLifecycleError("Rules-unit Combat typed selection is invalid.")
     for field in (
         "player_id",
         "unit_instance_id",
@@ -887,7 +948,7 @@ def _rules_unit_combat_hazard_context(
         "battle_round",
         "disembark_mode",
     ):
-        if selection.get(field) != source_context.get(field):
+        if canonical_json(selection.get(field)) != canonical_json(source_context.get(field)):
             raise GameLifecycleError(f"Rules-unit Combat Disembark source {field} drift.")
     return validate_json_value(combat_payload), mortal_wounds
 
@@ -904,6 +965,7 @@ def _emit_rules_unit_combat_hazard_resolved(
         {
             "source_rule_id": CORE_HAZARD_ROLLS_RULE_ID,
             "source_kind": TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
+            "disembark_payload_kind": RULES_UNIT_COMBAT_DISEMBARK_PAYLOAD_KIND,
             "disembark_mode": DisembarkModeKind.COMBAT_DISEMBARK.value,
             "disembark": validate_json_value(combat_payload),
             "mortal_wounds": mortal_wounds,

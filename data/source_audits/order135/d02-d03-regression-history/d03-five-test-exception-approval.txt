@@ -1,0 +1,12 @@
+<transcript_evidence>
+Assistant, Sentinel_e35ba1f8c8948191964e62b99e3c5c68, 2026-10-08 19:33:13 UTC:
+“Both reviewers recommend the five-test correction. May I apply it?
+
+- Give four Combat test setups terrain that genuinely prevents Tactical placement, so they still exercise hazards, Feel No Pain, legal fallback and invalid Combat distance
+- Adjust one fixed game identity to keep the pending-hazard branch exercised
+- Update the Tactical-available rejection test to inspect the atomic invalid response and verify state, decisions and queue stay unchanged
+
+All 63 original assertions remain, with five added checks. The original file will be preserved, and the applied tests rerun. Broader eligibility validation still remains”
+User, Sentinel_1c234d56cc9081919daeccd064e17e5f, 2026-10-08 19:37:32 UTC:
+“yes”
+</transcript_evidence>

@@ -1126,7 +1126,9 @@ def test_living_attached_recipient_remains_allocatable_after_component_death() -
 def test_order113_cleave_fixed_random_attached_restore_fork_replay(
     random: bool, attached: bool
 ) -> None:
-    session = random_melee_session(random=random, cleave=True, target_attached=attached)
+    session = random_melee_session(
+        random=random, cleave=True, target_attached=attached, pause_at_first_hit=True
+    )
     if random:
         request, budgets = _all_committed(session)
         payload = _split(request, budgets[0], [cast(int, budgets[0]["base_attacks"]) + 2])

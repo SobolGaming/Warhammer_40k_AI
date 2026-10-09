@@ -1,0 +1,37 @@
+{
+  "schema": "order135-counter-predecessor-performance-retention-v1",
+  "candidate": "0d108309cefab4ba93368ba8bbb68b1f7b488002",
+  "measured_runtime_candidate": "f974612d0bef9e47bfffe2ce212fea744d8e65d3",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a656b63de6507f28d3738ac4f265ada648929d8ab426a434ff9725bd75e531ef",
+  "records": [
+    {
+      "family": "movement",
+      "original_path": "docs/performance/current/order135-b04-b05-movement-mac01.json",
+      "archive_path": "docs/performance/history/order135-transport-candidate-0d108/order135-b04-b05-movement-mac01.json",
+      "bytes": 2407,
+      "sha256": "704b0a0c6b1ae1d069f5e7c981efe55ddf4557934055b798445617845d889a9e"
+    },
+    {
+      "family": "reconstruction",
+      "original_path": "docs/performance/current/order135-b04-b05-reconstruction-mac01.json",
+      "archive_path": "docs/performance/history/order135-transport-candidate-0d108/order135-b04-b05-reconstruction-mac01.json",
+      "bytes": 4756,
+      "sha256": "3507614b51d1ea579e70869feaacc197788b9d95e2953b78e19fe3cc4eb8f06d"
+    },
+    {
+      "family": "setup",
+      "original_path": "docs/performance/current/order135-b04-b05-setup-mac01.json",
+      "archive_path": "docs/performance/history/order135-transport-candidate-0d108/order135-b04-b05-setup-mac01.json",
+      "bytes": 3317,
+      "sha256": "e8a4dd542e411e82a3d8bcc9c9688c490c74f966d4c5c3c504ac4c8209d32da5"
+    },
+    {
+      "family": "visibility",
+      "original_path": "docs/performance/current/order135-b04-b05-visibility-mac01.json",
+      "archive_path": "docs/performance/history/order135-transport-candidate-0d108/order135-b04-b05-visibility-mac01.json",
+      "bytes": 5344,
+      "sha256": "62ed974cd6e63c6e68ee6d72d83fa2a4a9c237534a8d8acf2ed1b6801176a27d"
+    }
+  ],
+  "qualification": "Exact prior bytes retained as historical evidence. No new-runtime performance or aggregate credit."
+}

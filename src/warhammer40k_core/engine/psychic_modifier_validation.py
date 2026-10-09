@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.core.modifiers import ModifierError
 from warhammer40k_core.engine.attack_sequence_psychic_modifiers import (
     DECISION_TYPE,
-    _psychic_attack_modifier_ignore_request,
     _psychic_attack_modifier_ignore_selection_for_attack,
     selection_from_payload,
 )
@@ -16,6 +15,7 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import canonical_json
 from warhammer40k_core.engine.lifecycle_state_queries import active_attack_sequence_for_state
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.psychic_preparation import psychic_preparation_frontier
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.decision_controller import DecisionController
@@ -33,21 +33,15 @@ def validate_current_psychic_request(
     sequence = active_attack_sequence_for_state(state)
     if sequence is None:
         raise GameLifecycleError("Psychic modifier decision has no active attack.")
-    previous = _psychic_attack_modifier_ignore_selection_for_attack(
-        decisions=decisions,
-        attack_context_id=sequence.attack_context_id(),
-    )
-    expected = _psychic_attack_modifier_ignore_request(
+    frontier = psychic_preparation_frontier(
         state=state,
-        pool=sequence.current_pool(),
-        attacker_player_id=sequence.attacker_player_id,
-        attacking_unit_instance_id=sequence.attacking_unit_instance_id,
-        attack_context_id=sequence.attack_context_id(),
-        source_phase=sequence.source_phase,
+        decisions=decisions,
+        sequence=sequence,
+        records=decisions.records,
         runtime_modifier_registry=runtime_modifier_registry,
-        previous_selection=previous,
         request_id=request.request_id,
     )
+    expected = frontier.pending_request
     if expected is None or canonical_json(expected.to_payload()) != canonical_json(
         request.to_payload()
     ):
@@ -99,6 +93,7 @@ def validate_psychic_modifier_history(
         context = payload["attack_context_id"]
         contexts.add(cast(str, context))
     active = active_attack_sequence_for_state(state)
+    incomplete_contexts: set[str] = set()
     for context in sorted(contexts):
         selection = _psychic_attack_modifier_ignore_selection_for_attack(
             decisions=decisions,
@@ -107,13 +102,7 @@ def validate_psychic_modifier_history(
         if selection is None:
             raise GameLifecycleError("Psychic selection history is incomplete.")
         if not selection.complete:
-            if active is None or active.attack_context_id() != context:
-                raise GameLifecycleError("Incomplete Psychic selection has no active attack.")
-            if not any(
-                request.decision_type == DECISION_TYPE
-                for request in decisions.queue.pending_requests
-            ):
-                raise GameLifecycleError("Incomplete Psychic selection has no pending choice.")
+            incomplete_contexts.add(context)
     hit_contexts: set[str] = set()
     for event in decisions.event_log.records:
         payload = event.payload
@@ -149,9 +138,40 @@ def validate_psychic_modifier_history(
             != canonical_json(selected.effective_hit_roll_modifier)
         ):
             raise GameLifecycleError("Hit event Psychic modifier arithmetic drift.")
-    for context in contexts - hit_contexts:
-        if active is None or active.attack_context_id() != context:
+    unhit_contexts = contexts - hit_contexts
+    if unhit_contexts:
+        if active is None:
             raise GameLifecycleError("Psychic selection has no active attack or resolved hit.")
+        frontier = psychic_preparation_frontier(
+            state=state,
+            decisions=decisions,
+            sequence=active,
+            records=decisions.records,
+            runtime_modifier_registry=runtime_modifier_registry,
+            request_id="psychic:history-validation",
+        )
+        authenticated = set(frontier.completed_context_ids)
+        pending_context: str | None = None
+        if frontier.pending_request is not None:
+            payload = frontier.pending_request.payload
+            if not isinstance(payload, dict) or not isinstance(
+                payload.get("attack_context_id"), str
+            ):
+                raise GameLifecycleError("Psychic preparation lacks its occurrence identity.")
+            pending_context = cast(str, payload["attack_context_id"])
+            authenticated.add(pending_context)
+        if not unhit_contexts <= authenticated:
+            raise GameLifecycleError("Psychic history is outside the gathered preparation prefix.")
+        if incomplete_contexts and (
+            incomplete_contexts != {pending_context}
+            or not any(
+                request.decision_type == DECISION_TYPE
+                and isinstance(request.payload, dict)
+                and request.payload.get("attack_context_id") == pending_context
+                for request in decisions.queue.pending_requests
+            )
+        ):
+            raise GameLifecycleError("Incomplete Psychic selection has no pending frontier.")
     for request in decisions.queue.pending_requests:
         if request.decision_type == DECISION_TYPE:
             validate_current_psychic_request(

@@ -27,10 +27,10 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.destruction_reaction_decision_validation import (
     invalid_destruction_reaction_context_status,
 )
-from warhammer40k_core.engine.dice_result_overrides import (
-    DICE_RESULT_OVERRIDE_DECISION_TYPE,
+from warhammer40k_core.engine.dice_result_override_validation import (
     invalid_dice_result_override_status,
 )
+from warhammer40k_core.engine.dice_result_overrides import DICE_RESULT_OVERRIDE_DECISION_TYPE
 from warhammer40k_core.engine.finite_decision_validation import (
     invalid_finite_decision_status as _invalid_finite_decision_status,
 )

@@ -1,0 +1,37 @@
+{
+  "schema": "order135-d02-d03-predecessor-performance-retention-v1",
+  "candidate": "98e38fbe5d5b9d11cd82235b5a8d7ee8f420c843",
+  "measured_candidate": "8aecc1b2e87c1f1282a266d6bd38317c00ffa7cb",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0460d846bb6453bab62839e8dad5974be3ae1b21794f84b88c0a87714107300b",
+  "records": [
+    {
+      "family": "movement",
+      "original_path": "docs/performance/current/order135-pass-movement-mac01.json",
+      "archive_path": "docs/performance/history/order135-pass-candidate-98e38f/order135-pass-movement-mac01.json",
+      "bytes": 2404,
+      "sha256": "4d403ff64963d254f3ef9a5486e7e7de251a95a7ce13f0c7109827d0fd94e95f"
+    },
+    {
+      "family": "reconstruction",
+      "original_path": "docs/performance/current/order135-pass-reconstruction-mac01.json",
+      "archive_path": "docs/performance/history/order135-pass-candidate-98e38f/order135-pass-reconstruction-mac01.json",
+      "bytes": 4754,
+      "sha256": "0ec33439728241adf98e1109a6b004351b531d903b8985bc608d84a19a288332"
+    },
+    {
+      "family": "setup",
+      "original_path": "docs/performance/current/order135-pass-setup-mac01.json",
+      "archive_path": "docs/performance/history/order135-pass-candidate-98e38f/order135-pass-setup-mac01.json",
+      "bytes": 3316,
+      "sha256": "bb3a894104f633509a4bbef343e4a2708fa3c95b646470a4fd559f77a83bff83"
+    },
+    {
+      "family": "visibility",
+      "original_path": "docs/performance/current/order135-pass-visibility-mac01.json",
+      "archive_path": "docs/performance/history/order135-pass-candidate-98e38f/order135-pass-visibility-mac01.json",
+      "bytes": 5351,
+      "sha256": "f7503a14de33e331923db5d0d6a8a56f8ea283cc5e9e7e3e9ea1e4b0734b3421"
+    }
+  ],
+  "qualification": "Exact prior measurements preserved without new-runtime credit or changed budgets."
+}

@@ -57,6 +57,7 @@ def precision_shooting_scene(
     duplicate_precision: bool = False,
     duplicate_lethal: bool = False,
     attached_target: bool = False,
+    pause_at_first_hit: bool = False,
 ) -> PrecisionGroupingScene:
     """Start at canonical phase setup; every attack choice uses the real facade."""
     catalog = _catalog_with_same_profile_id_target_cache_collision_weapons()
@@ -214,6 +215,16 @@ def precision_shooting_scene(
     assert (
         "CHARACTER" in rules_unit_view_by_id(state=state, unit_instance_id=target_id).keywords
     ) is character_target
+    if pause_at_first_hit:
+        from warhammer40k_core.engine.command_points import CommandPointSourceKind
+
+        state.gain_command_points(
+            player_id="player-a",
+            amount=1,
+            source_id="order103-precision-pending-hit",
+            source_kind=CommandPointSourceKind.OTHER,
+            cap_exempt=True,
+        )
     initial = cast(GameLifecyclePayload, json.loads(json.dumps(session.lifecycle.to_payload())))
     request = session.advance_until_decision_or_terminal().decision_request
     assert request is not None

@@ -1,0 +1,33 @@
+def test_fights_first_pass_does_not_reoffer_same_unit_before_remaining_activation() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("alpha-first", "alpha-remaining"),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "alpha-first": Pose.at(10.0, 20.0),
+            "alpha-remaining": Pose.at(10.0, 40.0),
+            "enemy": Pose.at(13.0, 40.0),
+        },
+        game_id="phase15c-pass-before-remaining",
+        charge_fights_first_unit_keys=("alpha-first",),
+    )
+    first_request = _advance_to_fight_order_request(lifecycle)
+    first_payload = cast(dict[str, object], first_request.payload)
+
+    after_pass_status = _submit_option(
+        lifecycle,
+        request=first_request,
+        option_id=ELIGIBLE_TO_FIGHT_PASS_OPTION_ID,
+        result_id="phase15c-pass-before-remaining",
+    )
+    next_request = _decision_request(after_pass_status)
+    next_payload = cast(dict[str, object], next_request.payload)
+
+    assert first_request.actor_id == "player-a"
+    assert first_payload["ordering_band"] == "fights_first"
+    assert _request_unit_ids(first_request) == [units["alpha-first"].unit_instance_id]
+    assert next_request.actor_id == "player-a"
+    assert next_payload["ordering_band"] == "remaining_combats"
+    assert _request_unit_ids(next_request) == [units["alpha-remaining"].unit_instance_id]
+    assert _event_payloads(lifecycle, "fight_activation_selection_requested")[-1][
+        "eligible_unit_ids"
+    ] == [units["alpha-remaining"].unit_instance_id]

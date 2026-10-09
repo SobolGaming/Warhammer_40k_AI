@@ -1,0 +1,177 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "dice_sustained",
+  "workload_id": "order96-sustained-d3-optional-wound-rerolls-v1",
+  "base_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e21b92c4972bd99a9a043e519e6041dddff79ad7caf1f1f4ae3f9509a1e42134",
+  "head_input_digest": "09da1ae782f6ad86f88259de30c3bec8abbbed2bc65d6be93b811ffc5ef867f0",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:110f573cc70342f09c3102916f918a54a64f7b50f0966cdbdb51eba2b6de970e",
+    "host": {
+      "cpu": "Apple M5 Pro",
+      "memory_bytes": 68719476736,
+      "logical_cpus": 18,
+      "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "fc4fe1423d4864d251bf8f5b2c1eaf305b4f21a358cc668c8b5a20c166f75daf",
+    "fixture_sha256": "8b131b8a1233c6da324c1f12c67a3ddf05527e56018e2a4a84108f723891f527",
+    "samples": {
+      "shooting/false": [
+        0.8419361250125803,
+        0.8285639999667183,
+        0.7915069999871776,
+        0.7909209170029499,
+        0.8356374580180272
+      ],
+      "shooting/true": [
+        0.6926542920409702,
+        0.64810395805398,
+        0.6991685410030186,
+        0.6913300839951262,
+        0.6563579579815269
+      ],
+      "fight/false": [
+        0.5468155000125989,
+        0.5409433330059983,
+        0.5587719579925761,
+        0.5479390839464031,
+        0.5412981249974109
+      ],
+      "fight/true": [
+        0.545936124981381,
+        0.5025995000032708,
+        0.49684908299241215,
+        0.4956343750236556,
+        0.49591858295025304
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e21b92c4972bd99a9a043e519e6041dddff79ad7caf1f1f4ae3f9509a1e42134",
+    "host": {
+      "cpu": "Apple M5 Pro",
+      "memory_bytes": 68719476736,
+      "logical_cpus": 18,
+      "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "fc4fe1423d4864d251bf8f5b2c1eaf305b4f21a358cc668c8b5a20c166f75daf",
+    "fixture_sha256": "8b131b8a1233c6da324c1f12c67a3ddf05527e56018e2a4a84108f723891f527",
+    "samples": {
+      "shooting/false": [
+        0.779929207987152,
+        0.756941374973394,
+        0.7313477920251898,
+        0.7278425419935957,
+        0.764460333972238
+      ],
+      "shooting/true": [
+        0.7497984160436317,
+        0.7490022499696352,
+        0.7955790830310434,
+        0.7890895000309683,
+        0.7585505829774775
+      ],
+      "fight/false": [
+        0.6385841250303201,
+        0.6380620409618132,
+        0.6429638750269078,
+        0.6351407499751076,
+        0.640447000041604
+      ],
+      "fight/true": [
+        0.6720231249928474,
+        0.6752102080499753,
+        0.6711989169707522,
+        0.6782637080177665,
+        0.6793901250348426
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": [
+    {
+      "candidate_tree": "bae41bd010c8b4888e2d2d86affe566c7c9e586c",
+      "authentication_sha256": "bbd1c56af898f10625085a1a9bde2c75c00e230d8095d9c0ff674f2b34c3ddc1",
+      "rows": [
+        {
+          "case": "shooting/false",
+          "samples_per_side": 5,
+          "base_mean": 0.8186581500049215,
+          "head_mean": 1.137696258595679,
+          "mean_limit": 1.073322687506152,
+          "base_maximum": 0.8960035420022905,
+          "head_maximum": 1.1603325420001056,
+          "maximum_limit": 1.4440053130034358,
+          "passed": false
+        },
+        {
+          "case": "shooting/true",
+          "samples_per_side": 5,
+          "base_mean": 0.6888738166016992,
+          "head_mean": 1.172891441808315,
+          "mean_limit": 0.9110922707521241,
+          "base_maximum": 0.7433527499961201,
+          "head_maximum": 1.1858848750125617,
+          "maximum_limit": 1.2150291249941803,
+          "passed": false
+        },
+        {
+          "case": "fight/false",
+          "samples_per_side": 5,
+          "base_mean": 0.5322922419931274,
+          "head_mean": 1.0608465745986906,
+          "mean_limit": 0.7153653024914093,
+          "base_maximum": 0.5387075839971658,
+          "head_maximum": 1.0773794160049874,
+          "maximum_limit": 0.9080613759957487,
+          "passed": false
+        },
+        {
+          "case": "fight/true",
+          "samples_per_side": 5,
+          "base_mean": 0.5005723581998609,
+          "head_mean": 1.152362133184215,
+          "mean_limit": 0.6757154477498262,
+          "base_maximum": 0.5408207919972483,
+          "head_maximum": 1.1752951659727842,
+          "maximum_limit": 0.9112311879958724,
+          "passed": false
+        }
+      ],
+      "qualification": "Original complete raw inputs, matched command receipts, samples, and failed comparison remain immutable in candidate-d02-d03-04 and included in the final review archive. No previous timing credit."
+    },
+    {
+      "candidate_tree": "91ae33c79909593373f08789a112d724b3090656",
+      "authentication_sha256": "92665b65b638ea3f9c4f27b7064a060ac884debea2f1baa18d4f680637ec73f2",
+      "rows": [
+        {
+          "case": "fight/false",
+          "mean": 0.7393592248088681,
+          "mean_limit": 0.7212039374979213,
+          "maximum": 0.7547463329974562,
+          "maximum_limit": 0.9280177495034877
+        },
+        {
+          "case": "fight/true",
+          "mean": 0.7791967999946792,
+          "mean_limit": 0.6766682499990566,
+          "maximum": 0.7912811249843799,
+          "maximum_limit": 0.9191968749742955
+        }
+      ],
+      "qualification": "Preserved candidate06 actual paired sustained-Fight failures and all four raw dice command receipts; remaining families not launched. No previous timing credit or budget change."
+    }
+  ]
+}

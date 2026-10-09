@@ -132,7 +132,10 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             availability_kind="core",
             detachment_id=None,
             source_id=f"{source_prefix}:counteroffensive",
-            when_descriptor="after an enemy unit has fought",
+            when_descriptor=(
+                "Fight step of your opponent's Fight phase, "
+                "just after an enemy unit has resolved its attacks."
+            ),
             target_descriptor="one eligible unit from the player's army that can fight",
             effect_descriptor="the target unit fights next",
             restrictions_descriptor="matched play same stratagem per phase",
@@ -142,6 +145,7 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             enumerable=False,
             target_policy_id="counteroffensive_unit",
             handler_id="core:counteroffensive",
+            effect_payload={"requires_opponent_turn": True},
         ),
         SourceStratagemRow(
             stratagem_id="epic-challenge",

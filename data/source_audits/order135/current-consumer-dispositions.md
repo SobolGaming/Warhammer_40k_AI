@@ -1,0 +1,162 @@
+# Order135 current static dispositions, after Core-scope clarification
+
+Author delivery addendum, 8 October 2026: PR576 now has the owner-approved scope
+cutoff recorded in `pr576-follow-up-inventory.json`. The historical review below
+is retained. Approved D02/D03 add gathered original Hit/Wound boundaries,
+whole-unit Tactical feasibility before Combat, atomic invalid proposals and
+strict tagged grouped Combat history decoding. Exact protected originals and
+exceptions are retained in `d02-d03-explicit-repair-and-assertion-approval.json`.
+Current source bindings retain all 1,078 original requirements and full source
+observations. They do not convert a static link or focused run into semantic or
+runtime certification. Relaxed Tactical exclusion, grouped Save chronology,
+separate Deadly Demise qualification and every historical queue item retain
+their explicit limits. Complete frozen gates and scoped independent renewal
+remain required; no full Core or successor-order claim is made.
+
+One independent gpt-6.1-sol / High coding reviewer; no nested agents. Static only: no tests, imports, runtime probes or benchmarks. No repository changes. Reviewed baseline HEAD/base `70b0c0b43774f81d67753b0e3f830b38f1b178ff`, tree `9bfe078571d851065730f716ca990d87e7a11621`. This is an interim current-evidence review, not CLEAN, a runtime reproduction, accepted closure or an assertion that every requirement is semantically certified.
+
+The initial and V963 reports remain immutable. This addendum supersedes only their assessment that missing in-turn deployment integration necessarily prevents Core closure. The user clarified on October6 at20:16 UTC (message `Sentinel_0ebd9251c61881918a71b71413360d5e`) that this granting capability may be a faction exception; its absence alone must not keep the Core audit open. Historical Order134 qualifications and source archives are preserved. No granting ability or native in-turn path is invented.
+
+## Conditional Core restrictions
+
+For `03.02.02-obligation-02` and `03.02.02-obligation-03`, current candidate evidence is `tests/unit/test_order134_deployment_restrictions.py::test_constructed_condition_shared_consumers_and_actual_turn_expiry` and `::test_conditional_checkpoint_facade_restore_fork_views_events_replay_continuation`. I inspected their actual bodies. The former checks every restricted activity over Movement/Shooting/Charge/Fight, permits unaffected activities, includes attached/component IDs, Aircraft and opposite-turn variants, and expires at the actual turn owner's boundary. The latter reaches the real movement decision from an explicit constructed checkpoint, offers only Remain Stationary, rejects Normal atomically, persists/restores/forks, compares viewer roles, advances to the next turn and asserts exact replay. Invalid contexts, malformed restore, lost qualifying models and split-source membership have separate controls in the same file.
+
+These tests claim conditional Core behavior. They do not claim gameplay activation by an admitted faction granting ability. This distinction satisfies the clarified scope model; current runtime receipts and final source/owner binding still require the usual exact-head gates.
+
+## Fourteen changed historical assertion links
+
+Eleven links across categories09-12 cite the former assertion `assert boundaries == ['start_phase', 'end_phase']` in `tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore`. Its current body now asserts three Command windows (start/body/end) and two windows for the other phases, complete exact windows across both players and two rounds, twenty source-ordered phase completions, atomic stale/unknown input rejection, restore and shared persistence/viewer/replay evidence. Replace these eleven old assertion references with the current conditional assertion and `assert windows == expected`. They are not eleven missing implementations. This exact body was inspected, not merely its node name.
+
+The remaining three unresolved links are the old passenger-engagement / forced-response Shock tests. V963-SHOCK supersedes those outcomes; retain them as historical assertions and bind the current unengaged setup, no forced queue, charge lock and late turn-expiry nodes listed in `coding-review-v963-static-01.md`. C18-07 remains a historical qualified interpretation, with its operative consequence superseded by the complete current Shock selection. C12-04 separately retains the official-App v946 Engaging-only disposition.
+
+## Thirty-four requirements lacking original assertion links
+
+The following are current candidate repair bindings. A missing old assertion link does not mean a missing implementation. Binding these tests in an overlay is necessary, but source semantics, exact assertion, real consumer calls and fixture qualifications must accompany the binding; a test title or merged repair label alone earns no closure. Tests not described as fully inspected below are candidate links pending final exact-head assessment.
+
+| Original unlinked obligation(s) | Current candidate evidence and necessary qualification |
+| --- | --- |
+| 01.02.02 obligations05/06, implicit duration | `tests/unit/test_order122_effect_defaults.py::test_default_lifetime_uses_period_and_actual_turn_owner`, `::test_explicit_duration_always_overrides_default`, `::test_loaded_default_grant_full_cycles_restore_fork_viewers_and_replay`. Explicit durations retain precedence; distinguish phase/turn owner and one-shot effects. Generic late mission-boundary lifetime concern remains separately qualified. |
+| 01.04.03 obligation06, closest legal objective endpoint | `tests/unit/test_order131_objective_movement.py::test_source_consumer_facade_retry_persistence_fork_views_events_replay`; exact geometry in `tests/unit/test_order131_objective_endpoint_geometry.py::test_continuous_wall_endpoint_proof_requires_a_legal_full_witness`. Inspected actual facade setup, source CP expenditure, objective choice, invalid insufficient approach and wall rejection assertions. Cases include reachable/unreachable/already-in-range/wall. |
+| 02.01.01 obligation01, datasheet-name keyword | `tests/unit/test_order123_datasheet_identity.py::test_name_is_normalized_once_without_rewriting_retained_catalog_keywords`, `::test_loaded_lifecycle_identity_pending_continuation_fork_viewers_and_exact_replay`. Bind materialization, model/name roles, exact/near-name gates and recorded provenance; do not rewrite raw source keywords. |
+| 02.02 obligation01, absent Movement | `tests/unit/test_order115_absent_movement.py::test_absent_movement_cannot_advance_or_use_a_normal_move_bonus`, `::test_facade_advance_retry_completion_restore_fork_and_replay`, `::test_dash_reactive_hold_is_an_engine_created_restorable_completion`. Setup and no-displacement instruction remain separate from actually moving a model. |
+| 02.03.01 obligation01, nested conditions | `tests/unit/test_order124_nested_conditions.py::test_real_nested_upgrade_survives_pending_and_completed_continuations`, `::test_real_boundary_control_negatives_keep_only_the_basic_permission`, `::test_real_advanced_assault_preserves_nested_permission_and_continuations`. Parent and nested conditions must both hold; neither parser presence nor named-source title alone proves runtime branches. |
+| 02.05.01 obligation11, implicit unit subject | `tests/unit/test_order125_implicit_subjects.py::test_catalog_loaded_selection_survives_full_lifecycle_continuations`, `::test_shared_selection_enforces_real_keyword_owner_range_and_source_boundaries`, `::test_explicit_model_catalog_subject_never_offers_a_unit_selection_in_native_play`. Canonical test permission is declared as such; do not present it as an official faction ability. |
+| 02.05.01 obligation12, singular/plural | `tests/unit/test_order133_keyword_numbers.py::test_source_number_spellings_preserve_declared_runtime_token`, `::test_catalog_loaded_selection_survives_full_lifecycle_continuations`, and `tests/unit/test_order133_keyword_materialization.py::test_distinct_owner_labels_do_not_acquire_inferred_number_aliases`. Use the source-backed lexicon rather than stemming distinct identities such as CRUSADER/CRUSADERS. |
+| 03.01 obligation03, sequential movement | `tests/unit/test_order126_sequential_movement.py::test_facade_occupancy_order_invalid_retry_pending_completed_restore_and_replay`, `::test_native_sequential_move_against_overhanging_enemy_restores_and_replays`, `::test_native_sequential_charge_against_overhanging_enemy_restores_and_replays`. The relevant semantics are occupancy at each completed model move, not merely endpoint order labels. |
+| 03.02.02 obligations04/09, unavoidable overhang | `tests/unit/test_order128_setup_model_fit.py::test_original_avoidable_overhang_probe_rejects_and_ordinary_fit_survives`, `::test_impossible_zone_fit_does_not_excuse_avoidable_battlefield_overhang`, plus Order128 integration setup families. Preserve synthetic source-linked body geometry qualifications. This is setup fit, not directional LOS proof. |
+| 03.02.03 obligation03, Infiltrators redeployment | `tests/integration/test_order127_infiltrators_redeploy.py::test_catalog_infiltrators_redeploy_outside_zone_restores_and_replays`, `::test_attached_redeploy_requires_infiltrators_on_every_component`. Inspected actual source-backed Rangers/Yriel facade placement, removal/placement records, fork independence and helper restore/replay/viewers. The non-Infiltrators and geometry rejection controls remain. |
+| Category03 coherency mission-count FAQ | `tests/unit/test_order130_model_mission_destruction.py::test_surviving_unit_coherency_casualty_scores_per_model`, `::test_native_w20_casualty_uses_the_same_model_scoring_history_once`. Inspected per-model casualty scoring while the unit survives, five-point admitted cap, opponent/round negatives and pre-cleanup control authority. `tests/order130_helpers.py::assert_destruction_checkpoint` actually compares all viewer roles, forks and exact replay. |
+| 04.03.05 obligation04, empty selection is not fought | `tests/unit/test_fight_selection_completion.py::test_selection_completion_records_only_actual_fights_and_preserves_timing`, `::test_armed_selection_without_a_melee_target_completes_without_fighting`, `::test_engaging_response_preserves_empty_selection_and_resumes_once`. Inspected actual armed/unarmed completion body: `unit_has_fought` count equals armed, selection consumed once, completion has_fought/attack sequence identity, reaction timing and continued restore. Original weaponless test only asserts no attack steps and is insufficient alone. |
+| Category04 PRECISION grouping FAQ | `tests/unit/test_precision_target_grouping.py::test_non_character_target_gathers_both_physical_precision_orders`, `::test_character_target_preserves_distinct_precision_groups`, `::test_actual_casualties_retarget_unresolved_precision_groups`. Inspected real gathered options, physical weapon IDs, four total attacks and applicability false/true; helper persistence/completion must remain linked. |
+| Category04 independent range/visibility FAQ | `tests/unit/test_order104_range_visibility.py::test_facade_accepts_separate_witnesses_with_restore_continuation_and_replay`, `::test_different_enemy_units_cannot_combine_range_and_visibility`. Inspected real accepted ordinary/Overwatch declaration, attached variants, disjoint visible/in-range witnesses, invalid atomicity, completed facade attacks and exact replay. |
+| 06.02.01 obligation02, extra mortal attack identity | `tests/unit/test_order116_additional_mortals.py::test_source_backed_additional_mortals_preserve_attack_identity_and_damage_order`, `::test_additional_mortal_pending_retry_restore_and_lethal_continuation`, `::test_gathered_additional_mortals_keep_each_physical_weapon_through_lethal_restore`. Additional mortal damage must remain distinct from replacing normal damage with Devastating Wounds. |
+| Category06 Select Model allocation-trigger FAQ | `tests/unit/test_order117_mortal_allocation.py::test_allocation_trigger_executes_source_backed_prevention_before_wound_loss`, `::test_allocation_trigger_pending_choice_retry_fork_and_lethal_continuation`, `::test_source_permission_survives_real_save_reroll_and_lethal_continuation`. Bind triggering at selection before prevention/damage, without requiring a Feel No Pain choice to create the occurrence. |
+| 08.04 ability window | `tests/unit/test_order121_command_abilities.py::test_command_abilities_sequence_resumes_then_finishes_before_end_effect`, `::test_real_battle_shock_finishes_before_command_ability`, `::test_command_body_repeats_only_on_owners_turn_through_full_phase_cycles`; also current category07 facade timing assertion. Avoid counting explicitly start/end/CP/shock clauses in the unqualified body. |
+| 12.03 closest-target and attainable-engagement clauses | `tests/unit/test_order106_pile_in.py::test_pile_in_rejects_switching_target_or_avoidable_nonengagement`, `::test_pile_in_legal_closest_engagement_restores_and_replays`, `::test_pile_in_proven_unattainable_model_may_move_closer_without_engaging`. Include tie and attached target identity; undecidable coherency does not prove impossibility. |
+| Category12 extra-distance step FAQ | `tests/unit/test_order107_fight_distance_window.py::test_overrun_rejects_extra_distance_then_restores_retries_and_replays`, `::test_matching_pile_in_step_keeps_extra_distance_and_historical_restore`. Inspected real Overrun versus initial Pile In facade requests, rejected3.5/accepted3.0 Overrun, accepted3.5 matching Pile In, JSON restores/viewers/replay. Grant is an explicit typed test checkpoint. |
+| Category13 Exposed, Dense floor, climb contact, Solid endpoint and Solid visibility clauses (five) | `tests/unit/test_order108_terrain_semantics.py::test_exposed_is_an_explicit_round_tripped_classification`, `::test_floor_transit_permissions_and_valid_context_persistence`, `::test_contact_uses_base_edge_and_continuous_union_not_sampled_poses`, `::test_solid_windows_and_doors_share_visibility_and_endpoint_volume`, `::test_facade_terrain_rejection_retry_pending_completed_restore_and_replay`. Link complete exact physical-volume/membership owners, not feature names. |
+| 14.02 controlling unit | Current meaning from Order109 is player control + unit within range + any positive-OC member, which need not be the member in range. Old paraphrase is superseded. `tests/unit/test_order109_unit_control.py::test_mixed_unit_mission_action_facade_restore_and_exact_replay` and `::test_frozen_unit_control_survives_facade_boundary_restore_and_exact_replay` are actual current consumer families. |
+| Category16 shock interruption and explicit permission FAQs (two) | `tests/unit/test_action_movement_interruption.py::test_action_battle_shock_transition_is_terminal_except_explicit_permission`, `::test_failed_battle_shock_producer_interrupts_or_preserves_started_action`, `::test_shocked_start_uses_explicit_catalog_permission_through_facade`. Inspected distinction: shock-after-start calls direct/precomputed real owners; native Walker facade control shocks before start. Movement interruption has separate full facade replay proof. Preserve this qualification; no nonexistent faction source requirement or executed normal-play failure is inferred. |
+| Category17 ordinary friendly-transit FAQ | `tests/unit/test_order111_friendly_transit.py::test_pile_in_friendly_transit_uses_facade_and_replays`, plus its move-type matrix. Monster/Vehicle special Normal/Advance transit restrictions must not contaminate ordinary friendly transit for other move types. |
+| Category18 Aerialists post-disembark FAQ | `tests/unit/test_order61_embark.py::test_no_movement_embark_preserves_source_context_without_a_move`, `::test_source_embark_after_real_disembark_facade_restore_fork_replay`, `::test_attached_source_embark_moves_every_component_and_restores_replays`. Inspected no-movement source context, actual attached cargo mutation and invalid source/capacity/distance controls. Do not claim named faction loading from the Core permission exemplar. |
+| 19.04 attack-sequence source retention | `tests/unit/test_unit_abilities.py::test_attached_source_lifetime_facade_restore_replay`, `::test_equipped_attached_source_lifetime_uses_shared_catalog_consumer`. Inspected actual first-attack source casualty, surviving models, no physical retained model, still-active grant, source-presence distinction, completed attacks expiring grant, malformed atomicity, viewer event redaction, fork and exact replay. |
+| 24.05 Blast X | `tests/unit/test_phase13d_weapon_ability_helpers.py::test_order113_blast_x_uses_complete_groups_of_five`, `tests/unit/test_phase13b_shooting_declarations.py::test_order113_blast_x_shared_declaration_count`, `tests/unit/test_fire_overwatch.py::test_order113_blast_x_reaction_uses_shared_frozen_counts`. Preserve frozen Select Targets count and selected physical ability provenance across ordinary/reaction/gathered consumers. |
+
+## All-category and historical intake coverage limits
+
+The current static inventory surveys category00 and all25 numbered categories, totaling1078 requirements: 2,143,100,62,63,82,34,22,15,36,29,23,48,33,15,82,14,7,55,17,24,18,14,11,93,36 respectively. I inspected the requirement summaries, historical qualifications, all34 missing-link rows, all14 changed-link rows, the91 historical changelog dispositions and20 September10 items, alongside concrete source/test bodies noted above and in the previous reports. Static symbol existence remains distinct from semantic verification and runtime evidence. The exact final overlay must not present all1078 as passed just because owners/assertions resolve.
+
+Older changelog rows are operative clauses, duplicate splitting metadata, superseded source observations, translation-only notes, or explicitly external mission/provider metadata; these are different dispositions. In particular, v931 Shock needs current v963 supersession; v931 Ongoing forced-response wording needs the retained C12-04 official-App v946 supersession; v946 Rapid Disembark limits remain operative and must bind all ingress limits, including the enemy deployment zone. No complete v946 export is fabricated. September10 merged labels need actual current source/consumer evidence, especially Heavy per-model accepted turn distance, one Normal Move per turn/phase occurrence, control-before-other-rules and Action lifetimes; those actual families were inspected in the initial report.
+
+Remaining V963 work is described in `coding-review-v963-static-01.md`: complete FAQ selection/reconciliation for objective overlap, attached unit/model scope and outgoing-only edge visibility; explicit GDM layout and English-unchanged localization dispositions; current Snap/Shock mapping. The whole-observer LOS path lacks battlefield bounds/clipping in the inspected baseline. Generic expiry occurs before late mission choices, but frozen objective authority may preserve the actual +1OC example; no admitted failing consumer has been demonstrated. Neither candidate is represented as runtime-reproduced here.
+
+Missing faction-provider activation alone is not a Core failure. Preserve Order119 reposition and Order120 Psychic provenance/conditional checkpoints as Core evidence with separate named-faction qualification. Likewise preserve the Order87/Order92 owner conventions instead of elevating them to official clarifications. Speculative coordinated edited-history hardening remains separately queued; no expansion was undertaken.
+
+Final review still requires the complete stable canonical source/owner/assertion/consumer packet, exact head/tree/base, prerequisite completion and explicit polygon RELEASE. This reviewer remains available for the same independent review.
+
+On October7 at12:07UTC the user expressly approved the narrow B03 shared live
+proposal-context validation correction. The original native malformed-client
+capture increased decision records99→100 and removed pending queue1→0 while
+adding decision_recorded/proposal_accepted events before stale_active_player.
+Every game-state field and CP/use/effect ledger stayed unchanged, CP5→5.
+This was not unmodified legal play or edited history; no BASE execution or
+regression-introduction claim is inferred from the BASE-identical owner.
+Complete exact question/yes is preserved in
+`data/source_audits/order135/b03-explicit-repair-approval.json`.
+The existing shared prevalidator now requires complete typed eligibility-context
+equality for all parameterized Stratagem handlers before queue/history acceptance,
+retaining identity/catalog/round/phase diagnostic ordering and request-state drift.
+Target binding/effect selection remain legal client choices; no schema, fallback,
+rollback design, provider mechanics or permission is introduced. Native malformed
+context rejection preserves the complete lifecycle, followed by legal retry and
+actual attacks/CP/effect/interrupt/persistence/fork/allprincipalviews/events/exact
+replay. Qualified domain fixtures additionally cover trigger/window/payload drift,
+strict turn metadata, actual generic source and Carnival either-turn availability.
+No original test/assertion/branch/budget or historical evidence is weakened.
+Full current gates and both SAME exact-final reviews remain required; source3
+results and all failed/blocked receipts remain historical, without successor credit.
+
+October7 B04/B05 update: the approved shared disembark consumer now retains the
+existing three-dimensional/all-FRAME-parts containment predicate. The starting
+cargo restore consumer uses the existing actual deployment boundary only for
+carrier presence; all other cargo invariants remain active. New native pregame
+manifest tests retain the genuine initial anchor through setup and disembark,
+save/load/fork, role projections/events and exact replay. Synthetic geometry and
+legacy Core fixture admission remain explicit, without official body or faction
+certification. The source5 current pending/completed lifecycle states already
+restored exactly; its session save/export failed while restoring the predeployment
+initial anchor. Static bindings and focused tests do not establish corrected-source
+aggregate or complete1078 semantic closure. Source5 Mac results and all earlier
+reports remain historical. See the exact two-gap approval and scope plan.
+
+
+The complete subsequent user clarification expressly authorizes exact type-safe
+game-context validation at this same B03 boundary; its verbatim message is retained
+in `data/source_audits/order135/b03-type-safe-boundary-user-clarification.json`.
+A separate author native local control reproduced submitted catalog Boolean true
+changed only to JSON number1 passing Python equality, then raising the strict flag
+error after pending queue1->0, records99->100 and two acceptance events. Every
+gameplay field and CP remained unchanged. This malformed live-client boundary case
+is not an unmodified legal-play failure or edited-history scenario; no independent
+BASE execution or provider certification is claimed. The first diagnostic helper
+failed on saved queue shape; that failed receipt remains immutable without credit.
+The existing catalog and context comparisons now recursively distinguish JSON
+booleans from numbers, preserving complete fields, object key order independence,
+equal numeric representations such as1/1.0, existing diagnostic order, legal
+target/effect choices and authoritative request-state checks. No schema/parser,
+source registration, normalization, rollback or history design is added. Qualified
+nested-context controls test this JSON-kind boundary without claiming a native
+behavior-changing nested-context consumer. Both native role directions reject1
+and1.0 atomically, then perform the unchanged legal retry and actual fight with
+save/load/fork/views/events/exact replay. Earlier focused and performance epoch07
+results are historical after this executable/test change; fresh gates and both
+SAME exact-final CLEAN reviews remain mandatory.
+
+
+The user approved the independently reproduced Counter-offensive target-band gap
+on October8 at00:26:27UTC (October7 in America/New_York). Exact attributed parent
+transcript and scope are retained in
+`data/source_audits/order135/counter-band-explicit-repair-approval.json`. During
+ordinary public opponent Charge/Fight, an engaged unselected friendly unit with
+4CP was excluded before the source could grant Fights First. The shared query
+now exposes an explicit ordering-band scope. Its ordinary default remains
+restricted; only the Core discovery, prevalidation and effect paths request
+pre-grant eligibility. Presence, attached lineage, selected history, engagement,
+legal fight types, forced contexts, opponent-turn timing, CP, Battle-shock,
+repeated-use and B03 atomic context checks retain their existing owners.
+
+Every original test/fixture and assertion remains unchanged. In particular,
+`test_order70_counteroffensive_uses_current_model_complete_band` directly calls
+the default geometry query in a constructed own-turn context. It proves the
+default band filter; it is not evidence of lawful Core Counter availability.
+New public native both-direction regressions distinguish ordinary selection
+from Core pre-grant targeting, then exercise actual melee, normal band resume,
+CP/grant/interrupt history, malformed Boolean-number rejection, JSON save/load,
+fork, all principal views/events and exact replay. Existing native Remaining
+acceptance and own-turn rejection remain separate unchanged controls. No
+broader melee, generic interrupt, forced-queue or provider repair is included.
+
+The interrupted0d108 remainder and prior source passes remain immutable without
+new-source credit. Fresh identities, prerequisites, isolated16 authentication,
+explicit corrected RELEASE, full coverage/quality/profile and same-reviewer
+renewal are required. Individual all1078 semantic closure remains outstanding.

@@ -1,0 +1,339 @@
+{
+  "base": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+  "source_sha256": {
+    "src/warhammer40k_core/core/visibility.py": "912d675f133d3266aa67ddf667042a74bbe17eb9b2e73e757a2260f13d7c4b47",
+    "src/warhammer40k_core/geometry/continuous_visibility.py": "f1a7b388dd4707f94f0b16603a6972b35b9ef31734272c3fbdb60505992564ed",
+    "src/warhammer40k_core/engine/decision.py": "e35d0695c3ce4a7a0b0aae8790f2107c6092c48f1741b983025f50545181f68e"
+  },
+  "context": {
+    "ruleset_descriptor_hash": "ac8517bdc3c11a11ef7c9e61c48b51af72d398ba682baa246c749f8ebd4ec873",
+    "los_cache_key": "los:order135-rng-control",
+    "observer_model": {
+      "model_id": "observer",
+      "pose": {
+        "position": {
+          "x": 2.0,
+          "y": 2.0,
+          "z": 0.0
+        },
+        "facing": {
+          "degrees": 0.0
+        }
+      },
+      "base": {
+        "kind": "circular",
+        "radius": 0.5,
+        "length": null,
+        "width": null
+      },
+      "volume": {
+        "height": 2.0
+      }
+    },
+    "target_models": [
+      {
+        "model_id": "target",
+        "pose": {
+          "position": {
+            "x": 8.0,
+            "y": 2.0,
+            "z": 0.0
+          },
+          "facing": {
+            "degrees": 0.0
+          }
+        },
+        "base": {
+          "kind": "circular",
+          "radius": 0.5,
+          "length": null,
+          "width": null
+        },
+        "volume": {
+          "height": 2.0
+        }
+      }
+    ],
+    "terrain_features": [],
+    "terrain_areas": [],
+    "terrain_volumes": [],
+    "dynamic_model_blockers": [],
+    "observer_keywords": [],
+    "target_model_keywords": [
+      {
+        "model_id": "target",
+        "keywords": []
+      }
+    ],
+    "terrain_visibility_policy": {
+      "hidden_supported": true,
+      "hidden_detection_range_inches": 15.0,
+      "hidden_gone_to_ground_detection_penalty_inches": 3.0,
+      "hidden_requires_keywords": [
+        "BEAST",
+        "INFANTRY",
+        "SWARM"
+      ],
+      "hidden_requires_terrain_area_occupancy": true,
+      "hidden_lost_after_shooting": true,
+      "cover_effect": "attacker_bs_modifier",
+      "cover_policy": {
+        "cover_effect": "attacker_bs_modifier",
+        "grants_benefit_of_cover": true,
+        "non_stacking": true,
+        "requires_visible_target": true,
+        "requires_not_fully_visible": true,
+        "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true
+      },
+      "feature_policies": [
+        {
+          "terrain_feature_kind": "armoured_containers",
+          "line_of_sight_policy": "true_line_of_sight",
+          "blocks_model_visibility_through_footprint": false,
+          "blocks_full_visibility_through_footprint": false,
+          "uses_true_los_when_observer_wholly_within_feature": false,
+          "uses_true_los_when_target_intersects_feature": false,
+          "aircraft_uses_true_los_through_feature": false,
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "cover_policy": {
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_visible_target": true,
+            "requires_not_fully_visible": true,
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true
+          }
+        },
+        {
+          "terrain_feature_kind": "barricade_and_fuel_pipes",
+          "line_of_sight_policy": "true_line_of_sight",
+          "blocks_model_visibility_through_footprint": false,
+          "blocks_full_visibility_through_footprint": false,
+          "uses_true_los_when_observer_wholly_within_feature": false,
+          "uses_true_los_when_target_intersects_feature": false,
+          "aircraft_uses_true_los_through_feature": false,
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "cover_policy": {
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_visible_target": true,
+            "requires_not_fully_visible": true,
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true
+          }
+        },
+        {
+          "terrain_feature_kind": "battlefield_debris_and_statuary",
+          "line_of_sight_policy": "true_line_of_sight",
+          "blocks_model_visibility_through_footprint": false,
+          "blocks_full_visibility_through_footprint": false,
+          "uses_true_los_when_observer_wholly_within_feature": false,
+          "uses_true_los_when_target_intersects_feature": false,
+          "aircraft_uses_true_los_through_feature": false,
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "cover_policy": {
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_visible_target": true,
+            "requires_not_fully_visible": true,
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true
+          }
+        },
+        {
+          "terrain_feature_kind": "crater_and_rubble",
+          "line_of_sight_policy": "true_line_of_sight",
+          "blocks_model_visibility_through_footprint": false,
+          "blocks_full_visibility_through_footprint": false,
+          "uses_true_los_when_observer_wholly_within_feature": false,
+          "uses_true_los_when_target_intersects_feature": false,
+          "aircraft_uses_true_los_through_feature": false,
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "cover_policy": {
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_visible_target": true,
+            "requires_not_fully_visible": true,
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true
+          }
+        },
+        {
+          "terrain_feature_kind": "debris_and_statuary",
+          "line_of_sight_policy": "true_line_of_sight",
+          "blocks_model_visibility_through_footprint": false,
+          "blocks_full_visibility_through_footprint": false,
+          "uses_true_los_when_observer_wholly_within_feature": false,
+          "uses_true_los_when_target_intersects_feature": false,
+          "aircraft_uses_true_los_through_feature": false,
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "cover_policy": {
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_visible_target": true,
+            "requires_not_fully_visible": true,
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true
+          }
+        },
+        {
+          "terrain_feature_kind": "hills",
+          "line_of_sight_policy": "true_line_of_sight",
+          "blocks_model_visibility_through_footprint": false,
+          "blocks_full_visibility_through_footprint": false,
+          "uses_true_los_when_observer_wholly_within_feature": false,
+          "uses_true_los_when_target_intersects_feature": false,
+          "aircraft_uses_true_los_through_feature": false,
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "cover_policy": {
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_visible_target": true,
+            "requires_not_fully_visible": true,
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true
+          }
+        },
+        {
+          "terrain_feature_kind": "hills_and_sealed_buildings",
+          "line_of_sight_policy": "true_line_of_sight",
+          "blocks_model_visibility_through_footprint": false,
+          "blocks_full_visibility_through_footprint": false,
+          "uses_true_los_when_observer_wholly_within_feature": false,
+          "uses_true_los_when_target_intersects_feature": false,
+          "aircraft_uses_true_los_through_feature": false,
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "cover_policy": {
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_visible_target": true,
+            "requires_not_fully_visible": true,
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true
+          }
+        },
+        {
+          "terrain_feature_kind": "industrial_structures",
+          "line_of_sight_policy": "true_line_of_sight",
+          "blocks_model_visibility_through_footprint": false,
+          "blocks_full_visibility_through_footprint": false,
+          "uses_true_los_when_observer_wholly_within_feature": false,
+          "uses_true_los_when_target_intersects_feature": false,
+          "aircraft_uses_true_los_through_feature": false,
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "cover_policy": {
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_visible_target": true,
+            "requires_not_fully_visible": true,
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true
+          }
+        },
+        {
+          "terrain_feature_kind": "ruins",
+          "line_of_sight_policy": "area_obscuring",
+          "blocks_model_visibility_through_footprint": true,
+          "blocks_full_visibility_through_footprint": true,
+          "uses_true_los_when_observer_wholly_within_feature": true,
+          "uses_true_los_when_target_intersects_feature": true,
+          "aircraft_uses_true_los_through_feature": true,
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": true,
+          "cover_policy": {
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_visible_target": true,
+            "requires_not_fully_visible": true,
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true
+          }
+        },
+        {
+          "terrain_feature_kind": "sealed_buildings",
+          "line_of_sight_policy": "true_line_of_sight",
+          "blocks_model_visibility_through_footprint": false,
+          "blocks_full_visibility_through_footprint": false,
+          "uses_true_los_when_observer_wholly_within_feature": false,
+          "uses_true_los_when_target_intersects_feature": false,
+          "aircraft_uses_true_los_through_feature": false,
+          "towering_uses_true_los_through_feature": false,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "cover_policy": {
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_visible_target": true,
+            "requires_not_fully_visible": true,
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true
+          }
+        },
+        {
+          "terrain_feature_kind": "woods",
+          "line_of_sight_policy": "dense_cover",
+          "blocks_model_visibility_through_footprint": false,
+          "blocks_full_visibility_through_footprint": true,
+          "uses_true_los_when_observer_wholly_within_feature": true,
+          "uses_true_los_when_target_intersects_feature": false,
+          "aircraft_uses_true_los_through_feature": true,
+          "towering_uses_true_los_through_feature": true,
+          "towering_uses_true_los_when_wholly_within_feature": false,
+          "cover_policy": {
+            "cover_effect": "attacker_bs_modifier",
+            "grants_benefit_of_cover": true,
+            "non_stacking": true,
+            "requires_visible_target": true,
+            "requires_not_fully_visible": true,
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": true
+          }
+        }
+      ]
+    }
+  },
+  "witness": {
+    "context_fingerprint": "1caf41829e4cda28c6e2868b2d4e2b70a32499d3df760661360d9841df45d508",
+    "ruleset_descriptor_hash": "ac8517bdc3c11a11ef7c9e61c48b51af72d398ba682baa246c749f8ebd4ec873",
+    "los_cache_key": "los:order135-rng-control",
+    "observer_model_id": "observer",
+    "target_model_ids": [
+      "target"
+    ],
+    "visible_model_ids": [
+      "target"
+    ],
+    "fully_visible_model_ids": [
+      "target"
+    ],
+    "unit_visible": true,
+    "unit_fully_visible": true,
+    "model_records": [
+      {
+        "target_model_id": "target",
+        "model_visible": true,
+        "model_fully_visible": true,
+        "evidence": {
+          "algorithm_id": "continuous-analytic-prism-visibility:1",
+          "input_fingerprint": "4b2f8ee0a9400119b9264581c62d185242cdd20b22ff1af653fb7cb4e03b3619",
+          "model_visible": true,
+          "model_fully_visible": true,
+          "visibility_proof": "clear_enclosure",
+          "full_visibility_proof": "clear_enclosure",
+          "checked_witness_count": 0,
+          "clear_corridor": null,
+          "hidden_target_part": null
+        },
+        "blocker_records": []
+      }
+    ]
+  },
+  "rng_history_token": "{\"context_fingerprint\":\"1caf41829e4cda28c6e2868b2d4e2b70a32499d3df760661360d9841df45d508\",\"fully_visible_model_ids\":[\"target\"],\"los_cache_key\":\"los:order135-rng-control\",\"model_records\":[{\"blocker_records\":[],\"evidence\":{\"algorithm_id\":\"continuous-analytic-prism-visibility:1\",\"checked_witness_count\":0,\"clear_corridor\":null,\"full_visibility_proof\":\"clear_enclosure\",\"hidden_target_part\":null,\"input_fingerprint\":\"4b2f8ee0a9400119b9264581c62d185242cdd20b22ff1af653fb7cb4e03b3619\",\"model_fully_visible\":true,\"model_visible\":true,\"visibility_proof\":\"clear_enclosure\"},\"model_fully_visible\":true,\"model_visible\":true,\"target_model_id\":\"target\"}],\"observer_model_id\":\"observer\",\"ruleset_descriptor_hash\":\"ac8517bdc3c11a11ef7c9e61c48b51af72d398ba682baa246c749f8ebd4ec873\",\"target_model_ids\":[\"target\"],\"unit_fully_visible\":true,\"unit_visible\":true,\"visible_model_ids\":[\"target\"]}",
+  "qualification": "Actual BASE producer control for declared synthetic scalar geometry; not provider measurement certification."
+}

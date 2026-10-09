@@ -1,0 +1,72 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "movement",
+  "workload_id": "order80-normal-move-occurrence-v1",
+  "base_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1038332b0378377be510e16386aca64f0350e24a954c106f2f875a69c3ecb93b",
+  "head_input_digest": "780cd1cd084f2a176bf3e625dda6449b4230f34f2b6bd8840077450890604765",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:110f573cc70342f09c3102916f918a54a64f7b50f0966cdbdb51eba2b6de970e",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 137327259648,
+      "logical_cpus": 64,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
+    "fixture_sha256": "756756342c496dbad925de0ea8ce580debc1d9ba57cbbe57e6a8e9de4ad51c75",
+    "samples": {
+      "finite": [
+        7.251060499809682,
+        7.287194799864665,
+        7.213457999983802
+      ],
+      "parameterized": [
+        6.937540000071749,
+        6.945195400156081,
+        6.954600800061598
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1038332b0378377be510e16386aca64f0350e24a954c106f2f875a69c3ecb93b",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 137327259648,
+      "logical_cpus": 64,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
+    "fixture_sha256": "756756342c496dbad925de0ea8ce580debc1d9ba57cbbe57e6a8e9de4ad51c75",
+    "samples": {
+      "finite": [
+        7.336438700091094,
+        7.237128600012511,
+        7.2141589999664575
+      ],
+      "parameterized": [
+        6.951147299958393,
+        6.8871913000475615,
+        6.947219100082293
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": [
+    "Prior 62 Windows V963 refresh reports retained 14 failed inequalities in Order78/83/101, also reproduced on unchanged main7f45. Those failures remain historical failures; no passing status is inferred from these new bounded comparisons.",
+    "Preserved evidence: Library libfile_cb02a09ce87881918dbe447a67a3e779 SHA2564f194b6edee3e31de9caa277ae1c292be278e79b93d4c5d4e79e46ca8ebf7344; original 492df01c559aef3df8f4848428a1cfa4506f477d checkpoint and exact bytes retained externally. Policy-pinned historical report files remain unchanged.",
+    "All prior Order103 numerical exception records and failed/interrupted development tests remain immutable; no historical failure or provider/full-game qualification receives current pass credit."
+  ]
+}

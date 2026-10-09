@@ -1712,7 +1712,8 @@ def test_attached_rules_unit_embark_then_unified_disembark_is_atomic_and_resumab
 
 def test_attached_rules_unit_combat_disembark_is_atomic_and_group_hazardous() -> None:
     scenario, bodyguard, leader, transport = _attached_embark_ready_scenario()
-    state = _battle_state(scenario, game_id="phase10q-attached-combat-disembark")
+    state = _battle_state(scenario, game_id="order135-attached-combat-terrain-01")
+    _order135_prepare_supported_carrier_fixture(state, transport)
     attached_id = "attached-unit:army-alpha:attached-transport-passengers"
     component_ids = tuple(sorted((bodyguard.unit_instance_id, leader.unit_instance_id)))
     assert state.battlefield_state is not None
@@ -1843,6 +1844,7 @@ def test_attached_rules_unit_combat_disembark_is_atomic_and_group_hazardous() ->
 def test_attached_combat_disembark_hazard_fnp_round_trips_and_resumes() -> None:
     scenario, bodyguard, leader, transport = _attached_embark_ready_scenario()
     state = _battle_state(scenario, game_id="phase10q-attached-combat-fnp")
+    _order135_prepare_supported_carrier_fixture(state, transport)
     attached_id = "attached-unit:army-alpha:attached-transport-passengers"
     component_ids = tuple(sorted((bodyguard.unit_instance_id, leader.unit_instance_id)))
     grouped_placement = RulesUnitPlacement(
@@ -2559,6 +2561,7 @@ def test_started_embarked_unit_disembarks_through_movement_decision_lifecycle() 
 def test_movement_phase_combat_disembark_requires_tactical_impossible_evidence() -> None:
     scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
     state = _battle_state(scenario, game_id="phase14h-movement-combat-disembark")
+    _order135_prepare_supported_carrier_fixture(state, transport)
     assert state.battlefield_state is not None
     state.battlefield_state = state.battlefield_state.without_unit_placement(
         passenger.unit_instance_id
@@ -2613,7 +2616,7 @@ def test_movement_phase_combat_disembark_requires_tactical_impossible_evidence()
         transport=transport,
         disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK,
         transport_movement_status=TransportMovementStatus.NOT_MOVED,
-        poses=tuple(Pose.at(pose.position.x + 3.0, pose.position.y) for pose in _disembark_poses()),
+        poses=_disembark_poses(),
         result_id="phase14h-place-combat-disembark-fallback",
     )
     mortal_wound_request = _decision_request(status)
@@ -2699,6 +2702,8 @@ def test_movement_phase_combat_disembark_rejects_when_tactical_placement_is_lega
         )
     )
     before_battlefield = state.battlefield_state
+    before_state = state.to_payload()
+    before_decisions = decisions.to_payload()
     before_cargo = state.transport_cargo_state_for_transport(transport.unit_instance_id)
 
     status = _submit_disembark_placement_payload(
@@ -2718,8 +2723,13 @@ def test_movement_phase_combat_disembark_rejects_when_tactical_placement_is_lega
     assert state.battlefield_state == before_battlefield
     assert state.transport_cargo_state_for_transport(transport.unit_instance_id) == before_cargo
     assert passenger.unit_instance_id not in _placed_unit_ids(state)
-    invalid_event = _last_event_payload(decisions, "combat_disembark_tactical_available")
-    violations = cast(list[dict[str, object]], invalid_event["violations"])
+    assert state.to_payload() == before_state
+    assert decisions.to_payload() == before_decisions
+    assert decisions.queue.peek_next() == placement_request
+    assert isinstance(status.payload, dict)
+    validation = status.payload["proposal_validation"]
+    assert isinstance(validation, dict)
+    violations = cast(list[dict[str, object]], validation["violations"])
     assert violations[0]["violation_code"] == (
         TransportOperationViolationCode.COMBAT_DISEMBARK_TACTICAL_AVAILABLE.value
     )
@@ -2728,6 +2738,7 @@ def test_movement_phase_combat_disembark_rejects_when_tactical_placement_is_lega
 def test_movement_phase_combat_disembark_rejects_invalid_combat_placement() -> None:
     scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
     state = _battle_state(scenario, game_id="phase14h-combat-disembark-invalid-placement")
+    _order135_prepare_supported_carrier_fixture(state, transport)
     assert state.battlefield_state is not None
     state.battlefield_state = state.battlefield_state.without_unit_placement(
         passenger.unit_instance_id
@@ -9543,3 +9554,64 @@ def test_order63_attached_passengers_all_inherit_edge_distance(
             if row.violation_code
             is TransportOperationViolationCode.RAPID_DISEMBARK_INGRESS_RESTRICTION
         } == {leader.own_models[0].model_instance_id}
+
+
+def _order135_prepare_supported_carrier_fixture(state: GameState, transport: UnitInstance) -> None:
+    """Constructed lower-level fixture: ordinary sizes on an admitted small hill top.
+
+    No production policy, hazard roll, FNP source or existing assertion changes.
+    Separate public setup/native controls prove admission and exact replay.
+    """
+    from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
+
+    display = TerrainDisplayGeometry.axis_aligned_rectangle(
+        center_x_inches=10,
+        center_y_inches=10,
+        width_inches=10,
+        depth_inches=10,
+        display_template_id=None,
+    )
+    feature = TerrainFeatureDefinition(
+        feature_id="order135-protected-combat-platform",
+        feature_kind=TerrainFeatureKind.HILLS,
+        footprint_center_x_inches=10,
+        footprint_center_y_inches=10,
+        footprint_width_inches=10,
+        footprint_depth_inches=10,
+        rules_footprint_polygon=display.footprint_polygon,
+        display_geometry=display,
+        floors=(
+            TerrainFloorDefinition(
+                floor_id="carrier-top",
+                center_x_inches=10,
+                center_y_inches=10,
+                bottom_z_inches=5.5,
+                width_inches=4,
+                depth_inches=4,
+                thickness_inches=0.12,
+            ),
+        ),
+    )
+    assert state.battlefield_state is not None
+    carrier = state.battlefield_state.unit_placement_by_id(transport.unit_instance_id)
+    carrier = replace(
+        carrier,
+        model_placements=tuple(
+            replace(row, pose=Pose.at(row.pose.position.x, row.pose.position.y, 5.5))
+            for row in carrier.model_placements
+        ),
+    )
+    assert state.mission_setup is not None
+    state.mission_setup = replace(
+        state.mission_setup,
+        battlefield_layout_id=None,
+        deployment_map_id="order135-custom-platform-deployment",
+        terrain_layout_id="order135-custom-platform-terrain",
+        terrain_features=(feature,),
+        terrain_areas=(),
+        objective_terrain_areas=(),
+        battlefield_regions=(),
+    )
+    state.replace_battlefield_state(
+        replace(state.battlefield_state.with_unit_placement(carrier), terrain_features=(feature,))
+    )

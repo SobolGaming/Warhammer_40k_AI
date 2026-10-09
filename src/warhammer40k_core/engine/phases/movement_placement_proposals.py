@@ -196,6 +196,59 @@ def invalid_placement_proposal_submission_status(
                 ),
                 message="Disembark eligibility or permitting source changed.",
             )
+        if placement_submission.disembark_mode is DisembarkModeKind.COMBAT_DISEMBARK:
+            from warhammer40k_core.engine.phases.movement_rules_unit_disembark import (
+                RulesUnitDisembarkSelection,
+            )
+            from warhammer40k_core.engine.tactical_setup_feasibility import (
+                TacticalSetupOutcome,
+                tactical_setup_feasibility,
+            )
+
+            scenario = _battlefield_scenario(state)
+            transport_id = placement_submission.transport_unit_instance_id
+            cargo = state.transport_cargo_state_for_transport(transport_id)
+            if cargo is None:
+                raise GameLifecycleError("Combat admission requires current cargo and eligibility.")
+            rules_unit = rules_unit_view_from_armies(
+                armies=tuple(state.army_definitions),
+                unit_instance_id=placement_submission.unit_instance_id,
+            )
+            feasibility = tactical_setup_feasibility(
+                scenario=scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                cargo_state=cargo,
+                selection=RulesUnitDisembarkSelection(
+                    player_id=_active_player_id(state),
+                    battle_round=state.battle_round,
+                    unit_instance_id=placement_submission.unit_instance_id,
+                    transport_unit_instance_id=transport_id,
+                    attempted_placement=placement_submission.resolved_rules_unit_placement(),
+                    disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK,
+                    transport_movement_status=current.transport_movement_status,
+                    restriction_overrides=current.restriction_overrides,
+                ),
+                rules_unit=rules_unit,
+                transport_placement=scenario.battlefield_state.unit_placement_by_id(transport_id),
+                objective_markers=_objective_markers_for_state(state),
+            )
+            if feasibility.outcome is not TacticalSetupOutcome.IMPOSSIBLE:
+                return _reject_invalid_proposal(
+                    state=state,
+                    result=result,
+                    proposal_validation=ProposalValidationResult.invalid(
+                        proposal_request_id=proposal_request.request_id,
+                        proposal_kind=proposal_request.proposal_kind,
+                        violation_code=(
+                            "combat_disembark_tactical_available"
+                            if feasibility.outcome is TacticalSetupOutcome.EXISTS
+                            else "combat_disembark_tactical_unresolved"
+                        ),
+                        message=feasibility.reason,
+                        field="disembark_mode",
+                    ),
+                    message=feasibility.reason,
+                )
     return None
 
 

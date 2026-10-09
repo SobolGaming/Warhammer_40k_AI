@@ -26,6 +26,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_modifiers
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.attack_sequence_state import AttackSequence
+    from warhammer40k_core.engine.decision_record import DecisionRecord
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
     from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
@@ -267,11 +268,12 @@ def _psychic_attack_modifier_ignore_selection_for_attack(
     *,
     decisions: DecisionController,
     attack_context_id: str,
+    records: tuple[DecisionRecord, ...] | None = None,
 ) -> PsychicAttackModifierIgnoreSelection | None:
     previous: PsychicAttackModifierIgnoreSelection | None = None
     previous_context: dict[str, JsonValue] | None = None
     actor_id: str | None = None
-    for record in decisions.records:
+    for record in decisions.records if records is None else records:
         if record.request.decision_type != DECISION_TYPE:
             continue
         payload = record.request.payload
@@ -307,22 +309,41 @@ def _psychic_attack_modifier_ignore_selection_for_attack(
 
 def validate_psychic_attack_modifier_ignore_decision(
     *,
+    state: GameState,
     decisions: DecisionController,
     attack_sequence: AttackSequence,
     result: DecisionResult,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> None:
+    from warhammer40k_core.engine.psychic_preparation import psychic_preparation_frontier
+
     record = decisions.record_for_result(result)
     if record.request.decision_type != DECISION_TYPE:
         raise GameLifecycleError("Psychic modifier ignore decision has wrong request type.")
-    payload = record.request.payload
-    if (
-        not isinstance(payload, dict)
-        or payload.get("attack_context_id") != attack_sequence.attack_context_id()
+    records = decisions.records
+    if not records or records[-1] != record:
+        raise GameLifecycleError("Psychic modifier application requires the latest decision.")
+    # Authenticate the just-accepted request against its prior journal. Including
+    # this answer would move a completed occurrence's frontier to the next one.
+    frontier = psychic_preparation_frontier(
+        state=state,
+        decisions=decisions,
+        sequence=attack_sequence,
+        records=records[:-1],
+        request_id=record.request.request_id,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
+    expected = frontier.pending_request
+    if expected is None or canonical_json(expected.to_payload()) != canonical_json(
+        record.request.to_payload()
     ):
         raise GameLifecycleError("Psychic modifier ignore decision attack context drift.")
+    payload = expected.payload
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Psychic modifier request requires an object.")
     selection = _psychic_attack_modifier_ignore_selection_for_attack(
         decisions=decisions,
-        attack_context_id=attack_sequence.attack_context_id(),
+        attack_context_id=_string(payload, "attack_context_id"),
     )
     if selection is None or selection.option_id != result.selected_option_id:
         raise GameLifecycleError("Psychic modifier ignore decision option drift.")

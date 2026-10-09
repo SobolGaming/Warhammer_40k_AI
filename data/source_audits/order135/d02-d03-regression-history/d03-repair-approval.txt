@@ -1,0 +1,6 @@
+Assistant, 2026-10-08 15:56 UTC, Sentinel_deda0491387c8191924e1c5190a75ccb:
+"The consolidated checks confirmed one more transport bug: Combat Disembark is accepted even when a legal Tactical placement exists. That illegal branch changes state, rolls hazards, then crashes.
+
+May I add the narrow eligibility check and atomic-rejection regressions? The Mac’s intermittent connection also interrupted validation, so I’m verifying which processes finished before allowing code changes"
+User, 2026-10-08 15:57 UTC, Sentinel_0cf76cfb46848191ac86ad66f0abb8a3:
+"yes"

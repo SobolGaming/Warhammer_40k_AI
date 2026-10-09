@@ -101,7 +101,7 @@ from warhammer40k_core.rules.wahapedia_schema import (
 
 DAEMON_PRINCE_ID = "000004086"
 TORMENTORS_ID = "000004079"
-ECSTATIC_DEATH_GAME_ID = "order56-ecstatic_death_game_id-01-order64-0"
+ECSTATIC_DEATH_GAME_ID = "order102-ecstatic-chain-07"
 ECSTATIC_CHAIN_GAME_ID = "order102-ecstatic-chain-07"
 EXPECTED_PACKAGE_HASH = "86cf74bc36db389c92c05dba0752832eed98272a0a0fa2d16923c1e2b5f16d84"
 
@@ -734,7 +734,7 @@ def test_ecstatic_death_destroyed_unit_uses_normal_fight_selection_and_replay() 
         session=session,
         status=status,
         stop_at_decision_type="select_fight_activation",
-        result_id_prefix="ecstatic-death:before-attacker",
+        result_id_prefix="ecstatic-death-chain:before-attacker",
     )
     activation_request = status.decision_request
     assert activation_request is not None
@@ -746,14 +746,14 @@ def test_ecstatic_death_destroyed_unit_uses_normal_fight_selection_and_replay() 
     status = session.submit_option(
         request_id=activation_request.request_id,
         option_id=attacker_option_id,
-        result_id="ecstatic-death:attacker-activation",
+        result_id="ecstatic-death-chain:attacker-activation",
     )
     status = _advance_ecstatic_death_session(
         session=session,
         status=status,
         stop_at_decision_type=SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
-        result_id_prefix="ecstatic-death:attacker",
-        melee_profile_suffix=":sweep",
+        result_id_prefix="ecstatic-death-chain:attacker",
+        melee_profile_suffix=":strike",
     )
 
     reaction_request = status.decision_request
@@ -911,7 +911,7 @@ def test_ecstatic_death_restore_rejects_contextual_fight_on_death_drift(
         session=session,
         status=session.advance_until_decision_or_terminal(),
         stop_at_decision_type="select_fight_activation",
-        result_id_prefix="ecstatic-death:before-attacker",
+        result_id_prefix="ecstatic-death-chain:before-attacker",
     )
     activation_request = status.decision_request
     assert activation_request is not None
@@ -922,14 +922,14 @@ def test_ecstatic_death_restore_rejects_contextual_fight_on_death_drift(
             for option in activation_request.options
             if attacker.unit_instance_id in option.option_id
         ),
-        result_id="ecstatic-death:attacker-activation",
+        result_id="ecstatic-death-chain:attacker-activation",
     )
     status = _advance_ecstatic_death_session(
         session=session,
         status=status,
         stop_at_decision_type=SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
-        result_id_prefix="ecstatic-death:attacker",
-        melee_profile_suffix=":sweep",
+        result_id_prefix="ecstatic-death-chain:attacker",
+        melee_profile_suffix=":strike",
     )
     reaction_request = status.decision_request
     assert reaction_request is not None
@@ -943,6 +943,8 @@ def test_ecstatic_death_restore_rejects_contextual_fight_on_death_drift(
         result_id="ecstatic-death:accept",
     )
     payload = json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True))
+    # Each corruption starts from an independently valid accepted-retention state.
+    assert GameLifecycle.from_payload(payload).to_payload() == payload
     awaiting_effect = next(
         effect
         for effect in payload["state"]["persisting_effects"]
@@ -959,7 +961,7 @@ def test_ecstatic_death_restore_rejects_contextual_fight_on_death_drift(
     elif corruption == "orphan_result":
         destruction["result_id"] = "orphaned-retention-result"
     elif corruption == "wrong_decision":
-        destruction["result_id"] = "ecstatic-death:attacker-activation"
+        destruction["result_id"] = "ecstatic-death-chain:attacker-activation"
 
     with pytest.raises(GameLifecycleError):
         GameLifecycle.from_payload(payload)
@@ -1035,7 +1037,7 @@ def test_ecstatic_death_chain_uses_ordinary_fight_alternation_without_nesting() 
         status=status,
         stop_at_decision_type=SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
         result_id_prefix="ecstatic-death-chain:retained",
-        melee_profile_suffix=":sweep",
+        melee_profile_suffix=":strike",
         melee_target_unit_instance_id=child.unit_instance_id,
     )
     reaction_request = status.decision_request
@@ -1091,10 +1093,10 @@ def _ecstatic_death_fight_session(
     catalog = _ecstatic_death_test_catalog()
     lifecycle, units = fight_lifecycle(
         alpha_unit_ids=("attacker",),
-        enemy_unit_ids=("target",),
+        enemy_unit_ids=("retained",),
         origins={
             "attacker": Pose.at(x=10.0, y=20.0),
-            "target": Pose.at(x=11.0, y=20.0),
+            "retained": Pose.at(x=13.0, y=20.0),
         },
         game_id=game_id,
         datasheet_id=DAEMON_PRINCE_ID,
@@ -1109,7 +1111,7 @@ def _ecstatic_death_fight_session(
     state = lifecycle.state
     assert state is not None
     attacker = units["attacker"]
-    target = units["target"]
+    target = units["retained"]
     for unit in (attacker, target):
         model = unit.own_models[0]
         setup_damage = apply_damage_to_model(

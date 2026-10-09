@@ -24,7 +24,7 @@ from warhammer40k_core.engine.dice_roll_history import (
     latest_roll_state,
 )
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
-from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitComponent, rules_unit_view_by_id
 from warhammer40k_core.engine.unit_resource_state import (
     spend_unit_resource,
@@ -38,7 +38,6 @@ from warhammer40k_core.engine.weapon_abilities import (
 )
 
 if TYPE_CHECKING:
-    from warhammer40k_core.engine.attack_sequence_state import AttackSequence
     from warhammer40k_core.engine.game_state import GameState
 
 
@@ -199,6 +198,8 @@ def request_dice_result_override_if_available(
     weapon_profile_id: str,
     weapon_profile: WeaponProfile,
     target_keywords: tuple[str, ...],
+    request_id: str | None = None,
+    just_recorded_request_id: str | None = None,
 ) -> DecisionRequest | None:
     if roll_state is None or roll_state.result_override is not None:
         return None
@@ -214,6 +215,7 @@ def request_dice_result_override_if_available(
         decisions=decisions,
         roll_id=roll_state.original_result.roll_id,
         attack_context_id=attack_context_id,
+        excluding_request_id=just_recorded_request_id,
     ):
         return None
     rules_unit = rules_unit_view_by_id(
@@ -273,7 +275,7 @@ def request_dice_result_override_if_available(
     )
     context["context_fingerprint"] = _context_fingerprint_without_stored(context)
     return DecisionRequest(
-        request_id=state.next_decision_request_id(),
+        request_id=state.next_decision_request_id() if request_id is None else request_id,
         decision_type=DICE_RESULT_OVERRIDE_DECISION_TYPE,
         actor_id=rules_unit.owner_player_id,
         payload=validate_json_value(context),
@@ -300,122 +302,6 @@ def request_dice_result_override_if_available(
     )
 
 
-def invalid_dice_result_override_status(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    request: DecisionRequest,
-    result: DecisionResult,
-) -> LifecycleStatus | None:
-    invalid = _invalid_finite_override_status(
-        state=state,
-        request=request,
-        result=result,
-    )
-    if invalid is not None:
-        return invalid
-    if request.decision_type != DICE_RESULT_OVERRIDE_DECISION_TYPE:
-        raise GameLifecycleError("Dice result override validator received another decision type.")
-    payload = _request_payload(request)
-    if payload["context_fingerprint"] != _context_fingerprint_without_stored(payload):
-        return _invalid_status(state, field="context_fingerprint")
-    sequence = _active_attack_sequence(state=state, sequence_id=payload["sequence_id"])
-    if sequence is None:
-        return _invalid_status(state, field="sequence_id")
-    pool = sequence.current_pool()
-    expected_attack_identity = (
-        sequence.attack_context_id(),
-        sequence.pool_index,
-        sequence.attack_index,
-        sequence.attacking_unit_instance_id,
-        pool.attacker_model_instance_id,
-        pool.target_unit_instance_id,
-        pool.weapon_profile_id,
-        sequence.source_phase.value,
-    )
-    request_attack_identity = (
-        payload["attack_context_id"],
-        payload["pool_index"],
-        payload["attack_index"],
-        payload["attacking_unit_instance_id"],
-        payload["attacker_model_instance_id"],
-        payload["target_unit_instance_id"],
-        payload["weapon_profile_id"],
-        payload["source_phase"],
-    )
-    if expected_attack_identity != request_attack_identity:
-        return _invalid_status(state, field="attack_context")
-    latest_state = latest_roll_state(
-        decisions=decisions,
-        roll_id=payload["roll_id"],
-    )
-    request_roll_state = DiceRollState.from_payload(payload["roll_state"])
-    if latest_state != request_roll_state or latest_state.result_override is not None:
-        return _invalid_status(state, field="roll_state")
-    if latest_state.original_result.spec.roll_type != payload["roll_spec_type"]:
-        return _invalid_status(state, field="roll_spec_type")
-    rules_unit = rules_unit_view_by_id(
-        state=state,
-        unit_instance_id=payload["attacking_unit_instance_id"],
-    )
-    if request.actor_id != rules_unit.owner_player_id:
-        return _invalid_status(state, field="actor_id")
-    if payload["source_component_unit_instance_id"] not in (rules_unit.component_unit_instance_ids):
-        return _invalid_status(state, field="source_component_unit_instance_id")
-    source_component = next(
-        component.unit
-        for component in rules_unit.components
-        if component.unit.unit_instance_id == payload["source_component_unit_instance_id"]
-    )
-    if not any(model.is_alive for model in source_component.own_models):
-        return _invalid_status(state, field="source_component_alive")
-    attacker_model = rules_unit.model_by_id(payload["attacker_model_instance_id"])
-    descriptors = tuple(
-        descriptor
-        for descriptor in dice_result_override_descriptors_for_abilities(
-            source_component.datasheet_abilities
-        )
-        if descriptor.descriptor_id == payload["descriptor_id"]
-    )
-    if len(descriptors) != 1:
-        return _invalid_status(state, field="descriptor_id")
-    descriptor = descriptors[0]
-    if (
-        descriptor.source_rule_id != payload["source_rule_id"]
-        or descriptor.resource_kind != payload["resource_kind"]
-        or descriptor.resource_cost != payload["resource_cost"]
-        or descriptor.replacement_value != payload["replacement_value"]
-        or payload["roll_type"] not in descriptor.roll_types
-        or any(keyword in attacker_model.keywords for keyword in descriptor.excluded_model_keywords)
-    ):
-        return _invalid_status(state, field="descriptor_context")
-    current_count = unit_resource_total(
-        state=state,
-        unit_instance_id=source_component.unit_instance_id,
-        resource_kind=descriptor.resource_kind,
-    )
-    if current_count != payload["current_count"] or current_count < descriptor.resource_cost:
-        return _invalid_status(state, field="current_count")
-    target_keywords = rules_unit_view_by_id(
-        state=state,
-        unit_instance_id=pool.target_unit_instance_id,
-    ).keywords
-    expected_markers = [
-        marker.to_payload()
-        for marker in critical_trigger_markers_for_attack(
-            roll_type=payload["roll_type"],
-            weapon_profile=pool.weapon_profile,
-            target_keywords=target_keywords,
-            name_keywords=rules_unit_view_by_id(
-                state=state, unit_instance_id=pool.target_unit_instance_id
-            ).datasheet_name_keywords,
-        )
-    ]
-    if payload["critical_trigger_markers"] != expected_markers:
-        return _invalid_status(state, field="critical_trigger_markers")
-    return None
-
-
 def apply_dice_result_override_decision(
     *,
     state: GameState,
@@ -426,6 +312,9 @@ def apply_dice_result_override_decision(
     if request.decision_type != DICE_RESULT_OVERRIDE_DECISION_TYPE:
         raise GameLifecycleError("Dice result override applier received another decision type.")
     payload = _request_payload(request)
+    roll_state = DiceRollState.from_payload(payload["roll_state"])
+    if latest_roll_state(decisions=decisions, roll_id=payload["roll_id"]) != roll_state:
+        raise GameLifecycleError("Dice result override changed before application.")
     if result.selected_option_id == DECLINE_DICE_RESULT_OVERRIDE_OPTION_ID:
         decisions.event_log.append(
             "dice_result_override_declined",
@@ -440,7 +329,6 @@ def apply_dice_result_override_decision(
         return
     if result.selected_option_id != USE_DICE_RESULT_OVERRIDE_OPTION_ID:
         raise GameLifecycleError("Dice result override selected option is invalid.")
-    roll_state = DiceRollState.from_payload(payload["roll_state"])
     updated_roll_state = roll_state.with_result_override(
         decision_id=result.result_id,
         request_id=request.request_id,
@@ -530,8 +418,22 @@ def _request_context(
 
 
 def _request_payload(request: DecisionRequest) -> DiceResultOverrideRequestPayload:
-    if not isinstance(request.payload, dict):
+    if not isinstance(request.payload, dict) or set(request.payload) != set(
+        DiceResultOverrideRequestPayload.__annotations__
+    ):
         raise GameLifecycleError("Dice result override request payload must be an object.")
+    for field in (
+        "pool_index",
+        "attack_index",
+        "resource_cost",
+        "current_count",
+        "replacement_value",
+    ):
+        if type(request.payload[field]) is not int:
+            raise GameLifecycleError("Dice result override requires integer context values.")
+    for field in ("roll_successful", "roll_critical"):
+        if type(request.payload[field]) is not bool:
+            raise GameLifecycleError("Dice result override requires boolean roll flags.")
     return cast(DiceResultOverrideRequestPayload, request.payload)
 
 
@@ -546,8 +448,11 @@ def _dice_result_override_already_answered(
     decisions: DecisionController,
     roll_id: str,
     attack_context_id: str,
+    excluding_request_id: str | None = None,
 ) -> bool:
     for record in decisions.records:
+        if record.request.request_id == excluding_request_id:
+            continue
         if record.request.decision_type != DICE_RESULT_OVERRIDE_DECISION_TYPE:
             continue
         if not isinstance(record.request.payload, dict):
@@ -558,70 +463,6 @@ def _dice_result_override_already_answered(
         ):
             return True
     return False
-
-
-def _active_attack_sequence(*, state: GameState, sequence_id: str) -> AttackSequence | None:
-    candidates: list[AttackSequence | None] = []
-    if state.shooting_phase_state is not None:
-        candidates.append(state.shooting_phase_state.attack_sequence)
-    if state.out_of_phase_shooting_state is not None:
-        candidates.append(state.out_of_phase_shooting_state.attack_sequence)
-    if state.fight_phase_state is not None:
-        candidates.append(state.fight_phase_state.attack_sequence)
-    matching = tuple(
-        sequence
-        for sequence in candidates
-        if sequence is not None and sequence.sequence_id == sequence_id
-    )
-    if len(matching) > 1:
-        raise GameLifecycleError("Active dice result override sequence identity is ambiguous.")
-    return None if not matching else matching[0]
-
-
-def _invalid_status(state: GameState, *, field: str) -> LifecycleStatus:
-    return LifecycleStatus.invalid(
-        stage=state.stage,
-        message="Dice result override context is stale or invalid.",
-        payload={
-            "invalid_reason": "invalid_dice_result_override_context",
-            "field": field,
-        },
-    )
-
-
-def _invalid_finite_override_status(
-    *,
-    state: GameState,
-    request: DecisionRequest,
-    result: DecisionResult,
-) -> LifecycleStatus | None:
-    field: str | None = None
-    if result.request_id != request.request_id:
-        field = "request_id"
-    elif result.decision_type != request.decision_type:
-        field = "decision_type"
-    elif result.actor_id != request.actor_id:
-        field = "actor_id"
-    elif result.selected_option_id not in {option.option_id for option in request.options}:
-        field = "selected_option_id"
-    else:
-        selected_payload = next(
-            option.payload
-            for option in request.options
-            if option.option_id == result.selected_option_id
-        )
-        if result.payload != selected_payload:
-            field = "payload"
-    if field is None:
-        return None
-    return LifecycleStatus.invalid(
-        stage=state.stage,
-        message="Dice result override result does not match the pending request.",
-        payload={
-            "invalid_reason": "invalid_dice_result_override_result",
-            "field": field,
-        },
-    )
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

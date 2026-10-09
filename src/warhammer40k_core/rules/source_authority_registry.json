@@ -1160,6 +1160,16 @@
           "audit_id": "core-snap-shooting-maintained-app-mirror-2026-10-01",
           "identity_kind": "observed_at",
           "identity_value": "2026-10-01T12:04:31.127429+00:00"
+        },
+        {
+          "audit_id": "order135-visibility-battlefield-edge-maintained-app-mirror-2026-10-01",
+          "row_id": "faq:9638115f-b94b-4d05-ba62-df9fba2805ac:current-observation",
+          "source_observation_sha256": "a4f0a819a082ecaa335f33766c6d3b84e1b227a6c2badd66059c47ab5e6228d1",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/core-rules",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-10-01T12:04:31.127429+00:00"
         }
       ],
       "legacy_observations": [
@@ -1926,6 +1936,17 @@
           ],
           "catalog_sha256": null
         }
+      ],
+      "source_package_extensions": [
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-other-concepts-battlefield-edge",
+          "version": "maintained-app-mirror-observed-2026-10-01",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-rules:other-concepts:visibility-battlefield-edge-faq"
+          ],
+          "catalog_sha256": "5b94765d8456d7c2fb64aa48c5b97edaa868df030f06582598224231e01b1299"
+        }
       ]
     },
     {
@@ -2011,7 +2032,8 @@
           ],
           "catalog_sha256": "e1f80012ea30fdaf487ba1f4737e93da5b34dc40b70011f26592060c4d9a5ba0"
         }
-      ]
+      ],
+      "source_package_extensions": []
     }
   ]
 }

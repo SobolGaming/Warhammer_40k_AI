@@ -86,7 +86,8 @@ def successful_attack_roll_results(
     allocated_model_id: str,
     include_generated_hit: bool,
 ) -> tuple[DiceRollResult, ...]:
-    hit_wound_results: list[DiceRollResult] = []
+    hit_results: list[DiceRollResult] = []
+    wound_results: list[DiceRollResult] = []
     save_results: list[DiceRollResult] = []
     for attack_index in range(attacks):
         attack_context_id = replace(
@@ -94,23 +95,23 @@ def successful_attack_roll_results(
             attack_index=attack_index,
         ).attack_context_id()
         suffix = f"{roll_id_prefix}-attack-{attack_index + 1}"
-        hit_wound_results.extend(
-            (
-                _fixed_roll(
-                    f"roll:{suffix}-hit",
-                    attack_sequence_hit_roll_spec(
-                        weapon_profile_id=weapon_profile.profile_id,
-                        attack_context_id=attack_context_id,
-                        attacker_player_id=attacker_player_id,
-                    ),
+        hit_results.append(
+            _fixed_roll(
+                f"roll:{suffix}-hit",
+                attack_sequence_hit_roll_spec(
+                    weapon_profile_id=weapon_profile.profile_id,
+                    attack_context_id=attack_context_id,
+                    attacker_player_id=attacker_player_id,
                 ),
-                _fixed_roll(
-                    f"roll:{suffix}-wound",
-                    attack_sequence_wound_roll_spec(
-                        weapon_profile_id=weapon_profile.profile_id,
-                        attack_context_id=attack_context_id,
-                        attacker_player_id=attacker_player_id,
-                    ),
+            )
+        )
+        wound_results.append(
+            _fixed_roll(
+                f"roll:{suffix}-wound",
+                attack_sequence_wound_roll_spec(
+                    weapon_profile_id=weapon_profile.profile_id,
+                    attack_context_id=attack_context_id,
+                    attacker_player_id=attacker_player_id,
                 ),
             )
         )
@@ -128,7 +129,7 @@ def successful_attack_roll_results(
         )
         if include_generated_hit:
             generated_context_id = f"{attack_context_id}:generated-hit-002"
-            hit_wound_results.append(
+            wound_results.append(
                 _fixed_roll(
                     f"roll:{suffix}-generated-wound",
                     attack_sequence_wound_roll_spec(
@@ -150,7 +151,7 @@ def successful_attack_roll_results(
                     value=1,
                 )
             )
-    return (*hit_wound_results, *save_results)
+    return (*hit_results, *wound_results, *save_results)
 
 
 def drift_pending_destruction_reaction_payload(

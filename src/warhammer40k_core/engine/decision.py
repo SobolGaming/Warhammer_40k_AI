@@ -29,6 +29,8 @@ from warhammer40k_core.core.dice import (
     RollOffRound,
 )
 from warhammer40k_core.core.rng import RandomSource
+from warhammer40k_core.core.visibility_records import LineOfSightWitness, LineOfSightWitnessPayload
+from warhammer40k_core.core.visibility_rng_projection import LEGACY_VISIBILITY_ALGORITHM_ID
 from warhammer40k_core.engine.decision_record import DecisionRecord, DecisionRecordPayload
 from warhammer40k_core.engine.decision_request import (
     DecisionError,
@@ -150,6 +152,8 @@ def _rng_payload_history_token(payload: JsonValue) -> str:
 
 def _without_rng_history_neutral_metadata(value: JsonValue) -> JsonValue:
     if isinstance(value, dict):
+        if "rng_compatibility_projection" in value:
+            value = _legacy_los_rng_payload(value)
         # Added interpretation evidence must not perturb unchanged physical dice
         # sequences. Assigned values and physical-component selections remain in
         # authoritative history; absent or redundant evidence is omitted from RNG input.
@@ -200,6 +204,27 @@ def _without_rng_history_neutral_metadata(value: JsonValue) -> JsonValue:
     if isinstance(value, list):
         return [_without_rng_history_neutral_metadata(item) for item in value]
     return value
+
+
+def _legacy_los_rng_payload(value: dict[str, JsonValue]) -> dict[str, JsonValue]:
+    """Normalize a copied typed witness, retaining every gameplay field.
+
+    Fresh context equality authenticates projection eligibility and hashes.
+    Both live history and restored history call this same pure normalization.
+    """
+    witness = LineOfSightWitness.from_payload(cast(LineOfSightWitnessPayload, value))
+    projection = witness.rng_compatibility_projection
+    if projection is None:
+        raise DecisionError("LOS RNG projection field requires a typed projection.")
+    result = cast(dict[str, JsonValue], witness.to_payload())
+    del result["rng_compatibility_projection"]
+    result["context_fingerprint"] = projection.context_fingerprint
+    records = cast(list[dict[str, JsonValue]], result["model_records"])
+    for record, (_, fingerprint) in zip(records, projection.pairs, strict=True):
+        evidence = cast(dict[str, JsonValue], record["evidence"])
+        evidence["algorithm_id"] = LEGACY_VISIBILITY_ALGORITHM_ID
+        evidence["input_fingerprint"] = fingerprint
+    return result
 
 
 def _event_sequence_number(event_id: str) -> int:

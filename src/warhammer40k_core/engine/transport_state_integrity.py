@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.lifecycle_battlefield_requirements import (
+    state_requires_deployed_battlefield_state,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.reserves import ReserveStatus
 from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
@@ -99,6 +102,7 @@ def validate_transport_cargo_state_consistency(*, state: GameState) -> None:
         if (
             cargo_state.transport_unit_instance_id not in placed_unit_ids
             and unarrived_reserve_state is None
+            and state_requires_deployed_battlefield_state(state)
         ):
             raise GameLifecycleError("transport_cargo_states transport unit must be placed.")
         if unarrived_reserve_state is not None:

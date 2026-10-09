@@ -137,6 +137,19 @@ def lethal_wound_checkpoint(*, phase: BattlePhase) -> LocalGameSession:
     status = session.submit_option(
         request_id=request.request_id, result_id="r44:decline", option_id="roll-to-wound"
     )
+    # Every Lethal choice for this gathered pool precedes the original Wound step.
+    for index in range(1, 100):
+        pending = status.decision_request
+        if pending is None or pending.decision_type != "select_lethal_hit_wound":
+            break
+        status = session.submit_option(
+            request_id=pending.request_id,
+            result_id=f"r44:decline:{index}",
+            option_id="roll-to-wound",
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    else:
+        raise AssertionError("Gathered Lethal Hits choices did not finish.")
     assert isinstance(status.payload, dict)
     assert status.payload["phase_body_status"] == "attack_wound_command_reroll_pending", status
     assert status.decision_request is not None

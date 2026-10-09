@@ -16,6 +16,7 @@ from warhammer40k_core.engine.stratagems_generic_metadata import (
     SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND,
     companion_unit_id_or_none,
     objective_marker_id_or_none,
+    stratagem_turn_unavailable_reason,
 )
 from warhammer40k_core.engine.stratagems_model import *
 from warhammer40k_core.engine.stratagems_requests import *
@@ -338,6 +339,12 @@ def _stratagem_unavailable_reason(
     )
     if handler_reason is not None:
         return handler_reason
+    turn_reason = stratagem_turn_unavailable_reason(
+        definition=record.definition,
+        context=context,
+    )
+    if turn_reason is not None:
+        return turn_reason
     if target_binding is not None:
         target_error = _target_binding_error(
             state=state,

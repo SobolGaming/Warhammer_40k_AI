@@ -2972,6 +2972,7 @@ def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() ->
             ),
         ),
         clear_terrain=True,
+        record_deployment_history=True,
     )
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)

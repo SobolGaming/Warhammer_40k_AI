@@ -265,7 +265,7 @@ def test_assessment_rejects_missing_stale_or_unmapped_claims(failure: str) -> No
             "src/warhammer40k_core/engine/lifecycle.py",
             "GameLifecycle.from_payload",
             "serialization-replay",
-            ("reconstruction",),
+            ("reconstruction", "dice", "dice_sustained"),
         ),
         (
             "src/warhammer40k_core/engine/custom.py",
@@ -279,8 +279,11 @@ def test_assessment_rejects_missing_stale_or_unmapped_claims(failure: str) -> No
 def test_sensitive_operations_cannot_be_downgraded_or_omitted(
     path: str, owner: str, operation: str, families: tuple[str, ...]
 ) -> None:
+    operations: tuple[str, ...] = (operation,)
+    if path == "src/warhammer40k_core/engine/lifecycle.py":
+        operations += ("order135-gathered-attack-steps",)
     value, changes, mapping = _assessment(
-        path, owner=owner, category="rule_semantics", operations=(operation,)
+        path, owner=owner, category="rule_semantics", operations=operations
     )
     with pytest.raises(ValueError, match="detailed comparisons"):
         _validate(value, changes, mapping)
@@ -288,12 +291,26 @@ def test_sensitive_operations_cannot_be_downgraded_or_omitted(
         path,
         owner=owner,
         category="algorithm_or_search",
-        operations=(operation,),
+        operations=operations,
         selected=families,
     )
     assert _validate(value, changes, mapping) == set(families)
     object_value(object_value(value["rows"])[path])["operations"] = []
     with pytest.raises(ValueError, match=r".+"):
+        _validate(value, changes, mapping)
+
+
+@pytest.mark.parametrize("omitted", ["serialization-replay", "order135-gathered-attack-steps"])
+def test_each_lifecycle_sensitive_operation_remains_mandatory(omitted: str) -> None:
+    operations = ("serialization-replay", "order135-gathered-attack-steps")
+    value, changes, mapping = _assessment(
+        "src/warhammer40k_core/engine/lifecycle.py",
+        owner="GameLifecycle.from_payload",
+        category="algorithm_or_search",
+        operations=tuple(operation for operation in operations if operation != omitted),
+        selected=("reconstruction", "dice", "dice_sustained"),
+    )
+    with pytest.raises(ValueError, match="Sensitive owner operation omitted"):
         _validate(value, changes, mapping)
 
 

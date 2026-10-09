@@ -1,0 +1,1223 @@
+{
+  "schema": "order135-current-source-reconciliation-v1",
+  "previous_packet_sha256": "96f19958884c07990dba01c1506dea7a23793e1501c79f25a7b4598f00f23971",
+  "retained_current_source_sha256": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f",
+  "all_previous_rows_preserved": true,
+  "previous_rows": 345,
+  "current_rows": 350,
+  "unchanged_rows": 341,
+  "changed_source_rows": [
+    {
+      "row_id": "rule:15:15.09:1",
+      "previous": {
+        "row_id": "rule:15:15.09:1",
+        "category": "15",
+        "locator": "15.09",
+        "title": "Snap Shooting",
+        "occurrence": 1,
+        "source_sha256": "7f0d6aae4999b69197d7e2d7d2007fad2a78a9c23e9a069c304e5e18756c5ae8",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "text",
+            "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+            "value": "\u000eEligible If"
+          },
+          {
+            "ordinal": 2,
+            "kind": "text",
+            "sha256": "0212a47eca5aee5e8798341bb08f826c4bc13513de1efcdb0f18d06c5abc6735",
+            "value": "As stated in the rule allowing this \u0005shooting type\u0006."
+          },
+          {
+            "ordinal": 3,
+            "kind": "text",
+            "sha256": "437caf5f75cd706929968d1f7b450c536c3ca2dfeec0133957ccdf6fd1c10612",
+            "value": "\u000eWhile Shooting"
+          },
+          {
+            "ordinal": 4,
+            "kind": "text",
+            "sha256": "6c39f1993c5f89f81a9ed94645e17ab58fb29de195886adac3dc3e821503d09d",
+            "value": "• You can only target \u0001one\u0002 \u0005visible\u0006 enemy unit within 24\" of your unit (and only if it is an eligible target)."
+          },
+          {
+            "ordinal": 5,
+            "kind": "text",
+            "sha256": "878fd9113703f425c98d0f90c9c6bb98465a1bd432eb53a910b6595385a1c0c8",
+            "value": "• Each attack only hits on an unmodified \u0005hit roll\u0006 of 6 (irrespective of the attacking weapon’s \u0005BS\u0006 characteristic or any modifiers)."
+          },
+          {
+            "ordinal": 6,
+            "kind": "text",
+            "sha256": "462a8f4edc4438184852d3f68fa4e9510921bf3106b207c620326901f9b13944",
+            "value": "• You cannot re‑roll \u0005hit rolls\u0006."
+          },
+          {
+            "ordinal": 7,
+            "kind": "text",
+            "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+            "value": "\u000eEffect"
+          },
+          {
+            "ordinal": 8,
+            "kind": "text",
+            "sha256": "38b41a7c109a1b8284d8e745e38e4126a9e29d9623214f11f1fb6e4a5e9abeb0",
+            "value": "Your unit shoots as described in Making Attacks (04)."
+          },
+          {
+            "ordinal": 9,
+            "kind": "text",
+            "sha256": "3b0a419e0638b6172804599e28804af4b97411ddb84b2d8841739bdcf771bef4",
+            "value": "\u000eAfter Shooting"
+          },
+          {
+            "ordinal": 10,
+            "kind": "text",
+            "sha256": "f4667158419ad2a3efc7c444c5c7d03bd092647ae1acda8c7500d39fcc92ad78",
+            "value": "Until the end of the phase, your unit is \u0001not\u0002 \u0005eligible to start an action\u0006."
+          }
+        ],
+        "selected_provider": "Game Datamissions",
+        "historical_source_row_sha256": "143ce73dba4f291f9bb5944b67bcb91ec85eeb2cd77d99410db595d521ee0bd5",
+        "review_category": "15"
+      },
+      "current": {
+        "row_id": "rule:15:15.09:1",
+        "category": "15",
+        "locator": "15.09",
+        "title": "Snap Shooting",
+        "occurrence": 1,
+        "source_sha256": "7b8751d5410514a1e93385df76d0f02f15ca36797e8ade90b0ee5ddd168ff92a",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "text",
+            "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538"
+          },
+          {
+            "ordinal": 2,
+            "kind": "text",
+            "sha256": "0212a47eca5aee5e8798341bb08f826c4bc13513de1efcdb0f18d06c5abc6735"
+          },
+          {
+            "ordinal": 3,
+            "kind": "text",
+            "sha256": "437caf5f75cd706929968d1f7b450c536c3ca2dfeec0133957ccdf6fd1c10612"
+          },
+          {
+            "ordinal": 4,
+            "kind": "text",
+            "sha256": "6c39f1993c5f89f81a9ed94645e17ab58fb29de195886adac3dc3e821503d09d"
+          },
+          {
+            "ordinal": 5,
+            "kind": "text",
+            "sha256": "91753d7b1b9f8f59cfd3cdbf20638637eae734e43014b66bdbf1b8bf5dde92d4"
+          },
+          {
+            "ordinal": 6,
+            "kind": "text",
+            "sha256": "462a8f4edc4438184852d3f68fa4e9510921bf3106b207c620326901f9b13944"
+          },
+          {
+            "ordinal": 7,
+            "kind": "text",
+            "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d"
+          },
+          {
+            "ordinal": 8,
+            "kind": "text",
+            "sha256": "38b41a7c109a1b8284d8e745e38e4126a9e29d9623214f11f1fb6e4a5e9abeb0"
+          },
+          {
+            "ordinal": 9,
+            "kind": "text",
+            "sha256": "3b0a419e0638b6172804599e28804af4b97411ddb84b2d8841739bdcf771bef4"
+          },
+          {
+            "ordinal": 10,
+            "kind": "text",
+            "sha256": "f4667158419ad2a3efc7c444c5c7d03bd092647ae1acda8c7500d39fcc92ad78"
+          }
+        ]
+      }
+    },
+    {
+      "row_id": "rule:15:15.11:1",
+      "previous": {
+        "row_id": "rule:15:15.11:1",
+        "category": "15",
+        "locator": "15.11",
+        "title": "Heroic Intervention",
+        "occurrence": 1,
+        "source_sha256": "df759b591cf0a01391ac884dd29c436a8030346e655da7dae56e1210da9ae2a0",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "complete_heroic_clause",
+            "sha256": "391552c099c101b131feaf24c5795a6a15bc8ec82015424e0d2b4274a369a0bf",
+            "value": "1"
+          },
+          {
+            "ordinal": 2,
+            "kind": "complete_heroic_clause",
+            "sha256": "e47c531695c8f2c763f17508dfda3308a095660be97f4ffb8e184884e6c8ce0b",
+            "value": "One friendly unengaged unit within 12\" of one or more enemy units."
+          },
+          {
+            "ordinal": 3,
+            "kind": "complete_heroic_clause",
+            "sha256": "63872031d048d8dca82e993b59288898ecde8d1b8c8ba85af3bf36e64defb707",
+            "value": "You can only select a VEHICLE unit if it is a CHARACTER/WALKER unit."
+          },
+          {
+            "ordinal": 4,
+            "kind": "complete_heroic_clause",
+            "sha256": "85c981bcd5fe67e0af76d0c6a05631c0ff866faff751c81d5203b60f48c2216f",
+            "value": "End of your opponent’s Charge phase."
+          },
+          {
+            "ordinal": 5,
+            "kind": "complete_heroic_clause",
+            "sha256": "701be300664631792573eaeb1f7d94076c88e13785f5cddd83f50524b3c0e0c0",
+            "value": "Resolve a charge with your unit (11.02)."
+          },
+          {
+            "ordinal": 6,
+            "kind": "complete_heroic_clause",
+            "sha256": "ddf4515397c8f86aef486bff4271a101222e7f7fe4c26aeade836499776adc7b",
+            "value": "While doing so, before making the charge roll, you must select one of the following modes:"
+          },
+          {
+            "ordinal": 7,
+            "kind": "complete_heroic_clause",
+            "sha256": "615297bd5cfd5978a92b92db4c752c8255b26bb651021b277aebeb1e63dda9fd",
+            "value": "Leap to Defend: When selecting charge targets, you can only select enemy units that made a charge move this phase and are within the maximum distance."
+          },
+          {
+            "ordinal": 8,
+            "kind": "complete_heroic_clause",
+            "sha256": "5eba1ff81e6ae8876803ee24778192a713fee1b15d47823f4af171b8fe285861",
+            "value": "+1 CP\nInto the Fray:"
+          },
+          {
+            "ordinal": 9,
+            "kind": "complete_heroic_clause",
+            "sha256": "6fe3d5a22f99ed84b4ed0e5bd5fd6d1ae3925855457ca846c012f4caf523652a",
+            "value": "When making the charge roll, if the result is greater than 6 (after modifiers), change it to 6."
+          },
+          {
+            "ordinal": 10,
+            "kind": "complete_heroic_clause",
+            "sha256": "7511d9891b1bc2667123d4a168e7dafa62f527f2be51432e2296dd1f140561a6",
+            "value": "When selecting charge targets, you can select any enemy units that are within 6\" of your unit and within the maximum distance."
+          }
+        ],
+        "selected_provider": "40k.app Order94",
+        "historical_source_row_sha256": "80349708666d785971d28fdc05ec0f63fc9448a23352026108896c33bf1fada1",
+        "historical_blocks": [
+          {
+            "ordinal": 1,
+            "kind": "stratagem",
+            "sha256": "e6e1fe9a75d23f6d379d0d24fc8579d4962402d866fa2da9ff093eb4baab6ec0",
+            "value": "Cost: 1CP"
+          },
+          {
+            "ordinal": 2,
+            "kind": "stratagem",
+            "sha256": "aeafb115c79fb35425eb56dc737be462405b76d3a5eb83cda23a2369ab541b0a",
+            "value": "WHEN: End of your opponent’s Charge phase."
+          },
+          {
+            "ordinal": 3,
+            "kind": "stratagem",
+            "sha256": "a8258da7fe84f9e3741649ffc6ecd9835426ac31777bca5e0bdf5a6b920de119",
+            "value": "TARGET: One friendly unengaged unit within 12\" of one or more enemy units. You can only select a VEHICLE unit if it is a CHARACTER/WALKER unit."
+          },
+          {
+            "ordinal": 4,
+            "kind": "stratagem",
+            "sha256": "08d4a35016c2dc995e17738376b8abf1dfdee7396ba6dc635fa7c943fcf7c0fe",
+            "value": "EFFECT: Resolve a charge with your unit (11.02)."
+          },
+          {
+            "ordinal": 5,
+            "kind": "stratagem",
+            "sha256": "ddf4515397c8f86aef486bff4271a101222e7f7fe4c26aeade836499776adc7b",
+            "value": "While doing so, before making the charge roll, you must select one of the following modes:"
+          },
+          {
+            "ordinal": 6,
+            "kind": "stratagem",
+            "sha256": "bb768427575581f9d92f6b98af562afdfeb1b3998629e7a30c4362d8071c94d1",
+            "value": "• When selecting charge targets, you can only select enemy units that made a charge move this phase and are within the maximum distance."
+          },
+          {
+            "ordinal": 7,
+            "kind": "stratagem",
+            "sha256": "fab79a4f4667eec783665d2c6946fe5b4d5f2e4d781208197b481f639e65c924",
+            "value": "• is greater than 6 (after modifiers), change it to 6."
+          },
+          {
+            "ordinal": 8,
+            "kind": "stratagem",
+            "sha256": "42a74c7b07c95c316d5b2e4a5d67905c3f7d6bf111d75763a212a182363ee4c6",
+            "value": "can select any enemy units that are within 6\" of your unit and within the maximum distance."
+          }
+        ],
+        "review_category": "15"
+      },
+      "current": {
+        "row_id": "rule:15:15.11:1",
+        "category": "15",
+        "locator": "15.11",
+        "title": "Heroic Intervention",
+        "occurrence": 1,
+        "source_sha256": "e407ce0a8f58f5ceeb5eb88a9553346f97ac3801ec1d6fc3880e1c2a513c629c",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "stratagem",
+            "sha256": "e6e1fe9a75d23f6d379d0d24fc8579d4962402d866fa2da9ff093eb4baab6ec0"
+          },
+          {
+            "ordinal": 2,
+            "kind": "stratagem",
+            "sha256": "aeafb115c79fb35425eb56dc737be462405b76d3a5eb83cda23a2369ab541b0a"
+          },
+          {
+            "ordinal": 3,
+            "kind": "stratagem",
+            "sha256": "a8258da7fe84f9e3741649ffc6ecd9835426ac31777bca5e0bdf5a6b920de119"
+          },
+          {
+            "ordinal": 4,
+            "kind": "stratagem",
+            "sha256": "08d4a35016c2dc995e17738376b8abf1dfdee7396ba6dc635fa7c943fcf7c0fe"
+          },
+          {
+            "ordinal": 5,
+            "kind": "stratagem",
+            "sha256": "ddf4515397c8f86aef486bff4271a101222e7f7fe4c26aeade836499776adc7b"
+          },
+          {
+            "ordinal": 6,
+            "kind": "stratagem",
+            "sha256": "bb768427575581f9d92f6b98af562afdfeb1b3998629e7a30c4362d8071c94d1"
+          },
+          {
+            "ordinal": 7,
+            "kind": "stratagem",
+            "sha256": "fab79a4f4667eec783665d2c6946fe5b4d5f2e4d781208197b481f639e65c924"
+          },
+          {
+            "ordinal": 8,
+            "kind": "stratagem",
+            "sha256": "42a74c7b07c95c316d5b2e4a5d67905c3f7d6bf111d75763a212a182363ee4c6"
+          }
+        ]
+      }
+    },
+    {
+      "row_id": "rule:16:16.01:1",
+      "previous": {
+        "row_id": "rule:16:16.01:1",
+        "category": "16",
+        "locator": "16.01",
+        "title": "Performing Actions",
+        "occurrence": 1,
+        "source_sha256": "9ace4fc09f4a890c9ed17ace0ba98e9863db6dff5f73eb55e767db04805c573d",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "text",
+            "sha256": "ef261d8adc04210e71573d666c9d32b644ee4c0ffb4a3793151f2dc647f45dda",
+            "value": "Some rules allow units to perform \u0005actions\u0006. Each \u0005action\u0006 states:"
+          },
+          {
+            "ordinal": 2,
+            "kind": "text",
+            "sha256": "91de304ec8e3f9f088a4db408db11d0439851071afd4e54146039ec1630f3c56",
+            "value": "■ \u0005STARTS\u0006: When it is started."
+          },
+          {
+            "ordinal": 3,
+            "kind": "text",
+            "sha256": "e723e2c4c2d727113e247445ff64e5fc646e31e9fb97882ff0e5818f6a8ef7bb",
+            "value": "■ \u0005UNITS\u0006: Which friendly units can perform it."
+          },
+          {
+            "ordinal": 4,
+            "kind": "text",
+            "sha256": "c2095c661a12787c95262bd9dff1cd6ff88a5052697fbb63a15113d1ff2cf32f",
+            "value": "■ \u0005USE LIMIT\u0006: How many times friendly units can start it."
+          },
+          {
+            "ordinal": 5,
+            "kind": "text",
+            "sha256": "f9b330bd7ac49cf5ea10cb929aaba5013b34cfb16cfac234feb7c912467a3b05",
+            "value": "■ \u0005COMPLETES\u0006: When it completes."
+          },
+          {
+            "ordinal": 6,
+            "kind": "text",
+            "sha256": "519e6437a65191ef1cb90e94c97baedc141e9ec0fcfa1046fcda7c27fd0b81bd",
+            "value": "■ \u0005EFFECT\u0006: What the effects of completing it are."
+          },
+          {
+            "ordinal": 7,
+            "kind": "text",
+            "sha256": "39b30d4371bfd30e31fd046053b74015233ad26f3f8cbacc07d7570cc8ee86f6",
+            "value": "■ Any additional restrictions that may apply."
+          },
+          {
+            "ordinal": 8,
+            "kind": "text",
+            "sha256": "4820b09f14a591d7b3692cf51652bfd0cafe23f1642d18c7af0a0cc0634cfb98",
+            "value": "\u0005STARTING AN ACTION\u0006"
+          },
+          {
+            "ordinal": 9,
+            "kind": "text",
+            "sha256": "eebf7042f66395ff02934b69df1f0b6342ff6470b2fabb28335db0fba8adaf97",
+            "value": "A unit is\u0005eligible to start an action\u0006 unless one or more of the following apply to that unit:"
+          },
+          {
+            "ordinal": 10,
+            "kind": "text",
+            "sha256": "aa1270c5752220250f6b3ede7eb62a05fb30e753245ad57d76f2b750f47edb87",
+            "value": "■ It is not on the battlefield."
+          },
+          {
+            "ordinal": 11,
+            "kind": "text",
+            "sha256": "3463515bf98175b3be8c2d5ab9fc1b0618e83bf2111b3ac270641d7ba739716d",
+            "value": "■ It is an \u0003AIRCRAFT/FORTIFICATION\u0004 unit."
+          },
+          {
+            "ordinal": 12,
+            "kind": "text",
+            "sha256": "d2b31c302424847c2681339659a53e366544826fc39128cb0321a2064cbf0cda",
+            "value": "■ It is \u0005battle-shocked\u0006."
+          },
+          {
+            "ordinal": 13,
+            "kind": "text",
+            "sha256": "408162c4f8ac8913618e6e649bba85a1a305edc11054bf3c746474492e0fde79",
+            "value": "■ It has an \u0005OC\u0006 characteristic of 0 or ‘-’."
+          },
+          {
+            "ordinal": 14,
+            "kind": "text",
+            "sha256": "092d3007742bd0fcbfe037b67b4a077987fde0ee36d187acb859e904068d304b",
+            "value": "■ It is \u0005engaged\u0006 (unless it is a \u0003TITANIC\u0004 unit)."
+          },
+          {
+            "ordinal": 15,
+            "kind": "text",
+            "sha256": "c583e6816f725f36ffa961e2fdbd670753de593be711f3250588d41aeb8009ac",
+            "value": "■ It made an \u0005advance\u0006 or\u0006fall-back\u0006 move this turn."
+          },
+          {
+            "ordinal": 16,
+            "kind": "text",
+            "sha256": "bf17213af1f0ee1f4cc7d5779e67e1f5bfa512a05cae9523ac9af876cb4ecfbe",
+            "value": "■ It started another \u0005action\u0006 this turn."
+          },
+          {
+            "ordinal": 17,
+            "kind": "text",
+            "sha256": "12aeaede60492ea5ce0909c9e9b71f90948646c9aa98d733d415ae09de359006",
+            "value": "If a unit starts an \u0005action\u0006, until the end of the turn:"
+          },
+          {
+            "ordinal": 18,
+            "kind": "text",
+            "sha256": "cb3d69be514576b611c32da55b716957ea81788188dc9d3c3ed6358f0c57e27d",
+            "value": "■ It is not \u0005eligible to shoot\u0006 (excluding \u0003TITANIC\u0004 units)."
+          },
+          {
+            "ordinal": 19,
+            "kind": "text",
+            "sha256": "c0c9c652a873be50288f75f99405622f0b4910125a873472751322eb0ca7e585",
+            "value": "■ It is not \u0005eligible to declare a charge.\u0006"
+          },
+          {
+            "ordinal": 20,
+            "kind": "text",
+            "sha256": "be1cd406d7f06d2ad78add54218fb301108dbc80b4f9355efe6819363d8a33c8",
+            "value": "\u0005COMPLETING AN ACTION\u0006"
+          },
+          {
+            "ordinal": 21,
+            "kind": "text",
+            "sha256": "47e0a220c982502a5b2ab5777d351437522614a512155519f4315ed3a0c8a570",
+            "value": "If a unit performing an \u0005action\u0006 makes a move (excluding \u0005pile-in\u0006 and \u0005consolidation moves\u0006) or leaves the battlefield, that unit does not complete that \u0005action\u0006. Otherwise, when an \u0005action\u0006 is completed, its ‘Effect’ section is triggered."
+          },
+          {
+            "ordinal": 22,
+            "kind": "callout",
+            "sha256": "e2ef9d530aaf7cf34cb0578284925d326f74d80cb2ec6ddfe2e96efcca7285f7",
+            "value": {
+              "title": "Where To Find Actions",
+              "body": "The actions players can use can be found in other publications such as mission packs. All players can use core actions, while other actions may have restrictions such as army faction."
+            }
+          }
+        ],
+        "selected_provider": "Game Datamissions",
+        "historical_source_row_sha256": "4f34b5f837679a022826bdfc1cd30cc04426e38d5d3c69a1a869783d2f791c40",
+        "review_category": "16"
+      },
+      "current": {
+        "row_id": "rule:16:16.01:1",
+        "category": "16",
+        "locator": "16.01",
+        "title": "Performing Actions",
+        "occurrence": 1,
+        "source_sha256": "19b3cd2eaa9f36060d8eff197121cfc0989562ece20f01ec1c31970796d76241",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "text",
+            "sha256": "ef261d8adc04210e71573d666c9d32b644ee4c0ffb4a3793151f2dc647f45dda"
+          },
+          {
+            "ordinal": 2,
+            "kind": "text",
+            "sha256": "91de304ec8e3f9f088a4db408db11d0439851071afd4e54146039ec1630f3c56"
+          },
+          {
+            "ordinal": 3,
+            "kind": "text",
+            "sha256": "e723e2c4c2d727113e247445ff64e5fc646e31e9fb97882ff0e5818f6a8ef7bb"
+          },
+          {
+            "ordinal": 4,
+            "kind": "text",
+            "sha256": "c2095c661a12787c95262bd9dff1cd6ff88a5052697fbb63a15113d1ff2cf32f"
+          },
+          {
+            "ordinal": 5,
+            "kind": "text",
+            "sha256": "f9b330bd7ac49cf5ea10cb929aaba5013b34cfb16cfac234feb7c912467a3b05"
+          },
+          {
+            "ordinal": 6,
+            "kind": "text",
+            "sha256": "519e6437a65191ef1cb90e94c97baedc141e9ec0fcfa1046fcda7c27fd0b81bd"
+          },
+          {
+            "ordinal": 7,
+            "kind": "text",
+            "sha256": "39b30d4371bfd30e31fd046053b74015233ad26f3f8cbacc07d7570cc8ee86f6"
+          },
+          {
+            "ordinal": 8,
+            "kind": "text",
+            "sha256": "4820b09f14a591d7b3692cf51652bfd0cafe23f1642d18c7af0a0cc0634cfb98"
+          },
+          {
+            "ordinal": 9,
+            "kind": "text",
+            "sha256": "788d75a74f93d9c415652e7ab9b8e52ea7b978dec21b662031ba730091970ab7"
+          },
+          {
+            "ordinal": 10,
+            "kind": "text",
+            "sha256": "aa1270c5752220250f6b3ede7eb62a05fb30e753245ad57d76f2b750f47edb87"
+          },
+          {
+            "ordinal": 11,
+            "kind": "text",
+            "sha256": "3463515bf98175b3be8c2d5ab9fc1b0618e83bf2111b3ac270641d7ba739716d"
+          },
+          {
+            "ordinal": 12,
+            "kind": "text",
+            "sha256": "d2b31c302424847c2681339659a53e366544826fc39128cb0321a2064cbf0cda"
+          },
+          {
+            "ordinal": 13,
+            "kind": "text",
+            "sha256": "408162c4f8ac8913618e6e649bba85a1a305edc11054bf3c746474492e0fde79"
+          },
+          {
+            "ordinal": 14,
+            "kind": "text",
+            "sha256": "092d3007742bd0fcbfe037b67b4a077987fde0ee36d187acb859e904068d304b"
+          },
+          {
+            "ordinal": 15,
+            "kind": "text",
+            "sha256": "c583e6816f725f36ffa961e2fdbd670753de593be711f3250588d41aeb8009ac"
+          },
+          {
+            "ordinal": 16,
+            "kind": "text",
+            "sha256": "bf17213af1f0ee1f4cc7d5779e67e1f5bfa512a05cae9523ac9af876cb4ecfbe"
+          },
+          {
+            "ordinal": 17,
+            "kind": "text",
+            "sha256": "12aeaede60492ea5ce0909c9e9b71f90948646c9aa98d733d415ae09de359006"
+          },
+          {
+            "ordinal": 18,
+            "kind": "text",
+            "sha256": "cb3d69be514576b611c32da55b716957ea81788188dc9d3c3ed6358f0c57e27d"
+          },
+          {
+            "ordinal": 19,
+            "kind": "text",
+            "sha256": "c0c9c652a873be50288f75f99405622f0b4910125a873472751322eb0ca7e585"
+          },
+          {
+            "ordinal": 20,
+            "kind": "text",
+            "sha256": "be1cd406d7f06d2ad78add54218fb301108dbc80b4f9355efe6819363d8a33c8"
+          },
+          {
+            "ordinal": 21,
+            "kind": "text",
+            "sha256": "47e0a220c982502a5b2ab5777d351437522614a512155519f4315ed3a0c8a570"
+          },
+          {
+            "ordinal": 22,
+            "kind": "callout",
+            "sha256": "e2ef9d530aaf7cf34cb0578284925d326f74d80cb2ec6ddfe2e96efcca7285f7"
+          }
+        ]
+      }
+    },
+    {
+      "row_id": "rule:18:18.07:1",
+      "previous": {
+        "row_id": "rule:18:18.07:1",
+        "category": "18",
+        "locator": "18.07",
+        "title": "Shock Disembark Move",
+        "occurrence": 1,
+        "source_sha256": "e025777aff6de7c7295be2f0c857794148f2fdbdafc28f5f1df304655e7a2c41",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "text",
+            "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+            "value": "\u000eEligible If"
+          },
+          {
+            "ordinal": 2,
+            "kind": "text",
+            "sha256": "1b28381a5ba67e67046a9ad9afdeb8b5d5f3b2dd0ec6d223b8dd842825398b9e",
+            "value": "As stated in the rule allowing this \u0005move type\u0006, if all of the following apply to your unit:"
+          },
+          {
+            "ordinal": 3,
+            "kind": "text",
+            "sha256": "2641f7519e95c82f4cc156f0d0c0454f1573663b2ddd70b6ac81862792bd6bd4",
+            "value": "• Embarked within a \u0003TRANSPORT\u0004 model that is on the battlefield."
+          },
+          {
+            "ordinal": 4,
+            "kind": "text",
+            "sha256": "858e26c8aa849217d8b9db0ccb156d8a3997054d43070e099e384d0f37c9c975",
+            "value": "• Did not embark within that \u0003TRANSPORT\u0004 this phase."
+          },
+          {
+            "ordinal": 5,
+            "kind": "text",
+            "sha256": "246e8e2a3323d6176f0e973b99132e4dd0f3a2d32b6ea38914cf8871f1ba7bce",
+            "value": "\u000eSet-up Distance"
+          },
+          {
+            "ordinal": 6,
+            "kind": "text",
+            "sha256": "cf5630109b61705abfcdbf909552434abb870aea10da2d0ab3b1919d2420d2f7",
+            "value": "3\""
+          },
+          {
+            "ordinal": 7,
+            "kind": "text",
+            "sha256": "e71c12176330a1cb6bd961af93620cfe60c68b59704dac7bff9b61bc09d3c041",
+            "value": "\u000eWhile Moving"
+          },
+          {
+            "ordinal": 8,
+            "kind": "text",
+            "sha256": "8b0586e250eae8733522cdc99db37465bbe764f6018a548a7f9ac51f94e98501",
+            "value": "Set up each model in your unit wholly within the \u0005set‑up distance\u0006 of that \u0003TRANSPORT\u0004."
+          },
+          {
+            "ordinal": 9,
+            "kind": "text",
+            "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+            "value": "\u000eEffect"
+          },
+          {
+            "ordinal": 10,
+            "kind": "text",
+            "sha256": "3bff857cc0c2bc7405ac2d12f84203034581c95d4ff2d73da5b0ac78f9305401",
+            "value": "Your unit is set up as described in Set Up (Core Rules, 03.02)."
+          },
+          {
+            "ordinal": 11,
+            "kind": "text",
+            "sha256": "93f7fc4c73f4450e9f798302b2574b0462ae4f1e7e6ad9d40f4c7e9d6026a315",
+            "value": "\u000eAfter Moving"
+          },
+          {
+            "ordinal": 12,
+            "kind": "text",
+            "sha256": "44d6e04f94c70a077ca88e60ec0dfe4cab69ea2e00d79e1a1e6b3e0894ad828e",
+            "value": "Each model that started this move \u0005engaged\u0005 with an enemy unit must still be \u0005engaged\u0005 with that enemy unit. If one or more enemy units \u0005engaged\u0006 with your unit have not been \u0005selected to fight\u0006 this phase, your opponent must select each of those units, one at a time; when each is selected, it becomes \u0005eligible to fight\u0006 and is \u0005selected to fight\u0006"
+          }
+        ],
+        "selected_provider": "Game Datamissions",
+        "historical_source_row_sha256": "b261754c36831aa85c2b192ff64cdfcc8324a812a37a4ee53d48c5552c7bf51f",
+        "review_category": "18"
+      },
+      "current": {
+        "row_id": "rule:18:18.07:1",
+        "category": "18",
+        "locator": "18.07",
+        "title": "Shock Disembark Move",
+        "occurrence": 1,
+        "source_sha256": "1747a6ed39b7eeb9a7e5d45284cddea38c3148e9bbeeab30fadd00fc475dbd93",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "text",
+            "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538"
+          },
+          {
+            "ordinal": 2,
+            "kind": "text",
+            "sha256": "1b28381a5ba67e67046a9ad9afdeb8b5d5f3b2dd0ec6d223b8dd842825398b9e"
+          },
+          {
+            "ordinal": 3,
+            "kind": "text",
+            "sha256": "2641f7519e95c82f4cc156f0d0c0454f1573663b2ddd70b6ac81862792bd6bd4"
+          },
+          {
+            "ordinal": 4,
+            "kind": "text",
+            "sha256": "858e26c8aa849217d8b9db0ccb156d8a3997054d43070e099e384d0f37c9c975"
+          },
+          {
+            "ordinal": 5,
+            "kind": "text",
+            "sha256": "246e8e2a3323d6176f0e973b99132e4dd0f3a2d32b6ea38914cf8871f1ba7bce"
+          },
+          {
+            "ordinal": 6,
+            "kind": "text",
+            "sha256": "cf5630109b61705abfcdbf909552434abb870aea10da2d0ab3b1919d2420d2f7"
+          },
+          {
+            "ordinal": 7,
+            "kind": "text",
+            "sha256": "e71c12176330a1cb6bd961af93620cfe60c68b59704dac7bff9b61bc09d3c041"
+          },
+          {
+            "ordinal": 8,
+            "kind": "text",
+            "sha256": "8b0586e250eae8733522cdc99db37465bbe764f6018a548a7f9ac51f94e98501"
+          },
+          {
+            "ordinal": 9,
+            "kind": "text",
+            "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d"
+          },
+          {
+            "ordinal": 10,
+            "kind": "text",
+            "sha256": "3bff857cc0c2bc7405ac2d12f84203034581c95d4ff2d73da5b0ac78f9305401"
+          },
+          {
+            "ordinal": 11,
+            "kind": "text",
+            "sha256": "93f7fc4c73f4450e9f798302b2574b0462ae4f1e7e6ad9d40f4c7e9d6026a315"
+          },
+          {
+            "ordinal": 12,
+            "kind": "text",
+            "sha256": "4b95096dbdb372ad06a2ff95bcfe2c8f8005795e49bb948f4f213e26bae34423"
+          }
+        ]
+      }
+    }
+  ],
+  "new_complete_faqs": [
+    {
+      "id": "db020803-7564-45c9-a6d4-e4cdf463da32",
+      "question": "Can a unit be controlling more than one objective at once?",
+      "answer": "Yes."
+    },
+    {
+      "id": "8c51d370-70b2-46c7-abaa-228b55c830c3",
+      "question": "When determining control over an objective, can the same model's OC count towards more than one objective that model is within range of?",
+      "answer": "Yes."
+    },
+    {
+      "id": "f1507145-5606-474c-ba71-f5c92f2d6faf",
+      "question": "If a rule's effect lasts until the end of a specific part of the battle (e.g. until the end of the phase, until the end of the turn), is that rule still in effect at the end of that part of the battle?",
+      "answer": "Yes. For example, if an ability gave a unit +1 OC until the end of the turn, at the end of the turn, that unit would still have +1 OC. That unit would not have +1 OC at the start of the next turn."
+    },
+    {
+      "id": "9638115f-b94b-4d05-ba62-df9fba2805ac",
+      "question": "When a model overhangs the edge of the battlefield, how does that affect its visibility?",
+      "answer": "That model's controlling player can draw line of sight from any part of that model that is not overhanging the edge of the battlefield. Their opponent can draw line of sight to any part of that model."
+    },
+    {
+      "id": "3da822cb-4a7c-44d2-8a9d-b867b4c4aed8",
+      "question": "When does a model's or unit's ability in an attached unit apply to all models in that unit?",
+      "answer": "A rule that applies to 'this/that unit' or 'models in this/that unit' applies to all models in an attached unit. Rules that just apply to one model in an attached unit (for example, a rule that grants a model Feel No Pain or Lone Operative) only apply to that model, not to all models in the attached unit."
+    }
+  ],
+  "translations": [
+    {
+      "entry": {
+        "ref": "FAQ",
+        "title": "Can I use the Insane Bravery stratagem on a battle-shocked unit?",
+        "kind": "translations",
+        "locales": [
+          "zh"
+        ]
+      },
+      "complete_current_english": {
+        "id": "421a6f30-63e2-4e1f-b352-99b643637c53",
+        "question": "Can I use the Insane Bravery stratagem on a battle-shocked unit?",
+        "answer": "No, as a unit's controlling player cannot target that unit with stratagems (01.07)."
+      },
+      "previous_complete_english": {
+        "row_id": "faq:421a6f30-63e2-4e1f-b352-99b643637c53",
+        "category": "FAQ",
+        "locator": "421a6f30-63e2-4e1f-b352-99b643637c53",
+        "title": "FAQ 50",
+        "occurrence": 1,
+        "source_sha256": "c5ad1503a94c734aa9f1d0dadca11d1daa19dc63928131659eb8214c5f4c7724",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "question",
+            "sha256": "17ecd52861b3ea2da3e680e9baf7e22da1d12806ca7399d2ca023d4c4101dde0",
+            "value": "Can I use the Insane Bravery stratagem on a battle-shocked unit?"
+          },
+          {
+            "ordinal": 2,
+            "kind": "answer",
+            "sha256": "d5f9e4f950c46dd73fbe706b75dcc98dd96e84ba2fc7d3b600d8ead3898c0833",
+            "value": "No, as a unit's controlling player cannot target that unit with stratagems (01.07)."
+          }
+        ],
+        "selected_provider": "Game Datamissions",
+        "historical_source_row_sha256": "c72783394b10a1dccf9c97b67a55bb3e9e28ac9b33fd0ef695bede5abaed3100",
+        "review_category": "15"
+      },
+      "english_source_sha256_unchanged": true
+    },
+    {
+      "entry": {
+        "ref": "FAQ",
+        "title": "Do a unit's abilities continue to function while they are embarked within a TRANSPORT?",
+        "kind": "translations",
+        "locales": [
+          "zh"
+        ]
+      },
+      "complete_current_english": {
+        "id": "7ac6c358-0263-49ff-aee7-28b8fd4b5b8b",
+        "question": "Do a unit's abilities continue to function while they are embarked within a TRANSPORT?",
+        "answer": "Yes, within the restrictions specified by the ability itself. Embarked units are Not On The Battlefield (01.02.04), so any ability requiring visibility or measurement to another unit will fail. Example: Azrael is attached to an Intercessor Squad unit and embarked within a TRANSPORT, and that TRANSPORT is making a shooting attack using the Firing Deck ability. While Azrael's Supreme Grand Master ability is still technically active, it will have no effect, as the requirements of the ability are not met (the ability affects 'weapons equipped by models' in Azrael's unit, and for the purposes of Firing Deck, the TRANSPORT itself is equipped with those weapons instead)."
+      },
+      "previous_complete_english": {
+        "row_id": "faq:7ac6c358-0263-49ff-aee7-28b8fd4b5b8b",
+        "category": "FAQ",
+        "locator": "7ac6c358-0263-49ff-aee7-28b8fd4b5b8b",
+        "title": "FAQ 52",
+        "occurrence": 1,
+        "source_sha256": "736b6d704a27951f968fbcc84f7b0eca6840b08a451d353390367442244b1766",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "question",
+            "sha256": "0d2359f0952469e300ed8ad9721a173b7310d06670e7a5ccf7704ed672cc0886",
+            "value": "Do a unit's abilities continue to function while they are embarked within a TRANSPORT?"
+          },
+          {
+            "ordinal": 2,
+            "kind": "answer",
+            "sha256": "6cd771c59e08e78db18cc1c098753e503f93e266b01728b4f5a6e33253054071",
+            "value": "Yes, within the restrictions specified by the ability itself. Embarked units are Not On The Battlefield (01.02.04), so any ability requiring visibility or measurement to another unit will fail. Example: Azrael is attached to an Intercessor Squad unit and embarked within a TRANSPORT, and that TRANSPORT is making a shooting attack using the Firing Deck ability. While Azrael's Supreme Grand Master ability is still technically active, it will have no effect, as the requirements of the ability are not met (the ability affects 'weapons equipped by models' in Azrael's unit, and for the purposes of Firing Deck, the TRANSPORT itself is equipped with those weapons instead)."
+          }
+        ],
+        "selected_provider": "Game Datamissions",
+        "historical_source_row_sha256": "f0df86fe1df675a6893affaa1301697252e9156c64263ab1207ace7e683fb7a3",
+        "review_category": "01"
+      },
+      "english_source_sha256_unchanged": true
+    },
+    {
+      "entry": {
+        "ref": "FAQ",
+        "title": "Fight On Death (05.04.05) requires models awaiting such an ability to stay on the battlefield until their unit has attacked (or until the end of the phase). How do these models function while this is the case?",
+        "kind": "translations",
+        "locales": [
+          "zh"
+        ]
+      },
+      "complete_current_english": {
+        "id": "2d91a89e-59f3-410f-84cb-16644d7ea4a4",
+        "question": "Fight On Death (05.04.05) requires models awaiting such an ability to stay on the battlefield until their unit has attacked (or until the end of the phase). How do these models function while this is the case?",
+        "answer": "Models awaiting a Fight On Death ability are still present on the battlefield for all rules purposes. This includes (but is not limited to) the following regarding such models: They can be measured to by friendly/enemy abilities. They can be considered visible to friendly/enemy models where relevant. They can use their datasheet abilities. They can be targeted by stratagems. Enemy units can still be engaged with them (which may restrict the opposing player's consolidation/pile-In moves made as part of an overrun fight)."
+      },
+      "previous_complete_english": {
+        "row_id": "faq:2d91a89e-59f3-410f-84cb-16644d7ea4a4",
+        "category": "FAQ",
+        "locator": "2d91a89e-59f3-410f-84cb-16644d7ea4a4",
+        "title": "FAQ 49",
+        "occurrence": 1,
+        "source_sha256": "47c3d8041c00d1755fd01c8fc8149fccadfbd89cb238fa5d8184cadaeaaea455",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "question",
+            "sha256": "1e5b208338f4cb1ce8472d287695eb999105a4134268b2082a37ef827234dbb8",
+            "value": "Fight On Death (05.04.05) requires models awaiting such an ability to stay on the battlefield until their unit has attacked (or until the end of the phase). How do these models function while this is the case?"
+          },
+          {
+            "ordinal": 2,
+            "kind": "answer",
+            "sha256": "4ad9e5afd403dd1551f153608b455ebf7b898d7412ee542cea1535575971f91c",
+            "value": "Models awaiting a Fight On Death ability are still present on the battlefield for all rules purposes. This includes (but is not limited to) the following regarding such models: They can be measured to by friendly/enemy abilities. They can be considered visible to friendly/enemy models where relevant. They can use their datasheet abilities. They can be targeted by stratagems. Enemy units can still be engaged with them (which may restrict the opposing player's consolidation/pile-In moves made as part of an overrun fight)."
+          }
+        ],
+        "selected_provider": "Game Datamissions",
+        "historical_source_row_sha256": "252c80cd87e3e29907e2a0d4eab9c40a747e7fdc047053a435629a86eca94082",
+        "review_category": "05"
+      },
+      "english_source_sha256_unchanged": true
+    },
+    {
+      "entry": {
+        "ref": "FAQ",
+        "title": "How do modifiers to the charge roll (or to the maximum distance of the charge move, such as Take to the Skies) affect the selection of charge targets?",
+        "kind": "translations",
+        "locales": [
+          "zh"
+        ]
+      },
+      "complete_current_english": {
+        "id": "fb3b2776-c954-471b-b448-b70caa91929d",
+        "question": "How do modifiers to the charge roll (or to the maximum distance of the charge move, such as Take to the Skies) affect the selection of charge targets?",
+        "answer": "A charging unit may only select charge targets that are within the maximum distance of their charge roll, including any modifiers. If such a modifier occurs after selecting a charge target and causes that charge target to no longer be within the maximum distance, the charging unit would then select new targets (Target No Longer Eligible Or Viable, 04.03.03). Example: A unit's charge roll is 7\", and that unit has a datasheet ability which adds 1 to charge rolls: that charge's maximum distance is 8\", so you can select charge targets within 8\". Example: A FLYING unit chooses to take to the skies and rolls a charge roll of 9\"; that charge's maximum distance is 7\" (9\" minus the 2\" from taking to the skies), so you can select charge targets within 7\"."
+      },
+      "previous_complete_english": {
+        "row_id": "faq:fb3b2776-c954-471b-b448-b70caa91929d",
+        "category": "FAQ",
+        "locator": "fb3b2776-c954-471b-b448-b70caa91929d",
+        "title": "FAQ 59",
+        "occurrence": 1,
+        "source_sha256": "18f33a49e6d2f3f401aefb615c84a2d4d373c9b382b5bb38252504d517bc8662",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "question",
+            "sha256": "a96ae643606ba917a754075bdc88eacfc81fe6c253f593dcf8c32c0ac6233681",
+            "value": "How do modifiers to the charge roll (or to the maximum distance of the charge move, such as Take to the Skies) affect the selection of charge targets?"
+          },
+          {
+            "ordinal": 2,
+            "kind": "answer",
+            "sha256": "9dcf4016d536c714ec1dd6fbdd29e27e07db01ee636a22e0b3a33b6ba62d0d06",
+            "value": "A charging unit may only select charge targets that are within the maximum distance of their charge roll, including any modifiers. If such a modifier occurs after selecting a charge target and causes that charge target to no longer be within the maximum distance, the charging unit would then select new targets (Target No Longer Eligible Or Viable, 04.03.03). Example: A unit's charge roll is 7\", and that unit has a datasheet ability which adds 1 to charge rolls: that charge's maximum distance is 8\", so you can select charge targets within 8\". Example: A FLYING unit chooses to take to the skies and rolls a charge roll of 9\"; that charge's maximum distance is 7\" (9\" minus the 2\" from taking to the skies), so you can select charge targets within 7\"."
+          }
+        ],
+        "selected_provider": "Game Datamissions",
+        "historical_source_row_sha256": "018196972240eaf3ce822079ec6f90005c36c55279dbeaf5deca16abc5483808",
+        "review_category": "11"
+      },
+      "english_source_sha256_unchanged": true
+    },
+    {
+      "entry": {
+        "ref": "FAQ",
+        "title": "If a rule refers to an 'objective marker', does this mean an 'objective'?",
+        "kind": "translations",
+        "locales": [
+          "zh"
+        ]
+      },
+      "complete_current_english": {
+        "id": "dc9911da-e156-4b48-bf9b-18f9d96d037e",
+        "question": "If a rule refers to an 'objective marker', does this mean an 'objective'?",
+        "answer": "Yes (excluding rules in the Core Rules)'."
+      },
+      "previous_complete_english": {
+        "row_id": "faq:dc9911da-e156-4b48-bf9b-18f9d96d037e",
+        "category": "FAQ",
+        "locator": "dc9911da-e156-4b48-bf9b-18f9d96d037e",
+        "title": "FAQ 58",
+        "occurrence": 1,
+        "source_sha256": "f084d1e31353f70020957e67d0ad8821f406be29c8251048d27bf81e6664f4b3",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "question",
+            "sha256": "34ee4c1651a97b094781f86cf737a4a700bee42d60a9de7498a43a6521c1cc11",
+            "value": "If a rule refers to an 'objective marker', does this mean an 'objective'?"
+          },
+          {
+            "ordinal": 2,
+            "kind": "answer",
+            "sha256": "62088327959b1b67a43f6a9e113ed064f7b68ad8018c953fad9f1f4a6627dc33",
+            "value": "Yes (excluding rules in the Core Rules)'."
+          }
+        ],
+        "selected_provider": "Game Datamissions",
+        "historical_source_row_sha256": "ff9d848bf174f0ebb5ae6ad7150f13ce0ebfc6b375aa7a1fda2f55e9825e553b",
+        "review_category": "14"
+      },
+      "english_source_sha256_unchanged": true
+    },
+    {
+      "entry": {
+        "ref": "FAQ",
+        "title": "If both players have units with the Scouts ability, do they alternate resolving scout moves?",
+        "kind": "translations",
+        "locales": [
+          "zh"
+        ]
+      },
+      "complete_current_english": {
+        "id": "80182be3-1a44-464b-9ef6-cd9212429603",
+        "question": "If both players have units with the Scouts ability, do they alternate resolving scout moves?",
+        "answer": "Yes, players alternate resolving any pre-battle rules units from their army may have, starting with the player who will take the first turn."
+      },
+      "previous_complete_english": {
+        "row_id": "faq:80182be3-1a44-464b-9ef6-cd9212429603",
+        "category": "FAQ",
+        "locator": "80182be3-1a44-464b-9ef6-cd9212429603",
+        "title": "FAQ 54",
+        "occurrence": 1,
+        "source_sha256": "5d5056a4966de981a21706e962e5c9ea70f05377ff20fd4962f7cc7a01d5290b",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "question",
+            "sha256": "3c0fc4bbab2167e7151ea94dca03e42260922eb8bd4038937d7da201f22f8630",
+            "value": "If both players have units with the Scouts ability, do they alternate resolving scout moves?"
+          },
+          {
+            "ordinal": 2,
+            "kind": "answer",
+            "sha256": "1ab46438b0f91d7e43f535c7a16e990e08dbcdd1b193d5f6fd62e1364cd4cd68",
+            "value": "Yes, players alternate resolving any pre-battle rules units from their army may have, starting with the player who will take the first turn."
+          }
+        ],
+        "selected_provider": "Game Datamissions",
+        "historical_source_row_sha256": "7e56febfac168e8ebd7df9ade38ea17dc39ea2d2126b80f418ab7e1e4f16eb7c",
+        "review_category": "24"
+      },
+      "english_source_sha256_unchanged": true
+    },
+    {
+      "entry": {
+        "ref": "FAQ",
+        "title": "My unit has access to a rule that changes the Damage characteristic of an incoming attack to 0. When such an attack is allocated to a model in that unit, is the Damage changed before or after save rolls?",
+        "kind": "translations",
+        "locales": [
+          "zh"
+        ]
+      },
+      "complete_current_english": {
+        "id": "04f15433-3ee1-4c6d-8546-29e4247dee5b",
+        "question": "My unit has access to a rule that changes the Damage characteristic of an incoming attack to 0. When such an attack is allocated to a model in that unit, is the Damage changed before or after save rolls?",
+        "answer": "After."
+      },
+      "previous_complete_english": {
+        "row_id": "faq:04f15433-3ee1-4c6d-8546-29e4247dee5b",
+        "category": "FAQ",
+        "locator": "04f15433-3ee1-4c6d-8546-29e4247dee5b",
+        "title": "FAQ 48",
+        "occurrence": 1,
+        "source_sha256": "13028847f833da09851ea0172c574d87efff63f06d924d31f67bf2fb42574b60",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "question",
+            "sha256": "1b3af955204f50c6327a32410717f7823dfc5d9d8fb7bd964655e1bb17198dc0",
+            "value": "My unit has access to a rule that changes the Damage characteristic of an incoming attack to 0. When such an attack is allocated to a model in that unit, is the Damage changed before or after save rolls?"
+          },
+          {
+            "ordinal": 2,
+            "kind": "answer",
+            "sha256": "8510a791141a0e965820f9762da2897e0504b43facb922b85b31a444d1ba7d56",
+            "value": "After."
+          }
+        ],
+        "selected_provider": "Game Datamissions",
+        "historical_source_row_sha256": "43149781855be91a0413db98e986c69d11a7544b18392e83a319f1e2e669bc8f",
+        "review_category": "05"
+      },
+      "english_source_sha256_unchanged": true
+    },
+    {
+      "entry": {
+        "ref": "FAQ",
+        "title": "Units have all the keywords of all their models, and attached units have all the keywords of all of their component units. How are destroyed models taken into account for these purposes?",
+        "kind": "translations",
+        "locales": [
+          "zh"
+        ]
+      },
+      "complete_current_english": {
+        "id": "60232b79-7a10-44a0-ac68-e27312c7ba60",
+        "question": "Units have all the keywords of all their models, and attached units have all the keywords of all of their component units. How are destroyed models taken into account for these purposes?",
+        "answer": "These statements are only true so long as the models possessing those keywords remain part of the unit; destroyed models do not contribute their keywords to their prior unit. Example: The Aspiring Sorcerer model in a unit of Rubric Marines is destroyed; as none of the remaining models in the unit possess the PSYKER keyword, that unit is no longer a PSYKER unit."
+      },
+      "previous_complete_english": {
+        "row_id": "faq:60232b79-7a10-44a0-ac68-e27312c7ba60",
+        "category": "FAQ",
+        "locator": "60232b79-7a10-44a0-ac68-e27312c7ba60",
+        "title": "FAQ 51",
+        "occurrence": 1,
+        "source_sha256": "a4fb6955c73cae19a4d09415f8b77188b6fd8542fbb0448084db0db2c56c392f",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "question",
+            "sha256": "cba0e6720c8bf7fdf2688115d9082a8c9560174f4dfbe845b53102e10062692e",
+            "value": "Units have all the keywords of all their models, and attached units have all the keywords of all of their component units. How are destroyed models taken into account for these purposes?"
+          },
+          {
+            "ordinal": 2,
+            "kind": "answer",
+            "sha256": "bb19e36f668275ba2b6a291f637cb88d3c067f4cd8b51bb37b854e1077a521c8",
+            "value": "These statements are only true so long as the models possessing those keywords remain part of the unit; destroyed models do not contribute their keywords to their prior unit. Example: The Aspiring Sorcerer model in a unit of Rubric Marines is destroyed; as none of the remaining models in the unit possess the PSYKER keyword, that unit is no longer a PSYKER unit."
+          }
+        ],
+        "selected_provider": "Game Datamissions",
+        "historical_source_row_sha256": "9c7faba5429b585026069b7615aee0936050af2b4cec09ab6b69ac3b3f870e5b",
+        "review_category": "02"
+      },
+      "english_source_sha256_unchanged": true
+    },
+    {
+      "entry": {
+        "ref": "FAQ",
+        "title": "When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them?",
+        "kind": "translations",
+        "locales": [
+          "zh"
+        ]
+      },
+      "complete_current_english": {
+        "id": "7f238e23-cd3f-40ad-aa91-c75274cc655e",
+        "question": "When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them?",
+        "answer": "Line of sight is drawn from any part of the observing model to any part of the model being observed."
+      },
+      "previous_complete_english": {
+        "row_id": "faq:7f238e23-cd3f-40ad-aa91-c75274cc655e",
+        "category": "FAQ",
+        "locator": "7f238e23-cd3f-40ad-aa91-c75274cc655e",
+        "title": "FAQ 53",
+        "occurrence": 1,
+        "source_sha256": "cf0fd95bcbcfb3ff78f04318e141c735309cc69f5f3815ab946d5a4245563333",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "question",
+            "sha256": "ffa7b7df6ce4d7349f32e20829a2384d1df1eaf4de3848e5ebf51fbce76cd9db",
+            "value": "When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them?"
+          },
+          {
+            "ordinal": 2,
+            "kind": "answer",
+            "sha256": "1854fc2c1b8e35847e2d793664e9082f6e0127760087eef993775a1fc86bef69",
+            "value": "Line of sight is drawn from any part of the observing model to any part of the model being observed."
+          }
+        ],
+        "selected_provider": "Game Datamissions",
+        "historical_source_row_sha256": "8c6749a4fecbc2bb8c12711a9ee32cf2ff0d438766a647c3f570805aaa4619c4",
+        "review_category": "06"
+      },
+      "english_source_sha256_unchanged": true
+    },
+    {
+      "entry": {
+        "ref": "FAQ",
+        "title": "When do the effects of a FLYING unit taking to the skies apply?",
+        "kind": "translations",
+        "locales": [
+          "zh"
+        ]
+      },
+      "complete_current_english": {
+        "id": "ce5fd555-a0f1-4bc9-85d3-00443143e94a",
+        "question": "When do the effects of a FLYING unit taking to the skies apply?",
+        "answer": "When that unit is selected to make a normal/advance/fall-back/charge move. Note that for an advance/charge move, this means you must declare that a unit will take to the skies before rolling for that advance/charge move."
+      },
+      "previous_complete_english": {
+        "row_id": "faq:ce5fd555-a0f1-4bc9-85d3-00443143e94a",
+        "category": "FAQ",
+        "locator": "ce5fd555-a0f1-4bc9-85d3-00443143e94a",
+        "title": "FAQ 57",
+        "occurrence": 1,
+        "source_sha256": "2202a3d04b20b42997b9a0e9a19177697bf42ee7b2b1923c4674b43faa676e9b",
+        "blocks": [
+          {
+            "ordinal": 1,
+            "kind": "question",
+            "sha256": "37f87b55a764a4d35d3469796bbf40af0686b06be9adfd1cb8a76cd6e741c67b",
+            "value": "When do the effects of a FLYING unit taking to the skies apply?"
+          },
+          {
+            "ordinal": 2,
+            "kind": "answer",
+            "sha256": "362f7db31890980091a2dd0b972b52bead0e45af3fa8aa834f7b210fba61905b",
+            "value": "When that unit is selected to make a normal/advance/fall-back/charge move. Note that for an advance/charge move, this means you must declare that a unit will take to the skies before rolling for that advance/charge move."
+          }
+        ],
+        "selected_provider": "Game Datamissions",
+        "historical_source_row_sha256": "7a655a6d50b2cc19de2706d27b5d16d52f1355cf1a465ca522b401c6b8f8b054",
+        "review_category": "21"
+      },
+      "english_source_sha256_unchanged": true
+    }
+  ],
+  "layout_intake": [
+    {
+      "ref": "Preset",
+      "title": "Take and Hold/Reconnaissance - Layout A",
+      "kind": "changed",
+      "excerpt": {
+        "before": "… - Layout A. Deployment: Sweeping Engagement.",
+        "after": "… - Layout A. Deployment: Tipping Point."
+      }
+    },
+    {
+      "ref": "Preset",
+      "title": "Take and Hold/Reconnaissance - Layout B",
+      "kind": "changed",
+      "excerpt": {
+        "before": "… - Layout B. Deployment: Crucible Of Battle.",
+        "after": "… - Layout B. Deployment: Dawn Of War."
+      }
+    },
+    {
+      "ref": "Preset",
+      "title": "Take and Hold/Reconnaissance - Layout C",
+      "kind": "changed",
+      "excerpt": {
+        "before": "… - Layout C. Deployment: Tipping Point.",
+        "after": "… - Layout C. Deployment: Search and Destroy."
+      }
+    }
+  ],
+  "layout_qualification": "Retained changelog excerpts are not complete mission preset observations. Core categories01-25 do not certify provider mission presets. Independently admitted Event Companion mission data remains separate; do not imply GDM preset equivalence.",
+  "heroic_intervention_qualification": "Current maintained-mirror15.11 remains incomplete/garbled; accepted Order94 complete review transcription and discrepancy are retained, not superseded by recency.",
+  "runtime_pass_claimed": false
+}

@@ -22,7 +22,6 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.core.visibility import TerrainVisibilityContext
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
@@ -30,6 +29,7 @@ from warhammer40k_core.engine.battlefield_state import (
     PlacementError,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.battlefield_visibility_context import battlefield_visibility_context
 from warhammer40k_core.engine.damage_allocation import (
     MortalWoundApplication,
     MortalWoundApplicationProgress,
@@ -1563,7 +1563,8 @@ def _manifesting_model_can_see_target(
         return False
     if observer_model.model_id in in_range_ids:
         return True
-    context = TerrainVisibilityContext.from_ruleset_descriptor(
+    context = battlefield_visibility_context(
+        scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         los_cache_key=shooting_visibility_cache_key(
             scenario=scenario,

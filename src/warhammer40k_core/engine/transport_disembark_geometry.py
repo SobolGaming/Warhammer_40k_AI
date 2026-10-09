@@ -212,7 +212,7 @@ def _model_wholly_within_any_transport_model(
     return any(
         DistanceMeasurementContext.from_models(
             transport_model, model
-        ).target_wholly_within_distance(distance_inches, horizontal_only=True)
+        ).target_wholly_within_distance(distance_inches)
         for transport_model in transport_models
     )
 

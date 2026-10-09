@@ -1,0 +1,132 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "precision_grouping",
+  "workload_id": "order103-target-aware-precision-v1",
+  "base_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e21b92c4972bd99a9a043e519e6041dddff79ad7caf1f1f4ae3f9509a1e42134",
+  "head_input_digest": "09da1ae782f6ad86f88259de30c3bec8abbbed2bc65d6be93b811ffc5ef867f0",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:110f573cc70342f09c3102916f918a54a64f7b50f0966cdbdb51eba2b6de970e",
+    "host": {
+      "cpu": "Apple M5 Pro",
+      "memory_bytes": 68719476736,
+      "logical_cpus": 18,
+      "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "0b0e63cba0ef8457f20ba2aa5bb4028018ef11b4a0e2cc932868534bbc76a5db",
+    "fixture_sha256": "8b131b8a1233c6da324c1f12c67a3ddf05527e56018e2a4a84108f723891f527",
+    "samples": {
+      "plain_primary/group_request": [
+        0.0001177910016849637,
+        8.475000504404306e-05,
+        8.104101289063692e-05,
+        8.20829882286489e-05,
+        8.079200051724911e-05
+      ],
+      "precision_primary/group_request": [
+        0.00011054199421778321,
+        8.641602471470833e-05,
+        8.200004231184721e-05,
+        8.083402644842863e-05,
+        7.916701724752784e-05
+      ],
+      "character_target/group_request": [
+        0.00013641704572364688,
+        0.00011070899199694395,
+        0.00010554201435297728,
+        0.00010400003520771861,
+        0.00010558305075392127
+      ],
+      "selected_precision_source/group_request": [
+        0.00012500002048909664,
+        0.00010587502038106322,
+        0.00010150001617148519,
+        9.529100498184562e-05,
+        9.55839641392231e-05
+      ],
+      "selected_random_source/restore": [
+        1.480984250025358,
+        1.450014292029664,
+        1.4362542500020936,
+        1.4782602090272121,
+        1.4765822920016944
+      ],
+      "completed_random_source/replay": [
+        0.4303968750173226,
+        0.4284752500243485,
+        0.42892249999567866,
+        0.4687627090024762,
+        0.4292355839861557
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e21b92c4972bd99a9a043e519e6041dddff79ad7caf1f1f4ae3f9509a1e42134",
+    "host": {
+      "cpu": "Apple M5 Pro",
+      "memory_bytes": 68719476736,
+      "logical_cpus": 18,
+      "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "0b0e63cba0ef8457f20ba2aa5bb4028018ef11b4a0e2cc932868534bbc76a5db",
+    "fixture_sha256": "8b131b8a1233c6da324c1f12c67a3ddf05527e56018e2a4a84108f723891f527",
+    "samples": {
+      "plain_primary/group_request": [
+        0.00010816601570695639,
+        8.283404167741537e-05,
+        7.82920396886766e-05,
+        7.995800115168095e-05,
+        7.783301407471299e-05
+      ],
+      "precision_primary/group_request": [
+        0.00010716600809246302,
+        8.237495785579085e-05,
+        7.875001756474376e-05,
+        7.929099956527352e-05,
+        8.087500464171171e-05
+      ],
+      "character_target/group_request": [
+        0.0001406670198775828,
+        0.00011295796139165759,
+        0.0001622500130906701,
+        0.00010808400111272931,
+        0.0001058329944498837
+      ],
+      "selected_precision_source/group_request": [
+        0.00013775000115856528,
+        0.00010570802260190248,
+        0.0001010000123642385,
+        9.929097723215818e-05,
+        9.745900752022862e-05
+      ],
+      "selected_random_source/restore": [
+        1.4471670840284787,
+        1.4438173330272548,
+        1.486254999996163,
+        1.4845485830446705,
+        1.491726334032137
+      ],
+      "completed_random_source/replay": [
+        0.4958067089901306,
+        0.49477366596693173,
+        0.5432202909723856,
+        0.496004750020802,
+        0.49556629202561453
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": []
+}

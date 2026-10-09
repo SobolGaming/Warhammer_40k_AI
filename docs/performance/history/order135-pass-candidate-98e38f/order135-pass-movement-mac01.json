@@ -1,0 +1,68 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "movement",
+  "workload_id": "order80-normal-move-occurrence-v1",
+  "base_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0460d846bb6453bab62839e8dad5974be3ae1b21794f84b88c0a87714107300b",
+  "head_input_digest": "6fc55ca9df1ffc8fe7db8215cb5c6235a8a68554a1b69d9d3892b01fcec349ab",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:110f573cc70342f09c3102916f918a54a64f7b50f0966cdbdb51eba2b6de970e",
+    "host": {
+      "cpu": "Apple M5 Pro",
+      "memory_bytes": 68719476736,
+      "logical_cpus": 18,
+      "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
+    "fixture_sha256": "d6bafa179e3f8cefd12214a9d4bc1d6b8a242dfd8ae8076d56abd0447cd6317e",
+    "samples": {
+      "finite": [
+        2.1942262920201756,
+        2.1869345829763915,
+        2.197594792000018
+      ],
+      "parameterized": [
+        2.0866090419876855,
+        2.080050416989252,
+        2.0787680830108
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0460d846bb6453bab62839e8dad5974be3ae1b21794f84b88c0a87714107300b",
+    "host": {
+      "cpu": "Apple M5 Pro",
+      "memory_bytes": 68719476736,
+      "logical_cpus": 18,
+      "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
+    "fixture_sha256": "d6bafa179e3f8cefd12214a9d4bc1d6b8a242dfd8ae8076d56abd0447cd6317e",
+    "samples": {
+      "finite": [
+        2.2187924169993494,
+        2.215601459000027,
+        2.2146619590057526
+      ],
+      "parameterized": [
+        2.087876834004419,
+        2.0764085830014665,
+        2.089158458984457
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": []
+}

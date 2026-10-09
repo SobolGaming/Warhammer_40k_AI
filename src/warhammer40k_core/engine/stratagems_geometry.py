@@ -206,7 +206,14 @@ def _counteroffensive_target_context_error(
     context: StratagemEligibilityContext,
     target_binding: StratagemTargetBinding,
     ruleset_descriptor: RulesetDescriptor | None,
+    respect_ordering_band: bool = True,
 ) -> str | None:
+    """Validate a target in the explicitly requested fight-eligibility scope.
+
+    The Core handler requests pre-grant eligibility. The default band query
+    remains available to direct geometry callers and historical band controls;
+    those controls alone do not establish Core Stratagem availability.
+    """
     fight_state = state.fight_phase_state
     if fight_state is None:
         return "counteroffensive_requires_fight_phase_state"
@@ -219,6 +226,7 @@ def _counteroffensive_target_context_error(
         fight_state=fight_state,
         player_id=context.player_id,
         policy=descriptor.fight_policy,
+        respect_ordering_band=respect_ordering_band,
     )
     for fight_context in contexts:
         if fight_context.unit_instance_id != target_unit_id:
@@ -829,6 +837,25 @@ def _proposal_from_result_payload(payload: JsonValue) -> StratagemTargetProposal
         return None
 
 
+def _proposal_json_equal(left: JsonValue, right: JsonValue) -> bool:
+    # JSON booleans and numbers are distinct; equal number spellings may round-trip.
+    if isinstance(left, bool) or isinstance(right, bool):
+        return type(left) is type(right) and left == right
+    if isinstance(left, dict):
+        return (
+            isinstance(right, dict)
+            and left.keys() == right.keys()
+            and all(_proposal_json_equal(value, right[key]) for key, value in left.items())
+        )
+    if isinstance(left, list):
+        return (
+            isinstance(right, list)
+            and len(left) == len(right)
+            and all(_proposal_json_equal(a, b) for a, b in zip(left, right, strict=True))
+        )
+    return left == right
+
+
 def _proposal_context_error(
     *,
     state: GameState,
@@ -843,16 +870,18 @@ def _proposal_context_error(
         return "wrong_context"
     if submitted_proposal.stratagem_id != request_proposal.stratagem_id:
         return "wrong_context"
-    if submitted_proposal.catalog_record != request_proposal.catalog_record:
+    if not _proposal_json_equal(
+        cast(JsonValue, submitted_proposal.catalog_record.to_payload()),
+        cast(JsonValue, request_proposal.catalog_record.to_payload()),
+    ):
         return "wrong_context"
     if submitted_proposal.battle_round != request_proposal.battle_round:
         return "stale_battle_round"
     if submitted_proposal.phase is not request_proposal.phase:
         return "stale_phase"
-    if (
-        request_proposal.catalog_record.definition.handler_id
-        in (CORE_RAPID_INGRESS_HANDLER_ID, CORE_FIRE_OVERWATCH_HANDLER_ID)
-        and submitted_proposal.context != request_proposal.context
+    if not _proposal_json_equal(
+        cast(JsonValue, submitted_proposal.context.to_payload()),
+        cast(JsonValue, request_proposal.context.to_payload()),
     ):
         return "wrong_context"
     return _context_state_drift(state=state, context=request_proposal.context)

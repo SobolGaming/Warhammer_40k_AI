@@ -1,0 +1,20 @@
+{
+  "schema": "order135-final-quality-historical-inputs-v1",
+  "purpose": "Exact Order132 historical source pins only. Current semantic owners and assertions continue to read current source; no expected hash or selected source is replaced.",
+  "source_commit": "f054b52fe912875bfe425cf875de3756294b5c7b",
+  "source_audit": "data/source_audits/order132/source.audit.json",
+  "files": [
+    {
+      "path": "src/warhammer40k_core/engine/transports.py",
+      "historical_path": "data/source_audits/order135/final-quality-history/src/warhammer40k_core/engine/transports.py.txt",
+      "bytes": 98751,
+      "sha256": "3487121ab241df312fa6fb797f828cb981959192e6cfb5b43d76e087e4f39041"
+    },
+    {
+      "path": "src/warhammer40k_core/engine/transport_disembark_geometry.py",
+      "historical_path": "data/source_audits/order135/final-quality-history/src/warhammer40k_core/engine/transport_disembark_geometry.py.txt",
+      "bytes": 13000,
+      "sha256": "5c3d6da3ef371144d7323d94ce034bc386a8405b389d5a875a1f482c32ef0f74"
+    }
+  ]
+}

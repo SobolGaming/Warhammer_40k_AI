@@ -1,0 +1,341 @@
+{
+  "kind": "EXACT_CURRENT98_FINITE_SEMANTIC_QUEUE_DISPOSITIONS_NOT_CLEAN",
+  "utc": "2026-10-08T15:53:48.668541+00:00",
+  "candidate_tree": "98e38fbe5d5b9d11cd82235b5a8d7ee8f420c843",
+  "historical_head": "5e45dcc9fb1af6de138ebeba4b88005c744bc3b7",
+  "historical_tree": "e0723b3fd3af49f2363c1d83a0a9552c5cba1adf",
+  "base": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+  "current_files_rechecked": 5752,
+  "current_byte_mode_errors": [],
+  "complete_individual_obligation_traces": 1078,
+  "individual_trace_artifacts": 85,
+  "selected_source_rows": 350,
+  "faq_new_bindings": 5,
+  "records": [
+    {
+      "id": "R01-B04",
+      "disposition": "APPROVED_REPAIR_PRIOR_NATIVE_PASS_CURRENT_BYTE_IDENTITY",
+      "rationale": "Corrected full3D wholephysicalparts disembark and legalretry/restore/replay priornative0d108 evidence; controlling source unchanged current98. No newnativecurrent98 rerun credit.",
+      "controlling_source": "18.04 distance/01.04.01 FRAME wholephysicalparts",
+      "actual_owner": "engine/transport_disembark_geometry.py:_model_wholly_within_any_transport_model",
+      "complete_static_evidence": "rules-source5-verdict-02.md; native-disembark-control-04; native-corrected-transport-controls-03; corrected-static-authentication-01",
+      "next_minimal_boundary": "Completed public analyticalFRAME eight-inchbody Tactical setup at13.5/10/0 nearcarrier10/10/0, engine3DwholeFalse/horizontalTrue; invalidaccepted onsource5. Correctedcontrol rejectsz20 andordinarylegalretryload/fork/Replay."
+    },
+    {
+      "id": "R02-B05",
+      "disposition": "APPROVED_REPAIR_PRIOR_NATIVE_PASS_CURRENT_BYTE_IDENTITY",
+      "rationale": "Native Dedicatedstartingcargo initialreplayanchor save/load/fork/replay prior0d108 passed; current transport owners unchanged. No newcurrent98 rerun credit.",
+      "controlling_source": "18.01 startingcargo; native valid-state save/replay acceptance",
+      "actual_owner": "engine/transport_state_integrity.py:validate_transport_cargo_states; adapters/local_session.py:initial replay anchor",
+      "complete_static_evidence": "rules-source5-verdict-02.md; native-disembark-control-06; native-disembark-restore-control-01; native-corrected-transport-controls-03",
+      "next_minimal_boundary": "Completed untouched publicDedicatedmanifest mustering beforedeployment, thennormaldeployment/Command/legalTactical; currentlifecycleloads butsessionpending/completedSave/Replayexport failcarrierunplaced inengineinitialanchor. Correctedcontrol retainsinitialanchor partialdeployment andallbranches."
+    },
+    {
+      "id": "R03-B06",
+      "disposition": "APPROVED_REPAIR_PRIOR_ASSERTIONS_PASS_TAIL_FAILURE_QUALIFIED",
+      "rationale": "Prior84e Counteroffensive normalinterrupt native assertions passed; commandexit1 own postsummary Pathimportfailure preserved. Current owner source-correct and unchanged; no current98 native renewal credit.",
+      "controlling_source": "15.12 target/window and12.04 eligible independentFFband",
+      "actual_owner": "engine/phases/fight.py:_request_counteroffensive_if_available; engine/stratagems_geometry.py:_counteroffensive_context_error",
+      "complete_static_evidence": "rules-counter-band-blocker-01.md; native-counter-band-control-02; native-counter-repair-renewal-02",
+      "next_minimal_boundary": "Completed61publicsteps R2B genuinefirstchargerattacks ends; AengagedNonFF/unselectedCP4 andFFfilteredqueryempty. Oldnooffer, correctedCoreCounterAfiniteoffer costs2CP, Aactualmelee thenresumesB2FF, live/load/fork/views/events/Replay."
+    },
+    {
+      "id": "R04-FIGHT-TRANSITION",
+      "disposition": "FRESH_CURRENT98_NATIVE_RENEWAL_PASS",
+      "rationale": "native-current98-fight-transition-01 exit0:74 genuinepublicsteps/B1 FFcompletion event000671, nextRemainingactorA; generatedload/fork/allprincipalviews/events/exactReplayPASS.",
+      "controlling_source": "12.04 blocks6/8 playerowedSelection enteringRemaining",
+      "actual_owner": "engine/phases/fight.py:_advance_to_next_fight_request; engine/fight_order.py:FightPhaseState.with_next_band",
+      "complete_static_evidence": "rules-fight-transition-blocker-01.md; native-fight-transition-control-03; pass-assertion-independent-ruling-03",
+      "next_minimal_boundary": "Completed74publicsteps R2B lastgenuineB1FF melee event000671; A1/A2+B2aliveengagedNonFF; nextrequest000080actualB2 expectedA. Wronggeneratedstate allviews/load/fork/events/Replay preserved."
+    },
+    {
+      "id": "D01-PASS-SCOPE",
+      "disposition": "FRESH_POSITIVE_PUBLIC_BOUNDARY_OBSERVED_RENEWAL_COMPLETION_UNKNOWN",
+      "rationale": "native-current98-pass-scope-01 positive all-distant publicboundary sealed; pendingcheckpoint/continuation plusnegative scene completion unknown after exec-server disconnect. Do not claimpassrenewal/executableCLEAN.",
+      "controlling_source": "12.04.01block1 ALLeligiblefriendlyunits>5, acceptedpass selectionopponent",
+      "actual_owner": "engine/fight_order.py:eligible_pass_is_available/eligible_fight_contexts_for_player; engine/phases/fight.py:invalid_fight_activation_status",
+      "complete_static_evidence": "fight-pass-scope-candidate-001.json; trace051; pass-assertion-independent-ruling-03/ruling.md",
+      "next_minimal_boundary": "AfterpublicmixedFF/NONFFlegalengagement, actorhasdistantFF butnearotherwiseeligibleNonFF. Inspectpassoffer andsubmission beforemutation. Existingprotectedfixture nearbyunit0.2center opponent, explicitlysource-invalid pass."
+    },
+    {
+      "id": "D02-ATTACK-STEP-ORDER",
+      "disposition": "REPRODUCED_NORMAL_CORE_BLOCKER_HUMAN_D02_REPAIR_APPROVED",
+      "rationale": "Fresh native current98 onephysicalpool3 genuineattacks; firstHit2 thenWound5/Commandreroll whilelater2Hits absent. Reporta0311c\u2026; fullselected05.00wording/group/roll request/loadforkReplaysealed. Human15:47 approval received; auditor made noedits. Save-order subcandidate remainsstatic-only.",
+      "controlling_source": "05.00block2 allrolls eachstep simultaneous;04.03gatheridentical;05.01/.02/.03",
+      "actual_owner": "engine/attack_sequence_grouped_allocation.py:grouped_wounded_contexts_for_pool/_roll_grouped_saves; engine/attack_sequence_dice_rerolls.py:_roll_hit_and_wound",
+      "complete_static_evidence": "traces068/069/084; complete14e3savebody injectsHitWoundpairs andprovesSavebeforeDamageonly; freshread_roll_grouped_saves",
+      "next_minimal_boundary": "Public multiattackonephysicalpool with genuineordinaryHit/WoundDice, legalCoreCommandrerollorLethalchoice. ObservefirstWound/reroll pending beforelaterHits; Save similarlyfirstSaveRerollbeforelaterSaves. NoinjectedDice/history."
+    },
+    {
+      "id": "D03-COMBAT-EXISTENTIAL",
+      "disposition": "REPRODUCED_PUBLIC_RULE_ADMISSION_BLOCKER_SEPARATE_APPROVAL_REQUIRED",
+      "rationale": "Fresh current98 samepublicrequestfork proves actualTacticallegal; fartherCombatprocessed/placed/hazard before nativeKeyError player_id. Reportd36287\u2026 fullsource/events/invalidbranchqualification sealed. No validCombat persistence credit or repairapproval inferred.",
+      "controlling_source": "18.04blocks10/12/13 Tacticalifpossible elseCombat",
+      "actual_owner": "engine/phases/movement_transports.py:_resolve_combat_disembark_placement_submission; engine/phases/movement_rules_unit_disembark.py:resolve_rules_unit_combat_disembark",
+      "complete_static_evidence": "combat-mode-candidate-001.json; trace007",
+      "next_minimal_boundary": "Public startingcargo emptyboard/unmovedcarrier withlegalTacticalnear3pose; selectCombat endpoint>3<=6 thoughdifferentTacticalposeexists."
+    },
+    {
+      "id": "D04-DISEMBARK-SHOCK",
+      "disposition": "STATIC_DISCREPANCY_VALID_NATIVE_ENTRY_UNRESOLVED",
+      "rationale": "FarCombat illegalbranch showsserializedmarker end_of_turn but noauthorityShock. It doesnot establish legalCombat/Emergency normal reachability; no native blocker promotion. Need genuine legalCombatimpossibility or actualcarrierdestruction/Emergency.",
+      "controlling_source": "18.04Combat/18.05Emergency immediateBattleShock;01.07/14OC/16Actions/15targeting",
+      "actual_owner": "engine/phases/movement_rules_unit_disembark.py:apply_rules_unit_combat_disembark_to_state; engine/game_state.py:record_disembarked_unit_state; engine/rules_units.py:rules_unit_is_battle_shocked",
+      "complete_static_evidence": "transport-battle-shock-candidate-001.json; traces007/008/085",
+      "next_minimal_boundary": "LegalCombatwhereTacticalgenuinelyimpossible ORgenuinecarrierkilled\u2192Emergencyplace survivors; queryactualShockrecord/OC/controllerStratagem/Action thenownCommand."
+    },
+    {
+      "id": "D05-DISEMBARK-CONTEXT",
+      "disposition": "STATIC_DISCREPANCY_NORMAL_NATIVE_ENTRY_UNRESOLVED",
+      "rationale": "Current ordinary component routing actualterrain/battlefield context remains sourceunresolved for requested native witness; do not infer closure from imported03.02sharedsetup. No speculative history hardening promoted.",
+      "controlling_source": "18.04sharedsetup\u219203.02\u219213.06stable/nooverhang andactualbattlefield",
+      "actual_owner": "engine/phases/movement_rules_unit_disembark.py:resolve_rules_unit_disembark/_resolve_rules_unit_combat_components; engine/standard_disembark_resolution.py:resolve_disembark",
+      "complete_static_evidence": "disembark-terrain-context-candidate-001.json; traces009/079/083",
+      "next_minimal_boundary": "PublicTacticalnearactualdenseupperfloor unsupportedoverhang oractualboard<60x44 nearcarrieredge, noengine-state edits."
+    },
+    {
+      "id": "D06-EMBARK-FRAME",
+      "disposition": "STATIC_DISCREPANCY_NORMAL_NATIVE_ENTRY_UNRESOLVED",
+      "rationale": "Horizontalbase-only embark distance concern distinctfrom approvedDisembarkrepair. Need legalstableupperFRAME/3D publicMove-embark; no arbitrarybodycert.",
+      "controlling_source": "18.02everymodelwithin3;01.04default3D;17.02FRAMEparts",
+      "actual_owner": "engine/transport_embark_validation.py:_model_within_any_transport_model",
+      "complete_static_evidence": "candidate-reconciliation-001.json STATIC-EMBARK-DISTANCE-01; traces003/006",
+      "next_minimal_boundary": "PubliclegalNormal/Advanceend onstableelevatedfloor nearcarrierhorizontal but>3vertical; separatelyFRAMEbodynearcarrier supportbase>3, physicallylegal/nooverlap."
+    },
+    {
+      "id": "D07-UPPER-KEYWORDS",
+      "disposition": "STATIC_DISCREPANCY_NORMAL_NATIVE_CONTROL_NOT_RUN",
+      "rationale": "13.06 exactsurface keywords includesSWARM/MONSTER; current canonical ruins upper tuple BEAST/BELISARIUS_CAWL/FLY/IMPERIUM_PRIMARCH/INFANTRY omitsboth. ActualCoreVehicleMonster120 hasMONSTER. Nativebroadfittingfloor request notrun due transportcoordinationpause; do not promoteonlystatic.",
+      "controlling_source": "13.06blocks12\u201314 allowedINFANTRY/BEASTS/SWARM/FLY/MONSTER",
+      "actual_owner": "core/ruleset_descriptor.py:_terrain_feature_movement_policies_for_eleventh; engine/endpoint_placement.py elevatedfloorpolicy",
+      "complete_static_evidence": "upper-floor-keywords-candidate-001.json; trace047; freshwholepolicyread",
+      "next_minimal_boundary": "PubliccanonicalCoreVehicleMonster120mmbase onstablebigRuinsupperfloor whollyfit; setup first, thennormalmove endpoint ifavailable."
+    },
+    {
+      "id": "D08-FRAME-POSITION-BOUNDARIES",
+      "disposition": "STATIC_DISCREPANCY_NORMAL_NATIVE_ENTRY_UNRESOLVED",
+      "rationale": "Need publicpredeclaredfullFRAMEIngress edge6 orenemy8/scoutinfiltrate admittedentry. Base-only geometry concerns remain boundedsourcequalification; no grant/provider/bodycert.",
+      "controlling_source": "20.04wholeedge6/enemy>8;24.09DeepStrike/24.20Infiltrate/24.31\u201332Scout;01.04FRAMEpointdistance",
+      "actual_owner": "engine/large_model_setup.py:model_bounds caller; engine/reserve_setup_geometry.py:append_strategic_reserves_edge_violations; engine/reserves.py:append_common_reserve_placement_violations; engine/prebattle.py Scout/zone; engine/deployment_geometry.py:_append_infiltrator_enemy_zone_violations",
+      "complete_static_evidence": "ingress-frame-range-candidate-001.json; traces013/020/031/039/045",
+      "next_minimal_boundary": "PregamedeclaredFRAME baseinsideedge6 butbodyinsideboardbeyondallstrip, orbodywithin8enemywhilebases>8, outsideEngagement. PublicR2Ingress first; independentlyprebattleScout/Infiltrate whenactuallyadmitted."
+    },
+    {
+      "id": "D09-HEAVY-SHORT-ADVANCE",
+      "disposition": "STATIC_DISCREPANCY_NORMAL_NATIVE_ENTRY_UNRESOLVED",
+      "rationale": "Need genuine shortAdvance and actually admittedAssault+Heavy profile/ownShooting. Current advance blanketgate sourceconcern unpromoted withoutnormalconsumer.",
+      "controlling_source": "24.16ownShooting/unengaged/noSetup/allmodelmoved<=3 only; Assaultshootingpermission",
+      "actual_owner": "engine/phases/shooting_targeting.py:_rules_unit_within_heavy_movement_allowance/_rules_unit_has_no_advance_fall_back_or_setup",
+      "complete_static_evidence": "trace037/046; freshfullpredicate+source read",
+      "next_minimal_boundary": "PublicCorepredeclaredAssault+Heavyweapon, genuineAdvance pose<=3, unengaged/notsetup, thenlegalShooting. RealMoveDice used, short endpointvalid."
+    },
+    {
+      "id": "D10-SHOOTING-PHYSICAL-PROFILE",
+      "disposition": "STATIC_DISCREPANCY_FRESH_NATIVE_PROBE_PREPARED_NOT_RUN",
+      "rationale": "Current duplicatekey includesweapon_profile_id; fresh exact-current native alternateprofile script prepared only (noengineexecution) beforetransportpause. Mustrejectonephysicalcopy dualalternative profiledecl beforequeue/history/attackpoolmutation; source-only untilactualpublicboundary.",
+      "controlling_source": "04.01.03 chooseonephysicalweaponprofile perattackselection",
+      "actual_owner": "engine/phases/shooting_declaration_validation.py:_attack_pools_or_validation/_validate_shooting_weapon_selection_limit; engine/weapon_declaration.py:ShootingDeclarationProposal",
+      "complete_static_evidence": "traces065/066; freshfulltypedproposal andselectionlimit/readduplicateguard",
+      "next_minimal_boundary": "Publicactualadmittedrangedweaponwithtwoavailableprofiles SAMEphysicalcopy; submitbothinonefreshadvertiseddeclaration."
+    },
+    {
+      "id": "D11-ONE-SHOT-PROFILE",
+      "disposition": "STATIC_DISCREPANCY_CURRENT_ADMISSION_UNRESOLVED",
+      "rationale": "OneShot allowance physicalcopy vsprofileIDs distinctD10. Need actualadmittedmultialternateOneShot/profileturn2 source; no inventedgrant/liveusagehistory.",
+      "controlling_source": "24.26onceperphysicalweapon perbattle, stableafterrevival",
+      "actual_owner": "engine/game_state.py:OneShotWeaponUseRecord/one_shot_weapon_available/record_one_shot_weapon_selected; engine/weapon_instances.py",
+      "complete_static_evidence": "trace042",
+      "next_minimal_boundary": "ActualadmittedOneShotweaponwithtwoalternateprofiles samecopy, publicfirstprofilefire thennextlegalturnalternate availability/submit."
+    },
+    {
+      "id": "D12-EPIC-CHARACTER",
+      "disposition": "STATIC_DISCREPANCY_NORMAL_NATIVE_ENTRY_UNRESOLVED",
+      "rationale": "Actualattached rulesunit withaliveplacedCharacter mustadmit eligibleindividualCharacter while rejectingbodyguardatomically/CP/Precision; logical vsphysical lookup concerns notnativeclosed.",
+      "controlling_source": "15.03aliveplacedCHARACTERmodel inselectedfriendlyunit",
+      "actual_owner": "engine/stratagems_geometry.py:_epic_challenge_context_error/_unit_by_id; engine/stratagems_effect_handlers.py:_apply_epic_challenge_handler; engine/phases/fight.py:_request_epic_challenge_if_available",
+      "complete_static_evidence": "epic-character-model-candidate-001.json; trace018",
+      "next_minimal_boundary": "PublicCoreLeaderattachedBodyguard logicalFightactivation; offeredEpic choosesactualLeader; additionallyclientchoosesadvertisedNonCharacterBodyguardifoptionexists."
+    },
+    {
+      "id": "D13-COHERENCY-CHOICE",
+      "disposition": "STATIC_DISCREPANCY_NORMAL_NATIVE_ENTRY_UNRESOLVED",
+      "rationale": "Actualturn_cleanup._next_cleanup_model_id auto deterministic removal. Source playerremovesoneatatime; genuine bridgecasualty tworepairchoices requiredbeforeblockerpromotion.",
+      "controlling_source": "03.03block5 controllingplayers removeoneatatimeuntilcoherent",
+      "actual_owner": "engine/turn_cleanup.py:_next_cleanup_model_id/resolve_end_turn_cleanup",
+      "complete_static_evidence": "trace064; freshfull_next_cleanup_model_id; currentfull03.03",
+      "next_minimal_boundary": "Publiclegalcoherentformation,genuineattackkillsbridge, own/opponentendTurncleanup withtwolegalremaining-modelremovalchoices havingdifferentweapons/OC."
+    },
+    {
+      "id": "D14-SCOUTS-MIXED",
+      "disposition": "STATIC_DISCREPANCY_ACTUAL_GRANT_ADMISSION_UNRESOLVED",
+      "rationale": "Literal mandatorylowestcommon8 vsunshared6 forgrants{6,8}/{8} sourceconcern. No actualprebattle grantconsumer/nativewitness yet; sourceexception notsilentlyinferred.",
+      "controlling_source": "24.02block2 lowestnumbernotshared;24.32doesnotaddelectionexception",
+      "actual_owner": "engine/prebattle_instance_selection.py:scout_distance_options_for_model_ids",
+      "complete_static_evidence": "trace026/045; freshfull24.02/24.32+actualfunctionread",
+      "next_minimal_boundary": "Publicactualadmittedmodel1Scouts{6,8},model2{8}; prebattlefinitechoice mustlimit6undertheliteralunsharedrule."
+    },
+    {
+      "id": "D15-TERRAIN-OBJECTIVE-CAP",
+      "disposition": "STATIC_DISCREPANCY_NATIVE_MISSION_ENTRY_UNRESOLVED",
+      "rationale": "Selectedterrainobjectivearea clause nocap vsmarker3horizontal/5vertical. Need actualtypedmissionarea andstablemodel6+ phaseendOC normalconsumer; native geometry/provider assumptions prohibited.",
+      "controlling_source": "14.02block1 rangeofterrainobjective=withinterrainarea;13.01/01.04.01basefootprintarea",
+      "actual_owner": "engine/objective_geometry.py:measure_model_to_objective terrainbranch",
+      "complete_static_evidence": "objective-range-candidate-001.json secondcandidate; trace011; freshfull14.02/wholeownerread",
+      "next_minimal_boundary": "Publiccurrenttypedterrainobjective containingstableupperInfantryatZ6+ whosebasewithinfootprint; inspectphaseendOC, actualmission/sourceadmissionfirst."
+    },
+    {
+      "id": "S16-FIGHT-SNAPSHOT",
+      "disposition": "STATIC_SOURCE_SCOPE_NORMAL_ENTRY_UNRESOLVED",
+      "rationale": "Fightstep beforeactualPileIn boundary timing candidate; need legal newlyengaged-beforeFightstep actualsequence ratherthan DURINGFightfixture.",
+      "controlling_source": "12.00PileInstepbeforeFightstep;12.04eligibility/12.06Overrun atFightSTEPstart",
+      "actual_owner": "engine/phases/fight.py:_ensure_fight_phase_state/_advance_fight_movement_step; engine/fight_order.py:_fight_eligibility_reasons_for_rules_unit",
+      "complete_static_evidence": "fight-step-snapshot-candidate-001.json; traces049\u2013051",
+      "next_minimal_boundary": "Publicinitiallyunengagedenemy legallyengagedduringordinaryPileInBEFOREFightstep; theninspectOverrun/eligibility."
+    },
+    {
+      "id": "S17-CONSOLIDATE-HISTORY",
+      "disposition": "STATIC_SOURCE_SCOPE_NORMAL_ENTRY_UNRESOLVED",
+      "rationale": "Historical evereligible vsnoweligible source; ordinaryrealcasualtysequence beforeConsolidate first; no inventedconditionalmovementgrant.",
+      "controlling_source": "12.08uniteligibletofightatANYpointduringFightphase mayConsolidate",
+      "actual_owner": "engine/phases/fight.py Consolidate contextdiscovery; engine/fight_order.py currenteligibility",
+      "complete_static_evidence": "trace052",
+      "next_minimal_boundary": "Genuinefight makesunittemporarilyeligible, targetlaterkilled/movesbyactualadmittedsourcebeforeConsolidate andcurrentengagementlost; noinventedmovegrant."
+    },
+    {
+      "id": "S18-OBJECTIVE-AXIS",
+      "disposition": "SOURCE_INTERPRETATION_UNRESOLVED_NOT_REPRODUCED_BLOCKER",
+      "rationale": "Correlatedsamephysicalpart vsseparatehorizontal/vertical minima fullsource tension unresolved; no bodycert or incorrectrulesverdict merelyfrom unusedwithin_axis_limits helper.",
+      "controlling_source": "14.01.01within3horizontalAND5vertical;01.04physicalpointsemantics",
+      "actual_owner": "engine/objective_geometry.py:measure_model_to_objective markerbranch; geometry/measurement.py:within_axis_limits",
+      "complete_static_evidence": "objective-range-candidate-001.json firstcandidate; trace011; freshactualownerread",
+      "next_minimal_boundary": "PredeclaredFRAME higharmXYclosevertical6, groundbaseXY>3; noonepartmeetsboth. Actualcurrentmissionmarker/nativelegalsetupthenquery."
+    },
+    {
+      "id": "S19-EMERGENCY-PHYSICAL-PROOF",
+      "disposition": "STATIC_PROOF_SCOPE_NORMAL_ENTRY_UNRESOLVED",
+      "rationale": "Emergency omitted/closest fullFRAME vsbase-onlyexistence proof; genuinecarrierkillednativeentry required. Exactbasepolygoncertificate notallbodyproof; B04notautomaticclosure.",
+      "controlling_source": "18.05closestlegal/omitonlyunplaceable;01.04FRAMEallparts",
+      "actual_owner": "engine/emergency_disembark_placement.py:_append_omission/append_emergency_disembark_placement_violations; geometry/emergency_setup_proof.py:_plane_formula",
+      "complete_static_evidence": "traces008/083",
+      "next_minimal_boundary": "Actualcarrierkilled nativeEmergency withpredeclaredFRAMEretainedfullpartswherebase-onlyalternative closest/omission differs, genuinehazards."
+    },
+    {
+      "id": "S20-PATH-BODY-DISCOVERY",
+      "disposition": "STATIC_PROOF_SCOPE_NORMAL_ENTRY_UNRESOLVED",
+      "rationale": "Thinwall sampledposes vscontinuousphysicalpath candidate; actualadmittedforbiddenDensewall publicwitness required; no arbitrarygeometrycertificate or universalperformance inference.",
+      "controlling_source": "03.01allpathnotthroughforbidden;13.06Densefloor/contact;17.02FRAME",
+      "actual_owner": "geometry/pathing.py sampled touchingposes; geometry/terrain_transit.py:forbidden_dense_floor_crossing; geometry/pathing.py climbcontact",
+      "complete_static_evidence": "traces047/061",
+      "next_minimal_boundary": "PublicordinarynonpermittedVehiclelegalwitness crossesverythinDensewallbetween.5inch/1degree discovery samples; separatelybodyextendsabovebase crossingfloorwhilebaseZbelow, orunselectedFlywalkingverticalcontact."
+    },
+    {
+      "id": "S21-PLUNGING-SOURCE-SCOPE",
+      "disposition": "STATIC_SOURCE_ADMISSION_UNRESOLVED",
+      "rationale": "ActualdeclaredDenseheight/floor andmixedTowering/admittedunit source required; synthetichelperflags notnaturalproviderproof. No faction/providercert.",
+      "controlling_source": "22.05requiresupperDensefeatureheight+currentmodelscope/TOWERING12",
+      "actual_owner": "engine/shooting_targets.py:_plunging_fire_applies (full current operative geometry/source/model gates)",
+      "complete_static_evidence": "trace015; all25categoryindividualrecords",
+      "next_minimal_boundary": "Publicterrainfloor/baseZ differsdeclaredfeatureheight6+, mixedtargetTowering+ordinary whereactualadmittedCorecatalog; verifyselectedsource geometryactualbeforeprofilemod."
+    },
+    {
+      "id": "S22-LONE-VISIBILITY",
+      "disposition": "CONDITIONAL_ADMITTED_CONSUMER_UNRESOLVED_NOT_CORE_BLOCKER_BY_ABSENCE",
+      "rationale": "CurrentCoreExplosives8 insideLone12 cannotprove>12 visibilitydefect. Need actuallyadmittedability visibility>12 orfullsourceinterpretationdisproof; missingfuturegrant alone notCoreblocker.",
+      "controlling_source": "24.24default12directvisibilityonly/24.24.01alllivingmodels",
+      "actual_owner": "engine/shooting_targets.py:unit_has_line_of_sight_to_target; engine/generic_rule_attack_hooks.py visible_enemy consumer; engine/lone_operative.py:lone_operative_profile_for_rules_unit",
+      "complete_static_evidence": "trace041/046",
+      "next_minimal_boundary": "Actualadmittedvisibility-requiringabilitytoenemyLone>12; currentCoreExplosives8 isINSIDE12andcannotshowdefect."
+    },
+    {
+      "id": "S23-DEVASTATING-ZERO",
+      "disposition": "CONDITIONAL_GRANT_ADMISSION_UNRESOLVED_NOT_CORE_BLOCKER_BY_ABSENCE",
+      "rationale": "Need actualadmittedterminalDamageSET0 +DevWcritical. FixedDamage0 rejection doesnotdisprove validmodifierSET0; no livegrantinjection/futuregrantinvented.",
+      "controlling_source": "24.10mortaldamage=Damagecharacteristic;02.02.01terminalSET0",
+      "actual_owner": "engine/weapon_abilities.py:devastating_wounds_resolution; engine/deferred_mortal_wounds.py:DeferredMortalWounds.__post_init__",
+      "complete_static_evidence": "trace032/070; actualModifierStackSET0 preserved",
+      "next_minimal_boundary": "ActualadmittedDamageSET0grant pluscriticalDevW ownweapon; nolivehistory/grantinjection."
+    },
+    {
+      "id": "S24-OUTPHASE-FIRING-DECK",
+      "disposition": "CONDITIONAL_CONSUMER_NORMAL_ENTRY_UNRESOLVED",
+      "rationale": "Actualnativecargo/FiringDeck CoreOverwatch phaseguard required; borrowed ownphaseprofilebody insufficient; missingfuturecapacitygrant notCoreblocker alone.",
+      "controlling_source": "18.08FiringDeck inyourShootingphase",
+      "actual_owner": "engine/phases/shooting_firing_deck.py:_available_firing_deck_weapons; engine/phases/shooting_declaration_validation.py outphaseinventory",
+      "complete_static_evidence": "trace009 andcurrentall1078rawqualification",
+      "next_minimal_boundary": "ActualCoreOverwatchTransportwithgenuinecargo/FiringDeck outsideownShooting; inspectofferedborrowedweapon andactualshoot."
+    },
+    {
+      "id": "S25-IDENTICAL-POOL",
+      "disposition": "STATIC_SEMANTIC_POOL_NORMAL_EFFECT_UNRESOLVED",
+      "rationale": "FreshD02 sequence signature includesattackerModel butsinglebearer doesnotprove multi-bearer grouping effect. Mustretaincausality/fullvisibility differences; no blind identityfieldremovalproposal.",
+      "controlling_source": "04.03block4 mandatorygatherALLidentical;04.03.01sameoperativecharacteristics/rules",
+      "actual_owner": "engine/attack_sequence_selection.py:identical_attack_signature",
+      "complete_static_evidence": "trace067; freshcomplete04sources/actualsignature",
+      "next_minimal_boundary": "TwoactualCorebearers samefixedprofiles/applicableabilities/rules,targetfullyvisible/inrange andsameallocatedcausality; actualnormalshootpoolselection."
+    },
+    {
+      "id": "T26-DEMISE-REMOVAL",
+      "disposition": "OWNER_INTERPRETATION_RESOLVED_ORDINARY_NATIVE_VERIFICATION_UNRESOLVED",
+      "rationale": "Exact11:34 owner clarification retainsdestroyedmodelthroughFOD, enemyordinarycasualtycleanup thenownDDbeforephysicalremoval; legitimateenemyFODretention preserved. Staticoperativeowners sourcecompatible; actualnormalDDsourceproducer/admittedFOD combinednative notrun. Existinginjectedretainedfixtures notnormalCoregrantproof.",
+      "controlling_source": "FAQab92e97b...block2 aftermodelsremoved;05.04.04block2/05.04.05block2 triggeredrulesTHENremove",
+      "actual_owner": "engine/retained_destruction_cleanup.py retained cleanup continuation; engine/attack_sequence_damage_resolution.py:_resolve_deadly_demise_before_removal; engine/rule_model_destruction.py:_continue_rule_deadly_demise_sources",
+      "complete_static_evidence": "trace071; currentfullFAQ+Coreclauses freshlyread; allbound97completion/order9bodies",
+      "next_minimal_boundary": "No runtimecanresolvethesourceconflict. Afterhumanprecedence/meaningdecided, genuineadmittedFOD+DDnormalattack/phaseendeventorder wouldverify."
+    },
+    {
+      "id": "T27-ORDINARY-TRANSPORT",
+      "disposition": "CONDITIONAL_NORMAL_CONSUMER_ADMISSION_UNRESOLVED_NOT_CORE_BLOCKER_BY_ABSENCE",
+      "rationale": "ActualCorecatalogtransport existsbutcapacityproducer/musteringgrant pendingapplicability. Mustnotinventordinarycarrier capacity or rejectconditionalOrder134acceptance.",
+      "controlling_source": "18.01anyfriendlyTRANSPORT startingcargo;18.02postMoveembark",
+      "actual_owner": "engine/army_mustering.py Dedicatedmanifestgate; engine/phases/movement_fall_back_embark.py:_post_move_embark_options",
+      "complete_static_evidence": "candidate-reconciliation-001 STATIC-ORDINARY-TRANSPORT-ADMISSION-01; traces002/003",
+      "next_minimal_boundary": "ActualadmittednonDedicatedTRANSPORTtypedcapacity strictrosterconfiguration emptycarrier thenlegalpassengermove/embark; fullsource/datasheetadmissionreadfirst."
+    },
+    {
+      "id": "T28-FORTIFICATION-ALIAS",
+      "disposition": "CONDITIONAL_ADMISSION_UNRESOLVED_NOT_CORE_BLOCKER_BY_ABSENCE",
+      "rationale": "Pistol/CloseQuarters alias staticbranch concern; currentunsupportedFortificationdeployment cannotproveordinarynormalreachability; no futurefaction/providerinvented.",
+      "controlling_source": "24.27Pistol==CloseQuarters allpurposes;10.06extra-1",
+      "actual_owner": "engine/shooting_targets.py Fortificationengagement PISTOL-onlybranch; engine/deployment_geometry.py unsupportedFortification",
+      "complete_static_evidence": "trace042/054",
+      "next_minimal_boundary": "ActualadmittedFortificationnativebattlefield path mustexist beforetestingengagedtargetPistolvsCloseQuarters sameotherconditions."
+    },
+    {
+      "id": "Q29-ASSERTION-LABELS",
+      "disposition": "DISPROVEN_AS_STANDALONE_GAMEPLAY_BLOCKER_QUALIFICATIONS_RETAINED",
+      "rationale": "All1078owner/assertion actualbodyqualifications retained85traces; historicalinjected/bodytestlabels cannotcreditnaturalconsumer. Labels insufficient alone notnewgameplaydefect.",
+      "controlling_source": "05.04.04unattributed;01.05rerolled/assigned;01.06Ld; generalnativeproduceracceptance",
+      "actual_owner": "engine/destruction_provenance.py:ModelDestructionAttribution; engine/destruction_source_attribution.py projection; engine/attack_sequence_hit_wound.py; engine/leadership_evaluation.py",
+      "complete_static_evidence": "traces071/072/079\u2013085 fullactualbodies",
+      "next_minimal_boundary": "Read-only resolved scope: Fade-labelledunattributedhelper actuallyAbilityplayerA; criticalrerolledHit manualreplacefields; assignedWoundmanualconstructor; assignedReplaynamedbodyonlytypedroundtrip; foundationLdmanualtarget6; revivedphase/cargo provider manuallyinjected."
+    },
+    {
+      "id": "C30-QUARTER-FRAME",
+      "disposition": "DISPROVEN_SELECTED_CLAUSE_VIOLATION",
+      "rationale": "SelectedFRAMEphysicalparts specifieddistance doesnotuniversallychangequarterareafootprint. Do notinventallbodyarea requirement.",
+      "controlling_source": "01.04.01FRAMEwholepartsforSPECIFIEDDISTANCE vsareafootprintexample;01.04.05quarters",
+      "actual_owner": "geometry/table_quarters.py:wholly_within_table_quarter",
+      "complete_static_evidence": "candidate-reconciliation-001; trace083",
+      "next_minimal_boundary": "Read-onlycompletecontrollingclauses distinguishareafootprintfromdistance; exactFractionquarterstrips/fullbases."
+    },
+    {
+      "id": "C31-ELEVATED-EMPTY",
+      "disposition": "DISPROVEN_SELECTED_CLAUSE_VIOLATION",
+      "rationale": "Prior genuinez0/z6 emptyterrain bothnativeaccept/loadforkReplay. Selectedgeneralsetup lacksuniversalgroundsupportrule; actualterrainunsupportedbody concern isD05/S20 separately.",
+      "controlling_source": "03.02generalsetup;13.06surfaceclausesexplicitlyterrainfeatures",
+      "actual_owner": "engine/endpoint_placement.py emptyterrainloop; engine/deployment_geometry.py bounds/zone",
+      "complete_static_evidence": "candidate-reconciliation-001; native-elevation-candidate-01 twoactualcontrols beforeHOLD",
+      "next_minimal_boundary": "Completednativeground0/floating6emptyterrainbothaccept/load/fork/Replay; noexplicitselecteduniversalgroundsupport clauseestablished."
+    }
+  ],
+  "runtime_process_completion_unknown": "native_current98_pass_scope_01.py session70716 transportdisconnect; no completionreceipt; ps processcheck denied, no bypass",
+  "own_heavy_idle": null,
+  "engine_launches_suspended": true,
+  "repair_edits": false,
+  "D02_human_approval": "Direct parent15:47 yes transcript received; auditor noedits. Otherfindings requireseparatescopeapproval. Author mustcoordinatecompletion/pause beforeediting; afteredit STATICHOLD.",
+  "clean": false,
+  "fullgame_performance_certified": false,
+  "Order136_selected": false,
+  "postmerge_main25_categories_assessed": false,
+  "limits": "Unresolved means source/normalconsumer evidence remains incomplete; no copiedverdict, absenceofgrant-aloneCoreblocker, speculationhardeningpromotion, provider/body/factioncert, allrulesexecutableCLEAN orfinalroadmapcompliance."
+}

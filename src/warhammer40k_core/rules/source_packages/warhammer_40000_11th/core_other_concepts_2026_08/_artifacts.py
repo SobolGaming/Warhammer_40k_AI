@@ -55,6 +55,13 @@ EXPECTED_RULE_IDENTITIES: Final = (
         "VISIBILITY ANY-PART FAQ",
         "7ad46ec389adfa76cc3d0e3d763f6237835ae60a4264fbca52d48a97b79911ed",
     ),
+    (
+        "visibility-battlefield-edge-faq",
+        "gw-11e-core-rules:other-concepts:visibility-battlefield-edge-faq",
+        "06.01 FAQ",
+        "VISIBILITY BATTLEFIELD EDGE FAQ",
+        "80db6d90793920dac05771755f577d058ebda044071656f38d173bd22d5cad0a",
+    ),
 )
 EXPECTED_OBSERVATION_SHA256S: Final = (
     "7c9700d51718a74421b3a992336fef7ed34ba40e77c1f3ad6f70a4c91e2f7a30",
@@ -65,8 +72,10 @@ EXPECTED_OBSERVATION_SHA256S: Final = (
     "808889d3e570fd216481c5f4651b8981f44f03cfe3120af4b6f5156daba116fe",
     "3d876bcadfa01bcf585178b492cc87121c1f42757dadff7f3d78f878cab63a17",
     "0eb915b515067bb5f70563b66e5ff97e0797e5b7048bc144806a25f9c4e87f67",
+    "e41a2b79f8337a0f0c1b1ad8c79fb095d77ac32a441d39c5c537c582d9b9cc80",
+    "f525217fd3e6a156589e92a8074bb38af24220477518e10b99088c60717806a1",
 )
-EXPECTED_PACKAGE_HASH: Final = "215059ed938a096ef038f67db15dcf82f9437e07a0e8c0b5140634777c15ee38"
+EXPECTED_PACKAGE_HASH: Final = "758313fd9d1228b5625472d9559f6624afff4eb6a3e87094f98f4a6e5a13b3ca"
 
 
 class CoreOtherConceptsSourceArtifactError(ValueError):
@@ -230,7 +239,7 @@ def core_other_concepts_source_artifact_from_json_bytes(
             hashlib.sha256(rule.source_text.encode()).hexdigest() != rule.transcription_sha256
             for rule in artifact.rules
         )
-        or len(artifact.evidence) != len(EXPECTED_RULE_IDENTITIES) * 2
+        or len(artifact.evidence) != len(EXPECTED_OBSERVATION_SHA256S)
         or any(
             expected_transcriptions.get(row.rule_source_id) != row.transcription_sha256
             for row in artifact.evidence

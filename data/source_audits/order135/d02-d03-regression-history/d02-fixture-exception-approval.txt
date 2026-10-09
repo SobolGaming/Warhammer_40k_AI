@@ -1,0 +1,15 @@
+Parent delegation source_thread_id: 01a0efa7-1ce0-70b0-a637-75c1615f80ef
+
+The user has explicitly approved the exact two-file fixture proposal. Preserve this transcript and immutable originals, then apply only tests/lethal_hits_helpers.py:lethal_wound_checkpoint completion of genuine remaining Lethal choices and the single Fight result ID change in tests/unit/test_lethal_hits.py:test_choices_devastating_sustained_restore_and_replay from order103-fixture-01-00 to order135-gathered-lethal-fight-04. Keep all original assertions, both variants and Shooting input unchanged. Rerun all 134 affected original cases on stable inputs; preserve earlier overall failures and source qualifications. Independent coder is inspecting the exact proposal. Continue approved D03 work without unrelated scope changes. Earlier 'pending approval' message was superseded by this explicit answer.
+
+<transcript_evidence>
+Assistant, 2026-10-08 17:25 UTC, Sentinel_47a0e834052c8191887bd1f3cf595d9a:
+"The exact proposal is ready. May I approve these two test-fixture corrections?
+
+- Let the Lethal Hits helper finish the remaining legal Lethal choices before checking the wound step
+- Change one deterministic Fight input so its test still exercises a critical wound under the corrected roll order
+
+All existing assertions stay intact. We’ll preserve the original files and rerun all 134 affected regression cases"
+User, 2026-10-08 17:25 UTC, Sentinel_07b40e9287448191a2962456a092c747:
+"yes"
+</transcript_evidence>

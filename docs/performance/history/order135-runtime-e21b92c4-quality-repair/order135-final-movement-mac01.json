@@ -1,0 +1,68 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "movement",
+  "workload_id": "order80-normal-move-occurrence-v1",
+  "base_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e21b92c4972bd99a9a043e519e6041dddff79ad7caf1f1f4ae3f9509a1e42134",
+  "head_input_digest": "09da1ae782f6ad86f88259de30c3bec8abbbed2bc65d6be93b811ffc5ef867f0",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:110f573cc70342f09c3102916f918a54a64f7b50f0966cdbdb51eba2b6de970e",
+    "host": {
+      "cpu": "Apple M5 Pro",
+      "memory_bytes": 68719476736,
+      "logical_cpus": 18,
+      "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
+    "fixture_sha256": "8b131b8a1233c6da324c1f12c67a3ddf05527e56018e2a4a84108f723891f527",
+    "samples": {
+      "finite": [
+        2.2593929169815965,
+        2.2592975000152364,
+        2.2908937499742024
+      ],
+      "parameterized": [
+        2.134477625018917,
+        2.135058999992907,
+        2.1434537920285948
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e21b92c4972bd99a9a043e519e6041dddff79ad7caf1f1f4ae3f9509a1e42134",
+    "host": {
+      "cpu": "Apple M5 Pro",
+      "memory_bytes": 68719476736,
+      "logical_cpus": 18,
+      "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
+    "fixture_sha256": "8b131b8a1233c6da324c1f12c67a3ddf05527e56018e2a4a84108f723891f527",
+    "samples": {
+      "finite": [
+        2.2485647500143386,
+        2.2516344159957953,
+        2.2957407089998014
+      ],
+      "parameterized": [
+        2.1308394160005264,
+        2.126067459001206,
+        2.1302971669938415
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": []
+}

@@ -1,0 +1,424 @@
+from __future__ import annotations
+
+import hashlib
+import json
+from dataclasses import dataclass
+
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    core_smokescreen_2026_09 as smoke_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    core_stratagems_2026_08 as app_source,
+)
+
+EDITION_ID = "warhammer_40000_11th"
+SOURCE_PACKAGE_ID = app_source.SOURCE_PACKAGE_ID
+SOURCE_TITLE = "Warhammer 40,000 11th Edition Core Stratagems"
+SOURCE_VERSION = app_source.SOURCE_VERSION
+IMPORTED_AT_SCHEMA_VERSION = "core-v2-stratagem-source-v2"
+
+
+@dataclass(frozen=True, slots=True)
+class SourceStratagemRow:
+    stratagem_id: str
+    name: str
+    command_point_cost: int
+    category: str
+    availability_kind: str
+    detachment_id: str | None
+    source_id: str
+    when_descriptor: str
+    target_descriptor: str
+    effect_descriptor: str
+    restrictions_descriptor: str
+    trigger_kind: str
+    phase: str | None
+    target_kind: str
+    enumerable: bool
+    target_policy_id: str
+    handler_id: str
+    eligible_roll_types: tuple[str, ...] = ()
+    same_unit_target_per_phase: bool = True
+    once_per_turn: bool = False
+    once_per_battle: bool = False
+    once_per_target_per_phase: bool = False
+    allow_battle_shocked_targets: bool = False
+    effect_payload: dict[str, object] | None = None
+    disabled: bool = False
+
+    def to_payload(self) -> dict[str, object]:
+        return {
+            "stratagem_id": self.stratagem_id,
+            "name": self.name,
+            "command_point_cost": self.command_point_cost,
+            "category": self.category,
+            "availability_kind": self.availability_kind,
+            "detachment_id": self.detachment_id,
+            "source_id": self.source_id,
+            "when_descriptor": self.when_descriptor,
+            "target_descriptor": self.target_descriptor,
+            "effect_descriptor": self.effect_descriptor,
+            "restrictions_descriptor": self.restrictions_descriptor,
+            "trigger_kind": self.trigger_kind,
+            "phase": self.phase,
+            "target_kind": self.target_kind,
+            "enumerable": self.enumerable,
+            "target_policy_id": self.target_policy_id,
+            "handler_id": self.handler_id,
+            "eligible_roll_types": list(self.eligible_roll_types),
+            "same_unit_target_per_phase": self.same_unit_target_per_phase,
+            "once_per_turn": self.once_per_turn,
+            "once_per_battle": self.once_per_battle,
+            "once_per_target_per_phase": self.once_per_target_per_phase,
+            "allow_battle_shocked_targets": self.allow_battle_shocked_targets,
+            "effect_payload": self.effect_payload,
+            "disabled": self.disabled,
+        }
+
+
+def source_package_identity_payload() -> dict[str, str]:
+    return {
+        "edition_id": EDITION_ID,
+        "source_package_id": SOURCE_PACKAGE_ID,
+        "source_title": SOURCE_TITLE,
+        "source_version": SOURCE_VERSION,
+        "source_commit_or_import_hash": _import_hash(),
+        "imported_at_schema_version": IMPORTED_AT_SCHEMA_VERSION,
+    }
+
+
+def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
+    source_prefix = f"{SOURCE_PACKAGE_ID}:core"
+    crushing_impact_source = app_source.source_rule_by_id("crushing-impact")
+    explosives_source = app_source.source_rule_by_id("explosives")
+    fire_overwatch_source = app_source.source_rule_by_id("fire-overwatch")
+    insane_bravery_source = app_source.source_rule_by_id("insane-bravery")
+    rapid_ingress_source = app_source.source_rule_by_id("rapid-ingress")
+    return (
+        SourceStratagemRow(
+            stratagem_id="command-reroll",
+            name="Command Re-roll",
+            command_point_cost=1,
+            category="battle_tactic",
+            availability_kind="core",
+            detachment_id=None,
+            source_id=f"{source_prefix}:command-reroll",
+            when_descriptor="after dice roll",
+            target_descriptor="That unit or model.",
+            effect_descriptor="reroll that dice roll",
+            restrictions_descriptor="same stratagem and same targeted unit per phase",
+            trigger_kind="after_dice_roll",
+            phase=None,
+            target_kind="friendly_unit",
+            enumerable=True,
+            target_policy_id="command_reroll_unit",
+            handler_id="core:command-reroll",
+            eligible_roll_types=(
+                "advance_roll",
+                "charge_roll",
+                "damage_roll",
+                "hazardous_test",
+                "hit_roll",
+                "number_of_attacks_roll",
+                "save_roll",
+                "wound_roll",
+            ),
+        ),
+        SourceStratagemRow(
+            stratagem_id="counteroffensive",
+            name="Counteroffensive",
+            command_point_cost=2,
+            category="strategic_ploy",
+            availability_kind="core",
+            detachment_id=None,
+            source_id=f"{source_prefix}:counteroffensive",
+            when_descriptor="after an enemy unit has fought",
+            target_descriptor="one eligible unit from the player's army that can fight",
+            effect_descriptor="the target unit fights next",
+            restrictions_descriptor="matched play same stratagem per phase",
+            trigger_kind="just_after_enemy_unit_has_fought",
+            phase="fight",
+            target_kind="friendly_unit",
+            enumerable=False,
+            target_policy_id="counteroffensive_unit",
+            handler_id="core:counteroffensive",
+        ),
+        SourceStratagemRow(
+            stratagem_id="epic-challenge",
+            name="Epic Challenge",
+            command_point_cost=1,
+            category="epic_deed",
+            availability_kind="core",
+            detachment_id=None,
+            source_id=f"{source_prefix}:epic-challenge",
+            when_descriptor="fight phase just after a friendly character unit is selected to fight",
+            target_descriptor="that character unit",
+            effect_descriptor=(
+                "select one character model; that model's melee weapons gain Precision"
+            ),
+            restrictions_descriptor="matched play same stratagem per phase",
+            trigger_kind="just_after_friendly_unit_selected_to_fight",
+            phase="fight",
+            target_kind="friendly_unit",
+            enumerable=False,
+            target_policy_id="epic_challenge_unit",
+            handler_id="core:epic-challenge",
+        ),
+        SourceStratagemRow(
+            stratagem_id="fire-overwatch",
+            name="Fire Overwatch",
+            command_point_cost=1,
+            category="strategic_ploy",
+            availability_kind="core",
+            detachment_id=None,
+            source_id=f"{source_prefix}:fire-overwatch",
+            when_descriptor=fire_overwatch_source.when_text,
+            target_descriptor=_required_source_descriptor(
+                fire_overwatch_source.target_text,
+                rule_id=fire_overwatch_source.rule_id,
+                field_name="target_text",
+            ),
+            effect_descriptor=fire_overwatch_source.effect_text,
+            restrictions_descriptor="matched play same stratagem per phase",
+            trigger_kind="end_phase",
+            phase="movement",
+            target_kind="friendly_unit",
+            enumerable=False,
+            target_policy_id="out_of_phase_shooting_unit",
+            handler_id="core:fire-overwatch",
+        ),
+        SourceStratagemRow(
+            stratagem_id="explosives",
+            name="Explosives",
+            command_point_cost=1,
+            category="wargear",
+            availability_kind="core",
+            detachment_id=None,
+            source_id=f"{source_prefix}:explosives",
+            when_descriptor=explosives_source.when_text,
+            target_descriptor=_required_source_descriptor(
+                explosives_source.target_text,
+                rule_id=explosives_source.rule_id,
+                field_name="target_text",
+            ),
+            effect_descriptor=explosives_source.effect_text,
+            restrictions_descriptor="matched play same stratagem per phase",
+            trigger_kind="during_phase",
+            phase="shooting",
+            target_kind="friendly_unit",
+            enumerable=True,
+            target_policy_id="explosives_unit_and_enemy_target",
+            handler_id="core:explosives",
+        ),
+        SourceStratagemRow(
+            stratagem_id="heroic-intervention",
+            name="Heroic Intervention",
+            command_point_cost=1,
+            category="strategic_ploy",
+            availability_kind="core",
+            detachment_id=None,
+            source_id=f"{source_prefix}:heroic-intervention",
+            when_descriptor="end of the opponent charge phase",
+            target_descriptor=(
+                "one friendly unengaged unit within 12 inches of enemy units; vehicles must be "
+                "character or walker units"
+            ),
+            effect_descriptor=(
+                "resolve a charge using Leap to Defend or the +1CP Into the Fray mode"
+            ),
+            restrictions_descriptor="matched play same stratagem per phase",
+            trigger_kind="end_phase",
+            phase="charge",
+            target_kind="friendly_unit",
+            enumerable=False,
+            target_policy_id="heroic_intervention_unit",
+            handler_id="core:heroic-intervention",
+            effect_payload={
+                "modes": [
+                    {"mode": "leap_to_defend", "additional_command_point_cost": 0},
+                    {"mode": "into_the_fray", "additional_command_point_cost": 1},
+                ],
+            },
+        ),
+        SourceStratagemRow(
+            stratagem_id="insane-bravery",
+            name="Insane Bravery",
+            command_point_cost=1,
+            category="epic_deed",
+            availability_kind="core",
+            detachment_id=None,
+            source_id=insane_bravery_source.source_id,
+            when_descriptor="before a battle-shock test",
+            target_descriptor="one unit from the player's army about to take the test",
+            effect_descriptor="the battle-shock test is automatically passed",
+            restrictions_descriptor=(
+                "once per battle; "
+                + _required_source_descriptor(
+                    insane_bravery_source.restrictions_text,
+                    rule_id=insane_bravery_source.rule_id,
+                    field_name="restrictions_text",
+                )
+            ),
+            trigger_kind="start_phase",
+            phase="command",
+            target_kind="friendly_unit",
+            enumerable=False,
+            target_policy_id="battle_shock_test_unit",
+            handler_id="core:insane-bravery",
+            once_per_battle=True,
+        ),
+        SourceStratagemRow(
+            stratagem_id="rapid-ingress",
+            name="Rapid Ingress",
+            command_point_cost=1,
+            category="strategic_ploy",
+            availability_kind="core",
+            detachment_id=None,
+            source_id=f"{source_prefix}:rapid-ingress",
+            when_descriptor=rapid_ingress_source.when_text,
+            target_descriptor=_required_source_descriptor(
+                rapid_ingress_source.target_text,
+                rule_id=rapid_ingress_source.rule_id,
+                field_name="target_text",
+            ),
+            effect_descriptor=rapid_ingress_source.effect_text,
+            restrictions_descriptor=_required_source_descriptor(
+                rapid_ingress_source.restrictions_text,
+                rule_id=rapid_ingress_source.rule_id,
+                field_name="restrictions_text",
+            ),
+            trigger_kind="end_phase",
+            phase="movement",
+            target_kind="friendly_unit",
+            enumerable=False,
+            target_policy_id="reserves_unit",
+            handler_id="core:rapid-ingress",
+        ),
+        SourceStratagemRow(
+            stratagem_id="new-orders",
+            name="New Orders",
+            command_point_cost=1,
+            category="strategic_ploy",
+            availability_kind="core",
+            detachment_id=None,
+            source_id=f"{source_prefix}:new-orders",
+            when_descriptor="command phase tactical secondary mission step",
+            target_descriptor="one active tactical secondary mission card",
+            effect_descriptor="discard the card and draw a replacement",
+            restrictions_descriptor="chapter approved tactical mission support",
+            trigger_kind="start_phase",
+            phase="command",
+            target_kind="tactical_secondary_card",
+            enumerable=True,
+            target_policy_id="active_tactical_secondary_card",
+            handler_id="core:new-orders",
+            once_per_battle=True,
+        ),
+        SourceStratagemRow(
+            stratagem_id="smokescreen",
+            name="Smokescreen",
+            command_point_cost=1,
+            category="wargear",
+            availability_kind="core",
+            detachment_id=None,
+            source_id=f"{source_prefix}:smokescreen",
+            when_descriptor="start of the opponent Shooting phase",
+            target_descriptor="one friendly SMOKE rules unit",
+            effect_descriptor=smoke_source.source_rules()[0].source_text,
+            restrictions_descriptor="matched play same stratagem per phase",
+            trigger_kind="start_phase",
+            phase="shooting",
+            target_kind="friendly_unit",
+            enumerable=True,
+            target_policy_id="friendly_smoke_unit",
+            handler_id="generic:rule-ir",
+            effect_payload=smoke_source.execution_payload(),
+        ),
+        SourceStratagemRow(
+            stratagem_id="crushing-impact",
+            name="Crushing Impact",
+            command_point_cost=1,
+            category="strategic_ploy",
+            availability_kind="core",
+            detachment_id=None,
+            source_id=f"{source_prefix}:crushing-impact",
+            when_descriptor=crushing_impact_source.when_text,
+            target_descriptor=_required_source_descriptor(
+                crushing_impact_source.target_text,
+                rule_id=crushing_impact_source.rule_id,
+                field_name="target_text",
+            ),
+            effect_descriptor=crushing_impact_source.effect_text,
+            restrictions_descriptor="matched play same stratagem per phase",
+            trigger_kind="after_unit_ends_charge_move",
+            phase="charge",
+            target_kind="friendly_unit",
+            enumerable=True,
+            target_policy_id="crushing_impact_unit",
+            handler_id="core:crushing-impact",
+        ),
+    )
+
+
+def detachment_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
+    source_prefix = f"{SOURCE_PACKAGE_ID}:detachment:gladius-task-force"
+    return (
+        SourceStratagemRow(
+            stratagem_id="armour-of-contempt",
+            name="Armour of Contempt",
+            command_point_cost=1,
+            category="battle_tactic",
+            availability_kind="detachment",
+            detachment_id="gladius-task-force",
+            source_id=f"{source_prefix}:armour-of-contempt",
+            when_descriptor="after an enemy unit selects targets",
+            target_descriptor="one selected adeptus astartes unit from the player's army",
+            effect_descriptor="improve the targeted unit's armour resilience for the attack",
+            restrictions_descriptor="gladius task force detachment stratagem",
+            trigger_kind="after_unit_selected_as_target",
+            phase="shooting",
+            target_kind="friendly_unit",
+            enumerable=False,
+            target_policy_id="unsupported:phase-13:selected-target-unit",
+            handler_id="unsupported:phase-13:armour-of-contempt",
+        ),
+    )
+
+
+def stratagem_rows() -> tuple[SourceStratagemRow, ...]:
+    return tuple(
+        sorted(
+            (*core_stratagem_rows(), *detachment_stratagem_rows()),
+            key=lambda row: (row.availability_kind, row.stratagem_id),
+        )
+    )
+
+
+def _import_hash() -> str:
+    encoded = json.dumps(
+        {
+            "edition_id": EDITION_ID,
+            "source_package_id": SOURCE_PACKAGE_ID,
+            "source_title": SOURCE_TITLE,
+            "source_version": SOURCE_VERSION,
+            "imported_at_schema_version": IMPORTED_AT_SCHEMA_VERSION,
+            "app_source_package_hash": app_source.PACKAGE_HASH,
+            "stratagems": [row.to_payload() for row in stratagem_rows()],
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _required_source_descriptor(
+    value: str | None,
+    *,
+    rule_id: str,
+    field_name: str,
+) -> str:
+    if value is None:
+        raise app_source.CoreStratagemAppSourceArtifactError(
+            f"Core Stratagem App-source {rule_id} requires {field_name}."
+        )
+    return value

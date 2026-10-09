@@ -1,0 +1,2017 @@
+{
+  "registry_schema": "core-v2-source-authority-registry-v2",
+  "registry_id": "core-rules-source-authority-registry-2026-09-02",
+  "scopes": [
+    {
+      "scope_id": "warhammer_40000_11th_core_rules",
+      "edition": "warhammer_40000_11th",
+      "corpus": "core_rules_categories_01_25",
+      "policy_ids": [
+        "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+        "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26"
+      ],
+      "audit_rows": [
+        {
+          "audit_id": "40k-app-command-phase-search-index-2026-08-26",
+          "row_id": "heading-sequence:command-phase",
+          "source_observation_sha256": "e646d81ba284b1a4b5572b96d68cbfca52ef8cdf15cedf7c2c69ae8b5066c0ab",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules",
+          "policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+          "identity_kind": "legacy_inventory",
+          "identity_value": null
+        },
+        {
+          "audit_id": "40k-app-core-rules-2026-08-25",
+          "row_id": "category:01",
+          "source_observation_sha256": "3668da89d60d6234672f11be41cb08ddca6816354db062b47c4b4adf8ebf2ec5",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/01-core-concepts",
+          "policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+          "identity_kind": "legacy_inventory",
+          "identity_value": null
+        },
+        {
+          "audit_id": "40k-app-core-rules-2026-08-25",
+          "row_id": "category:05",
+          "source_observation_sha256": "c771b8acbb62f912cc21c649a6a1ec0cac5d5a1f02e5454747b9427a8571892e",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/05-attack-sequence",
+          "policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+          "identity_kind": "legacy_inventory",
+          "identity_value": null
+        },
+        {
+          "audit_id": "40k-app-core-rules-2026-08-25",
+          "row_id": "category:06",
+          "source_observation_sha256": "646b405724eb9f1a7f441fed3b3af0cae62925c72fb4b069fc17118fbab13b73",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/06-other-concepts",
+          "policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+          "identity_kind": "legacy_inventory",
+          "identity_value": null
+        },
+        {
+          "audit_id": "40k-app-core-rules-2026-08-25",
+          "row_id": "category:09",
+          "source_observation_sha256": "a00bccdc9dd090acd4fa211034bd397739392c4f018276667e3309f8d66960ae",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/09-movement-phase",
+          "policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+          "identity_kind": "legacy_inventory",
+          "identity_value": null
+        },
+        {
+          "audit_id": "40k-app-core-rules-2026-08-25",
+          "row_id": "category:14",
+          "source_observation_sha256": "ff60f2ecfd3c0e16b9815c05183d66dcbe940fd0fca006046a08f93ba67a80fc",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/14-objectives",
+          "policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+          "identity_kind": "legacy_inventory",
+          "identity_value": null
+        },
+        {
+          "audit_id": "40k-app-core-rules-2026-08-25",
+          "row_id": "category:15",
+          "source_observation_sha256": "90d660a2388e7f6799e71fe8c2305d019409614b70ee9fcb962609851ab15f59",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/15-stratagems",
+          "policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+          "identity_kind": "legacy_inventory",
+          "identity_value": null
+        },
+        {
+          "audit_id": "40k-app-core-rules-2026-08-25",
+          "row_id": "category:18",
+          "source_observation_sha256": "d9a06d3c5b350f66bad9e4b89f62242fd0f0b4c54579ea3ad6bbf2c2674b8d0e",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/18-transports",
+          "policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+          "identity_kind": "legacy_inventory",
+          "identity_value": null
+        },
+        {
+          "audit_id": "40k-app-core-rules-2026-08-25",
+          "row_id": "category:19",
+          "source_observation_sha256": "9328cc0ae8f0c22dc52418c3238a105d7031cdfdb5daf78bd377c56f36c795bd",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/19-attached-units",
+          "policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+          "identity_kind": "legacy_inventory",
+          "identity_value": null
+        },
+        {
+          "audit_id": "40k-app-core-rules-2026-08-25",
+          "row_id": "category:20",
+          "source_observation_sha256": "e286a7f886f625a18def11dc4fcbd41fd6fee12aad88a575471fed0e77186729",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/20-strategic-reserves",
+          "policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+          "identity_kind": "legacy_inventory",
+          "identity_value": null
+        },
+        {
+          "audit_id": "40k-app-core-rules-2026-08-25",
+          "row_id": "category:24",
+          "source_observation_sha256": "5f68585a913965b35453a1d3e6d8278583c85e20a6dcf0721fef6f899080877a",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/24-core-abilities",
+          "policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+          "identity_kind": "legacy_inventory",
+          "identity_value": null
+        },
+        {
+          "audit_id": "40k-app-core-rules-2026-08-25",
+          "row_id": "category:25",
+          "source_observation_sha256": "11ec20d47a3a15ae3a01377c5591ed22e14cf3e39a8f04d25424166d5d0e4ac7",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/25-muster-armies",
+          "policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+          "identity_kind": "legacy_inventory",
+          "identity_value": null
+        },
+        {
+          "audit_id": "40k-app-core-rules-2026-08-25",
+          "row_id": "finding:40k-app-duplicate-09-07-01",
+          "source_observation_sha256": "176af8d44bd405c13a3da73fa4d06eab83c81fa4784112fa34d24d1861c93cb9",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/09-movement-phase",
+          "policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+          "identity_kind": "legacy_inventory",
+          "identity_value": null
+        },
+        {
+          "audit_id": "40k-app-core-rules-2026-08-25",
+          "row_id": "finding:40k-app-numbering-05-03-02",
+          "source_observation_sha256": "05f23eceb90b1a3096c104858f0fa19be6e9d0c62a2932e63e01539098d9bd9f",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/05-attack-sequence",
+          "policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+          "identity_kind": "legacy_inventory",
+          "identity_value": null
+        },
+        {
+          "audit_id": "40k-app-core-rules-2026-08-25",
+          "row_id": "finding:hidden-unverified-source-13-09",
+          "source_observation_sha256": "62d982be96a81f69059f11def8a0ee75e6ae64f2dfd6f7132e4913140e9aaaf4",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/13-terrain",
+          "policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+          "identity_kind": "legacy_inventory",
+          "identity_value": null
+        },
+        {
+          "audit_id": "40k-app-core-rules-2026-08-25",
+          "row_id": "finding:july-transcription-conflict-12-08",
+          "source_observation_sha256": "726ce364500c7f1d6b9776651f430ac05ad144a5899877fdbd857128e6cf041c",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/12-fight-phase",
+          "policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+          "identity_kind": "legacy_inventory",
+          "identity_value": null
+        },
+        {
+          "audit_id": "40k-app-core-rules-2026-08-25",
+          "row_id": "finding:july-transcription-not-observed-fly-heavy",
+          "source_observation_sha256": "06190cdde3ed1cb3dbb9a1eaabd7fb8d0844ad09d117b0515090befdcf38aebb",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/21-flying-and-surging",
+          "policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+          "identity_kind": "legacy_inventory",
+          "identity_value": null
+        },
+        {
+          "audit_id": "40k-app-core-rules-2026-08-25",
+          "row_id": "finding:july-transcription-not-observed-mixed-hazard",
+          "source_observation_sha256": "3e631ef574fa9c00dab7d1a6621d8f63252017925f1413f8fe1d1bf328f61b82",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/24-core-abilities",
+          "policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+          "identity_kind": "legacy_inventory",
+          "identity_value": null
+        },
+        {
+          "audit_id": "40k-app-core-rules-2026-08-25",
+          "row_id": "finding:official-pdf-mirror-order-15-05-15-06",
+          "source_observation_sha256": "743ece521c82481891e362e74ca916da5b24910e2dbf75ee27c9aed133e9480d",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/15-stratagems",
+          "policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+          "identity_kind": "legacy_inventory",
+          "identity_value": null
+        },
+        {
+          "audit_id": "core-rules-maintained-app-mirrors-2026-09-02",
+          "row_id": "40k-app-core-rules-observed-2026-08-25",
+          "source_observation_sha256": "ae80bd86900f54bc80f2ab711b80a3dc8b1ba70d1e8764a9a831bb63cc2742a5",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-08-25T00:00:00-04:00"
+        },
+        {
+          "audit_id": "core-rules-maintained-app-mirrors-2026-09-02",
+          "row_id": "game-datamissions-core-rules-data-931",
+          "source_observation_sha256": "1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "app_version",
+          "identity_value": "931"
+        },
+        {
+          "audit_id": "core-rules-maintained-app-mirrors-2026-09-02",
+          "row_id": "game-datamissions-core-rules-data-946",
+          "source_observation_sha256": "d56418ca2a27645d032519c4fe11c97ae5520c50d0cb5b54201e97534a2d3279",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "app_version",
+          "identity_value": "946"
+        },
+        {
+          "audit_id": "core-objectives-maintained-app-mirrors-2026-09-05",
+          "row_id": "terrain-objectives",
+          "source_observation_sha256": "0d48eb98a9be49808743e1c2e75163093163ee177a1d8818836ddf0f854ac189",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/14-objectives",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-05T08:38:21-04:00"
+        },
+        {
+          "audit_id": "core-objectives-maintained-app-mirrors-2026-09-05",
+          "row_id": "objectives-not-within-a-terrain-area",
+          "source_observation_sha256": "0c4c710383443babf10c595244156d0b374ddae5ae5c7ce0dc29c6e25184278a",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/14-objectives",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-05T08:38:21-04:00"
+        },
+        {
+          "audit_id": "core-objectives-maintained-app-mirrors-2026-09-05",
+          "row_id": "terrain-objective-control-range",
+          "source_observation_sha256": "a35eeb99c8a34665eb1cd42d1e0a1a878e588e7610fd9ba446897985fe72d451",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/14-objectives",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-05T08:38:21-04:00"
+        },
+        {
+          "audit_id": "core-objectives-maintained-app-mirrors-2026-09-05",
+          "row_id": "objective-marker-terminology-faq",
+          "source_observation_sha256": "d4679f1c484d3c3f38ba8fd9f1a557060563ef8cebfad807fd41c9e1fad961c4",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "app_version",
+          "identity_value": "931"
+        },
+        {
+          "row_id": "consolidation-move",
+          "source_observation_sha256": "8665696b9e9e4e57a4c2c6c4aa7e6dc4a9a4d2f0cfb8e1b6ac471068e6becc1e",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/12-fight-phase",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-fight-maintained-app-mirrors-2026-09-05",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-05T18:32:47-04:00"
+        },
+        {
+          "row_id": "ongoing-consolidation-erratum",
+          "source_observation_sha256": "18192e0938a80171ca232388ba200ccc9e80973165518340bd4888e3e388e211",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-fight-maintained-app-mirrors-2026-09-05",
+          "identity_kind": "app_version",
+          "identity_value": "931"
+        },
+        {
+          "row_id": "consolidate-step",
+          "source_observation_sha256": "d1298b6a5b4e9db03f27c9a77b0611d6129b203dfc9c9e031e64e3401ef6119c",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/12-fight-phase",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-fight-maintained-app-mirrors-2026-09-05",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-05T18:32:47-04:00"
+        },
+        {
+          "row_id": "aura-abilities:40k-app",
+          "source_observation_sha256": "c0a99fff77e5c50a9c81a359e878aba62ec8bf045dc53963982cec416487fe30",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/22-other-rules-and-abilities",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-aura-psychic-maintained-app-mirrors-2026-09-06",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-06T12:57:51Z"
+        },
+        {
+          "row_id": "psychic-abilities-with-a-psychic-level:40k-app",
+          "source_observation_sha256": "b4b6e75ae6463e3d10a4a7e177b83560bc4ce804c6e31e174fb54a7c6ff81374",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/22-other-rules-and-abilities",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-aura-psychic-maintained-app-mirrors-2026-09-06",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-06T12:57:51Z"
+        },
+        {
+          "row_id": "psychic-abilities-with-a-psychic-level:gdm",
+          "source_observation_sha256": "a79192183fa0e5ebb080a145d335c6b363e6a84bea650f9ce74f68215aa3a9d2",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-aura-psychic-maintained-app-mirrors-2026-09-06",
+          "identity_kind": "app_version",
+          "identity_value": "931"
+        },
+        {
+          "row_id": "duplicated-abilities:40k-app",
+          "source_observation_sha256": "4a37e2adbecc617bc913a16d9548f68f895393887bdc9f6e33fcea33fa11da49",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/24-core-abilities",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-duplicated-abilities-maintained-app-mirrors-2026-09-06",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-06T14:49:36Z"
+        },
+        {
+          "audit_id": "core-off-battlefield-battle-shock-maintained-app-mirrors-2026-09-06",
+          "row_id": "off-battlefield-battle-shock:40k-app",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/01-core-concepts",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "source_observation_sha256": "c139623d48440f0dd104f51333e4200bd14d5c8839713c2a932ca3e6f94ae31e",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-06T16:04:16Z"
+        },
+        {
+          "row_id": "unit-splitting:40k-app",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/01-core-concepts",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "source_observation_sha256": "5fb98bc5cfbaac54399e77eff6cb25006fdc2dcbb93ff3a605f4090ad540face",
+          "audit_id": "core-unit-splitting-maintained-app-mirrors-2026-09-06",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-06T17:29:03Z"
+        },
+        {
+          "row_id": "balanced-unit-splitting:gdm",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "source_observation_sha256": "19d99e87b14fd7f286ade01e8a70ee64759b5f685ac7dc27f0ec303fbfd7ddd8",
+          "audit_id": "core-unit-splitting-maintained-app-mirrors-2026-09-06",
+          "identity_kind": "app_version",
+          "identity_value": "931"
+        },
+        {
+          "row_id": "embarked-abilities:gdm-v931",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "source_observation_sha256": "570d6afeb3ba563bdb5cdda85018ad948694af7c7d869ec99bc5fe13aa6aadb0",
+          "audit_id": "core-embarked-abilities-maintained-app-mirrors-2026-09-07",
+          "identity_kind": "app_version",
+          "identity_value": "931"
+        },
+        {
+          "row_id": "off-battlefield-ability-conditions:40k-app",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/01-core-concepts",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "source_observation_sha256": "fddababef28f6b2c98b06804e86f4827236c5c8e2502ea5d09f443d1a2d5fb7d",
+          "audit_id": "core-embarked-abilities-maintained-app-mirrors-2026-09-07",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-07T00:02:56Z"
+        },
+        {
+          "row_id": "ordered-modifiers:40k-app",
+          "source_observation_sha256": "ce29e604dda147708960150e85b167e1a195c308d3714b6125da6ec586e5536a",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/02-datasheets",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-modifiers-maintained-app-mirrors-2026-09-07",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-07T02:46:54Z"
+        },
+        {
+          "row_id": "modified-dice-limits:40k-app",
+          "source_observation_sha256": "4b24c317d0bf608322ce332c58246d2a202834f261228d28db10640fb820422b",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/02-datasheets",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-modifiers-maintained-app-mirrors-2026-09-07",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-07T02:46:54Z"
+        },
+        {
+          "row_id": "detection-lone-operative-limits:40k-app",
+          "source_observation_sha256": "293e62779134a817b3f697aa75e459c2f53616b9e577bfaef36404d3264c64f8",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/02-datasheets",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-modifiers-maintained-app-mirrors-2026-09-07",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-07T02:46:54Z"
+        },
+        {
+          "row_id": "psychic-individual-modifiers:40k-app",
+          "source_observation_sha256": "7a0858e8559dec4c4c8cd135e6865be496f91e94e26fab51582504ce8f8fb5cc",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/24-core-abilities",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-modifiers-maintained-app-mirrors-2026-09-07",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-07T16:05:47Z"
+        },
+        {
+          "row_id": "ignore-individual-modifiers:40k-app",
+          "source_observation_sha256": "5416540cae6e3d3c1d4c006550573651951dd4fe4ee21cebb70abc8aaabbe4ff",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/02-datasheets",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-modifiers-maintained-app-mirrors-2026-09-07",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-07T16:05:47Z"
+        },
+        {
+          "row_id": "stratagem-cost-limits:40k-app",
+          "source_observation_sha256": "2b6e22fd3d73428ececafb8f388c795c9fa338a7d3d77ca93bcedfa0eb3dd37e",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/02-datasheets",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-modifiers-maintained-app-mirrors-2026-09-07",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-11T19:52:51Z"
+        },
+        {
+          "audit_id": "core-fight-on-death-maintained-app-mirrors-2026-09-07",
+          "row_id": "retained-presence:gdm-v931",
+          "source_observation_sha256": "175989634a824a069106f3097fcacec41b5935da1bf90f195e56b6b18990c2d6",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "app_version",
+          "identity_value": "931"
+        },
+        {
+          "audit_id": "core-fight-on-death-maintained-app-mirrors-2026-09-07",
+          "row_id": "fight-on-death:40k-app",
+          "source_observation_sha256": "a1a92b105252f4bd310fd8e721fd1d22729efd66875ecceea694480eedc51291",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/05-attack-sequence",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-07T21:35:45Z"
+        },
+        {
+          "row_id": "destroyed-model-keywords:gdm-v931",
+          "source_observation_sha256": "74930ebc501e1e6ff74b53e83f94d7ac728ef9f6eef8cd6d4355e4b42f800b3e",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-model-keywords-maintained-app-mirrors-2026-09-08",
+          "identity_kind": "app_version",
+          "identity_value": "931"
+        },
+        {
+          "audit_id": "core-visibility-maintained-app-mirrors-2026-09-08",
+          "row_id": "visibility-classifications",
+          "source_observation_sha256": "3398b5017348df28c7427171878963d797b23245eb6f56eb0e1df8c1c017ddf5",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/06-other-concepts",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-08T17:17:05Z"
+        },
+        {
+          "audit_id": "core-visibility-maintained-app-mirrors-2026-09-08",
+          "row_id": "visibility-any-part-faq",
+          "source_observation_sha256": "d2d36d50451e0e498860bc04a5682c29fbdf54ca964ef9a24fed36fe7d585972",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "app_version",
+          "identity_value": "931"
+        },
+        {
+          "audit_id": "core-indirect-shooting-maintained-app-mirrors-2026-09-09",
+          "row_id": "indirect-shooting:40k-app",
+          "source_observation_sha256": "d280afafb00b95b97ec33e4d29c8a157166da0e2d8f7467faee31ae34de2458e",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/10-shooting-phase",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-09T12:02:18.843Z"
+        },
+        {
+          "audit_id": "core-indirect-shooting-maintained-app-mirrors-2026-09-09",
+          "row_id": "remain-stationary:40k-app",
+          "source_observation_sha256": "3d5ae30a91f9b16941fea635d81e4a25146e191c35092216927554eabca313ce",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/09-movement-phase",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-09T12:16:21.670Z"
+        },
+        {
+          "audit_id": "core-actions-maintained-app-mirrors-2026-09-09",
+          "row_id": "performing-actions:40k-app",
+          "source_observation_sha256": "8537fde17e17b00d0421761c5cf79f9aa4857bcf12a6ff26632b46cff8b426d5",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/16-actions",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-09T14:50:00+00:00"
+        },
+        {
+          "audit_id": "core-actions-maintained-app-mirrors-2026-09-09",
+          "row_id": "normal-shooting:40k-app",
+          "source_observation_sha256": "d6fb42f1f36552097c06aeb812b44d8497831ec3eb1ecef4e46f7dd31541a65a",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/10-shooting-phase",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-09T14:50:00+00:00"
+        },
+        {
+          "audit_id": "core-actions-maintained-app-mirrors-2026-09-09",
+          "row_id": "assault-shooting:40k-app",
+          "source_observation_sha256": "be277d870fdceef12cf7fe88fbd0037648fd446e8278544c9eba783afe94ae26",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/10-shooting-phase",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-09T14:50:00+00:00"
+        },
+        {
+          "audit_id": "core-actions-maintained-app-mirrors-2026-09-09",
+          "row_id": "close-quarters-shooting:40k-app",
+          "source_observation_sha256": "7156130301f0fb59ce98a0fa5a07da8a974ca48dfd7d36eebc6744ad7b0008c3",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/10-shooting-phase",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-09T14:50:00+00:00"
+        },
+        {
+          "audit_id": "core-sequencing-maintained-app-mirrors-2026-09-10",
+          "row_id": "active-player",
+          "source_observation_sha256": "af92f23ae68a4408bb78b1d683ae49aa29141b13634ada83a7f4c0fa2df96c66",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/01-core-concepts",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-10T16:07:00+00:00"
+        },
+        {
+          "audit_id": "core-sequencing-maintained-app-mirrors-2026-09-10",
+          "row_id": "players-rules",
+          "source_observation_sha256": "04761696ad91e37e189c3c9bb7fb489444970575054a8dd06a5fd98b8b64048b",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/01-core-concepts",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-10T16:07:00+00:00"
+        },
+        {
+          "audit_id": "core-sequencing-maintained-app-mirrors-2026-09-10",
+          "row_id": "rules-sequencing",
+          "source_observation_sha256": "b067ad5fb2a0490fbcf8c01bd10422bc726e879a17c9a43ac92bf71cc3026a3b",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/01-core-concepts",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-10T16:07:00+00:00"
+        },
+        {
+          "audit_id": "core-sequencing-maintained-app-mirrors-2026-09-10",
+          "row_id": "end-turn-mission-order",
+          "source_observation_sha256": "86836fb54f2b41645f25446dd83ae1fd11d8b56cfbe8a90a3b5aa0a130a12229",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/07-the-battle-round",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-10T18:07:00+00:00"
+        },
+        {
+          "audit_id": "core-sequencing-maintained-app-mirrors-2026-09-10",
+          "row_id": "end-round-mission-order",
+          "source_observation_sha256": "ef5ae07e5360aedd1630073388db15269bbf8245b940cbe834bd43590de79d39",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/07-the-battle-round",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-10T18:07:00+00:00"
+        },
+        {
+          "audit_id": "core-stealth-maintained-app-mirrors-2026-09-12",
+          "row_id": "stealth:40k-app",
+          "source_observation_sha256": "f0e3ecd64cf432c5c7768b6c0ed4eb2f4e9624ac2e6a74176a6e42afdab9aef1",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/24-core-abilities",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-12T02:06:45Z"
+        },
+        {
+          "audit_id": "core-smokescreen-maintained-app-mirrors-2026-09-12",
+          "row_id": "smokescreen:40k-app",
+          "source_observation_sha256": "d1197fb81ad3ad6288763e46708f391370b2cda8ac58f1b962321257fa84c6f3",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/15-stratagems",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-12T11:17:25Z"
+        },
+        {
+          "audit_id": "core-target-replacement-maintained-app-mirrors-2026-09-12",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-12T14:47:00+00:00",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "provider_name": "40k.app",
+          "row_id": "target-no-longer-eligible-or-viable",
+          "source_observation_sha256": "353f37876d9d0c350816ce148aff18738a5477e0de6abf773f9e48760aecd2d8",
+          "source_url": "https://www.40k.app/rules/04-making-attacks"
+        },
+        {
+          "row_id": "critical-hit-success-faq",
+          "source_observation_sha256": "53c91f5a6737b46ff549e6b76f185a0ee609c6027a778a330e9a445a14350dbc",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-critical-hits-maintained-app-mirrors-2026-09-13",
+          "identity_kind": "app_version",
+          "identity_value": "931"
+        },
+        {
+          "row_id": "snap-critical-hit-faq",
+          "source_observation_sha256": "80fa7ff7cca2ee2c5a61d79fdcc2ca145a5df93a3a7cfb8ae9254f930f0d7466",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-critical-hits-maintained-app-mirrors-2026-09-13",
+          "identity_kind": "app_version",
+          "identity_value": "931"
+        },
+        {
+          "row_id": "lethal-hits:40k-app",
+          "source_observation_sha256": "727c6dfecd7f96bce067e8ade4c724cbd5b9371bf1c4742e636291274eaa7c2d",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/24-core-abilities",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-lethal-hits-maintained-app-mirrors-2026-09-13",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-13T15:00:34Z"
+        },
+        {
+          "audit_id": "core-charge-maintained-app-mirrors-2026-09-14",
+          "row_id": "modified-charge-targets-faq",
+          "source_observation_sha256": "05e5e478d337f737e5a6f4950e7315f915a8ccbcec481e5a4f8eaa9d46707d8b",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "app_version",
+          "identity_value": "931"
+        },
+        {
+          "row_id": "model-endpoints",
+          "source_observation_sha256": "3c40e1d82103df43d9a12af5de9cb266954ec8e183bea83efd5bc2524fa47e8d",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/11-charge-phase",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-charge-maintained-app-mirrors-2026-09-14",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-14T14:09:27.140Z"
+        },
+        {
+          "row_id": "take-to-the-skies",
+          "source_observation_sha256": "016ad68ee8868f6a8cd139544a39b31fad0e5775f947619858eceffa123e2f62",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-flying-maintained-app-mirrors-2026-09-15",
+          "identity_kind": "app_version",
+          "identity_value": "931"
+        },
+        {
+          "row_id": "surge-move",
+          "source_observation_sha256": "af2d7a99d05da410269168190d9e2ed646cce976426a8b9d2ef5e882e921953b",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/21-flying-and-surging",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-surge-maintained-app-mirrors-2026-09-16",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-16T00:00:00+00:00"
+        },
+        {
+          "audit_id": "core-super-heavy-walker-maintained-app-mirrors-2026-09-16",
+          "row_id": "super-heavy-walker",
+          "source_observation_sha256": "9240dc6508400375ec9f96cbf7528865d72d8ab17e3afc1190463e3dc235df21",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/24-core-abilities",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-16T00:00:00+00:00"
+        },
+        {
+          "row_id": "large-model-setup",
+          "source_observation_sha256": "e8775a950fdb1da83ced0160414761d63cc1778489f92f956ca4be745800ca49",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/03-moving",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-large-model-setup-maintained-app-mirrors-2026-09-17",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-17T00:00:00+00:00"
+        },
+        {
+          "row_id": "large-model-disembark",
+          "source_observation_sha256": "5dbb0c10e629fecede27a6b8594d55a66326ec5d6a50677af0e56326d2ed18b8",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/03-moving",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-large-model-disembark-maintained-app-mirrors-2026-09-17",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-17T00:00:00+00:00"
+        },
+        {
+          "row_id": "measuring-to-destroyed",
+          "source_observation_sha256": "0d702836fd2fe1197c45434c346be55fa4b42d406159129e11cdd6d364e5e56b",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/05-attack-sequence",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-measuring-to-destroyed-maintained-app-mirrors-2026-09-18",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-18T12:05:00+00:00"
+        },
+        {
+          "row_id": "damage-to-0-after-saves-faq",
+          "source_observation_sha256": "91dfafdf104dde3f2e3444b59f71360e194c8a4426280c828aa764619517b814",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-failed-save-damage-timing-maintained-app-mirrors-2026-09-18",
+          "identity_kind": "app_version",
+          "identity_value": "931"
+        },
+        {
+          "row_id": "empty-dedicated-transport",
+          "source_observation_sha256": "90191962421b4997f5595441ab43aed12e3f75dd2a460db1adb4d3f2b0212d1e",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/18-transports",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-empty-dedicated-transport-maintained-app-mirrors-2026-09-18",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-18T16:45:00+00:00"
+        },
+        {
+          "row_id": "emergency-disembark-placement",
+          "source_observation_sha256": "c39e87327a822139e0075c5af984b48f2fecbc0c2d5a3645507473e9e2545150",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/18-transports",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-emergency-disembark-placement-maintained-app-mirrors-2026-09-18",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-18T19:30:00+00:00"
+        },
+        {
+          "row_id": "embark-setup-turn",
+          "source_observation_sha256": "4503d551667d1bcde2b40187b031e0a877926ad544aabd423fce085a25bf23d1",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/18-transports",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-embark-setup-turn-maintained-app-mirrors-2026-09-19",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-19T13:10:00+00:00"
+        },
+        {
+          "row_id": "reserve-transport",
+          "source_observation_sha256": "d400a19b74b423af4b2260d2e76126e0519ede7dbcfa482c69bd1b086f2fef66",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-reserve-transport-maintained-app-mirrors-2026-09-19",
+          "identity_kind": "app_version",
+          "identity_value": "946"
+        },
+        {
+          "row_id": "placing-reserves",
+          "source_observation_sha256": "c1d51d6e70fa3451ee43db7121bb78b106d50da08dade63c8e29c9fba4d03e6a",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/20-strategic-reserves",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-reserve-transport-maintained-app-mirrors-2026-09-19",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-19T19:06:00+00:00"
+        },
+        {
+          "row_id": "ingress",
+          "source_observation_sha256": "e50d5797cb8c3864f6d9e9ae13aafaf23710519c3d0ad39759e07643dd1e5ac5",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/20-strategic-reserves",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-reserve-transport-maintained-app-mirrors-2026-09-19",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-19T19:06:00+00:00"
+        },
+        {
+          "row_id": "final-turn-cleanup",
+          "source_observation_sha256": "fc9ae9865a9ff5768c128a23b140896fd835e247b57a12d40581921479feb0e6",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/20-strategic-reserves",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-reserve-lifetimes-maintained-app-mirrors-2026-09-19",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-19T21:33:00+00:00"
+        },
+        {
+          "row_id": "reposition",
+          "source_observation_sha256": "9514885873681f10d48bfaa77bec2a5d4eaa2252ee58713a37f42269816b401f",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/20-strategic-reserves",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-reserve-lifetimes-maintained-app-mirrors-2026-09-19",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-19T21:33:00+00:00"
+        },
+        {
+          "row_id": "arrival",
+          "source_observation_sha256": "399d12f3d012a603c07d02cfa71d3db3d1793f9b2a1af3404d05835bd424d449",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/20-strategic-reserves",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-reserve-lifetimes-maintained-app-mirrors-2026-09-19",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-19T21:33:00+00:00"
+        },
+        {
+          "row_id": "ingress",
+          "source_observation_sha256": "db20f6042161945e5618e642f22c1e3950a2f26dc19dde772c9f14f143c75b25",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/20-strategic-reserves",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-reserve-lifetimes-maintained-app-mirrors-2026-09-19",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-19T21:33:00+00:00"
+        },
+        {
+          "audit_id": "core-firing-deck-maintained-app-mirrors-2026-09-20",
+          "row_id": "firing_deck:40k-app",
+          "source_observation_sha256": "9f54ad3a7c7d78cdb3edf88d3cf08e1e13371637e3088ddf5ad2968fbe9bd34f",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/24-core-abilities",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-20T11:30:00Z"
+        },
+        {
+          "audit_id": "core-aircraft-maintained-app-mirrors-2026-09-20",
+          "row_id": "deployment:40k-app",
+          "source_observation_sha256": "98ba2d9cb0ae31c48e5cf07f1aace55c9c6941b611d6f62dc2541b622168cefc",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/23-aircraft",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-20T14:34:15Z"
+        },
+        {
+          "audit_id": "core-aircraft-maintained-app-mirrors-2026-09-20",
+          "row_id": "movement:40k-app",
+          "source_observation_sha256": "36a5d05d32defde10ec9a157f7f341aba775c1177044defd74613e84011e45c0",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/23-aircraft",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-20T14:34:15Z"
+        },
+        {
+          "audit_id": "core-aircraft-maintained-app-mirrors-2026-09-20",
+          "row_id": "shooting:40k-app",
+          "source_observation_sha256": "d1f86e7edde5fc73c6d87c12ed4595063b58f448dab48f4045b09f7dc93e81be",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/23-aircraft",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-20T14:34:15Z"
+        },
+        {
+          "audit_id": "core-aircraft-maintained-app-mirrors-2026-09-20",
+          "row_id": "charging-and-fighting:40k-app",
+          "source_observation_sha256": "c3738676fbe8e43c300877228ae17c6362c8519abf6b7d8203f96f8e05e17593",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/23-aircraft",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-20T14:34:15Z"
+        },
+        {
+          "row_id": "battle_size:40k-app",
+          "source_observation_sha256": "99e83112d99313ae4b0de72119affe37a21d3c354a42b576653fa9bb0097ab5b",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/25-muster-armies",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-mustering-limits-maintained-app-mirrors-2026-09-20",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-20T18:08:38Z"
+        },
+        {
+          "row_id": "single_three_dp_detachment:40k-app",
+          "source_observation_sha256": "69ca00edcd589425807134307dad790b538ae083b91c4573489eb802f6f5e952",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/25-muster-armies",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-mustering-limits-maintained-app-mirrors-2026-09-20",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-20T18:08:38Z"
+        },
+        {
+          "row_id": "upgrade_accounting:40k-app",
+          "source_observation_sha256": "4bcde0e0bcd9f41abd4989e5edbb1cbac9ac1e0e15b0dd9715c564e4f6c2f893",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/25-muster-armies",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-mustering-limits-maintained-app-mirrors-2026-09-20",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-20T18:08:38Z"
+        },
+        {
+          "audit_id": "core-roster-models-maintained-app-mirrors-2026-09-20",
+          "row_id": "warlord:40k-app",
+          "source_observation_sha256": "bc17afb83c10d7375d6a30e25bad34d828b34ff31d77bc7fe52d7d41b299cecb",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/25-muster-armies",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-20T20:51:19Z"
+        },
+        {
+          "audit_id": "core-roster-models-maintained-app-mirrors-2026-09-20",
+          "row_id": "enhancement:40k-app",
+          "source_observation_sha256": "3bbd5b433798273835a495d36a0f473bcf16df78a2b74503d91ee91a607168d0",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/25-muster-armies",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-20T20:51:19Z"
+        },
+        {
+          "audit_id": "core-roster-construction-maintained-app-mirrors-2026-09-20",
+          "row_id": "duplicate-detachment:40k-app",
+          "source_observation_sha256": "1bd57e637ceaca8718a28c6537754c2de0973d46c8eeab939e191279c2a1aad8",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/25-muster-armies",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-21T00:32:52Z"
+        },
+        {
+          "audit_id": "core-roster-construction-maintained-app-mirrors-2026-09-20",
+          "row_id": "constraints:40k-app",
+          "source_observation_sha256": "01fe922e7f260460c0f846940fc24dffbb8e4d82a59422851e042b69bd074a6b",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/25-muster-armies",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-21T00:32:52Z"
+        },
+        {
+          "audit_id": "core-roster-construction-maintained-app-mirrors-2026-09-20",
+          "row_id": "unit-admission:40k-app",
+          "source_observation_sha256": "ec3047f355fb03ecf4e8db275e799f2a7bd6dcf413377b272c0e9880129081fb",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/25-muster-armies",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-21T00:32:52Z"
+        },
+        {
+          "audit_id": "core-roster-construction-maintained-app-mirrors-2026-09-20",
+          "row_id": "support-attachment:40k-app",
+          "source_observation_sha256": "fb3f5ba5984e0f406f45e8000b8da52317f06bf180f9ea729f06e337d4cf508e",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/25-muster-armies",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-21T00:32:52Z"
+        },
+        {
+          "row_id": "fights-first:40k-app",
+          "source_observation_sha256": "240c270d94c77235f822eb461c614e840742dc95c8a1bad957fe2eb9312e70b9",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/24-core-abilities",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-fights-first-maintained-app-mirrors-2026-09-21",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-21T12:06:54Z"
+        },
+        {
+          "row_id": "unit-grants:40k-app",
+          "source_observation_sha256": "26acf54fda3dad1d1a2cc87ad2a81de36527374ad62197aeb1933482678cbf32",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/01-core-concepts",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-fights-first-maintained-app-mirrors-2026-09-21",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-21T12:06:54Z"
+        },
+        {
+          "audit_id": "core-engaged-shooting-maintained-app-mirrors-2026-09-21",
+          "row_id": "engaged-monster-vehicle-target:40k-app",
+          "source_observation_sha256": "71dded5a559844c3f96399ef560988c8d422954d65a9c4a5c668d7daabd09d5e",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/17-monsters-and-vehicles",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-21T18:41:25Z"
+        },
+        {
+          "row_id": "gone-to-ground:40k-app",
+          "source_observation_sha256": "f9e008887a8bb38842033b62d64ecc769553ac52370ae4c39384ccb9f3d21b0b",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/13-terrain",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-gone-to-ground-maintained-app-mirrors-2026-09-23",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-23T14:19:29.200772+00:00"
+        },
+        {
+          "row_id": "revival:40k-app",
+          "source_observation_sha256": "5214e698c41ef0abba31b49f415e6808c5c79b9718cfaf0b7246c5a796207e3c",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/01-core-concepts",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-revival-maintained-app-mirrors-2026-09-24",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-24T13:16:10+00:00"
+        },
+        {
+          "row_id": "highest-lowest:40k-app",
+          "source_observation_sha256": "e8fa68c6abc35a6f10e8ec08e99e21138a1ea2294eadaa03f48331b39a49cf27",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/01-core-concepts",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-dice-results-maintained-app-mirrors-2026-09-24",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-24T20:42:09+00:00"
+        },
+        {
+          "row_id": "treated-as-set-to:40k-app",
+          "source_observation_sha256": "1e916e148f2e31b3fec5baa7a7e3309678556cb6c7c34d5299ed3a8b34e275cd",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/01-core-concepts",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-dice-results-maintained-app-mirrors-2026-09-24",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-24T20:42:09+00:00"
+        },
+        {
+          "row_id": "default-critical-hit:40k-app",
+          "source_observation_sha256": "443a95fa4e5e221239442528f09cb4ccfd4dee445c7db39fd0fb73cad91a9347",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/05-attack-sequence",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-dice-results-maintained-app-mirrors-2026-09-24",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-24T20:42:09+00:00"
+        },
+        {
+          "row_id": "default-critical-wound:40k-app",
+          "source_observation_sha256": "2ac24e8e86a9dded0f14f434127579d9e3f065afc09d09e91d2a13727e8a5c89",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/05-attack-sequence",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-dice-results-maintained-app-mirrors-2026-09-24",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-24T20:42:09+00:00"
+        },
+        {
+          "row_id": "deemed-base-contact:gdm",
+          "source_observation_sha256": "743f9409d7a6730f08a946f081e56e72f04d894094380a29f4a1e57ca77f3797",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/core-rules",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-base-contact-maintained-app-mirrors-2026-09-24",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-25T02:17:22+00:00"
+        },
+        {
+          "row_id": "table-quarters:gdm",
+          "source_observation_sha256": "f2f5ed994841e756d69c148ea95e512124d1973c6e4fde318fa882b20f2a2c32",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/core-rules",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-table-quarters-maintained-app-mirrors-2026-09-25",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-25T15:36:30+00:00"
+        },
+        {
+          "row_id": "random-characteristics:gdm",
+          "source_observation_sha256": "f54d6eb3a802fc90f4c8d25b27631b223741014cbd7aee8277a1b96424590f37",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/core-rules",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-random-characteristics-maintained-app-mirrors-2026-09-25",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-25T19:21:58+00:00"
+        },
+        {
+          "row_id": "weapons-with-no-strength:gdm",
+          "source_observation_sha256": "c772e59dbeceb87e497d5cf61a68b9fe921809233be35f69dd9baa267f886506",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/core-rules",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-modifiers-maintained-app-mirrors-2026-09-07",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-26T14:43:34.151423+00:00"
+        },
+        {
+          "audit_id": "core-modifiers-maintained-app-mirrors-2026-09-07",
+          "row_id": "healing:gdm",
+          "source_observation_sha256": "9fe3b9b237ec1b5cf6d13bad82a292153357e88345c05ee4c3e774385f5cac4e",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/core-rules",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-26T17:51:03+00:00"
+        },
+        {
+          "audit_id": "core-shock-disembark-maintained-app-mirror-2026-10-01",
+          "row_id": "rule:18.07:current-observation",
+          "source_observation_sha256": "3738e2ba5c83388b3924f2f159484c806bf59dedb679043fa0b2eac826699058",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/core-rules",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-10-01T12:04:31.127429+00:00"
+        },
+        {
+          "row_id": "rule:15.09:current-observation",
+          "source_observation_sha256": "b38c6f030e05553a286764a28a01147423c7035598039b1dcaa8208f76138c90",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/core-rules",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-snap-shooting-maintained-app-mirror-2026-10-01",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-10-01T12:04:31.127429+00:00"
+        }
+      ],
+      "legacy_observations": [
+        {
+          "evidence_id": "40k-app-attached-units-2026-09-01:bodyguard-unit-destroyed",
+          "rule_source_id": "gw-11e-core-rules:attached-units:bodyguard-unit-destroyed",
+          "observation_sha256": "ee513960052396784786dee07ff736c25c0c120f06e56d6940b020fdf71f2d5d"
+        },
+        {
+          "evidence_id": "40k-app-attack-sequence-2026-09-01:destroyed",
+          "rule_source_id": "core_rules_05_04_04_destroyed",
+          "observation_sha256": "ceb8fca60471aea370514c919ea7bf991f9a1d84b8c43f3fb560793fd0569bef"
+        },
+        {
+          "evidence_id": "40k-app-command-phase-search-index-2026-08-26:battle-shock",
+          "rule_source_id": "gw-11e-core-rules:command-phase:battle-shock",
+          "observation_sha256": "e60b785371c3815fe3a9a2b77ca4dc012c6e5541c95dbcc22f68b5452c576a78"
+        },
+        {
+          "evidence_id": "40k-app-command-phase-search-index-2026-08-26:gain-core-cp",
+          "rule_source_id": "gw-11e-core-rules:command-phase:gain-core-cp",
+          "observation_sha256": "9809dd16794d824ee12f6b7d6a8e0075e61cabde43c93a9bdfe9b797b5df283a"
+        },
+        {
+          "evidence_id": "40k-app-command-phase-search-index-2026-08-26:start-of-command-phase",
+          "rule_source_id": "gw-11e-core-rules:command-phase:start-of-command-phase",
+          "observation_sha256": "9b5ce8b7402b6719772dec0ebca6e477d6f2c9a0ddb3b83f8504d2337d5c6d76"
+        },
+        {
+          "evidence_id": "40k-app-core-rules-2026-08-25:01.02.03-embarked-model-return",
+          "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:01.02.03-embarked-model-return",
+          "observation_sha256": "31f4dacc3108f52b14a31b6139791840c287c7744dcff1ffb6d92587bfcfa526"
+        },
+        {
+          "evidence_id": "40k-app-core-rules-2026-08-25:05.03.02-post-roll-attack-profiles",
+          "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:05.03.02-post-roll-attack-profiles",
+          "observation_sha256": "077842773c5f1bcfb42e7fca86d6ff4a8c8ca34ce11cc8e27ae5461151c24a3c"
+        },
+        {
+          "evidence_id": "40k-app-core-rules-2026-08-25:05.04.05-fight-on-death",
+          "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:05.04.05-fight-on-death",
+          "observation_sha256": "778f901f725235fe4885fe35c34e1174181fc1d86faeb31e9cb3427802c72d0d"
+        },
+        {
+          "evidence_id": "40k-app-core-rules-2026-08-25:09-normal-move-one-per-phase",
+          "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09-normal-move-one-per-phase",
+          "observation_sha256": "d0475f0e2ea5f6a5cd7554ce2232fdd2d87067e60d5b22f0aaa64f322e6934ea"
+        },
+        {
+          "evidence_id": "40k-app-core-rules-2026-08-25:09.07.01-desperate-escape-definition",
+          "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09.07.01-desperate-escape-definition",
+          "observation_sha256": "b7d1cd551972eb9f054d77686e0122707b45c83b964e61860498fc6aeb14ce37"
+        },
+        {
+          "evidence_id": "40k-app-core-rules-2026-08-25:09.07.01-forced-desperate-escape",
+          "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09.07.01-forced-desperate-escape",
+          "observation_sha256": "4b3ffc22e64a4b01404b19968576823c6a8226c7337b53ff24dea7d858ff0eb9"
+        },
+        {
+          "evidence_id": "40k-app-core-rules-2026-08-25:12.08-objective-consolidation",
+          "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:12.08-objective-consolidation",
+          "observation_sha256": "0c0afa0845fe6a42a2cbde41edb21b2028f16489d7d0a41e14e1bdd500e08f78"
+        },
+        {
+          "evidence_id": "40k-app-core-rules-2026-08-25:13.09-hidden",
+          "rule_source_id": "gw-11e-app-core-rules-hidden-transcription-observed-2026-08-09:rule:13.09-hidden",
+          "observation_sha256": "ed53f99a6e521d8af5cabdce5f56aa981dc2003cc25ba3d8ae51a8ed0c51dd8e"
+        },
+        {
+          "evidence_id": "40k-app-core-rules-2026-08-25:14.02.01-control-first",
+          "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first",
+          "observation_sha256": "b9a2510ffeb7b68617045e710ccfeb8606f448d8f4efaf5f863e1c1b605817b6"
+        },
+        {
+          "evidence_id": "40k-app-core-rules-2026-08-25:18.01-dedicated-transport",
+          "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:18.01-dedicated-transport",
+          "observation_sha256": "a623c01536366c2354e2c98015874b21965788be9c5d0e5effce2eb4f382c9d4"
+        },
+        {
+          "evidence_id": "40k-app-core-rules-2026-08-25:20.01.02-strategic-reserves",
+          "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:20.01.02-strategic-reserves",
+          "observation_sha256": "aa4d96dcb935f0698d51adf3bcacfb0ce5f9915577ed20dfe8b2422716e1c81d"
+        },
+        {
+          "evidence_id": "40k-app-core-rules-2026-08-25:24.28.01-precision-devastating-wounds",
+          "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:24.28.01-precision-devastating-wounds",
+          "observation_sha256": "54ec9c30bf40191e2ffe6ece46e8893ba1c1ccf0e974ded61c1b2450bb746c3e"
+        },
+        {
+          "evidence_id": "40k-app-core-rules-2026-08-25:24.37.01-torrent",
+          "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:24.37.01-torrent",
+          "observation_sha256": "0749533064cedccdfb818bb639ac5261a326ed4f8843708d235107fc701c73b0"
+        },
+        {
+          "evidence_id": "40k-app-core-rules-2026-08-25:25.04-epic-hero-enhancements",
+          "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:25.04-epic-hero-enhancements",
+          "observation_sha256": "e97a891081b4ef414db7508ce4ad3273db540557f40badb83c70bb09438d68f4"
+        },
+        {
+          "evidence_id": "40k-app-core-rules-2026-08-25:25.04-incursion-detachment",
+          "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:25.04-incursion-detachment",
+          "observation_sha256": "da2f2e85cbfc33de332572142b1a26db4bf1e1ac844cd0c4a6dcaef55bae0d21"
+        },
+        {
+          "evidence_id": "40k-app-core-rules-2026-08-25:faq-hazardous-mixed-unit-keywords",
+          "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:faq-hazardous-mixed-unit-keywords",
+          "observation_sha256": "97eb6d511c35160b8cce7f8df8489e545c107436c24337467a0ae4015c25b3c8"
+        },
+        {
+          "evidence_id": "40k-app-core-rules-2026-08-25:faq-heavy-fly-horizontal-distance",
+          "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:faq-heavy-fly-horizontal-distance",
+          "observation_sha256": "42985e0c42729da563f9d11849ba0c9c64fb0a962dd106420b116e742d475808"
+        },
+        {
+          "evidence_id": "40k-app-core-stratagems-2026-08-26:crushing-impact",
+          "rule_source_id": "gw-11e-core-stratagems:core:crushing-impact",
+          "observation_sha256": "329f378b3cb1f78f28f7f32047e01e2b78295d155c30df9fde775bf0cab3afa4"
+        },
+        {
+          "evidence_id": "40k-app-core-stratagems-2026-08-26:explosives",
+          "rule_source_id": "gw-11e-core-stratagems:core:explosives",
+          "observation_sha256": "45c1a404c497f2d3d1cb0feb00ce09371fd3520bce8af43214930bc474dd9c41"
+        },
+        {
+          "evidence_id": "40k-app-core-stratagems-2026-08-26:fire-overwatch",
+          "rule_source_id": "gw-11e-core-stratagems:core:fire-overwatch",
+          "observation_sha256": "6cfdfa59d51b3bc1302101ac70a142bc3926ac2f532fb035254f4cc08eb6f9a1"
+        },
+        {
+          "evidence_id": "40k-app-core-stratagems-2026-08-26:rapid-ingress",
+          "rule_source_id": "gw-11e-core-stratagems:core:rapid-ingress",
+          "observation_sha256": "42c4328d54aa18d826225dedd0b1e0043f4d8e3fe0f2e09d1ab12db7913314a6"
+        },
+        {
+          "evidence_id": "40k-app-core-stratagems-2026-08-26:snap-shooting",
+          "rule_source_id": "gw-11e-core-stratagems:rule:snap-shooting",
+          "observation_sha256": "b88a09f338d839344e4d589dcc17b658cf075d11f20c079a9c55297ed70d1a26"
+        },
+        {
+          "evidence_id": "40k-app-movement-phase-2026-08-30:fall-back-move",
+          "rule_source_id": "gw-11e-core-rules:movement-phase:fall-back-move",
+          "observation_sha256": "97d7323f54195e968c0cff8e7c8434ce5b5f8fe9dca4be3dc558359b3d1e9d23"
+        },
+        {
+          "evidence_id": "40k-app-movement-phase-2026-08-30:move-units-step",
+          "rule_source_id": "gw-11e-core-rules:movement-phase:move-units-step",
+          "observation_sha256": "fe123e0660e231a31e550414e2289ee66922b20312e055c69f077ab186e21800"
+        },
+        {
+          "evidence_id": "40k-app-movement-phase-2026-08-30:selecting-modes",
+          "rule_source_id": "gw-11e-core-rules:movement-phase:selecting-modes",
+          "observation_sha256": "e5c209da27f60c11654788ed26c561e63374791fb345a032f3ce9a4620838db0"
+        },
+        {
+          "evidence_id": "40k-app-other-concepts-2026-08-31:mortal-wounds",
+          "rule_source_id": "gw-11e-core-rules:other-concepts:mortal-wounds",
+          "observation_sha256": "faa8f4b08ebb8663e2ae5f84373465d5691b58ca56d67e461b9e81fdea4abc8a"
+        },
+        {
+          "evidence_id": "40k-app-other-concepts-2026-08-31:visibility",
+          "rule_source_id": "gw-11e-core-rules:other-concepts:visibility",
+          "observation_sha256": "cf12c5ecc2b7fdc082246161fcbab2e301df0a1eb8134f4b69175f0884a35a9a"
+        },
+        {
+          "evidence_id": "40k-app-transports-2026-09-01:emergency-disembark-move",
+          "rule_source_id": "gw-11e-core-rules:transports:emergency-disembark-move",
+          "observation_sha256": "645e8e96af35d4aefe38c755c2ce6b72579d925865ace9e5b16e5b58158c5b98"
+        }
+      ],
+      "legacy_controlling_transcriptions": [
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-command-phase",
+          "version": "40k-app-search-index-observed-2026-08-26",
+          "rule_source_id": "gw-11e-core-rules:command-phase:battle-shock",
+          "historical_observation_sha256": "e60b785371c3815fe3a9a2b77ca4dc012c6e5541c95dbcc22f68b5452c576a78",
+          "controlling_transcription_sha256": "b2a5cdecb25d1f89f004062fab75868023e2f557066df4eeb2ba9d94352f2f4e"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-command-phase",
+          "version": "40k-app-search-index-observed-2026-08-26",
+          "rule_source_id": "gw-11e-core-rules:command-phase:gain-core-cp",
+          "historical_observation_sha256": "9809dd16794d824ee12f6b7d6a8e0075e61cabde43c93a9bdfe9b797b5df283a",
+          "controlling_transcription_sha256": "6a09ea8b545e04dfbb0755408986862f7cf19991bb023106cafcbbb63b8e55d0"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-command-phase",
+          "version": "40k-app-search-index-observed-2026-08-26",
+          "rule_source_id": "gw-11e-core-rules:command-phase:start-of-command-phase",
+          "historical_observation_sha256": "9b5ce8b7402b6719772dec0ebca6e477d6f2c9a0ddb3b83f8504d2337d5c6d76",
+          "controlling_transcription_sha256": "539a37c85bcb22ebe08ae017a6e926489bbc8b311680d80514d5151855ed1c31"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-movement-phase",
+          "version": "40k-app-movement-phase-observed-2026-08-30",
+          "rule_source_id": "gw-11e-core-rules:movement-phase:move-units-step",
+          "historical_observation_sha256": "fe123e0660e231a31e550414e2289ee66922b20312e055c69f077ab186e21800",
+          "controlling_transcription_sha256": "7761ce9360aa56e0f00a0e74d3b6095c5b1742523fd1d424d51989e9aeaab982"
+        }
+      ],
+      "source_packages": [
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-app-core-rules-hidden-transcription-observed-2026-08-09",
+          "version": "observed-2026-08-09",
+          "allowed_rule_source_ids": [
+            "gw-11e-app-core-rules-hidden-transcription-observed-2026-08-09:rule:13.09-hidden"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-abilities",
+          "version": "game-datamissions-v931-observed-2026-09-02",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-abilities:core:deadly-demise",
+            "gw-11e-core-abilities:core:hazardous",
+            "gw-11e-core-abilities:faq:alternating-scout-moves"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-attached-units",
+          "version": "40k-app-attached-units-observed-2026-09-01",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-rules:attached-units:bodyguard-unit-destroyed"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-attack-sequence",
+          "version": "40k-app-attack-sequence-observed-2026-09-01",
+          "allowed_rule_source_ids": [
+            "core_rules_05_04_04_destroyed"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-command-phase",
+          "version": "40k-app-search-index-observed-2026-08-26",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-rules:command-phase:battle-shock",
+            "gw-11e-core-rules:command-phase:gain-core-cp",
+            "gw-11e-core-rules:command-phase:start-of-command-phase"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-movement-phase",
+          "version": "40k-app-movement-phase-observed-2026-08-30",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-rules:movement-phase:fall-back-move",
+            "gw-11e-core-rules:movement-phase:move-units-step",
+            "gw-11e-core-rules:movement-phase:selecting-modes"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-other-concepts",
+          "version": "maintained-app-mirrors-observed-2026-09-08",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-rules:other-concepts:mortal-wounds",
+            "gw-11e-core-rules:other-concepts:visibility",
+            "gw-11e-core-rules:other-concepts:visibility-any-part-faq",
+            "gw-11e-core-rules:other-concepts:visibility-classifications"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-stratagems",
+          "version": "reviewed-stratagems-observed-2026-09-02",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-stratagems:core:crushing-impact",
+            "gw-11e-core-stratagems:core:explosives",
+            "gw-11e-core-stratagems:core:fire-overwatch",
+            "gw-11e-core-stratagems:core:insane-bravery",
+            "gw-11e-core-stratagems:core:rapid-ingress",
+            "gw-11e-core-stratagems:rule:snap-shooting"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-rules-and-event-updates-2026-07-22",
+          "version": "2026-07-22",
+          "allowed_rule_source_ids": [
+            "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:01.02.03-embarked-model-return",
+            "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:05.03.02-post-roll-attack-profiles",
+            "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:05.04.05-fight-on-death",
+            "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09-normal-move-one-per-phase",
+            "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09.07.01-desperate-escape-definition",
+            "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09.07.01-forced-desperate-escape",
+            "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:12.08-objective-consolidation",
+            "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first",
+            "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:18.01-dedicated-transport",
+            "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:20.01.02-strategic-reserves",
+            "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:24.28.01-precision-devastating-wounds",
+            "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:24.37.01-torrent",
+            "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:25.04-epic-hero-enhancements",
+            "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:25.04-incursion-detachment",
+            "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:faq-hazardous-mixed-unit-keywords",
+            "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:faq-heavy-fly-horizontal-distance"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-objectives",
+          "version": "maintained-app-mirrors-observed-2026-09-05",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-objectives:objective-marker-terminology-faq",
+            "gw-11e-core-objectives:objectives-not-within-a-terrain-area",
+            "gw-11e-core-objectives:terrain-objective-control-range",
+            "gw-11e-core-objectives:terrain-objectives"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-fight",
+          "version": "maintained-app-mirrors-owner-resolved-v946-2026-09-21",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-fight:consolidate-step",
+            "gw-11e-core-fight:consolidation-move",
+            "gw-11e-core-fight:ongoing-consolidation-erratum"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-aura-psychic",
+          "version": "maintained-app-mirrors-observed-2026-09-06",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-aura-psychic:aura-abilities",
+            "gw-11e-core-aura-psychic:psychic-abilities-with-a-psychic-level"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-duplicated-abilities",
+          "version": "maintained-app-mirrors-observed-2026-09-06",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-duplicated-abilities:duplicated-abilities"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-off-battlefield-battle-shock",
+          "version": "maintained-app-mirrors-observed-2026-09-06",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-off-battlefield-battle-shock:off-battlefield-battle-shock"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-unit-splitting",
+          "version": "maintained-app-mirrors-observed-2026-09-06",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-unit-splitting:balanced-unit-splitting",
+            "gw-11e-core-unit-splitting:unit-splitting"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-embarked-abilities",
+          "version": "maintained-app-mirrors-observed-2026-09-07",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-embarked-abilities:embarked-abilities",
+            "gw-11e-core-embarked-abilities:off-battlefield-ability-conditions"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-modifiers",
+          "version": "maintained-app-mirrors-observed-2026-09-07",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-modifiers:detection-lone-operative-limits",
+            "gw-11e-core-modifiers:healing",
+            "gw-11e-core-modifiers:ignore-individual-modifiers",
+            "gw-11e-core-modifiers:modified-dice-limits",
+            "gw-11e-core-modifiers:ordered-modifiers",
+            "gw-11e-core-modifiers:psychic-individual-modifiers",
+            "gw-11e-core-modifiers:stratagem-cost-limits",
+            "gw-11e-core-modifiers:weapons-with-no-strength"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-fight-on-death",
+          "version": "maintained-app-mirrors-observed-2026-09-07",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-fight-on-death:fight-on-death",
+            "gw-11e-core-fight-on-death:retained-presence"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-model-keywords",
+          "version": "maintained-app-mirrors-observed-2026-09-08",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-model-keywords:destroyed-model-keywords"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-indirect-shooting",
+          "version": "maintained-app-mirrors-observed-2026-09-09",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-indirect-shooting:indirect-shooting",
+            "gw-11e-core-indirect-shooting:remain-stationary"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-actions",
+          "version": "maintained-app-mirrors-observed-2026-09-09",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-actions:assault-shooting",
+            "gw-11e-core-actions:close-quarters-shooting",
+            "gw-11e-core-actions:normal-shooting",
+            "gw-11e-core-actions:performing-actions"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-sequencing",
+          "version": "maintained-app-mirrors-observed-2026-09-10",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-sequencing:active-player",
+            "gw-11e-core-sequencing:players-rules",
+            "gw-11e-core-sequencing:rules-sequencing",
+            "gw-11e-core-sequencing:end-turn-mission-order",
+            "gw-11e-core-sequencing:end-round-mission-order"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-stealth",
+          "version": "maintained-app-mirrors-observed-2026-09-12",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-stealth:stealth"
+          ],
+          "catalog_sha256": "5f0bc9b93f64d7b3a39bed442c3fc54b81350e419f5d14d459b07134fd1cfe55"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-smokescreen",
+          "version": "maintained-app-mirrors-observed-2026-09-12",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-stratagems:core:smokescreen"
+          ],
+          "catalog_sha256": "f5b55c15d38956fa0662bcaf7ad0ef40414440e330f61b86c75cd1d9ff745c62"
+        },
+        {
+          "allowed_rule_source_ids": [
+            "gw-11e-core-target-replacement:target-no-longer-eligible-or-viable"
+          ],
+          "catalog_sha256": "7950519230872ac982cee490834a5e41b6797923ad4fdfcae9f19aa763fc8668",
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-target-replacement",
+          "version": "maintained-app-mirrors-observed-2026-09-12"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-critical-hits",
+          "version": "maintained-app-mirrors-observed-2026-10-01",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-critical-hits:critical-hit-success-faq",
+            "gw-11e-core-critical-hits:snap-critical-hit-faq",
+            "gw-11e-core-critical-hits:snap-shooting-no-critical-hits"
+          ],
+          "catalog_sha256": "866683e53b3192ba3bbb53b5e112d77cc125283ef25eed7f249d76330ab7e714"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-lethal-hits",
+          "version": "maintained-app-mirrors-observed-2026-09-13",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-lethal-hits:lethal-hits"
+          ],
+          "catalog_sha256": "ba47fa058cd10dd39be8148446626843d230ea6274d60da0d59ffcb812d3d0b4"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-charge",
+          "version": "maintained-app-mirrors-observed-2026-09-14",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-charge:model-endpoints",
+            "gw-11e-core-charge:modified-charge-targets-faq"
+          ],
+          "catalog_sha256": "ba9135b7aed94bc68621bd5f3db9647ab623ed7c5dd6638f5124abf1253309d9"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-flying",
+          "version": "maintained-app-mirrors-observed-2026-09-15",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-flying:take-to-the-skies"
+          ],
+          "catalog_sha256": "1b1cd0ddd59e7379bb2f0d90e7b3b1e96499f40fa680ad0ca62565222c68f2c4"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-surge",
+          "version": "maintained-app-mirrors-observed-2026-09-16",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-surge:surge-move"
+          ],
+          "catalog_sha256": "0704c8588bd0f343af951af7fda729b6d182c559ae90d46755c61784f48baaba"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-super-heavy-walker",
+          "version": "maintained-app-mirrors-observed-2026-09-16",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-super-heavy-walker:super-heavy-walker"
+          ],
+          "catalog_sha256": "90e6d87bef527b37d00b9a6fbf0808f2aa6dddb366ac84dc4168cf29af2f6316"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-large-model-setup",
+          "version": "maintained-app-mirrors-observed-2026-09-17",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-large-model-setup:large-model-setup"
+          ],
+          "catalog_sha256": "83a5253f6ee50bbd0681a5b95cdaead626b872b99865f7b4136abb17757145e4"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-large-model-disembark",
+          "version": "maintained-app-mirrors-observed-2026-09-17",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-large-model-disembark:large-model-disembark"
+          ],
+          "catalog_sha256": "908613587fd368a1b386aa3e601b18bff4c7cd1a95c17eafcec60fc055c4717a"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-measuring-to-destroyed",
+          "version": "maintained-app-mirrors-observed-2026-09-18",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-measuring-to-destroyed:measuring-to-destroyed"
+          ],
+          "catalog_sha256": "0d5ed1ef4d4c459028037b3602e2687fa66f71193ec5b33d8fef2f749d64e213"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-failed-save-damage-timing",
+          "version": "maintained-app-mirrors-observed-2026-09-18",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-failed-save-damage-timing:damage-to-0-after-saves-faq"
+          ],
+          "catalog_sha256": "9dbe167c20bb423863d6a24118ca16dd0dab7a47b977b1ef53835e8cadcdaa98"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-empty-dedicated-transport",
+          "version": "maintained-app-mirrors-observed-2026-09-18",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-empty-dedicated-transport:empty-dedicated-transport"
+          ],
+          "catalog_sha256": "f5ae3409fd824ca0440f74c1408097936ed21c42d5c8da940fcf9dc1e6054096"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-emergency-disembark-placement",
+          "version": "maintained-app-mirrors-observed-2026-09-18",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-emergency-disembark-placement:emergency-disembark-placement"
+          ],
+          "catalog_sha256": "4231ddfb2ba34e156b67508bb8bfa58cb1de8249fe9d054ce1138c392f7c7da3"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-embark-setup-turn",
+          "version": "maintained-app-mirrors-observed-2026-09-19",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-embark-setup-turn:embark-setup-turn"
+          ],
+          "catalog_sha256": "9457a192ef594b908999bece210538928cb95b83e9d1c0b10f4650a122c5b032"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-reserve-transport",
+          "version": "maintained-app-mirrors-observed-2026-09-19",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-reserve-transport:reserve-transport",
+            "gw-11e-core-reserve-transport:placing-reserves",
+            "gw-11e-core-reserve-transport:ingress"
+          ],
+          "catalog_sha256": "284752ce215947df71e2d33ab66b4537cb46d84c3a90b029bbb6665a829f65f7"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-reserve-lifetimes",
+          "version": "maintained-app-mirrors-observed-2026-09-19",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-reserve-lifetimes:final-turn-cleanup",
+            "gw-11e-core-reserve-lifetimes:reposition",
+            "gw-11e-core-reserve-lifetimes:arrival",
+            "gw-11e-core-reserve-lifetimes:ingress"
+          ],
+          "catalog_sha256": "d77c1b5dac44496179649e545dd0ba130bf18b02a7f8c32c91fedf9a2b9c6672"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-firing-deck",
+          "version": "maintained-app-mirrors-observed-2026-09-20",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-firing-deck:firing_deck"
+          ],
+          "catalog_sha256": "269d9e02ff7bc13cabc08aa4b8682db278589b8369a49ec210f47663f439680b"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-aircraft",
+          "version": "maintained-app-mirrors-observed-2026-09-20",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-aircraft:charging-and-fighting",
+            "gw-11e-core-aircraft:deployment",
+            "gw-11e-core-aircraft:movement",
+            "gw-11e-core-aircraft:shooting"
+          ],
+          "catalog_sha256": "30dc3b26155ee42de4bf51ec40f8568aefbb924f47e157cf63ce09d7ed13f51b"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-mustering-limits",
+          "version": "maintained-app-mirrors-observed-2026-09-20",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-mustering-limits:battle_size",
+            "gw-11e-core-mustering-limits:single_three_dp_detachment",
+            "gw-11e-core-mustering-limits:upgrade_accounting"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-roster-models",
+          "version": "maintained-app-mirrors-observed-2026-09-20",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-roster-models:enhancement",
+            "gw-11e-core-roster-models:warlord"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-roster-construction",
+          "version": "maintained-app-mirrors-observed-2026-09-20",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-roster-construction:constraints",
+            "gw-11e-core-roster-construction:duplicate-detachment",
+            "gw-11e-core-roster-construction:support-attachment",
+            "gw-11e-core-roster-construction:unit-admission"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-fights-first",
+          "version": "maintained-app-mirrors-observed-2026-09-21",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-fights-first:fights-first",
+            "gw-11e-core-fights-first:unit-grants"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-engaged-shooting",
+          "version": "maintained-app-mirrors-observed-2026-09-21",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-engaged-shooting:engaged-monster-vehicle-target"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-gone-to-ground",
+          "version": "maintained-app-mirrors-observed-2026-09-23",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-gone-to-ground:gone-to-ground"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-revival",
+          "version": "maintained-app-mirrors-observed-2026-09-24",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-revival:revival"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-dice-results",
+          "version": "maintained-app-mirrors-observed-2026-09-24",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-dice-results:highest-lowest",
+            "gw-11e-core-dice-results:treated-as-set-to",
+            "gw-11e-core-dice-results:default-critical-hit",
+            "gw-11e-core-dice-results:default-critical-wound"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-base-contact",
+          "version": "maintained-app-mirrors-observed-2026-09-24",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-base-contact:deemed-base-contact"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-table-quarters",
+          "version": "maintained-app-mirrors-observed-2026-09-25",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-table-quarters:table-quarters"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-random-characteristics",
+          "version": "maintained-app-mirrors-observed-2026-09-25",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-random-characteristics:random-characteristics"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-transports",
+          "version": "reviewed-transports-shock-observed-2026-10-01",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-rules:transports:assault-disembark-move",
+            "gw-11e-core-rules:transports:emergency-disembark-move",
+            "gw-11e-core-rules:transports:shock-disembark-move"
+          ],
+          "catalog_sha256": null
+        }
+      ]
+    },
+    {
+      "scope_id": "warhammer_40000_11th_factions",
+      "edition": "warhammer_40000_11th",
+      "corpus": "matched_play_factions_detachments_datasheets",
+      "policy_ids": [
+        "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05"
+      ],
+      "audit_rows": [
+        {
+          "audit_id": "faction-maintained-app-mirror-2026-09-05",
+          "row_id": "f00:faction:adepta-sororitas",
+          "source_observation_sha256": "b6b959e996a5616b29e9595889a0501b7d3d49891a194a170eb05e5d8f063091",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/factions/adepta-sororitas/army-rules",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "identity_kind": "versioned_observation",
+          "identity_value": "946@2026-09-05T22:36:11+00:00"
+        },
+        {
+          "audit_id": "faction-maintained-app-mirror-2026-09-05",
+          "row_id": "f00:detachment:adepta-sororitas",
+          "source_observation_sha256": "f69f04398ac2b49ffd999e74e6003ddc3b5d4229dda0c0bcbeddf087363c9fa6",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/factions/adepta-sororitas/detachments/sanctified-orators",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "identity_kind": "versioned_observation",
+          "identity_value": "946@2026-09-05T22:36:11+00:00"
+        },
+        {
+          "audit_id": "faction-maintained-app-mirror-2026-09-05",
+          "row_id": "f00:datasheet:adepta-sororitas",
+          "source_observation_sha256": "549cee4dfb3ad4bba0ffa8d4be6c65c4fce8610a6766ea5f6b90fd8a1fc8beda",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/factions/adepta-sororitas/units/exorcist",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "identity_kind": "versioned_observation",
+          "identity_value": "946@2026-09-05T22:36:11+00:00"
+        },
+        {
+          "audit_id": "retained-attack-faction-app-mirror-2026-09-08",
+          "row_id": "space-marines:hellblaster-squad:for-the-chapter",
+          "source_observation_sha256": "d4274993057452b0f88dc4a3f0cff441f82c9503b16fb2f8f7e62cbab424e28d",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/factions/space-marines/units/hellblaster-squad",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "identity_kind": "versioned_observation",
+          "identity_value": "946@2026-09-08T01:39:45+00:00"
+        },
+        {
+          "audit_id": "retained-attack-faction-app-mirror-2026-09-08",
+          "row_id": "grey-knights:hallowed-conclave:unending-fidelity",
+          "source_observation_sha256": "27e9d21da15cbbf3117914f9be65a66f703d031f7dd2ff11a69feaa2deb2e0ec",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/factions/grey-knights/detachments/hallowed-conclave",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "identity_kind": "versioned_observation",
+          "identity_value": "946@2026-09-08T01:39:45+00:00"
+        }
+      ],
+      "legacy_observations": [],
+      "legacy_controlling_transcriptions": [],
+      "source_packages": [
+        {
+          "namespace": "core-v2-reviewed-app-mirror",
+          "package_name": "reviewed-faction-app-observations",
+          "version": "app-data-946-observed-2026-09-05",
+          "allowed_rule_source_ids": [
+            "faction-app:adepta-sororitas:army-rules",
+            "faction-app:adepta-sororitas:datasheet:exorcist",
+            "faction-app:adepta-sororitas:detachment:sanctified-orators"
+          ],
+          "catalog_sha256": "81ab4a71ea5e22f4fae34a657c49e5abcbfce37977bb1a32ed72917d4532eb91"
+        },
+        {
+          "namespace": "core-v2-reviewed-app-mirror",
+          "package_name": "reviewed-retained-attack-faction-sources",
+          "version": "app-data-946-observed-2026-09-08",
+          "allowed_rule_source_ids": [
+            "faction-app:grey-knights:hallowed-conclave:unending-fidelity",
+            "faction-app:space-marines:hellblaster-squad:for-the-chapter"
+          ],
+          "catalog_sha256": "e1f80012ea30fdaf487ba1f4737e93da5b34dc40b70011f26592060c4d9a5ba0"
+        }
+      ]
+    }
+  ]
+}

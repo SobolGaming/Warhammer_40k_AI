@@ -1,0 +1,1249 @@
+{
+  "requirement_bindings": {
+    "01.02.02-obligation-05": {
+      "current_test_nodes": [
+        "tests/unit/test_order122_effect_defaults.py::test_implicit_duration_reaches_weapon_characteristic_consumer",
+        "tests/unit/test_order122_effect_defaults.py::test_default_lifetime_uses_period_and_actual_turn_owner",
+        "tests/unit/test_order122_effect_defaults.py::test_explicit_duration_always_overrides_default",
+        "tests/unit/test_order122_effect_defaults.py::test_missing_default_calendar_prevents_preceding_command_point_mutation",
+        "tests/unit/test_order122_effect_defaults.py::test_nonpersistent_rule_evaluation_needs_no_implicit_calendar",
+        "tests/unit/test_order122_effect_defaults.py::test_typed_trigger_period_cannot_be_granted_in_a_different_phase",
+        "tests/unit/test_order122_effect_defaults.py::test_loaded_default_grant_full_cycles_restore_fork_viewers_and_replay"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "01.02.02-obligation-06": {
+      "current_test_nodes": [
+        "tests/unit/test_order122_effect_defaults.py::test_implicit_duration_reaches_weapon_characteristic_consumer",
+        "tests/unit/test_order122_effect_defaults.py::test_default_lifetime_uses_period_and_actual_turn_owner",
+        "tests/unit/test_order122_effect_defaults.py::test_explicit_duration_always_overrides_default",
+        "tests/unit/test_order122_effect_defaults.py::test_missing_default_calendar_prevents_preceding_command_point_mutation",
+        "tests/unit/test_order122_effect_defaults.py::test_nonpersistent_rule_evaluation_needs_no_implicit_calendar",
+        "tests/unit/test_order122_effect_defaults.py::test_typed_trigger_period_cannot_be_granted_in_a_different_phase",
+        "tests/unit/test_order122_effect_defaults.py::test_loaded_default_grant_full_cycles_restore_fork_viewers_and_replay"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "01.04.03-obligation-06": {
+      "current_test_nodes": [
+        "tests/unit/test_order131_objective_movement.py::test_source_consumer_facade_retry_persistence_fork_views_events_replay",
+        "tests/unit/test_order131_objective_endpoint_geometry.py::test_continuous_wall_endpoint_proof_requires_a_legal_full_witness"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "02.01.01-obligation-01": {
+      "current_test_nodes": [
+        "tests/unit/test_order123_datasheet_identity.py::test_name_is_normalized_once_without_rewriting_retained_catalog_keywords",
+        "tests/unit/test_order123_datasheet_identity.py::test_scoped_and_materialization_assignments_add_only_datasheet_identity",
+        "tests/unit/test_order123_datasheet_identity.py::test_live_model_scope_keeps_identity_after_specialist_casualty",
+        "tests/unit/test_order123_datasheet_identity.py::test_identity_keeps_native_keyword_punctuation_and_deduplicates",
+        "tests/unit/test_order123_datasheet_identity.py::test_official_admitted_catalog_already_has_names_and_preserves_reconciliation",
+        "tests/unit/test_order123_datasheet_identity.py::test_catalog_name_transport_and_enhancement_gates_share_identity",
+        "tests/unit/test_order123_datasheet_identity.py::test_materialized_model_keeps_datasheet_identity_despite_distinct_model_label",
+        "tests/unit/test_order123_datasheet_identity.py::test_loaded_lifecycle_identity_pending_continuation_fork_viewers_and_exact_replay",
+        "tests/unit/test_order123_datasheet_identity.py::test_contextful_generic_gates_preserve_both_native_sides",
+        "tests/unit/test_order123_datasheet_identity.py::test_name_role_and_independent_grant_keep_conventional_keyword_compatibility",
+        "tests/unit/test_order123_datasheet_identity.py::test_near_names_coexist_in_one_attached_inventory_without_aliasing_each_other",
+        "tests/unit/test_order123_datasheet_identity.py::test_explicit_native_selector_declarations_disambiguate_eager_validation_only",
+        "tests/unit/test_order123_datasheet_identity.py::test_model_name_payload_metadata_is_strictly_paired",
+        "tests/unit/test_order123_datasheet_identity.py::test_weapon_positive_negative_and_anti_selectors_keep_native_spelling",
+        "tests/unit/test_order123_datasheet_identity.py::test_current_runtime_restore_authenticates_name_classification",
+        "tests/unit/test_order123_datasheet_identity.py::test_native_selector_metadata_preserves_eager_domain_container_errors",
+        "tests/unit/test_order123_datasheet_identity.py::test_declared_native_weapon_selectors_preserve_names_at_grammar_boundaries",
+        "tests/unit/test_order123_datasheet_identity.py::test_selected_mustering_name_grant_keeps_its_independent_ordinary_role",
+        "tests/unit/test_order123_datasheet_identity.py::test_mustering_name_role_is_limited_to_the_selected_model_profile"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "02.02-obligation-01": {
+      "current_test_nodes": [
+        "tests/unit/test_order115_absent_movement.py::test_absent_movement_cannot_advance_or_use_a_normal_move_bonus",
+        "tests/unit/test_order115_absent_movement.py::test_fixed_distance_reaction_preserves_per_model_absence",
+        "tests/unit/test_order115_absent_movement.py::test_facade_advance_retry_completion_restore_fork_and_replay",
+        "tests/unit/test_order115_absent_movement.py::test_shared_permission_serializes_and_proves_fixed_pose_reachability",
+        "tests/unit/test_order115_absent_movement.py::test_attached_movement_keeps_dash_bodyguard_fixed_and_numeric_leader_mobile",
+        "tests/unit/test_order115_absent_movement.py::test_dash_reactive_hold_is_an_engine_created_restorable_completion",
+        "tests/unit/test_order115_absent_movement.py::test_dash_fighter_completes_lethal_attacks_and_post_destruction_continuation",
+        "tests/unit/test_order115_absent_movement.py::test_fixed_oval_surge_certifies_maximum_approach_and_restores"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "02.03.01-obligation-01": {
+      "current_test_nodes": [
+        "tests/unit/test_order124_nested_conditions.py::test_selected_source_compiles_with_parent_and_stronger_branch",
+        "tests/unit/test_order124_nested_conditions.py::test_real_nested_upgrade_survives_pending_and_completed_continuations",
+        "tests/unit/test_order124_nested_conditions.py::test_incomplete_structured_nested_sources_gain_no_runtime_hook",
+        "tests/unit/test_order124_nested_conditions.py::test_real_boundary_control_negatives_keep_only_the_basic_permission",
+        "tests/unit/test_order124_nested_conditions.py::test_unrelated_attack_contexts_cannot_gain_the_nested_source",
+        "tests/unit/test_order124_nested_conditions.py::test_nested_source_requires_complete_actual_attack_context",
+        "tests/unit/test_order124_nested_conditions.py::test_shared_target_legality_and_closest_ties_preserve_eligible_targets",
+        "tests/unit/test_order124_nested_conditions.py::test_real_weaker_branch_and_outer_source_negatives",
+        "tests/unit/test_order124_nested_conditions.py::test_real_advanced_assault_preserves_nested_permission_and_continuations"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "02.05.01-obligation-11": {
+      "current_test_nodes": [
+        "tests/unit/test_order125_implicit_subjects.py::test_selected_default_subject_preserves_keyword_and_source_range",
+        "tests/unit/test_order125_implicit_subjects.py::test_complete_default_unit_rule_has_a_shared_executable_consumer",
+        "tests/unit/test_order125_implicit_subjects.py::test_catalog_loaded_selection_survives_full_lifecycle_continuations",
+        "tests/unit/test_order125_implicit_subjects.py::test_shared_selection_enforces_real_keyword_owner_range_and_source_boundaries",
+        "tests/unit/test_order125_implicit_subjects.py::test_implicit_subject_does_not_invent_keywords_aliases_or_discard_language",
+        "tests/unit/test_order125_implicit_subjects.py::test_explicit_noun_and_source_spans_remain_intact",
+        "tests/unit/test_order125_implicit_subjects.py::test_implicit_adjacent_keywords_keep_the_existing_conjunction",
+        "tests/unit/test_order125_implicit_subjects.py::test_ordinary_trigger_does_not_admit_unestablished_weapon_context",
+        "tests/unit/test_order125_implicit_subjects.py::test_subject_matcher_preserves_literal_declared_keyword_parts",
+        "tests/unit/test_order125_implicit_subjects.py::test_subject_matcher_keeps_explicit_overlap_and_literal_order",
+        "tests/unit/test_order125_implicit_subjects.py::test_explicit_model_subject_keeps_typed_evidence_and_no_unit_consumer",
+        "tests/unit/test_order125_implicit_subjects.py::test_explicit_model_catalog_subject_never_offers_a_unit_selection_in_native_play"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "02.05.01-obligation-12": {
+      "current_test_nodes": [
+        "tests/unit/test_order133_keyword_numbers.py::test_source_number_spellings_preserve_declared_runtime_token",
+        "tests/unit/test_order133_keyword_numbers.py::test_plural_adjacent_sequence_consumes_literal_alias_before_next_keyword",
+        "tests/unit/test_order133_keyword_numbers.py::test_unknown_and_invariant_tokens_are_not_stemmed",
+        "tests/unit/test_order133_keyword_numbers.py::test_catalog_loaded_selection_survives_full_lifecycle_continuations",
+        "tests/unit/test_order133_keyword_materialization.py::test_plural_raw_catalog_keeps_model_ownership_and_rederives_on_load",
+        "tests/unit/test_order133_keyword_materialization.py::test_plural_beast_uses_native_geometry_on_muster_and_materialization",
+        "tests/unit/test_order133_keyword_materialization.py::test_runtime_grants_and_mustering_preserve_raw_provenance",
+        "tests/unit/test_order133_keyword_materialization.py::test_distinct_owner_labels_do_not_acquire_inferred_number_aliases"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "03.01-obligation-03": {
+      "current_test_nodes": [
+        "tests/unit/test_order126_sequential_movement.py::test_cyclic_exchange_cannot_complete_either_model_first",
+        "tests/unit/test_order126_sequential_movement.py::test_facade_occupancy_order_invalid_retry_pending_completed_restore_and_replay",
+        "tests/unit/test_order126_sequential_movement.py::test_shared_path_consumers_accept_vacate_before_follow_and_reject_cyclic_occupancy",
+        "tests/unit/test_order126_sequential_movement.py::test_legal_friendly_transit_and_multisegment_rotation_remain_playable",
+        "tests/unit/test_order126_sequential_movement.py::test_native_sequential_move_against_overhanging_enemy_restores_and_replays",
+        "tests/unit/test_order126_sequential_movement.py::test_native_sequential_charge_against_overhanging_enemy_restores_and_replays"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "03.02.02-obligation-04": {
+      "current_test_nodes": [
+        "tests/unit/test_order128_setup_model_fit.py::test_whole_model_fit_searches_all_rotations_and_preserves_offset",
+        "tests/unit/test_order128_setup_model_fit.py::test_compound_parts_require_one_common_pose_not_independent_fits",
+        "tests/unit/test_order128_setup_model_fit.py::test_concentric_cutout_fit_preserves_largest_base_or_body",
+        "tests/unit/test_order128_setup_model_fit.py::test_circular_body_polygon_cutout_edge_corner_and_interior",
+        "tests/unit/test_order128_setup_model_fit.py::test_circular_body_concave_cutout_preserves_decomposition_seams",
+        "tests/unit/test_order128_setup_model_fit.py::test_original_avoidable_overhang_probe_rejects_and_ordinary_fit_survives",
+        "tests/unit/test_order128_setup_model_fit.py::test_cardinal_boundary_contact_is_wholly_contained",
+        "tests/unit/test_order128_setup_model_fit.py::test_impossible_zone_fit_does_not_excuse_avoidable_battlefield_overhang",
+        "tests/integration/test_order128_setup_overhang.py::test_cutout_zone_legal_impossible_body_fit_and_avoidable_retry",
+        "tests/integration/test_order128_setup_overhang.py::test_catalog_strategic_reserve_whole_body_fit_and_impossible_exception",
+        "tests/integration/test_order128_setup_overhang.py::test_catalog_deployment_body_fit_atomic_retry_restore_fork_views_events_replay",
+        "tests/integration/test_order128_setup_overhang.py::test_normal_catalog_redeploy_consumes_body_fit_authority",
+        "tests/integration/test_order128_setup_overhang.py::test_body_exception_keeps_base_and_submission_boundaries_atomic"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "03.02.02-obligation-09": {
+      "current_test_nodes": [
+        "tests/unit/test_order128_setup_model_fit.py::test_whole_model_fit_searches_all_rotations_and_preserves_offset",
+        "tests/unit/test_order128_setup_model_fit.py::test_compound_parts_require_one_common_pose_not_independent_fits",
+        "tests/unit/test_order128_setup_model_fit.py::test_concentric_cutout_fit_preserves_largest_base_or_body",
+        "tests/unit/test_order128_setup_model_fit.py::test_circular_body_polygon_cutout_edge_corner_and_interior",
+        "tests/unit/test_order128_setup_model_fit.py::test_circular_body_concave_cutout_preserves_decomposition_seams",
+        "tests/unit/test_order128_setup_model_fit.py::test_original_avoidable_overhang_probe_rejects_and_ordinary_fit_survives",
+        "tests/unit/test_order128_setup_model_fit.py::test_cardinal_boundary_contact_is_wholly_contained",
+        "tests/unit/test_order128_setup_model_fit.py::test_impossible_zone_fit_does_not_excuse_avoidable_battlefield_overhang",
+        "tests/integration/test_order128_setup_overhang.py::test_cutout_zone_legal_impossible_body_fit_and_avoidable_retry",
+        "tests/integration/test_order128_setup_overhang.py::test_catalog_strategic_reserve_whole_body_fit_and_impossible_exception",
+        "tests/integration/test_order128_setup_overhang.py::test_catalog_deployment_body_fit_atomic_retry_restore_fork_views_events_replay",
+        "tests/integration/test_order128_setup_overhang.py::test_normal_catalog_redeploy_consumes_body_fit_authority",
+        "tests/integration/test_order128_setup_overhang.py::test_body_exception_keeps_base_and_submission_boundaries_atomic"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "03.02.02-obligation-02": {
+      "current_test_nodes": [
+        "tests/unit/test_order134_deployment_restrictions.py::test_constructed_condition_shared_consumers_and_actual_turn_expiry",
+        "tests/unit/test_order134_deployment_restrictions.py::test_pregame_seam_creates_no_first_turn_effect",
+        "tests/unit/test_order134_deployment_restrictions.py::test_conditional_seam_invalid_context_is_atomic",
+        "tests/unit/test_order134_deployment_restrictions.py::test_conditional_effect_envelope_rejects_malformed_restore",
+        "tests/unit/test_order134_deployment_restrictions.py::test_conditional_restore_binds_model_target_and_owner",
+        "tests/unit/test_order134_deployment_restrictions.py::test_dead_qualifying_model_keeps_valid_conditional_state_and_remaining_unit_lock",
+        "tests/unit/test_order134_deployment_restrictions.py::test_constructed_split_inventory_retains_conditional_source_model_membership",
+        "tests/unit/test_order134_deployment_restrictions.py::test_conditional_checkpoint_facade_restore_fork_views_events_replay_continuation"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "03.02.02-obligation-03": {
+      "current_test_nodes": [
+        "tests/unit/test_order134_deployment_restrictions.py::test_constructed_condition_shared_consumers_and_actual_turn_expiry",
+        "tests/unit/test_order134_deployment_restrictions.py::test_pregame_seam_creates_no_first_turn_effect",
+        "tests/unit/test_order134_deployment_restrictions.py::test_conditional_seam_invalid_context_is_atomic",
+        "tests/unit/test_order134_deployment_restrictions.py::test_conditional_effect_envelope_rejects_malformed_restore",
+        "tests/unit/test_order134_deployment_restrictions.py::test_conditional_restore_binds_model_target_and_owner",
+        "tests/unit/test_order134_deployment_restrictions.py::test_dead_qualifying_model_keeps_valid_conditional_state_and_remaining_unit_lock",
+        "tests/unit/test_order134_deployment_restrictions.py::test_constructed_split_inventory_retains_conditional_source_model_membership",
+        "tests/unit/test_order134_deployment_restrictions.py::test_conditional_checkpoint_facade_restore_fork_views_events_replay_continuation"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "03.02.03-obligation-03": {
+      "current_test_nodes": [
+        "tests/integration/test_order127_infiltrators_redeploy.py::test_catalog_infiltrators_redeploy_outside_zone_restores_and_replays",
+        "tests/integration/test_order127_infiltrators_redeploy.py::test_catalog_noninfiltrators_remain_zone_bound_and_invalid_placement_is_atomic",
+        "tests/integration/test_order127_infiltrators_redeploy.py::test_catalog_infiltrator_geometry_rejection_preserves_state_and_retry",
+        "tests/integration/test_order127_infiltrators_redeploy.py::test_attached_redeploy_requires_infiltrators_on_every_component"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "faq-904b8b36-09f0-4449-a9c3-45892664ef60-obligation-01": {
+      "current_test_nodes": [
+        "tests/unit/test_order130_model_mission_destruction.py::test_surviving_unit_coherency_casualty_scores_per_model",
+        "tests/unit/test_order130_model_mission_destruction.py::test_native_w20_casualty_uses_the_same_model_scoring_history_once"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "04.03.05-obligation-04": {
+      "current_test_nodes": [
+        "tests/unit/test_fight_selection_completion.py::test_selection_completion_records_only_actual_fights_and_preserves_timing",
+        "tests/unit/test_fight_selection_completion.py::test_armed_retained_fight_cleanup_preserves_completion_across_restore",
+        "tests/unit/test_fight_selection_completion.py::test_empty_retained_selection_waits_for_phase_end_cleanup_across_restore",
+        "tests/unit/test_fight_selection_completion.py::test_armed_selection_without_a_melee_target_completes_without_fighting",
+        "tests/unit/test_fight_selection_completion.py::test_actual_melee_attempt_counts_even_when_it_misses_or_hits_automatically",
+        "tests/unit/test_fight_selection_completion.py::test_engaging_response_preserves_empty_selection_and_resumes_once"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "faq-ee9a398d-3acb-4440-b63a-68bed3e6e217-obligation-01": {
+      "current_test_nodes": [
+        "tests/unit/test_precision_target_grouping.py::test_non_character_target_gathers_both_physical_precision_orders",
+        "tests/unit/test_precision_target_grouping.py::test_character_target_preserves_distinct_precision_groups",
+        "tests/unit/test_precision_target_grouping.py::test_mixed_precision_random_defence_history_restores_and_replays",
+        "tests/unit/test_precision_target_grouping.py::test_selected_duplicate_precision_source_follows_target_applicability",
+        "tests/unit/test_precision_target_grouping.py::test_legal_extra_attacks_share_target_aware_grouping",
+        "tests/unit/test_precision_target_grouping.py::test_actual_casualties_retarget_unresolved_precision_groups",
+        "tests/unit/test_precision_target_grouping.py::test_group_context_is_required_strict_and_pending_mutation_fails_atomically",
+        "tests/unit/test_precision_target_grouping.py::test_non_precision_selected_source_identity_remains_distinct",
+        "tests/unit/test_precision_target_grouping.py::test_attached_character_allocation_and_casualty_preserve_recorded_group_context"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "faq-5553f538-6182-4e72-905a-67855489bb1d-obligation-01": {
+      "current_test_nodes": [
+        "tests/unit/test_order104_range_visibility.py::test_range_and_visibility_use_independent_models_with_complete_witnesses",
+        "tests/unit/test_order104_range_visibility.py::test_visibility_does_not_replace_required_weapon_range",
+        "tests/unit/test_order104_range_visibility.py::test_detection_and_visibility_remain_required",
+        "tests/unit/test_order104_range_visibility.py::test_different_enemy_units_cannot_combine_range_and_visibility",
+        "tests/unit/test_order104_range_visibility.py::test_hidden_near_model_still_supplies_rapid_fire_half_range",
+        "tests/unit/test_order104_range_visibility.py::test_facade_accepts_separate_witnesses_with_restore_continuation_and_replay"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "06.02.01-obligation-02": {
+      "current_test_nodes": [
+        "tests/unit/test_order116_additional_mortals.py::test_source_backed_additional_mortals_preserve_attack_identity_and_damage_order",
+        "tests/unit/test_order116_additional_mortals.py::test_additional_mortal_pending_retry_restore_and_lethal_continuation",
+        "tests/unit/test_order116_additional_mortals.py::test_additional_mortal_weapon_scope_is_source_owned",
+        "tests/unit/test_order116_additional_mortals.py::test_additional_mortal_permission_validates_schema_and_occurrence",
+        "tests/unit/test_order116_additional_mortals.py::test_successful_wounds_generate_additional_mortals_even_after_successful_saves",
+        "tests/unit/test_order116_additional_mortals.py::test_additional_permission_id_cannot_alias_native_mortal_application",
+        "tests/unit/test_order116_additional_mortals.py::test_additional_mortals_coexist_with_native_devastating_wounds",
+        "tests/unit/test_order116_additional_mortals.py::test_attack_mortal_producers_resume_once_after_command_reroll_windows",
+        "tests/unit/test_order116_additional_mortals.py::test_gathered_additional_mortals_keep_each_physical_weapon_through_lethal_restore",
+        "tests/unit/test_order116_additional_mortals.py::test_attack_mortal_fnp_keeps_psychic_weapon_classification"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01": {
+      "current_test_nodes": [
+        "tests/unit/test_order117_mortal_allocation.py::test_order120_real_psychic_damage_source_and_historical_core_pins",
+        "tests/unit/test_order117_mortal_allocation.py::test_order120_classifies_explicit_source_title_once",
+        "tests/unit/test_order117_mortal_allocation.py::test_order120_ability_classification_survives_real_pending_fork_viewers_and_replay",
+        "tests/unit/test_order117_mortal_allocation.py::test_order120_non_psychic_ability_never_uses_psychic_only_protection",
+        "tests/unit/test_order117_mortal_allocation.py::test_order120_ordinary_extra_mortals_keep_the_originating_psychic_weapon",
+        "tests/unit/test_order117_mortal_allocation.py::test_order120_non_attack_direct_ability_damage_preserves_classification_before_mutation",
+        "tests/unit/test_order117_mortal_allocation.py::test_order120_malformed_or_wrong_source_descriptor_fails_closed",
+        "tests/unit/test_order117_mortal_allocation.py::test_order120_invalid_descriptor_rejects_before_zero_prevention_mutation",
+        "tests/unit/test_order117_mortal_allocation.py::test_allocation_trigger_executes_source_backed_prevention_before_wound_loss",
+        "tests/unit/test_order117_mortal_allocation.py::test_allocation_trigger_pending_choice_retry_fork_and_lethal_continuation",
+        "tests/unit/test_order117_mortal_allocation.py::test_allocation_boundary_is_independent_of_prevention_configuration",
+        "tests/unit/test_order117_mortal_allocation.py::test_allocation_permission_does_not_protect_another_rules_unit",
+        "tests/unit/test_order117_mortal_allocation.py::test_allocation_permission_factory_and_schema_fail_closed",
+        "tests/unit/test_order117_mortal_allocation.py::test_direct_route_executes_the_same_prevention_or_rejects_choice_before_mutation",
+        "tests/unit/test_order117_mortal_allocation.py::test_allocation_permission_freezes_all_attached_physical_models",
+        "tests/unit/test_order117_mortal_allocation.py::test_source_permission_survives_real_save_reroll_and_lethal_continuation",
+        "tests/unit/test_order117_mortal_allocation.py::test_missing_prevention_dice_authority_fails_before_allocation_and_allows_retry",
+        "tests/unit/test_order117_mortal_allocation.py::test_direct_unconditional_allocation_keeps_existing_prevention_dice_sequence"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "08.04-ability-window": {
+      "current_test_nodes": [
+        "tests/unit/test_order121_command_abilities.py::test_command_gain_executes_in_its_distinct_source_window",
+        "tests/unit/test_order121_command_abilities.py::test_command_abilities_sequence_resumes_then_finishes_before_end_effect",
+        "tests/unit/test_order121_command_abilities.py::test_other_unqualified_phase_does_not_gain_command_consumer",
+        "tests/unit/test_order121_command_abilities.py::test_real_battle_shock_finishes_before_command_ability",
+        "tests/unit/test_order121_command_abilities.py::test_failed_roll_or_lost_bearer_cannot_gain_cp",
+        "tests/unit/test_order121_command_abilities.py::test_command_body_repeats_only_on_owners_turn_through_full_phase_cycles",
+        "tests/unit/test_order121_command_abilities.py::test_command_body_rejects_entry_before_core_steps",
+        "tests/unit/test_order121_command_abilities.py::test_qualified_command_trigger_does_not_gain_body_consumer",
+        "tests/unit/test_order121_command_abilities.py::test_command_body_audits_after_manager_creation_preserve_native_dice_and_restore"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "12.03-closest-target": {
+      "current_test_nodes": [
+        "tests/unit/test_order106_pile_in.py::test_pile_in_rejects_switching_target_or_avoidable_nonengagement",
+        "tests/unit/test_order106_pile_in.py::test_pile_in_legal_closest_engagement_restores_and_replays",
+        "tests/unit/test_order106_pile_in.py::test_pile_in_stationary_and_closed_loop_paths",
+        "tests/unit/test_order106_pile_in.py::test_pile_in_proven_unattainable_model_may_move_closer_without_engaging",
+        "tests/unit/test_order106_pile_in.py::test_pile_in_coherency_unresolved_does_not_invent_unattainability",
+        "tests/unit/test_order106_pile_in.py::test_pile_in_tied_closest_targets_allow_either_target",
+        "tests/unit/test_order106_pile_in.py::test_pile_in_closest_identity_is_attached_target_unit_not_one_component"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "12.03-attainable-engagement": {
+      "current_test_nodes": [
+        "tests/unit/test_order106_pile_in.py::test_pile_in_rejects_switching_target_or_avoidable_nonengagement",
+        "tests/unit/test_order106_pile_in.py::test_pile_in_legal_closest_engagement_restores_and_replays",
+        "tests/unit/test_order106_pile_in.py::test_pile_in_stationary_and_closed_loop_paths",
+        "tests/unit/test_order106_pile_in.py::test_pile_in_proven_unattainable_model_may_move_closer_without_engaging",
+        "tests/unit/test_order106_pile_in.py::test_pile_in_coherency_unresolved_does_not_invent_unattainability",
+        "tests/unit/test_order106_pile_in.py::test_pile_in_tied_closest_targets_allow_either_target",
+        "tests/unit/test_order106_pile_in.py::test_pile_in_closest_identity_is_attached_target_unit_not_one_component"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "faq-9657bb5d-72da-4d42-9927-731c9fc0e315-distance-window": {
+      "current_test_nodes": [
+        "tests/unit/test_order107_fight_distance_window.py::test_overrun_request_uses_core_distance",
+        "tests/unit/test_order107_fight_distance_window.py::test_overrun_rejects_extra_distance_then_restores_retries_and_replays",
+        "tests/unit/test_order107_fight_distance_window.py::test_matching_pile_in_step_keeps_extra_distance_and_historical_restore",
+        "tests/unit/test_order107_fight_distance_window.py::test_extra_distance_requires_matching_phase_and_step"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "13.06-exposed-traversal": {
+      "current_test_nodes": [
+        "tests/unit/test_order108_terrain_semantics.py::test_exposed_is_an_explicit_round_tripped_classification",
+        "tests/unit/test_order108_terrain_semantics.py::test_forbidden_terrain_paths_are_rejected",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_window_blocks_continuous_visibility",
+        "tests/unit/test_order108_terrain_semantics.py::test_shared_setup_endpoint_rejects_solid_window",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_volume_fills_only_enclosed_low_openings",
+        "tests/unit/test_order108_terrain_semantics.py::test_floor_transit_permissions_and_valid_context_persistence",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_windows_and_doors_share_visibility_and_endpoint_volume",
+        "tests/unit/test_order108_terrain_semantics.py::test_high_opening_and_body_protrusion_boundaries",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_door_does_not_become_a_physical_transit_blocker",
+        "tests/unit/test_order108_terrain_semantics.py::test_contact_uses_base_edge_and_continuous_union_not_sampled_poses",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_contact_accepts_clearance_and_rejects_lost_contact",
+        "tests/unit/test_order108_terrain_semantics.py::test_facade_terrain_rejection_retry_pending_completed_restore_and_replay",
+        "tests/unit/test_order108_terrain_semantics.py::test_exposed_logical_area_preserves_other_members_classification",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_climb_exact_contact_boundary_is_continuously_decidable",
+        "tests/unit/test_order108_terrain_semantics.py::test_facade_exact_contact_rotation_accepts_and_persists",
+        "tests/unit/test_order108_terrain_semantics.py::test_oval_rotating_contact_uses_continuous_support_minimum",
+        "tests/unit/test_order108_terrain_semantics.py::test_physical_floor_can_close_solid_window_without_sealing_open_top",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_floor_crossing_proves_actual_shape_clearance",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_floor_clearance_retains_tangent_endpoint",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_ceiling_does_not_fill_space_between_parallel_walls"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "13.06-dense-floor-crossing": {
+      "current_test_nodes": [
+        "tests/unit/test_order108_terrain_semantics.py::test_exposed_is_an_explicit_round_tripped_classification",
+        "tests/unit/test_order108_terrain_semantics.py::test_forbidden_terrain_paths_are_rejected",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_window_blocks_continuous_visibility",
+        "tests/unit/test_order108_terrain_semantics.py::test_shared_setup_endpoint_rejects_solid_window",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_volume_fills_only_enclosed_low_openings",
+        "tests/unit/test_order108_terrain_semantics.py::test_floor_transit_permissions_and_valid_context_persistence",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_windows_and_doors_share_visibility_and_endpoint_volume",
+        "tests/unit/test_order108_terrain_semantics.py::test_high_opening_and_body_protrusion_boundaries",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_door_does_not_become_a_physical_transit_blocker",
+        "tests/unit/test_order108_terrain_semantics.py::test_contact_uses_base_edge_and_continuous_union_not_sampled_poses",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_contact_accepts_clearance_and_rejects_lost_contact",
+        "tests/unit/test_order108_terrain_semantics.py::test_facade_terrain_rejection_retry_pending_completed_restore_and_replay",
+        "tests/unit/test_order108_terrain_semantics.py::test_exposed_logical_area_preserves_other_members_classification",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_climb_exact_contact_boundary_is_continuously_decidable",
+        "tests/unit/test_order108_terrain_semantics.py::test_facade_exact_contact_rotation_accepts_and_persists",
+        "tests/unit/test_order108_terrain_semantics.py::test_oval_rotating_contact_uses_continuous_support_minimum",
+        "tests/unit/test_order108_terrain_semantics.py::test_physical_floor_can_close_solid_window_without_sealing_open_top",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_floor_crossing_proves_actual_shape_clearance",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_floor_clearance_retains_tangent_endpoint",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_ceiling_does_not_fill_space_between_parallel_walls"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "13.06-vertical-contact": {
+      "current_test_nodes": [
+        "tests/unit/test_order108_terrain_semantics.py::test_exposed_is_an_explicit_round_tripped_classification",
+        "tests/unit/test_order108_terrain_semantics.py::test_forbidden_terrain_paths_are_rejected",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_window_blocks_continuous_visibility",
+        "tests/unit/test_order108_terrain_semantics.py::test_shared_setup_endpoint_rejects_solid_window",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_volume_fills_only_enclosed_low_openings",
+        "tests/unit/test_order108_terrain_semantics.py::test_floor_transit_permissions_and_valid_context_persistence",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_windows_and_doors_share_visibility_and_endpoint_volume",
+        "tests/unit/test_order108_terrain_semantics.py::test_high_opening_and_body_protrusion_boundaries",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_door_does_not_become_a_physical_transit_blocker",
+        "tests/unit/test_order108_terrain_semantics.py::test_contact_uses_base_edge_and_continuous_union_not_sampled_poses",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_contact_accepts_clearance_and_rejects_lost_contact",
+        "tests/unit/test_order108_terrain_semantics.py::test_facade_terrain_rejection_retry_pending_completed_restore_and_replay",
+        "tests/unit/test_order108_terrain_semantics.py::test_exposed_logical_area_preserves_other_members_classification",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_climb_exact_contact_boundary_is_continuously_decidable",
+        "tests/unit/test_order108_terrain_semantics.py::test_facade_exact_contact_rotation_accepts_and_persists",
+        "tests/unit/test_order108_terrain_semantics.py::test_oval_rotating_contact_uses_continuous_support_minimum",
+        "tests/unit/test_order108_terrain_semantics.py::test_physical_floor_can_close_solid_window_without_sealing_open_top",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_floor_crossing_proves_actual_shape_clearance",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_floor_clearance_retains_tangent_endpoint",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_ceiling_does_not_fill_space_between_parallel_walls"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "13.06.01-solid-endpoint": {
+      "current_test_nodes": [
+        "tests/unit/test_order108_terrain_semantics.py::test_exposed_is_an_explicit_round_tripped_classification",
+        "tests/unit/test_order108_terrain_semantics.py::test_forbidden_terrain_paths_are_rejected",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_window_blocks_continuous_visibility",
+        "tests/unit/test_order108_terrain_semantics.py::test_shared_setup_endpoint_rejects_solid_window",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_volume_fills_only_enclosed_low_openings",
+        "tests/unit/test_order108_terrain_semantics.py::test_floor_transit_permissions_and_valid_context_persistence",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_windows_and_doors_share_visibility_and_endpoint_volume",
+        "tests/unit/test_order108_terrain_semantics.py::test_high_opening_and_body_protrusion_boundaries",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_door_does_not_become_a_physical_transit_blocker",
+        "tests/unit/test_order108_terrain_semantics.py::test_contact_uses_base_edge_and_continuous_union_not_sampled_poses",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_contact_accepts_clearance_and_rejects_lost_contact",
+        "tests/unit/test_order108_terrain_semantics.py::test_facade_terrain_rejection_retry_pending_completed_restore_and_replay",
+        "tests/unit/test_order108_terrain_semantics.py::test_exposed_logical_area_preserves_other_members_classification",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_climb_exact_contact_boundary_is_continuously_decidable",
+        "tests/unit/test_order108_terrain_semantics.py::test_facade_exact_contact_rotation_accepts_and_persists",
+        "tests/unit/test_order108_terrain_semantics.py::test_oval_rotating_contact_uses_continuous_support_minimum",
+        "tests/unit/test_order108_terrain_semantics.py::test_physical_floor_can_close_solid_window_without_sealing_open_top",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_floor_crossing_proves_actual_shape_clearance",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_floor_clearance_retains_tangent_endpoint",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_ceiling_does_not_fill_space_between_parallel_walls"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "13.11-solid": {
+      "current_test_nodes": [
+        "tests/unit/test_order108_terrain_semantics.py::test_exposed_is_an_explicit_round_tripped_classification",
+        "tests/unit/test_order108_terrain_semantics.py::test_forbidden_terrain_paths_are_rejected",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_window_blocks_continuous_visibility",
+        "tests/unit/test_order108_terrain_semantics.py::test_shared_setup_endpoint_rejects_solid_window",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_volume_fills_only_enclosed_low_openings",
+        "tests/unit/test_order108_terrain_semantics.py::test_floor_transit_permissions_and_valid_context_persistence",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_windows_and_doors_share_visibility_and_endpoint_volume",
+        "tests/unit/test_order108_terrain_semantics.py::test_high_opening_and_body_protrusion_boundaries",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_door_does_not_become_a_physical_transit_blocker",
+        "tests/unit/test_order108_terrain_semantics.py::test_contact_uses_base_edge_and_continuous_union_not_sampled_poses",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_contact_accepts_clearance_and_rejects_lost_contact",
+        "tests/unit/test_order108_terrain_semantics.py::test_facade_terrain_rejection_retry_pending_completed_restore_and_replay",
+        "tests/unit/test_order108_terrain_semantics.py::test_exposed_logical_area_preserves_other_members_classification",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_climb_exact_contact_boundary_is_continuously_decidable",
+        "tests/unit/test_order108_terrain_semantics.py::test_facade_exact_contact_rotation_accepts_and_persists",
+        "tests/unit/test_order108_terrain_semantics.py::test_oval_rotating_contact_uses_continuous_support_minimum",
+        "tests/unit/test_order108_terrain_semantics.py::test_physical_floor_can_close_solid_window_without_sealing_open_top",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_floor_crossing_proves_actual_shape_clearance",
+        "tests/unit/test_order108_terrain_semantics.py::test_rotating_floor_clearance_retains_tangent_endpoint",
+        "tests/unit/test_order108_terrain_semantics.py::test_solid_ceiling_does_not_fill_space_between_parallel_walls"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "14.02-controlling-unit": {
+      "current_test_nodes": [
+        "tests/unit/test_order109_unit_control.py::test_control_requires_controller_and_range_even_with_positive_member",
+        "tests/unit/test_order109_unit_control.py::test_positive_oc_uses_runtime_modifiers_and_battle_shock",
+        "tests/unit/test_order109_unit_control.py::test_positive_member_follows_existing_rules_presence",
+        "tests/unit/test_order109_unit_control.py::test_outside_range_member_gets_recorded_random_oc_preparation",
+        "tests/unit/test_order109_unit_control.py::test_outside_range_member_gets_modifier_preparation",
+        "tests/unit/test_order109_unit_control.py::test_mission_completion_uses_frozen_all_model_control",
+        "tests/unit/test_order109_unit_control.py::test_shared_stratagem_control_separates_range_and_positive_oc",
+        "tests/unit/test_order109_unit_control.py::test_stratagem_selection_only_resolves_oc_for_in_range_candidates",
+        "tests/unit/test_order109_unit_control.py::test_frozen_unit_control_survives_facade_boundary_restore_and_exact_replay",
+        "tests/unit/test_order109_unit_control.py::test_mixed_unit_mission_action_facade_restore_and_exact_replay"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "faq-bbe268a2-b1fd-43ab-8b24-fd4363730c3f-shock-interrupt": {
+      "current_test_nodes": [
+        "tests/unit/test_action_movement_interruption.py::test_action_battle_shock_transition_is_terminal_except_explicit_permission",
+        "tests/unit/test_action_movement_interruption.py::test_explicit_shocked_action_permission_preserves_movement_interruption_and_replay",
+        "tests/unit/test_action_movement_interruption.py::test_shocked_start_uses_explicit_catalog_permission_through_facade",
+        "tests/unit/test_action_movement_interruption.py::test_completed_reactive_move_interrupts_action_through_facade",
+        "tests/unit/test_action_movement_interruption.py::test_declined_reactive_move_preserves_action_completion",
+        "tests/unit/test_action_movement_interruption.py::test_interruption_preserves_shooting_and_charge_locks",
+        "tests/unit/test_action_movement_interruption.py::test_action_evidence_classifies_completed_move_not_net_displacement",
+        "tests/unit/test_action_movement_interruption.py::test_restore_rejects_forged_completed_move_interruption",
+        "tests/unit/test_action_movement_interruption.py::test_secondary_terminal_cannot_hide_suppressed_move_interruption",
+        "tests/unit/test_action_movement_interruption.py::test_coordinated_secondary_completion_cannot_hide_move_interruption",
+        "tests/unit/test_action_movement_interruption.py::test_secondary_history_binds_immutable_start_fields_before_status_policy",
+        "tests/unit/test_action_movement_interruption.py::test_secondary_completion_requires_authentic_ordered_boundary",
+        "tests/unit/test_action_movement_interruption.py::test_secondary_terminal_authenticates_persisted_state_and_context",
+        "tests/unit/test_action_movement_interruption.py::test_failed_battle_shock_producer_interrupts_or_preserves_started_action",
+        "tests/unit/test_action_movement_interruption.py::test_action_permission_coverage_only_claims_supported_source_kind",
+        "tests/unit/test_action_movement_interruption.py::test_action_permission_requires_present_granting_attached_component",
+        "tests/unit/test_action_movement_interruption.py::test_action_permission_rejects_other_clause_shapes"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "faq-4c654d00-318d-4665-9e46-26cfab179a29-shock-permission": {
+      "current_test_nodes": [
+        "tests/unit/test_action_movement_interruption.py::test_action_battle_shock_transition_is_terminal_except_explicit_permission",
+        "tests/unit/test_action_movement_interruption.py::test_explicit_shocked_action_permission_preserves_movement_interruption_and_replay",
+        "tests/unit/test_action_movement_interruption.py::test_shocked_start_uses_explicit_catalog_permission_through_facade",
+        "tests/unit/test_action_movement_interruption.py::test_completed_reactive_move_interrupts_action_through_facade",
+        "tests/unit/test_action_movement_interruption.py::test_declined_reactive_move_preserves_action_completion",
+        "tests/unit/test_action_movement_interruption.py::test_interruption_preserves_shooting_and_charge_locks",
+        "tests/unit/test_action_movement_interruption.py::test_action_evidence_classifies_completed_move_not_net_displacement",
+        "tests/unit/test_action_movement_interruption.py::test_restore_rejects_forged_completed_move_interruption",
+        "tests/unit/test_action_movement_interruption.py::test_secondary_terminal_cannot_hide_suppressed_move_interruption",
+        "tests/unit/test_action_movement_interruption.py::test_coordinated_secondary_completion_cannot_hide_move_interruption",
+        "tests/unit/test_action_movement_interruption.py::test_secondary_history_binds_immutable_start_fields_before_status_policy",
+        "tests/unit/test_action_movement_interruption.py::test_secondary_completion_requires_authentic_ordered_boundary",
+        "tests/unit/test_action_movement_interruption.py::test_secondary_terminal_authenticates_persisted_state_and_context",
+        "tests/unit/test_action_movement_interruption.py::test_failed_battle_shock_producer_interrupts_or_preserves_started_action",
+        "tests/unit/test_action_movement_interruption.py::test_action_permission_coverage_only_claims_supported_source_kind",
+        "tests/unit/test_action_movement_interruption.py::test_action_permission_requires_present_granting_attached_component",
+        "tests/unit/test_action_movement_interruption.py::test_action_permission_rejects_other_clause_shapes"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "faq-9b1c81f5-2ea0-40eb-9015-6a005367cd75-friendly-transit": {
+      "current_test_nodes": [
+        "tests/unit/test_order111_friendly_transit.py::test_friendly_transit_uses_move_scope_and_retains_endpoint_and_enemy_rules",
+        "tests/unit/test_order111_friendly_transit.py::test_fall_back_through_friendly_model_retries_restores_and_replays",
+        "tests/unit/test_order111_friendly_transit.py::test_pile_in_friendly_transit_uses_facade_and_replays"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "18.07-preserve-passenger-engagement": {
+      "current_test_nodes": [
+        "tests/unit/test_v963_shock_disembark.py::test_v963_shock_unengaged_setup_has_no_queue_and_restores_exactly",
+        "tests/unit/test_v963_shock_disembark.py::test_v963_shock_malformed_and_stale_proposals_do_not_pop_or_mutate",
+        "tests/unit/test_v963_shock_disembark.py::test_v963_shock_charge_lock_includes_all_turn_end_rules_then_expires",
+        "tests/unit/test_v963_shock_disembark.py::test_v963_shock_rejects_passenger_engagement_without_mutation"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "18.07-post-placement-forced-fights": {
+      "current_test_nodes": [
+        "tests/unit/test_v963_shock_disembark.py::test_v963_shock_unengaged_setup_has_no_queue_and_restores_exactly",
+        "tests/unit/test_v963_shock_disembark.py::test_v963_shock_malformed_and_stale_proposals_do_not_pop_or_mutate",
+        "tests/unit/test_v963_shock_disembark.py::test_v963_shock_charge_lock_includes_all_turn_end_rules_then_expires",
+        "tests/unit/test_v963_shock_disembark.py::test_v963_shock_rejects_passenger_engagement_without_mutation"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "c2df3e97-f21e-4fc9-943e-37072c08c10e-aerialists-post-disembark": {
+      "current_test_nodes": [
+        "tests/unit/test_order61_embark.py::test_setup_blocks_every_transport_throughout_actual_turn",
+        "tests/unit/test_order61_embark.py::test_tactical_setup_followup_move_suppresses_embark_restores_and_replays",
+        "tests/unit/test_order61_embark.py::test_embark_finite_submission_revalidates_setup_before_queue_pop",
+        "tests/unit/test_order61_embark.py::test_setup_history_has_no_missing_field_or_surge_fallback",
+        "tests/unit/test_order61_embark.py::test_no_movement_embark_preserves_source_context_without_a_move",
+        "tests/unit/test_order61_embark.py::test_ordinary_embark_still_requires_its_real_move",
+        "tests/unit/test_order61_embark.py::test_source_embark_after_real_disembark_facade_restore_fork_replay",
+        "tests/unit/test_order61_embark.py::test_source_embark_after_disembark_requires_the_distinct_explicit_permission",
+        "tests/unit/test_order61_embark.py::test_source_embark_revalidates_supported_drift_before_queue_pop",
+        "tests/unit/test_order61_embark.py::test_attached_source_embark_moves_every_component_and_restores_replays",
+        "tests/unit/test_order61_embark.py::test_no_movement_context_identity_cannot_be_forged_into_another_selection",
+        "tests/unit/test_order61_embark.py::test_source_embark_then_rejected_disembark_retry_restores_and_replays"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "19.04-attack-sequence-source-retention": {
+      "current_test_nodes": [
+        "tests/unit/test_unit_abilities.py::test_attached_conferring_bearer_survives_as_ability_source_until_attacks_finish",
+        "tests/unit/test_unit_abilities.py::test_attached_source_lifetime_facade_restore_replay",
+        "tests/unit/test_unit_abilities.py::test_equipped_attached_source_lifetime_uses_shared_catalog_consumer",
+        "tests/unit/test_unit_abilities.py::test_mortal_application_routes_retain_only_attack_conferring_sources",
+        "tests/unit/test_unit_abilities.py::test_retained_model_aura_keeps_attached_ability_without_external_geometry",
+        "tests/unit/test_unit_abilities.py::test_retained_passive_stealth_source_grants_only_living_attached_recipients",
+        "tests/unit/test_unit_abilities.py::test_queued_source_destruction_survives_native_deferred_mortal_checkpoint",
+        "tests/unit/test_unit_abilities.py::test_core_keyword_ability_descriptors_enable_boolean_families_without_keywords",
+        "tests/unit/test_unit_abilities.py::test_parameterized_core_keyword_ability_descriptors_parse_values_without_keywords",
+        "tests/unit/test_unit_abilities.py::test_catalog_ability_descriptor_validates_wargear_ir_metadata",
+        "tests/unit/test_unit_abilities.py::test_catalog_ability_descriptor_rejects_non_json_ir_payload_values",
+        "tests/unit/test_unit_abilities.py::test_order56_core_family_is_normalized_at_the_descriptor_boundary",
+        "tests/unit/test_unit_abilities.py::test_order56_native_damage_abilities_preserve_each_source_before_selection",
+        "tests/unit/test_unit_abilities.py::test_order56_numeric_core_instances_require_and_retain_one_active_source",
+        "tests/unit/test_unit_abilities.py::test_order56_core_instance_decision_uses_facade_and_restores",
+        "tests/unit/test_unit_abilities.py::test_order56_keyword_grants_preserve_sources_even_when_already_present"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "24.05-blast-x-per-five": {
+      "current_test_nodes": [
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_order56_attack_inventory_preserves_conditional_sources_across_split_targets",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_order56_equal_sources_have_distinct_finite_choices",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_order56_duplicate_selection_precedes_target_conditions_and_never_stacks",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase13d_weapon_ability_helpers_use_structured_descriptors",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_order113_blast_x_uses_complete_groups_of_five",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_order113_blast_descriptor_preserves_value_condition_and_payload",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_order113_attack_count_sources_require_one_occurrence_without_stacking",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_order113_invalid_blast_value_fails_closed",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase13d_sustained_hits_d3_requires_resolved_d3_on_critical_hits",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase13d_weapon_ability_helpers_fail_fast_on_incomplete_profiles",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase13d_anti_keyword_threshold_matches_canonical_target_keywords",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase13d_anti_keyword_supports_slash_keywords_and_non_matching_targets",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase14i_duplicate_anti_keyword_abilities_require_selected_descriptor",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase14i_keyword_gated_weapon_abilities_match_target_keywords",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase14i_non_keyword_gated_weapon_abilities_match_missing_target_keywords",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase14i_hunter_target_gate_is_target_eligibility",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase14i_duplicate_anti_weapon_ability_selection_is_adapter_visible",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase13d_core_stratagem_effect_helpers_read_typed_payloads",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase13d_core_stratagem_effect_helpers_fail_fast_on_bad_payloads",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_order56_deadly_demise_instance_choice_is_mandatory",
+        "tests/unit/test_phase13d_weapon_ability_helpers.py::test_order113_blast_applicability_and_grouping_require_keyword",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_p06a_shooting_targets_cannot_use_a_sub_one_millimeter_visibility_gap",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_cached_shooting_lifecycle_templates_are_mutation_isolated",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_shooting_unit_selection_and_declaration_use_lifecycle_records",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14f_select_shooting_type_is_finite_before_declaration",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_order33_indirect_mode_and_mixed_weapon_outcomes",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_shooting_target_candidate_cache_uses_full_weapon_profile_identity",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14f_select_shooting_type_rejects_drift_before_mutation",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14f_select_shooting_type_rejects_wrong_actor_and_option_before_mutation",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_random_attacks_resolve_when_declaration_is_accepted",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_declaration_applies_rapid_blast_melta_and_heavy_modifiers",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_order113_blast_x_shared_declaration_count",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_order113_ingested_mixed_blast_requires_player_choice",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_advanced_unit_allowed_to_shoot_does_not_gain_heavy_modifier",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_applies_after_small_move_but_not_after_more_than_three_inches",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_out_of_phase_shooting",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_out_of_phase_shooting_declaration_records_ranged_attack_history",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_unit_set_up_this_turn",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_disembarked_unit_set_up_this_turn",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_engaged_unit",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_torrent_anti_and_devastating_wounds_are_attack_sequence_effects",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase18b_command_reroll_window_opens_after_shooting_hit_roll",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase18b_command_reroll_use_spends_cp_once_and_resumes_shooting_hit_roll",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase18b_command_reroll_rejects_stale_shooting_hit_opportunity",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase18b_command_reroll_rejects_wrong_opportunity_window_id",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase18b_command_reroll_decline_suppresses_same_shooting_hit_opportunity",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase18b_command_reroll_window_opens_after_shooting_wound_roll",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase18b_twin_linked_decline_preserves_command_reroll_choice",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase18b_command_reroll_window_opens_after_shooting_save_roll",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase18b_command_reroll_window_opens_after_shooting_damage_roll",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_deferred_devastating_mortal_wounds_route_feel_no_pain_choice",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_deferred_devastating_mortal_wounds_route_each_model_choice",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_pending_mortal_fnp_allocation_authority_rejects_tampering",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_pending_mortal_fnp_rejects_protected_character_substitution",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_singleton_mortal_fnp_allocation_authority_round_trips",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_mortal_progress_rejects_cross_unit_model_before_damage",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_mortal_wound_priority_tiers_cover_attached_characters",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_out_of_phase_post_roll_pools_are_ordered_by_active_player",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_precision_allocation_can_select_visible_attached_character",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_precision_devastating_mortal_wounds_prioritize_selected_character",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_precision_decline_or_no_visible_character_uses_bodyguard_allocation",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_precision_selection_persists_for_current_attack_pool",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_grouped_saves_roll_before_low_to_high_damage_allocation",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14k_grouped_damage_requests_defender_model_choice_inside_current_group",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14k_grouped_damage_auto_selects_only_wounded_model_in_current_group",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14k_damage_model_choice_payload_round_trips_json_safe",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14k_damage_model_choice_malformed_payload_rejects_before_queue_pop",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14k_damage_model_choice_stale_pending_damage_rejects_before_queue_pop",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14k_damage_model_choice_dead_selected_model_rejects_before_queue_pop",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14k_damage_model_choice_wounded_priority_drift_rejects_before_queue_pop",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_pooled_walk_recomputes_save_after_group_transition",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14i_impossible_armour_save_remains_real_save_roll",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14i_no_save_damage_order_die_is_not_a_save_roll",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_pending_grouped_damage_round_trips_across_fnp_pause",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_pending_grouped_damage_payload_validates_fail_fast",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_allocation_order_request_after_grouped_wound_pool",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_grouped_allocation_splits_real_shimmershield_bearer_before_save_rolls",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_grouped_failed_saves_transition_to_next_ordered_group",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_allocation_order_only_exposes_same_tier_choices",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_grouped_lethal_sustained_hits_use_grouped_host",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_grouped_devastating_wounds_cap_each_critical_wound",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_grouped_precision_promotes_character_then_returns_to_bodyguard",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_lethal_and_sustained_hits_resolve_generated_hits",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14i_lethal_hits_vehicle_gate_controls_auto_wound",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_attached_unit_uses_highest_bodyguard_toughness_for_wounds",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_attached_unit_uses_support_toughness_after_bodyguard_destroyed",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_attached_unit_uses_leader_toughness_after_bodyguard_destroyed",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_mustered_attached_unit_targets_and_allocates_as_rules_unit",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_mustered_attached_unit_uses_character_toughness_after_bodyguard_removed",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_mustered_attached_unit_selects_to_shoot_as_one_rules_unit",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_attached_target_uses_retained_component_geometry_but_living_allocation",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14i_sustained_hits_slash_keyword_gate_controls_generated_hits",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_twin_linked_consumes_submitted_reroll_semantics_once",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14f_indirect_fire_targets_unseen_units_and_unmodified_one_to_five_fail",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14f_friendly_visibility_query_uses_real_los_evidence",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14f_shooting_type_tokens_are_fail_fast",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14f_indirect_stationary_friendly_visibility_uses_one_to_three_fail",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_fire_overwatch_hits_only_on_unmodified_sixes",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_generic_rule_ir_fire_overwatch_threshold_status_applies",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14f_snap_shooting_rule_hits_only_on_unmodified_sixes",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_fire_overwatch_torrent_weapons_auto_hit",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_hazardous_tests_resolve_after_all_attacks",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_p24d_hazardous_preserves_order_through_completion_and_restore",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_wound_roll_table_uses_integer_safe_boundaries",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_attached_character_wounded_by_attacker_constraint_is_not_forced_later",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_attached_unit_roles_require_runtime_keyword_not_identifier_prefix",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_benefit_of_cover_does_not_modify_saves",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14i_impossible_save_options_are_not_filtered_out",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_invulnerable_and_armour_save_checks_have_no_save_kind_decision",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_armour_save_can_succeed_after_invulnerable_save_fails",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_benefit_of_cover_worsens_ballistic_skill_before_hit_roll",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase17_post_shoot_cover_denial_suppresses_cover_hit_penalty",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase17_post_shoot_cover_denial_suppresses_cover_save_eligibility",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_hit_roll_bonus_cap_applies_after_ballistic_skill_modifier",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_psychic_attack_can_ignore_detrimental_skill_and_hit_roll_modifiers",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_psychic_attack_can_ignore_detrimental_modifiers_and_keep_hit_bonus",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_roll",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_no_ability_sequence_resolves_and_emits_ordered_hooks",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_random_damage_is_not_rolled_for_saved_attacks",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_random_damage_rolls_after_failed_save",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_attack_payloads_hooks_and_fast_dice_groups",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_identical_attack_signature_and_gathered_group_payloads",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_precision_visibility_provenance_prevents_unsafe_gathering",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_attacker_observer_provenance_prevents_unsafe_cover_gathering",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_range_and_firing_deck_provenance_prevent_unsafe_gathering",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_shooting_test1_gathered_save_order_regression",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_gathered_attack_state_fails_fast_on_malformed_shapes",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_attack_sequence_round_trips_current_gathered_group_json_safe",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_select_target_and_attack_group_branch_precedence_records",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_single_target_and_group_auto_records_finite_choices",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_attack_sequence_selection_invalid_before_queue_pop",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_modifier_stack_host_payload_and_validation",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_decision_payloads_validate_fail_fast",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_save_roll_checks_one_invulnerable_then_armour",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_allocation_order_decision_payloads_validate_before_mutation",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_allocation_group_payloads_preserve_roles_and_priority",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_allocation_group_payloads_prioritize_wounded_then_allocated_models",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_allocation_order_decision_fails_fast_on_malformed_domain_objects",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_mandatory_saves_and_plunging_fire_are_typed",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_save_and_plunging_fire_validation_is_fail_fast",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_damage_mortal_wounds_and_feel_no_pain_hosts_round_trip",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_forced_single_source_feel_no_pain_reduces_failed_save_damage",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_allocated_attack_damage_modifier_runs_after_model_allocation",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_psychic_attack_classification_enables_psychic_only_feel_no_pain",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_optional_feel_no_pain_choice_routes_through_lifecycle",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_destroyed_model_reaction_choice_records_removal_and_selection",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_fight_on_death_model_retains_presence_and_component_keywords",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_fight_on_death_only_unit_is_targetable_without_new_damage",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_fight_target_enumeration_includes_fight_on_death_only_unit",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_mixed_fight_on_death_target_replays_geometry_and_living_allocation",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_is_mandatory_and_not_a_decline_choice",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demise",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_p18c_fully_destroyed_cargo_skips_its_placement_request",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_p18c_pending_cargo_order_keeps_interleaved_attached_components_adjacent",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_p18c_retained_attached_lineage_accepts_living_embarked_component",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_p18c_hazard_destroyed_attached_component_uses_frozen_cargo_authority",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_p18c_attached_cargo_hazard_resolves_one_canonical_rules_unit_snapshot",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_pending_destroyed_transport_state_round_trips_and_rejects_drift",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_proposal_prevalidation_rejects_invalid_payloads",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_fail_fast_guards_preserve_state_requirements",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_invalid_placement_retries_before_removal",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_requests_each_embarked_unit_before_removal",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_apply_rejects_invalid_recorded_contexts",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_descriptor_registers_sources_for_each_model",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_feel_no_pain_descriptor_registers_sources_for_each_model",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_feel_no_pain_keyword_without_descriptor_fails_fast",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_fnp_pauses_before_destroyed_model_removal",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_reaction",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_secondary_deadly_demise_chains_before_removal",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_destruction_reaction_invalid_submission_does_not_mutate_queue",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_destruction_reaction_payloads_round_trip",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_destruction_reaction_validation_errors_are_typed",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_mortal_wounds_use_forced_feel_no_pain_per_wound",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_mortal_wounds_use_psychic_attack_source_with_mortal_wound_scope",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_mortal_wounds_ignore_psychic_attack_source_without_mortal_wound_scope",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_direct_mortal_wound_helper_rejects_choice_routing_contexts",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_multi_wound_mortal_destruction_round_trips_repeated_model_rows",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_multi_model_mortal_fnp_pause_persists_first_logical_death_boundary",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_mortal_wound_lifecycle_progress_round_trip",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_mortal_wound_lifecycle_value_objects_fail_fast",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_mortal_wound_routing_rejects_invalid_lifecycle_edges",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_out_of_phase_shooting_state_payload_round_trip",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_invalid_attack_save_and_damage_payloads_fail_fast",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_order33_actual_reroll_windows_are_scoped_to_indirect_attacks",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_indirect_mode_requires_unengaged_rules_unit",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_new_engagement_rejects_pending_indirect_declaration",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_retained_engagement_survives_restoration",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_order34_completed_shooting_restricts_actions_through_exact_phase_boundary",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_order34_pending_shooting_revalidates_action_restriction_before_queue_pop",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_order33_stale_malformed_and_unseen_ordinary_submissions_fail_closed",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_order33_lower_failure_range_still_requires_the_modified_hit_value",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_r34_002_completed_shooting_inventory_is_authenticated",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_r34_002_completed_shooting_cannot_be_relabelled_to_remove_action_restriction",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_r34_002_unactivated_unit_rejects_unproven_completion_pair",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_r34_002_completion_requires_original_declaration_subject_and_timing",
+        "tests/unit/test_fire_overwatch.py::test_overwatch_discovery_requires_its_catalog_without_mutation",
+        "tests/unit/test_fire_overwatch.py::test_phase_end_overwatch_offers_every_eligible_enemy",
+        "tests/unit/test_fire_overwatch.py::test_overwatch_restore_replay_and_phase_end_continuation",
+        "tests/unit/test_fire_overwatch.py::test_decline_and_unaffordable_overwatch_do_not_repeat_or_spend",
+        "tests/unit/test_fire_overwatch.py::test_stratagem_submission_drift_fails_before_recording",
+        "tests/unit/test_fire_overwatch.py::test_shooter_ineligibility_filters_window_or_rejects_proposal",
+        "tests/unit/test_fire_overwatch.py::test_protected_enemy_stays_excluded_before_and_after_shooter_selection",
+        "tests/unit/test_fire_overwatch.py::test_snap_24_inch_boundary_is_shared_by_offer_and_submission",
+        "tests/unit/test_fire_overwatch.py::test_snap_range_is_measured_from_rules_unit_instead_of_firing_model",
+        "tests/unit/test_fire_overwatch.py::test_r45_001_snap_boundary_uses_other_attached_component",
+        "tests/unit/test_fire_overwatch.py::test_r45_001_group_range_preserves_weapon_visibility_and_present_model_limits",
+        "tests/unit/test_fire_overwatch.py::test_shooting_proposal_faults_preserve_pending_request_and_state",
+        "tests/unit/test_fire_overwatch.py::test_invisible_enemy_is_excluded_even_with_indirect_weapon",
+        "tests/unit/test_fire_overwatch.py::test_attached_shooter_and_target_use_canonical_rules_unit_identities",
+        "tests/unit/test_fire_overwatch.py::test_phase_end_snap_preserves_raw_six_no_hit_reroll_and_action_lock",
+        "tests/unit/test_fire_overwatch.py::test_overwatch_target_scope_uses_current_living_or_retained_group_presence",
+        "tests/unit/test_fire_overwatch.py::test_overwatch_projection_checkpoint_precedes_automatic_phase_progress",
+        "tests/unit/test_fire_overwatch.py::test_order113_blast_x_reaction_uses_shared_frozen_counts",
+        "tests/unit/test_fire_overwatch.py::test_order113_blast_occurrence_choice_rejects_invalid_before_random_roll"
+      ],
+      "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "04.02.01-obligation-03": {
+      "current_test_nodes": [
+        "tests/unit/test_order135_shooting_boundary.py::test_last_shooter_without_attacks_preserves_boundary_save_fork_views_and_replay",
+        "tests/unit/test_order135_shooting_boundary.py::test_nonempty_native_attack_remains_shot_at_boundary",
+        "tests/unit/test_order135_shooting_boundary.py::test_boundary_shot_projection_requires_explicit_valid_attack_pools"
+      ],
+      "disposition": "Explicit B01 native actual-shot boundary persistence controls; no static runtime pass claim.",
+      "qualification_reference": "data/source_audits/order135/b01-explicit-repair-approval.json",
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:_shooting_declaration_ids",
+        "src/warhammer40k_core/engine/phases/shooting_model.py:ShootingPhaseState.with_declaration",
+        "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py:validate_primary_mission_shooting_event_decision_authority"
+      ]
+    },
+    "04.03.04-obligation-04": {
+      "current_test_nodes": [
+        "tests/unit/test_order135_shooting_boundary.py::test_last_shooter_without_attacks_preserves_boundary_save_fork_views_and_replay",
+        "tests/unit/test_order135_shooting_boundary.py::test_nonempty_native_attack_remains_shot_at_boundary",
+        "tests/unit/test_order135_shooting_boundary.py::test_boundary_shot_projection_requires_explicit_valid_attack_pools"
+      ],
+      "disposition": "Explicit B01 native actual-shot boundary persistence controls; no static runtime pass claim.",
+      "qualification_reference": "data/source_audits/order135/b01-explicit-repair-approval.json",
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:_shooting_declaration_ids",
+        "src/warhammer40k_core/engine/phases/shooting_model.py:ShootingPhaseState.with_declaration",
+        "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py:validate_primary_mission_shooting_event_decision_authority"
+      ]
+    },
+    "15.12-window": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/stratagems_generic_metadata.py:stratagem_turn_unavailable_reason",
+        "src/warhammer40k_core/engine/stratagems_eligibility.py:_generic_rule_ir_stratagem_unavailable_reason",
+        "src/warhammer40k_core/engine/stratagems_selection.py:_stratagem_unavailable_reason",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems.py:core_stratagem_rows",
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_proposal_context_error",
+        "src/warhammer40k_core/engine/stratagems_apply.py:invalid_stratagem_target_proposal_status",
+        "src/warhammer40k_core/engine/stratagems_apply.py:apply_stratagem_target_proposal",
+        "src/warhammer40k_core/engine/lifecycle.py:GameLifecycle.submit_decision",
+        "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_parameterized_payload",
+        "src/warhammer40k_core/engine/phases/fight.py:request_counteroffensive_if_available",
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_proposal_json_equal",
+        "src/warhammer40k_core/engine/fight_order.py:eligible_fight_contexts_for_player",
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_counteroffensive_target_context_error",
+        "src/warhammer40k_core/engine/stratagems_eligibility.py:_handler_unavailable_reason",
+        "src/warhammer40k_core/engine/stratagems_effect_handlers.py:_apply_counteroffensive_handler"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_counteroffensive_timing.py::test_core_counteroffensive_requires_opponent_fight_phase",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_core_counteroffensive_own_turn_rejection_is_atomic",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_own_turn_is_not_offered",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_opponent_turn_acceptance_persists",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_engine_admission_context_drift_preserves_queue_history_and_state",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_shared_turn_metadata_retains_strict_short_circuit_and_absent_active_semantics",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_actual_generic_source_retains_opponent_turn_availability",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_actual_carnival_source_retains_either_turn_availability",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_engine_admission_catalog_json_boolean_drift_is_atomic",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_engine_admission_context_json_kinds_preserve_valid_number_echo",
+        "tests/unit/test_order135_counteroffensive_band.py::test_native_counter_targets_non_first_unit_before_grant"
+      ],
+      "disposition": "Explicitly approved B02 opponent-Fight-phase Core timing; original clause and source fingerprint unchanged. Native both-direction dispatch, actual melee trigger, CP/effect/interrupt, save/fork/views/events/exact replay and continuation controls; qualified atomic engine-admission fixture. Static inventory alone is not certification.",
+      "qualification_reference": "data/source_audits/order135/b02-explicit-repair-approval.json",
+      "approved_shared_context_boundary_qualification": {
+        "approval_reference": "data/source_audits/order135/b03-explicit-repair-approval.json",
+        "documented_acceptance": "docs/ADAPTER_DECISION_CONTRACT.md:1904,1908",
+        "scope": "Exact typed request context equality before queue/history/events for supported live submissions; valid target/effect choices and earlier authoritative checks preserved.",
+        "reproduced_original_impact": "records99\u2192100/queue1\u21920/two acceptance-history events/exception, every game-state and CP/use/effect ledger unchanged CP5\u21925; malformed live-client input, no ordinary legal-play or edited-history claim, no executed BASE introduction claim.",
+        "current_controls": "Both-direction native context invalid leaves complete lifecycle unchanged, followed by exact legal retry,2CP/FightsFirst/interrupt/actual-melee continuation, save/load/fork/allprincipalviews/events/exact replay. Constructed domain context/metadata/Carnival controls qualified; no whole-provider certification."
+      },
+      "approved_b03_json_kind_qualification": {
+        "authority": "data/source_audits/order135/b03-type-safe-boundary-user-clarification.json",
+        "authority_sha256": "9f0961397527914f3b042603b6777440ecc5429d44af838dde94c2828e72ddc2",
+        "boundary": "Existing catalog/context checks, same positions and diagnostics before queue/history acceptance; recursive complete JSON-kind comparison distinguishes booleans/numbers while equal numeric representations and object key order remain accepted.",
+        "actual_local_entry": "Native Core pending request, only deep-copied submitted catalog flag true -> JSON 1. Actual late requires_opponent_turn must be a bool exception consumed queue1->0 and records99->100 with two acceptance events; every gameplay field/CP unchanged.",
+        "qualification": "Malformed live game-decision input; no unmodified legal-play failure, edited history, BASE execution, regression-introduction, or provider certification claim. No demonstrated native behavior-changing nested-context consumer is inferred.",
+        "controls": "Four qualified domain catalog cases plus two qualified nested-context JSON-kind/numeric echo cases. Native both-role malformed1/1.0 rejection precedes exact legal retry,2CP/effect/interrupt/actual-melee, persistence/fork/views/events/replay."
+      },
+      "approved_counter_band_qualification": {
+        "authority": "data/source_audits/order135/counter-band-explicit-repair-approval.json",
+        "source": "Selected12.04 fight eligibility precedes selected15.12 Fights First grant; ordinary current-band selection is distinct.",
+        "native_control": "Both role directions, public opponent Charge/Fight, genuine attacks, non-FightsFirst target, ordinary default still excludes it, 2CP/grant/interrupt/resume, atomic malformed echo, pending/completed save/load/fork/all-role views/events/exact replay. Existing Remaining positive and own-turn negative remain unchanged.",
+        "historical_private_control": "Original test_order70_counteroffensive_uses_current_model_complete_band and every assertion stay byte-for-byte unchanged. Its direct default geometry query in a constructed own-turn context proves only current-band membership, not lawful Core availability. Authoritative Core callers explicitly opt into pre-grant eligibility.",
+        "limits": "Pregame synthetic bounded Core catalog; no provider or whole-game certification. Static bindings are not runtime or exhaustive semantic closure."
+      }
+    },
+    "01.04.01-obligation-06": {
+      "current_test_nodes": [
+        "tests/unit/test_order135_transport_boundaries.py::test_shared_disembark_owner_retains_vertical_and_frame_extent",
+        "tests/unit/test_order135_transport_boundaries.py::test_native_frame_disembark_rejects_out_of_band_physical_body"
+      ],
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/transport_disembark_geometry.py:_model_wholly_within_any_transport_model"
+      ],
+      "disposition": "B04 current shared3D disembark consumer and native predeclared FRAME positive/negative controls; independent full-source renewal pending.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "18.04-rapid-tactical-distance": {
+      "current_test_nodes": [
+        "tests/unit/test_order135_transport_boundaries.py::test_shared_disembark_owner_retains_vertical_and_frame_extent",
+        "tests/unit/test_order135_transport_boundaries.py::test_native_frame_disembark_rejects_out_of_band_physical_body"
+      ],
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/transport_disembark_geometry.py:_model_wholly_within_any_transport_model"
+      ],
+      "disposition": "B04 current shared3D disembark consumer and native predeclared FRAME positive/negative controls; independent full-source renewal pending.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "18.01-start-embarked-whole-unit": {
+      "current_test_nodes": [
+        "tests/unit/test_order135_transport_boundaries.py::test_native_starting_cargo_keeps_initial_anchor_through_disembark",
+        "tests/unit/test_order135_transport_boundaries.py::test_native_setup_without_manifest_remains_restorable",
+        "tests/unit/test_order135_transport_boundaries.py::test_predeployment_allowance_preserves_embarked_physical_removal_guard",
+        "tests/unit/test_order135_transport_boundaries.py::test_missing_carrier_remains_invalid_after_deployment"
+      ],
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/transport_state_integrity.py:validate_transport_cargo_state_consistency",
+        "src/warhammer40k_core/engine/lifecycle_battlefield_requirements.py:state_requires_deployed_battlefield_state",
+        "src/warhammer40k_core/adapters/local_session.py:LocalGameSession._capture_initial_replay_lifecycle_if_needed"
+      ],
+      "disposition": "B05 authentic predeployment manifest anchor and native session persistence/replay. Direct corrupted state checks isolate placement/removal invariants; they are not native legal histories. Ordinary non-Dedicated carrier admission remains an independently reported unapproved candidate, not closure from these tests.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "12.04-eligibility": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/fight_order.py:eligible_fight_contexts_for_player",
+        "src/warhammer40k_core/engine/phases/fight.py:request_counteroffensive_if_available",
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_counteroffensive_target_context_error",
+        "src/warhammer40k_core/engine/stratagems_eligibility.py:_handler_unavailable_reason",
+        "src/warhammer40k_core/engine/stratagems_effect_handlers.py:_apply_counteroffensive_handler"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_counteroffensive_band.py::test_native_counter_targets_non_first_unit_before_grant",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_own_turn_is_not_offered",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_opponent_turn_acceptance_persists"
+      ],
+      "disposition": "Original source and assertions retained; approved Core pre-grant target eligibility correction.",
+      "approved_counter_band_qualification": {
+        "authority": "data/source_audits/order135/counter-band-explicit-repair-approval.json",
+        "source": "Selected12.04 fight eligibility precedes selected15.12 Fights First grant; ordinary current-band selection is distinct.",
+        "native_control": "Both role directions, public opponent Charge/Fight, genuine attacks, non-FightsFirst target, ordinary default still excludes it, 2CP/grant/interrupt/resume, atomic malformed echo, pending/completed save/load/fork/all-role views/events/exact replay. Existing Remaining positive and own-turn negative remain unchanged.",
+        "historical_private_control": "Original test_order70_counteroffensive_uses_current_model_complete_band and every assertion stay byte-for-byte unchanged. Its direct default geometry query in a constructed own-turn context proves only current-band membership, not lawful Core availability. Authoritative Core callers explicitly opt into pre-grant eligibility.",
+        "limits": "Pregame synthetic bounded Core catalog; no provider or whole-game certification. Static bindings are not runtime or exhaustive semantic closure."
+      }
+    },
+    "15.12-target": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/fight_order.py:eligible_fight_contexts_for_player",
+        "src/warhammer40k_core/engine/phases/fight.py:request_counteroffensive_if_available",
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_counteroffensive_target_context_error",
+        "src/warhammer40k_core/engine/stratagems_eligibility.py:_handler_unavailable_reason",
+        "src/warhammer40k_core/engine/stratagems_effect_handlers.py:_apply_counteroffensive_handler"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_counteroffensive_band.py::test_native_counter_targets_non_first_unit_before_grant",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_own_turn_is_not_offered",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_opponent_turn_acceptance_persists"
+      ],
+      "disposition": "Original source and assertions retained; approved Core pre-grant target eligibility correction.",
+      "approved_counter_band_qualification": {
+        "authority": "data/source_audits/order135/counter-band-explicit-repair-approval.json",
+        "source": "Selected12.04 fight eligibility precedes selected15.12 Fights First grant; ordinary current-band selection is distinct.",
+        "native_control": "Both role directions, public opponent Charge/Fight, genuine attacks, non-FightsFirst target, ordinary default still excludes it, 2CP/grant/interrupt/resume, atomic malformed echo, pending/completed save/load/fork/all-role views/events/exact replay. Existing Remaining positive and own-turn negative remain unchanged.",
+        "historical_private_control": "Original test_order70_counteroffensive_uses_current_model_complete_band and every assertion stay byte-for-byte unchanged. Its direct default geometry query in a constructed own-turn context proves only current-band membership, not lawful Core availability. Authoritative Core callers explicitly opt into pre-grant eligibility.",
+        "limits": "Pregame synthetic bounded Core catalog; no provider or whole-game certification. Static bindings are not runtime or exhaustive semantic closure."
+      }
+    },
+    "15.12-fights-first": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/fight_order.py:eligible_fight_contexts_for_player",
+        "src/warhammer40k_core/engine/phases/fight.py:request_counteroffensive_if_available",
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_counteroffensive_target_context_error",
+        "src/warhammer40k_core/engine/stratagems_eligibility.py:_handler_unavailable_reason",
+        "src/warhammer40k_core/engine/stratagems_effect_handlers.py:_apply_counteroffensive_handler"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_counteroffensive_band.py::test_native_counter_targets_non_first_unit_before_grant",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_own_turn_is_not_offered",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_opponent_turn_acceptance_persists"
+      ],
+      "disposition": "Original source and assertions retained; approved Core pre-grant target eligibility correction.",
+      "approved_counter_band_qualification": {
+        "authority": "data/source_audits/order135/counter-band-explicit-repair-approval.json",
+        "source": "Selected12.04 fight eligibility precedes selected15.12 Fights First grant; ordinary current-band selection is distinct.",
+        "native_control": "Both role directions, public opponent Charge/Fight, genuine attacks, non-FightsFirst target, ordinary default still excludes it, 2CP/grant/interrupt/resume, atomic malformed echo, pending/completed save/load/fork/all-role views/events/exact replay. Existing Remaining positive and own-turn negative remain unchanged.",
+        "historical_private_control": "Original test_order70_counteroffensive_uses_current_model_complete_band and every assertion stay byte-for-byte unchanged. Its direct default geometry query in a constructed own-turn context proves only current-band membership, not lawful Core availability. Authoritative Core callers explicitly opt into pre-grant eligibility.",
+        "limits": "Pregame synthetic bounded Core catalog; no provider or whole-game certification. Static bindings are not runtime or exhaustive semantic closure."
+      }
+    },
+    "15.12-next-selection": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/fight_order.py:eligible_fight_contexts_for_player",
+        "src/warhammer40k_core/engine/phases/fight.py:request_counteroffensive_if_available",
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_counteroffensive_target_context_error",
+        "src/warhammer40k_core/engine/stratagems_eligibility.py:_handler_unavailable_reason",
+        "src/warhammer40k_core/engine/stratagems_effect_handlers.py:_apply_counteroffensive_handler"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_counteroffensive_band.py::test_native_counter_targets_non_first_unit_before_grant",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_own_turn_is_not_offered",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_opponent_turn_acceptance_persists"
+      ],
+      "disposition": "Original source and assertions retained; approved Core pre-grant target eligibility correction.",
+      "approved_counter_band_qualification": {
+        "authority": "data/source_audits/order135/counter-band-explicit-repair-approval.json",
+        "source": "Selected12.04 fight eligibility precedes selected15.12 Fights First grant; ordinary current-band selection is distinct.",
+        "native_control": "Both role directions, public opponent Charge/Fight, genuine attacks, non-FightsFirst target, ordinary default still excludes it, 2CP/grant/interrupt/resume, atomic malformed echo, pending/completed save/load/fork/all-role views/events/exact replay. Existing Remaining positive and own-turn negative remain unchanged.",
+        "historical_private_control": "Original test_order70_counteroffensive_uses_current_model_complete_band and every assertion stay byte-for-byte unchanged. Its direct default geometry query in a constructed own-turn context proves only current-band membership, not lawful Core availability. Authoritative Core callers explicitly opt into pre-grant eligibility.",
+        "limits": "Pregame synthetic bounded Core catalog; no provider or whole-game certification. Static bindings are not runtime or exhaustive semantic closure."
+      }
+    },
+    "12.04-empty-first": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/fight_order.py:FightPhaseState.with_next_band",
+        "src/warhammer40k_core/engine/phases/fight.py:_advance_to_next_fight_request"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_fight_transition.py::test_native_fights_first_exhaustion_keeps_owed_player"
+      ],
+      "disposition": "Approved preservation of originally owed player across exhausted Fights First band, before speculative availability scanning. Original assertions retained.",
+      "authority": "data/source_audits/order135/fight-transition-explicit-repair-approval.json",
+      "qualification": "Pregame analytical Core M18/A1/WS6/S1/D1 scene, both directions and pending/completed actual fight/consolidation save/load/fork/views/events/replay. No faction or broad Fight certification."
+    },
+    "12.04-remaining": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/fight_order.py:FightPhaseState.with_next_band",
+        "src/warhammer40k_core/engine/phases/fight.py:_advance_to_next_fight_request"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_fight_transition.py::test_native_fights_first_exhaustion_keeps_owed_player"
+      ],
+      "disposition": "Approved preservation of originally owed player across exhausted Fights First band, before speculative availability scanning. Original assertions retained.",
+      "authority": "data/source_audits/order135/fight-transition-explicit-repair-approval.json",
+      "qualification": "Pregame analytical Core M18/A1/WS6/S1/D1 scene, both directions and pending/completed actual fight/consolidation save/load/fork/views/events/replay. No faction or broad Fight certification."
+    },
+    "12.04.01-distant-pass": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/fight_order.py:eligible_pass_is_available",
+        "src/warhammer40k_core/engine/phases/fight.py:_advance_to_next_fight_request",
+        "src/warhammer40k_core/engine/phases/fight.py:_invalid_fight_pass_status"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_fight_pass.py::test_nearby_remaining_unit_prevents_fights_first_pass",
+        "tests/unit/test_order135_fight_pass.py::test_original_five_model_pass_fixture_rejects_pass",
+        "tests/unit/test_order135_fight_pass.py::test_newly_nearby_lower_band_unit_invalidates_offered_pass_atomically",
+        "tests/unit/test_order135_fight_pass.py::test_pass_distance_boundary_is_strict",
+        "tests/unit/test_order135_fight_pass.py::test_native_pass_after_shared_charge_target_dies",
+        "tests/unit/test_phase15c_fight_order.py::test_fights_first_pass_does_not_reoffer_same_unit_before_remaining_activation"
+      ],
+      "disposition": "All otherwise-eligible friendly units constrain the strict greater-than-five pass test. The current ordering band still constrains selectable units and the finite request snapshot.",
+      "authority": "data/source_audits/order135/pass-explicit-repair-and-assertion-approval.json",
+      "qualification": "Original protected fixture was invalid for passing; exact original bytes remain archived and original geometry is a rejection control. Corrected positive first completes nearby friendly melee, leaving a lawful pass and opponent Remaining handoff. Canonical restored and deliberate stale-state controls are distinct from pregame analytical native controls. No runtime pass is asserted by this binding."
+    },
+    "05.00-obligation-01": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/gathered_attack_dice.py:resolve_gathered_attack_dice"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_gathered_attack_steps.py::test_native_gathered_hit_and_wound_steps_precede_reroll_choices",
+        "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay"
+      ],
+      "disposition": "Approved D02: prepare, roll and resolve gathered original Hits before Wounds; prepare, roll and resolve gathered original Wounds before their later-step choices. Resume reuses engine journal.",
+      "authority": "data/source_audits/order135/d02-d03-explicit-repair-and-assertion-approval.json",
+      "qualification": "Native three-attack public control plus original generated-hit/melee/replay fixtures; exact protected helper and one Fight identity exception preserve assertions. Grouped Save and identical-pool questions remain separately qualified, not certified by this binding."
+    },
+    "05.00-obligation-02": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/gathered_attack_dice.py:resolve_gathered_attack_dice"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_gathered_attack_steps.py::test_native_gathered_hit_and_wound_steps_precede_reroll_choices",
+        "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay"
+      ],
+      "disposition": "Approved D02: prepare, roll and resolve gathered original Hits before Wounds; prepare, roll and resolve gathered original Wounds before their later-step choices. Resume reuses engine journal.",
+      "authority": "data/source_audits/order135/d02-d03-explicit-repair-and-assertion-approval.json",
+      "qualification": "Native three-attack public control plus original generated-hit/melee/replay fixtures; exact protected helper and one Fight identity exception preserve assertions. Grouped Save and identical-pool questions remain separately qualified, not certified by this binding."
+    },
+    "18.04-tactical-before-combat": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/tactical_setup_feasibility.py:tactical_setup_feasibility",
+        "src/warhammer40k_core/geometry/tactical_setup_proof.py:tactical_setup_is_excluded",
+        "src/warhammer40k_core/engine/rules_unit_combat_payload.py:rules_unit_combat_from_payload"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_combat_tactical_feasibility.py::test_native_far_combat_is_atomic_when_another_tactical_setup_exists",
+        "tests/unit/test_order135_combat_tactical_feasibility.py::test_native_combat_accepts_proven_impossible_tactical_height",
+        "tests/unit/test_order135_combat_tactical_feasibility.py::test_native_grouped_combat_pending_hazard_preserves_strict_context_and_replay",
+        "tests/unit/test_order135_combat_tactical_feasibility.py::test_native_combat_accepts_ordinary_terrain_constrained_tactical_impossibility"
+      ],
+      "disposition": "Approved D03: verified whole-unit Tactical witness blocks Combat; a sound necessary-domain exclusion can authorize Combat, while unresolved proof rejects atomically. Current grouped hazard producer and shared strict decoder preserve valid state.",
+      "authority": "data/source_audits/order135/d02-d03-explicit-repair-and-assertion-approval.json",
+      "qualification": "Analytical public tall-FRAME and ordinary supported-platform scenes plus original attached hazard/FNP regressions. Continuous joint pose proof is relaxed; finite witness failure is not impossibility, and these controls do not establish complete admission for every scene. Exact five-test exception retains all 63 original assertions and adds five atomicity assertions."
+    },
+    "18.04-combat-hazard": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/tactical_setup_feasibility.py:tactical_setup_feasibility",
+        "src/warhammer40k_core/geometry/tactical_setup_proof.py:tactical_setup_is_excluded",
+        "src/warhammer40k_core/engine/rules_unit_combat_payload.py:rules_unit_combat_from_payload"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_combat_tactical_feasibility.py::test_native_far_combat_is_atomic_when_another_tactical_setup_exists",
+        "tests/unit/test_order135_combat_tactical_feasibility.py::test_native_combat_accepts_proven_impossible_tactical_height",
+        "tests/unit/test_order135_combat_tactical_feasibility.py::test_native_grouped_combat_pending_hazard_preserves_strict_context_and_replay",
+        "tests/unit/test_order135_combat_tactical_feasibility.py::test_native_combat_accepts_ordinary_terrain_constrained_tactical_impossibility"
+      ],
+      "disposition": "Approved D03: verified whole-unit Tactical witness blocks Combat; a sound necessary-domain exclusion can authorize Combat, while unresolved proof rejects atomically. Current grouped hazard producer and shared strict decoder preserve valid state.",
+      "authority": "data/source_audits/order135/d02-d03-explicit-repair-and-assertion-approval.json",
+      "qualification": "Analytical public tall-FRAME and ordinary supported-platform scenes plus original attached hazard/FNP regressions. Continuous joint pose proof is relaxed; finite witness failure is not impossibility, and these controls do not establish complete admission for every scene. Exact five-test exception retains all 63 original assertions and adds five atomicity assertions."
+    }
+  },
+  "source_supersessions": {
+    "rule:15:15.09:1": {
+      "disposition": "V963 Snap raw six is ordinary hit; preserve critical wound and no automatic critical-hit triggers.",
+      "test_files": [
+        "tests/unit/test_critical_hits.py",
+        "tests/unit/test_lethal_hits.py"
+      ]
+    },
+    "rule:15:15.11:1": {
+      "disposition": "Newer mirror remains incomplete/garbled. Retain accepted full Order94 transcription and explicit discrepancy, without recency-based supersession.",
+      "test_files": []
+    },
+    "rule:16:16.01:1": {
+      "disposition": "Whitespace/callout relocation; operative gameplay clauses retained. Action transition qualification is recorded separately.",
+      "test_files": [
+        "tests/unit/test_action_movement_interruption.py"
+      ]
+    },
+    "rule:18:18.07:1": {
+      "disposition": "V963 Shock unengaged setup; no inherited passenger engagement or forced queue; actual late turn-end charge expiry.",
+      "test_files": [
+        "tests/unit/test_v963_shock_disembark.py"
+      ]
+    }
+  },
+  "current_new_faqs": {
+    "db020803-7564-45c9-a6d4-e4cdf463da32": {
+      "category": "14",
+      "owners": [
+        "src/warhammer40k_core/engine/objective_control.py:resolve_objective_control",
+        "src/warhammer40k_core/engine/unit_objective_control.py:current_unit_objective_control"
+      ],
+      "test_files": [
+        "tests/unit/test_order135_objective_overlap.py",
+        "tests/unit/test_order109_unit_control.py"
+      ],
+      "qualification": "Independent per-objective definition query plus existing real frozen-control/mission facade consumers; no provider mission-preset certification."
+    },
+    "8c51d370-70b2-46c7-abaa-228b55c830c3": {
+      "category": "14",
+      "owners": [
+        "src/warhammer40k_core/engine/objective_control.py:resolve_objective_control"
+      ],
+      "test_files": [
+        "tests/unit/test_order135_objective_overlap.py",
+        "tests/unit/test_order109_unit_control.py"
+      ],
+      "qualification": "Same actual model contributes complete OC independently to each result; no global split/deduplication."
+    },
+    "f1507145-5606-474c-ba71-f5c92f2d6faf": {
+      "category": "01",
+      "owners": [
+        "src/warhammer40k_core/engine/turn_end_boundary.py:prepare_turn_end_boundary"
+      ],
+      "test_files": [
+        "tests/unit/test_order122_effect_defaults.py",
+        "tests/unit/test_order79_control_first.py",
+        "tests/unit/test_order109_unit_control.py",
+        "tests/unit/test_v963_shock_disembark.py"
+      ],
+      "qualification": "Frozen boundary authority preserves current admitted late OC consumers. Generic expiry inventory precedes late mission choices; no demonstrated admitted live late-effect failure. Specialized Shock expiry is not generalized to all effects; see complete current-source-qualifications.md."
+    },
+    "9638115f-b94b-4d05-ba62-df9fba2805ac": {
+      "category": "06",
+      "owners": [
+        "src/warhammer40k_core/geometry/physical_visibility.py:resolve_physical_visibility",
+        "src/warhammer40k_core/engine/battlefield_visibility_context.py:battlefield_visibility_context",
+        "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/__init__.py:source_packages",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/__init__.py:battlefield_edge_source_package",
+        "src/warhammer40k_core/rules/source_authority_registry.py:SourceAuthorityScopeRegistry.all_source_packages",
+        "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext._rng_compatibility_projection",
+        "src/warhammer40k_core/core/visibility_records.py:LineOfSightWitness",
+        "src/warhammer40k_core/core/visibility_rng_projection.py:VisibilityRngProjection",
+        "src/warhammer40k_core/core/visibility_rng_projection.py:legacy_scalar_input_fingerprint",
+        "src/warhammer40k_core/engine/decision.py:_legacy_los_rng_payload",
+        "src/warhammer40k_core/engine/decision.py:DiceRollManager._seed_existing_event_history",
+        "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:_shooting_declaration_ids",
+        "src/warhammer40k_core/engine/phases/shooting_model.py:ShootingPhaseState.with_declaration",
+        "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py:validate_primary_mission_shooting_event_decision_authority"
+      ],
+      "test_files": [
+        "tests/unit/test_order135_physical_visibility.py",
+        "tests/unit/test_order135_visibility_facade.py",
+        "tests/code_quality/test_order135_current_core_audit.py",
+        "tests/unit/test_order135_visibility_rng_projection.py",
+        "tests/unit/test_order135_shooting_boundary.py"
+      ],
+      "qualification": "Approved V963-VISIBILITY repair with actual retained maintained-mirror observation and native catalog ingress; analytical body dimensions remain synthetic/source-linked geometry, not official miniature measurements.",
+      "rng_compatibility_qualification": "Explicitly approved typed/versioned unchanged-scalar-only RNG projection. Current complete physical/bounds evidence remains authoritative; changed composite/clipped geometry retains current RNG metadata. Live/save/fork/replay and authentic BASE token are bound, never implied by static presence.",
+      "boundary_persistence_repair_qualification": "Explicitly approved B01: accepted empty/no-attack and selected-targetless declarations remain completed selections without becoming shots in reconstructed boundary history. Only nonempty typed actual attack pools mark the unit as shot; all decision/proposal/source/causal/identity/phase/ineligible guards remain. BASE-identical old owner; no regression-introduction claim. Native scalar/physical last-shooter boundaries, saves/forks/all views/events/exact replay and positive actual-attack controls bind runtime behavior; static presence is not certification."
+    },
+    "3da822cb-4a7c-44d2-8a9d-b867b4c4aed8": {
+      "category": "19",
+      "owners": [
+        "src/warhammer40k_core/engine/rules_units.py:rules_unit_view_by_id",
+        "src/warhammer40k_core/engine/lone_operative.py:lone_operative_profile_for_rules_unit",
+        "src/warhammer40k_core/engine/catalog_rule_consumption.py:CatalogWeaponKeywordGrantRuntime"
+      ],
+      "test_files": [
+        "tests/unit/test_unit_abilities.py",
+        "tests/unit/test_order97_semantic_evidence_18_25.py",
+        "tests/unit/test_phase17g_thousand_sons_army_rule.py"
+      ],
+      "qualification": "Existing cross-component unit grants and explicit Lone Operative target-scope assertions are bound separately from equipped-bearer source lifetimes. No faction provider is fabricated."
+    }
+  },
+  "qualification": "Complete inventory and static exact-body binding, not a runtime-pass certificate. All prior source text, tests, assertions, branches and ceilings remain immutable; complete current gates and two exact-final reviews are independent delivery requirements."
+}

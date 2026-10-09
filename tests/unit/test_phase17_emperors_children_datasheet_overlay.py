@@ -4035,6 +4035,7 @@ def test_infractors_excessive_assault_uses_fight_lifecycle_decision_and_replays(
         phase=BattlePhase.FIGHT,
         with_icon=False,
         game_id=game_id,
+        full_size_units=not within_objective_range,
     )
     state = session.lifecycle.state
     assert state is not None
@@ -4049,8 +4050,31 @@ def test_infractors_excessive_assault_uses_fight_lifecycle_decision_and_replays(
             y=marker.y_inches,
         )
     else:
-        _move_unit(state, target.unit_instance_id, x=18.0, y=10.0)
-        _move_unit(state, infractors.unit_instance_id, x=16.0, y=10.0)
+        # Ten models in one 1.5-inch-spaced line exceed the nine-inch span.
+        # Two compact rows preserve disjoint bases and complete melee engagement.
+        for unit, x in ((infractors, 16.0), (target, 19.0)):
+            battlefield = state.battlefield_state
+            assert battlefield is not None
+            placement = battlefield.unit_placement_by_id(unit.unit_instance_id)
+            state.replace_battlefield_state(
+                battlefield.with_unit_placement(
+                    replace(
+                        placement,
+                        model_placements=tuple(
+                            replace(
+                                model,
+                                pose=Pose.at(
+                                    x=x + (index % 2) * 1.3,
+                                    y=10.0 + (index // 2) * 1.5,
+                                ),
+                            )
+                            for index, model in enumerate(placement.model_placements)
+                        ),
+                    )
+                )
+            )
+        setup_payload = session.lifecycle.to_payload()
+        assert GameLifecycle.from_payload(setup_payload).to_payload() == setup_payload
     status = session.advance_until_decision_or_terminal()
     status = _advance_battleline_fight_to_source_reroll(
         session=session,
@@ -4061,7 +4085,32 @@ def test_infractors_excessive_assault_uses_fight_lifecycle_decision_and_replays(
     payload = cast(dict[str, JsonValue], request.payload)
 
     assert request.decision_type == DICE_REROLL_DECISION_TYPE
-    assert payload["current_values"] == [expected_wound_value]
+    from warhammer40k_core.engine.attack_sequence import attack_sequence_wound_roll_spec
+
+    context = cast(dict[str, JsonValue], payload["attack_context"])
+    wound_state = cast(dict[str, JsonValue], context["wound_roll_state"])
+    original = cast(dict[str, JsonValue], wound_state["original_result"])
+    expected_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=cast(str, context["weapon_profile_id"]),
+        attack_context_id=cast(str, context["attack_context_id"]),
+        attacker_player_id="player-a",
+    ).to_payload()
+    assert original["spec"] == expected_spec
+    physical = [
+        event
+        for event in session.lifecycle.decision_controller.event_log.records
+        if event.event_type == "dice_rolled"
+        and isinstance(event.payload, dict)
+        and event.payload.get("roll_id") == payload["roll_id"]
+    ]
+    assert len(physical) == 1
+    assert physical[0].payload == original
+    assert original["source"] == "rng"
+    assert wound_state["rerolls"] == []
+    assert payload["current_values"] == original["values"]
+    actual_values = cast(list[int], original["values"])
+    assert len(actual_values) == 1
+    assert (actual_values[0] != 1) is within_objective_range
     assert (expected_wound_value != 1) is within_objective_range
     assert cast(dict[str, JsonValue], payload["attack_context"])["unit_instance_id"] == (
         infractors.unit_instance_id
@@ -4218,10 +4267,11 @@ def test_icon_of_excess_requires_enemy_destruction_then_resolves_unit_leadership
         "expected_gain_status",
     ),
     [
-        # Order 43 hit-record evidence changes the later leadership RNG history.
-        ("order43-icon-0", False, True, "applied"),
-        ("order103-fixture-15-00", False, False, None),
-        ("order103-fixture-04-00", True, True, "capped"),
+        # Existing captured identities provide success/failure.
+        # Compare the successful identity with and without the cap.
+        ("order103-fixture-15-00", False, True, "applied"),
+        ("order43-icon-0", False, False, None),
+        ("order103-fixture-15-00", True, True, "capped"),
     ],
 )
 def test_icon_of_excess_uses_shooting_lifecycle_destruction_and_replays(
@@ -7180,6 +7230,7 @@ def _battleline_lifecycle_session(
     source_wargear_option_id: str | None = None,
     catalog_package: CanonicalCatalogPackage | None = None,
     source_faction_id: str = "EC",
+    full_size_units: bool = False,
 ) -> tuple[LocalGameSession, UnitInstance, UnitInstance]:
     package = _catalog_package() if catalog_package is None else catalog_package
     base_catalog = package.army_catalog
@@ -7207,19 +7258,30 @@ def _battleline_lifecycle_session(
         )
         for target_profile in target_datasheet.model_profiles
     )
+    # The raw-one witness uses complete canonical-size units, not a dice override.
+    if full_size_units:
+        assert not single_source_model
+        assert not single_target_model
+        assert not extra_target
     target_composition = (
-        (replace(target_datasheet.composition[0], min_models=1, max_models=1),)
-        if single_target_model
-        else tuple(
-            replace(composition, min_models=1, max_models=1)
-            for composition in target_datasheet.composition
+        tuple(replace(entry, min_models=entry.max_models) for entry in target_datasheet.composition)
+        if full_size_units
+        else (
+            (replace(target_datasheet.composition[0], min_models=1, max_models=1),)
+            if single_target_model
+            else tuple(
+                replace(composition, min_models=1, max_models=1)
+                for composition in target_datasheet.composition
+            )
         )
     )
     target_datasheet = replace(
         target_datasheet,
         model_profiles=single_wound_target_profiles,
         composition=target_composition,
-        max_unit_models=len(target_composition),
+        max_unit_models=(
+            target_datasheet.max_unit_models if full_size_units else len(target_composition)
+        ),
     )
     source_detachment_id = "battleline-lifecycle-test"
     target_detachment_id = source_detachment_id
@@ -7375,6 +7437,14 @@ def _battleline_lifecycle_session(
         datasheet_id=source_datasheet_id,
         unit_selection_id="source-battleline",
     )
+    if full_size_units:
+        source_selection = replace(
+            source_selection,
+            model_profile_selections=tuple(
+                ModelProfileSelection(entry.model_profile_id, entry.max_models)
+                for entry in catalog.datasheet_by_id(source_datasheet_id).composition
+            ),
+        )
     if with_icon and source_wargear_option_id is not None:
         raise AssertionError("Battleline lifecycle fixture accepts one wargear option family.")
     if with_icon:

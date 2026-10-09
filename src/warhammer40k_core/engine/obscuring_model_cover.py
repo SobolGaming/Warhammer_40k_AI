@@ -10,6 +10,7 @@ from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_f
 from warhammer40k_core.engine.battlefield_state import (
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.battlefield_visibility_context import battlefield_visibility_context
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.generic_rule_effect_payloads import (
     generic_rule_effect_payload_grants_ability,
@@ -144,7 +145,8 @@ def _visibility_context(*, state: GameState, pool: RangedAttackPool) -> TerrainV
         raise GameLifecycleError("Obscuring-model Cover requires a placed target.")
     models = geometry_models_for_unit_placements(scenario=scenario, unit_placements=placements)
     areas = shooting_terrain_areas_for_state(state)
-    return TerrainVisibilityContext.from_ruleset_descriptor(
+    return battlefield_visibility_context(
+        scenario=scenario,
         ruleset_descriptor=state.ruleset_descriptor_for_runtime_policy(),
         los_cache_key=shooting_visibility_cache_key(
             scenario=scenario, terrain_features=battlefield.terrain_features, terrain_areas=areas
