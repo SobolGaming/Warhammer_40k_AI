@@ -1,0 +1,16 @@
+{
+  "schema": "order135-narrow-pass-exception-authority-v1",
+  "provenance": "Exact parent-supplied dated assistant/user transcript; not separately retrieved conversation export.",
+  "exact_parent_supplied_transcript": "Assistant, 2026-10-08 02:50 UTC, Sentinel_0743425303c88191a17e995880e176be:\n\"The turn-selection repair passes both player directions and save/load/replay checks. Both reviewers found that an old test expects the wrong player after a pass; its setup also appears to allow passing when a nearby eligible unit should prevent it.\n\nMay I correct that regression, preserve the original unchanged as historical evidence, and reproduce and fix the narrow pass-eligibility issue? This needs an explicit exception to keeping every original assertion unchanged\"\nAssistant, 2026-10-08 11:45 UTC, Sentinel_5cf8c2da47488191ac486c838851e0ec:\n\"The code already follows that ordinary Deadly Demise ordering; we\u2019ll verify it through native play when testing resumes.\n\nThe remaining approval is the pass-rule exception from last night: may I correct the outdated test while preserving its original, then reproduce and fix the nearby-unit pass-eligibility issue?\"\nUser, 2026-10-08 12:13 UTC, Sentinel_c519c0e97b9081918a3f0b47a495bfa5:\n\"yes\"\n",
+  "scope": "Correct only the named pass regression fixture/actor-unit expectations; preserve original full bytes; reproduce and minimally repair pass availability/prevalidation over all otherwise eligible units. Other original assertions unchanged.",
+  "original_complete_test": {
+    "path": "data/source_audits/order135/pass-regression-history/test_phase15c_fight_order.py.txt",
+    "bytes": 309158,
+    "sha256": "3638d8797b4b915e7928cea04c9348b7ed4de671346a6cc4df6a3556569d777e"
+  },
+  "original_function": {
+    "path": "data/source_audits/order135/pass-regression-history/original-pass-function.py.txt",
+    "sha256": "e4396ff4ae043cba9a38a27c191d9e584ed7978ca1f3e7340f6997bea51ab31d"
+  },
+  "qualification": "Only the named original test function is excepted. Original requirements/source captures and every other original assertion remain unchanged. No broader repair, merge, full-suite RELEASE or CLEAN is granted."
+}

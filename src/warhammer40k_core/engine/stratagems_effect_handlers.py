@@ -326,6 +326,7 @@ def _apply_counteroffensive_handler(
         fight_state=fight_state,
         player_id=use_record.player_id,
         policy=ruleset_descriptor.fight_policy,
+        respect_ordering_band=False,
     )
     fight_context = next(
         (candidate for candidate in contexts if candidate.unit_instance_id == target_unit_id),

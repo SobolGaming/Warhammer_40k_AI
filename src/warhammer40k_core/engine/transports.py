@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, replace
 from enum import StrEnum
-from typing import TYPE_CHECKING, Self, TypedDict, cast
+from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.deployment_zones import DeploymentZone
 from warhammer40k_core.core.dice import DiceRollState, DiceRollStatePayload
@@ -125,6 +125,9 @@ if TYPE_CHECKING:
         MortalWoundApplicationPayload,
     )
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.phases.movement_rules_unit_disembark import (
+        RulesUnitCombatDisembarkResolution,
+    )
 
 
 transport_restriction_override_kind_from_token = (
@@ -275,10 +278,12 @@ class TransportHazardMortalWoundsPayload(TypedDict):
     source_rule_id: str
     source_kind: str
     disembark_mode: str
+    disembark_payload_kind: NotRequired[str]
     disembark: (
         CombatDisembarkPayload
         | DestroyedTransportDisembarkPayload
         | DestroyedTransportHazardRollsPayload
+        | dict[str, JsonValue]
     )
     mortal_wounds: int
     mortal_wound_application: MortalWoundApplicationPayload | None
@@ -1276,7 +1281,12 @@ class CombatDisembark:
 class TransportHazardMortalWounds:
     source_rule_id: str
     source_kind: str
-    disembark: CombatDisembark | DestroyedTransportDisembark | DestroyedTransportHazardRolls
+    disembark: (
+        CombatDisembark
+        | DestroyedTransportDisembark
+        | DestroyedTransportHazardRolls
+        | RulesUnitCombatDisembarkResolution
+    )
     mortal_wound_application: MortalWoundApplication | None = None
     pending_mortal_wound_request: DecisionRequest | None = None
 
@@ -1285,6 +1295,9 @@ class TransportHazardMortalWounds:
         from warhammer40k_core.engine.mortal_wound_model_allocation import (
             is_mortal_wound_resolution_request,
             mortal_wound_resolution_source_context,
+        )
+        from warhammer40k_core.engine.phases.movement_rules_unit_disembark import (
+            RulesUnitCombatDisembarkResolution,
         )
 
         object.__setattr__(
@@ -1305,13 +1318,14 @@ class TransportHazardMortalWounds:
             CombatDisembark,
             DestroyedTransportDisembark,
             DestroyedTransportHazardRolls,
+            RulesUnitCombatDisembarkResolution,
         }:
             raise GameLifecycleError(
                 "TransportHazardMortalWounds requires a transport hazard disembark."
             )
         if type(self.disembark) is not DestroyedTransportHazardRolls:
             placed_disembark = cast(
-                CombatDisembark | DestroyedTransportDisembark,
+                CombatDisembark | DestroyedTransportDisembark | RulesUnitCombatDisembarkResolution,
                 self.disembark,
             )
             if not placed_disembark.placement.is_valid:
@@ -1368,7 +1382,11 @@ class TransportHazardMortalWounds:
 
     @property
     def disembark_mode(self) -> DisembarkModeKind:
-        if type(self.disembark) is CombatDisembark:
+        from warhammer40k_core.engine.phases.movement_rules_unit_disembark import (
+            RulesUnitCombatDisembarkResolution,
+        )
+
+        if type(self.disembark) in {CombatDisembark, RulesUnitCombatDisembarkResolution}:
             return DisembarkModeKind.COMBAT_DISEMBARK
         if type(self.disembark) is DestroyedTransportDisembark:
             return self.disembark.disembark_mode
@@ -1381,7 +1399,12 @@ class TransportHazardMortalWounds:
         return self.disembark.mortal_wound_count
 
     def to_payload(self) -> TransportHazardMortalWoundsPayload:
-        return {
+        from warhammer40k_core.engine.phases.movement_rules_unit_disembark import (
+            RULES_UNIT_COMBAT_DISEMBARK_PAYLOAD_KIND,
+            RulesUnitCombatDisembarkResolution,
+        )
+
+        payload: TransportHazardMortalWoundsPayload = {
             "source_rule_id": self.source_rule_id,
             "source_kind": self.source_kind,
             "disembark_mode": self.disembark_mode.value,
@@ -1397,16 +1420,38 @@ class TransportHazardMortalWounds:
             if self.pending_mortal_wound_request is None
             else self.pending_mortal_wound_request.request_id,
         }
+        if type(self.disembark) is RulesUnitCombatDisembarkResolution:
+            payload["disembark_payload_kind"] = RULES_UNIT_COMBAT_DISEMBARK_PAYLOAD_KIND
+        return payload
 
     @classmethod
     def from_payload(cls, payload: TransportHazardMortalWoundsPayload) -> Self:
         from warhammer40k_core.engine.damage_allocation import MortalWoundApplication
+        from warhammer40k_core.engine.phases.movement_rules_unit_disembark import (
+            RULES_UNIT_COMBAT_DISEMBARK_PAYLOAD_KIND,
+        )
+        from warhammer40k_core.engine.rules_unit_combat_payload import (
+            rules_unit_combat_from_payload,
+        )
 
         disembark_mode = disembark_mode_kind_from_token(payload["disembark_mode"])
-        if disembark_mode is DisembarkModeKind.COMBAT_DISEMBARK:
-            disembark: (
-                CombatDisembark | DestroyedTransportDisembark | DestroyedTransportHazardRolls
-            ) = CombatDisembark.from_payload(cast(CombatDisembarkPayload, payload["disembark"]))
+        disembark: (
+            CombatDisembark
+            | DestroyedTransportDisembark
+            | DestroyedTransportHazardRolls
+            | RulesUnitCombatDisembarkResolution
+        )
+        if "disembark_payload_kind" in payload:
+            if (
+                payload["disembark_payload_kind"] != RULES_UNIT_COMBAT_DISEMBARK_PAYLOAD_KIND
+                or disembark_mode is not DisembarkModeKind.COMBAT_DISEMBARK
+            ):
+                raise GameLifecycleError("Transport hazard payload discriminator drift.")
+            disembark = rules_unit_combat_from_payload(validate_json_value(payload["disembark"]))
+        elif disembark_mode is DisembarkModeKind.COMBAT_DISEMBARK:
+            disembark = CombatDisembark.from_payload(
+                cast(CombatDisembarkPayload, payload["disembark"])
+            )
         elif disembark_mode in {
             DisembarkModeKind.DESTROYED_TRANSPORT,
             DisembarkModeKind.EMERGENCY_DISEMBARK,
@@ -1417,7 +1462,9 @@ class TransportHazardMortalWounds:
                     cast(DestroyedTransportDisembarkPayload, disembark_payload)
                 )
             else:
-                disembark = DestroyedTransportHazardRolls.from_payload(disembark_payload)
+                disembark = DestroyedTransportHazardRolls.from_payload(
+                    cast(DestroyedTransportHazardRollsPayload, disembark_payload)
+                )
         else:
             raise GameLifecycleError(
                 "TransportHazardMortalWounds requires a hazard disembark mode."
@@ -1444,6 +1491,13 @@ class TransportHazardMortalWounds:
         )
         if expected_request_id != payload["pending_mortal_wound_request_id"]:
             raise GameLifecycleError("TransportHazardMortalWounds pending request drift.")
+        if "disembark_payload_kind" in payload:
+            from warhammer40k_core.engine.event_log import canonical_json
+
+            if canonical_json(validate_json_value(result.to_payload())) != canonical_json(
+                validate_json_value(payload)
+            ):
+                raise GameLifecycleError("Rules-unit transport hazard completion payload drift.")
         return result
 
 

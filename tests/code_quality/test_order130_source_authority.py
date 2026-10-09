@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from tools.core_rules_order84_capture import fingerprint
+from tools.core_rules_order97_history import historical_evidence_path
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -20,4 +21,6 @@ def test_order130_selected_faq_and_original_source_archives_remain_exact() -> No
     for block in audit["selected_source"]["blocks"]:
         assert fingerprint(block["value"]) == block["sha256"]
     for name, expected in audit["pinned_git_blob_sha256"].items():
-        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == expected
+        historical = historical_evidence_path(name, root=ROOT)
+        path = ROOT / name if historical is None else historical
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == expected

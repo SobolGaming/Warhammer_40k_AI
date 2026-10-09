@@ -86,6 +86,21 @@ ORDER126_MAPPING_SHA256 = "4664ea3c444ce541d57e7c066dfa8a41a21890d65cddbc774bb39
 ORDER135_MAPPING = "data/source_audits/order135/historical-inputs.json"
 ORDER135_MAPPING_SHA256 = "5e6088ea869552c2e508fa676842b40ada02cf3c8de07f30732f34e3471a46f9"
 
+ORDER135_D02_MAPPING = "data/source_audits/order135/d02-historical-inputs.json"
+ORDER135_D02_MAPPING_SHA256 = "f44d9c658e2ef3980ecd9cd9bbdbfd9fa7c51ad9863d36b9d5ba026bc1027a02"
+
+
+ORDER135_FINAL_FIXTURE_MAPPING = "data/source_audits/order135/final-fixture-historical-inputs.json"
+ORDER135_FINAL_FIXTURE_MAPPING_SHA256 = (
+    "e0fea4bc8a7e84071b5ded77f25710234a1e3d87711ea64e8556de98efbc3942"
+)
+
+
+ORDER135_FINAL_QUALITY_MAPPING = "data/source_audits/order135/final-quality-historical-inputs.json"
+ORDER135_FINAL_QUALITY_MAPPING_SHA256 = (
+    "5a531ffd9a716f83aacdf090079c2e8a593e7bcad168247cce6cf6d483ad7c34"
+)
+
 
 def historical_evidence_path(reference: str, *, root: Path) -> Path | None:
     """Resolve only the reviewed mapping; missing or corrupt history never falls back."""
@@ -111,6 +126,9 @@ def historical_evidence_path(reference: str, *, root: Path) -> Path | None:
         (ORDER123_MAPPING, ORDER123_MAPPING_SHA256),
         (ORDER126_MAPPING, ORDER126_MAPPING_SHA256),
         (ORDER135_MAPPING, ORDER135_MAPPING_SHA256),
+        (ORDER135_D02_MAPPING, ORDER135_D02_MAPPING_SHA256),
+        (ORDER135_FINAL_FIXTURE_MAPPING, ORDER135_FINAL_FIXTURE_MAPPING_SHA256),
+        (ORDER135_FINAL_QUALITY_MAPPING, ORDER135_FINAL_QUALITY_MAPPING_SHA256),
     ):
         raw = (root / mapping_name).read_bytes()
         if hashlib.sha256(raw).hexdigest() != expected_sha256:

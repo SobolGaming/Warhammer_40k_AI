@@ -588,9 +588,11 @@ def _apply_attack_sequence_decision_to_sequence(
     status: LifecycleStatus | None
     if result.decision_type == SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE:
         validate_psychic_attack_modifier_ignore_decision(
+            state=state,
             decisions=decisions,
             attack_sequence=attack_sequence,
             result=result,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         updated_sequence = attack_sequence
         allocated_model_ids = already_allocated_model_ids

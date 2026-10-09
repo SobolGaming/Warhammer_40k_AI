@@ -1,0 +1,38 @@
+{
+  "schema": "order135-b04-b05-explicit-bounded-repair-approval-v1",
+  "source_thread_id": "01a0efa7-1ce0-70b0-a637-75c1615f80ef",
+  "transcript_evidence": [
+    {
+      "role": "assistant",
+      "recorded_time_utc": "2026-10-07T22:32:39.860163+00:00",
+      "text": "The fresh Mac suite passed all 11,181 tests with 85.30% combined line-and-branch coverage, but the independent audit reproduced two more gaps:\n\n- Disembark distance ignores height, accepting a configured FRAME model that isn’t wholly within the required 3 inches in 3D\n- An ordinary transport-and-passenger setup reaches legal disembark decisions, but saving or exporting replay fails when restoring its initial setup state\n\nMay I add these two narrow transport fixes and their regression tests to Order135? Merge remains blocked until they’re resolved and revalidated"
+    },
+    {
+      "role": "user",
+      "recorded_time_utc": "2026-10-07T22:43:46+00:00",
+      "sentinel": "Sentinel_7dba44b4eb248191af3a76542e375417",
+      "text": "yes, fix found gaps"
+    }
+  ],
+  "provenance": "Exact dated human transcript supplied by the authorized parent; no independently fetched transcript or backend model attestation is claimed.",
+  "approved_scope": "B04 shared full 3D/all-FRAME-parts disembark containment and B05 legitimate predeployment starting-cargo anchor restore, with narrow regressions and complete renewed validation.",
+  "preserved_invariants": [
+    "Inclusive distance and existing oversized-base exception.",
+    "All mode, terrain, enemy engagement, overlap and coherency restrictions.",
+    "Cargo identity, ownership, type/capacity, whole attached living components, duplicate carriage, reserve binding and destroyed-route rules.",
+    "Carrier presence after actual deployment; living/dead cargo placement/removal partition before and after deployment.",
+    "Original native replay anchor and all admission/configuration/source/turn/identity controls."
+  ],
+  "source5": {
+    "head": "5e45dcc9fb1af6de138ebeba4b88005c744bc3b7",
+    "tree": "e0723b3fd3af49f2363c1d83a0a9552c5cba1adf",
+    "base": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+    "rules_report_sha256": "53cae4bc52cf84ec3c73ebdd6f75e7ae836922eeec808f1e5e8073412d575d0d",
+    "rules_support_index_sha256": "1eabb4bccb037209631fb258d7fde359eee99b48bbed2f11bd7f9c30afb02bd6",
+    "coding_addendum_sha256": "18c3b4433fe27d44955dc7cc35a2260da8a8352c2d65ae73ba05ff2a29618d5c",
+    "retained_truth": "11181 cases/33543 phases and85.29837522150397 percent combined branch-aware aggregate passed only on unchanged source5. B04/B05 and incomplete individual1078 semantic tracing prevent closure.",
+    "successor_credit": false
+  },
+  "qualification": "B04 native analytical FRAME fixture has explicit synthetic geometry and legacy Core admission. B05 ordinary current pending/completed lifecycle restore is exact; session save/replay export rejects the engine-produced predeployment initial anchor. No official faction/provider/body or full-game certification.",
+  "execution_policy": "Both SAME fresh Mac reviewers remain STATIC ONLY through corrected prerequisites, quiet smoke, complete quality and isolated unchanged16/HOLD/explicit independent RELEASE. Preserve failures, source5 cohort and old reports. New exact-source aggregate and both exact-final reviews required. No gate waiver, unrelated candidate repair, automatic main CI or successor implementation."
+}

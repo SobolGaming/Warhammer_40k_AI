@@ -1,0 +1,61 @@
+{
+  "schema": "order135-final-fixture-historical-inputs-v1",
+  "purpose": "Exact Order97 already-reviewed source5 originals only. Current Order135 audit reads actual current files and never this resolver. No original review identity, assertions, scope or validation is replaced.",
+  "source_commit": "5e45dcc9fb1af6de138ebeba4b88005c744bc3b7",
+  "files": [
+    {
+      "path": "tests/core_stratagem_helpers.py",
+      "historical_path": "data/source_audits/order135/final-fixture-history/tests/core_stratagem_helpers.py.txt",
+      "bytes": 20501,
+      "sha256": "c364a97338c29de3fec9deaf82138779a734c3b170ba54e61bcd3c07a4b404b9"
+    },
+    {
+      "path": "tests/critical_hit_helpers.py",
+      "historical_path": "data/source_audits/order135/final-fixture-history/tests/critical_hit_helpers.py.txt",
+      "bytes": 13389,
+      "sha256": "36b8deda25937fdeff433dbe1e7fe52d354f81d9800fdaa98950643915d84176"
+    },
+    {
+      "path": "tests/disembark_eligibility_helpers.py",
+      "historical_path": "data/source_audits/order135/final-fixture-history/tests/disembark_eligibility_helpers.py.txt",
+      "bytes": 8376,
+      "sha256": "0dc8cae31e6419b2d4605f32718320243c89ca6fc958ca92dd4e160e9cd3a1cb"
+    },
+    {
+      "path": "tests/large_model_disembark_helpers.py",
+      "historical_path": "data/source_audits/order135/final-fixture-history/tests/large_model_disembark_helpers.py.txt",
+      "bytes": 4489,
+      "sha256": "66d786d39b1200f53bad26f2edad923c346895b8deccf1e3b58a649345c4e980"
+    },
+    {
+      "path": "tests/order58_failed_save_damage_timing_helpers.py",
+      "historical_path": "data/source_audits/order135/final-fixture-history/tests/order58_failed_save_damage_timing_helpers.py.txt",
+      "bytes": 8401,
+      "sha256": "3583a5811eec0f9464d4d27e98f84d844a1d4776af08ee164a6b928bdb1695c5"
+    },
+    {
+      "path": "tests/order97_gap_probes_18_25.py",
+      "historical_path": "data/source_audits/order135/final-fixture-history/tests/order97_gap_probes_18_25.py.txt",
+      "bytes": 27164,
+      "sha256": "7305e6f7a169289bb19cb2e88205fabb2e844b0a6f4abcccc85bb8a8a3719312"
+    },
+    {
+      "path": "tests/phase13b_shooting_declaration_helpers.py",
+      "historical_path": "data/source_audits/order135/final-fixture-history/tests/phase13b_shooting_declaration_helpers.py.txt",
+      "bytes": 117166,
+      "sha256": "c1c66067bd49667d7986fb4388e1002b469edea1c9ed76a824c65da183a3f99b"
+    },
+    {
+      "path": "tests/unit/test_order101_setup_failure.py",
+      "historical_path": "data/source_audits/order135/final-fixture-history/tests/unit/test_order101_setup_failure.py.txt",
+      "bytes": 77241,
+      "sha256": "c76479303b1bb3eb5c5b3824c346f994326e23b627f8d29b54883a406e139521"
+    },
+    {
+      "path": "tests/unit/test_phase12c_core_stratagems.py",
+      "historical_path": "data/source_audits/order135/final-fixture-history/tests/unit/test_phase12c_core_stratagems.py.txt",
+      "bytes": 281001,
+      "sha256": "0dd9238c8bc869e2432442cd635360d79b528d0f6b73f5657b30a8179d9e9310"
+    }
+  ]
+}

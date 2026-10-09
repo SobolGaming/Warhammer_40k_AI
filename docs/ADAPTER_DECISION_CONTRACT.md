@@ -2,6 +2,12 @@
 
 ## Order135: physical visibility and battlefield-edge origins
 
+Contract44.3.22 retains existing decision and persistence envelopes for full3D
+disembark containment and valid predeployment starting-cargo anchor restoration.
+Source-invalid placement keeps its existing recorded rejection/retry behavior;
+no anchor replacement, schema migration or relaxed live cargo guard is introduced.
+Exact runtime identity remains required.
+
 Contract44.3.21 publishes shared physical visibility through existing shooting,
 cover, projection, event and persistence/replay surfaces. The support base and
 declared body components form the physical union; only outgoing origins are
@@ -5632,6 +5638,15 @@ submission leaves the pending request, records, RNG and authoritative state inta
 Selection history binds this boundary across every continuation; hit events carry
 and validate the final selected identities and effective skill/hit arithmetic.
 
+Gathered attacks retain the stored pool cursor at zero while preparing each
+original occurrence before any Hit roll. One shared engine owner derives the
+Psychic preparation frontier from the current pool and its ordered accepted
+choices. Pre-pop validation, phase application and restoration use that same
+authority; a completed earlier choice without a Hit event is valid only within
+this authenticated prefix. Random BS/WS values come from the existing occurrence
+evaluation journal, without additional dice draws. No client cursor, option,
+payload field or visibility class is added; the existing finite contract applies.
+
 `effect_snapshot_sha256` is engine-private authority evidence. The shared adapters
 redaction owner removes it recursively from pending choices, decision records,
 events and status metadata for every viewer. Finite clients submit an option ID;
@@ -7734,3 +7749,55 @@ Order130 / Contract44.3.16 freezes shared per-model destruction occurrences in
 secondary scoring evidence v2. Coherency cleanup updates model wounds without
 triggering destroyed-model rules, and authentic casualty-gap saves remain valid
 until turn-end cleanup. Decision and viewer families retain their payloads.
+
+
+### Order135 Core Counter eligibility before the grant
+
+Contract44.3.23 uses the existing parameterized Stratagem request and effect
+continuation to admit otherwise eligible non-FightsFirst targets during the
+opponent Fights First step. Core target discovery, authoritative prevalidation
+and effect application share an explicit pre-grant query scope; ordinary Fight
+selection remains band-restricted. No decision or payload shape changes. Existing
+CP/source/turn/target/context validation, atomic Boolean-number rejection,
+viewer/event projections and exact-runtime persistence/replay remain required.
+
+### Order135 Fight transition and pass eligibility
+
+Contract44.3.24 retains the existing finite Fight activation request. Exhausting
+Fights First preserves the ordinary player owed selection into Remaining Combats.
+Availability scanning must not replace that player with the last scanned player;
+the explicit Remaining-to-Fights-First restart keeps its existing active-player rule.
+
+Pass offering and pre-pop submission validation require all otherwise-eligible
+friendly units, across ordering bands, to be strictly more than five inches from
+every enemy. Forced activations cannot pass. The selectable options and finite
+request snapshot continue to describe the current band. A stale pass is rejected
+before queue, accepted history or event mutation, without changing the request
+or requiring a new payload family. Accepted passes hand ordinary selection to
+the opponent, with normal band progression. Existing save/load/fork, principal
+views/events and exact-runtime replay retain their contracts.
+
+### Order135 gathered attack steps and Combat disembark
+
+Contract44.3.25 retains the finite Hit/Wound reroll and Lethal choice families.
+All gathered original Hit rolls precede Hit resolution and Wound generation;
+all eligible Wound preparations precede original Wound rolls and their resolution.
+Resumption consumes engine-owned roll and decision journals without trusting an
+adapter cursor or repeating a physical roll. This does not certify grouped Save
+timing or every pool grouping interpretation.
+
+The existing Combat placement proposal is validated against whole-unit Tactical
+feasibility before queue pop. A verified legal Tactical alternative or an
+unresolved exclusion returns typed invalid status with the same pending request,
+state, histories, events and RNG. Only a sound exclusion can authorize Combat;
+the shared owner rechecks it before hazard draws. Positive witnesses pass the
+complete current placement owner with actual battlefield and terrain context.
+Finite candidate exhaustion is not an impossibility proof.
+
+Grouped Combat hazard events explicitly carry
+`disembark_payload_kind="rules_unit_combat_disembark"`. Live continuation,
+persistence and Fight history share strict complete typed decoding and canonical
+context comparison; Boolean/number aliases and extra unowned fields are rejected.
+The existing standalone and Emergency variants retain their routes. No old draft
+payload is silently converted. Exact-runtime save/load/fork, public event views
+and replay remain required. See the contract migration for feasibility limits.

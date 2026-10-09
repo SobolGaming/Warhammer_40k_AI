@@ -2522,6 +2522,7 @@ def test_phase14e_melee_cleave_adds_single_target_attacks_from_target_model_coun
 def test_phase14e_melee_lance_uses_charge_move_wound_modifier() -> None:
     catalog, ruleset, scenario, attacker, target_a, _target_b = _melee_fixture(
         leader_keywords=(WeaponKeyword.LANCE,),
+        leader_attack_count=1,
         target_b_pose=Pose.at(30.0, 30.0),
     )
     request = _melee_request(
@@ -7654,6 +7655,7 @@ def _melee_fixture(
     *,
     include_extra_attacks: bool = False,
     leader_keywords: tuple[WeaponKeyword, ...] = (),
+    leader_attack_count: int | None = None,
     leader_abilities: tuple[AbilityDescriptor, ...] = (),
     target_a_pose: Pose | None = None,
     target_b_pose: Pose | None = None,
@@ -7679,6 +7681,22 @@ def _melee_fixture(
         leader_keywords=leader_keywords,
         leader_abilities=leader_abilities,
     )
+    if leader_attack_count is not None:
+        catalog = replace(
+            catalog,
+            wargear=tuple(
+                replace(
+                    item,
+                    weapon_profiles=tuple(
+                        replace(profile, attack_profile=AttackProfile.fixed(leader_attack_count))
+                        for profile in item.weapon_profiles
+                    ),
+                )
+                if item.wargear_id == "core-leader-blade"
+                else item
+                for item in catalog.wargear
+            ),
+        )
     ruleset = RulesetDescriptor.warhammer_40000_eleventh(descriptor_version="core-v2-phase15d-test")
     armies = _armies(
         catalog,

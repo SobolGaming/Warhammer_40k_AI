@@ -29,6 +29,7 @@ def random_melee_session(
     attached: bool = False,
     fixed_bodyguard: bool = False,
     fixed_attacks: int | None = None,
+    pause_at_first_hit: bool = False,
 ) -> LocalGameSession:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     if fixed_bodyguard:
@@ -184,6 +185,18 @@ def random_melee_session(
         fights_first_unit_keys=("bodyguard",) if attached else ("attacker",),
         record_deployment=True,
     )
+    if pause_at_first_hit:
+        from warhammer40k_core.engine.command_points import CommandPointSourceKind
+
+        state = lifecycle.state
+        assert state is not None
+        state.gain_command_points(
+            player_id="player-a",
+            amount=1,
+            source_id="order113-cleave-pending-hit",
+            source_kind=CommandPointSourceKind.OTHER,
+            cap_exempt=True,
+        )
     return LocalGameSession(lifecycle)
 
 
@@ -195,6 +208,15 @@ def melee_boundary(session: LocalGameSession) -> DecisionRequest:
         assert request is not None
         if request.decision_type in {"submit_melee_declaration", "select_melee_weapon"}:
             return request
+        if request.decision_type == "submit_stratagem_target_proposal":
+            from warhammer40k_core.engine.stratagems_requests import stratagem_decline_payload
+
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id=f"prepare-{index}",
+                payload=stratagem_decline_payload(),
+            )
+            continue
         option = next(
             option for option in request.options if not option.option_id.startswith("complete")
         )

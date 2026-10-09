@@ -167,7 +167,7 @@ def test_additional_mortal_permission_validates_schema_and_occurrence(phase: Bat
 def test_successful_wounds_generate_additional_mortals_even_after_successful_saves(
     phase: BattlePhase,
 ) -> None:
-    session = additional_mortal_session(phase, armor_penetration=0)
+    session = additional_mortal_session(phase, armor_penetration=0, attacks=6)
     complete_attack(session)
     events = session.lifecycle.decision_controller.event_log.records
     wounded = [

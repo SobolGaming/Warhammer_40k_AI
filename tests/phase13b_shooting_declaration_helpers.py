@@ -2435,6 +2435,8 @@ def _phase14l_test1_dice_results(
                 value=hit_roll,
             )
         )
+    for attack_number, hit_roll in enumerate((2, 4, 6, 4, 3), start=1):
+        attack_context_id = f"phase14l-shooting-test1:pool-001:attack-{attack_number:03d}"
         if hit_roll >= 3:
             results.append(
                 _fixed_roll_result(
@@ -2474,6 +2476,8 @@ def _phase14l_test1_dice_results(
                 value=hit_roll,
             )
         )
+    for attack_number, hit_roll in enumerate((4, 4, 2), start=1):
+        attack_context_id = f"phase14l-shooting-test1:pool-004:attack-{attack_number:03d}"
         if hit_roll >= 4:
             results.append(
                 _fixed_roll_result(
@@ -2710,32 +2714,32 @@ def _paused_optional_fnp_lifecycle() -> tuple[GameLifecycle, DecisionRequest]:
     injected_results: list[DiceRollResult] = []
     for attack_number in range(1, 3):
         attack_context_id = f"phase14h-fnp-round-trip:pool-001:attack-{attack_number:03d}"
-        injected_results.extend(
-            (
-                _fixed_roll_result(
-                    roll_id=f"phase14h-fnp-hit-{attack_number}",
-                    spec=DiceRollSpec(
-                        expression=DiceExpression(quantity=1, sides=6),
-                        reason=(
-                            f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}"
-                        ),
-                        roll_type="attack_sequence.hit",
-                        actor_id="player-a",
-                    ),
-                    value=6,
+        injected_results.append(
+            _fixed_roll_result(
+                roll_id=f"phase14h-fnp-hit-{attack_number}",
+                spec=DiceRollSpec(
+                    expression=DiceExpression(quantity=1, sides=6),
+                    reason=(f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}"),
+                    roll_type="attack_sequence.hit",
+                    actor_id="player-a",
                 ),
-                _fixed_roll_result(
-                    roll_id=f"phase14h-fnp-wound-{attack_number}",
-                    spec=DiceRollSpec(
-                        expression=DiceExpression(quantity=1, sides=6),
-                        reason=(
-                            f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}"
-                        ),
-                        roll_type="attack_sequence.wound",
-                        actor_id="player-a",
+                value=6,
+            )
+        )
+    for attack_number in range(1, 3):
+        attack_context_id = f"phase14h-fnp-round-trip:pool-001:attack-{attack_number:03d}"
+        injected_results.append(
+            _fixed_roll_result(
+                roll_id=f"phase14h-fnp-wound-{attack_number}",
+                spec=DiceRollSpec(
+                    expression=DiceExpression(quantity=1, sides=6),
+                    reason=(
+                        f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}"
                     ),
-                    value=6,
+                    roll_type="attack_sequence.wound",
+                    actor_id="player-a",
                 ),
+                value=6,
             )
         )
     for attack_number in range(1, 3):

@@ -206,7 +206,14 @@ def _counteroffensive_target_context_error(
     context: StratagemEligibilityContext,
     target_binding: StratagemTargetBinding,
     ruleset_descriptor: RulesetDescriptor | None,
+    respect_ordering_band: bool = True,
 ) -> str | None:
+    """Validate a target in the explicitly requested fight-eligibility scope.
+
+    The Core handler requests pre-grant eligibility. The default band query
+    remains available to direct geometry callers and historical band controls;
+    those controls alone do not establish Core Stratagem availability.
+    """
     fight_state = state.fight_phase_state
     if fight_state is None:
         return "counteroffensive_requires_fight_phase_state"
@@ -219,6 +226,7 @@ def _counteroffensive_target_context_error(
         fight_state=fight_state,
         player_id=context.player_id,
         policy=descriptor.fight_policy,
+        respect_ordering_band=respect_ordering_band,
     )
     for fight_context in contexts:
         if fight_context.unit_instance_id != target_unit_id:

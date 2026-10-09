@@ -1244,9 +1244,11 @@ def _apply_fight_attack_sequence_decision(
     status: LifecycleStatus | None
     if result.decision_type == SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE:
         validate_psychic_attack_modifier_ignore_decision(
+            state=state,
             decisions=decisions,
             attack_sequence=fight_state.attack_sequence,
             result=result,
+            runtime_modifier_registry=handler.runtime_modifier_registry,
         )
         updated_sequence = fight_state.attack_sequence
         allocated_model_ids = fight_state.allocated_model_ids_this_phase
@@ -2083,6 +2085,8 @@ def _advance_to_next_fight_request(
     policy: FightPolicyDescriptor,
 ) -> _FightRequestContext:
     current = fight_state
+    # Checking the other player's availability must not consume the owed turn.
+    band_entry_player_id = current.fight_order_state.next_player_id
     checked_player_ids: set[str] = set()
     for _iteration in range(
         len(state.player_ids) * (len(current.fight_order_state.ordering_bands) + 1) * 2
@@ -2106,6 +2110,7 @@ def _advance_to_next_fight_request(
                 ordering_band=FightOrderingBandKind.FIGHTS_FIRST,
                 next_player_id=current.active_player_id,
             )
+            band_entry_player_id = current.fight_order_state.next_player_id
             checked_player_ids = set()
             continue
         contexts = (
@@ -2123,7 +2128,12 @@ def _advance_to_next_fight_request(
             return _FightRequestContext(
                 fight_state=current,
                 contexts=contexts,
-                pass_available=eligible_pass_is_available(contexts),
+                pass_available=eligible_pass_is_available(
+                    state=state,
+                    fight_state=current,
+                    player_id=current.fight_order_state.next_player_id,
+                    policy=policy,
+                ),
             )
         checked_player_ids.add(current.fight_order_state.next_player_id)
         if len(checked_player_ids) < len(state.player_ids):
@@ -2134,7 +2144,7 @@ def _advance_to_next_fight_request(
                 )
             )
             continue
-        current = current.with_next_band()
+        current = current.with_next_band(next_player_id=band_entry_player_id)
         checked_player_ids = set()
     raise GameLifecycleError("Fight phase exceeded deterministic ordering guard.")
 
@@ -2827,6 +2837,7 @@ def request_counteroffensive_if_available(
             fight_state=require_fight_state(state),
             player_id=player_id,
             policy=policy,
+            respect_ordering_band=False,
         )
         if not contexts:
             continue
@@ -3194,7 +3205,12 @@ def _invalid_fight_pass_status(
     current_contexts: tuple[FightEligibilityContext, ...],
     policy: FightPolicyDescriptor,
 ) -> LifecycleStatus | None:
-    if not eligible_pass_is_available(current_contexts):
+    if not eligible_pass_is_available(
+        state=state,
+        fight_state=fight_state,
+        player_id=fight_state.fight_order_state.next_player_id,
+        policy=policy,
+    ):
         return LifecycleStatus.invalid(
             stage=state.stage,
             message="Eligible-to-fight pass is not currently legal.",

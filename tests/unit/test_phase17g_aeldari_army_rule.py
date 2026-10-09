@@ -2121,20 +2121,30 @@ def _aspect_shrine_lifecycle_override_request(
         status,
         result_id="aspect-token-decline-hit-command-reroll",
     )
-    if (
+    hit_assignment_count = 0
+    while (
         twin_linked
         and _decision_request(status).decision_type == DICE_RESULT_OVERRIDE_DECISION_TYPE
     ):
         hit_assignment = _decision_request(status)
+        assert isinstance(hit_assignment.payload, dict)
+        assert hit_assignment.payload["roll_spec_type"] == "attack_sequence.hit"
+        hit_assignment_count += 1
         status = lifecycle.submit_decision(
             DecisionResult.for_request(
-                result_id="order96:decline-hit-assignment",
+                result_id=(
+                    "order96:decline-hit-assignment"
+                    if hit_assignment_count == 1
+                    else f"order96:decline-hit-assignment:{hit_assignment.request_id}"
+                ),
                 request=hit_assignment,
                 selected_option_id="decline",
             )
         )
         status = _decline_stratagem_window_if_present(
-            lifecycle, status, result_id="order96:decline-wound-command-reroll"
+            lifecycle,
+            status,
+            result_id=f"order96:decline-wound-command-reroll:{hit_assignment_count}",
         )
     request = _decision_request(status)
     assert request.decision_type == (

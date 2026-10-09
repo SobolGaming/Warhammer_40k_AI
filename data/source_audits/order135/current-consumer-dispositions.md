@@ -1,5 +1,18 @@
 # Order135 current static dispositions, after Core-scope clarification
 
+Author delivery addendum, 8 October 2026: PR576 now has the owner-approved scope
+cutoff recorded in `pr576-follow-up-inventory.json`. The historical review below
+is retained. Approved D02/D03 add gathered original Hit/Wound boundaries,
+whole-unit Tactical feasibility before Combat, atomic invalid proposals and
+strict tagged grouped Combat history decoding. Exact protected originals and
+exceptions are retained in `d02-d03-explicit-repair-and-assertion-approval.json`.
+Current source bindings retain all 1,078 original requirements and full source
+observations. They do not convert a static link or focused run into semantic or
+runtime certification. Relaxed Tactical exclusion, grouped Save chronology,
+separate Deadly Demise qualification and every historical queue item retain
+their explicit limits. Complete frozen gates and scoped independent renewal
+remain required; no full Core or successor-order claim is made.
+
 One independent gpt-6.1-sol / High coding reviewer; no nested agents. Static only: no tests, imports, runtime probes or benchmarks. No repository changes. Reviewed baseline HEAD/base `70b0c0b43774f81d67753b0e3f830b38f1b178ff`, tree `9bfe078571d851065730f716ca990d87e7a11621`. This is an interim current-evidence review, not CLEAN, a runtime reproduction, accepted closure or an assertion that every requirement is semantically certified.
 
 The initial and V963 reports remain immutable. This addendum supersedes only their assessment that missing in-turn deployment integration necessarily prevents Core closure. The user clarified on October6 at20:16 UTC (message `Sentinel_0ebd9251c61881918a71b71413360d5e`) that this granting capability may be a faction exception; its absence alone must not keep the Core audit open. Historical Order134 qualifications and source archives are preserved. No granting ability or native in-turn path is invented.
@@ -83,6 +96,19 @@ No original test/assertion/branch/budget or historical evidence is weakened.
 Full current gates and both SAME exact-final reviews remain required; source3
 results and all failed/blocked receipts remain historical, without successor credit.
 
+October7 B04/B05 update: the approved shared disembark consumer now retains the
+existing three-dimensional/all-FRAME-parts containment predicate. The starting
+cargo restore consumer uses the existing actual deployment boundary only for
+carrier presence; all other cargo invariants remain active. New native pregame
+manifest tests retain the genuine initial anchor through setup and disembark,
+save/load/fork, role projections/events and exact replay. Synthetic geometry and
+legacy Core fixture admission remain explicit, without official body or faction
+certification. The source5 current pending/completed lifecycle states already
+restored exactly; its session save/export failed while restoring the predeployment
+initial anchor. Static bindings and focused tests do not establish corrected-source
+aggregate or complete1078 semantic closure. Source5 Mac results and all earlier
+reports remain historical. See the exact two-gap approval and scope plan.
+
 
 The complete subsequent user clarification expressly authorizes exact type-safe
 game-context validation at this same B03 boundary; its verbatim message is retained
@@ -105,3 +131,32 @@ and1.0 atomically, then perform the unchanged legal retry and actual fight with
 save/load/fork/views/events/exact replay. Earlier focused and performance epoch07
 results are historical after this executable/test change; fresh gates and both
 SAME exact-final CLEAN reviews remain mandatory.
+
+
+The user approved the independently reproduced Counter-offensive target-band gap
+on October8 at00:26:27UTC (October7 in America/New_York). Exact attributed parent
+transcript and scope are retained in
+`data/source_audits/order135/counter-band-explicit-repair-approval.json`. During
+ordinary public opponent Charge/Fight, an engaged unselected friendly unit with
+4CP was excluded before the source could grant Fights First. The shared query
+now exposes an explicit ordering-band scope. Its ordinary default remains
+restricted; only the Core discovery, prevalidation and effect paths request
+pre-grant eligibility. Presence, attached lineage, selected history, engagement,
+legal fight types, forced contexts, opponent-turn timing, CP, Battle-shock,
+repeated-use and B03 atomic context checks retain their existing owners.
+
+Every original test/fixture and assertion remains unchanged. In particular,
+`test_order70_counteroffensive_uses_current_model_complete_band` directly calls
+the default geometry query in a constructed own-turn context. It proves the
+default band filter; it is not evidence of lawful Core Counter availability.
+New public native both-direction regressions distinguish ordinary selection
+from Core pre-grant targeting, then exercise actual melee, normal band resume,
+CP/grant/interrupt history, malformed Boolean-number rejection, JSON save/load,
+fork, all principal views/events and exact replay. Existing native Remaining
+acceptance and own-turn rejection remain separate unchanged controls. No
+broader melee, generic interrupt, forced-queue or provider repair is included.
+
+The interrupted0d108 remainder and prior source passes remain immutable without
+new-source credit. Fresh identities, prerequisites, isolated16 authentication,
+explicit corrected RELEASE, full coverage/quality/profile and same-reviewer
+renewal are required. Individual all1078 semantic closure remains outstanding.

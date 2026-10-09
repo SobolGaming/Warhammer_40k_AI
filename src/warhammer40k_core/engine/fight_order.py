@@ -332,13 +332,19 @@ class FightPhaseState:
     def with_next_player(self, player_id: str) -> Self:
         return self._with_order_state(self.fight_order_state.with_next_player(player_id))
 
-    def with_next_band(self) -> Self:
+    def with_next_band(self, *, next_player_id: str | None = None) -> Self:
         if self.fight_order_state.current_band_index + 1 >= len(
             self.fight_order_state.ordering_bands
         ):
             return self.with_phase_complete()
         return self._with_order_state(
-            self.fight_order_state.with_next_band(next_player_id=self.active_player_id)
+            self.fight_order_state.with_next_band(
+                next_player_id=(
+                    self.fight_order_state.next_player_id
+                    if next_player_id is None
+                    else next_player_id
+                )
+            )
         )
 
     def with_ordering_band(
@@ -658,7 +664,50 @@ def eligible_fight_contexts_for_player(
     fight_state: FightPhaseState,
     player_id: str,
     policy: FightPolicyDescriptor,
+    respect_ordering_band: bool = True,
 ) -> tuple[FightEligibilityContext, ...]:
+    """Query fight eligibility, optionally before an ordering-priority grant.
+
+    Ordinary selection uses the current band. A source that grants priority
+    after choosing its target must query otherwise eligible units first.
+    Forced-context, presence, lineage and previous-selection guards apply in
+    either scope; returned contexts retain the actual current band.
+    """
+    requested_player_id = _validate_identifier("player_id", player_id)
+    forced_context = fight_state.forced_activation_context
+    if forced_context is not None and requested_player_id != forced_context.selecting_player_id:
+        return ()
+    eligible_units = _otherwise_eligible_fight_units(
+        state=state, fight_state=fight_state, player_id=player_id, policy=policy
+    )
+    live_fights_first = FightsFirstRegistry.from_state(state)
+    band = fight_state.current_ordering_band
+    selected_units: list[tuple[RulesUnitView, tuple[FightEligibilityKind, ...]]] = []
+    for rules_unit, reasons in eligible_units:
+        if forced_context is None and respect_ordering_band:
+            has_fights_first = live_fights_first.has_unit(rules_unit.unit_instance_id)
+            if band is FightOrderingBandKind.FIGHTS_FIRST and not has_fights_first:
+                continue
+            if band is FightOrderingBandKind.REMAINING_COMBATS and has_fights_first:
+                continue
+        selected_units.append((rules_unit, reasons))
+    return _fight_contexts_for_eligible_units(
+        state=state,
+        fight_state=fight_state,
+        player_id=player_id,
+        policy=policy,
+        eligible_units=tuple(selected_units),
+    )
+
+
+def _otherwise_eligible_fight_units(
+    *,
+    state: GameState,
+    fight_state: FightPhaseState,
+    player_id: str,
+    policy: FightPolicyDescriptor,
+) -> tuple[tuple[RulesUnitView, tuple[FightEligibilityKind, ...]], ...]:
+    """Own eligibility independently of the priority used to select an activation."""
     requested_player_id = _validate_identifier("player_id", player_id)
     forced_context = fight_state.forced_activation_context
     if forced_context is not None and requested_player_id != forced_context.selecting_player_id:
@@ -671,8 +720,7 @@ def eligible_fight_contexts_for_player(
         for rules_unit in placed_rules_units
         if rules_unit.owner_player_id == requested_player_id
     )
-    live_fights_first = FightsFirstRegistry.from_state(state)
-    contexts: list[FightEligibilityContext] = []
+    eligible_units: list[tuple[RulesUnitView, tuple[FightEligibilityKind, ...]]] = []
     for rules_unit in player_rules_units:
         unit_id = rules_unit.unit_instance_id
         if forced_context is not None and not rules_unit_identity_history_contains(
@@ -695,27 +743,35 @@ def eligible_fight_contexts_for_player(
         )
         if not reasons:
             continue
-        band = fight_state.current_ordering_band
-        has_fights_first = live_fights_first.has_unit(unit_id)
-        if forced_context is None:
-            if band is FightOrderingBandKind.FIGHTS_FIRST and not has_fights_first:
-                continue
-            if band is FightOrderingBandKind.REMAINING_COMBATS and has_fights_first:
-                continue
-        contexts.append(
-            FightEligibilityContext(
-                player_id=requested_player_id,
-                battle_round=fight_state.battle_round,
-                unit_instance_id=unit_id,
-                ordering_band=band,
-                eligibility_reasons=reasons,
-                closest_enemy_distance_inches=_closest_enemy_distance_inches(
-                    state=state,
-                    rules_unit=rules_unit,
-                ),
-                pass_distance_inches=policy.eligible_pass_distance_inches,
-            )
+        eligible_units.append((rules_unit, reasons))
+    return tuple(eligible_units)
+
+
+def _fight_contexts_for_eligible_units(
+    *,
+    state: GameState,
+    fight_state: FightPhaseState,
+    player_id: str,
+    policy: FightPolicyDescriptor,
+    eligible_units: tuple[tuple[RulesUnitView, tuple[FightEligibilityKind, ...]], ...],
+) -> tuple[FightEligibilityContext, ...]:
+    # Ordinary selection filters priority before measuring distance. Passing
+    # supplies every otherwise-eligible unit to the same context authority.
+    contexts = tuple(
+        FightEligibilityContext(
+            player_id=player_id,
+            battle_round=fight_state.battle_round,
+            unit_instance_id=rules_unit.unit_instance_id,
+            ordering_band=fight_state.current_ordering_band,
+            eligibility_reasons=reasons,
+            closest_enemy_distance_inches=_closest_enemy_distance_inches(
+                state=state,
+                rules_unit=rules_unit,
+            ),
+            pass_distance_inches=policy.eligible_pass_distance_inches,
         )
+        for rules_unit, reasons in eligible_units
+    )
     return tuple(sorted(contexts, key=lambda context: context.unit_instance_id))
 
 
@@ -727,7 +783,25 @@ def unit_is_currently_engaged(*, state: GameState, unit_instance_id: str) -> boo
     )
 
 
-def eligible_pass_is_available(contexts: tuple[FightEligibilityContext, ...]) -> bool:
+def eligible_pass_is_available(
+    *,
+    state: GameState,
+    fight_state: FightPhaseState,
+    player_id: str,
+    policy: FightPolicyDescriptor,
+) -> bool:
+    """All otherwise-eligible friendly units must be strictly beyond pass range."""
+    if fight_state.forced_activation_context is not None:
+        return False
+    contexts = _fight_contexts_for_eligible_units(
+        state=state,
+        fight_state=fight_state,
+        player_id=player_id,
+        policy=policy,
+        eligible_units=_otherwise_eligible_fight_units(
+            state=state, fight_state=fight_state, player_id=player_id, policy=policy
+        ),
+    )
     if not contexts:
         return False
     return all(context.more_than_pass_distance_from_all_enemies for context in contexts)

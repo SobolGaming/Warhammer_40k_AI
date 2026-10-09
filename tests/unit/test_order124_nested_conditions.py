@@ -325,7 +325,9 @@ def test_shared_target_legality_and_closest_ties_preserve_eligible_targets(case:
 def test_real_weaker_branch_and_outer_source_negatives(
     improved: bool, closest: bool, source_present: bool, expected: str
 ) -> None:
-    session = nested_session(improved=improved, closest=closest, source_present=source_present)
+    session = nested_session(
+        improved=improved, closest=closest, source_present=source_present, attack_count=12
+    )
     declare_nested_shot(session)
     loaded, fork = _assert_roundtrips(session)
     requests = finish_nested_shot(session, use_reroll=False)

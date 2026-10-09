@@ -4,6 +4,7 @@ from __future__ import annotations
 
 # This dispatch adapter accesses lifecycle-owned authorities, like the other dispatch adapters.
 # pyright: reportPrivateUsage=false
+from dataclasses import replace
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.dice import DiceRollResult, DiceRollResultPayload, DiceRollState
@@ -12,19 +13,24 @@ from warhammer40k_core.engine.attack_sequence_dice_rerolls import (
     apply_source_backed_attack_dice_reroll_decision,
     build_source_backed_wound_reroll_request,
 )
-from warhammer40k_core.engine.attack_sequence_model import attack_sequence_wound_roll_spec
+from warhammer40k_core.engine.attack_sequence_model import (
+    HitRoll,
+    HitRollPayload,
+    attack_sequence_wound_roll_spec,
+)
 from warhammer40k_core.engine.decision_dispatch import DecisionDispatchHandler
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
 from warhammer40k_core.engine.dice_roll_history import latest_roll_state
-from warhammer40k_core.engine.event_log import JsonValue, canonical_json
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue, canonical_json
 from warhammer40k_core.engine.lifecycle_state_queries import active_attack_sequence_for_state
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.attack_sequence_state import AttackSequence
     from warhammer40k_core.engine.lifecycle import GameLifecycle
 
 
@@ -154,20 +160,7 @@ def validate_wound_reroll_request(lifecycle: GameLifecycle, request: DecisionReq
         attack_sequence=sequence, attack_context_id=context_id
     ):
         raise GameLifecycleError("Wound reroll attack context drift.")
-    # Grouped resolution restarts its pool on resume. The last physical wound,
-    # rather than the persisted pool cursor, identifies the unresolved frontier.
-    wounds = tuple(
-        event
-        for event in decisions.event_log.records
-        if event.event_type == "dice_rolled"
-        and isinstance(event.payload, dict)
-        and isinstance(event.payload.get("spec"), dict)
-        and cast(dict[str, JsonValue], event.payload["spec"]).get("roll_type")
-        == "attack_sequence.wound"
-    )
-    if not wounds:
-        raise GameLifecycleError("Wound reroll has no physical dice authority.")
-    physical = DiceRollResult.from_payload(cast(DiceRollResultPayload, wounds[-1].payload))
+    physical = _unresolved_gathered_wound(sequence=sequence, events=decisions.event_log.records)
     pool = sequence.current_pool()
     if physical.spec != attack_sequence_wound_roll_spec(
         weapon_profile_id=pool.weapon_profile_id,
@@ -203,3 +196,59 @@ def validate_wound_reroll_request(lifecycle: GameLifecycle, request: DecisionReq
         request.to_payload()
     ):
         raise GameLifecycleError("Wound reroll request differs from current source authority.")
+
+
+def _unresolved_gathered_wound(
+    *, sequence: AttackSequence, events: tuple[EventRecord, ...]
+) -> DiceRollResult:
+    """Bind the first unfinished Wound to its physical Hit and generated-hit lineage."""
+    pool = sequence.current_pool()
+    hits = [
+        event.payload
+        for event in events
+        if event.event_type == "attack_sequence_step"
+        and isinstance(event.payload, dict)
+        and event.payload.get("step") == "hit"
+        and event.payload.get("sequence_id") == sequence.sequence_id
+        and event.payload.get("pool_index") == sequence.pool_index
+    ]
+    if tuple(row.get("attack_index") for row in hits) != tuple(range(pool.attacks)):
+        raise GameLifecycleError("Wound reroll requires a complete gathered Hit step.")
+    specs: dict[str, str] = {}
+    for index, row in enumerate(hits):
+        raw_hit = row.get("payload")
+        if not isinstance(raw_hit, dict):
+            raise GameLifecycleError("Wound reroll requires typed Hit evidence.")
+        hit = HitRoll.from_payload(cast(HitRollPayload, raw_hit))
+        current = replace(sequence, attack_index=index)
+        if row.get("attack_context_id") != current.attack_context_id():
+            raise GameLifecycleError("Wound reroll original Hit identity drift.")
+        if not hit.successful:
+            continue
+        for generated in range(hit.generated_hits):
+            if generated:
+                current = current.advanced_after_generated_hit(hit)
+            context_id = current.attack_context_id()
+            spec = attack_sequence_wound_roll_spec(
+                weapon_profile_id=pool.weapon_profile_id,
+                attack_context_id=context_id,
+                attacker_player_id=sequence.attacker_player_id,
+            )
+            specs[canonical_json(spec.to_payload())] = context_id
+    completed = {
+        cast(str, event.payload.get("attack_context_id"))
+        for event in events
+        if event.event_type == "attack_sequence_step"
+        and isinstance(event.payload, dict)
+        and event.payload.get("step") == "wound"
+        and event.payload.get("sequence_id") == sequence.sequence_id
+        and event.payload.get("pool_index") == sequence.pool_index
+    }
+    for event in events:
+        if event.event_type != "dice_rolled" or not isinstance(event.payload, dict):
+            continue
+        physical = DiceRollResult.from_payload(cast(DiceRollResultPayload, event.payload))
+        pending_context_id = specs.get(canonical_json(physical.spec.to_payload()))
+        if pending_context_id is not None and pending_context_id not in completed:
+            return physical
+    raise GameLifecycleError("Wound reroll has no unresolved gathered physical die.")

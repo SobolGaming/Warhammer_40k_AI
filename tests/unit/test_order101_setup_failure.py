@@ -1345,14 +1345,14 @@ def test_repeated_failure_cannot_reuse_previous_selection_or_rejection(forgery: 
 def test_combat_failed_setup_and_tactical_available_have_distinct_continuations(
     impossible: bool,
 ) -> None:
-    session = large_disembark_session(diameter=100 if impossible else 5)
+    session = large_disembark_session(diameter=5, supported_carrier=impossible)
     pending_request(session)
     initial = session.lifecycle.to_payload()
     submission = _select_disembark(session, prefix="order101:combat")
     submission = replace(
         submission,
         disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK,
-        attempted_placement=large_disembark_placement(session),
+        attempted_placement=large_disembark_placement(session, gap=1.01 if impossible else 0.5),
     )
     result = session.submit_parameterized_payload(
         request_id=submission.proposal_request_id,
@@ -1611,7 +1611,7 @@ def test_failed_attached_setup_preserves_every_embarked_component_and_replays() 
     ],
 )
 def test_failed_disembark_rejects_historical_authority_tamper(combat: bool, tamper: str) -> None:
-    session = large_disembark_session(diameter=100 if combat else 5)
+    session = large_disembark_session(diameter=5, supported_carrier=combat)
     submission = _select_disembark(session, prefix="order101:source-proof")
     if combat:
         submission = replace(submission, disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK)
@@ -1641,12 +1641,21 @@ def test_combat_tactical_available_then_failed_setup_restores_and_replays(retry_
             disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK,
             attempted_placement=large_disembark_placement(session),
         )
+        before_rejection = deepcopy(session.lifecycle.to_payload())
         result = session.submit_parameterized_payload(
             request_id=submission.proposal_request_id,
             result_id=f"order101:combat-chain:{index}",
             payload=validate_json_value(submission.to_payload()),
         )
         assert result.status_kind is LifecycleStatusKind.INVALID
+        assert session.lifecycle.to_payload() == before_rejection
+        diagnostic_status = cast(dict[str, JsonValue], result.payload)
+        validation = cast(dict[str, JsonValue], diagnostic_status["proposal_validation"])
+        assert any(
+            cast(dict[str, JsonValue], violation)["violation_code"]
+            == "combat_disembark_tactical_available"
+            for violation in cast(list[JsonValue], validation["violations"])
+        )
         assert pending_request(session).decision_type == "submit_placement_proposal"
     submission = replace(
         submission,
@@ -1673,7 +1682,7 @@ def test_combat_tactical_available_then_failed_setup_restores_and_replays(retry_
         corrupt_failed_setup_authority(corrupted, tamper=tamper)
         with pytest.raises(GameLifecycleError):
             GameLifecycle.from_payload(corrupted)
-    for event_type in ("combat_disembark_tactical_available", "placement_proposal_requested"):
+    for event_type in ("disembark_placement_invalid", "placement_proposal_requested"):
         corrupted = deepcopy(snapshot)
         predecessor_event = next(
             event
@@ -1688,20 +1697,22 @@ def test_combat_tactical_available_then_failed_setup_restores_and_replays(retry_
     diagnostic = next(
         event["payload"]
         for event in corrupted["decisions"]["event_log"]
-        if event["event_type"] == "combat_disembark_tactical_available"
+        if event["event_type"] == "disembark_placement_invalid"
     )
     assert isinstance(diagnostic, dict)
     violations = diagnostic["violations"]
     assert isinstance(violations, list)
     assert isinstance(violations[0], dict)
-    violations[0]["violation_code"] = "unit_placement_drift"
-    with pytest.raises(GameLifecycleError, match="Tactical-available diagnostic authority drift"):
+    violations[0]["violation_code"] = "combat_disembark_tactical_available"
+    with pytest.raises(
+        GameLifecycleError, match="Failed Disembark diagnostic producer authority drift"
+    ):
         GameLifecycle.from_payload(corrupted)
     corrupted = deepcopy(snapshot)
     first = next(
         record
         for record in corrupted["decisions"]["records"]
-        if record["result"]["result_id"] == "order101:combat-chain:0"
+        if record["result"]["result_id"] == "order101:combat-chain:failed-tactical"
     )
     submitted = first["result"]["payload"]
     assert isinstance(submitted, dict)

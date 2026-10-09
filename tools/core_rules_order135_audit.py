@@ -447,6 +447,24 @@ def build(root: Path = ROOT) -> dict[str, Any]:
         "approved_b03_type_safe_same_boundary_clarification": _read(
             root, AUDIT / "b03-type-safe-boundary-user-clarification.json"
         ),
+        "approved_b04_b05_transport_repairs": _read(
+            root, AUDIT / "b04-b05-explicit-repair-approval.json"
+        ),
+        "approved_counter_band_eligibility_repair": _read(
+            root, AUDIT / "counter-band-explicit-repair-approval.json"
+        ),
+        "approved_fight_transition_repair": _read(
+            root, AUDIT / "fight-transition-explicit-repair-approval.json"
+        ),
+        "approved_pass_eligibility_repair_and_assertion_exception": _read(
+            root, AUDIT / "pass-explicit-repair-and-assertion-approval.json"
+        ),
+        "approved_d02_d03_repairs_and_assertion_exceptions": _read(
+            root, AUDIT / "d02-d03-explicit-repair-and-assertion-approval.json"
+        ),
+        "pr576_owner_cutoff_and_follow_up_inventory": _read(
+            root, AUDIT / "pr576-follow-up-inventory.json"
+        ),
         "retained_baseline_consumer_report": (
             root / AUDIT / "current-consumer-dispositions.md"
         ).read_text(),

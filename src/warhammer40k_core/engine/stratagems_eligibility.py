@@ -268,6 +268,7 @@ def _handler_unavailable_reason(
                 context=context,
                 target_binding=target_binding,
                 ruleset_descriptor=ruleset_descriptor,
+                respect_ordering_band=False,
             )
         return None
     if definition.handler_id == CORE_CRUSHING_IMPACT_HANDLER_ID:

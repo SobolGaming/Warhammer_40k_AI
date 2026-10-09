@@ -1,5 +1,23 @@
 # CORE V2 external contract
 
+Contract44.3.25 gathers original Hit and Wound rolls at their respective steps,
+checks whole-unit Tactical feasibility before Combat disembark, and strictly
+decodes explicitly tagged grouped Combat hazard history. See
+[44.3.25](migrations/44.3.24-to-44.3.25.md) for exact-runtime compatibility and
+unresolved feasibility limits.
+
+Contract44.3.24 preserves the owed player across Fight band transitions and checks
+all otherwise-eligible friendly units before offering or accepting a pass. Existing
+envelopes are retained. See [44.3.24](migrations/44.3.23-to-44.3.24.md).
+
+Contract44.3.23 corrects Core Counter-offensive eligibility before its Fights First
+grant, retaining ordinary band selection and the existing request/persistence
+schemas. See [44.3.23](migrations/44.3.22-to-44.3.23.md).
+
+Contract44.3.22 corrects full3D disembark containment and native starting-cargo
+predeployment anchor restore through the existing envelopes. Exact runtime
+identity remains required. See [44.3.22](migrations/44.3.21-to-44.3.22.md).
+
 Contract44.3.10 carries the selected Core nested hit reroll through the existing
 finite reroll and source-linked attack-context envelopes, retaining both outer
 target eligibility and the inner opponent-controlled-objective condition. See

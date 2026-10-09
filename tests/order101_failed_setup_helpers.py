@@ -254,8 +254,6 @@ def failed_setup_automatic_record_session() -> tuple[LocalGameSession, GameLifec
         ("select_shooting_unit", "army-alpha:remaining-unit"),
         ("select_shooting_type", "normal"),
         ("submit_shooting_declaration", "shooting_declaration"),
-        *(("use_stratagem", "decline_stratagem_window"),) * 8,
-        ("select_damage_allocation_model", "army-beta:enemy-unit:core-intercessor-like:001"),
         ("select_shooting_unit", "complete_shooting_phase"),
         ("select_charging_unit", "complete_charge_phase"),
         ("select_movement_unit", "army-beta:enemy-unit"),
@@ -271,7 +269,8 @@ def failed_setup_automatic_record_session() -> tuple[LocalGameSession, GameLifec
     for index, (decision_type, choice) in enumerate(choices):
         request = pending_request(session)
         assert request.decision_type == decision_type, (index, decision_type, request)
-        result_id = f"order123-setup-source-choice-23:{index}"
+        result_index = index if index <= 12 else index + 9
+        result_id = f"order123-setup-source-choice-23:{result_index}"
         if choice == "failed_disembark":
             proposal = PlacementProposalPayload(
                 proposal_request_id=request.request_id,
@@ -301,6 +300,27 @@ def failed_setup_automatic_record_session() -> tuple[LocalGameSession, GameLifec
             )
             assert status.status_kind is not LifecycleStatusKind.INVALID
             assert len(session.lifecycle.decision_controller.records) > count + 1
+            for attack_choice in range(64):
+                attack_request = pending_request(session)
+                if attack_request.decision_type == "select_shooting_unit":
+                    break
+                assert attack_request.decision_type in {
+                    "use_stratagem",
+                    "select_damage_allocation_model",
+                }, attack_request
+                option_id = (
+                    "decline_stratagem_window"
+                    if attack_request.decision_type == "use_stratagem"
+                    else attack_request.options[0].option_id
+                )
+                attack_status = session.submit_option(
+                    request_id=attack_request.request_id,
+                    result_id=f"order123-setup-actual-attack:{attack_choice}",
+                    option_id=option_id,
+                )
+                assert attack_status.status_kind is not LifecycleStatusKind.INVALID
+            else:
+                raise AssertionError("Actual intervening shooting did not complete.")
         elif choice == "decline_stratagem":
             status = session.submit_parameterized_payload(
                 request_id=request.request_id,

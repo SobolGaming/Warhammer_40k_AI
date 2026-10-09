@@ -8,6 +8,9 @@ from warhammer40k_core.engine import mortal_wound_model_allocation as _mw_model
 from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice_result_override_validation import (
+    validate_dice_result_override_request,
+)
 from warhammer40k_core.engine.dice_result_overrides import (
     DICE_RESULT_OVERRIDE_DECISION_TYPE,
     apply_dice_result_override_decision,
@@ -141,6 +144,13 @@ def apply_attack_sequence_decision(
     ):
         resolves_reaction_frame = context.resolves_reaction_frame
         fight_owned = context.fight_owned
+        if record.request.decision_type == DICE_RESULT_OVERRIDE_DECISION_TYPE:
+            validate_dice_result_override_request(
+                state=state,
+                decisions=context.decisions,
+                request=record.request,
+                just_recorded=True,
+            )
         applier = (
             apply_lethal_hit_wound_decision
             if record.request.decision_type == SELECT_LETHAL_HIT_WOUND_DECISION_TYPE

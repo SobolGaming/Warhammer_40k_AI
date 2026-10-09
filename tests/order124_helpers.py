@@ -102,6 +102,7 @@ def nested_session(
     tied_closest: bool = False,
     nearest_target_ineligible: bool = False,
     advanced: bool = False,
+    attack_count: int = 6,
 ) -> LocalGameSession:
     """Canonical catalog fixture followed by a real Movement/Shooting boundary."""
     compiled = nested_source()
@@ -131,7 +132,7 @@ def nested_session(
                 weapon_profiles=tuple(
                     replace(
                         profile,
-                        attack_profile=AttackProfile.fixed(6),
+                        attack_profile=AttackProfile.fixed(attack_count),
                         damage_profile=DamageProfile.fixed(1),
                         keywords=(WeaponKeyword.ASSAULT,)
                         if advanced and item.wargear_id == "core-bolt-rifle"

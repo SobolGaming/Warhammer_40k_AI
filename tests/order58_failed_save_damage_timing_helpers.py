@@ -147,6 +147,7 @@ def order58_injected_rolls(
                 value=6,
             )
         )
+    for attack_context_id, index in zip(attack_ids, range(1, attacks + 1), strict=True):
         rolls.append(
             _fixed_roll_result(
                 roll_id=f"{sequence_id}-wound-{index}",

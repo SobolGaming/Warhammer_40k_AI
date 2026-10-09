@@ -122,13 +122,15 @@ def test_hit_restore_requires_owning_recorded_hit(phase: BattlePhase, forgery: s
     context = next(
         die["attack_context"]
         for die in pending["sorted_save_dice"]
-        if die["attack_context"]["hit_roll"]["unmodified_roll"] == 5
+        if die["attack_context"]["hit_roll"]["successful"]
+        and not die["attack_context"]["hit_roll"]["critical"]
     )
     hit = context["hit_roll"]
     assert not hit["critical"]
     assert hit["successful"]
     if forgery == "critical":
-        hit["critical_threshold"] = 5
+        assert hit["unmodified_roll"] is not None
+        hit["critical_threshold"] = hit["unmodified_roll"]
         hit["critical_is_threshold"] = True
         hit["critical"] = True
     elif forgery == "source":
@@ -218,7 +220,7 @@ def test_critical_consumers_through_facade_restore_and_replay(
     from warhammer40k_core.engine.event_log import JsonValue
     from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
 
-    session = critical_hit_session(phase=phase)
+    session = critical_hit_session(phase=phase, attack_count=24)
     pending_request(session)
     initial = session.lifecycle.to_payload()
     completed = False

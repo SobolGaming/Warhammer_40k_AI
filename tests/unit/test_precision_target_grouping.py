@@ -27,7 +27,7 @@ from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 def test_non_character_target_gathers_both_physical_precision_orders(
     precision_first: bool,
 ) -> None:
-    scene = precision_shooting_scene(precision_first=precision_first)
+    scene = precision_shooting_scene(precision_first=precision_first, pause_at_first_hit=True)
     request = offered_group_request(scene.session)
     assert len(request.options) == 1, [option.payload for option in request.options]
     body = cast(dict[str, JsonValue], request.options[0].payload)

@@ -3507,32 +3507,32 @@ def test_phase14e_precision_selection_persists_for_current_attack_pool() -> None
     injected_results: list[DiceRollResult] = []
     for attack_number in range(1, 3):
         attack_context_id = f"phase14e-precision-pool:pool-001:attack-{attack_number:03d}"
-        injected_results.extend(
-            (
-                _fixed_roll_result(
-                    roll_id=f"phase14e-precision-pool-hit-{attack_number}",
-                    spec=DiceRollSpec(
-                        expression=DiceExpression(quantity=1, sides=6),
-                        reason=(
-                            f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}"
-                        ),
-                        roll_type="attack_sequence.hit",
-                        actor_id="player-a",
-                    ),
-                    value=6,
+        injected_results.append(
+            _fixed_roll_result(
+                roll_id=f"phase14e-precision-pool-hit-{attack_number}",
+                spec=DiceRollSpec(
+                    expression=DiceExpression(quantity=1, sides=6),
+                    reason=(f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}"),
+                    roll_type="attack_sequence.hit",
+                    actor_id="player-a",
                 ),
-                _fixed_roll_result(
-                    roll_id=f"phase14e-precision-pool-wound-{attack_number}",
-                    spec=DiceRollSpec(
-                        expression=DiceExpression(quantity=1, sides=6),
-                        reason=(
-                            f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}"
-                        ),
-                        roll_type="attack_sequence.wound",
-                        actor_id="player-a",
+                value=6,
+            )
+        )
+    for attack_number in range(1, 3):
+        attack_context_id = f"phase14e-precision-pool:pool-001:attack-{attack_number:03d}"
+        injected_results.append(
+            _fixed_roll_result(
+                roll_id=f"phase14e-precision-pool-wound-{attack_number}",
+                spec=DiceRollSpec(
+                    expression=DiceExpression(quantity=1, sides=6),
+                    reason=(
+                        f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}"
                     ),
-                    value=6,
+                    roll_type="attack_sequence.wound",
+                    actor_id="player-a",
                 ),
+                value=6,
             )
         )
 
@@ -3648,6 +3648,8 @@ def test_phase14e_grouped_saves_roll_before_low_to_high_damage_allocation() -> N
                 value=6,
             )
         )
+    for attack_number in range(1, 4):
+        attack_context_id = f"phase14e-grouped-saves:pool-001:attack-{attack_number:03d}"
         injected_results.append(
             _fixed_roll_result(
                 roll_id=f"phase14e-grouped-wound-{attack_number}",
@@ -4180,32 +4182,32 @@ def test_phase14h_pooled_walk_recomputes_save_after_group_transition() -> None:
     injected_results: list[DiceRollResult] = []
     for attack_number in range(1, 3):
         attack_context_id = f"phase14h-lazy-save-transition:pool-001:attack-{attack_number:03d}"
-        injected_results.extend(
-            (
-                _fixed_roll_result(
-                    roll_id=f"phase14h-lazy-hit-{attack_number}",
-                    spec=DiceRollSpec(
-                        expression=DiceExpression(quantity=1, sides=6),
-                        reason=(
-                            f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}"
-                        ),
-                        roll_type="attack_sequence.hit",
-                        actor_id="player-a",
-                    ),
-                    value=6,
+        injected_results.append(
+            _fixed_roll_result(
+                roll_id=f"phase14h-lazy-hit-{attack_number}",
+                spec=DiceRollSpec(
+                    expression=DiceExpression(quantity=1, sides=6),
+                    reason=(f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}"),
+                    roll_type="attack_sequence.hit",
+                    actor_id="player-a",
                 ),
-                _fixed_roll_result(
-                    roll_id=f"phase14h-lazy-wound-{attack_number}",
-                    spec=DiceRollSpec(
-                        expression=DiceExpression(quantity=1, sides=6),
-                        reason=(
-                            f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}"
-                        ),
-                        roll_type="attack_sequence.wound",
-                        actor_id="player-a",
+                value=6,
+            )
+        )
+    for attack_number in range(1, 3):
+        attack_context_id = f"phase14h-lazy-save-transition:pool-001:attack-{attack_number:03d}"
+        injected_results.append(
+            _fixed_roll_result(
+                roll_id=f"phase14h-lazy-wound-{attack_number}",
+                spec=DiceRollSpec(
+                    expression=DiceExpression(quantity=1, sides=6),
+                    reason=(
+                        f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}"
                     ),
-                    value=6,
+                    roll_type="attack_sequence.wound",
+                    actor_id="player-a",
                 ),
+                value=6,
             )
         )
     for attack_number, save_value in ((1, 1), (2, 3)):
@@ -4887,6 +4889,10 @@ def test_phase14e_allocation_order_request_after_grouped_wound_pool() -> None:
                 value=6,
             )
         )
+    for attack_number in range(1, 3):
+        attack_context_id = (
+            f"phase14e-allocation-order-grouped-pool:pool-001:attack-{attack_number:03d}"
+        )
         injected_results.append(
             _fixed_roll_result(
                 roll_id=f"phase14e-order-wound-{attack_number}",
@@ -5228,6 +5234,8 @@ def test_phase14e_grouped_failed_saves_transition_to_next_ordered_group() -> Non
                 value=6,
             )
         )
+    for attack_number in range(1, 3):
+        attack_context_id = f"phase14e-ordered-group-transition:pool-001:attack-{attack_number:03d}"
         injected_results.append(
             _fixed_roll_result(
                 roll_id=f"phase14e-ordered-transition-wound-{attack_number}",
@@ -5535,6 +5543,18 @@ def test_phase14e_grouped_lethal_sustained_hits_use_grouped_host() -> None:
                     value=6,
                 ),
                 _fixed_roll_result(
+                    roll_id="phase14e-grouped-lethal-sustained-hit-2",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=(
+                            f"Hit roll for {weapon_profile.profile_id} attack {second_context_id}"
+                        ),
+                        roll_type="attack_sequence.hit",
+                        actor_id="player-a",
+                    ),
+                    value=1,
+                ),
+                _fixed_roll_result(
                     roll_id="phase14e-grouped-lethal-sustained-wound-generated",
                     spec=DiceRollSpec(
                         expression=DiceExpression(quantity=1, sides=6),
@@ -5546,18 +5566,6 @@ def test_phase14e_grouped_lethal_sustained_hits_use_grouped_host() -> None:
                         actor_id="player-a",
                     ),
                     value=6,
-                ),
-                _fixed_roll_result(
-                    roll_id="phase14e-grouped-lethal-sustained-hit-2",
-                    spec=DiceRollSpec(
-                        expression=DiceExpression(quantity=1, sides=6),
-                        reason=(
-                            f"Hit roll for {weapon_profile.profile_id} attack {second_context_id}"
-                        ),
-                        roll_type="attack_sequence.hit",
-                        actor_id="player-a",
-                    ),
-                    value=1,
                 ),
                 _fixed_roll_result(
                     roll_id="phase14e-grouped-lethal-sustained-armour-save-1",
@@ -5775,6 +5783,8 @@ def test_phase14e_grouped_precision_promotes_character_then_returns_to_bodyguard
                 value=6,
             )
         )
+    for attack_number in range(1, 3):
+        attack_context_id = f"phase14e-grouped-precision:pool-001:attack-{attack_number:03d}"
         injected_results.append(
             _fixed_roll_result(
                 roll_id=f"phase14e-grouped-precision-wound-{attack_number}",

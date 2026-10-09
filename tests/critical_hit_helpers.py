@@ -140,7 +140,9 @@ def hit_roll(
     )
 
 
-def critical_hit_session(*, phase: BattlePhase = BattlePhase.SHOOTING) -> LocalGameSession:
+def critical_hit_session(
+    *, phase: BattlePhase = BattlePhase.SHOOTING, attack_count: int = 12
+) -> LocalGameSession:
     """Real Shooting activation and a canonical persisted Fight threshold fixture."""
     from tests.phase13b_shooting_declaration_helpers import (
         _canonical_catalog,
@@ -189,7 +191,7 @@ def critical_hit_session(*, phase: BattlePhase = BattlePhase.SHOOTING) -> LocalG
                     replace(
                         weapon,
                         skill=CharacteristicValue.from_raw(weapon.skill.characteristic, 6),
-                        attack_profile=AttackProfile.fixed(12),
+                        attack_profile=AttackProfile.fixed(attack_count),
                         damage_profile=DamageProfile.fixed(1),
                         strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 1),
                         keywords=(WeaponKeyword.LETHAL_HITS, WeaponKeyword.SUSTAINED_HITS),

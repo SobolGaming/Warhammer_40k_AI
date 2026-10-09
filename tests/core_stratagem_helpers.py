@@ -224,6 +224,7 @@ def _battle_lifecycle(
         tuple[str, tuple[FeelNoPainSource, ...], bool], ...
     ] = (),
     clear_terrain: bool = False,
+    record_deployment_history: bool = False,
 ) -> GameLifecycle:
     if battle_round < 1:
         raise AssertionError("Battle lifecycle fixture round must be positive.")
@@ -233,6 +234,12 @@ def _battle_lifecycle(
         clear_terrain=clear_terrain,
     )
     state = _state(lifecycle)
+    if record_deployment_history:
+        from tests.setup_completion_helpers import record_current_battlefield_placements_for_fixture
+
+        record_current_battlefield_placements_for_fixture(
+            state, decisions=lifecycle.decision_controller
+        )
     for unit_instance_id, keywords in keyword_replacements:
         _replace_unit_keywords(
             state,

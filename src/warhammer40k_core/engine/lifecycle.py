@@ -976,6 +976,20 @@ class GameLifecycle:
         from warhammer40k_core.engine.dice_extremum import validate_dice_extremum_history
 
         validate_pending_attack_rerolls(lifecycle)
+        from warhammer40k_core.engine.dice_result_override_validation import (
+            validate_pending_dice_result_overrides,
+        )
+
+        validate_pending_dice_result_overrides(
+            state=lifecycle._require_state(), decisions=lifecycle.decision_controller
+        )
+        from warhammer40k_core.engine.dice_result_override_history import (
+            validate_dice_result_override_history,
+        )
+
+        validate_dice_result_override_history(
+            state=lifecycle._require_state(), decisions=lifecycle.decision_controller
+        )
         validate_dice_extremum_history(
             state=lifecycle._require_state(), decisions=lifecycle.decision_controller
         )

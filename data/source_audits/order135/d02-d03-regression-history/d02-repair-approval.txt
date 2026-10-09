@@ -1,0 +1,6 @@
+Assistant, 2026-10-08 15:45 UTC, Sentinel_af7623fdef408191bc0be0daf0c1ceac:
+"The audit reproduced a separate attack-ordering bug: in a three-attack pool, the engine offers a Command Re-roll for the first wound before rolling the other two hits. The selected rule requires completing all rolls at each step, so the player is making that choice without the required hit results.
+
+May I add the gathered hit/wound sequencing repair and its persistence/replay regressions? I’m also having the remaining audit candidates checked so we can consolidate further findings"
+User, 2026-10-08 15:47 UTC, Sentinel_b6126d5981508191897e656be8dded7f:
+"yes"

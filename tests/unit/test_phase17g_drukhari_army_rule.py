@@ -1983,6 +1983,24 @@ def test_hatred_eternal_accepted_fight_hit_reroll_resumes_attack_sequence() -> N
     )
 
     assert accepted_status.status_kind is not LifecycleStatusKind.INVALID
+    while not any(
+        row["step"] == AttackSequenceStep.WOUND.value
+        for row in _event_payloads(lifecycle, "attack_sequence_step")
+    ):
+        remaining_hit = _decision_request_from_status(accepted_status)
+        assert remaining_hit.decision_type == DICE_REROLL_DECISION_TYPE
+        assert isinstance(remaining_hit.payload, dict)
+        remaining_context = remaining_hit.payload["attack_context"]
+        assert isinstance(remaining_context, dict)
+        assert remaining_context["hit_roll_state"] is not None
+        accepted_status = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id=f"drukhari-test:hatred-fight-decline:{remaining_hit.request_id}",
+                request=remaining_hit,
+                selected_option_id="decline",
+            )
+        )
+        assert accepted_status.status_kind is not LifecycleStatusKind.INVALID
     reroll_payloads = _event_payloads(lifecycle, "dice_reroll_resolved")
     assert len(reroll_payloads) == 1
     rerolled_state = DiceRollState.from_payload(cast(DiceRollStatePayload, reroll_payloads[0]))

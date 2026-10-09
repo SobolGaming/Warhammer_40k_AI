@@ -523,80 +523,27 @@ def _resolve_combat_disembark_placement_submission(
     scenario: BattlefieldScenario,
     transport_placement: UnitPlacement,
 ) -> LifecycleStatus | None:
-    active_player_id = _active_player_id(state)
-    unit = _unit_instance_by_id(state=state, unit_instance_id=selection.unit_instance_id)
-    tactical_selection = replace(
-        selection,
-        disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
-    )
-    tactical_resolution = resolve_disembark(
-        scenario=scenario,
-        ruleset_descriptor=ruleset_descriptor,
-        cargo_state=cargo_state,
-        selection=tactical_selection,
-        unit=unit,
-        transport_placement=transport_placement,
-        objective_markers=_objective_markers_for_state(state),
-    )
-    if tactical_resolution.is_valid:
-        invalid_payload = _transport_operation_invalid_payload(
-            state=state,
-            active_player_id=active_player_id,
-            unit_instance_id=selection.unit_instance_id,
-            transport_unit_instance_id=selection.transport_unit_instance_id,
-            result=result,
-            phase_body_status="combat_disembark_tactical_available",
-            violations=(
-                TransportOperationViolation(
-                    violation_code=(
-                        TransportOperationViolationCode.COMBAT_DISEMBARK_TACTICAL_AVAILABLE
-                    ),
-                    message=(
-                        "Combat Disembark requires engine-owned evidence that the submitted "
-                        "placement is not legal as Tactical Disembark."
-                    ),
-                    unit_instance_id=selection.unit_instance_id,
-                    blocker_id=selection.transport_unit_instance_id,
-                ),
-            ),
+    # The standalone entry uses the same whole-unit authority as attached cargo.
+    if (
+        scenario != _battlefield_scenario(state)
+        or cargo_state
+        != state.transport_cargo_state_for_transport(selection.transport_unit_instance_id)
+        or transport_placement
+        != scenario.battlefield_state.unit_placement_by_id(selection.transport_unit_instance_id)
+    ):
+        raise GameLifecycleError(
+            "Combat Disembark context differs from current authoritative state."
         )
-        decisions.event_log.append("combat_disembark_tactical_available", invalid_payload)
-        return LifecycleStatus.invalid(
-            stage=GameLifecycleStage.BATTLE,
-            message="Combat Disembark requires Tactical-impossible evidence.",
-            payload=invalid_payload,
-        )
-
-    combat_result = resolve_combat_disembark(
-        scenario=scenario,
-        ruleset_descriptor=ruleset_descriptor,
-        cargo_state=cargo_state,
-        selection=selection,
-        unit=unit,
-        transport_placement=transport_placement,
-        dice_manager=_dice_roll_manager_for_state(state=state, decisions=decisions),
-        objective_markers=_objective_markers_for_state(state),
-    )
-    if not combat_result.placement.is_valid:
-        invalid_payload = _transport_operation_invalid_payload(
-            state=state,
-            active_player_id=active_player_id,
-            unit_instance_id=selection.unit_instance_id,
-            transport_unit_instance_id=selection.transport_unit_instance_id,
-            result=result,
-            phase_body_status="combat_disembark_placement_invalid",
-            violations=combat_result.placement.violations,
-        )
-        decisions.event_log.append("combat_disembark_placement_invalid", invalid_payload)
-        return LifecycleStatus.invalid(
-            stage=GameLifecycleStage.BATTLE,
-            message="Combat Disembark placement is invalid.",
-            payload=invalid_payload,
-        )
-    return _apply_valid_combat_disembark(
+    return _resolve_disembark_placement_submission(
         state=state,
-        decisions=decisions,
-        combat_disembark=combat_result,
-        tactical_resolution=tactical_resolution,
         result=result,
+        decisions=decisions,
+        ruleset_descriptor=ruleset_descriptor,
+        unit_instance_id=selection.unit_instance_id,
+        transport_unit_instance_id=selection.transport_unit_instance_id,
+        attempted_placement=RulesUnitPlacement.single(selection.attempted_placement),
+        disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK,
+        transport_movement_status=selection.transport_movement_status,
+        restriction_overrides=selection.restriction_overrides,
+        start_engaged_enemy_unit_instance_ids=selection.start_engaged_enemy_unit_instance_ids,
     )

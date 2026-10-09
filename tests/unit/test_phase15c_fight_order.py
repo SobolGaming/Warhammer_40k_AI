@@ -958,6 +958,19 @@ def test_phase15f_full_fight_gate_drains_melee_damage_before_completion() -> Non
         lifecycle.advance_until_decision_or_terminal(),
         result_id_prefix="phase15f-full-fight",
     )
+    for boundary_index in range(4):
+        if _state(lifecycle).current_battle_phase is BattlePhase.MOVEMENT:
+            break
+        request = _decision_request(final_status)
+        assert _state(lifecycle).current_battle_phase is BattlePhase.COMMAND
+        assert request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+        final_status = lifecycle.submit_decision(
+            ParameterizedSubmission(
+                request_id=request.request_id,
+                result_id=f"phase15f-next-command-decline-{boundary_index}",
+                payload=stratagem_decline_payload(),
+            ).to_result(request)
+        )
     state = _state(lifecycle)
     event_types = [event.event_type for event in lifecycle.decision_controller.event_log.records]
     destroyed_payload = _last_event_payload(lifecycle, "model_destroyed")
@@ -2448,17 +2461,28 @@ def test_eligible_to_fight_pass_is_offered_only_when_all_eligible_units_are_more
 
 def test_fights_first_pass_does_not_reoffer_same_unit_before_remaining_activation() -> None:
     lifecycle, units = _fight_lifecycle(
+        catalog=armed_fight_control_catalog(),
         alpha_unit_ids=("alpha-first", "alpha-remaining"),
         enemy_unit_ids=("enemy",),
         origins={
             "alpha-first": Pose.at(10.0, 20.0),
-            "alpha-remaining": Pose.at(10.0, 40.0),
+            "alpha-remaining": Pose.at(6.0, 40.0),
             "enemy": Pose.at(13.0, 40.0),
         },
         game_id="phase15c-pass-before-remaining",
-        charge_fights_first_unit_keys=("alpha-first",),
+        charge_fights_first_unit_keys=("alpha-first", "alpha-remaining"),
     )
-    first_request = _advance_to_fight_order_request(lifecycle)
+    # The nearby friendly unit must already have fought for the pass to be legal.
+    # This is a restored canonical fixture, not a native Charge-history control.
+    initial_request = _advance_to_fight_order_request(lifecycle)
+    completed_nearby = _submit_normal_fight(
+        lifecycle,
+        request=initial_request,
+        unit=units["alpha-remaining"],
+        result_id="phase15c-pass-nearby-already-fought",
+    )
+    assert_completed_melee(lifecycle, unit_instance_id=units["alpha-remaining"].unit_instance_id)
+    first_request = _decision_request(completed_nearby)
     first_payload = cast(dict[str, object], first_request.payload)
 
     after_pass_status = _submit_option(
@@ -2473,12 +2497,12 @@ def test_fights_first_pass_does_not_reoffer_same_unit_before_remaining_activatio
     assert first_request.actor_id == "player-a"
     assert first_payload["ordering_band"] == "fights_first"
     assert _request_unit_ids(first_request) == [units["alpha-first"].unit_instance_id]
-    assert next_request.actor_id == "player-a"
+    assert next_request.actor_id == "player-b"
     assert next_payload["ordering_band"] == "remaining_combats"
-    assert _request_unit_ids(next_request) == [units["alpha-remaining"].unit_instance_id]
+    assert _request_unit_ids(next_request) == [units["enemy"].unit_instance_id]
     assert _event_payloads(lifecycle, "fight_activation_selection_requested")[-1][
         "eligible_unit_ids"
-    ] == [units["alpha-remaining"].unit_instance_id]
+    ] == [units["enemy"].unit_instance_id]
 
 
 def test_fights_first_pass_completes_phase_when_no_remaining_units_exist() -> None:

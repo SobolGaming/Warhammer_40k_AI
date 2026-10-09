@@ -76,6 +76,7 @@ def invalid_lethal_hit_wound_status(
     decisions: DecisionController,
     request: DecisionRequest,
     result: DecisionResult,
+    just_recorded: bool = False,
 ) -> LifecycleStatus | None:
     invalid = invalid_finite_decision_status(
         state=state, request=request, result=result, invalid_reason="invalid_lethal_hit_wound"
@@ -84,7 +85,10 @@ def invalid_lethal_hit_wound_status(
         return invalid
     try:
         validate_lethal_hit_request(
-            state=state, event_records=decisions.event_log.records, request=request
+            state=state,
+            event_records=decisions.event_log.records,
+            request=request,
+            just_recorded=just_recorded,
         )
     except GameLifecycleError as exc:
         return LifecycleStatus.invalid(
@@ -106,7 +110,7 @@ def apply_lethal_hit_wound_decision(
     if decisions.record_for_result(result).request != request:
         raise GameLifecycleError("Lethal Hits result requires its owning recorded request.")
     invalid = invalid_lethal_hit_wound_status(
-        state=state, decisions=decisions, request=request, result=result
+        state=state, decisions=decisions, request=request, result=result, just_recorded=True
     )
     if invalid is not None:
         raise GameLifecycleError("Lethal Hits cannot apply an invalid recorded choice.")
@@ -270,6 +274,7 @@ def validate_lethal_hit_request(
     state: GameState,
     event_records: tuple[EventRecord, ...],
     request: DecisionRequest,
+    just_recorded: bool = False,
 ) -> None:
     sequence = active_attack_sequence_for_state(state)
     if sequence is None:
@@ -285,10 +290,40 @@ def validate_lethal_hit_request(
     )
     if not hits:
         raise GameLifecycleError("Lethal Hits requires an owning recorded Hit.")
-    # Grouped resolution persists the pool at index zero and reuses completed
-    # rolls when resuming. Its latest recorded Hit is the unresolved frontier;
-    # the request must not select its own arbitrary index within that pool.
-    frontier = hits[-1]
+    # Every original Hit is completed before Wound preparation begins. Derive
+    # the first unanswered eligible choice from that complete engine journal;
+    # never let a submitted request choose an arbitrary attack within the pool.
+    if tuple(row.get("attack_index") for row in hits) != tuple(
+        range(sequence.current_pool().attacks)
+    ):
+        raise GameLifecycleError("Lethal Hits requires the complete ordered gathered Hit step.")
+    answered_ids = {
+        cast(str, raw_request.get("request_id"))
+        for event in event_records
+        if event.event_type == "decision_recorded"
+        and isinstance(event.payload, dict)
+        and isinstance(raw_request := event.payload.get("request"), dict)
+        and raw_request.get("decision_type") == SELECT_LETHAL_HIT_WOUND_DECISION_TYPE
+        and (not just_recorded or raw_request.get("request_id") != request.request_id)
+    }
+    frontier: dict[str, JsonValue] | None = None
+    for row in hits:
+        index = row.get("attack_index")
+        raw_hit = row.get("payload")
+        if type(index) is not int or not isinstance(raw_hit, dict):
+            raise GameLifecycleError("Lethal Hits requires typed gathered Hit evidence.")
+        candidate = replace(sequence, attack_index=index)
+        if row.get("attack_context_id") != candidate.attack_context_id():
+            raise GameLifecycleError("Lethal Hits gathered attack identity drift.")
+        hit = HitRoll.from_payload(cast(HitRollPayload, raw_hit))
+        if (
+            _eligible(state, candidate, hit)
+            and f"{candidate.attack_context_id()}:lethal-hit-wound" not in answered_ids
+        ):
+            frontier = row
+            break
+    if frontier is None:
+        raise GameLifecycleError("Lethal Hits requires an unanswered eligible gathered Hit.")
     attack_index = frontier.get("attack_index")
     if (
         type(attack_index) is not int

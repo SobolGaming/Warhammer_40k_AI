@@ -818,6 +818,11 @@ def test_attached_shooter_and_target_use_canonical_rules_unit_identities(attacks
 def test_phase_end_snap_preserves_raw_six_no_hit_reroll_and_action_lock(attacks: int) -> None:
     from tests.fire_overwatch_helpers import SHOOTER, finish_overwatch
 
+    from warhammer40k_core.engine.attack_sequence import (
+        attack_sequence_hit_roll_spec,
+        attack_sequence_wound_roll_spec,
+    )
+    from warhammer40k_core.engine.event_log import JsonValue, canonical_json
     from warhammer40k_core.engine.mission_action_eligibility import (
         MISSION_ACTION_UNIT_ALREADY_SHOT,
         mission_action_unit_ineligibility_reason,
@@ -831,6 +836,82 @@ def test_phase_end_snap_preserves_raw_six_no_hit_reroll_and_action_lock(attacks:
     )
     request = _require_request(choose_shooter(session, pending_overwatch(session)))
     finish_overwatch(session, choose_enemy(session, request, ENEMIES[0]))
+    # Authenticate the unique physical Hit before linking its resolved Wound.
+    physical_hits: dict[str, dict[str, JsonValue]] = {}
+    physical_hit_indices: dict[str, int] = {}
+    physical_roll_ids: set[str] = set()
+    events = session.lifecycle.decision_controller.event_log.records
+    for event_index, event in enumerate(events):
+        if event.event_type != "dice_rolled":
+            continue
+        assert isinstance(event.payload, dict)
+        physical_spec = event.payload["spec"]
+        assert isinstance(physical_spec, dict)
+        if physical_spec["roll_type"] != "attack_sequence.hit":
+            continue
+        physical_key = canonical_json(physical_spec)
+        physical_roll_id = event.payload["roll_id"]
+        assert isinstance(physical_roll_id, str)
+        assert physical_key not in physical_hits
+        assert physical_roll_id not in physical_roll_ids
+        physical_hits[physical_key] = event.payload
+        physical_hit_indices[physical_key] = event_index
+        physical_roll_ids.add(physical_roll_id)
+    owning_hits: dict[str, int] = {}
+    resolved_hit_keys: set[str] = set()
+    for event_index, event in enumerate(events):
+        if event.event_type != "attack_sequence_step":
+            continue
+        assert isinstance(event.payload, dict)
+        if event.payload["step"] != "hit":
+            continue
+        hit = event.payload["payload"]
+        assert isinstance(hit, dict)
+        context_id = event.payload["attack_context_id"]
+        weapon_profile_id = hit["weapon_profile_id"]
+        raw_hit = hit["unmodified_roll"]
+        roll_state = hit["roll_state"]
+        assert isinstance(context_id, str)
+        assert isinstance(weapon_profile_id, str)
+        assert type(raw_hit) is int
+        assert isinstance(roll_state, dict)
+        original_result = roll_state["original_result"]
+        assert isinstance(original_result, dict)
+        original_spec = original_result["spec"]
+        assert isinstance(original_spec, dict)
+        actor_id = original_spec["actor_id"]
+        assert isinstance(actor_id, str)
+        assert actor_id == "player-a"
+        expected_hit_spec = attack_sequence_hit_roll_spec(
+            weapon_profile_id=weapon_profile_id,
+            attack_context_id=context_id,
+            attacker_player_id=actor_id,
+            reroll_forbidden_rule_ids=("core:snap-shooting",),
+        )
+        assert original_spec == expected_hit_spec.to_payload()
+        physical_key = canonical_json(expected_hit_spec.to_payload())
+        physical_result = physical_hits[physical_key]
+        assert original_result == physical_result
+        assert physical_hit_indices[physical_key] < event_index
+        physical_values = physical_result["values"]
+        assert isinstance(physical_values, list)
+        assert len(physical_values) == 1
+        physical_raw = physical_values[0]
+        assert type(physical_raw) is int
+        assert raw_hit == physical_raw
+        assert physical_key not in resolved_hit_keys
+        resolved_hit_keys.add(physical_key)
+        if hit["successful"] is not True:
+            continue
+        wound_spec = attack_sequence_wound_roll_spec(
+            weapon_profile_id=weapon_profile_id,
+            attack_context_id=context_id,
+            attacker_player_id=actor_id,
+        )
+        key = canonical_json(wound_spec.to_payload())
+        assert key not in owning_hits
+        owning_hits[key] = physical_raw
+    assert resolved_hit_keys == set(physical_hits)
     hits: list[int] = []
     wounds = 0
     for event in session.lifecycle.decision_controller.event_log.records:
@@ -846,7 +927,7 @@ def test_phase_end_snap_preserves_raw_six_no_hit_reroll_and_action_lock(attacks:
             assert type(values[0]) is int
             hits.append(values[0])
         elif spec["roll_type"] == "attack_sequence.wound":
-            assert hits[-1] == 6
+            assert owning_hits[canonical_json(spec)] == 6
             wounds += 1
     assert any(3 <= raw <= 5 for raw in hits)
     assert wounds == hits.count(6)

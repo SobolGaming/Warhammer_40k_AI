@@ -870,7 +870,11 @@
         "src/warhammer40k_core/engine/lifecycle.py:GameLifecycle.submit_decision",
         "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_parameterized_payload",
         "src/warhammer40k_core/engine/phases/fight.py:request_counteroffensive_if_available",
-        "src/warhammer40k_core/engine/stratagems_geometry.py:_proposal_json_equal"
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_proposal_json_equal",
+        "src/warhammer40k_core/engine/fight_order.py:eligible_fight_contexts_for_player",
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_counteroffensive_target_context_error",
+        "src/warhammer40k_core/engine/stratagems_eligibility.py:_handler_unavailable_reason",
+        "src/warhammer40k_core/engine/stratagems_effect_handlers.py:_apply_counteroffensive_handler"
       ],
       "current_test_nodes": [
         "tests/unit/test_order135_counteroffensive_timing.py::test_core_counteroffensive_requires_opponent_fight_phase",
@@ -882,7 +886,8 @@
         "tests/unit/test_order135_counteroffensive_timing.py::test_actual_generic_source_retains_opponent_turn_availability",
         "tests/unit/test_order135_counteroffensive_timing.py::test_actual_carnival_source_retains_either_turn_availability",
         "tests/unit/test_order135_counteroffensive_timing.py::test_engine_admission_catalog_json_boolean_drift_is_atomic",
-        "tests/unit/test_order135_counteroffensive_timing.py::test_engine_admission_context_json_kinds_preserve_valid_number_echo"
+        "tests/unit/test_order135_counteroffensive_timing.py::test_engine_admission_context_json_kinds_preserve_valid_number_echo",
+        "tests/unit/test_order135_counteroffensive_band.py::test_native_counter_targets_non_first_unit_before_grant"
       ],
       "disposition": "Explicitly approved B02 opponent-Fight-phase Core timing; original clause and source fingerprint unchanged. Native both-direction dispatch, actual melee trigger, CP/effect/interrupt, save/fork/views/events/exact replay and continuation controls; qualified atomic engine-admission fixture. Static inventory alone is not certification.",
       "qualification_reference": "data/source_audits/order135/b02-explicit-repair-approval.json",
@@ -900,7 +905,237 @@
         "actual_local_entry": "Native Core pending request, only deep-copied submitted catalog flag true -> JSON 1. Actual late requires_opponent_turn must be a bool exception consumed queue1->0 and records99->100 with two acceptance events; every gameplay field/CP unchanged.",
         "qualification": "Malformed live game-decision input; no unmodified legal-play failure, edited history, BASE execution, regression-introduction, or provider certification claim. No demonstrated native behavior-changing nested-context consumer is inferred.",
         "controls": "Four qualified domain catalog cases plus two qualified nested-context JSON-kind/numeric echo cases. Native both-role malformed1/1.0 rejection precedes exact legal retry,2CP/effect/interrupt/actual-melee, persistence/fork/views/events/replay."
+      },
+      "approved_counter_band_qualification": {
+        "authority": "data/source_audits/order135/counter-band-explicit-repair-approval.json",
+        "source": "Selected12.04 fight eligibility precedes selected15.12 Fights First grant; ordinary current-band selection is distinct.",
+        "native_control": "Both role directions, public opponent Charge/Fight, genuine attacks, non-FightsFirst target, ordinary default still excludes it, 2CP/grant/interrupt/resume, atomic malformed echo, pending/completed save/load/fork/all-role views/events/exact replay. Existing Remaining positive and own-turn negative remain unchanged.",
+        "historical_private_control": "Original test_order70_counteroffensive_uses_current_model_complete_band and every assertion stay byte-for-byte unchanged. Its direct default geometry query in a constructed own-turn context proves only current-band membership, not lawful Core availability. Authoritative Core callers explicitly opt into pre-grant eligibility.",
+        "limits": "Pregame synthetic bounded Core catalog; no provider or whole-game certification. Static bindings are not runtime or exhaustive semantic closure."
       }
+    },
+    "01.04.01-obligation-06": {
+      "current_test_nodes": [
+        "tests/unit/test_order135_transport_boundaries.py::test_shared_disembark_owner_retains_vertical_and_frame_extent",
+        "tests/unit/test_order135_transport_boundaries.py::test_native_frame_disembark_rejects_out_of_band_physical_body"
+      ],
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/transport_disembark_geometry.py:_model_wholly_within_any_transport_model"
+      ],
+      "disposition": "B04 current shared3D disembark consumer and native predeclared FRAME positive/negative controls; independent full-source renewal pending.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "18.04-rapid-tactical-distance": {
+      "current_test_nodes": [
+        "tests/unit/test_order135_transport_boundaries.py::test_shared_disembark_owner_retains_vertical_and_frame_extent",
+        "tests/unit/test_order135_transport_boundaries.py::test_native_frame_disembark_rejects_out_of_band_physical_body"
+      ],
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/transport_disembark_geometry.py:_model_wholly_within_any_transport_model"
+      ],
+      "disposition": "B04 current shared3D disembark consumer and native predeclared FRAME positive/negative controls; independent full-source renewal pending.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "18.01-start-embarked-whole-unit": {
+      "current_test_nodes": [
+        "tests/unit/test_order135_transport_boundaries.py::test_native_starting_cargo_keeps_initial_anchor_through_disembark",
+        "tests/unit/test_order135_transport_boundaries.py::test_native_setup_without_manifest_remains_restorable",
+        "tests/unit/test_order135_transport_boundaries.py::test_predeployment_allowance_preserves_embarked_physical_removal_guard",
+        "tests/unit/test_order135_transport_boundaries.py::test_missing_carrier_remains_invalid_after_deployment"
+      ],
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/transport_state_integrity.py:validate_transport_cargo_state_consistency",
+        "src/warhammer40k_core/engine/lifecycle_battlefield_requirements.py:state_requires_deployed_battlefield_state",
+        "src/warhammer40k_core/adapters/local_session.py:LocalGameSession._capture_initial_replay_lifecycle_if_needed"
+      ],
+      "disposition": "B05 authentic predeployment manifest anchor and native session persistence/replay. Direct corrupted state checks isolate placement/removal invariants; they are not native legal histories. Ordinary non-Dedicated carrier admission remains an independently reported unapproved candidate, not closure from these tests.",
+      "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+    },
+    "12.04-eligibility": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/fight_order.py:eligible_fight_contexts_for_player",
+        "src/warhammer40k_core/engine/phases/fight.py:request_counteroffensive_if_available",
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_counteroffensive_target_context_error",
+        "src/warhammer40k_core/engine/stratagems_eligibility.py:_handler_unavailable_reason",
+        "src/warhammer40k_core/engine/stratagems_effect_handlers.py:_apply_counteroffensive_handler"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_counteroffensive_band.py::test_native_counter_targets_non_first_unit_before_grant",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_own_turn_is_not_offered",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_opponent_turn_acceptance_persists"
+      ],
+      "disposition": "Original source and assertions retained; approved Core pre-grant target eligibility correction.",
+      "approved_counter_band_qualification": {
+        "authority": "data/source_audits/order135/counter-band-explicit-repair-approval.json",
+        "source": "Selected12.04 fight eligibility precedes selected15.12 Fights First grant; ordinary current-band selection is distinct.",
+        "native_control": "Both role directions, public opponent Charge/Fight, genuine attacks, non-FightsFirst target, ordinary default still excludes it, 2CP/grant/interrupt/resume, atomic malformed echo, pending/completed save/load/fork/all-role views/events/exact replay. Existing Remaining positive and own-turn negative remain unchanged.",
+        "historical_private_control": "Original test_order70_counteroffensive_uses_current_model_complete_band and every assertion stay byte-for-byte unchanged. Its direct default geometry query in a constructed own-turn context proves only current-band membership, not lawful Core availability. Authoritative Core callers explicitly opt into pre-grant eligibility.",
+        "limits": "Pregame synthetic bounded Core catalog; no provider or whole-game certification. Static bindings are not runtime or exhaustive semantic closure."
+      }
+    },
+    "15.12-target": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/fight_order.py:eligible_fight_contexts_for_player",
+        "src/warhammer40k_core/engine/phases/fight.py:request_counteroffensive_if_available",
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_counteroffensive_target_context_error",
+        "src/warhammer40k_core/engine/stratagems_eligibility.py:_handler_unavailable_reason",
+        "src/warhammer40k_core/engine/stratagems_effect_handlers.py:_apply_counteroffensive_handler"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_counteroffensive_band.py::test_native_counter_targets_non_first_unit_before_grant",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_own_turn_is_not_offered",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_opponent_turn_acceptance_persists"
+      ],
+      "disposition": "Original source and assertions retained; approved Core pre-grant target eligibility correction.",
+      "approved_counter_band_qualification": {
+        "authority": "data/source_audits/order135/counter-band-explicit-repair-approval.json",
+        "source": "Selected12.04 fight eligibility precedes selected15.12 Fights First grant; ordinary current-band selection is distinct.",
+        "native_control": "Both role directions, public opponent Charge/Fight, genuine attacks, non-FightsFirst target, ordinary default still excludes it, 2CP/grant/interrupt/resume, atomic malformed echo, pending/completed save/load/fork/all-role views/events/exact replay. Existing Remaining positive and own-turn negative remain unchanged.",
+        "historical_private_control": "Original test_order70_counteroffensive_uses_current_model_complete_band and every assertion stay byte-for-byte unchanged. Its direct default geometry query in a constructed own-turn context proves only current-band membership, not lawful Core availability. Authoritative Core callers explicitly opt into pre-grant eligibility.",
+        "limits": "Pregame synthetic bounded Core catalog; no provider or whole-game certification. Static bindings are not runtime or exhaustive semantic closure."
+      }
+    },
+    "15.12-fights-first": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/fight_order.py:eligible_fight_contexts_for_player",
+        "src/warhammer40k_core/engine/phases/fight.py:request_counteroffensive_if_available",
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_counteroffensive_target_context_error",
+        "src/warhammer40k_core/engine/stratagems_eligibility.py:_handler_unavailable_reason",
+        "src/warhammer40k_core/engine/stratagems_effect_handlers.py:_apply_counteroffensive_handler"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_counteroffensive_band.py::test_native_counter_targets_non_first_unit_before_grant",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_own_turn_is_not_offered",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_opponent_turn_acceptance_persists"
+      ],
+      "disposition": "Original source and assertions retained; approved Core pre-grant target eligibility correction.",
+      "approved_counter_band_qualification": {
+        "authority": "data/source_audits/order135/counter-band-explicit-repair-approval.json",
+        "source": "Selected12.04 fight eligibility precedes selected15.12 Fights First grant; ordinary current-band selection is distinct.",
+        "native_control": "Both role directions, public opponent Charge/Fight, genuine attacks, non-FightsFirst target, ordinary default still excludes it, 2CP/grant/interrupt/resume, atomic malformed echo, pending/completed save/load/fork/all-role views/events/exact replay. Existing Remaining positive and own-turn negative remain unchanged.",
+        "historical_private_control": "Original test_order70_counteroffensive_uses_current_model_complete_band and every assertion stay byte-for-byte unchanged. Its direct default geometry query in a constructed own-turn context proves only current-band membership, not lawful Core availability. Authoritative Core callers explicitly opt into pre-grant eligibility.",
+        "limits": "Pregame synthetic bounded Core catalog; no provider or whole-game certification. Static bindings are not runtime or exhaustive semantic closure."
+      }
+    },
+    "15.12-next-selection": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/fight_order.py:eligible_fight_contexts_for_player",
+        "src/warhammer40k_core/engine/phases/fight.py:request_counteroffensive_if_available",
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_counteroffensive_target_context_error",
+        "src/warhammer40k_core/engine/stratagems_eligibility.py:_handler_unavailable_reason",
+        "src/warhammer40k_core/engine/stratagems_effect_handlers.py:_apply_counteroffensive_handler"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_counteroffensive_band.py::test_native_counter_targets_non_first_unit_before_grant",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_own_turn_is_not_offered",
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_opponent_turn_acceptance_persists"
+      ],
+      "disposition": "Original source and assertions retained; approved Core pre-grant target eligibility correction.",
+      "approved_counter_band_qualification": {
+        "authority": "data/source_audits/order135/counter-band-explicit-repair-approval.json",
+        "source": "Selected12.04 fight eligibility precedes selected15.12 Fights First grant; ordinary current-band selection is distinct.",
+        "native_control": "Both role directions, public opponent Charge/Fight, genuine attacks, non-FightsFirst target, ordinary default still excludes it, 2CP/grant/interrupt/resume, atomic malformed echo, pending/completed save/load/fork/all-role views/events/exact replay. Existing Remaining positive and own-turn negative remain unchanged.",
+        "historical_private_control": "Original test_order70_counteroffensive_uses_current_model_complete_band and every assertion stay byte-for-byte unchanged. Its direct default geometry query in a constructed own-turn context proves only current-band membership, not lawful Core availability. Authoritative Core callers explicitly opt into pre-grant eligibility.",
+        "limits": "Pregame synthetic bounded Core catalog; no provider or whole-game certification. Static bindings are not runtime or exhaustive semantic closure."
+      }
+    },
+    "12.04-empty-first": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/fight_order.py:FightPhaseState.with_next_band",
+        "src/warhammer40k_core/engine/phases/fight.py:_advance_to_next_fight_request"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_fight_transition.py::test_native_fights_first_exhaustion_keeps_owed_player"
+      ],
+      "disposition": "Approved preservation of originally owed player across exhausted Fights First band, before speculative availability scanning. Original assertions retained.",
+      "authority": "data/source_audits/order135/fight-transition-explicit-repair-approval.json",
+      "qualification": "Pregame analytical Core M18/A1/WS6/S1/D1 scene, both directions and pending/completed actual fight/consolidation save/load/fork/views/events/replay. No faction or broad Fight certification."
+    },
+    "12.04-remaining": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/fight_order.py:FightPhaseState.with_next_band",
+        "src/warhammer40k_core/engine/phases/fight.py:_advance_to_next_fight_request"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_fight_transition.py::test_native_fights_first_exhaustion_keeps_owed_player"
+      ],
+      "disposition": "Approved preservation of originally owed player across exhausted Fights First band, before speculative availability scanning. Original assertions retained.",
+      "authority": "data/source_audits/order135/fight-transition-explicit-repair-approval.json",
+      "qualification": "Pregame analytical Core M18/A1/WS6/S1/D1 scene, both directions and pending/completed actual fight/consolidation save/load/fork/views/events/replay. No faction or broad Fight certification."
+    },
+    "12.04.01-distant-pass": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/fight_order.py:eligible_pass_is_available",
+        "src/warhammer40k_core/engine/phases/fight.py:_advance_to_next_fight_request",
+        "src/warhammer40k_core/engine/phases/fight.py:_invalid_fight_pass_status"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_fight_pass.py::test_nearby_remaining_unit_prevents_fights_first_pass",
+        "tests/unit/test_order135_fight_pass.py::test_original_five_model_pass_fixture_rejects_pass",
+        "tests/unit/test_order135_fight_pass.py::test_newly_nearby_lower_band_unit_invalidates_offered_pass_atomically",
+        "tests/unit/test_order135_fight_pass.py::test_pass_distance_boundary_is_strict",
+        "tests/unit/test_order135_fight_pass.py::test_native_pass_after_shared_charge_target_dies",
+        "tests/unit/test_phase15c_fight_order.py::test_fights_first_pass_does_not_reoffer_same_unit_before_remaining_activation"
+      ],
+      "disposition": "All otherwise-eligible friendly units constrain the strict greater-than-five pass test. The current ordering band still constrains selectable units and the finite request snapshot.",
+      "authority": "data/source_audits/order135/pass-explicit-repair-and-assertion-approval.json",
+      "qualification": "Original protected fixture was invalid for passing; exact original bytes remain archived and original geometry is a rejection control. Corrected positive first completes nearby friendly melee, leaving a lawful pass and opponent Remaining handoff. Canonical restored and deliberate stale-state controls are distinct from pregame analytical native controls. No runtime pass is asserted by this binding."
+    },
+    "05.00-obligation-01": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/gathered_attack_dice.py:resolve_gathered_attack_dice"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_gathered_attack_steps.py::test_native_gathered_hit_and_wound_steps_precede_reroll_choices",
+        "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay"
+      ],
+      "disposition": "Approved D02: prepare, roll and resolve gathered original Hits before Wounds; prepare, roll and resolve gathered original Wounds before their later-step choices. Resume reuses engine journal.",
+      "authority": "data/source_audits/order135/d02-d03-explicit-repair-and-assertion-approval.json",
+      "qualification": "Native three-attack public control plus original generated-hit/melee/replay fixtures; exact protected helper and one Fight identity exception preserve assertions. Grouped Save and identical-pool questions remain separately qualified, not certified by this binding."
+    },
+    "05.00-obligation-02": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/gathered_attack_dice.py:resolve_gathered_attack_dice"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_gathered_attack_steps.py::test_native_gathered_hit_and_wound_steps_precede_reroll_choices",
+        "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay"
+      ],
+      "disposition": "Approved D02: prepare, roll and resolve gathered original Hits before Wounds; prepare, roll and resolve gathered original Wounds before their later-step choices. Resume reuses engine journal.",
+      "authority": "data/source_audits/order135/d02-d03-explicit-repair-and-assertion-approval.json",
+      "qualification": "Native three-attack public control plus original generated-hit/melee/replay fixtures; exact protected helper and one Fight identity exception preserve assertions. Grouped Save and identical-pool questions remain separately qualified, not certified by this binding."
+    },
+    "18.04-tactical-before-combat": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/tactical_setup_feasibility.py:tactical_setup_feasibility",
+        "src/warhammer40k_core/geometry/tactical_setup_proof.py:tactical_setup_is_excluded",
+        "src/warhammer40k_core/engine/rules_unit_combat_payload.py:rules_unit_combat_from_payload"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_combat_tactical_feasibility.py::test_native_far_combat_is_atomic_when_another_tactical_setup_exists",
+        "tests/unit/test_order135_combat_tactical_feasibility.py::test_native_combat_accepts_proven_impossible_tactical_height",
+        "tests/unit/test_order135_combat_tactical_feasibility.py::test_native_grouped_combat_pending_hazard_preserves_strict_context_and_replay",
+        "tests/unit/test_order135_combat_tactical_feasibility.py::test_native_combat_accepts_ordinary_terrain_constrained_tactical_impossibility"
+      ],
+      "disposition": "Approved D03: verified whole-unit Tactical witness blocks Combat; a sound necessary-domain exclusion can authorize Combat, while unresolved proof rejects atomically. Current grouped hazard producer and shared strict decoder preserve valid state.",
+      "authority": "data/source_audits/order135/d02-d03-explicit-repair-and-assertion-approval.json",
+      "qualification": "Analytical public tall-FRAME and ordinary supported-platform scenes plus original attached hazard/FNP regressions. Continuous joint pose proof is relaxed; finite witness failure is not impossibility, and these controls do not establish complete admission for every scene. Exact five-test exception retains all 63 original assertions and adds five atomicity assertions."
+    },
+    "18.04-combat-hazard": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/tactical_setup_feasibility.py:tactical_setup_feasibility",
+        "src/warhammer40k_core/geometry/tactical_setup_proof.py:tactical_setup_is_excluded",
+        "src/warhammer40k_core/engine/rules_unit_combat_payload.py:rules_unit_combat_from_payload"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order135_combat_tactical_feasibility.py::test_native_far_combat_is_atomic_when_another_tactical_setup_exists",
+        "tests/unit/test_order135_combat_tactical_feasibility.py::test_native_combat_accepts_proven_impossible_tactical_height",
+        "tests/unit/test_order135_combat_tactical_feasibility.py::test_native_grouped_combat_pending_hazard_preserves_strict_context_and_replay",
+        "tests/unit/test_order135_combat_tactical_feasibility.py::test_native_combat_accepts_ordinary_terrain_constrained_tactical_impossibility"
+      ],
+      "disposition": "Approved D03: verified whole-unit Tactical witness blocks Combat; a sound necessary-domain exclusion can authorize Combat, while unresolved proof rejects atomically. Current grouped hazard producer and shared strict decoder preserve valid state.",
+      "authority": "data/source_audits/order135/d02-d03-explicit-repair-and-assertion-approval.json",
+      "qualification": "Analytical public tall-FRAME and ordinary supported-platform scenes plus original attached hazard/FNP regressions. Continuous joint pose proof is relaxed; finite witness failure is not impossibility, and these controls do not establish complete admission for every scene. Exact five-test exception retains all 63 original assertions and adds five atomicity assertions."
     }
   },
   "source_supersessions": {

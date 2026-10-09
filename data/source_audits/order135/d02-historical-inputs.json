@@ -1,0 +1,16 @@
+{
+  "schema": "order135-approved-d02-historical-inputs-v1",
+  "base": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+  "authority": "data/source_audits/order135/d02-d03-explicit-repair-and-assertion-approval.json",
+  "qualification": "Exact original helper for historical Order97 only; current Order135 reads the corrected live helper/tests. No reviewed inventory hash or historical assertion is changed.",
+  "files": [
+    {
+      "path": "tests/lethal_hits_helpers.py",
+      "historical_path": "data/source_audits/order135/d02-d03-regression-history/lethal_hits_helpers.py.txt",
+      "bytes": 6328,
+      "sha256": "f55d0df7ce3137cd11d8d4e530dbee3f12baf00dcdf9e02d15094519c220ba96",
+      "git_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+      "git_path": "tests/lethal_hits_helpers.py"
+    }
+  ]
+}

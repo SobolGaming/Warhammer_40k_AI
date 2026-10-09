@@ -48,7 +48,9 @@ def test_choices_devastating_sustained_restore_and_replay(phase: BattlePhase, ch
     # Fixed legal result identities exercise an original critical wound in each
     # phase without replacing RNG or the engine's decision controller.
     first_result_id = (
-        "order103-fixture-01-00" if phase is BattlePhase.FIGHT else "order103-fixture-12-00"
+        "order135-gathered-lethal-fight-04"
+        if phase is BattlePhase.FIGHT
+        else "order103-fixture-12-00"
     )
     for current in (session, restored):
         current.submit_option(

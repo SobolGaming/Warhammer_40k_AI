@@ -1,0 +1,102 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "setup",
+  "workload_id": "order101-failed-setup-restore-view-replay-v1",
+  "base_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a3eefa524712acefb6fd5def22276f98c383256dfd7981d79c058bc0380fbd2d",
+  "head_input_digest": "aba76af912b1465ef1c5a6dadfad05bd348ea422e2a4d6e030dbe2fad28e0ab1",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:110f573cc70342f09c3102916f918a54a64f7b50f0966cdbdb51eba2b6de970e",
+    "host": {
+      "cpu": "Apple M5 Pro",
+      "memory_bytes": 68719476736,
+      "logical_cpus": 18,
+      "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "aa2a5bdaaaf26d8746cb800c482e3403092d7fa37741809abe5caba1741b6069",
+    "fixture_sha256": "89e78d5b094d891cccfd6023c740db735cabf83cf84b9fec58496f119a74e7e9",
+    "samples": {
+      "cargo-5": [
+        1.4018023749813437,
+        1.3461073329672217,
+        1.3880689160432667,
+        1.3506572089972906,
+        1.3661375420051627,
+        1.395342291041743,
+        1.354565333982464
+      ],
+      "cargo-100": [
+        1.34942600002978,
+        1.39179162500659,
+        1.3627513339743018,
+        1.3586694580153562,
+        1.3997844170080498,
+        1.3581099170260131,
+        1.4004883750458248
+      ],
+      "loaded-deep-strike": [
+        2.2216428340179846,
+        2.2415953340241686,
+        2.2198646669858135,
+        2.199462874967139,
+        2.2406864169752225,
+        2.2507572090253234,
+        2.210948791995179
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a3eefa524712acefb6fd5def22276f98c383256dfd7981d79c058bc0380fbd2d",
+    "host": {
+      "cpu": "Apple M5 Pro",
+      "memory_bytes": 68719476736,
+      "logical_cpus": 18,
+      "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "aa2a5bdaaaf26d8746cb800c482e3403092d7fa37741809abe5caba1741b6069",
+    "fixture_sha256": "89e78d5b094d891cccfd6023c740db735cabf83cf84b9fec58496f119a74e7e9",
+    "samples": {
+      "cargo-5": [
+        1.3714402919868007,
+        1.3413032919634134,
+        1.3682058340054937,
+        1.3316640420234762,
+        1.3345027909963392,
+        1.3788731250097044,
+        1.3393381250207312
+      ],
+      "cargo-100": [
+        1.3527895840234123,
+        1.3775616249768063,
+        1.3364983340143226,
+        1.3401437499560416,
+        1.3760764580219984,
+        1.4965489159803838,
+        1.5548082499881275
+      ],
+      "loaded-deep-strike": [
+        2.4009779159678146,
+        2.2738331250147894,
+        2.2285693339654244,
+        2.194647249998525,
+        2.277721583028324,
+        2.277674874989316,
+        2.1835377090028487
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": []
+}

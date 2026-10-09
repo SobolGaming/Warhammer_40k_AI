@@ -1,0 +1,41 @@
+{
+  "schema": "order135-source5-performance-record-retention-v1",
+  "source_head": "5e45dcc9fb1af6de138ebeba4b88005c744bc3b7",
+  "source_tree": "e0723b3fd3af49f2363c1d83a0a9552c5cba1adf",
+  "source_candidate_tree": "f974612d0bef9e47bfffe2ce212fea744d8e65d3",
+  "qualification": "Prior comparison bytes preserved exactly as historical records. They receive no corrected candidate performance credit. Fresh current records use new versioned paths.",
+  "records": [
+    {
+      "original_path": "docs/performance/current/order135-movement-01.json",
+      "archive_path": "docs/performance/history/order135-source5/order135-movement-01.json",
+      "bytes": 3205,
+      "sha256": "0a507fecbbb254dda35153a1c6fe1daa5d2483e3cb5e1082429eaccea4ad3680",
+      "fresh_path": "docs/performance/current/order135-b04-b05-movement-mac01.json",
+      "fresh_sha256": "704b0a0c6b1ae1d069f5e7c981efe55ddf4557934055b798445617845d889a9e"
+    },
+    {
+      "original_path": "docs/performance/current/order135-reconstruction-01.json",
+      "archive_path": "docs/performance/history/order135-source5/order135-reconstruction-01.json",
+      "bytes": 5546,
+      "sha256": "e7ee32bfa0cfbb68bb0dc6a220995b3e26c8f640eb7aae67af7a3d019649f7a1",
+      "fresh_path": "docs/performance/current/order135-b04-b05-reconstruction-mac01.json",
+      "fresh_sha256": "3507614b51d1ea579e70869feaacc197788b9d95e2953b78e19fe3cc4eb8f06d"
+    },
+    {
+      "original_path": "docs/performance/current/order135-setup-01.json",
+      "archive_path": "docs/performance/history/order135-source5/order135-setup-01.json",
+      "bytes": 4087,
+      "sha256": "fbff97a2edbc36a614b82756cd227a992b23fc4a4d8e16b39bdc363397ca3577",
+      "fresh_path": "docs/performance/current/order135-b04-b05-setup-mac01.json",
+      "fresh_sha256": "e8a4dd542e411e82a3d8bcc9c9688c490c74f966d4c5c3c504ac4c8209d32da5"
+    },
+    {
+      "original_path": "docs/performance/current/order135-visibility-01.json",
+      "archive_path": "docs/performance/history/order135-source5/order135-visibility-01.json",
+      "bytes": 6086,
+      "sha256": "809c84fec904643acd49afde471b2e8cb54af9b4a860a9f7a4c2b476c435f743",
+      "fresh_path": "docs/performance/current/order135-b04-b05-visibility-mac01.json",
+      "fresh_sha256": "62ed974cd6e63c6e68ee6d72d83fa2a4a9c237534a8d8acf2ed1b6801176a27d"
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "dice",
+  "workload_id": "order96-optional-wound-rerolls-v1",
+  "base_revision": "70b0c0b43774f81d67753b0e3f830b38f1b178ff",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e21b92c4972bd99a9a043e519e6041dddff79ad7caf1f1f4ae3f9509a1e42134",
+  "head_input_digest": "09da1ae782f6ad86f88259de30c3bec8abbbed2bc65d6be93b811ffc5ef867f0",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:110f573cc70342f09c3102916f918a54a64f7b50f0966cdbdb51eba2b6de970e",
+    "host": {
+      "cpu": "Apple M5 Pro",
+      "memory_bytes": 68719476736,
+      "logical_cpus": 18,
+      "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "fc4fe1423d4864d251bf8f5b2c1eaf305b4f21a358cc668c8b5a20c166f75daf",
+    "fixture_sha256": "8b131b8a1233c6da324c1f12c67a3ddf05527e56018e2a4a84108f723891f527",
+    "samples": {
+      "shooting/false": [
+        0.5089024579501711,
+        0.48452145903138444,
+        0.450947042030748,
+        0.49473208299605176,
+        0.48577645898330957
+      ],
+      "shooting/true": [
+        0.46679520898032933,
+        0.5016952080186456,
+        0.5047142499824986,
+        0.4667003329959698,
+        0.4703544999938458
+      ],
+      "fight/false": [
+        0.3148557080421597,
+        0.30721487500704825,
+        0.30609337496571243,
+        0.30546341597801074,
+        0.31240954203531146
+      ],
+      "fight/true": [
+        0.3143456249963492,
+        0.30890241597080603,
+        0.30761070898734033,
+        0.35252870799740776,
+        0.30816779198357835
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e21b92c4972bd99a9a043e519e6041dddff79ad7caf1f1f4ae3f9509a1e42134",
+    "host": {
+      "cpu": "Apple M5 Pro",
+      "memory_bytes": 68719476736,
+      "logical_cpus": 18,
+      "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "fc4fe1423d4864d251bf8f5b2c1eaf305b4f21a358cc668c8b5a20c166f75daf",
+    "fixture_sha256": "8b131b8a1233c6da324c1f12c67a3ddf05527e56018e2a4a84108f723891f527",
+    "samples": {
+      "shooting/false": [
+        0.5590903750271536,
+        0.5497651670011692,
+        0.5175284170545638,
+        0.5502559580490924,
+        0.5534662500140257
+      ],
+      "shooting/true": [
+        0.5428102079895325,
+        0.5838632499799132,
+        0.5990515840239823,
+        0.5437037080409937,
+        0.5433982909889892
+      ],
+      "fight/false": [
+        0.4019176670117304,
+        0.4057156250346452,
+        0.39986845798557624,
+        0.3991169999935664,
+        0.398876334016677
+      ],
+      "fight/true": [
+        0.41544899996370077,
+        0.4200334170018323,
+        0.4238012909772806,
+        0.4167394589749165,
+        0.4243429590133019
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": [
+    {
+      "candidate_tree": "bae41bd010c8b4888e2d2d86affe566c7c9e586c",
+      "authentication_sha256": "6fc4479c5b59df11a83cb83ddc48f503cd627264d3d34f84e72b66d6694b3a53",
+      "rows": [
+        {
+          "case": "shooting/false",
+          "samples_per_side": 5,
+          "base_mean": 0.48062901679077186,
+          "head_mean": 0.7112411081965547,
+          "mean_limit": 0.6507862709884649,
+          "base_maximum": 0.5042226669902448,
+          "head_maximum": 0.754231124999933,
+          "maximum_limit": 0.8563340004853671,
+          "passed": false
+        },
+        {
+          "case": "shooting/true",
+          "samples_per_side": 5,
+          "base_mean": 0.4811598165950272,
+          "head_mean": 0.6883332586032338,
+          "mean_limit": 0.6514497707437841,
+          "base_maximum": 0.5132933330023661,
+          "head_maximum": 0.7064727499964647,
+          "maximum_limit": 0.8699399995035492,
+          "passed": false
+        },
+        {
+          "case": "fight/false",
+          "samples_per_side": 5,
+          "base_mean": 0.3079838999954518,
+          "head_mean": 0.4914247418055311,
+          "mean_limit": 0.43497987499431473,
+          "base_maximum": 0.3199457500013523,
+          "head_maximum": 0.5004095420008525,
+          "maximum_limit": 0.5799186250020284,
+          "passed": false
+        },
+        {
+          "case": "fight/true",
+          "samples_per_side": 5,
+          "base_mean": 0.3150336170045193,
+          "head_mean": 0.5065144749940373,
+          "mean_limit": 0.44379202125564915,
+          "base_maximum": 0.36351145899971016,
+          "head_maximum": 0.5159293329925276,
+          "maximum_limit": 0.6452671884995652,
+          "passed": false
+        }
+      ],
+      "qualification": "Original complete raw inputs, matched command receipts, samples, and failed comparison remain immutable in candidate-d02-d03-04 and included in the final review archive. No previous timing credit."
+    },
+    {
+      "candidate_tree": "ad4694c169340f8f908f4cfc8f568bce4b67c801",
+      "authentication_sha256": "41cf767db4428b417026f496b6c5a608563cbee77763ddd63d46b8f23ce231c6",
+      "rows": [
+        {
+          "case": "fight/true",
+          "mean": 0.45293565840111116,
+          "mean_limit": 0.4502466040110448,
+          "maximum": 0.4678826250019483,
+          "maximum_limit": 0.6202708120195893
+        }
+      ],
+      "qualification": "Preserved candidate05 actual paired ordinary-dice failure and raw receipts; remaining measurements not launched; no timing credit or changed ceilings."
+    }
+  ]
+}

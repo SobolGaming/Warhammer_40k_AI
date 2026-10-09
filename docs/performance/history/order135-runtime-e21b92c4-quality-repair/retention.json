@@ -1,0 +1,62 @@
+{
+  "schema": "order135-quality-repair-performance-retention-v1",
+  "records": [
+    {
+      "family": "dice",
+      "old_path": "docs/performance/current/order135-final-dice-mac01.json",
+      "history_path": "docs/performance/history/order135-runtime-e21b92c4-quality-repair/order135-final-dice-mac01.json",
+      "bytes": 5908,
+      "sha256": "cba5cf56b2879b716036d225b487b9678d82ed4d22aa8734a7f6822013abd122",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e21b92c4972bd99a9a043e519e6041dddff79ad7caf1f1f4ae3f9509a1e42134"
+    },
+    {
+      "family": "dice_sustained",
+      "old_path": "docs/performance/current/order135-final-dice_sustained-mac01.json",
+      "history_path": "docs/performance/history/order135-runtime-e21b92c4-quality-repair/order135-final-dice_sustained-mac01.json",
+      "bytes": 6156,
+      "sha256": "32220fc3bb7e22be5a3119ce8285fd99cebb0f1c34470a3d3a81b490d118df3a",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e21b92c4972bd99a9a043e519e6041dddff79ad7caf1f1f4ae3f9509a1e42134"
+    },
+    {
+      "family": "movement",
+      "old_path": "docs/performance/current/order135-final-movement-mac01.json",
+      "history_path": "docs/performance/history/order135-runtime-e21b92c4-quality-repair/order135-final-movement-mac01.json",
+      "bytes": 2409,
+      "sha256": "390a9d29484bcff508ca07f1ce98b0e617a835ef0b3734bbbc46be0194714d65",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e21b92c4972bd99a9a043e519e6041dddff79ad7caf1f1f4ae3f9509a1e42134"
+    },
+    {
+      "family": "precision_grouping",
+      "old_path": "docs/performance/current/order135-final-precision_grouping-mac01.json",
+      "history_path": "docs/performance/history/order135-runtime-e21b92c4-quality-repair/order135-final-precision_grouping-mac01.json",
+      "bytes": 4393,
+      "sha256": "1ee736d06321069647cda7fba896228bbc9660f32078df87232325cca7702e06",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e21b92c4972bd99a9a043e519e6041dddff79ad7caf1f1f4ae3f9509a1e42134"
+    },
+    {
+      "family": "reconstruction",
+      "old_path": "docs/performance/current/order135-final-reconstruction-mac01.json",
+      "history_path": "docs/performance/history/order135-runtime-e21b92c4-quality-repair/order135-final-reconstruction-mac01.json",
+      "bytes": 4755,
+      "sha256": "7d125b220447f72152ea4ae662102eb8c969d7f7e5ce35bdddb01f684abd18b3",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e21b92c4972bd99a9a043e519e6041dddff79ad7caf1f1f4ae3f9509a1e42134"
+    },
+    {
+      "family": "setup",
+      "old_path": "docs/performance/current/order135-final-setup-mac01.json",
+      "history_path": "docs/performance/history/order135-runtime-e21b92c4-quality-repair/order135-final-setup-mac01.json",
+      "bytes": 3318,
+      "sha256": "098a2f0595dd1250c6910fc14381b7c65a93c085e29bd57e5618f3edd20a9fe6",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e21b92c4972bd99a9a043e519e6041dddff79ad7caf1f1f4ae3f9509a1e42134"
+    },
+    {
+      "family": "visibility",
+      "old_path": "docs/performance/current/order135-final-visibility-mac01.json",
+      "history_path": "docs/performance/history/order135-runtime-e21b92c4-quality-repair/order135-final-visibility-mac01.json",
+      "bytes": 5333,
+      "sha256": "8ac9e0359692d0822ec3f689e62d6266e1b518bae981cf2103e1594896548373",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e21b92c4972bd99a9a043e519e6041dddff79ad7caf1f1f4ae3f9509a1e42134"
+    }
+  ],
+  "qualification": "Byte-exact previous runtime comparisons; no current measurement credit, no sample or ceiling changes."
+}

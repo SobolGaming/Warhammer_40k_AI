@@ -1,0 +1,251 @@
+{
+  "schema": "order135-approved-d02-d03-and-protected-exceptions-v1",
+  "provenance": "Direct replies and exact owner transcripts relayed by parent, retained verbatim; no independent backend-model or original conversation export claim.",
+  "transcripts": [
+    {
+      "path": "data/source_audits/order135/d02-d03-regression-history/d02-repair-approval.txt",
+      "sha256": "20915daeafdc8f60d2bcd18ed7568d207d0a9996adc330f9df0697d09ff768ef"
+    },
+    {
+      "path": "data/source_audits/order135/d02-d03-regression-history/d03-repair-approval.txt",
+      "sha256": "27c2dd11be5a73e23d0ace0d6f8fc7502de1eb00e1c0d93e1c76781113d50b61"
+    },
+    {
+      "path": "data/source_audits/order135/d02-d03-regression-history/d02-fixture-exception-approval.txt",
+      "sha256": "ad6fc43b0cbfcb326f30cc9f2b2aca95e8c27e1f7bbbf1648c47a3646f647d72"
+    },
+    {
+      "path": "data/source_audits/order135/d02-d03-regression-history/d03-five-test-exception-approval.txt",
+      "sha256": "4e0caf2b9478e4a90480cda0dccb7814842780596edca9eb81a13cf6497a933e"
+    },
+    {
+      "path": "data/source_audits/order135/d02-d03-regression-history/cutoff-and-publication-transcript.txt",
+      "sha256": "8c440281a08b992643075137663bd1e4a65bd1fb4b8c70b6be45495a245618dc"
+    }
+  ],
+  "d02_proposal": {
+    "status": "REVIEWABLE_PROPOSAL_ONLY_EXPLICIT_PROTECTED_FIXTURE_EXCEPTION_REQUIRED",
+    "current_candidate_tree": "b844f4b3fd3688655007def5d68a656be80f69a3",
+    "canonical_file_count": 5755,
+    "git_head": "5e45dcc9fb1af6de138ebeba4b88005c744bc3b7",
+    "changes": [
+      {
+        "path": "tests/lethal_hits_helpers.py",
+        "original_sha256": "f55d0df7ce3137cd11d8d4e530dbee3f12baf00dcdf9e02d15094519c220ba96",
+        "proposed_sha256": "5db60d818c07f1e12fb61fabead07722da73baebda47ce8a58af7da9e629d6eb",
+        "only_changed_functions": [
+          "lethal_wound_checkpoint"
+        ],
+        "patch": "lethal_hits_helpers.py.patch"
+      },
+      {
+        "path": "tests/unit/test_lethal_hits.py",
+        "original_sha256": "e7bbf50a21d4b447b1b9b97753fee0af55c6d92ebe09b677c2262193f7dc9257",
+        "proposed_sha256": "3a7dc21113bf13594b9b1d78fd0b9f09c117937bc230a72599e3daf310851beb",
+        "only_changed_functions": [
+          "test_choices_devastating_sustained_restore_and_replay"
+        ],
+        "patch": "test_lethal_hits.py.patch"
+      }
+    ],
+    "failed_original_cases": [
+      "tests.unit.test_lethal_hits::test_choices_devastating_sustained_restore_and_replay[roll-to-wound-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_declined_wound_checkpoint_continues_without_drift[shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_declined_wound_checkpoint_continues_without_drift[fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[missing-choice-wound-reroll-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[missing-choice-wound-reroll-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[missing-choice-completed-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[missing-choice-completed-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[target-wound-reroll-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[target-wound-reroll-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[target-completed-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[target-completed-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[target-keywords-wound-reroll-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[target-keywords-wound-reroll-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[target-keywords-completed-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[target-keywords-completed-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[mirrored-target-wound-reroll-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[mirrored-target-wound-reroll-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[mirrored-target-completed-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[mirrored-target-completed-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[missing-recorded-wound-reroll-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[missing-recorded-wound-reroll-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[missing-recorded-completed-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[missing-recorded-completed-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[orphan-issued-wound-reroll-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[orphan-issued-wound-reroll-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[orphan-issued-completed-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[orphan-issued-completed-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[missing-issued-wound-reroll-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[missing-issued-wound-reroll-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[missing-issued-completed-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[missing-issued-completed-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[duplicate-issued-wound-reroll-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[duplicate-issued-wound-reroll-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[duplicate-issued-completed-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[duplicate-issued-completed-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[duplicate-recorded-wound-reroll-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[duplicate-recorded-wound-reroll-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[duplicate-recorded-completed-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[duplicate-recorded-completed-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[answer-before-request-wound-reroll-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[answer-before-request-wound-reroll-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[answer-before-request-completed-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[answer-before-request-completed-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[request-before-hit-wound-reroll-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[request-before-hit-wound-reroll-fight]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[request-before-hit-completed-shooting]",
+      "tests.unit.test_lethal_hits::test_r44_001_historical_choices_are_authenticated_before_restore[request-before-hit-completed-fight]"
+    ],
+    "reason": "Selected05.00 original grouped-step chronology and24.23 pre-Wound Lethal choices conflict with first-decline immediate-Wound checkpoint. The old fixed Fight result identity no longer yields its intended critical Wound under corrected roll ordering.",
+    "preservation": "All original production tests/helpers remain byte-exact in checkout. Whole original files copied read-only alongside exact proposed replacements.",
+    "proposal_evidence": {
+      "008": {
+        "exit": 1,
+        "helper_cases": {
+          "shooting": "PASS",
+          "fight": "PASS"
+        },
+        "entire_command_pass": false
+      },
+      "009": {
+        "exit": 1,
+        "tests": 8,
+        "passed": 5,
+        "failed": 3,
+        "exact_proposed_Fight_identity": "order135-gathered-lethal-fight-04",
+        "exact_Fight_case": "PASS all original assertions, including actual critical Wound, Devastating effect, generated-hit count, live/restored equality and exact replay",
+        "four_shooting_cases": "Also selected because the parameter ID contains fight; unchanged Shooting identity, all passed",
+        "entire_command_pass": false
+      }
+    },
+    "scope_request": "Permit only lethal_wound_checkpoint to drain genuine pending pre-Wound Lethal choices before its existing checkpoint assertions, and only the fixed Fight result_id literal in test_choices_devastating_sustained_restore_and_replay to become order135-gathered-lethal-fight-04. No original assertion is removed or weakened; no RNG/state/history injection. All downstream original tests must run unchanged after approval.",
+    "no_credit": [
+      "Original47failures are preserved failures",
+      "External proposed-case results are not original suite or complete candidate passes",
+      "No final CLEAN or RELEASE"
+    ]
+  },
+  "d02_applied_exception": {
+    "approval_transcript_sha256": "ad6fc43b0cbfcb326f30cc9f2b2aca95e8c27e1f7bbbf1648c47a3646f647d72",
+    "proposal_sha256": "a3bd1830d8c57b4ff39dc3a33c708a774f3a63d844520f303fc80713b5348b54",
+    "applied_exact_approved_proposal": true,
+    "changes": [
+      {
+        "path": "tests/lethal_hits_helpers.py",
+        "original_sha256": "f55d0df7ce3137cd11d8d4e530dbee3f12baf00dcdf9e02d15094519c220ba96",
+        "proposed_sha256": "5db60d818c07f1e12fb61fabead07722da73baebda47ce8a58af7da9e629d6eb",
+        "only_changed_functions": [
+          "lethal_wound_checkpoint"
+        ],
+        "patch": "lethal_hits_helpers.py.patch",
+        "original_assertions": 8,
+        "proposed_assertions": 9,
+        "all_original_assertions_retained": true
+      },
+      {
+        "path": "tests/unit/test_lethal_hits.py",
+        "original_sha256": "e7bbf50a21d4b447b1b9b97753fee0af55c6d92ebe09b677c2262193f7dc9257",
+        "proposed_sha256": "3a7dc21113bf13594b9b1d78fd0b9f09c117937bc230a72599e3daf310851beb",
+        "only_changed_functions": [
+          "test_choices_devastating_sustained_restore_and_replay"
+        ],
+        "patch": "test_lethal_hits.py.patch",
+        "original_assertions": 46,
+        "proposed_assertions": 46,
+        "all_original_assertions_retained": true
+      }
+    ],
+    "scope": "No production changes; only exact two approved fixture replacements."
+  },
+  "d03_decoder_approval": {
+    "question": "May I add the narrow Combat persistence repair described in recovery/gathered-step-repair-01/D03-valid-combat-persistence-proposal-01/proposal.json? A legally accepted Combat placement now reproduces a restore failure because its rules-unit hazard payload is decoded as a single-unit payload. This needs a shared strict decoder and round-trip tests; the existing D03 approval covered eligibility and atomic rejection, so I need a separate scope decision before changing history decoding.",
+    "answer": "Approve narrow decoder repair",
+    "question_item_id": "[\"request_user_input_async\",\"call_dc10efbc1e6949fc9121453b8abc0d95\",0]",
+    "proposal_sha256": "9ac67dd799992586ae1ea45a88a2d51e5d212a740401c10500f5b55f213e8161",
+    "duplicate_reply": "Same approval delivered twice; one scope decision."
+  },
+  "d03_five_test_proposal_sha256": "29868ce18eb9730855034877c60e2d96b9f035c3d6f3250ae1cdc9173e4e6766",
+  "d03_five_test_approval": {
+    "provenance": "Exact attributed transcript supplied by parent in delegated message; not an independently retrieved conversation export.",
+    "parent_thread_id": "01a0efa7-1ce0-70b0-a637-75c1615f80ef",
+    "user_message_id": "Sentinel_1c234d56cc9081919daeccd064e17e5f",
+    "user_utc": "2026-10-08 19:37:32 UTC",
+    "answer": "yes",
+    "scope": "Only exact proposal04, all original assertions preserved. Applied five-test rerun required. No further original-test exception.",
+    "approved_hashes": {
+      "proposal.json": "29868ce18eb9730855034877c60e2d96b9f035c3d6f3250ae1cdc9173e4e6766",
+      "test_phase10q_transport_proposal.py": "f3eee694f8695c3eb6bd31d1f85f573ee2c5522bd0f32c43e85ca876a26687d6",
+      "proposed.patch": "a8190f5377d15be1e2c990c6f32a82ac264b9beeeca1f9da842423e440fc8aa8",
+      "original-test_phase10q_transports.py": "a5036db25969afcb6c525ad425b58afd68e49401cdc1e7216c60dcba8dbb7993"
+    },
+    "transcript_sha256": "4e0caf2b9478e4a90480cda0dccb7814842780596edca9eb81a13cf6497a933e"
+  },
+  "d03_five_test_application": {
+    "status": "EXACT_APPROVED_PROPOSAL04_APPLIED_STATIC_VERIFIED_RUNTIME_RERUN_PENDING",
+    "completed_utc": "2026-10-08T19:39:56.727520+00:00",
+    "before_tree": "3a477e36cb5b5e049c5714cf89c1d14f72d70b3c",
+    "after_tree": "789119fcea9302f6a2107b6949e816d7f49b9533",
+    "head": "5e45dcc9fb1af6de138ebeba4b88005c744bc3b7",
+    "canonical_files": 5760,
+    "changed_paths": [
+      "tests/unit/test_phase10q_transports.py"
+    ],
+    "old_file_sha256": "a5036db25969afcb6c525ad425b58afd68e49401cdc1e7216c60dcba8dbb7993",
+    "applied_file_sha256": "f3eee694f8695c3eb6bd31d1f85f573ee2c5522bd0f32c43e85ca876a26687d6",
+    "unchanged_other_function_count": 125,
+    "all_other_function_source_bytes_equal": true,
+    "module_statements_unchanged": true,
+    "assertion_counts": {
+      "test_movement_phase_combat_disembark_rejects_invalid_combat_placement": {
+        "old_assertions": 7,
+        "new_assertions": 7,
+        "removed_or_changed": 0
+      },
+      "test_attached_rules_unit_combat_disembark_is_atomic_and_group_hazardous": {
+        "old_assertions": 13,
+        "new_assertions": 13,
+        "removed_or_changed": 0
+      },
+      "test_movement_phase_combat_disembark_rejects_when_tactical_placement_is_legal": {
+        "old_assertions": 7,
+        "new_assertions": 12,
+        "removed_or_changed": 0
+      },
+      "test_movement_phase_combat_disembark_requires_tactical_impossible_evidence": {
+        "old_assertions": 17,
+        "new_assertions": 17,
+        "removed_or_changed": 0
+      },
+      "test_attached_combat_disembark_hazard_fnp_round_trips_and_resumes": {
+        "old_assertions": 19,
+        "new_assertions": 19,
+        "removed_or_changed": 0
+      }
+    },
+    "old_assertions_preserved": 63,
+    "added_assertions": 5,
+    "approval_record_sha256": "5febe849a868f5b22f4020feacd9fae6ff0e0154b8dcb87a0ca9cd5a1564ec93",
+    "transcript_sha256": "4e0caf2b9478e4a90480cda0dccb7814842780596edca9eb81a13cf6497a933e",
+    "limitations": "Static application proof only. Run027 external proposal execution is not substituted for the required applied-run evidence. No final gate, RELEASE, general feasibility completion or CLEAN."
+  },
+  "original_files": [
+    {
+      "path": "data/source_audits/order135/d02-d03-regression-history/lethal_hits_helpers.py.txt",
+      "bytes": 6328,
+      "sha256": "f55d0df7ce3137cd11d8d4e530dbee3f12baf00dcdf9e02d15094519c220ba96"
+    },
+    {
+      "path": "data/source_audits/order135/d02-d03-regression-history/test_lethal_hits.py.txt",
+      "bytes": 22783,
+      "sha256": "e7bbf50a21d4b447b1b9b97753fee0af55c6d92ebe09b677c2262193f7dc9257"
+    },
+    {
+      "path": "data/source_audits/order135/d02-d03-regression-history/test_phase10q_transports.py.txt",
+      "bytes": 382642,
+      "sha256": "a5036db25969afcb6c525ad425b58afd68e49401cdc1e7216c60dcba8dbb7993"
+    }
+  ],
+  "scope": "Gathered original Hit/Wound chronology; whole-unit Tactical-existence guard and atomic Combat rejection; strict grouped Combat history decoding; only exact approved two Lethal fixture changes and five transport test functions. No other protected assertion exception.",
+  "qualification": "Earlier failed/interrupted/draft runs remain historical failures. This authority grants no validation pass or reviewer CLEAN. Publication and merge remain conditional on all mandatory gates."
+}

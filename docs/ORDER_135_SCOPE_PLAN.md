@@ -1,5 +1,38 @@
 # Order135 current Core certification audit
 
+## Current delivery cutoff, 8 October 2026
+
+The owner capped PR576 after the reproduced D02/D03 repairs. Finish those approved
+changes, the earlier approved repairs and directly affected regression/trust
+boundaries; do not expand this PR through further exploratory repairs. All final
+gates, both independent scoped exact-final reviews and CI remain required before
+publication and merge. A demonstrated legal-play regression introduced by the new
+Combat gate remains a blocker for this PR. The exact cutoff and standing conditional
+publication authority are retained with the [35-item follow-up inventory](ORDER_135_FOLLOW_UP.md).
+No successor order is selected and no complete Core certification is claimed.
+
+The original PFINAL acceptance below remains the audit's historical scope. The
+independent 1,078-clause and five-FAQ static trace is complete, but its unresolved
+findings and native evidence limits remain recorded. A scoped PR closure does not
+replace the separate fresh assessment of actual merged main.
+
+Approved D02 gathers original Hit and Wound rolls at their respective boundaries
+and retains generated-hit, Lethal, reroll and replay identity. The exact two-file
+fixture exception follows remaining genuine Lethal choices and changes one fixed
+Fight input; every original assertion is retained. Approved D03 validates
+whole-unit Tactical existence before Combat, rejects atomically, and uses a
+shared strict explicitly tagged grouped Combat history decoder. Joint continuous
+pose exclusion is a necessary-domain proof; unresolved searches do not authorize
+Combat or establish complete support for all admitted scenes. Supported-platform
+and FRAME positives, atomic negatives and pending hazard/FNP continuations remain
+bounded evidence, not faction/body certification. The exact five-test exception
+preserves all 63 original assertions and adds five atomicity assertions; original
+files and human transcripts are retained as non-collected audit data.
+
+Contract44.3.25 documents the corrected behavior and exact-runtime boundary.
+Current focused run receipts remain separate from the required final frozen
+cohort, coverage, performance, shard, quality and independent renewal evidence.
+
 The selected scope is PFINAL/CAUDIT-01: re-audit all25 categories after the
 preceding implementation merges, including complete operative rule/FAQ source
 observations, engine owners, facade regressions, older operative updates,
@@ -187,3 +220,117 @@ and1.0 atomically, then perform the unchanged legal retry and actual fight with
 save/load/fork/views/events/exact replay. Earlier focused and performance epoch07
 results are historical after this executable/test change; fresh gates and both
 SAME exact-final CLEAN reviews remain mandatory.
+
+On October7 at22:43:46UTC the user approved the two fresh Mac transport findings,
+B04 and B05; the exact question/answer is retained in
+`data/source_audits/order135/b04-b05-explicit-repair-approval.json`.
+B04 removes the horizontal-only projection from the shared disembark containment
+caller, using the existing three-dimensional measurement owner and all FRAME
+parts. Inclusive distance, oversized-base exceptions, mode, terrain, engagement,
+overlap and coherency restrictions remain owned by their existing validators.
+B05 applies the existing lifecycle deployment boundary only to the carrier's
+placement requirement. Cargo identity, ownership, capacity, whole living attached
+membership, duplicate carriage, reserve binding and physical removal checks remain
+active before, during and after deployment. No session anchor is replaced or
+accepted through a persistence bypass. The actual ordinary pending/completed
+states were already restorable; saving/export failed on their legitimate initial
+predeployment replay anchor.
+
+New native starting-manifest regressions retain that anchor through setup, partial
+deployment and legal disembark, with save/load/fork, all role views/events and exact
+replay. Synthetic FRAME controls reject an out-of-band physical body and preserve
+a fitting body's invalid-placement retry and legal admission. Direct shared-owner
+checks retain three- and six-inch vertical semantics, postdeployment carrier
+presence and predeployment cargo removal guards. Existing tests are unchanged.
+Analytical Core fixtures do not certify official model measurements, faction
+admission or provider activation. Contract44.3.22 retains the existing envelopes
+and binds the corrected runtime; old snapshots require their original runtime.
+
+The source5 Mac cohort remains an immutable pass for5e45dcc9 only, without
+corrected-source credit. Both same fresh Mac reviewers remain required. Their
+all25+00 source/category and five-FAQ survey is separate from the incomplete
+individual1078 consumer/assertion trace; no counts-based closure is claimed.
+Other static candidates are outside this two-repair approval. Complete corrected
+source gates, quiet measurements/smoke, quality, isolated16/HOLD/explicit RELEASE,
+the covered remainder and renewed exact-final reviews remain pending.
+
+
+The user approved the independently reproduced Counter-offensive target-band gap
+on October8 at00:26:27UTC (October7 in America/New_York). Exact attributed parent
+transcript and scope are retained in
+`data/source_audits/order135/counter-band-explicit-repair-approval.json`. During
+ordinary public opponent Charge/Fight, an engaged unselected friendly unit with
+4CP was excluded before the source could grant Fights First. The shared query
+now exposes an explicit ordering-band scope. Its ordinary default remains
+restricted; only the Core discovery, prevalidation and effect paths request
+pre-grant eligibility. Presence, attached lineage, selected history, engagement,
+legal fight types, forced contexts, opponent-turn timing, CP, Battle-shock,
+repeated-use and B03 atomic context checks retain their existing owners.
+
+Every original test/fixture and assertion remains unchanged. In particular,
+`test_order70_counteroffensive_uses_current_model_complete_band` directly calls
+the default geometry query in a constructed own-turn context. It proves the
+default band filter; it is not evidence of lawful Core Counter availability.
+New public native both-direction regressions distinguish ordinary selection
+from Core pre-grant targeting, then exercise actual melee, normal band resume,
+CP/grant/interrupt history, malformed Boolean-number rejection, JSON save/load,
+fork, all principal views/events and exact replay. Existing native Remaining
+acceptance and own-turn rejection remain separate unchanged controls. No
+broader melee, generic interrupt, forced-queue or provider repair is included.
+
+The interrupted0d108 remainder and prior source passes remain immutable without
+new-source credit. Fresh identities, prerequisites, isolated16 authentication,
+explicit corrected RELEASE, full coverage/quality/profile and same-reviewer
+renewal are required. Individual all1078 semantic closure remains outstanding.
+
+The user approved the reproduced Fight transition gap on October8 at02:22UTC.
+The exact attributed approval is retained in
+`data/source_audits/order135/fight-transition-explicit-repair-approval.json`.
+The ordinary Fight dispatcher preserves the player owed selection before scanning
+the other player's availability. Exhausting Fights First carries that owed player
+into Remaining Combats; it does not use the speculative scan cursor or reset to
+the active player. The explicit Remaining-to-Fights-First restart, ordinary
+alternation, forced queue and interrupt continuation retain their existing rules.
+Both native role directions exercise genuine public Charge/Fight, actual melee
+and consolidation with pending/completed save/load/fork/views/events/exact replay.
+
+On October8 at12:13UTC the user also approved the narrow pass eligibility repair
+and one original-regression exception. Exact attributed question/answer and scope
+are retained in
+`data/source_audits/order135/pass-explicit-repair-and-assertion-approval.json`.
+The complete original test file and original function are retained byte for byte
+under `data/source_audits/order135/pass-regression-history/`. Only
+`test_fights_first_pass_does_not_reoffer_same_unit_before_remaining_activation`
+is excepted; all other original assertions remain unchanged. Its old five-model
+geometry contains a nearby eligible Remaining unit, so it is retained as a
+rejection control rather than described as a lawful accepted pass. The corrected
+positive first completes the nearby friendly unit's real melee, then passes with
+only distant eligible friendly units and checks the opponent's Remaining choice.
+
+The offer and pre-pop submission guard now share the same all-otherwise-eligible
+distance predicate, with the existing strict greater-than-five comparison.
+Selectable units and the finite request snapshot remain band-specific; forced
+activations remain unable to pass. Both actor directions and exact distance
+boundaries are covered. A deliberately changed restored battlefield tests atomic
+rejection of a stale offered pass and legal retry; it is not described as natural
+Movement. Separate analytical pregame Core native controls use public setup,
+Movement, real Charge and actual melee to establish positive and nearby-unit
+negative cases, with persistence, fork, all principal views/events and exact replay.
+These analytical profiles do not certify a faction, provider or physical model.
+
+The earlier native018 positive ended Fight against an exhausted opponent and did
+not prove a Remaining actor. Corrected focused019 uses a distinct positive scene
+with a surviving eligible enemy and explicit next-player/band/unit assertions;
+its 19 cases and 57 phases passed on unchanged measured inputs. Both runs and all
+failed development attempts remain immutable outside the checkout. Contract44.3.24
+binds the new runtime while retaining existing decision/persistence schemas.
+No historical cohort or focused run supplies corrected full-gate credit.
+
+The same rules auditor has now completed the individual1078 source/consumer/test
+traces and five new FAQ bindings. That static completion is not executable CLEAN
+or acceptance of every qualified candidate. The ordinary Deadly Demise source
+clarification does not authorize force-removal of independently retained enemies
+or unrelated repairs. Fresh canonical identities, prerequisites, quiet matched
+measurements/smoke, isolated16 independent authentication, explicit RELEASE,
+complete coverage/profile/shard/quality gates and both same-reviewer exact-final
+renewals remain required. No merge authorization is granted.
