@@ -2650,7 +2650,7 @@ def test_movement_phase_combat_disembark_requires_tactical_impossible_evidence()
     )
     assert disembarked_state is not None
     assert disembarked_state.disembark_mode is DisembarkModeKind.COMBAT_DISEMBARK
-    assert disembarked_state.battle_shocked_until == "until_cleared"
+    assert disembarked_state.battle_shocked_until == "end_of_turn"
     assert disembarked_state.can_declare_charge is False
     assert state.movement_phase_state is not None
     assert passenger.unit_instance_id in state.movement_phase_state.selected_unit_ids
@@ -5060,7 +5060,7 @@ def test_disembark_mode_status_pairs_are_fail_fast_and_round_trip() -> None:
         transport_movement_status=TransportMovementStatus.NOT_MOVED,
     )
 
-    assert combat_state.battle_shocked_until == "until_cleared"
+    assert combat_state.battle_shocked_until == "end_of_turn"
     assert combat_state.can_declare_charge is False
 
     with pytest.raises(GameLifecycleError, match="Tactical Disembark requires an unmoved"):
@@ -5353,7 +5353,7 @@ def test_combat_disembark_rolls_hazard_for_each_model_and_round_trips() -> None:
     assert len(result.model_rolls) == len(passenger.own_models)
     assert result.mortal_wound_count == 2
     assert result.disembarked_unit_state is not None
-    assert result.disembarked_unit_state.battle_shocked_until == "until_cleared"
+    assert result.disembarked_unit_state.battle_shocked_until == "end_of_turn"
     assert result.disembarked_unit_state.can_declare_charge is False
     assert result.disembarked_unit_state.disembark_mode is DisembarkModeKind.COMBAT_DISEMBARK
     assert CombatDisembark.from_payload(result.to_payload()) == result

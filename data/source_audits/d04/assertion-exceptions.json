@@ -1,0 +1,76 @@
+{
+  "base": "7a2da43900757b57ced6b11db4a6e011b7f1297d",
+  "scope": "D04 native Combat Disembark authoritative Battle-shock only",
+  "source": {
+    "tuple": "rule:18:18.04:1",
+    "block": 23,
+    "sha256": "ed5ace0412d4f87e7f436e64eb56f5081325cbc6b3c0a1dda347562c890144b9"
+  },
+  "authority": "Human October 9 21:00 UTC approved all listed bounded corrections; selected D04 acceptance explicitly inventories necessary current runtime marker/assertion changes.",
+  "justification": "The end-of-turn clause qualifies inability to declare a charge. Battle-shock persists until source-authorized clearing; 08.03 selects previously shocked units and clears on ordinary successful own Command test.",
+  "baseline_file": "data/source_audits/d04/baseline-phase10q-transports.py.txt",
+  "baseline_file_sha256": "f3eee694f8695c3eb6bd31d1f85f573ee2c5522bd0f32c43e85ca876a26687d6",
+  "assertion_exceptions": [
+    {
+      "nodeid": "tests/unit/test_phase10q_transports.py::test_movement_phase_combat_disembark_requires_tactical_impossible_evidence",
+      "original_function_ast_sha256": "41cd5eaf2b0748208ea83805197c3e837b1d9d593d49fcf03999aae5cd4bd2ed",
+      "original_assertions": [
+        "assert state.battlefield_state is not None",
+        "assert disembark_option_payload['disembark_mode'] == DisembarkModeKind.TACTICAL_DISEMBARK.value",
+        "assert proposal.context is not None",
+        "assert proposal.context['allowed_disembark_modes'] == [DisembarkModeKind.TACTICAL_DISEMBARK.value, DisembarkModeKind.COMBAT_DISEMBARK.value]",
+        "assert status is None",
+        "assert stored_cargo is not None",
+        "assert stored_cargo.embarked_unit_instance_ids == ()",
+        "assert disembarked_state is not None",
+        "assert disembarked_state.disembark_mode is DisembarkModeKind.COMBAT_DISEMBARK",
+        "assert disembarked_state.battle_shocked_until == 'end_of_turn'",
+        "assert disembarked_state.can_declare_charge is False",
+        "assert state.movement_phase_state is not None",
+        "assert passenger.unit_instance_id in state.movement_phase_state.selected_unit_ids",
+        "assert passenger.unit_instance_id in state.movement_phase_state.moved_unit_ids",
+        "assert {violation['violation_code'] for violation in tactical_violations} == {TransportOperationViolationCode.DISEMBARK_DISTANCE.value}",
+        "assert hazard_event['source_kind'] == TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND",
+        "assert hazard_event['disembark_mode'] == DisembarkModeKind.COMBAT_DISEMBARK.value"
+      ],
+      "changed_assertion": "assert disembarked_state.battle_shocked_until == 'end_of_turn'",
+      "current_assertion": "assert disembarked_state.battle_shocked_until == 'until_cleared'"
+    },
+    {
+      "nodeid": "tests/unit/test_phase10q_transports.py::test_disembark_mode_status_pairs_are_fail_fast_and_round_trip",
+      "original_function_ast_sha256": "2082e8563fb5fc8aaa955a8c6a4d36a6d9bdaf2672836e592c022b882f6b2b24",
+      "original_assertions": [
+        "assert DisembarkSelection.from_payload(tactical_selection.to_payload()) == tactical_selection",
+        "assert DisembarkSelection.from_payload(tactical_stationary_selection.to_payload()) == tactical_stationary_selection",
+        "assert DisembarkSelection.from_payload(rapid_normal_selection.to_payload()) == rapid_normal_selection",
+        "assert DisembarkSelection.from_payload(rapid_ingress_selection.to_payload()) == rapid_ingress_selection",
+        "assert DisembarkSelection.from_payload(assault_selection.to_payload()) == assault_selection",
+        "assert DisembarkSelection.from_payload(combat_selection.to_payload()) == combat_selection",
+        "assert combat_state.battle_shocked_until == 'end_of_turn'",
+        "assert combat_state.can_declare_charge is False"
+      ],
+      "changed_assertion": "assert combat_state.battle_shocked_until == 'end_of_turn'",
+      "current_assertion": "assert combat_state.battle_shocked_until == 'until_cleared'"
+    },
+    {
+      "nodeid": "tests/unit/test_phase10q_transports.py::test_combat_disembark_rolls_hazard_for_each_model_and_round_trips",
+      "original_function_ast_sha256": "0015a18e9cb7f7bdfc87a3ea7526499a6858af3d4b4c33459e53643c171a04b8",
+      "original_assertions": [
+        "assert result.placement.is_valid",
+        "assert result.roll_threshold == HAZARD_ROLL_FAILURE_THRESHOLD",
+        "assert result.mortal_wounds_per_failed_roll == 1",
+        "assert len(result.model_rolls) == len(passenger.own_models)",
+        "assert result.mortal_wound_count == 2",
+        "assert result.disembarked_unit_state is not None",
+        "assert result.disembarked_unit_state.battle_shocked_until == 'end_of_turn'",
+        "assert result.disembarked_unit_state.can_declare_charge is False",
+        "assert result.disembarked_unit_state.disembark_mode is DisembarkModeKind.COMBAT_DISEMBARK",
+        "assert CombatDisembark.from_payload(result.to_payload()) == result",
+        "assert updated_battlefield.unit_placement_by_id(passenger.unit_instance_id) == attempted_placement"
+      ],
+      "changed_assertion": "assert result.disembarked_unit_state.battle_shocked_until == 'end_of_turn'",
+      "current_assertion": "assert result.disembarked_unit_state.battle_shocked_until == 'until_cleared'"
+    }
+  ],
+  "unchanged": "Every other original assertion and fixture; historical selected-inputs, archives and ceilings; Emergency lifetime."
+}

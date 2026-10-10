@@ -1,0 +1,139 @@
+{
+  "base": "7a2da43900757b57ced6b11db4a6e011b7f1297d",
+  "changes": {
+    "src/warhammer40k_core/engine/battle_shock_state_history.py": {
+      "before_sha256": "a79b5c1b3275b28097c89c0bf272fb62fb59079e61b6f14f21c8bd13464a4827",
+      "after_sha256": "444a26cebf5e29e089f85fefff98cd72b253ae8c3bd5c7faa10bc8e548cfc018",
+      "owners": {
+        "_replay_battle_shock_state_until": {
+          "before": "e5ed2d61acb9805405399727add1a1958853556fa47fd9cae21b42b45cef00be",
+          "after": "897402d5c1355325de0be0cdfd3a6dc98bcd5e6984759453aa3b5272ccb18c42"
+        },
+        "validate_battle_shock_state_history": {
+          "before": "3269a7ac9a005df48f8ee08799a67984064a8df6ad6298e97810c1e75e11fe14",
+          "after": "4b61c6677661a5406ba124add2c1301892143c89e8d6947d2b08b458bd3c7fb0"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/combat_disembark_battle_shock.py": {
+      "before_sha256": null,
+      "after_sha256": "a075b6f9a3174097b3f266e1bf498ce3614946a6f68631e86249761cad7b0370",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "74b3d7eeeac10d2c15bfba6202b8480f16fa955983a91999603367c035f17bc5"
+        },
+        "_combat_disembark": {
+          "before": null,
+          "after": "2dddb8f88dc92035f0ed01605317250398f26c8072317e3ea45ce7525fb91ccd"
+        },
+        "_combat_hazard": {
+          "before": null,
+          "after": "02a4bbe61671a770b686a44ba2e0f3c2495dda462f893150d07b65e1f2e370d6"
+        },
+        "_object": {
+          "before": null,
+          "after": "9120496228999efc711c6f1f1c9bfcea3c90a3e9bd6362cf6f3bae1bd2c2f533"
+        },
+        "_occurrence_payload": {
+          "before": null,
+          "after": "bd19c0d56821826bcbbab0c048394f3f0a8aabd69c123f525dc4830e867290ac"
+        },
+        "_setup_source": {
+          "before": null,
+          "after": "f403c6f255026b700e148ffaae31964c940db6675700c9810bc540d0af9b19ea"
+        },
+        "complete_combat_disembark_battle_shock": {
+          "before": null,
+          "after": "0e00235319cef0a970ded0015fe456231201548a6a5e07e54006340949fa3d26"
+        },
+        "replay_combat_disembark_battle_shock": {
+          "before": null,
+          "after": "7adcd21f3988e281fedfd26d49d4589c7c24c0332268b898749b630306417a19"
+        },
+        "validate_combat_battle_shock_completions": {
+          "before": null,
+          "after": "981bd29696c3e0332ad93ff394d7bc0dd0369350f62971302da7a0f87a7a0dff"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/lifecycle.py": {
+      "before_sha256": "3e79d50a4fcb5d04a7709e3a6f0943949151e4bf27d027efd9348ea8f7f66e05",
+      "after_sha256": "6bb0b8ab95e0f7b83e40f2d5db66f81e542fba7f20671c6be30c87617e06cd02",
+      "owners": {
+        "@module": {
+          "before": "10756b23b2aedf075ebdda6e2cf238709399951d72b0189d7347d7b0043a475d",
+          "after": "cae39349990a4d496e218b669ccebcc5cc59a5f36f1da8c7dc5d8df2b4eec2ea"
+        },
+        "GameLifecycle._apply_mortal_wound_resolution_decision": {
+          "before": "99f32a06ab88a5c043b7f51d96d52b5c32359ec495b0658dcd52859963489f28",
+          "after": "f72bd1b61fc95a5a8543381d7fa2c3945c957ab01d2e68e78ffacc999d166e8f"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_placement_proposals.py": {
+      "before_sha256": "1a2726b42125d68852e679744b91b1061a778de4ae6619aac8b45d3816a13f25",
+      "after_sha256": "fb73df45daf27364ce93f03c13e0174eadd44887938e9698c8a113d009814cb9",
+      "owners": {
+        "_apply_valid_combat_disembark": {
+          "before": "75e5724e8d74ee658d3208aa85947aa25e0eeca9c5e74e63a2a9f88a439ff764",
+          "after": "06ea7c293f449b49eaa0a6d398263dc8287c6c1ff861af11addf10ef41224503"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_rules_unit_disembark.py": {
+      "before_sha256": "952971570c651b56266c5cc41a1860ac1d9bc8ea40e15d8fcf11e446084daf88",
+      "after_sha256": "6a7db7d460fd0b3cb5e10e333e5ddb5b4fe7d54b926eaa94085f633ae6016571",
+      "owners": {
+        "_emit_rules_unit_combat_hazard_resolved": {
+          "before": "52a916b4ec7289e794f595a69aa2436c776a82d370f4d7c7be94b0918b1d3856",
+          "after": "30f67e58cf242773ef03ea9696381e1bb186194f21740ba1d2d2a5f9950cbb7f"
+        },
+        "apply_rules_unit_combat_disembark_feel_no_pain_decision": {
+          "before": "9e6222b1bfa9ede104ba62d443398940be2baeb30ca6f385bcbebdf6f034ba93",
+          "after": "93b778e75ab587987e9173da83233d570580e7c1838db8e0c52bba3e6cc35c4c"
+        },
+        "apply_rules_unit_combat_disembark_to_state": {
+          "before": "4640d18749748b2c9c7d9511f0f873b085517f8b340c33da1291a47895d99ab7",
+          "after": "a86e9c08f236c5ac85db8ca5d231cc1bef3493a6feb90a847bc031f0af1dd1d5"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/transport_disembark_state.py": {
+      "before_sha256": "2bf243711bdd79546202b82f457021f3ba4a480cb1561a99cff89ce555617a54",
+      "after_sha256": "3bda1dec36c962378f2d2fe81f2c714fdcf4bc8d771b0a2ff9a48779cea9ed1c",
+      "owners": {
+        "DisembarkedUnitState.for_mode": {
+          "before": "8f090ce42978ed08928d82f1de4fc6e65f2f4d5e873e3ad86be496a5066182e3",
+          "after": "6959c6bb1086e1b70bb1ade9bdb95af93be91b920d1a07a324ab67f383665730"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "src/warhammer40k_core/engine/battle_shock_state_history.py": [
+      "d04-combat-direct-status"
+    ],
+    "src/warhammer40k_core/engine/combat_disembark_battle_shock.py": [
+      "d04-combat-direct-status"
+    ],
+    "src/warhammer40k_core/engine/lifecycle.py": [
+      "order135-gathered-attack-steps",
+      "d04-combat-lifecycle-continuation"
+    ],
+    "src/warhammer40k_core/engine/phases/movement_placement_proposals.py": [
+      "order135-tactical-exclusion",
+      "d04-combat-direct-status"
+    ],
+    "src/warhammer40k_core/engine/phases/movement_rules_unit_disembark.py": [
+      "order135-tactical-exclusion",
+      "d04-combat-direct-status"
+    ],
+    "src/warhammer40k_core/engine/transport_disembark_state.py": [
+      "d04-combat-direct-status"
+    ]
+  },
+  "authority": "Selected bounded D04 correctness repair and sequential remediation default: quiet serial current-runtime smoke plus exact-base assessment; detailed comparisons remain required for deliberate performance work or demonstrated serious regression. Exact independent review judges classification; no numeric or live gate is waived.",
+  "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
+  "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
+}

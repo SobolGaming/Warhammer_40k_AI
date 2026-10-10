@@ -5750,6 +5750,52 @@
       ],
       "sensitive": true,
       "mandatory": true
+    },
+    "d04-combat-direct-status": {
+      "paths": [
+        "src/warhammer40k_core/engine/combat_disembark_battle_shock.py",
+        "src/warhammer40k_core/engine/battle_shock_state_history.py",
+        "src/warhammer40k_core/engine/phases/movement_placement_proposals.py",
+        "src/warhammer40k_core/engine/phases/movement_rules_unit_disembark.py",
+        "src/warhammer40k_core/engine/transport_disembark_state.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "reconstruction"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "d04-combat-regression-and-source-evidence": {
+      "paths": [
+        "tests/d04_combat_helpers.py",
+        "tests/unit/test_d04_combat_battle_shock.py",
+        "data/source_audits/d04/assertion-exceptions.json",
+        "data/source_audits/d04/baseline-phase10q-transports.py.txt",
+        "contracts/migrations/44.3.25-to-44.3.26.md"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "d04-combat-lifecycle-continuation": {
+      "paths": [
+        "src/warhammer40k_core/engine/lifecycle.py"
+      ],
+      "owners": [
+        "@module",
+        "GameLifecycle._apply_mortal_wound_resolution_decision"
+      ],
+      "families": [
+        "reconstruction"
+      ],
+      "sensitive": true,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

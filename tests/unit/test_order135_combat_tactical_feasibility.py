@@ -271,6 +271,8 @@ def test_native_grouped_combat_pending_hazard_preserves_strict_context_and_repla
     context = mortal_wound_resolution_source_context(pending)
     assert isinstance(context, dict)
     assert _rules_unit_combat_hazard_context(context)[1] > 0
+    assert not state.battle_shocked_unit_ids
+    assert not state.battle_shocked_unit_states
     before = session.to_persistence_payload()
     for invalid_round in (True, 1.0, False, "1"):
         malformed = copy.deepcopy(context)
@@ -289,6 +291,20 @@ def test_native_grouped_combat_pending_hazard_preserves_strict_context_and_repla
             submit_fixture_request(branch, current)
         else:
             raise AssertionError("Grouped Combat hazard did not finish.")
+        branch_state = branch.lifecycle.state
+        assert branch_state is not None
+        assert branch_state.battle_shocked_unit_ids == ["army-alpha:passenger"]
+        assert len(branch_state.battle_shocked_unit_states) == 1
+        assert branch_state.battle_shocked_unit_states[0].source_result_id == (
+            "order135-combat:pending-hazard"
+        )
+        assert (
+            sum(
+                event.event_type == "combat_disembark_battle_shock_applied"
+                for event in branch.lifecycle.decision_controller.event_log.records
+            )
+            == 1
+        )
         assert_checkpoint(branch)
     assert session.to_persistence_payload() == restored.to_persistence_payload()
     assert session.to_persistence_payload() == forked.to_persistence_payload()
