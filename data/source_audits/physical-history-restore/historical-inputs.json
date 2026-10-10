@@ -1,0 +1,16 @@
+{
+  "schema": "physical-history-restore-historical-inputs-v1",
+  "purpose": "Exact original Order97 assertion evidence only; current appended regressions still execute current source. No reviewed inventory, assertion, source or budget is replaced.",
+  "source_commit": "7debdbd4182c1ee2703a367f2966dbdac685f18e",
+  "files": [
+    {
+      "path": "tests/integration/test_off_battlefield_command_battle_shock.py",
+      "historical_path": "data/source_audits/physical-history-restore/baseline-off-battlefield-command-tests.py.txt",
+      "bytes": 23703,
+      "sha256": "877f50031cc5fc93a3a8adb2f12efdd08bfca48259d8161ee306aae6e5c53cc6",
+      "order97_file_pin": "877f50031cc5fc93a3a8adb2f12efdd08bfca48259d8161ee306aae6e5c53cc6",
+      "git_path": "tests/integration/test_off_battlefield_command_battle_shock.py",
+      "git_revision": "7debdbd4182c1ee2703a367f2966dbdac685f18e"
+    }
+  ]
+}

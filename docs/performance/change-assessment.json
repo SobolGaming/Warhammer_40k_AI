@@ -1,1288 +1,520 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "7a2da43900757b57ced6b11db4a6e011b7f1297d",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65a865158b0b41f877efcee3297335b6cf7fdc01166a674f30d7f79a140bf6e5",
-  "operation_map_sha256": "ef5df1449c15784b7cf635af3fc71ee0de6742f77671a1b985d5b86b597823a5",
+  "base": "7debdbd4182c1ee2703a367f2966dbdac685f18e",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0b87ae159198b4850c8eab38d67187e0e4f4c8032583a0b09ab53e9225922901",
+  "operation_map_sha256": "01df22c2fee58612eee06a7bc41867e65b432d1bef4585f69d1e5321262c8d38",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "2d92a4ab508f67ba080857bb1862ba13ceb2865d471c2cb02a7b43a48f8245ca",
-      "after_sha256": "cdba21f86b2e64aeba1214217e4e167d128428e7d9fd5fa28e4af662ddb4c066",
+      "before_sha256": "cdba21f86b2e64aeba1214217e4e167d128428e7d9fd5fa28e4af662ddb4c066",
+      "after_sha256": "03cc19bf5b693e7cabad6952efc4ffa65355a088ea55a3bc3b9927d5688630ea",
       "owners": {
         "@document": {
-          "before": "2d92a4ab508f67ba080857bb1862ba13ceb2865d471c2cb02a7b43a48f8245ca",
-          "after": "cdba21f86b2e64aeba1214217e4e167d128428e7d9fd5fa28e4af662ddb4c066"
+          "before": "cdba21f86b2e64aeba1214217e4e167d128428e7d9fd5fa28e4af662ddb4c066",
+          "after": "03cc19bf5b693e7cabad6952efc4ffa65355a088ea55a3bc3b9927d5688630ea"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "beaf1280f87a66f2176f999f85016e80cd34ae79a4c4f68d9965bc6a89428558",
-      "after_sha256": "62c1f3b602b820578046584304e0c35bbf904f8dd32b2c95f11bb37950745145",
+      "before_sha256": "62c1f3b602b820578046584304e0c35bbf904f8dd32b2c95f11bb37950745145",
+      "after_sha256": "72b0735e0d317a9568fa6518cb0f8c8d5f382c6bd36c4b3df26dabfda708e96f",
       "owners": {
         "@document": {
-          "before": "beaf1280f87a66f2176f999f85016e80cd34ae79a4c4f68d9965bc6a89428558",
-          "after": "62c1f3b602b820578046584304e0c35bbf904f8dd32b2c95f11bb37950745145"
+          "before": "62c1f3b602b820578046584304e0c35bbf904f8dd32b2c95f11bb37950745145",
+          "after": "72b0735e0d317a9568fa6518cb0f8c8d5f382c6bd36c4b3df26dabfda708e96f"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "8d061973d569260fcf05cccd4c0330b49463d10bf2249f7a493c07bf14eb41d4",
-      "after_sha256": "8828891d3847d1d17fc7a3718990dec9913b7d87870d346fe3214fc2602f7ed3",
+      "before_sha256": "8828891d3847d1d17fc7a3718990dec9913b7d87870d346fe3214fc2602f7ed3",
+      "after_sha256": "52a4da90a015c17e7773bba01a2f5cb18218a993a17818adce6a4cd9f5cd90ac",
       "owners": {
         "@document": {
-          "before": "8d061973d569260fcf05cccd4c0330b49463d10bf2249f7a493c07bf14eb41d4",
-          "after": "8828891d3847d1d17fc7a3718990dec9913b7d87870d346fe3214fc2602f7ed3"
+          "before": "8828891d3847d1d17fc7a3718990dec9913b7d87870d346fe3214fc2602f7ed3",
+          "after": "52a4da90a015c17e7773bba01a2f5cb18218a993a17818adce6a4cd9f5cd90ac"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "646cab25db1ff395d150233e147a4a5530ecb7e48a839bf1d7cf2f45f8e1bb8a",
-      "after_sha256": "53cd52d6609c9ba57ea69a715fc09199abd4776836a050ae981bbd144ad4b965",
+      "before_sha256": "53cd52d6609c9ba57ea69a715fc09199abd4776836a050ae981bbd144ad4b965",
+      "after_sha256": "438cf85e5895d1fffe5c78c53488273781280c130345a0c9bf193fc2632bc867",
       "owners": {
         "@document": {
-          "before": "646cab25db1ff395d150233e147a4a5530ecb7e48a839bf1d7cf2f45f8e1bb8a",
-          "after": "53cd52d6609c9ba57ea69a715fc09199abd4776836a050ae981bbd144ad4b965"
+          "before": "53cd52d6609c9ba57ea69a715fc09199abd4776836a050ae981bbd144ad4b965",
+          "after": "438cf85e5895d1fffe5c78c53488273781280c130345a0c9bf193fc2632bc867"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "207d503535795ee797ee1788cf0bccae9029b4ce4f56339c9acd77fe225b25cb",
-      "after_sha256": "a277dc655ebcf809e5bf8e020780ac04c3b3973f42b140726d173d77a608a843",
+      "before_sha256": "a277dc655ebcf809e5bf8e020780ac04c3b3973f42b140726d173d77a608a843",
+      "after_sha256": "403925ff0672617ba682f867b88c8609ecb7b44edf0321380a7331c3fe80c94c",
       "owners": {
         "@document": {
-          "before": "207d503535795ee797ee1788cf0bccae9029b4ce4f56339c9acd77fe225b25cb",
-          "after": "a277dc655ebcf809e5bf8e020780ac04c3b3973f42b140726d173d77a608a843"
+          "before": "a277dc655ebcf809e5bf8e020780ac04c3b3973f42b140726d173d77a608a843",
+          "after": "403925ff0672617ba682f867b88c8609ecb7b44edf0321380a7331c3fe80c94c"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "f084c0b6dade47a628e8ff06a7af9dff274100f2e9cdbb63815f6fd928a78789",
-      "after_sha256": "1afaf91dabdb576edc96dee6af02e1c3b6c41c72989f41ac8a7cc09b12b693bb",
+      "before_sha256": "1afaf91dabdb576edc96dee6af02e1c3b6c41c72989f41ac8a7cc09b12b693bb",
+      "after_sha256": "c1938206c855d58aa4464a8099abdadc7720c914ddcfb24d349d951412ea4eab",
       "owners": {
         "@document": {
-          "before": "f084c0b6dade47a628e8ff06a7af9dff274100f2e9cdbb63815f6fd928a78789",
-          "after": "1afaf91dabdb576edc96dee6af02e1c3b6c41c72989f41ac8a7cc09b12b693bb"
+          "before": "1afaf91dabdb576edc96dee6af02e1c3b6c41c72989f41ac8a7cc09b12b693bb",
+          "after": "c1938206c855d58aa4464a8099abdadc7720c914ddcfb24d349d951412ea4eab"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "a29b6a2d22f501718bac7e0ad7db619ebdedd6231b77b72cbabe2445e09b9749",
-      "after_sha256": "ab1010411a7badb322cbd8e2601d5ac43b2d420987f38d259a588b4bffd0ec9d",
+      "before_sha256": "ab1010411a7badb322cbd8e2601d5ac43b2d420987f38d259a588b4bffd0ec9d",
+      "after_sha256": "ded468aba08de5becf300803e1735c53a64a7d3925ca6b903986d6c4cabaf674",
       "owners": {
         "@document": {
-          "before": "a29b6a2d22f501718bac7e0ad7db619ebdedd6231b77b72cbabe2445e09b9749",
-          "after": "ab1010411a7badb322cbd8e2601d5ac43b2d420987f38d259a588b4bffd0ec9d"
+          "before": "ab1010411a7badb322cbd8e2601d5ac43b2d420987f38d259a588b4bffd0ec9d",
+          "after": "ded468aba08de5becf300803e1735c53a64a7d3925ca6b903986d6c4cabaf674"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "85c8bc4218e992862f144262f2c3daddc5346bbd373f08b5e570ddb35cb9d161",
-      "after_sha256": "9b2e77ca248196485ffcb4a900a7be498d29bbd1498b644a31b0df85e2e3d3a1",
+      "before_sha256": "9b2e77ca248196485ffcb4a900a7be498d29bbd1498b644a31b0df85e2e3d3a1",
+      "after_sha256": "3351eddbe6939fda882364efc340400745edfc7b171ac5f6fcec0ba33e909429",
       "owners": {
         "@document": {
-          "before": "85c8bc4218e992862f144262f2c3daddc5346bbd373f08b5e570ddb35cb9d161",
-          "after": "9b2e77ca248196485ffcb4a900a7be498d29bbd1498b644a31b0df85e2e3d3a1"
+          "before": "9b2e77ca248196485ffcb4a900a7be498d29bbd1498b644a31b0df85e2e3d3a1",
+          "after": "3351eddbe6939fda882364efc340400745edfc7b171ac5f6fcec0ba33e909429"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "60f9dbf04e0487b6201c1a8b91d2b0eafdf3600335564e7e8ca3271c69df2b19",
-      "after_sha256": "8b974becf631b5a69139f4a527ff0b9b4f83eed9d083bb9c28b4ebd6010f4a4e",
+      "before_sha256": "8b974becf631b5a69139f4a527ff0b9b4f83eed9d083bb9c28b4ebd6010f4a4e",
+      "after_sha256": "16a2931a24f4bebaa5c5fa086306eb117fcfa4ba240eff3e0aef7d9550ec070e",
       "owners": {
         "@document": {
-          "before": "60f9dbf04e0487b6201c1a8b91d2b0eafdf3600335564e7e8ca3271c69df2b19",
-          "after": "8b974becf631b5a69139f4a527ff0b9b4f83eed9d083bb9c28b4ebd6010f4a4e"
+          "before": "8b974becf631b5a69139f4a527ff0b9b4f83eed9d083bb9c28b4ebd6010f4a4e",
+          "after": "16a2931a24f4bebaa5c5fa086306eb117fcfa4ba240eff3e0aef7d9550ec070e"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "2a98cc1d2dbb7ece0b478b30485a5e40802728be0ec8c41f6ef60ccdda50aa1e",
-      "after_sha256": "b099b284598393e32369d892ff0c8623a641d455d56ea9e8be7e68a5cd9a845d",
+      "before_sha256": "b099b284598393e32369d892ff0c8623a641d455d56ea9e8be7e68a5cd9a845d",
+      "after_sha256": "6e95ceea9a3b8ae7d493303163287983d4e76c8346add24762c094dfe5ece45f",
       "owners": {
         "@document": {
-          "before": "2a98cc1d2dbb7ece0b478b30485a5e40802728be0ec8c41f6ef60ccdda50aa1e",
-          "after": "b099b284598393e32369d892ff0c8623a641d455d56ea9e8be7e68a5cd9a845d"
+          "before": "b099b284598393e32369d892ff0c8623a641d455d56ea9e8be7e68a5cd9a845d",
+          "after": "6e95ceea9a3b8ae7d493303163287983d4e76c8346add24762c094dfe5ece45f"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "a62ca2c775aeb8db51bafe3e529bc6d851da48425941677190444fe0b6ea92e5",
-      "after_sha256": "d10b4baac151b52c2beb2cc07ee129f6b54df6d43fe20fdf1705a2affaa703cc",
+      "before_sha256": "d10b4baac151b52c2beb2cc07ee129f6b54df6d43fe20fdf1705a2affaa703cc",
+      "after_sha256": "c47f23612260d78a812f5f0f37107d227db9081f00e664d68988bfa97a20ac25",
       "owners": {
         "@document": {
-          "before": "a62ca2c775aeb8db51bafe3e529bc6d851da48425941677190444fe0b6ea92e5",
-          "after": "d10b4baac151b52c2beb2cc07ee129f6b54df6d43fe20fdf1705a2affaa703cc"
+          "before": "d10b4baac151b52c2beb2cc07ee129f6b54df6d43fe20fdf1705a2affaa703cc",
+          "after": "c47f23612260d78a812f5f0f37107d227db9081f00e664d68988bfa97a20ac25"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "767a9a42029f4b7b7f988269b5879c731d572c9b400acb058968bd8f8157e681",
-      "after_sha256": "f49b1c03610a035b600e00e5e5f2e7ba9b97f2d39a2e4e33948c3a59eb582acc",
+      "before_sha256": "f49b1c03610a035b600e00e5e5f2e7ba9b97f2d39a2e4e33948c3a59eb582acc",
+      "after_sha256": "e3a235c119674558c5738f566a08a8f767cb4609247a645a08944186beb09415",
       "owners": {
         "@document": {
-          "before": "767a9a42029f4b7b7f988269b5879c731d572c9b400acb058968bd8f8157e681",
-          "after": "f49b1c03610a035b600e00e5e5f2e7ba9b97f2d39a2e4e33948c3a59eb582acc"
+          "before": "f49b1c03610a035b600e00e5e5f2e7ba9b97f2d39a2e4e33948c3a59eb582acc",
+          "after": "e3a235c119674558c5738f566a08a8f767cb4609247a645a08944186beb09415"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "db1fffd0822d7a4d7f3d28e761310f7c634ecf2a7d5e9fffbc7ec6f5943da5b7",
-      "after_sha256": "e32b5ee34e6b1f97dadcc512e2ec90d250d9c68028f1ea7af0c828ea26572f3c",
+      "before_sha256": "e32b5ee34e6b1f97dadcc512e2ec90d250d9c68028f1ea7af0c828ea26572f3c",
+      "after_sha256": "94ede2761acd62511e32f41946fca38e480b2becc3defa71c8da54bb2aaa5cb4",
       "owners": {
         "@document": {
-          "before": "db1fffd0822d7a4d7f3d28e761310f7c634ecf2a7d5e9fffbc7ec6f5943da5b7",
-          "after": "e32b5ee34e6b1f97dadcc512e2ec90d250d9c68028f1ea7af0c828ea26572f3c"
+          "before": "e32b5ee34e6b1f97dadcc512e2ec90d250d9c68028f1ea7af0c828ea26572f3c",
+          "after": "94ede2761acd62511e32f41946fca38e480b2becc3defa71c8da54bb2aaa5cb4"
         }
       }
     },
     "conformance/typescript/src/contract.ts": {
-      "before_sha256": "fd52c889e42af85349de1ae9767f2bb254525556beb338ea43f0d25536b15c01",
-      "after_sha256": "d91cb60c7344320e747807407c469957f7890e04e56c09d8d626d22ddd4980d1",
+      "before_sha256": "d91cb60c7344320e747807407c469957f7890e04e56c09d8d626d22ddd4980d1",
+      "after_sha256": "8930a53cb8316470af08e2d6d057f651c53f7829222fe6f9a5a4d211ecd70dbb",
       "owners": {
         "@document": {
-          "before": "fd52c889e42af85349de1ae9767f2bb254525556beb338ea43f0d25536b15c01",
-          "after": "d91cb60c7344320e747807407c469957f7890e04e56c09d8d626d22ddd4980d1"
+          "before": "d91cb60c7344320e747807407c469957f7890e04e56c09d8d626d22ddd4980d1",
+          "after": "8930a53cb8316470af08e2d6d057f651c53f7829222fe6f9a5a4d211ecd70dbb"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "3dcd6629910a9548ed169ea4fe637ac43309b12eddb4a4d1befdffe129139c8c",
-      "after_sha256": "cc78eacbc80fcbfbc91abe8f607d9952e0a3a92444f105e2a3904268825019c1",
+      "before_sha256": "cc78eacbc80fcbfbc91abe8f607d9952e0a3a92444f105e2a3904268825019c1",
+      "after_sha256": "d136a1d9dc9d65e0c3c67b76b9a126c0b18a02cea151319e5dc3303abb32e15e",
       "owners": {
         "@document": {
-          "before": "3dcd6629910a9548ed169ea4fe637ac43309b12eddb4a4d1befdffe129139c8c",
-          "after": "cc78eacbc80fcbfbc91abe8f607d9952e0a3a92444f105e2a3904268825019c1"
+          "before": "cc78eacbc80fcbfbc91abe8f607d9952e0a3a92444f105e2a3904268825019c1",
+          "after": "d136a1d9dc9d65e0c3c67b76b9a126c0b18a02cea151319e5dc3303abb32e15e"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "7d8630e8153c3870a6325ecf43bbc66247f9cbf7fff7bea73388ee2ceb936acf",
-      "after_sha256": "d633bc73abbee411ce354b225fd57b4339225e0e2d5bcd1484a5d9689bb36d86",
+      "before_sha256": "d633bc73abbee411ce354b225fd57b4339225e0e2d5bcd1484a5d9689bb36d86",
+      "after_sha256": "0ed22c583963f1cf2b5f1c609aa24c9461f1e466c52a8379f4d511a1a98d59d7",
       "owners": {
         "@document": {
-          "before": "7d8630e8153c3870a6325ecf43bbc66247f9cbf7fff7bea73388ee2ceb936acf",
-          "after": "d633bc73abbee411ce354b225fd57b4339225e0e2d5bcd1484a5d9689bb36d86"
+          "before": "d633bc73abbee411ce354b225fd57b4339225e0e2d5bcd1484a5d9689bb36d86",
+          "after": "0ed22c583963f1cf2b5f1c609aa24c9461f1e466c52a8379f4d511a1a98d59d7"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "92d97b9790feae1380c196107d248c29aa33b6c596cc858c626ad3920910094e",
-      "after_sha256": "a0744d220c40b869c9f86afd11c50ae094fabea0013cd4b63c2a450f020ad120",
+      "before_sha256": "a0744d220c40b869c9f86afd11c50ae094fabea0013cd4b63c2a450f020ad120",
+      "after_sha256": "c118b0c1125dd98629c0050fc8dd4da19b51c3d47a465da32d5ea235db67c528",
       "owners": {
         "@document": {
-          "before": "92d97b9790feae1380c196107d248c29aa33b6c596cc858c626ad3920910094e",
-          "after": "a0744d220c40b869c9f86afd11c50ae094fabea0013cd4b63c2a450f020ad120"
+          "before": "a0744d220c40b869c9f86afd11c50ae094fabea0013cd4b63c2a450f020ad120",
+          "after": "c118b0c1125dd98629c0050fc8dd4da19b51c3d47a465da32d5ea235db67c528"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "76d46afc2cb46adcbd272ee0e8ff7de1be1498d96cc0d20dd69194c1b42cb7a5",
-      "after_sha256": "3a77ee4b1760ed06c79395c3f70376ce7db83138d796f0effbac3aa25cc7d426",
+      "before_sha256": "3a77ee4b1760ed06c79395c3f70376ce7db83138d796f0effbac3aa25cc7d426",
+      "after_sha256": "ae45bfaa3fe285983ca5fbffabb0ecdb1141c1508aaf9cdd4b1c6199a513d51d",
       "owners": {
         "@document": {
-          "before": "76d46afc2cb46adcbd272ee0e8ff7de1be1498d96cc0d20dd69194c1b42cb7a5",
-          "after": "3a77ee4b1760ed06c79395c3f70376ce7db83138d796f0effbac3aa25cc7d426"
+          "before": "3a77ee4b1760ed06c79395c3f70376ce7db83138d796f0effbac3aa25cc7d426",
+          "after": "ae45bfaa3fe285983ca5fbffabb0ecdb1141c1508aaf9cdd4b1c6199a513d51d"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "b81ce646cfaa45eb46f1ed0083b5ac5f6f3ab5b0b508f8809f8f2c0fe9d0c931",
-      "after_sha256": "41f5d31a9fe54b989438fd103839da058911ce50709c4c939447de19a1bd05f4",
+      "before_sha256": "41f5d31a9fe54b989438fd103839da058911ce50709c4c939447de19a1bd05f4",
+      "after_sha256": "ad5ec2e9b6483ee35509744cb425cdf7ed0286b018a0d66fcc9b41afe54b871a",
       "owners": {
         "@document": {
-          "before": "b81ce646cfaa45eb46f1ed0083b5ac5f6f3ab5b0b508f8809f8f2c0fe9d0c931",
-          "after": "41f5d31a9fe54b989438fd103839da058911ce50709c4c939447de19a1bd05f4"
+          "before": "41f5d31a9fe54b989438fd103839da058911ce50709c4c939447de19a1bd05f4",
+          "after": "ad5ec2e9b6483ee35509744cb425cdf7ed0286b018a0d66fcc9b41afe54b871a"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "dcb1f225b882254a98df39cd76c60ebc7cc9ea2310bc131dacd0a0ce5023d721",
-      "after_sha256": "52ee7dbce2677265e2a40c6c511fe97a4551bb16aa3574c1e00d991db17b4754",
+      "before_sha256": "52ee7dbce2677265e2a40c6c511fe97a4551bb16aa3574c1e00d991db17b4754",
+      "after_sha256": "17fd08a51d65421402c446550a52b3a12dd601304bd30b469927e44c1920afc3",
       "owners": {
         "@document": {
-          "before": "dcb1f225b882254a98df39cd76c60ebc7cc9ea2310bc131dacd0a0ce5023d721",
-          "after": "52ee7dbce2677265e2a40c6c511fe97a4551bb16aa3574c1e00d991db17b4754"
+          "before": "52ee7dbce2677265e2a40c6c511fe97a4551bb16aa3574c1e00d991db17b4754",
+          "after": "17fd08a51d65421402c446550a52b3a12dd601304bd30b469927e44c1920afc3"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "5b2a317b6dd7a5aa0c2ac4d1e7fea2e11bad1e587015961886d38dc5f3461363",
-      "after_sha256": "00197e93574a89d1417b0c933ebe53688dac9a370bf0c79c9799416505a62c73",
+      "before_sha256": "00197e93574a89d1417b0c933ebe53688dac9a370bf0c79c9799416505a62c73",
+      "after_sha256": "f7b96359dc1027660af653673222bd9281d3c12256f18c1ffada1034f9255117",
       "owners": {
         "@document": {
-          "before": "5b2a317b6dd7a5aa0c2ac4d1e7fea2e11bad1e587015961886d38dc5f3461363",
-          "after": "00197e93574a89d1417b0c933ebe53688dac9a370bf0c79c9799416505a62c73"
+          "before": "00197e93574a89d1417b0c933ebe53688dac9a370bf0c79c9799416505a62c73",
+          "after": "f7b96359dc1027660af653673222bd9281d3c12256f18c1ffada1034f9255117"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "9a4d0e3b6fa73c69c194238fa15b057bc52ae835f3db769796dbaf10c329ecc1",
-      "after_sha256": "adcbb328477e7ccab90e47ffce04691bfe9b8ff4fc1cc76eb18870f7aa76c8f9",
+      "before_sha256": "adcbb328477e7ccab90e47ffce04691bfe9b8ff4fc1cc76eb18870f7aa76c8f9",
+      "after_sha256": "ecf8af1c10fb7a11ae8059bfe09198ea57dd8ffddeb4a86dde4329f29c03eb38",
       "owners": {
         "@document": {
-          "before": "9a4d0e3b6fa73c69c194238fa15b057bc52ae835f3db769796dbaf10c329ecc1",
-          "after": "adcbb328477e7ccab90e47ffce04691bfe9b8ff4fc1cc76eb18870f7aa76c8f9"
+          "before": "adcbb328477e7ccab90e47ffce04691bfe9b8ff4fc1cc76eb18870f7aa76c8f9",
+          "after": "ecf8af1c10fb7a11ae8059bfe09198ea57dd8ffddeb4a86dde4329f29c03eb38"
         }
       }
     },
-    "contracts/migrations/44.3.25-to-44.3.26.md": {
+    "contracts/migrations/44.3.26-to-44.3.27.md": {
       "before_sha256": null,
-      "after_sha256": "eb57101b9e8b5e5f77a4275869988fb0d6648b5aca4948ebb6e255ae2402bc3b",
+      "after_sha256": "5fe1233d1a54f586a6c08203a271545a3964be3779a935a890f960b6409f478c",
       "owners": {
         "@document": {
           "before": null,
-          "after": "eb57101b9e8b5e5f77a4275869988fb0d6648b5aca4948ebb6e255ae2402bc3b"
+          "after": "5fe1233d1a54f586a6c08203a271545a3964be3779a935a890f960b6409f478c"
         }
       }
     },
     "contracts/openapi.yaml": {
-      "before_sha256": "07a63fd1d5dff3e031e5fa964132b2de222b7ae61458c655b0ffb2e287458b95",
-      "after_sha256": "08f6eb614ddfaf4757a5d0274648998d78c55970a017e9d55011ed4bf66b39f9",
+      "before_sha256": "08f6eb614ddfaf4757a5d0274648998d78c55970a017e9d55011ed4bf66b39f9",
+      "after_sha256": "0354e04b9bb9c27eddd2f9c88ead266da4951a614388dc265409ee69d525a81b",
       "owners": {
         "@document": {
-          "before": "07a63fd1d5dff3e031e5fa964132b2de222b7ae61458c655b0ffb2e287458b95",
-          "after": "08f6eb614ddfaf4757a5d0274648998d78c55970a017e9d55011ed4bf66b39f9"
-        }
-      }
-    },
-    "data/source_audits/d04/assertion-exceptions.json": {
-      "before_sha256": null,
-      "after_sha256": "873f4432539b25c7693df12ebf74cfa00fb7f388ebc3e50aefd20d0a85880e61",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "873f4432539b25c7693df12ebf74cfa00fb7f388ebc3e50aefd20d0a85880e61"
-        }
-      }
-    },
-    "data/source_audits/d04/baseline-phase10q-transports.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "f3eee694f8695c3eb6bd31d1f85f573ee2c5522bd0f32c43e85ca876a26687d6",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "f3eee694f8695c3eb6bd31d1f85f573ee2c5522bd0f32c43e85ca876a26687d6"
-        }
-      }
-    },
-    "data/source_audits/order135/current-bindings.json": {
-      "before_sha256": "f0030d292784ed43b45bafdee4a62a4b525984ecda9e845cf72f4562cb0a9abc",
-      "after_sha256": "f171ed97c0858c4744efe797dd5669d91d5547015eedd0d1e78b742dfd79da44",
-      "owners": {
-        "@document": {
-          "before": "f0030d292784ed43b45bafdee4a62a4b525984ecda9e845cf72f4562cb0a9abc",
-          "after": "f171ed97c0858c4744efe797dd5669d91d5547015eedd0d1e78b742dfd79da44"
+          "before": "08f6eb614ddfaf4757a5d0274648998d78c55970a017e9d55011ed4bf66b39f9",
+          "after": "0354e04b9bb9c27eddd2f9c88ead266da4951a614388dc265409ee69d525a81b"
         }
       }
     },
     "data/source_audits/order135/current-inventory.json": {
-      "before_sha256": "86cb7efe11ac4fbde6ea6dc1059b172d6fcabe77353c0051f54602893bb09422",
-      "after_sha256": "fa6e408ec1e4a493bf1c67b7e573f3f12b94538f5290586c0b9b5deeaff25df7",
+      "before_sha256": "fa6e408ec1e4a493bf1c67b7e573f3f12b94538f5290586c0b9b5deeaff25df7",
+      "after_sha256": "92c92af1129c3cf52dfd2a5c0be8769f8e88e8cbc180dad3b1cd0ce3c4a186c8",
       "owners": {
         "@document": {
-          "before": "86cb7efe11ac4fbde6ea6dc1059b172d6fcabe77353c0051f54602893bb09422",
-          "after": "fa6e408ec1e4a493bf1c67b7e573f3f12b94538f5290586c0b9b5deeaff25df7"
+          "before": "fa6e408ec1e4a493bf1c67b7e573f3f12b94538f5290586c0b9b5deeaff25df7",
+          "after": "92c92af1129c3cf52dfd2a5c0be8769f8e88e8cbc180dad3b1cd0ce3c4a186c8"
         }
       }
     },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "9d5fd95a9e0c1176857b51161aa0b3f556b0ac0f6de070a447465d57928a1dc9",
-      "after_sha256": "cf45472dbf6c4e4c98ed5f44d06e22cd685e55afb63bb19c5d5df01dd5dccd57",
+    "data/source_audits/physical-history-restore/baseline-off-battlefield-command-tests.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "877f50031cc5fc93a3a8adb2f12efdd08bfca48259d8161ee306aae6e5c53cc6",
       "owners": {
         "@document": {
-          "before": "9d5fd95a9e0c1176857b51161aa0b3f556b0ac0f6de070a447465d57928a1dc9",
-          "after": "cf45472dbf6c4e4c98ed5f44d06e22cd685e55afb63bb19c5d5df01dd5dccd57"
+          "before": null,
+          "after": "877f50031cc5fc93a3a8adb2f12efdd08bfca48259d8161ee306aae6e5c53cc6"
+        }
+      }
+    },
+    "data/source_audits/physical-history-restore/baseline-physical-authority.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "7df434b15f175cc8486dbc765a7badc3f6c2ff7b6d1fab54bf72419c9269ff57",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "7df434b15f175cc8486dbc765a7badc3f6c2ff7b6d1fab54bf72419c9269ff57"
+        }
+      }
+    },
+    "data/source_audits/physical-history-restore/historical-inputs.json": {
+      "before_sha256": null,
+      "after_sha256": "c9c4030a4b06bf684600ddb1741ca769da40cf29bc90196ee40e3d0fe09f60f2",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c9c4030a4b06bf684600ddb1741ca769da40cf29bc90196ee40e3d0fe09f60f2"
+        }
+      }
+    },
+    "data/source_audits/physical-history-restore/provenance.json": {
+      "before_sha256": null,
+      "after_sha256": "b7956aebeb21ea6e2888508fe2c63e8f294f8eb20ad07a8500189371aa2e8cb9",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b7956aebeb21ea6e2888508fe2c63e8f294f8eb20ad07a8500189371aa2e8cb9"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "7f0cb985c6e2bee50aa0a4687ba63d2a56468e7f515cd5b6a4a9a5d55a7fa5ab",
-      "after_sha256": "1ff6b72250fdd76aa72840df8cf50b04c1ef1490e7dca900391e2948daefb035",
+      "before_sha256": "1ff6b72250fdd76aa72840df8cf50b04c1ef1490e7dca900391e2948daefb035",
+      "after_sha256": "55bb7d6cfd40da4366feab8eaaf145374ab81dec2dd535847c4b69800c9699b1",
       "owners": {
         "@document": {
-          "before": "7f0cb985c6e2bee50aa0a4687ba63d2a56468e7f515cd5b6a4a9a5d55a7fa5ab",
-          "after": "1ff6b72250fdd76aa72840df8cf50b04c1ef1490e7dca900391e2948daefb035"
+          "before": "1ff6b72250fdd76aa72840df8cf50b04c1ef1490e7dca900391e2948daefb035",
+          "after": "55bb7d6cfd40da4366feab8eaaf145374ab81dec2dd535847c4b69800c9699b1"
         }
       }
     },
-    "docs/D04_COMBAT_BATTLE_SHOCK_SCOPE.md": {
+    "docs/PHYSICAL_HISTORY_SAVE_RESTORE_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "fc3efbc7cc94afe119dd8155d1325c8a85076eaba2b9e792a20e095a33e1681f",
+      "after_sha256": "a6eb0a27b59d5c1a9610246b823d184f9c429ee0d47c4f22979b7d3a4f3ec931",
       "owners": {
         "@document": {
           "before": null,
-          "after": "fc3efbc7cc94afe119dd8155d1325c8a85076eaba2b9e792a20e095a33e1681f"
-        }
-      }
-    },
-    "docs/performance/policy-v3/d04-rule-semantics.json": {
-      "before_sha256": null,
-      "after_sha256": "0509d995b51405d291d332cc74ee5e2ab43a93452c6fa407a830a307194f362d",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "0509d995b51405d291d332cc74ee5e2ab43a93452c6fa407a830a307194f362d"
+          "after": "a6eb0a27b59d5c1a9610246b823d184f9c429ee0d47c4f22979b7d3a4f3ec931"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "32248a61ca508ec778133ee90f77ed57d3163b242e0a2068f5800541624476a9",
-      "after_sha256": "78ca6111ef2e5f3fdbff9f34dee43df1519ea0ecd246b3d9871fe8d522b9bf2b",
+      "before_sha256": "78ca6111ef2e5f3fdbff9f34dee43df1519ea0ecd246b3d9871fe8d522b9bf2b",
+      "after_sha256": "0c4fa7422eea6dbf1b793b52f83f2b135b1452bc9101f3f0823c78b0967ac06b",
       "owners": {
         "@document": {
-          "before": "32248a61ca508ec778133ee90f77ed57d3163b242e0a2068f5800541624476a9",
-          "after": "78ca6111ef2e5f3fdbff9f34dee43df1519ea0ecd246b3d9871fe8d522b9bf2b"
+          "before": "78ca6111ef2e5f3fdbff9f34dee43df1519ea0ecd246b3d9871fe8d522b9bf2b",
+          "after": "0c4fa7422eea6dbf1b793b52f83f2b135b1452bc9101f3f0823c78b0967ac06b"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "6dbfbfec0aa46542b38d3f062d23ba1a3beb910c3d4c75e5086b262118664e83",
-      "after_sha256": "73e44a96d604e1e5e7aebfb1cfef9c450cd58441d7d82e129b8f97538e042192",
+      "before_sha256": "73e44a96d604e1e5e7aebfb1cfef9c450cd58441d7d82e129b8f97538e042192",
+      "after_sha256": "15c4a53279fcae9d2a9feedde48a0a600ab0bd7634a9dbc8c66ae5273309f86c",
       "owners": {
         "@document": {
-          "before": "6dbfbfec0aa46542b38d3f062d23ba1a3beb910c3d4c75e5086b262118664e83",
-          "after": "73e44a96d604e1e5e7aebfb1cfef9c450cd58441d7d82e129b8f97538e042192"
+          "before": "73e44a96d604e1e5e7aebfb1cfef9c450cd58441d7d82e129b8f97538e042192",
+          "after": "15c4a53279fcae9d2a9feedde48a0a600ab0bd7634a9dbc8c66ae5273309f86c"
         }
       }
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
-      "before_sha256": "d6c78ae7fef60ac04f57070edc4831850cde5566407ff3ef0583100d3c2694d7",
-      "after_sha256": "7f0a8c746da24870fec056754a693c39fd5d0ccb7aeedc68a90d76162c5d9a5d",
+      "before_sha256": "7f0a8c746da24870fec056754a693c39fd5d0ccb7aeedc68a90d76162c5d9a5d",
+      "after_sha256": "1b09773e7952d27f348c0c42deba7235c387b15042582e958d54e42e8d36c8a0",
       "owners": {
         "@module": {
-          "before": "cc59f5bca34a2f1174633d08dcb98f47905a7f3d859e3437b290b92882251e68",
-          "after": "cb011ce631bc2b646a5bcb24f1fc68c105544dd87f25003a1a1b064cfa4d6155"
+          "before": "cb011ce631bc2b646a5bcb24f1fc68c105544dd87f25003a1a1b064cfa4d6155",
+          "after": "432a664e3732b3d812bf595a9b1555b70037424f1bf0d0d7bd2a0f4de7442618"
         }
       }
     },
-    "src/warhammer40k_core/engine/battle_shock_state_history.py": {
-      "before_sha256": "a79b5c1b3275b28097c89c0bf272fb62fb59079e61b6f14f21c8bd13464a4827",
-      "after_sha256": "444a26cebf5e29e089f85fefff98cd72b253ae8c3bd5c7faa10bc8e548cfc018",
+    "src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py": {
+      "before_sha256": "7df434b15f175cc8486dbc765a7badc3f6c2ff7b6d1fab54bf72419c9269ff57",
+      "after_sha256": "f286f1f5b07aaa92a10d7437af88626af3656a4373797384baba106379c20bcd",
       "owners": {
-        "_replay_battle_shock_state_until": {
-          "before": "e5ed2d61acb9805405399727add1a1958853556fa47fd9cae21b42b45cef00be",
-          "after": "897402d5c1355325de0be0cdfd3a6dc98bcd5e6984759453aa3b5272ccb18c42"
+        "@module": {
+          "before": "ec9194526ef4920cb9a9316531ae0dccf1ec74bb8a05e97b76dce3502dcd6bdd",
+          "after": "7359499405a8b635885c4b4167a158d2babd6726fc519adaa7db498b26aa9698"
         },
-        "validate_battle_shock_state_history": {
-          "before": "3269a7ac9a005df48f8ee08799a67984064a8df6ad6298e97810c1e75e11fe14",
-          "after": "4b61c6677661a5406ba124add2c1301892143c89e8d6947d2b08b458bd3c7fb0"
+        "_authenticated_scoring_commit_checkpoint": {
+          "before": "d33c543e5f37eb6145482012686a741234ba3f285dfb99e8b487e4c90c9428a5",
+          "after": null
+        },
+        "_forward_scoring_commit_anchor_or_none": {
+          "before": "96939dd45cd3e4daf6bed9a7605bc6f95dd745d5eb35b937d60ac901dbaeaed6",
+          "after": "5b3f781d3ea85d64316b642bad02dba6e8b8ec494e2e85f491c3923f98ef14d5"
+        },
+        "_physical_authority_before_checkpoint": {
+          "before": "7aff7a476a2439f4ec70da3f7ba86ebb0ca2f6ecf93fea6289b4689708eb195a",
+          "after": "03f1e43e7541133f779d1d3a1aea7a78a5b73520f9e39f7872a343a481f7e941"
+        },
+        "_physical_authority_before_event": {
+          "before": "05e18ae7f87503c216b959eb586f543bc5fe5321c15cf3ea5e009dd5563b5ce2",
+          "after": "522c44eb2b2a52876697fecdae829d1e58758780e737ebae4d00445ce5977e40"
+        },
+        "physical_model_authority_before_event": {
+          "before": "ca4e478462cd27facb6a13d7577ef4bfebe56d90a4ff0b803f3bfa96244e8512",
+          "after": "6a4aa7f32f6dd6a986384d633df1a0b5bfcbddab9038bec25e8f552dcf1c1549"
+        },
+        "validate_primary_mission_boundary_physical_authority": {
+          "before": "088f4108c23104682fdf26400b7a91704bc5711600c6eb948ed02ddb8a097078",
+          "after": "63cb1568b173bc1ba85d084b1af678aa6ab3c7ca07408f45554a55690753d65e"
         }
       }
     },
-    "src/warhammer40k_core/engine/combat_disembark_battle_shock.py": {
+    "src/warhammer40k_core/engine/primary_scoring_physical_anchor.py": {
       "before_sha256": null,
-      "after_sha256": "a075b6f9a3174097b3f266e1bf498ce3614946a6f68631e86249761cad7b0370",
+      "after_sha256": "6e94331072f3a6d5fe41d4105255888e2e32f429c14f3488f85d598001f4f875",
       "owners": {
         "@module": {
           "before": null,
-          "after": "74b3d7eeeac10d2c15bfba6202b8480f16fa955983a91999603367c035f17bc5"
+          "after": "caf065e410d0ec938e0a45d3fbc497e6ba1bf0bbe6724f2507f3dd7cce964a0e"
         },
-        "_combat_disembark": {
+        "authenticated_scoring_commit_checkpoint": {
           "before": null,
-          "after": "2dddb8f88dc92035f0ed01605317250398f26c8072317e3ea45ce7525fb91ccd"
-        },
-        "_combat_hazard": {
-          "before": null,
-          "after": "02a4bbe61671a770b686a44ba2e0f3c2495dda462f893150d07b65e1f2e370d6"
-        },
-        "_object": {
-          "before": null,
-          "after": "9120496228999efc711c6f1f1c9bfcea3c90a3e9bd6362cf6f3bae1bd2c2f533"
-        },
-        "_occurrence_payload": {
-          "before": null,
-          "after": "bd19c0d56821826bcbbab0c048394f3f0a8aabd69c123f525dc4830e867290ac"
-        },
-        "_setup_source": {
-          "before": null,
-          "after": "f403c6f255026b700e148ffaae31964c940db6675700c9810bc540d0af9b19ea"
-        },
-        "complete_combat_disembark_battle_shock": {
-          "before": null,
-          "after": "0e00235319cef0a970ded0015fe456231201548a6a5e07e54006340949fa3d26"
-        },
-        "replay_combat_disembark_battle_shock": {
-          "before": null,
-          "after": "7adcd21f3988e281fedfd26d49d4589c7c24c0332268b898749b630306417a19"
-        },
-        "validate_combat_battle_shock_completions": {
-          "before": null,
-          "after": "981bd29696c3e0332ad93ff394d7bc0dd0369350f62971302da7a0f87a7a0dff"
+          "after": "ce9afffb9b9637716a0566a0778804af3a23abc34eafe62f20250b3b9cf05d5f"
         }
       }
     },
-    "src/warhammer40k_core/engine/lifecycle.py": {
-      "before_sha256": "3e79d50a4fcb5d04a7709e3a6f0943949151e4bf27d027efd9348ea8f7f66e05",
-      "after_sha256": "6bb0b8ab95e0f7b83e40f2d5db66f81e542fba7f20671c6be30c87617e06cd02",
-      "owners": {
-        "@module": {
-          "before": "10756b23b2aedf075ebdda6e2cf238709399951d72b0189d7347d7b0043a475d",
-          "after": "cae39349990a4d496e218b669ccebcc5cc59a5f36f1da8c7dc5d8df2b4eec2ea"
-        },
-        "GameLifecycle._apply_mortal_wound_resolution_decision": {
-          "before": "99f32a06ab88a5c043b7f51d96d52b5c32359ec495b0658dcd52859963489f28",
-          "after": "f72bd1b61fc95a5a8543381d7fa2c3945c957ab01d2e68e78ffacc999d166e8f"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/phases/movement_placement_proposals.py": {
-      "before_sha256": "1a2726b42125d68852e679744b91b1061a778de4ae6619aac8b45d3816a13f25",
-      "after_sha256": "fb73df45daf27364ce93f03c13e0174eadd44887938e9698c8a113d009814cb9",
-      "owners": {
-        "_apply_valid_combat_disembark": {
-          "before": "75e5724e8d74ee658d3208aa85947aa25e0eeca9c5e74e63a2a9f88a439ff764",
-          "after": "06ea7c293f449b49eaa0a6d398263dc8287c6c1ff861af11addf10ef41224503"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/phases/movement_rules_unit_disembark.py": {
-      "before_sha256": "952971570c651b56266c5cc41a1860ac1d9bc8ea40e15d8fcf11e446084daf88",
-      "after_sha256": "6a7db7d460fd0b3cb5e10e333e5ddb5b4fe7d54b926eaa94085f633ae6016571",
-      "owners": {
-        "_emit_rules_unit_combat_hazard_resolved": {
-          "before": "52a916b4ec7289e794f595a69aa2436c776a82d370f4d7c7be94b0918b1d3856",
-          "after": "30f67e58cf242773ef03ea9696381e1bb186194f21740ba1d2d2a5f9950cbb7f"
-        },
-        "apply_rules_unit_combat_disembark_feel_no_pain_decision": {
-          "before": "9e6222b1bfa9ede104ba62d443398940be2baeb30ca6f385bcbebdf6f034ba93",
-          "after": "93b778e75ab587987e9173da83233d570580e7c1838db8e0c52bba3e6cc35c4c"
-        },
-        "apply_rules_unit_combat_disembark_to_state": {
-          "before": "4640d18749748b2c9c7d9511f0f873b085517f8b340c33da1291a47895d99ab7",
-          "after": "a86e9c08f236c5ac85db8ca5d231cc1bef3493a6feb90a847bc031f0af1dd1d5"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/transport_disembark_state.py": {
-      "before_sha256": "2bf243711bdd79546202b82f457021f3ba4a480cb1561a99cff89ce555617a54",
-      "after_sha256": "3bda1dec36c962378f2d2fe81f2c714fdcf4bc8d771b0a2ff9a48779cea9ed1c",
-      "owners": {
-        "DisembarkedUnitState.for_mode": {
-          "before": "8f090ce42978ed08928d82f1de4fc6e65f2f4d5e873e3ad86be496a5066182e3",
-          "after": "6959c6bb1086e1b70bb1ade9bdb95af93be91b920d1a07a324ab67f383665730"
-        }
-      }
-    },
-    "tests/d04_combat_helpers.py": {
+    "tests/code_quality/test_physical_history_anchor_provenance.py": {
       "before_sha256": null,
-      "after_sha256": "6328073b4d6dce5dd39b0f173b697f23c7243f110762b4c61633ff33c8c71c99",
+      "after_sha256": "6127acc269ac2d374256e89950f21a0e48e00ab08082302734997e076555f963",
       "owners": {
         "@module": {
           "before": null,
-          "after": "d22587cb3f5faafff28fe5fee5ac99f0c9e34df13f944ae3f57136b8af01e0d7"
+          "after": "71b3d6c384f8f23c181e314e7f1ce5c2cfe69365dac10e476eec99948ed3dfb7"
         },
-        "canonical_attached_cargo_config": {
+        "_functions": {
           "before": null,
-          "after": "2eb120ffd8f2700d25a0a0211ac9dc2fe3ad3f538d61e06f9ace541a8696dcd1"
+          "after": "692d5130b555282b2d560b9652dfae15eac7154cb37bdeecb1813ee6c1066c48"
         },
-        "canonical_cargo_proposal": {
+        "test_prior_command_history_regression_bodies_are_preserved": {
           "before": null,
-          "after": "b1d504ae709558b5c7d95f453cd0cbbca1b1f4547b4b32057eb2128d4abb3fdc"
+          "after": "d4e5457da672385028c1eb50b6091c3d561395ed5b94b65dc99fa18369f2b06c"
         },
-        "canonical_mob_cargo_config": {
+        "test_scoring_anchor_extraction_preserves_authentication_body_and_archive_hashes": {
           "before": null,
-          "after": "f41ed59de8ada598f42e3189c7e8b10de884d236055e6dcf721cc1d80740015e"
-        },
-        "combat_proposal": {
-          "before": null,
-          "after": "601eb608c15c60cb5959b15e8d14149c8938256fe457c8faffe3dd57b0b92d76"
-        },
-        "combat_session": {
-          "before": null,
-          "after": "91b02488a4881baa40c2a69b45b5ca33006cd02a59a1f13ddb2ccb8ad28ed92c"
-        },
-        "finish_to_next_own_movement": {
-          "before": null,
-          "after": "f017eff0544e55cc0c548e470f7ce4353c3f0aee6bc55b8442fbb8a2fbe6d67c"
+          "after": "ec55a51a5a430b47bf1c287ecd658d6e272cacdded5559f4ad023375c571dedb"
         }
       }
     },
-    "tests/unit/test_d04_combat_battle_shock.py": {
+    "tests/integration/test_off_battlefield_command_battle_shock.py": {
+      "before_sha256": "877f50031cc5fc93a3a8adb2f12efdd08bfca48259d8161ee306aae6e5c53cc6",
+      "after_sha256": "d58f788f6f9a80403ff494750ff22572f9d20b091e7d2ce05e66c9c13b9bf0aa",
+      "owners": {
+        "@module": {
+          "before": "6a202f6cd17be214d3531ec580eaa5facaba0a9b8afae5676c3956ab8246e32c",
+          "after": "b312cc85fde0d0a952e53f25793c3fbcacbb92b4d86af1ac2f21d842f8daea88"
+        },
+        "assert_replayed": {
+          "before": null,
+          "after": "2222aef196f10dee82968e4eed558a833c9ddca5a3b4ace9450f70a05b644e15"
+        },
+        "assert_session_equivalent": {
+          "before": null,
+          "after": "fc866d694ac36f637adb910a829fe1560de5a8931bc02e8f3755364021edf4fb"
+        },
+        "complete_movement": {
+          "before": null,
+          "after": "d2c787716f177c014b87bad50c7ddd777f595e86fdc34a5e87a606987869f405"
+        },
+        "test_prior_embarked_checkpoint_restores_pending_and_completed_native_movement": {
+          "before": null,
+          "after": "5479c59232732763e7c02da21820d832565bf53cc786b6b7a017ed3b109215dd"
+        }
+      }
+    },
+    "tests/physical_history_transport_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "a7aaa6b03f56818134ed7b78bf157d794ab404b57061c960014ce52757755180",
+      "after_sha256": "01a65c0d049e48994c9593d854209602fdbe76e00dcfe59ae7cbf66c722b3fc7",
       "owners": {
         "@module": {
           "before": null,
-          "after": "a4611a7d0c189fb211cb293fca361d47b16dc5d17097c18af11bb8c85c72938c"
+          "after": "87120bcd1d1ebc86ac2c2d3568f252828bb52947bc01ead1b71c6b40d3ae2fc2"
         },
-        "test_native_attached_combat_uses_one_identity_and_shared_status_is_idempotent": {
+        "PhysicalHistoryScene": {
           "before": null,
-          "after": "ea39564486944df5e70f17ce95a80d5af9e6f48b036557a8b72ea97795f72f6e"
+          "after": "bcb3b763ef9a930b91eee60b941471205d3c399310ed44e03d146139a4fc200b"
         },
-        "test_native_combat_all_killed_cargo_records_no_surviving_shock": {
+        "PhysicalHistoryScene.handle": {
           "before": null,
-          "after": "98098fe324642c917714046611758e1177924785851f3598cc3d641827b4315b"
+          "after": "2b7e5820c2656bdd40dd6b3165676f03fd3ddb1ec12917bf122d0cbc4295b8fd"
         },
-        "test_native_combat_malformed_source_is_atomic_and_retry_applies_once": {
+        "PhysicalHistoryScene.reach_later_move": {
           "before": null,
-          "after": "f6185526487e0147bf038852241a01ed6c5fed713c02824b5482ba2e2757b627"
+          "after": "1b68c6ed161e6b4cb916abd3de90beb4f9f07e6f6982a9145e68576074e67a2c"
         },
-        "test_native_combat_member_oc_and_normal_objective_resolver_use_shared_status": {
+        "choose": {
           "before": null,
-          "after": "70b3560e9ffe5a994f476b713d9b0ae38b89030a9485f2cea6755f175c219960"
+          "after": "9e27ea1588f43a384d0c10583821314ddd08300843d262ad98a07f32ec455751"
         },
-        "test_native_combat_persists_until_one_required_own_command_test": {
+        "default_choice": {
           "before": null,
-          "after": "af0a076f465a8bf3a87c0c890f5843c395cfc39d624ef2d0d5a472227403a39c"
+          "after": "295fb137c6afe4af3ef24883d9abc6e08b47a55ed44b1afe747140303fc43564"
         },
-        "test_native_combat_restore_requires_the_exact_direct_status_occurrence": {
+        "move_payload": {
           "before": null,
-          "after": "5dd4e57dfb63b3f690d1f4a57d65ddb0dc347145131415e59d2e5dd9a41196c4"
+          "after": "81976a1a7f99b8160422ae8d2cc11316897c3ce62d3758be7b4149bc27058de3"
         },
-        "test_native_combat_survivor_enters_shared_shock_without_test_and_restores": {
+        "physical_history_config": {
           "before": null,
-          "after": "778d4e11d0dc6f4c43ea7953717f85284ee7db491d4bcfadd69bcd9fe70da88d"
+          "after": "f498b3428277be61fd5c094930ab4dcab6be5869c184ff520afdf22a81dab3a8"
         },
-        "test_native_ground_tactical_remains_unshocked_positive": {
+        "propose": {
           "before": null,
-          "after": "f719cdc497396762d353599202f29d310a267e8bd8f8019e24eb774cede8dccb"
+          "after": "bc9f1df39fb2470173f29fe08758406ba8ce5836c8daecbf7f193da9b5ef0e38"
+        },
+        "round2_movement_scene": {
+          "before": null,
+          "after": "af7a5d917c70afb152a18a9d041174d064550c450504377f943bd83e62037cec"
+        },
+        "state_of": {
+          "before": null,
+          "after": "567653c717ce6efd60212d6c2ad46a18a86214e6eb9b4391fc83d4b2a7c79443"
         }
       }
     },
-    "tests/unit/test_order135_combat_tactical_feasibility.py": {
-      "before_sha256": "d79b971393bba82fe49926333648e3947aedfac5ec865816163e9503d551114f",
-      "after_sha256": "75657e9a1fcf141259f8ba3a62e0f74b01ed848df026c400f3d07202b4cc969e",
-      "owners": {
-        "test_native_grouped_combat_pending_hazard_preserves_strict_context_and_replay": {
-          "before": "05f01f15c7615b0c30312b43ff0b3db40e7617038adb02e489d1b74441996d9d",
-          "after": "360b047c27fabf5eaf1ae81f273c598b5aea21b8214eb35ef4a53f3f1c1b0aab"
-        }
-      }
-    },
-    "tests/unit/test_phase10q_transports.py": {
-      "before_sha256": "f3eee694f8695c3eb6bd31d1f85f573ee2c5522bd0f32c43e85ca876a26687d6",
-      "after_sha256": "69392d9013a45e174a674d624925550150a40f5b993eda25c3da152e518c56a5",
-      "owners": {
-        "test_combat_disembark_rolls_hazard_for_each_model_and_round_trips": {
-          "before": "0015a18e9cb7f7bdfc87a3ea7526499a6858af3d4b4c33459e53643c171a04b8",
-          "after": "55cf692295370e66dda99f4f4362ed5c875fcc6c75c8b9034b914169900778b5"
-        },
-        "test_disembark_mode_status_pairs_are_fail_fast_and_round_trip": {
-          "before": "2082e8563fb5fc8aaa955a8c6a4d36a6d9bdaf2672836e592c022b882f6b2b24",
-          "after": "b7699da63e5320a6ee71f84fc75f23161f5d4e580df72d61c80274b8d995b5f3"
-        },
-        "test_movement_phase_combat_disembark_requires_tactical_impossible_evidence": {
-          "before": "41cd5eaf2b0748208ea83805197c3e837b1d9d593d49fcf03999aae5cd4bd2ed",
-          "after": "6aedfeaa77aa277da32b3a33ba3458febee80ca3feac8de82f7f5aee5fd4bbe4"
-        }
-      }
-    },
-    "tools/core_rules_order135_audit.py": {
-      "before_sha256": "756641b94bf6c2c5845968d734adcce90de3e5e5fc7ef20366e5430e41ff8076",
-      "after_sha256": "44e1a8b9d02ce29138025988d1665537da7371eef724e3fe9fa5484d85ccec7e",
-      "owners": {
-        "_d04_assertion_exception": {
-          "before": null,
-          "after": "87b24dd216e1c79f06b4ef3b1398f79c89dcad20f1d383f32721672c40219941"
-        },
-        "build": {
-          "before": "9767a7d70f385333cf370aee94b40df431da2baf407383ba3d0945a6ac139525",
-          "after": "7310bdce057cba9ea0188de438a7cc5b433534d99b157d1981fc6528892dfb00"
-        }
-      }
-    },
-    "tools/performance_policy.py": {
-      "before_sha256": "d0102426e4b04483736489699e2baddcb9027b11c1a6b18de4f823a84a6d07a6",
-      "after_sha256": "c2f9cddcfa9bebc2117ec6fdd74a0ff5453515d89910808dca113a534e5099d5",
+    "tools/core_rules_order97_history.py": {
+      "before_sha256": "07e35808d6ed43bd46a4a481c6557dbfb3c5ad2e3bf0badff10257633d698496",
+      "after_sha256": "a45267d5cd7565989d8f79c105b58f5ae2838637eaa97ff924dbb32a8ce0b8b2",
       "owners": {
         "@module": {
-          "before": "f75cf87c7839e89c0671d27ef588d3d0ba91dc4f53b84e71e69ccac091493619",
-          "after": "3a85392259ccbde45e59acccf3c759c75b4627158c08bb357a130fb792e6a867"
+          "before": "70784b2e2fc1cff99128704ad43787772f209cc4c74b55367f5b9da917591a14",
+          "after": "9f2d3ad4aefd9029e2fe7e4fa947b4bdd55ed8c692e769de669393b55ec7f62a"
         },
-        "_d04_smoke_operations": {
-          "before": null,
-          "after": "e9b4ebdb57aeae2dd7391d0f27e9f855aba28f2c5c6491631bee6496ecaeb268"
-        },
-        "validate_assessment": {
-          "before": "e792b5995f6c605d710f6597197365c9cbc29fed406e8f34bac73e69bd7577e8",
-          "after": "3ac72bfd9d7cc3c4d66f89b5f9571487c826a35bf47f1d0542d1846700cb608e"
+        "historical_evidence_path": {
+          "before": "0b90340a81b7abe1fc4258091108fabb8c786fdd861035d0b8407eeb57919216",
+          "after": "d51493eff2ce6fec77a6a283ea644a02d1f8e2d91b23b7ff24096de332d92b19"
         }
       }
     }
   },
   "rows": {
-    "conformance/typescript/src/contract.ts": {
-      "category": "rule_semantics",
-      "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "contracts/examples/persistence/session-persistence.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "contracts/examples/sessions/session-command-outcome.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "contracts/examples/sessions/session-command-started.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "contracts/examples/sessions/session-metadata-created.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "contracts/examples/support-profile-player-a-redacted.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "contracts/examples/support-profile-player-b-redacted.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "contracts/examples/support-profile.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "contracts/manifest.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "contracts/migrations/44.3.25-to-44.3.26.md": {
-      "category": "rule_semantics",
-      "operations": [
-        "d04-combat-regression-and-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "contracts/openapi.yaml": {
-      "category": "rule_semantics",
-      "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "data/source_audits/d04/assertion-exceptions.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "d04-combat-regression-and-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "data/source_audits/d04/baseline-phase10q-transports.py.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "d04-combat-regression-and-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "data/source_audits/order135/current-bindings.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "order135-current-source-audit"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "data/source_audits/order135/current-inventory.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "order135-current-source-audit"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "",
-      "unchanged_work": ""
-    },
-    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "",
-      "unchanged_work": ""
-    },
-    "docs/D04_COMBAT_BATTLE_SHOCK_SCOPE.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "",
-      "unchanged_work": ""
-    },
-    "docs/performance/policy-v3/d04-rule-semantics.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "",
-      "unchanged_work": ""
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "",
-      "unchanged_work": ""
-    },
-    "src/warhammer40k_core/_engine_build_manifest.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "source-record",
-        "order108-terrain-semantics",
-        "order109-unit-control-semantics",
-        "order110-action-battle-shock-semantics"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "src/warhammer40k_core/adapters/external_contract.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "contract-42-1-publication",
-        "order103-src-warhammer40k_core-adapters-external_contract",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order110-action-battle-shock-semantics",
-        "order114-embark-permissions",
-        "v963-snap-hit-semantics",
-        "order115-movement-permission",
-        "order116-movement-permission",
-        "order117-allocation-permission",
-        "order118-attack-source-lifetime",
-        "order120-ability-damage-classification",
-        "order121-command-abilities-timing",
-        "order122-default-effect-lifetimes",
-        "order123-datasheet-identity",
-        "order124-nested-conditions",
-        "order125-default-unit-subjects",
-        "order126-sequential-physical-movement",
-        "order127-redeploy-validation",
-        "order128-whole-model-setup",
-        "order129-flight-history",
-        "order130-model-mission-history",
-        "order131-objective-approach",
-        "order132-circular-containment",
-        "order133-keyword-number-identity",
-        "order134-conditional-deployment-restriction",
-        "order135-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "src/warhammer40k_core/engine/battle_shock_state_history.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "d04-combat-direct-status"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "src/warhammer40k_core/engine/combat_disembark_battle_shock.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "transport-rule-branch",
-        "d04-combat-direct-status"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "src/warhammer40k_core/engine/lifecycle.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order114-embark-permissions",
-        "order119-movement-source-permission",
-        "order121-command-abilities-timing",
-        "order135-gathered-attack-steps",
-        "d04-combat-lifecycle-continuation"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "src/warhammer40k_core/engine/phases/movement_placement_proposals.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "movement-rule-branch",
-        "order135-tactical-exclusion",
-        "d04-combat-direct-status"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "src/warhammer40k_core/engine/phases/movement_rules_unit_disembark.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "transport-rule-branch",
-        "movement-rule-branch",
-        "order135-tactical-exclusion",
-        "d04-combat-direct-status"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "src/warhammer40k_core/engine/transport_disembark_state.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "transport-rule-branch",
-        "d04-combat-direct-status"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "tests/d04_combat_helpers.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "d04-combat-regression-and-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "tests/unit/test_d04_combat_battle_shock.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "d04-combat-regression-and-source-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "tests/unit/test_order135_combat_tactical_feasibility.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order135-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "tests/unit/test_phase10q_transports.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order135-regressions"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "tools/core_rules_order135_audit.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order135-current-source-audit"
-      ],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "rule:18:18.04:1 block23 direct surviving Combat Battle-shock; rule:01:01.07:1 shared status consumers; rule:08:08.03:1 ordinary own Command failure retention and success clearing.",
-      "unchanged_work": "Tactical search, placement/damage/FNP algorithms, source admission, existing serializers and caches remain unchanged. Added required status occurrence and corresponding history branch use shared owners; no intended optimization or full-game certification. Current native survivor, pending, all-killed, attached, OC, Command and exact persistence/replay controls supplement the required unchanged smoke and live work/cache checks."
-    },
-    "tools/performance_policy.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "D04-only direct Combat status, causal replay and source lifetime correction; related current proof, contract and regression identities follow this bounded implementation. Independent review must judge every changed owner and this mapping.",
-      "source_obligation": "",
-      "unchanged_work": ""
-    },
     "ci/test_shards/durations.json": {
       "category": "measured_workload",
       "operations": [
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Mac JUnit profile; preserve original selection, gates and thresholds without any engine or test change.",
-      "source_obligation": "",
-      "unchanged_work": "Only measured timing metadata and distribution manifests change. Every executable, test, helper, controlling rule source, runtime resource, contract and original assertion remains byte-identical to reviewed TREE9d21."
+      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "measured_workload",
@@ -1290,9 +522,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Mac JUnit profile; preserve original selection, gates and thresholds without any engine or test change.",
-      "source_obligation": "",
-      "unchanged_work": "Only measured timing metadata and distribution manifests change. Every executable, test, helper, controlling rule source, runtime resource, contract and original assertion remains byte-identical to reviewed TREE9d21."
+      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "measured_workload",
@@ -1300,9 +532,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Mac JUnit profile; preserve original selection, gates and thresholds without any engine or test change.",
-      "source_obligation": "",
-      "unchanged_work": "Only measured timing metadata and distribution manifests change. Every executable, test, helper, controlling rule source, runtime resource, contract and original assertion remains byte-identical to reviewed TREE9d21."
+      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "measured_workload",
@@ -1310,9 +542,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Mac JUnit profile; preserve original selection, gates and thresholds without any engine or test change.",
-      "source_obligation": "",
-      "unchanged_work": "Only measured timing metadata and distribution manifests change. Every executable, test, helper, controlling rule source, runtime resource, contract and original assertion remains byte-identical to reviewed TREE9d21."
+      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "measured_workload",
@@ -1320,9 +552,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Mac JUnit profile; preserve original selection, gates and thresholds without any engine or test change.",
-      "source_obligation": "",
-      "unchanged_work": "Only measured timing metadata and distribution manifests change. Every executable, test, helper, controlling rule source, runtime resource, contract and original assertion remains byte-identical to reviewed TREE9d21."
+      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "measured_workload",
@@ -1330,9 +562,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Mac JUnit profile; preserve original selection, gates and thresholds without any engine or test change.",
-      "source_obligation": "",
-      "unchanged_work": "Only measured timing metadata and distribution manifests change. Every executable, test, helper, controlling rule source, runtime resource, contract and original assertion remains byte-identical to reviewed TREE9d21."
+      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "measured_workload",
@@ -1340,9 +572,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Mac JUnit profile; preserve original selection, gates and thresholds without any engine or test change.",
-      "source_obligation": "",
-      "unchanged_work": "Only measured timing metadata and distribution manifests change. Every executable, test, helper, controlling rule source, runtime resource, contract and original assertion remains byte-identical to reviewed TREE9d21."
+      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "measured_workload",
@@ -1350,9 +582,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Mac JUnit profile; preserve original selection, gates and thresholds without any engine or test change.",
-      "source_obligation": "",
-      "unchanged_work": "Only measured timing metadata and distribution manifests change. Every executable, test, helper, controlling rule source, runtime resource, contract and original assertion remains byte-identical to reviewed TREE9d21."
+      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "measured_workload",
@@ -1360,9 +592,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Mac JUnit profile; preserve original selection, gates and thresholds without any engine or test change.",
-      "source_obligation": "",
-      "unchanged_work": "Only measured timing metadata and distribution manifests change. Every executable, test, helper, controlling rule source, runtime resource, contract and original assertion remains byte-identical to reviewed TREE9d21."
+      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "measured_workload",
@@ -1370,9 +602,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Mac JUnit profile; preserve original selection, gates and thresholds without any engine or test change.",
-      "source_obligation": "",
-      "unchanged_work": "Only measured timing metadata and distribution manifests change. Every executable, test, helper, controlling rule source, runtime resource, contract and original assertion remains byte-identical to reviewed TREE9d21."
+      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "measured_workload",
@@ -1380,9 +612,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Mac JUnit profile; preserve original selection, gates and thresholds without any engine or test change.",
-      "source_obligation": "",
-      "unchanged_work": "Only measured timing metadata and distribution manifests change. Every executable, test, helper, controlling rule source, runtime resource, contract and original assertion remains byte-identical to reviewed TREE9d21."
+      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "measured_workload",
@@ -1390,9 +622,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Mac JUnit profile; preserve original selection, gates and thresholds without any engine or test change.",
-      "source_obligation": "",
-      "unchanged_work": "Only measured timing metadata and distribution manifests change. Every executable, test, helper, controlling rule source, runtime resource, contract and original assertion remains byte-identical to reviewed TREE9d21."
+      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "measured_workload",
@@ -1400,9 +632,271 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Mac JUnit profile; preserve original selection, gates and thresholds without any engine or test change.",
-      "source_obligation": "",
-      "unchanged_work": "Only measured timing metadata and distribution manifests change. Every executable, test, helper, controlling rule source, runtime resource, contract and original assertion remains byte-identical to reviewed TREE9d21."
+      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
+    },
+    "conformance/typescript/src/contract.ts": {
+      "category": "rule_semantics",
+      "operations": [
+        "contract-42-1-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "contract-42-1-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "contract-42-1-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "contract-42-1-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "contract-42-1-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "contract-42-1-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "contract-42-1-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "contract-42-1-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "contracts/manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "contract-42-1-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "contracts/migrations/44.3.26-to-44.3.27.md": {
+      "category": "rule_semantics",
+      "operations": [
+        "physical-history-restore-regression-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "contracts/openapi.yaml": {
+      "category": "rule_semantics",
+      "operations": [
+        "contract-42-1-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "data/source_audits/order135/current-inventory.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order135-current-source-audit"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "data/source_audits/physical-history-restore/baseline-off-battlefield-command-tests.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "physical-history-restore-regression-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "data/source_audits/physical-history-restore/baseline-physical-authority.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "physical-history-restore-regression-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "data/source_audits/physical-history-restore/historical-inputs.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "physical-history-restore-regression-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "data/source_audits/physical-history-restore/provenance.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "physical-history-restore-regression-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserved source/policy/test evidence for the separate physical-history prerequisite.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "docs/PHYSICAL_HISTORY_SAVE_RESTORE_SCOPE.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserved source/policy/test evidence for the separate physical-history prerequisite.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserved source/policy/test evidence for the separate physical-history prerequisite.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "src/warhammer40k_core/adapters/external_contract.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "contract-42-1-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "physical-history-preceding-scoring-anchor"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "src/warhammer40k_core/engine/primary_scoring_physical_anchor.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "physical-history-preceding-scoring-anchor"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "tests/code_quality/test_physical_history_anchor_provenance.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserved source/policy/test evidence for the separate physical-history prerequisite.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "tests/integration/test_off_battlefield_command_battle_shock.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "physical-history-restore-regression-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "tests/physical_history_transport_helpers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "physical-history-restore-regression-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+    },
+    "tools/core_rules_order97_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "shock-source-generation-and-audit"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
+      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
+      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
     }
   },
   "milestone": "ordinary",

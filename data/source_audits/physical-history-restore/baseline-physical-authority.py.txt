@@ -36,6 +36,9 @@ from warhammer40k_core.engine.movement_decision_authority import (
     movement_event_key,
     validated_embark_movement_completions,
 )
+from warhammer40k_core.engine.objective_control_record_authority import (
+    objective_control_record_hash,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_battlefield_departure import (
     PrimaryBattlefieldDepartureState,
@@ -54,11 +57,16 @@ from warhammer40k_core.engine.primary_mission_event_decision_authority import (
 from warhammer40k_core.engine.primary_mission_fight_on_death_physical_history import (
     PhysicalAuthorityState as _PhysicalAuthority,
 )
-from warhammer40k_core.engine.primary_scoring_commit_checkpoint import (
-    PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT,
+from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
+    PrimaryScoringBoundaryStatus,
 )
-from warhammer40k_core.engine.primary_scoring_physical_anchor import (
-    authenticated_scoring_commit_checkpoint,
+from warhammer40k_core.engine.primary_scoring_commit_checkpoint import (
+    PRIMARY_SCORING_COMMIT_BOUNDARY_KIND,
+    PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT,
+    primary_scoring_commit_checkpoint_from_events,
+)
+from warhammer40k_core.engine.primary_scoring_state_evidence import (
+    PrimaryScoringBoundaryKind,
 )
 from warhammer40k_core.engine.return_on_death import (
     RETURN_ON_DEATH_SET_BACK_UP_COMPLETED_EVENT_TYPE,
@@ -183,7 +191,6 @@ def physical_model_authority_before_event(
     departure_by_id = _primary_battlefield_departure_by_id(state=state)
     no_trigger_destroyed_departure_ids = _no_trigger_destroyed_departure_ids(state=state)
     before = _physical_authority_before_event(
-        state=state,
         event_records=event_records,
         event_index=event_index,
         expected_game_id=state.game_id,
@@ -344,7 +351,7 @@ def _forward_scoring_commit_anchor_or_none(
             return None
         if event.event_type != PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT:
             continue
-        checkpoint = authenticated_scoring_commit_checkpoint(
+        checkpoint = _authenticated_scoring_commit_checkpoint(
             state=state,
             event_records=event_records,
             anchor_index=anchor_index,
@@ -360,6 +367,95 @@ def _forward_scoring_commit_anchor_or_none(
             raise GameLifecycleError("Primary scoring-commit physical anchor inventory drifted.")
         return anchor_index, checkpoint, authority
     return None
+
+
+def _authenticated_scoring_commit_checkpoint(
+    *,
+    state: GameState,
+    event_records: tuple[EventRecord, ...],
+    anchor_index: int,
+) -> PrimaryMissionBoundaryCheckpoint:
+    event = event_records[anchor_index]
+    if event.event_id != f"event-{anchor_index + 1:06d}":
+        raise GameLifecycleError("Primary scoring-commit physical anchor event order drifted.")
+    if not isinstance(event.payload, dict):
+        raise GameLifecycleError("Primary scoring-commit physical anchor payload is invalid.")
+    raw_record_id = event.payload.get("objective_control_record_id")
+    raw_boundary_kind = event.payload.get("scoring_boundary_kind")
+    scoring_player_id = event.payload.get("scoring_player_id")
+    if type(scoring_player_id) is not str or scoring_player_id not in state.player_ids:
+        raise GameLifecycleError("Primary scoring-commit physical anchor player drifted.")
+    if type(raw_record_id) is not str or not raw_record_id:
+        raise GameLifecycleError(
+            "Primary scoring-commit physical anchor record identity is invalid."
+        )
+    if raw_boundary_kind not in {
+        PrimaryScoringBoundaryKind.ORDINARY.value,
+        PrimaryScoringBoundaryKind.END_OF_BATTLE.value,
+    }:
+        raise GameLifecycleError("Primary scoring-commit physical anchor boundary kind is invalid.")
+    boundary_kind = PrimaryScoringBoundaryKind(raw_boundary_kind)
+    bound_index, checkpoint = primary_scoring_commit_checkpoint_from_events(
+        event_records=event_records,
+        objective_control_record_id=raw_record_id,
+        scoring_boundary_kind=boundary_kind.value,
+        scoring_player_id=scoring_player_id,
+    )
+    if bound_index != anchor_index:
+        raise GameLifecycleError("Primary scoring-commit physical anchor occurrence drifted.")
+    records = tuple(
+        record for record in state.objective_control_records if record.record_id == raw_record_id
+    )
+    if len(records) != 1:
+        raise GameLifecycleError(
+            "Primary scoring-commit physical anchor Objective Control record drifted."
+        )
+    record = records[0]
+    evidences = tuple(
+        evidence
+        for evidence in state.primary_scoring_state_evidence_records
+        if evidence.objective_control_record_id == raw_record_id
+        and evidence.scoring_boundary_kind is boundary_kind
+        and evidence.scoring_player_id == scoring_player_id
+    )
+    lifecycles = tuple(
+        lifecycle
+        for lifecycle in state.primary_scoring_boundary_lifecycles
+        if lifecycle.objective_control_record_id == raw_record_id
+        and lifecycle.scoring_boundary_kind is boundary_kind
+        and lifecycle.scoring_player_id == scoring_player_id
+    )
+    if len(evidences) != 1 or len(lifecycles) != 1:
+        raise GameLifecycleError(
+            "Primary scoring-commit physical anchor retained authority drifted."
+        )
+    evidence = evidences[0]
+    lifecycle = lifecycles[0]
+    if (
+        lifecycle.status is not PrimaryScoringBoundaryStatus.RESOLVED
+        or lifecycle.scoring_commit_checkpoint_id != checkpoint.checkpoint_id
+        or lifecycle.scoring_commit_checkpoint_hash != checkpoint.checkpoint_hash
+        or evidence.scoring_commit_checkpoint_id != checkpoint.checkpoint_id
+        or evidence.scoring_commit_checkpoint_hash != checkpoint.checkpoint_hash
+        or evidence.objective_control_record_hash != objective_control_record_hash(record)
+    ):
+        raise GameLifecycleError("Primary scoring-commit physical anchor hash binding drifted.")
+    if (
+        checkpoint.boundary_kind != PRIMARY_SCORING_COMMIT_BOUNDARY_KIND
+        or checkpoint.game_id != record.game_id
+        or checkpoint.player_id != record.active_player_id
+        or checkpoint.active_player_id != record.active_player_id
+        or checkpoint.battle_round != record.battle_round
+        or checkpoint.phase != record.phase
+        or checkpoint.battlefield_id != record.battlefield_id
+        or evidence.game_id != record.game_id
+        or evidence.active_player_id != record.active_player_id
+        or evidence.battle_round != record.battle_round
+        or evidence.phase != record.phase
+        or evidence.battlefield_id != record.battlefield_id
+    ):
+        raise GameLifecycleError("Primary scoring-commit physical anchor context drifted.")
+    return checkpoint
 
 
 def primary_mission_model_placements_from_checkpoint(
@@ -465,7 +561,6 @@ def validate_primary_mission_boundary_physical_authority(
     if not initial_model_ids <= current_model_ids:
         raise GameLifecycleError("Primary mission initial model inventory drifted.")
     before = _physical_authority_before_checkpoint(
-        state=state,
         event_records=event_records,
         checkpoint_index=checkpoint_index,
         checkpoint=checkpoint,
@@ -685,7 +780,6 @@ def _apply_destroyed_transport_disembark_omitted_model_destruction(
 
 def _physical_authority_before_checkpoint(
     *,
-    state: GameState,
     event_records: tuple[EventRecord, ...],
     checkpoint_index: int,
     checkpoint: PrimaryMissionBoundaryCheckpoint,
@@ -699,7 +793,6 @@ def _physical_authority_before_checkpoint(
     embark_movement_completions: tuple[EmbarkMovementCompletion, ...],
 ) -> dict[str, _PhysicalAuthority]:
     return _physical_authority_before_event(
-        state=state,
         event_records=event_records,
         event_index=checkpoint_index,
         expected_game_id=checkpoint.game_id,
@@ -717,7 +810,6 @@ def _physical_authority_before_checkpoint(
 
 def _physical_authority_before_event(
     *,
-    state: GameState,
     event_records: tuple[EventRecord, ...],
     event_index: int,
     expected_game_id: str,
@@ -734,15 +826,7 @@ def _physical_authority_before_event(
     authority: dict[str, _PhysicalAuthority] = {}
     segment_start = 0
     for prior_index, event in enumerate(event_records[:event_index]):
-        if event.event_type == PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT:
-            prior_checkpoint = PrimaryMissionBoundaryCheckpoint.from_payload(event.payload)
-        elif event.event_type == PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT:
-            prior_checkpoint = authenticated_scoring_commit_checkpoint(
-                state=state,
-                event_records=event_records,
-                anchor_index=prior_index,
-            )
-        else:
+        if event.event_type != PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT:
             continue
         authority = _physical_authority_by_model(
             event_records[segment_start:prior_index],
@@ -755,6 +839,7 @@ def _physical_authority_before_event(
             no_trigger_destroyed_departure_ids=no_trigger_destroyed_departure_ids,
             embark_movement_completions=embark_movement_completions,
         )
+        prior_checkpoint = PrimaryMissionBoundaryCheckpoint.from_payload(event.payload)
         seeded = _checkpoint_authority(
             checkpoint=prior_checkpoint,
             expected_game_id=expected_game_id,
